@@ -1,11 +1,18 @@
 import React, { Component } from 'react';
-import { Row, Col, Modal, Button, FormGroup } from 'react-bootstrap';
-import DatePicker from "react-datepicker";
+import { Row, Col, Modal, Button, FormGroup, ButtonToolbar } from 'react-bootstrap';
+// import DatePicker from "react-datepicker";
+import DatePicker from "react-date-picker";
 import BaseComponent from '.././BaseComponent';
 import SideNav from '../common/side-nav/SideNav';
 import Footer from '../common/footer/Footer';
-
+import axios from "../../shared/axios";
+import { withRouter } from 'react-router-dom';
+import { loaderStart, loaderStop } from "../../store/actions/loader";
+import { connect } from "react-redux";
 import { Formik, Form, Field, ErrorMessage } from 'formik';
+
+
+const initialValues = {};
 
 class InformationYourself extends Component {
     constructor(props) {
@@ -15,8 +22,33 @@ class InformationYourself extends Component {
         this.handleClose = this.handleClose.bind(this);
 
         this.state = {
-            show: false,
+            show: false,  
+            selectedMember: [],
+            memberInfo: []
         };
+    }
+
+    handleSubmit = (values) => {
+        var drv = [];
+        var memberInfo = [];
+        const formData = new FormData(); 
+        for (const key in values) {
+            if (values.hasOwnProperty(key)) {
+                formData.append(key, values[key]);
+                if(values[key] === '1') {                
+                    drv.push(key);                 
+                }      
+                memberInfo.push(key,values[key]);
+            }
+        }
+        this.setState({
+            selectedMember: drv, memberInfo: memberInfo
+        })
+        this.handleClose();
+    }
+
+    medicalQuestions = (productId,memberInfo) => {
+        this.props.history.push(`/MedicalDetails/${productId}/${memberInfo}`);
     }
 
 
@@ -39,6 +71,10 @@ class InformationYourself extends Component {
         e.target.value.length === 0 && element.classList.remove('active');
     }
     render() {
+        const {selectedMember, show, memberInfo} = this.state
+        const {productId} = this.props
+        // console.log("localStorage", localStorage.getItem('customerInfo'))
+        console.log("memberInfo", memberInfo)
         return (
             <>
                 <BaseComponent>
@@ -68,6 +104,7 @@ class InformationYourself extends Component {
                                                 <input type="text"
                                                     placeholder="Select"
                                                     id="memberContainer"
+                                                    value = {selectedMember}
                                                     readonly=""
                                                     onFocus={e => this.changePlaceHoldClassAdd(e)}
                                                     onBlur={e => this.changePlaceHoldClassRemove(e)} />
@@ -75,7 +112,7 @@ class InformationYourself extends Component {
                                             </div>
                                         </div>
                                         <div className="cntrbtn">
-                                            <button className="btnPrimary">Go</button>
+                                            <button className="btnPrimary" onClick= {this.medicalQuestions.bind(this,productId,memberInfo )}>Go</button>
                                         </div>
                                     </div>
 
@@ -84,7 +121,7 @@ class InformationYourself extends Component {
                             </div>
 
                             <Modal className="customModal1" bsSize="md"
-                                show={this.state.show}
+                                show={show}
                                 onHide={this.handleClose}>
                                 <div className="customModalfamlyForm">
                                     <div className="modal-header">
@@ -92,279 +129,195 @@ class InformationYourself extends Component {
                                     </div>
                                     <Modal.Body>
                                         <div className="row formSection">
-                                            <div className="col-md-4">
-                                                <label className="customCheckBox formGrp formGrp">Self
-                                    <input type="checkbox"
-                                                        name="family[Self][check]"
-                                                        className="user-self"
-                                                        id="family[Self][check]"
-                                                        value="1"
-                                                        aria-invalid="false" />
-                                                    <span className="checkmark mL-0"></span>
-                                                    <span className="error-message"></span>
-                                                </label>
-                                            </div>
+                                            <Formik initialValues={initialValues} 
+                                            onSubmit={this.handleSubmit} 
+                                            // validationSchema={vehicleInspectionValidation}
+                                            >
+                                            {({ values, errors, setFieldValue, setFieldTouched, isValid, isSubmitting, touched }) => {
 
-                                            <div className="col-md-4">
-                                                <label className="formGrp error">
-                                                    {/* <input type="text" 
-                                    name="family[Self][dob]" 
-                                    className="dobdatepicker hasDatepicker" 
-                                    value="" 
-                                    placeholder="Select DOB" 
-                                    readonly="" 
-                                    id="dp1590484875886" 
-                                    aria-invalid="true" 
-                                    aria-required="true" 
-                                    /> */}
-                                                    <DatePicker
-                                                        // showTimeSelect
-                                                        // timeFormat="HH:mm"
-                                                        // timeIntervals={15}
-                                                        // timeCaption="time"
-                                                        minDate={new Date()}
-                                                        dateFormat="dd MMM yyyy"
-                                                        placeholderText="DOB"
-                                                        peekPreviousMonth
-                                                        peekPreviousYear
-                                                        showMonthDropdown
-                                                        showYearDropdown
-                                                        dropdownMode="select"
-                                                    />
+                                                return (
+                                                <Form>
+                                                    <Row xs={12} sm={12} md={12}>
+                                                    <Col xs={12} sm={6} md={4}>
+                                                        <div className="col-md-4">
+                                                        <label className="customCheckBox formGrp formGrp">Self</label>
+                                                        <Field
+                                                            type="checkbox"
+                                                            name="self"
+                                                            value="1"
+                                                            onChange={(e) => {
+                                                            if (e.target.checked === true) {
+                                                                setFieldValue('self', '1');
+                                                            } else {
+                                                                setFieldValue('self', '0');
+                                                                setFieldValue("selfDob", '');
+                                                            }
+                                                        }}
+                                                        checked={values.self == '1' ? true : false}
+                                                />
+                                                        <DatePicker
+                                                            name="selfDob"
+                                                            onChange={(value) => {
+                                                            setFieldTouched("selfDob");
+                                                            setFieldValue("selfDob", value);
+                                                            }}
+                                                            value={values.selfDob}
+                                                        />
+                                                        {errors.selfDob ? (
+                                                                <span className="errorMsg">{errors.selfDob}</span>
+                                                            ) : null }
+                                                        </div>
+                                                    </Col>
+                                                    </Row>
 
-                                                    {/* <span className="error-message">Please enter dob</span> */}
-                                                </label>
-                                            </div>
+                                                    <Row xs={12} sm={12} md={12}>
+                                                    <Col xs={12} sm={6} md={4}>
+                                                        <div className="col-md-4">
+                                                        <label className="customCheckBox formGrp formGrp">Spouse</label>
+                                                        <Field
+                                                            type="checkbox"
+                                                            name="spouse"
+                                                            value="1"
+                                                            onChange={(e) => {
+                                                            if (e.target.checked === true) {
+                                                                setFieldValue('spouse', '1');
+                                                            } else {
+                                                                setFieldValue('spouse', '0');
+                                                                setFieldValue("spouseDob", '');
+                                                            }
+                                                        }}
+                                                        checked={values.spouse == '1' ? true : false}
+                                                />
+                                                        <DatePicker
+                                                            name="spouseDob"
+                                                            onChange={(value) => {
+                                                            setFieldTouched("spouseDob");
+                                                            setFieldValue("spouseDob", value);
+                                                            }}
+                                                            value={values.spouseDob}
+                                                        />
+                                                        {errors.spouseDob ? (
+                                                                <span className="errorMsg">{errors.spouseDob}</span>
+                                                            ) : null }
+                                                        </div>
+                                                    </Col>
+                                                    </Row>
+
+                                                    <Row xs={12} sm={12} md={12}>
+                                                    <Col xs={12} sm={6} md={4}>
+                                                        <div className="col-md-4">
+                                                        <label className="customCheckBox formGrp formGrp">Child 1</label>
+                                                        <Field
+                                                            type="checkbox"
+                                                            name="child1"
+                                                            value="1"
+                                                            onChange={(e) => {
+                                                            if (e.target.checked === true) {
+                                                                setFieldValue('child1', '1');
+                                                            } else {
+                                                                setFieldValue('child1', '0');
+                                                                setFieldValue("child1Dob", '');
+                                                            }
+                                                        }}
+                                                        checked={values.child1 == '1' ? true : false}
+                                                />
+                                                        <DatePicker
+                                                            name="child1Dob"
+                                                            onChange={(value) => {
+                                                            setFieldTouched("child1Dob");
+                                                            setFieldValue("child1Dob", value);
+                                                            }}
+                                                            value={values.child1Dob}
+                                                        />
+                                                        {errors.child1Dob ? (
+                                                                <span className="errorMsg">{errors.child1Dob}</span>
+                                                            ) : null }
+                                                        </div>
+                                                    </Col>                                                  
+                                                    </Row>
+
+                                                    <Row xs={12} sm={12} md={12}>
+                                                    <Col xs={12} sm={6} md={4}>
+                                                        <div className="col-md-4">
+                                                        <label className="customCheckBox formGrp formGrp">Father</label>
+                                                        <Field
+                                                            type="checkbox"
+                                                            name="father"
+                                                            value="1"
+                                                            onChange={(e) => {
+                                                            if (e.target.checked === true) {
+                                                                setFieldValue('father', '1');
+                                                            } else {
+                                                                setFieldValue('father', '0');
+                                                                setFieldValue("fatherDob", '')
+                                                            }
+                                                        }}
+                                                        checked={values.father == '1' ? true : false}
+                                                />
+                                                        <DatePicker
+                                                            name="fatherDob"
+                                                            onChange={(value) => {
+                                                            setFieldTouched("fatherDob");
+                                                            setFieldValue("fatherDob", value);
+                                                            }}
+                                                            value={values.fatherDob}
+                                                        />
+                                                        {errors.fatherDob ? (
+                                                                <span className="errorMsg">{errors.fatherDob}</span>
+                                                            ) : null }
+                                                        </div>
+                                                    </Col>
+                                                    </Row>
+
+                                                    <Row xs={12} sm={12} md={12}>
+                                                    <Col xs={12} sm={6} md={4}>
+                                                        <div className="col-md-4">
+                                                        <label className="customCheckBox formGrp formGrp">Mother</label>
+                                                        <Field
+                                                            type="checkbox"
+                                                            name="mother"
+                                                            value="1"
+                                                            onChange={(e) => {
+                                                            if (e.target.checked === true) {
+                                                                setFieldValue('mother', '1');
+                                                            } else {
+                                                                setFieldValue('mother', '0');
+                                                                setFieldValue("motherDob", '');
+                                                            }
+                                                        }}
+                                                        checked={values.mother == '1' ? true : false}
+                                                />
+                                                        <DatePicker
+                                                            name="motherDob"
+                                                            onChange={(value) => {
+                                                            setFieldTouched("motherDob");
+                                                            setFieldValue("motherDob", value);
+                                                            }}
+                                                            value={values.motherDob}
+                                                        />
+                                                        {errors.motherDob ? (
+                                                                <span className="errorMsg">{errors.motherDob}</span>
+                                                            ) : null }
+                                                        </div>
+                                                    </Col>
+                                                    </Row>
+
+
+                                                    <ButtonToolbar>
+
+                                                    <Button className={`btnPrimary`}
+                                                        type="submit" 
+                                                        disabled={isSubmitting ? true : false}
+                                                    >
+                                                        {isSubmitting ? 'Wait' : 'Submit'}
+                                                    </Button>      
+                                                    </ButtonToolbar>
+                                                </Form>
+                                                );
+                                            }}
+                                            </Formik>
+
                                         </div>
-
-
-                                        <div className="row formSection">
-                                            <div className="col-md-4">
-                                                <label className="customCheckBox formGrp formGrp">Spouse
-                                    <input type="checkbox"
-                                                        name="family[Self][check]"
-                                                        className="user-self"
-                                                        id="family[Self][check]"
-                                                        value="1"
-                                                        aria-invalid="false" />
-                                                    <span className="checkmark mL-0"></span>
-                                                    <span className="error-message"></span>
-                                                </label>
-                                            </div>
-
-                                            <div className="col-md-4">
-                                                <label className="formGrp error">
-                                                    <DatePicker
-                                                        // showTimeSelect
-                                                        // timeFormat="HH:mm"
-                                                        // timeIntervals={15}
-                                                        // timeCaption="time"
-                                                        minDate={new Date()}
-                                                        dateFormat="dd MMM yyyy"
-                                                        placeholderText="DOB"
-                                                        peekPreviousMonth
-                                                        peekPreviousYear
-                                                        showMonthDropdown
-                                                        showYearDropdown
-                                                        dropdownMode="select"
-                                                    />
-
-                                                    {/* <span className="error-message">Please enter dob</span> */}
-                                                </label>
-                                            </div>
-                                        </div>
-
-                                        <div className="row formSection">
-                                            <div className="col-md-4">
-                                                <label className="customCheckBox formGrp formGrp">Child 1
-                                    <input type="checkbox"
-                                                        name="family[Self][check]"
-                                                        className="user-self"
-                                                        id="family[Self][check]"
-                                                        value="1"
-                                                        aria-invalid="false" />
-                                                    <span className="checkmark mL-0"></span>
-                                                    <span className="error-message"></span>
-                                                </label>
-                                            </div>
-
-                                            <div className="col-md-4">
-                                                <label className="formGrp error">
-                                                    <DatePicker
-                                                        // showTimeSelect
-                                                        // timeFormat="HH:mm"
-                                                        // timeIntervals={15}
-                                                        // timeCaption="time"
-                                                        minDate={new Date()}
-                                                        dateFormat="dd MMM yyyy"
-                                                        placeholderText="DOB"
-                                                        peekPreviousMonth
-                                                        peekPreviousYear
-                                                        showMonthDropdown
-                                                        showYearDropdown
-                                                        dropdownMode="select"
-                                                    />
-
-                                                    {/* <span className="error-message">Please enter dob</span> */}
-                                                </label>
-                                            </div>
-
-                                            <div className="col-md-4">
-                                                <label className="formGrp">
-                                                    <select name="family[Child_1][gender]" aria-invalid="false">
-                                                        <option value="">Gender</option>
-                                                        <option value="male">Male</option>
-                                                        <option value="female">Female</option>
-                                                    </select>
-                                                </label>
-                                                {/* <span className="error-message">Please enter dob</span> */}
-                                            </div>
-                                        </div>
-
-                                        <div className="row formSection">
-                                            <div className="col-md-4">
-                                                <label className="customCheckBox formGrp formGrp">Father
-                                    <input type="checkbox"
-                                                        name="family[Self][check]"
-                                                        className="user-self"
-                                                        id="family[Self][check]"
-                                                        value="1"
-                                                        aria-invalid="false" />
-                                                    <span className="checkmark mL-0"></span>
-                                                    <span className="error-message"></span>
-                                                </label>
-                                            </div>
-
-                                            <div className="col-md-4">
-                                                <label className="formGrp error">
-                                                    <DatePicker
-                                                        // showTimeSelect
-                                                        // timeFormat="HH:mm"
-                                                        // timeIntervals={15}
-                                                        // timeCaption="time"
-                                                        minDate={new Date()}
-                                                        dateFormat="dd MMM yyyy"
-                                                        placeholderText="DOB"
-                                                        peekPreviousMonth
-                                                        peekPreviousYear
-                                                        showMonthDropdown
-                                                        showYearDropdown
-                                                        dropdownMode="select"
-                                                    />
-
-                                                    {/* <span className="error-message">Please enter dob</span> */}
-                                                </label>
-                                            </div>
-                                        </div>
-
-                                        <div className="row formSection">
-                                            <div className="col-md-4">
-                                                <label className="customCheckBox formGrp formGrp">Mother
-                                    <input type="checkbox"
-                                                        name="family[Self][check]"
-                                                        className="user-self"
-                                                        id="family[Self][check]"
-                                                        value="1"
-                                                        aria-invalid="false" />
-                                                    <span className="checkmark mL-0"></span>
-                                                    <span className="error-message"></span>
-                                                </label>
-                                            </div>
-
-                                            <div className="col-md-4">
-                                                <label className="formGrp error">
-                                                    <DatePicker
-                                                        // showTimeSelect
-                                                        // timeFormat="HH:mm"
-                                                        // timeIntervals={15}
-                                                        // timeCaption="time"
-                                                        minDate={new Date()}
-                                                        dateFormat="dd MMM yyyy"
-                                                        placeholderText="DOB"
-                                                        peekPreviousMonth
-                                                        peekPreviousYear
-                                                        showMonthDropdown
-                                                        showYearDropdown
-                                                        dropdownMode="select"
-                                                    />
-
-                                                    {/* <span className="error-message">Please enter dob</span> */}
-                                                </label>
-                                            </div>
-                                        </div>
-
-                                        <div className="row formSection">
-                                            <div className="col-md-4">
-                                                <label className="customCheckBox formGrp formGrp">Father in law
-                                    <input type="checkbox"
-                                                        name="family[Self][check]"
-                                                        className="user-self"
-                                                        id="family[Self][check]"
-                                                        value="1"
-                                                        aria-invalid="false" />
-                                                    <span className="checkmark mL-0"></span>
-                                                    <span className="error-message"></span>
-                                                </label>
-                                            </div>
-
-                                            <div className="col-md-4">
-                                                <label className="formGrp error">
-                                                    <DatePicker
-                                                        // showTimeSelect
-                                                        // timeFormat="HH:mm"
-                                                        // timeIntervals={15}
-                                                        // timeCaption="time"
-                                                        minDate={new Date()}
-                                                        dateFormat="dd MMM yyyy"
-                                                        placeholderText="DOB"
-                                                        peekPreviousMonth
-                                                        peekPreviousYear
-                                                        showMonthDropdown
-                                                        showYearDropdown
-                                                        dropdownMode="select"
-                                                    />
-
-                                                    {/* <span className="error-message">Please enter dob</span> */}
-                                                </label>
-                                            </div>
-                                        </div>
-
-                                        <div className="row formSection m-b-45">
-                                            <div className="col-md-4">
-                                                <label className="customCheckBox formGrp formGrp">Mother in law
-                                    <input type="checkbox"
-                                                        name="family[Self][check]"
-                                                        className="user-self"
-                                                        id="family[Self][check]"
-                                                        value="1"
-                                                        aria-invalid="false" />
-                                                    <span className="checkmark mL-0"></span>
-                                                    <span className="error-message"></span>
-                                                </label>
-                                            </div>
-
-                                            <div className="col-md-4">
-                                                <label className="formGrp error">
-                                                    <DatePicker
-                                                        // showTimeSelect
-                                                        // timeFormat="HH:mm"
-                                                        // timeIntervals={15}
-                                                        // timeCaption="time"
-                                                        minDate={new Date()}
-                                                        dateFormat="dd MMM yyyy"
-                                                        placeholderText="DOB"
-                                                        peekPreviousMonth
-                                                        peekPreviousYear
-                                                        showMonthDropdown
-                                                        showYearDropdown
-                                                        dropdownMode="select"
-                                                    />
-
-                                                    {/* <span className="error-message">Please enter dob</span> */}
-                                                </label>
-                                            </div>
-                                        </div>
-                                        <div className="cntrbtn"><button className="btnPrimary">Select</button></div>
                                     </Modal.Body>
                                 </div>
                             </Modal>
@@ -376,4 +329,17 @@ class InformationYourself extends Component {
     }
 }
 
-export default InformationYourself;
+const mapStateToProps = state => {
+    return {
+      loading: state.loader.loading
+    };
+  };
+  
+  const mapDispatchToProps = dispatch => {
+    return {
+      loadingStart: () => dispatch(loaderStart()),
+      loadingStop: () => dispatch(loaderStop())
+    };
+  };
+
+export default withRouter (connect( mapStateToProps, mapDispatchToProps)(InformationYourself));

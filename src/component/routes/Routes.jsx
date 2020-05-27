@@ -42,6 +42,7 @@ class Routes extends Component {
                         <Route exact path="/login" component={LogIn} />                        
                         <PrivateRoute exact path="/Products" component={Products} />
                         <PrivateRoute exact path="/Health/:productId" component={Health} />
+                        <PrivateRoute exact path="/MedicalDetails/:productId/:familyInfo" component={MedicalDetails} />
                         <PrivateRoute exact path="/Select-brand" component={SelectBrand} />
                         <Redirect from="/" to="/Products" />
                     </Switch>

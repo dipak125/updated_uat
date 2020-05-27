@@ -73,9 +73,6 @@
   "devDependencies": {
     "react-to-print": "^2.0.0-alpha-4"
   },
-  "eslintConfig": {
-    "extends": "react-app"
-  },
   "browserslist": {
     "production": [
       ">0.2%",
