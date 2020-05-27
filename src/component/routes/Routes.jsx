@@ -12,7 +12,8 @@ import LogIn from "../common/login/LogIn";
 // import Motor from '../motor/Motor';
 import SelectBrand from '../SelectBrand/SelectBrand';
 // import Products from '../products/Products';
-import Health from '../health/Health';
+import Health from '../health/InformationYourself';
+import MedicalDetails from '../health/MedicalDetails';
 
 const componentLoader = () => {
     return (
