@@ -15,6 +15,7 @@ class HeaderTop extends Component {
                 this.props.logout();
             })
             .catch(err => {
+                this.props.logout();
                 // this.props.loadingStop();
             });
 
@@ -72,7 +73,7 @@ class HeaderTop extends Component {
                                 </div>
                             </Dropdown.Toggle>
                             <Dropdown.Menu>
-                                <Dropdown.Item href="#" onClick={this.handleLogout}>Logout</Dropdown.Item>
+                                <Dropdown.Item  onClick={this.handleLogout}>Logout</Dropdown.Item>
                             </Dropdown.Menu>
                         </Dropdown>                       
                     </div>
@@ -83,4 +84,16 @@ class HeaderTop extends Component {
     }
 }
 
-export default HeaderTop ;
+const mapDispatchToProps = dispatch => {
+    return {
+        logout: () => dispatch(authLogout())
+    }
+}
+
+const mapStateToProps = state => {
+    return {
+        loading: state.loader.loading
+    };
+};
+
+export default connect(mapStateToProps, mapDispatchToProps)(HeaderTop);

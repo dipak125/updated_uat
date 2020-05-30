@@ -14,7 +14,6 @@ h4{font-size: 18px; line-height: 22px; font-weight: 600;}
 .fontSize17{ font-size: 17px!important;}
 
 /*Addjustment*/
-.m-t-10 {margin-top: 10px;}
 .m-t-15{ margin-top: 15px;} 
 .m-t--20 {margin-top: -20px;}
 .m-b-15{ margin-bottom: 15px!important;}
@@ -25,7 +24,7 @@ h4{font-size: 18px; line-height: 22px; font-weight: 600;}
 .m-b-25{ margin-bottom: 25px !important;}
 .m-t-30{ margin-top:30px;} 
 .m-b-30{ margin-bottom:30px;}
-.m-b-40 {margin-bottom: 40px !important;}
+.m-b-40 {margin-bottom: 40px;}
 .m-b-45 {margin-bottom: 45px;}
 .m-b15 {margin-bottom: 15px !important;}
 .m-b-10 {margin-bottom: 10px !important;}
@@ -38,7 +37,6 @@ h4{font-size: 18px; line-height: 22px; font-weight: 600;}
 .m-r-15 {margin-right: 15px;}
 .m-r-25 {margin-right: 25px;}
 .m-r-40{ margin-right:40px;}
-.m-l-5 {margin-left: 5px;}
 .m-l-20 {margin-left: 20px !important;}
 .m-l-0 {margin-left: 0px !important;}
 .m-l-15 {margin-left: 15px !important;}
@@ -143,7 +141,7 @@ ul.navPan li a span{ margin-bottom:8px; display: block; }
 
 /*-------------- Select Brand Section--------------*/
 
-.brand { margin: 25px auto; padding: 25px; max-height: 70vh; max-width: 1066px; background: url(../images/brand-bg1.svg) no-repeat center center; box-shadow: 0 4px 20px rgba(0, 0, 0, .08); -webkit-box-shadow: 0 4px 20px rgba(0, 0, 0, .08); -moz-box-shadow: 0 4px 20px rgba(0, 0, 0, .08); box-sizing: border-box; border-radius: 25px; min-height: 710px;}
+.brand { margin: 25px auto; padding: 25px; max-height: 70vh; max-width: 1066px; background: url(../images/brand-bg1.svg) no-repeat center center; box-shadow: 0 4px 20px rgba(0, 0, 0, .08); -webkit-box-shadow: 0 4px 20px rgba(0, 0, 0, .08); -moz-box-shadow: 0 4px 20px rgba(0, 0, 0, .08); box-sizing: border-box; border-radius: 25px; min-height: 650px;}
 .brandhead h4 {font-size: 15px; color: #1482AB;}
 .brandhead p {font-size: 18px; color: #231F20;}
 
@@ -212,7 +210,7 @@ ul.navPan li a span{ margin-bottom:8px; display: block; }
    background-color: #eee;
  }
  
- /* On mouse-over, add a grey background color */
+ /* On mouse-over, abrand-bg1.svgdd a grey background color */
  .customCheckBoxtwo:hover input ~ .checkmark {
    background-color: #ccc;
  }
@@ -461,24 +459,6 @@ Note: Beware of modifying this element as it can break the animations - you shou
 .infoIcon {margin-left: 5px;}
 /*---------Address close-------*/
 
-/*---------Select Duration Start-------*/
-.premium {padding: 15px; background-color: #b8daff; border: 1px solid #7abaff;}
-.premium p {margin-bottom: 0;}
-/*---------Select Duration close-------*/
-
-
-/*---- Policy Details start------*/
-.rghtsideTrigr {border-bottom: 1px solid #D2D2D2; margin-bottom: 15px;}
-.rghtsideTrigr .Collapsible__trigger {display: block;}
-.rghtsideTrigr .Collapsible__trigger { background-image: url(../images/plus-sign.svg); background-repeat: no-repeat; background-position: right; cursor: pointer; margin-bottom: 15px; color: #353535;  font-weight: 700; font-size: 16px; line-height: 21px;}
-.rghtsideTrigr .Collapsible__trigger.is-open {background-image: url(../images/minus-sign.svg); border-bottom: 1px solid #D2D2D2; height: 40px; font-weight: 700; font-size: 16px; line-height: 21px;}
-.listrghtsideTrigr {margin: 15px;}
-.paymntgatway {font-size: 17px; color: #000;}
-.paymntgatway img {cursor: pointer;}
-/* .bgwhite {background-color: #ffffff !important; background-image: none !important; height: 100% !important; min-height: 0 !important; padding-bottom: 50px;} */
-
-
-/*---- Policy Details close------*/
 /*---------Insurance close-------*/
 
 
@@ -552,4 +532,3 @@ Note: Beware of modifying this element as it can break the animations - you shou
     position: absolute;
     top: 0;
 }
-.errorMsg{ color: #ff0000; font-size: 12px; line-height: 14px; display: block; padding-top: 4px;}

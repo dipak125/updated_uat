@@ -12,28 +12,23 @@ import * as Yup from "yup";
 import mapValues from 'lodash/mapValues';
 
 
-
 const validateMedicalDetails = Yup.object().shape({
     question_id: Yup.lazy(obj =>
         Yup.object(
-            mapValues(obj => {     
-                console.log('ssss===>',obj);
-              //  console.log('aaaaa=====>',key)
-           /* if (key.includes('question_id')) {
+            mapValues(obj, (value, key) => {     
+            if (key.includes('question_id')) {
                 return Yup.object().shape({
                 question_id: Yup.string().required("Enter")
                 })
-            }*/
+            }
             })
         )
         )
-        
 }) 
         
 // const initialValues = {
 //     question_id_1 : "n"
 // }
-
 
 class MedicalDetails extends Component {
 
@@ -41,9 +36,7 @@ class MedicalDetails extends Component {
         questionList: [],
         message: "",
         question_answer: [],
-        flag: false,
-        selected_answer:[],
-        selected_question:[]
+        flag: false
       };
 
     sumInsured = (productId) => {
@@ -56,31 +49,16 @@ class MedicalDetails extends Component {
 
     handleChangeSubmit = (key,value) => {
         let question_id = [];
-        let selected_answer = [];
-        let selected_question = [];
         const formData = new FormData(); 
 
         if ( key.match(/question_id/gi)){      
         question_id.push(key.substr(12, 1));                            
         }
 
-        
-
         formData.append('question_id', question_id[0]);
         formData.append('answer', value);
-        selected_answer.push(value);
-        selected_answer = [...new Set(selected_answer)];
-        selected_question = this.state.selected_question;
-        selected_question.push(question_id[0]);
-        selected_question = [...new Set(selected_question)];
-
-
-        this.setState({
-            selected_question,
-            selected_answer
-        })
-
         formData.append('policy_holder_id', localStorage.getItem('policyHolder_id'));
+
         this.props.loadingStart();
         axios
           .post(`/medical-question`, formData)
@@ -99,9 +77,7 @@ class MedicalDetails extends Component {
 
     handleSubmit = (values) => {
         const {productId} = this.props.match.params
-        var selected_question = this.state.selected_question
-        if(selected_question && selected_question.length>0)
-            this.props.history.push(`/SelectDuration/${productId}`);
+        this.props.history.push(`/SelectDuration/${productId}`);
     }
 
     getQuestionList = () => {
@@ -147,9 +123,8 @@ class MedicalDetails extends Component {
     
     render() {
         const {productId } = this.props.match.params
-        const {questionList, question_answer, flag,selected_question,selected_answer} = this.state
-        console.log('Selected Questions==>',selected_question)
-        console.log('Selected Answer==>',selected_answer)
+        const {questionList, question_answer, flag} = this.state
+
         
         let initialValues = {}
 
@@ -163,14 +138,6 @@ class MedicalDetails extends Component {
             else initialValues[`question_id_${question.id}`] = "";
             
         })
-    }
-
-    const checkValidation = (str)=>{    
-        let error;
-        if(str==''){
-            error = 'Please selet an answer'
-        }
-        return error
     }
     
     const newInitialValues =  Object.assign(initialValues) ;
@@ -194,7 +161,7 @@ class MedicalDetails extends Component {
 
                             {Object.keys(newInitialValues).length > 0 ?
                             <Formik initialValues={newInitialValues} onSubmit={this.handleSubmit}
-                           //  validationSchema={validateMedicalDetails}
+                            // validationSchema={validateMedicalDetails}
                             >
                             {({ values, errors, setFieldValue, setFieldTouched, isValid, isSubmitting, touched }) => {
 
@@ -243,12 +210,11 @@ class MedicalDetails extends Component {
                                                         this.handleChangeSubmit(`question_id_${question.id}`,e.target.value)
                                                     }}
                                                     checked={values[`question_id_${question.id}`] == 'n' ? true : false}
-                                                   // validation = {checkValidation}
                                                 />
                                                     <span className="checkmark" />
                                                     <span className="fs-14">No</span>
-                                                    {!this.state.selected_question.includes(question.id) ? (
-                                                    <span className="errorMsg">Please select a question</span>
+                                                    {errors.question_id && touched.question_id ? (
+                                                    <span className="errorMsg">Required</span>
                                                     ) : null}
                                                 </label>
                                             </div>
