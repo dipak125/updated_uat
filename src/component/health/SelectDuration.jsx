@@ -97,13 +97,30 @@ class SelectDuration extends Component {
 
     handleSubmit = (values) => {
         const {productId} = this.props.match.params
+        const {serverResponse} = this.state
         const formData = new FormData(); 
-        for (const key in values) {
-            if (values.hasOwnProperty(key)) {
-                formData.append(key, values[key]);
-            }
-        }
-        this.props.history.push(`/Address/${productId}`);
+
+        formData.append('policy_holder_id', localStorage.getItem('policyHolder_id'));
+        formData.append('start_date', serverResponse.EffectiveDate);
+        formData.append('end_date', serverResponse.ExpiryDate);
+        formData.append('gross_premium', serverResponse.GrossPremium);
+        formData.append('service_tax', serverResponse.TGST);
+        formData.append('swatch_bharat_cess', '0');
+        formData.append('krishi_kalayan_cess', '0');
+        formData.append('net_premium', serverResponse.DuePremium);
+        formData.append('sum_insured', serverResponse.SumInsured);
+
+        this.props.loadingStart();
+        axios
+        .post(`/duration-premium`, formData)
+        .then(res => { 
+            this.props.history.push(`/Address/${productId}`);
+        })
+        .catch(err => {
+    
+          this.props.loadingStop();
+        });
+
         this.props.loadingStart();      
 
     }
@@ -143,7 +160,6 @@ class SelectDuration extends Component {
       }
 
       quote = (value) => {
-          console.log(value)
         const {accessToken, policyHolderDetails} = this.state
         let data = {
             "RequestHeader":{
@@ -161,7 +177,7 @@ class SelectDuration extends Component {
                "ExpiryDate":moment(value.polEndDate).format("YYYY-MM-DD"),
                "PremiumFrequency":"1",
                "NonFloaterDiscount":"",
-               "ProbableMaxLoss":value.insureValue,
+               "ProbableMaxLoss":"100",
                "GSTType":"SGST",
                "AgreementCode":"2963",
                "SBIGBranchCode":"HO",
@@ -182,20 +198,20 @@ class SelectDuration extends Component {
                      "PolicyRiskList":[
                         {
                            "ProductElementCode":"R10007",
-                           "DateOfBirth":"1984-05-10",
+                           "DateOfBirth":policyHolderDetails.dob,
                            "ArgInsuredRelToProposer":2,
                            "ArogyaOccupation":"1",
                            "Height":163.3,
                            "Weight":58,
                            "Questionnaire2b":"0",
-                           "IsSmoker":"0",
-                           "AlcoholStatus":"0",
-                           "TobaccoLoading":"0",
-                           "AlcoholQuantity":"1",
+                           "IsSmoker":policyHolderDetails.request_data.question_answer[0].response == 'n' ? "0" : "1",
+                           "AlcoholStatus":policyHolderDetails.request_data.question_answer[1].response == 'n' ? "0" : "1",
+                           "TobaccoLoading":policyHolderDetails.request_data.question_answer[2].response == 'n' ? "0" : "1",
+                           "AlcoholQuantity":policyHolderDetails.request_data.question_answer[3].response == 'n' ? "0" : "1",
                            "PolicyCoverageList":[
                               {
                                  "ProductElementCode":"HVSC01",
-                                 "SanjeevaniSumInsured":5
+                                 "SanjeevaniSumInsured":value.insureValue
                               }
                            ]
                         }
@@ -226,8 +242,11 @@ class SelectDuration extends Component {
     }
 
     handleChange =() => {
-
+        this.setState({
+            serverResponse: []
+          });
     }
+
 
 
 
@@ -290,7 +309,7 @@ class SelectDuration extends Component {
                                                             onChange={(value) => {
                                                                 setFieldTouched("polStartDate");
                                                                 setFieldValue("polStartDate", value);
-                                                                // this.setState({ polStartDate: value });
+                                                                // this.handleChange();
                                                             }}
                                                             selected={values.polStartDate}
                                                         />
@@ -321,7 +340,7 @@ class SelectDuration extends Component {
                                                             onChange={(value) => {
                                                                 setFieldTouched("polEndDate");
                                                                 setFieldValue("polEndDate", value);
-                                                                // this.setState({ polEndDate: value });
+                                                                // this.handleChange();
                                                                 }}
                                                             selected={values.polEndDate}
                                                         />
@@ -347,18 +366,15 @@ class SelectDuration extends Component {
                                                                     className="formGrp"
                                                                 >
                                                                 <option value="">Select sum insured</option>
-                                                                    <option value="100000">100 000</option>
-                                                                    <option value="200000">200 000</option>
-                                                                    <option value="300000">300 000</option>
-                                                                    <option value="400000">400 000</option>
-                                                                    <option value="500000">500 000</option>
-                                                                    <option value="600000">600 000</option>
-                                                                    <option value="700000">700 000</option>
-                                                                    <option value="800000">800 000</option>
-                                                                    <option value="900000">900 000</option>
-                                                                    <option value="1000000">10 00 000</option>
-                                                                    <option value="1100000">11 00 000</option>
-                                                                    <option value="1200000">12 00 000</option>
+                                                                    <option value="1">100 000</option>
+                                                                    <option value="2">150 000</option>
+                                                                    <option value="3">200 000</option>
+                                                                    <option value="4">250 000</option>
+                                                                    <option value="5">300 000</option>
+                                                                    <option value="6">350 000</option>
+                                                                    <option value="7">400 000</option>
+                                                                    <option value="8">450 000</option>
+                                                                    <option value="9">500 000</option>
                                                                 </Field>    
                                                                 {errors.insureValue && touched.insureValue ? (
                                                                 <span className="errorMsg">{errors.insureValue}</span>
@@ -374,7 +390,7 @@ class SelectDuration extends Component {
                                                     <Col sm={12}>
                                                         <div className="d-flex justify-content-between align-items-center premium m-b-25">
                                                             <p>Your Total Premium for One Year :</p>
-                                                            <p><strong>Rs:</strong> { serverResponse ? (serverResponse.message ? 0 : serverResponse.PolicyLobList[0].GrossPremium ) : 0}</p>
+                                                            <p><strong>Rs:</strong> { serverResponse ? (serverResponse.message ? 0 : serverResponse.DuePremium ) : 0}</p>
                                                         </div>
                                                     </Col>
 
