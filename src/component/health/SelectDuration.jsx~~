@@ -88,8 +88,7 @@ class SelectDuration extends Component {
         policyHolderDetails: [],
         polStartDate: "",
         polEndDate: "",
-        insureValue: "" ,
-        error: []
+        insureValue: "" 
       };
 
 
@@ -240,18 +239,9 @@ class SelectDuration extends Component {
       axios
         .post(`/quickQuoteService`, formData)
         .then(res => { 
-        if(res.data.AdjustedPremium){
-            this.setState({
-                serverResponse: res.data,
-                error: []
-            }) 
-        }else {
-            this.setState({
-                serverResponse: res.data,
-                error: res.data
-            }) 
-        }
-          
+          this.setState({
+              serverResponse: res.data
+          }) 
         })
         .catch(err => {
           this.setState({
@@ -275,29 +265,15 @@ class SelectDuration extends Component {
 
     render() {
         const {productId} = this.props.match.params
-        const {policyHolderDetails, serverResponse, error} = this.state
-        const request_data = policyHolderDetails ? policyHolderDetails.request_data:null;
-        let start_date = request_data && request_data.start_date ? new Date(request_data.start_date): '';
-        let end_date = request_data && request_data.end_date ? new Date(request_data.end_date): '';
+        const {policyHolderDetails, serverResponse} = this.state
 
-        
-    //    let insureValue = arrSumIns[parseInt(sum_insured)] ? arrSumIns[parseInt(sum_insured)] :''
-        
 
         const newInitialValues = Object.assign(initialValues, {
-            polStartDate: start_date ? start_date : "",
-            polEndDate: end_date  ? end_date : "",
-            insureValue: policyHolderDetails && policyHolderDetails.request_data ? Math.floor(policyHolderDetails.request_data.sum_insured) : ""
+            polStartDate: policyHolderDetails && policyHolderDetails.length > 0 ? policyHolderDetails.request_data.start_date : "",
+            polEndDate: policyHolderDetails && policyHolderDetails.length > 0 ? policyHolderDetails.request_data.end_date : "",
+            insureValue: policyHolderDetails && policyHolderDetails.length > 0 ? sum_assured[policyHolderDetails.request_data.sum_insured] : ""
         })
-
-        console.log("newInitialValues", newInitialValues)
     
-        const errMsg =  error && error.messages && error.messages.length > 0 ? error.messages.map((msg, qIndex)=>{  
-            return(
-                <h5> {msg.message}</h5>                   
-            )                                                
-        }) : null
-
         return (
             <>
                 <BaseComponent>
@@ -311,15 +287,14 @@ class SelectDuration extends Component {
                                 <section className="brand">
                                     <div className="boxpd">
                                         <div className="d-flex justify-content-left carloan m-b-25">
-                                            <h4> Select the duration for your Health Insurance</h4>                                          
+                                            <h4> Select the duration for your Health Insurance</h4>
                                         </div>
-                                        <h5>{errMsg}</h5>
                                         <Formik initialValues={newInitialValues} 
                                         onSubmit={ serverResponse ? (serverResponse.message ? this.quote : this.handleSubmit ) : this.quote}
                                         validationSchema={validateDuration}
                                         >
                                         {({ values, errors, setFieldValue, setFieldTouched, isValid, isSubmitting, touched }) => {
-                                            console.log("aaaaaaaaaaaaaLAAAA========>",values);
+
                                         return (
                                         <Form>
                                         <Row>
@@ -402,19 +377,19 @@ class SelectDuration extends Component {
                                                                     name="insureValue"
                                                                     component="select"
                                                                     autoComplete="off"
-                                                                    value={values.insureValue}                                                                    
+                                                                    value={values.insureValue}
                                                                     className="formGrp"
                                                                 >
                                                                 <option value="">Select sum insured</option>
-                                                                    <option value="1" >100 000</option>
-                                                                    <option value="2" >150 000</option>
-                                                                    <option value="3" >200 000</option>
-                                                                    <option value="4" >250 000</option>
-                                                                    <option value="5" >300 000</option>
-                                                                    <option value="6" >350 000</option>
-                                                                    <option value="7" >400 000</option>
-                                                                    <option value="8" >450 000</option>
-                                                                    <option value="9" >500 000</option>
+                                                                    <option value="1">100 000</option>
+                                                                    <option value="2">150 000</option>
+                                                                    <option value="3">200 000</option>
+                                                                    <option value="4">250 000</option>
+                                                                    <option value="5">300 000</option>
+                                                                    <option value="6">350 000</option>
+                                                                    <option value="7">400 000</option>
+                                                                    <option value="8">450 000</option>
+                                                                    <option value="9">500 000</option>
                                                                 </Field>    
                                                                 {errors.insureValue && touched.insureValue ? (
                                                                 <span className="errorMsg">{errors.insureValue}</span>

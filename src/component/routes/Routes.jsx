@@ -11,14 +11,14 @@ import Loader from "react-loader-spinner";
 import LogIn from "../common/login/LogIn";
 // import Motor from '../motor/Motor';
 import SelectBrand from '../SelectBrand/SelectBrand';
-import SelectDuration from '../health/SelectDuration';
-import Health from '../health/InformationYourself';
-import MedicalDetails from '../health/MedicalDetails';
-import Address from '../health/Address';
-import NomineeDetails from '../health/NomineeDetails';
-import PolicyDetails from '../health/PolicyDetails';
-import PolicySummery from '../health/PolicySummery';
-import ThankYou from '../health/ThankYou';
+// import SelectDuration from '../health/SelectDuration';
+// import Health from '../health/InformationYourself';
+// import MedicalDetails from '../health/MedicalDetails';
+// import Address from '../health/Address';
+// import NomineeDetails from '../health/NomineeDetails';
+// import PolicyDetails from '../health/PolicyDetails';
+// import PolicySummery from '../health/PolicySummery';
+// import ThankYou from '../health/ThankYou';
 
 import UnderMaintenance from '../UnderMaintenance';
 
@@ -35,6 +35,39 @@ const loadingContent = componentLoader();
 
 const Products = Loadable({
     loader: () => import(/*webpackChunkName: "Products" */"../products/Products.jsx"),
+    loading: () => loadingContent
+});
+
+const Health = Loadable({
+    loader: () => import(/*webpackChunkName: "Products" */"../health/InformationYourself.jsx"),
+    loading: () => loadingContent
+});
+const MedicalDetails = Loadable({
+    loader: () => import(/*webpackChunkName: "Products" */"../health/MedicalDetails.jsx"),
+    loading: () => loadingContent
+});
+const SelectDuration = Loadable({
+    loader: () => import(/*webpackChunkName: "Products" */"../health/SelectDuration.jsx"),
+    loading: () => loadingContent
+});
+const Address = Loadable({
+    loader: () => import(/*webpackChunkName: "Products" */"../health/Address.jsx"),
+    loading: () => loadingContent
+});
+const NomineeDetails = Loadable({
+    loader: () => import(/*webpackChunkName: "Products" */"../health/NomineeDetails.jsx"),
+    loading: () => loadingContent
+});
+const PolicyDetails = Loadable({
+    loader: () => import(/*webpackChunkName: "Products" */"../health/PolicyDetails.jsx"),
+    loading: () => loadingContent
+});
+const ThankYou = Loadable({
+    loader: () => import(/*webpackChunkName: "Products" */"../health/ThankYou.jsx"),
+    loading: () => loadingContent
+});
+const PolicySummery = Loadable({
+    loader: () => import(/*webpackChunkName: "Products" */"../health/PolicySummery.jsx"),
     loading: () => loadingContent
 });
 
@@ -55,7 +88,7 @@ class Routes extends Component {
                         <PrivateRoute exact path="/NomineeDetails/:productId" component={NomineeDetails} /> 
                         <PrivateRoute exact path="/PolicyDetails/:productId" component={PolicyDetails} />
                         <PrivateRoute exact path="/PolicySummery/:productId" component={PolicySummery} />                 
-                        <PrivateRoute exact path="/ThankYou/:productId" component={ThankYou} />
+                        <PrivateRoute exact path="/ThankYou/:policyId" component={ThankYou} />
                         <PrivateRoute exact path="/Select-brand" component={SelectBrand} />
                         <PrivateRoute exact path="/UnderMaintenance" component={UnderMaintenance} />
                         <Redirect from="/" to="/Products" />

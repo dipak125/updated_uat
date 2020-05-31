@@ -12,10 +12,6 @@ import moment from "moment";
 import * as Yup from 'yup';
 
 import { Formik, Form, Field, ErrorMessage } from 'formik';
-import dateformat from "dateformat";
-import { changeFormat, get18YearsBeforeDate, PersonAge } from "../../shared/dateFunctions";
-
-const maxDob = dateformat(new Date(), 'mm/dd/yyyy');
 
 const initialValues = {
     self: 0,
@@ -49,38 +45,12 @@ const validateFamilyMembers  = Yup.object().shape({
     //check_input : Yup.string().required('Please select an options'),
     dob_0: Yup.string().when(['looking_for_0'], {
       is: looking_for_0 => looking_for_0 == 'self',
-      then: Yup.string().required('Self DOB field is required')
-    .test(
-        "18YearsChecking",
-        function() {
-            return "Age sgould me minium 18 years"
-        },
-        function (value) {
-            if (value) {
-                const ageObj = new PersonAge();
-                return ageObj.whatIsMyAge(value) >= 18;
-            }
-            return true;
-        }
-    ),
+      then: Yup.string().required('Self DOB field is required'),
       othewise: Yup.string()
     }),
     dob_1: Yup.string().when(['looking_for_1'], {
         is: looking_for_1 => looking_for_1 == 'spouse',
-        then: Yup.string().required('Spouse DOB field is required')
-        .test(
-            "18YearsChecking",
-            function() {
-                return "Age sgould me minium 18 years"
-            },
-            function (value) {
-                if (value) {
-                    const ageObj = new PersonAge();
-                    return ageObj.whatIsMyAge(value) >= 18;
-                }
-                return true;
-            }
-        ),
+        then: Yup.string().required('Spouse DOB field is required'),
         othewise: Yup.string()
     }),
     dob_2: Yup.string().when(['looking_for_2'], {
@@ -96,74 +66,22 @@ const validateFamilyMembers  = Yup.object().shape({
     
     dob_3: Yup.string().when(['looking_for_3'], {
         is: looking_for_3 => looking_for_3 == 'father',
-        then: Yup.string().required('Father DOB field is required')
-        .test(
-            "18YearsChecking",
-            function() {
-                return "Age sgould me minium 18 years"
-            },
-            function (value) {
-                if (value) {
-                    const ageObj = new PersonAge();
-                    return ageObj.whatIsMyAge(value) >= 18;
-                }
-                return true;
-            }
-        ),
+        then: Yup.string().required('Father DOB field is required'),
         othewise: Yup.string()
     }),
     dob_4: Yup.string().when(['looking_for_4'], {
         is: looking_for_4 => looking_for_4 == 'mother',
-        then: Yup.string().required('Mother DOB field is required')
-        .test(
-            "18YearsChecking",
-            function() {
-                return "Age sgould me minium 18 years"
-            },
-            function (value) {
-                if (value) {
-                    const ageObj = new PersonAge();
-                    return ageObj.whatIsMyAge(value) >= 18;
-                }
-                return true;
-            }
-        ),
+        then: Yup.string().required('Mother DOB field is required'),
         othewise: Yup.string()
     }),
     dob_5: Yup.string().when(['looking_for_5'], {
         is: looking_for_5 => looking_for_5 == 'fatherInLaw',
-        then: Yup.string().required('Father-In-Law DOB field is required')
-        .test(
-            "18YearsChecking",
-            function() {
-                return "Age sgould me minium 18 years"
-            },
-            function (value) {
-                if (value) {
-                    const ageObj = new PersonAge();
-                    return ageObj.whatIsMyAge(value) >= 18;
-                }
-                return true;
-            }
-        ),
+        then: Yup.string().required('Father-In-Law DOB field is required'),
         othewise: Yup.string()
     }),
     dob_6: Yup.string().when(['looking_for_6'], {
         is: looking_for_6 => looking_for_6 == 'motherInLaw',
-        then: Yup.string().required('Mother-In-Law DOB field is required')
-        .test(
-            "18YearsChecking",
-            function() {
-                return "Age sgould me minium 18 years"
-            },
-            function (value) {
-                if (value) {
-                    const ageObj = new PersonAge();
-                    return ageObj.whatIsMyAge(value) >= 18;
-                }
-                return true;
-            }
-        ),
+        then: Yup.string().required('Mother-In-Law DOB field is required'),
         othewise: Yup.string()
     }),
     
@@ -401,8 +319,8 @@ setStateForPreviousData=(family_members)=>{
 		}
     }
     render() {
-        const {memberInfo, insureList,validateCheck,gender,familyMembers,lookingFor,dob} = this.state
-        console.log("FAMILY11111======>",dob);
+        const {memberInfo, insureList,validateCheck,gender,familyMembers} = this.state
+       // console.log("FAMILY======>",familyMembers);
         const insureListPrev = this.getInsuredList(familyMembers);
        
         console.log("insureList =====",familyMembers);
@@ -410,21 +328,21 @@ setStateForPreviousData=(family_members)=>{
         const newInitialValues = Object.assign(initialValues, {
             check_input: validateCheck ? validateCheck :0,
             gender: gender ? gender : "",
-            looking_for_0: lookingFor[0] ? lookingFor[0]:"",
-            dob_0: dob[0] ? new Date(dob[0]) : "",
-            looking_for_1: lookingFor[1] ? lookingFor[1] : "",
-            dob_1: dob[1] ? new Date(dob[1]) : "",
-            looking_for_2: lookingFor[2] ? lookingFor[2] : "",
-            dob_2: dob[2] ? new Date(dob[2]) : "",
+            looking_for_0: "",
+            dob_0: memberInfo ? memberInfo.dob_0 : "",
+            looking_for_1: memberInfo ? memberInfo.looking_for_1 : "",
+            dob_1: memberInfo ? memberInfo.dob_1 : "",
+            looking_for_2: memberInfo ? memberInfo.looking_for_2 : "",
+            dob_2: memberInfo ? memberInfo.dob_2 : "",
             child1Gender: memberInfo ? memberInfo.child1Gender : "",
-            looking_for_3: lookingFor[3] ? lookingFor[3] : "",
-            dob_3: dob[3] ? new Date(dob[3]) : "",
-            looking_for_4: lookingFor[4] ? lookingFor[4] : "",
-            dob_4: dob[4] ? new Date(dob[4]) : "",
-            looking_for_5: lookingFor[5] ? lookingFor[5] : "",
-            dob_5: dob[5] ? new Date(dob[5]) : "",
-            looking_for_6: lookingFor[6] ? lookingFor[6] : "",
-            dob_6: dob[6] ? new Date(dob[6]) : "",
+            looking_for_3: memberInfo ? memberInfo.looking_for_3 : "",
+            dob_3: memberInfo ? memberInfo.dob_3 : "",
+            looking_for_4: memberInfo ? memberInfo.looking_for_4 : "",
+            dob_4: memberInfo ? memberInfo.dob_4 : "",
+            looking_for_5: memberInfo ? memberInfo.looking_for_5 : "",
+            dob_5: memberInfo ? memberInfo.dob_5 : "",
+            looking_for_6: memberInfo ? memberInfo.looking_for_6 : "",
+            dob_6: memberInfo ? memberInfo.dob_6 : "",
             insureList: insureListPrev ? insureListPrev.toString()  : (insureList ? insureList :'')
         });
            

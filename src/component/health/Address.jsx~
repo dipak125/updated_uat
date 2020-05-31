@@ -5,7 +5,7 @@ import BaseComponent from '.././BaseComponent';
 import SideNav from '../common/side-nav/SideNav';
 import Footer from '../common/footer/Footer';
 // import ReactTooltip from "react-tooltip";
-import { Formik, Field, Form, FieldArray } from "formik";
+import { Formik, Field, Form } from "formik";
 import * as Yup from "yup";
 
 import axios from "../../shared/axios";
@@ -14,25 +14,18 @@ import { loaderStart, loaderStop } from "../../store/actions/loader";
 import { connect } from "react-redux";
 import { changeFormat, get18YearsBeforeDate, PersonAge } from "../../shared/dateFunctions";
 import dateformat from "dateformat";
-import moment from "moment";
 
 import "react-datepicker/dist/react-datepicker.css"
 import 'react-datepicker/dist/react-datepicker-cssmodules.min.css'
 
 const maxDob = dateformat(new Date(), 'mm/dd/yyyy');
 
-const initialFamilyDetails = {
-	fname: "",
-	lname: "",
-	dob: new Date(),
-    gender: "",	
-    family_member_id:0,
-    looking_for:''
-};
-
 const initialValues = {
     proposerAsInsured: "",
-    family_members:[initialFamilyDetails],
+    fname: "",
+    lname: "",
+    dob: "",
+    gender: "",
     panNo: "",
     phoneNo: "",
     email: "",
@@ -49,7 +42,24 @@ const validateAddress =  Yup.object().shape({
     proposerAsInsured: Yup.string()
         .required(function() {
             return "Please select a value"
-        }),    
+        }),
+    lname: Yup.string().required(function() {
+        return "Please enter a value"
+    }),
+    fname: Yup.string(function() {
+        return "Please enter a value"
+    }).required(function() {
+        return "Please enter a value"
+    })
+        .min(3, function() {
+            return "Name must be minimum 3 chracters"
+        })
+        .max(40, function() {
+            return "Name must be maximum 3 chracters"
+        })
+        .matches(/^[A-Za-z][A-Za-záéíñóúüÁÉÍÑÓÚÜ\s\-']*[A-Za-z\s]$/, function() {
+            return "Please enter valid name"
+        }),
     address1: Yup.string()
         .required(function() {
             return "Enter plot number."
@@ -69,7 +79,28 @@ const validateAddress =  Yup.object().shape({
         .email( function() {
             return "Please enter valid email"
         }),
-    
+    dob: Yup
+        .date()
+        .required( function() {
+            return "Please enter DOB"
+        })
+        //.max(maxDob, 'Date of birth should be equal or earlier on ${max}')
+        .max(maxDob, function() {
+            return "Date should not be future date"
+        })
+        .test(
+            "18YearsChecking",
+            function() {
+                return "Age sgould me minium 18 years"
+            },
+            function (value) {
+                if (value) {
+                    const ageObj = new PersonAge();
+                    return ageObj.whatIsMyAge(value) >= 18;
+                }
+                return true;
+            }
+        ),
     phoneNo: Yup.string()
         .required(function() {
             return "Please enter phone number"
@@ -83,7 +114,10 @@ const validateAddress =  Yup.object().shape({
         .max(12, function() {
             return "Phone number should be maximum 12 digits"
         }),
-   
+    gender: Yup.string()
+        .required(function() {
+            return "Select gender"
+        }),
     panNo: Yup.string()
         .required(function() {
             return "Enter PAN number"
@@ -105,86 +139,14 @@ const validateAddress =  Yup.object().shape({
         .required(function() {
             return "Select eIA option"
         }),
-    family_members: Yup.array().of(
-            Yup.object().shape({
-                fname: Yup.string().required("Required First name"),
-                lname: Yup.string().required("Required Last name"),
-                dob: Yup.date().required("Please enter DOB").max(maxDob, function() {
-                    return "Date should not be future date"
-                })
-                .test(
-                    "18YearsChecking",
-                    function() {
-                        return "Age sgould me minium 18 years"
-                    },
-                    function (value) {
-                        if (value) {
-                            const ageObj = new PersonAge();
-                            return ageObj.whatIsMyAge(value) >= 18;
-                        }
-                        return true;
-                    }
-                ),
-                gender: Yup.string().nullable().required("Require Gender"),        
-
-            })     
-    )
 
 });
 
-const validateFirstName=(str)=>{
-    let error;
-    if(str == ''){
-        error = 'Please enter the name';
-    }
-    return error;    
-}
-
 class Address extends Component {
-
-  
-    constructor(props) {
-		super(props)
-		this.state = {
-            familyMembers:[],
-            addressDetails:{},
-            is_eia_account:''
-		}
-	}
-
-    
-
 
     changePlaceHoldClassAdd(e) {
         let element = e.target.parentElement;
         element.classList.add('active');
-    }
-
-    componentDidMount(){       
-        this.fetchData();
-       // console.log("zzzzzz======>",productId)
-    }
-
-    fetchData=()=>{
-        const {productId } = this.props.match.params
-        let policyHolder_id = localStorage.getItem("policyHolder_id");
-        axios.get(`policy-holder/${policyHolder_id}`)
-            .then(res=>{
-                //console.log("aaaaaabbbbbir========>",response.data.data.policyHolder.request_data.family_members)
-                let family_members = res.data.data.policyHolder.request_data.family_members
-                let addressDetails = JSON.parse(res.data.data.policyHolder.address)
-                let is_eia_account = res.data.data.policyHolder.is_eia_account
-                this.setState({ 
-                    familyMembers:family_members,
-                    addressDetails,
-                    is_eia_account
-                })
-                
-            })
-            .catch(function (error) {
-                // handle error
-                console.log(error);
-            })
     }
 
     changePlaceHoldClassRemove(e) {
@@ -196,104 +158,13 @@ class Address extends Component {
         this.props.history.push(`/SelectDuration/${productId}`);
     }
 
-    handleSubmit = (values) => {
-        const {productId } = this.props.match.params
-        const policyHolder_id =  localStorage.getItem('policyHolder_id');
-        const formData = new FormData();
-        
-        formData.append('policy_holder_id',policyHolder_id);
-        const family_members = values.family_members;
-        let proposerAsInsured = values.proposerAsInsured;
-        sessionStorage.setItem('proposed_insured',proposerAsInsured);
-
-        for(let i=0;i<family_members.length;i++){
-            formData.append(`looking_for[${i}]`, family_members[i].looking_for);
-            formData.append(`family_member_id[${i}]`, family_members[i].family_member_id);
-            formData.append(`gender[${i}]`, family_members[i].gender);
-            formData.append(`first_name[${i}]`, family_members[i].fname);
-            formData.append(`last_name[${i}]`, family_members[i].lname);
-            formData.append(`dob[${i}]`, moment(family_members[i].dob).format("YYYY-MM-DD"));
-          //  formData.append(`pancard_no[${i}]`, values.panNo);
-         //   formData.append(`pancard_no[${i}]`, values.panNo);
-        }  
-        let email = values.email;
-        sessionStorage.setItem('email_data',email);
-        formData.append('is_eia_account',values.eIA);
-        sessionStorage.setItem('pan_data',values.panNo);
-        let address_object = {}
-        Object.assign(address_object,{
-            address1:values.address1,
-            address2:values.address2,
-            address3:values.address3,
-            area:values.area,
-            phoneNo:values.phoneNo,
-            pincode:values.pincode,
-            state:values.state,
-        })
-        formData.append('communication_address',JSON.stringify(address_object));
-        this.props.loadingStop();
-        axios
-        .post(`/insured-member-details`, formData)
-        .then(res => {
-           // if(res.data.completedStep == 4){
-                this.props.history.push(`/NomineeDetails/${productId}`);
-           // }        
-        })
-        .catch(err => {
-        
-        this.props.loadingStop();
-        });
-
-       
-        //console.log("Values =======> ",values);
-
-
-       // const {productId} = this.props.match.params
-
-
+    handleSubmit = (event) => {
+        const {productId} = this.props.match.params
+        this.props.history.push(`/NomineeDetails/${productId}`);
     }
 
-    initFamilyDetailsList = familyDetails => {
-		if (familyDetails.length > 0) {
-			return familyDetails.map(resource => ({
-				fname: resource.first_name ? resource.first_name:'',
-				lname: resource.last_name ? resource.last_name:'',
-				dob: resource.dob,
-                gender: resource.gender ?  resource.gender:'',
-                looking_for: resource.relation_with,
-                family_member_id: resource.id,
-                pancard_no:resource.pancard_no
-			}));
-		} else {
-			return [initialFamilyDetails];
-		}
-	};
-
     render() {
-        const {familyMembers,addressDetails,is_eia_account} = this.state    
-        console.log("ADDRESS DETAILS======>",is_eia_account)
-        let newInitialValues = Object.assign(initialValues, {
-            proposerAsInsured: sessionStorage.getItem('proposed_insured') ? sessionStorage.getItem('proposed_insured') : "",
-            family_members:this.initFamilyDetailsList(
-                familyMembers
-            ),
-            panNo: sessionStorage.getItem('pan_data') ? sessionStorage.getItem('pan_data') : "" ,
-            phoneNo: addressDetails && addressDetails.phoneNo ? addressDetails.phoneNo: "",
-            email: sessionStorage.getItem('email_data') ? sessionStorage.getItem('email_data') : "",
-            address1: addressDetails && addressDetails.address1 ? addressDetails.address1: "",
-            address2: addressDetails && addressDetails.address2 ? addressDetails.address2:  "",
-            address3: addressDetails && addressDetails.address3 ? addressDetails.address3: "",
-            pincode: addressDetails && addressDetails.pincode ? addressDetails.pincode: "",
-            area: addressDetails && addressDetails.area ? addressDetails.area: "",
-            state: addressDetails && addressDetails.state ? addressDetails.state: "",
-            eIA: is_eia_account ?  is_eia_account : 0
-        });
-
-
-
-        console.log("NNNNNNN--=--->",this.state)
         const {productId} = this.props.match.params
-        console.log("Family Members ------>",familyMembers)
         return (
             <>
                 <BaseComponent>
@@ -307,11 +178,11 @@ class Address extends Component {
                                 <section className="brand">
                                     <div className="boxpd">
 
-                                    <Formik initialValues={newInitialValues} onSubmit={this.handleSubmit} 
+                                    <Formik initialValues={initialValues} onSubmit={this.handleSubmit} 
                                     validationSchema={validateAddress}
                                     >
                                     {({ values, errors, setFieldValue, setFieldTouched, isValid, isSubmitting, touched }) => {
-                                        
+
                                     return (
                                     <Form>
                                         <div className="d-flex justify-content-left align-items-center">
@@ -358,45 +229,28 @@ class Address extends Component {
                                             <h4> Tell us more about the Insured Members</h4>
                                         </div>
 
-                                       
-                                                        
+
                                         <Row>
                                             <Col sm={12} md={9} lg={9}>
-                                            <>
-                                            <FieldArray
-                                                name="family_members"
-                                                render={arrayHelpers => (
-                                                    <div>
-                                            {familyMembers && familyMembers.length>0 && familyMembers.map((resource,index)=> 
-                                                    <div className="d-flex justify-content-left prsnlinfo">
-                                                        <div className="W12">
-                                                            {resource.relation_with}
-                                                            <Field
-                                                                name={`family_members.${index}.family_member_id`}
-                                                                type="hidden"
-                                                                value={values.family_members[index].family_member_id}
-                                                            />
-                                                            <Field
-                                                                name={`family_members.${index}.looking_for`}
-                                                                type="hidden"
-                                                                value={values.family_members[index].looking_for}
-                                                            />
-                                                        </div>
-                                                        <Row>
+                                                <div className="d-flex justify-content-left prsnlinfo">
+                                                    <div className="W12">Self</div>
+
+
+                                                    <Row>
                                                         <Col sm={12} md={3} lg={3}>
                                                             <FormGroup>
                                                                 <div className="insurerName">
                                                                     <Field
-                                                                        name={`family_members.${index}.fname`}
+                                                                        name="fname"
                                                                         type="text"
                                                                         placeholder="First Name"
                                                                         autoComplete="off"
                                                                         onFocus={e => this.changePlaceHoldClassAdd(e)}
                                                                         onBlur={e => this.changePlaceHoldClassRemove(e)}
-                                                                        value = {values.family_members[index].fname}
+                                                                        value={values.fname}
                                                                     />
-                                                                     {errors.family_members && errors.family_members[index] && errors.family_members[index].fname ? (
-                                                                    <span className="errorMsg">{errors.family_members[index].fname}</span>
+                                                                    {errors.fname && touched.fname ? (
+                                                                    <span className="errorMsg">{errors.fname}</span>
                                                                     ) : null}
                                                                 </div>
                                                             </FormGroup>
@@ -405,16 +259,16 @@ class Address extends Component {
                                                             <FormGroup>
                                                                 <div className="insurerName">
                                                                     <Field
-                                                                            name={`family_members.${index}.lname`}
+                                                                            name="lname"
                                                                             type="text"
                                                                             placeholder="Last Name"
                                                                             autoComplete="off"
                                                                             onFocus={e => this.changePlaceHoldClassAdd(e)}
                                                                             onBlur={e => this.changePlaceHoldClassRemove(e)}
-                                                                            value = {values.family_members[index].lname}                                                                            
+                                                                            value={values.lname}
                                                                     />
-                                                                     {errors.family_members && errors.family_members[index] && errors.family_members[index].lname ? (
-                                                                    <span className="errorMsg">{errors.family_members[index].lname}</span>
+                                                                    {errors.lname && touched.lname ? (
+                                                                    <span className="errorMsg">{errors.lname}</span>
                                                                     ) : null}
                                                                 </div>
                                                             </FormGroup>
@@ -422,7 +276,7 @@ class Address extends Component {
                                                         <Col sm={12} md={3} lg={3}>
                                                             <FormGroup>
                                                                 <DatePicker
-                                                                    name={`family_members.${index}.dob`}
+                                                                    name="dob"
                                                                     minDate={new Date()}
                                                                     dateFormat="dd MMM yyyy"
                                                                     placeholderText="DOB"
@@ -434,46 +288,41 @@ class Address extends Component {
                                                                     maxDate={new Date()}
                                                                     minDate={new Date(1/1/1900)}
                                                                     className="datePckr"
-                                                                    selected={values.family_members[index].dob ? new Date(values.family_members[index].dob):new Date()}
-                                                                    onChange={(val) => {
-                                                                        console.log("MOLK----->",val)
-                                                                        setFieldTouched(`family_members.${index}.dob`);
-                                                                        setFieldValue(`family_members.${index}.dob`, val);
+                                                                    onChange={(value) => {
+                                                                        setFieldTouched("dob");
+                                                                        setFieldValue("dob", value);
                                                                       }}
-                                                                      
-                                                                    //selected={moment(values.family_members[index].dob).format("dd MMM yyyy")}
-                                                                    
+                                                                    selected={values.dob}
                                                                 />
-                                                                {errors.family_members && errors.family_members[index] && errors.family_members[index].dob ? (
-                                                                    <span className="errorMsg">{errors.family_members[index].dob}</span>
-                                                                ) : null}  
+                                                                {errors.dob && touched.dob ? (
+                                                                    <span className="errorMsg">{errors.dob}</span>
+                                                                ) : null}
                                                             </FormGroup>
                                                         </Col>
                                                         <Col sm={12} md={3} lg={3}>
                                                             <FormGroup>
                                                                 <div className="formSection">
                                                                     <Field
-                                                                        name={`family_members.${index}.gender`}
+                                                                        name="gender"
                                                                         component="select"
-                                                                        autoComplete="off"                                                                        
+                                                                        autoComplete="off"
+                                                                        value={values.gender}
                                                                         className="formGrp"
                                                                     >
                                                                     <option value="">Select gender</option>
-                                                                        <option value="m">Male</option>
-                                                                        <option value="f">Female</option>
+                                                                        <option value="male">Male</option>
+                                                                        <option value="female">Female</option>
                                                                     </Field>     
-                                                                    {errors.family_members && errors.family_members[index] && errors.family_members[index].gender ? (
-                                                                    <span className="errorMsg">{errors.family_members[index].gender}</span>
-                                                                ) : null}                   
+                                                                    {errors.gender && touched.gender ? (
+                                                                        <span className="errorMsg">{errors.gender}</span>
+                                                                    ) : null}                    
                                                                 </div>
                                                             </FormGroup>
                                                         </Col>
-                                                        </Row>   
-                                                    </div>
-                                                    )}                                                
-                                                    </div>
-                                                )}/>
-                                                </>
+
+                                                    </Row>
+                                                </div>
+
                                                 <Row className="m-b-25">
                                                     <Col sm={12} md={4} lg={4}>
                                                         <div className="insurerName">
@@ -495,7 +344,7 @@ class Address extends Component {
                                                         <div className="insurerName">
                                                             <Field
                                                                 name="phoneNo"
-                                                                type="number"
+                                                                type="text"
                                                                 placeholder="PHONE NO"
                                                                 autoComplete="off"
                                                                 onFocus={e => this.changePlaceHoldClassAdd(e)}

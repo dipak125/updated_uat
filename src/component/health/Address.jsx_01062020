@@ -109,22 +109,7 @@ const validateAddress =  Yup.object().shape({
             Yup.object().shape({
                 fname: Yup.string().required("Required First name"),
                 lname: Yup.string().required("Required Last name"),
-                dob: Yup.date().required("Please enter DOB").max(maxDob, function() {
-                    return "Date should not be future date"
-                })
-                .test(
-                    "18YearsChecking",
-                    function() {
-                        return "Age sgould me minium 18 years"
-                    },
-                    function (value) {
-                        if (value) {
-                            const ageObj = new PersonAge();
-                            return ageObj.whatIsMyAge(value) >= 18;
-                        }
-                        return true;
-                    }
-                ),
+                dob: Yup.date().required("Please enter DOB"),                    
                 gender: Yup.string().nullable().required("Require Gender"),        
 
             })     
@@ -434,7 +419,7 @@ class Address extends Component {
                                                                     maxDate={new Date()}
                                                                     minDate={new Date(1/1/1900)}
                                                                     className="datePckr"
-                                                                    selected={values.family_members[index].dob ? new Date(values.family_members[index].dob):new Date()}
+                                                                    selected={new Date(values.family_members[index].dob)}
                                                                     onChange={(val) => {
                                                                         console.log("MOLK----->",val)
                                                                         setFieldTouched(`family_members.${index}.dob`);

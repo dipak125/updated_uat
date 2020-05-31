@@ -8,22 +8,57 @@ import SideNav from '../common/side-nav/SideNav';
 import Footer from '../common/footer/Footer';
 import { Formik, Field, Form } from "formik";
 import * as Yup from "yup";
+import moment from "moment";
 
 import axios from "../../shared/axios";
 import { withRouter } from 'react-router-dom';
 import { loaderStart, loaderStop } from "../../store/actions/loader";
 import { connect } from "react-redux";
 
-// const newInitialValues ={
-//     family_member_id_33: 'y'
-// }
+
+const initialValues = {
+    first_name: "",
+    last_name: "",
+    gender: "",
+    dob: "",
+    relation_with: ""
+}
+
+const validateNominee = Yup.object().shape({
+    last_name: Yup.string().required(function() {
+        return "Please enter a last name"
+    }),
+    first_name: Yup.string(function() {
+        return "Please enter name"
+    }).required(function() {
+        return "Please enter name"
+    })
+        .min(3, function() {
+            return "Name must be minimum 3 chracters"
+        })
+        .max(40, function() {
+            return "Name must be maximum 3 chracters"
+        })
+        .matches(/^[A-Za-z][A-Za-záéíñóúüÁÉÍÑÓÚÜ\s\-']*[A-Za-z\s]$/, function() {
+            return "Please enter valid name"
+    }),
+    gender: Yup.string().required(function() {
+            return "Please enter a last name"
+    }),
+    dob: Yup
+        .date()
+        .required( function() {
+            return "Please enter DOB"
+    }),
+    relation_with: Yup.string().required(function() {
+        return "Please enter relation"
+    })
+})
 
 class NomineeDetails extends Component {
 
     state = {
-        policyHolderDetails: [],
-        message: ""
-
+        NomineeDetails: [], 
       };
 
     changePlaceHoldClassAdd(e) {
@@ -40,75 +75,78 @@ class NomineeDetails extends Component {
         this.props.history.push(`/Address/${productId}`);
     }
 
-    handleSubmit = (event) => {
+    handleSubmit = (values, actions) => {
         const {productId} = this.props.match.params
-        this.props.history.push(`/PolicyDetails/${productId}`);
-    }
-
-    handleChangeSubmit = (family_member_id,value) => {
-
         const formData = new FormData(); 
 
-        formData.append('family_member_id', family_member_id);
-        formData.append('is_nominee', value);
+        for (const key in values) {
+            if (values.hasOwnProperty(key)) {
+              if(key == "dob"){
+                formData.append(key, moment(values[key]).format("YYYY-MM-DD"));
+              }
+              else {
+                 formData.append(key, values[key]);
+              }          
+            }
+          }
         formData.append('policy_holder_id', localStorage.getItem('policyHolder_id'));
-
         this.props.loadingStart();
         axios
-          .post(`/set-nominee`, formData)
-          .then(res => {
-            this.setState({
-                message: res.data.msg
-            });
-          })
-          .catch(err => {
-            this.setState({
-                message: ""
-            });
-            this.props.loadingStop();
-          });
+        .post(`/insert-nominee`, formData)
+        .then(res => { 
+            // this.props.loadingStop();
+            this.props.history.push(`/PolicyDetails/${productId}`);
+        })
+        .catch(err => {
+    
+          this.props.loadingStop();
+        });
+
+        
     }
 
-    getPolicyHolderDetails = () => {
+    getNomineeDetails = () => {
         this.props.loadingStart();
         axios
           .get(`/policy-holder/${localStorage.getItem('policyHolder_id')}`)
-          .then(res => {
+          .then(res => { 
             this.setState({
-                policyHolderDetails: res.data.data.policyHolder.request_data.family_members
+                NomineeDetails: res.data.data.policyHolder.request_data.nominee[0]
             }) 
+            // this.props.loadingStop();
           })
           .catch(err => {
             this.setState({
-                policyHolderDetails: [], flag: true
+                NomineeDetails: []
             });
             this.props.loadingStop();
           });
       }
 
-    componentDidMount() {
-        this.getPolicyHolderDetails();
+      componentDidMount() {
+        this.getNomineeDetails();
       }
 
 
     render() {
         const {productId} = this.props.match.params
-        const {policyHolderDetails} = this.state
+        const {NomineeDetails} = this.state
+        moment.defaultFormat = "YYYY-MM-YY";
 
-        let initialValues = {}
-
-        policyHolderDetails.map((member, qIndex) => {
-            initialValues[`family_member_id_${member.id}`] = member.is_nominee;
+        const newInitialValues = Object.assign(initialValues, {
+            first_name: NomineeDetails ? NomineeDetails.first_name : "",
+            last_name: NomineeDetails ? NomineeDetails.last_name : "",
+            gender: NomineeDetails ? NomineeDetails.gender : "",
+            dob: NomineeDetails && NomineeDetails.dob ? new Date(NomineeDetails.dob) : "",
+            relation_with: NomineeDetails ? NomineeDetails.relation_with : ""
         })
-
-        const newInitialValues =  Object.assign(initialValues) ;
-
+        
+        
+        // console.log("newInitialValues", moment(NomineeDetails.dob, moment.defaultFormat).toDate())
+        // console.log("newInitialValues", moment(NomineeDetails.dob).utc())
 
         return (
-            
             <>
-            {console.log("newInitialValues", newInitialValues)}
-
                 <BaseComponent>
                     <div className="container-fluid">
                         <div className="row">
@@ -125,9 +163,9 @@ class NomineeDetails extends Component {
                                         <div className="d-flex justify-content-left carloan m-b-25">
                                             <h4> Nominee  Details</h4>
                                         </div>
-                                    {Object.keys(newInitialValues).length > 0 ?
+
                                     <Formik initialValues={newInitialValues} onSubmit={this.handleSubmit} 
-                                    // validationSchema={validateNominee}
+                                    validationSchema={validateNominee}
                                     >
                                     {({ values, errors, setFieldValue, setFieldTouched, isValid, isSubmitting, touched }) => {
 
@@ -136,52 +174,120 @@ class NomineeDetails extends Component {
                                         <Row>
                                             <Col sm={12} md={9} lg={9}>
 
-                                            {policyHolderDetails.map((member, qIndex) => ( 
-                                                member.relation_with != 'self' ?
-                                                <div className="medinfo"><p className="W500">{member.relation_with}</p>                              
-                                                <FormGroup>
-                                                    <div className="d-inline-flex m-b-30">
-                                                        <div className="p-r-25">
-                                                            <label className="customRadio3">
-                                                            <Field
-                                                                type="radio"
-                                                                name={`family_member_id_${member.id}`}
-                                                                value="y"
-                                                                key={qIndex}  
-                                                                onChange={(e) => {
-                                                                    setFieldValue(`family_member_id_${member.id}`, e.target.value);
-                                                                    this.handleChangeSubmit(member.id,e.target.value)
-                                                                }}
-                                                                checked={values[`family_member_id_${member.id}`] == 'y' ? true : false}
-                                                            />
-                                                                <span className="checkmark " /><span className="fs-14"> Yes</span>                      
-                                                            </label>
-                                                        </div>     
-                                                        <div className="">
-                                                            <label className="customRadio3">
-                                                            <Field
-                                                                type="radio"
-                                                                name={`family_member_id_${member.id}`}
-                                                                value="n"
-                                                                key={qIndex}  
-                                                                onChange={(e) => {
-                                                                    setFieldValue(`family_member_id_${member.id}`, e.target.value);
-                                                                    this.handleChangeSubmit(member.id, e.target.value)
-                                                                }}
-                                                                checked={values[`family_member_id_${member.id}`] == 'n' ? true : false}
-                                                            />
-                                                                <span className="checkmark" />
-                                                                <span className="fs-14">No</span>                                      
-                                                            </label>
-                                                        </div>                             
-                                                    </div>
-                                                    </FormGroup>
-            
-                                                </div>
-                                                : null
-                                                ))}
+                                                <Row>
+                                                    <Col sm={12} md={4} lg={4}>
+                                                        <FormGroup>
+                                                            <div className="insurerName">
+                                                                <Field
+                                                                    name="first_name"
+                                                                    type="text"
+                                                                    placeholder="First Name"
+                                                                    autoComplete="off"
+                                                                    onFocus={e => this.changePlaceHoldClassAdd(e)}
+                                                                    onBlur={e => this.changePlaceHoldClassRemove(e)}
+                                                                    value={values.first_name}
+                                                                />
+                                                                {errors.first_name && touched.first_name ? (
+                                                                <span className="errorMsg">{errors.first_name}</span>
+                                                                ) : null}
+                                                                
+                                                            </div>
+                                                        </FormGroup>
+                                                    </Col>
 
-                                                    
+                                                    <Col sm={12} md={4} lg={4}>
+                                                        <FormGroup>
+                                                            <div className="insurerName">
+                                                                <Field
+                                                                    name="last_name"
+                                                                    type="text"
+                                                                    placeholder="Last Name"
+                                                                    autoComplete="off"
+                                                                    onFocus={e => this.changePlaceHoldClassAdd(e)}
+                                                                    onBlur={e => this.changePlaceHoldClassRemove(e)}
+                                                                    value={values.last_name}
+                                                                />
+                                                                {errors.last_name && touched.last_name ? (
+                                                                <span className="errorMsg">{errors.last_name}</span>
+                                                                ) : null}
+                                                            </div>
+                                                        </FormGroup>
+                                                    </Col>
+
+
+                                                    <Col sm={12} md={4} lg={4}>
+                                                        <FormGroup>
+                                                            <div className="formSection">
+                                                                <Field
+                                                                    name="gender"
+                                                                    component="select"
+                                                                    autoComplete="off"
+                                                                    value={values.gender}
+                                                                    className="formGrp"
+                                                                >
+                                                                <option value="">Select gender</option>
+                                                                        <option value="m">Male</option>
+                                                                        <option value="f">Female</option>
+                                                                    </Field>     
+                                                                    {errors.gender && touched.gender ? (
+                                                                        <span className="errorMsg">{errors.gender}</span>
+                                                                    ) : null}     
+                                                            </div>
+                                                        </FormGroup>
+                                                    </Col>
+                                                </Row>
+
+                                                <Row className="m-b-45">
+                                                    <Col sm={12} md={4} lg={4}>
+                                                        <FormGroup>
+                                                            <DatePicker
+                                                                name="dob"
+                                                                minDate={new Date()}
+                                                                dateFormat="dd MMM yyyy"
+                                                                placeholderText="DOB"
+                                                                peekPreviousMonth
+                                                                peekPreviousYear
+                                                                showMonthDropdown
+                                                                showYearDropdown
+                                                                dropdownMode="select"
+                                                                maxDate={new Date()}
+                                                                minDate={new Date(1/1/1900)}
+                                                                className="datePckr"
+                                                                onChange={(value) => {
+                                                                    setFieldTouched("dob");
+                                                                    setFieldValue("dob", value);
+                                                                    }}
+                                                                selected={values.dob}
+                                                            />
+                                                            {errors.dob && touched.dob ? (
+                                                                <span className="errorMsg">{errors.dob}</span>
+                                                            ) : null}
+                                                        </FormGroup>
+                                                    </Col>
+
+
+                                                    <Col sm={12} md={4} lg={6}>
+                                                        <FormGroup>
+                                                            <div className="formSection">                                                           
+                                                                <Field
+                                                                    name="relation_with"
+                                                                    component="select"
+                                                                    autoComplete="off"
+                                                                    value={values.relation_with}
+                                                                    className="formGrp"
+                                                                >
+                                                                <option value="">Relation with Primary Insured</option>
+                                                                <option value="male">father</option>
+                                                                <option value="mother">Mother</option>
+                                                                <option value="spouse">Spouse</option>
+                                                                </Field>     
+                                                                {errors.relation_with && touched.relation_with ? (
+                                                                    <span className="errorMsg">{errors.relation_with}</span>
+                                                                ) : null}        
+                                                            </div>
+                                                        </FormGroup>
+                                                    </Col>
+                                                </Row>
                                                 <div className="d-flex justify-content-left resmb">
                                                 <Button className={`backBtn`} type="button"  disabled={isSubmitting ? true : false} onClick= {this.addressInfo.bind(this, productId )}>
                                                     {isSubmitting ? 'Wait..' : 'Back'}
@@ -202,7 +308,6 @@ class NomineeDetails extends Component {
                                     );
                                     }}
                                     </Formik>
-                                    : null}
                                     </div>
                                 </section>
                             </div>

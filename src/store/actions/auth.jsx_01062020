@@ -52,9 +52,6 @@ export const authLogout = () => {
     localStorage.removeItem('users');
     localStorage.removeItem('policyHolder_id');
     localStorage.removeItem('policyHolder_refNo');
-    sessionStorage.removeItem('pan_data');
-    sessionStorage.removeItem('email_data');
-    sessionStorage.removeItem('proposed_insured');
 
     return {
         type: AUTH_LOGOUT

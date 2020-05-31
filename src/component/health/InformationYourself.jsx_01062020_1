@@ -12,10 +12,6 @@ import moment from "moment";
 import * as Yup from 'yup';
 
 import { Formik, Form, Field, ErrorMessage } from 'formik';
-import dateformat from "dateformat";
-import { changeFormat, get18YearsBeforeDate, PersonAge } from "../../shared/dateFunctions";
-
-const maxDob = dateformat(new Date(), 'mm/dd/yyyy');
 
 const initialValues = {
     self: 0,
@@ -49,38 +45,12 @@ const validateFamilyMembers  = Yup.object().shape({
     //check_input : Yup.string().required('Please select an options'),
     dob_0: Yup.string().when(['looking_for_0'], {
       is: looking_for_0 => looking_for_0 == 'self',
-      then: Yup.string().required('Self DOB field is required')
-    .test(
-        "18YearsChecking",
-        function() {
-            return "Age sgould me minium 18 years"
-        },
-        function (value) {
-            if (value) {
-                const ageObj = new PersonAge();
-                return ageObj.whatIsMyAge(value) >= 18;
-            }
-            return true;
-        }
-    ),
+      then: Yup.string().required('Self DOB field is required'),
       othewise: Yup.string()
     }),
     dob_1: Yup.string().when(['looking_for_1'], {
         is: looking_for_1 => looking_for_1 == 'spouse',
-        then: Yup.string().required('Spouse DOB field is required')
-        .test(
-            "18YearsChecking",
-            function() {
-                return "Age sgould me minium 18 years"
-            },
-            function (value) {
-                if (value) {
-                    const ageObj = new PersonAge();
-                    return ageObj.whatIsMyAge(value) >= 18;
-                }
-                return true;
-            }
-        ),
+        then: Yup.string().required('Spouse DOB field is required'),
         othewise: Yup.string()
     }),
     dob_2: Yup.string().when(['looking_for_2'], {
@@ -96,74 +66,22 @@ const validateFamilyMembers  = Yup.object().shape({
     
     dob_3: Yup.string().when(['looking_for_3'], {
         is: looking_for_3 => looking_for_3 == 'father',
-        then: Yup.string().required('Father DOB field is required')
-        .test(
-            "18YearsChecking",
-            function() {
-                return "Age sgould me minium 18 years"
-            },
-            function (value) {
-                if (value) {
-                    const ageObj = new PersonAge();
-                    return ageObj.whatIsMyAge(value) >= 18;
-                }
-                return true;
-            }
-        ),
+        then: Yup.string().required('Father DOB field is required'),
         othewise: Yup.string()
     }),
     dob_4: Yup.string().when(['looking_for_4'], {
         is: looking_for_4 => looking_for_4 == 'mother',
-        then: Yup.string().required('Mother DOB field is required')
-        .test(
-            "18YearsChecking",
-            function() {
-                return "Age sgould me minium 18 years"
-            },
-            function (value) {
-                if (value) {
-                    const ageObj = new PersonAge();
-                    return ageObj.whatIsMyAge(value) >= 18;
-                }
-                return true;
-            }
-        ),
+        then: Yup.string().required('Mother DOB field is required'),
         othewise: Yup.string()
     }),
     dob_5: Yup.string().when(['looking_for_5'], {
         is: looking_for_5 => looking_for_5 == 'fatherInLaw',
-        then: Yup.string().required('Father-In-Law DOB field is required')
-        .test(
-            "18YearsChecking",
-            function() {
-                return "Age sgould me minium 18 years"
-            },
-            function (value) {
-                if (value) {
-                    const ageObj = new PersonAge();
-                    return ageObj.whatIsMyAge(value) >= 18;
-                }
-                return true;
-            }
-        ),
+        then: Yup.string().required('Father-In-Law DOB field is required'),
         othewise: Yup.string()
     }),
     dob_6: Yup.string().when(['looking_for_6'], {
         is: looking_for_6 => looking_for_6 == 'motherInLaw',
-        then: Yup.string().required('Mother-In-Law DOB field is required')
-        .test(
-            "18YearsChecking",
-            function() {
-                return "Age sgould me minium 18 years"
-            },
-            function (value) {
-                if (value) {
-                    const ageObj = new PersonAge();
-                    return ageObj.whatIsMyAge(value) >= 18;
-                }
-                return true;
-            }
-        ),
+        then: Yup.string().required('Mother-In-Law DOB field is required'),
         othewise: Yup.string()
     }),
     
