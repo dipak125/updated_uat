@@ -42,8 +42,7 @@ const initialValues = {
     pincode: "",
     area: "",
     state: "",
-    eIA: "",
-    eia_account_no:""
+    eIA: ""
     };
 
 const validateAddress =  Yup.object().shape({
@@ -92,17 +91,16 @@ const validateAddress =  Yup.object().shape({
     pincode: Yup.string()
         .required(function() {
             return "Enter pin code"
-        }).min(6, 'Must be exactly 6 digits')
-        .max(6, 'Must be exactly 6 digits'),
+        }),
 
     area: Yup.string()
         .required(function() {
             return "Select area"
         }),
-    /*state: Yup.string()
+    state: Yup.string()
         .required(function() {
-            return "Enter state"
-        }),*/
+            return "Enter stater"
+        }),
     eIA: Yup.string()
         .required(function() {
             return "Select eIA option"
@@ -130,12 +128,7 @@ const validateAddress =  Yup.object().shape({
                 gender: Yup.string().nullable().required("Require Gender"),        
 
             })     
-    ),
-    eia_account_no:Yup.string().when(['eIA'], {
-        is: eIA => eIA == 1,
-        then: Yup.string().required('Please select the EIA account number'),
-        othewise: Yup.string()
-    })
+    )
 
 });
 
@@ -153,14 +146,9 @@ class Address extends Component {
     constructor(props) {
 		super(props)
 		this.state = {
-            policy_holder:{},
             familyMembers:[],
             addressDetails:{},
-            is_eia_account:'',
-            selfFlag:false,
-            pinDataArr:[],
-            stateName:[],
-            showEIA:false
+            is_eia_account:''
 		}
 	}
 
@@ -183,97 +171,20 @@ class Address extends Component {
         axios.get(`policy-holder/${policyHolder_id}`)
             .then(res=>{
                 //console.log("aaaaaabbbbbir========>",response.data.data.policyHolder.request_data.family_members)
-                let policy_holder =  res.data.data.policyHolder;
                 let family_members = res.data.data.policyHolder.request_data.family_members
                 let addressDetails = JSON.parse(res.data.data.policyHolder.address)
                 let is_eia_account = res.data.data.policyHolder.is_eia_account
-                let selfFlag = false;
-                for(let i=0;i<family_members.length;i++){
-                    if(family_members[i].relation_with=='self'){
-                        selfFlag = true
-                        break
-                    }
-                }
-                
-
                 this.setState({ 
-                    selfFlag,
-                    policy_holder,
                     familyMembers:family_members,
                     addressDetails,
                     is_eia_account
                 })
-
-                this.fetchPrevAreaDetails(addressDetails)
                 
             })
             .catch(function (error) {
                 // handle error
                 console.log(error);
             })
-    }
-
-    fetchPrevAreaDetails=(addressDetails)=>{
-            //console.log("PPPPPPP=======>",addressDetails);
-            if(addressDetails){
-                let pincode = addressDetails.pincode;
-                const formData = new FormData();
-                formData.append('pincode',pincode);
-                axios.post('generate-pincode-details',
-                formData
-                ).then(res=>{
-                    let pinData = res.data.trim();               
-                    let pinDataArr = JSON.parse(pinData.substring(0,pinData.length-10))   
-                    let stateName=pinDataArr.map(resource=>
-                        resource.STATE_NM
-                    )  
-                    var unique = stateName.filter((v, i, a) => a.indexOf(v) === i); 
-                    
-                        
-                    this.setState({
-                        pinDataArr,
-                        stateName:unique,
-                    });
-                }).
-                catch(err=>{
-                    console.log(err);
-                })
-            }
-            
-    }
-
-    fetchAreadetails=(e)=>{
-        //let pinCode=obj.value;
-        let pinCode = e.target.value;
-        console.log("AAAAAAAA=====>",pinCode)
-       
-        if(pinCode.length==6){
-
-            const formData = new FormData();
-            formData.append('pincode',pinCode);
-            axios.post('generate-pincode-details',
-            formData
-            ).then(res=>{
-                let pinData = res.data.trim();               
-                let pinDataArr = JSON.parse(pinData.substring(0,pinData.length-10))   
-                let stateName=pinDataArr.map(resource=>
-                    resource.STATE_NM
-                )  
-                var unique = stateName.filter((v, i, a) => a.indexOf(v) === i); 
-                
-                    
-                this.setState({
-                    pinDataArr,
-                    stateName:unique,
-                });
-            }).
-            catch(err=>{
-                console.log(err);
-            })
-           
-
-        }
-        
     }
 
     changePlaceHoldClassRemove(e) {
@@ -319,10 +230,7 @@ class Address extends Component {
             pincode:values.pincode,
             state:values.state,
         })
-        formData.append('communication_address',JSON.stringify(address_object));        
-        if(values.eIA == 1){
-            formData.append('eia_account_no',values.eia_account_no)
-        }        
+        formData.append('communication_address',JSON.stringify(address_object));
         this.props.loadingStop();
         axios
         .post(`/insured-member-details`, formData)
@@ -359,29 +267,13 @@ class Address extends Component {
 		} else {
 			return [initialFamilyDetails];
 		}
-    };
+	};
 
-    showEIAText = (value) =>{
-        if(value == 1){
-            this.setState({
-                showEIA:true,
-                is_eia_account:1
-            })
-        }
-        else{
-            this.setState({
-                showEIA:false,
-                is_eia_account:0
-            })
-        }
-    }
-    
-    
     render() {
-        const {policy_holder,familyMembers,addressDetails,is_eia_account,selfFlag,pinDataArr,stateName,showEIA} = this.state    
-        console.log("ADDRESS DETAILS======>",stateName)
+        const {familyMembers,addressDetails,is_eia_account} = this.state    
+        console.log("ADDRESS DETAILS======>",is_eia_account)
         let newInitialValues = Object.assign(initialValues, {
-            proposerAsInsured: sessionStorage.getItem('proposed_insured') ? sessionStorage.getItem('proposed_insured') : (selfFlag ? 1:0),
+            proposerAsInsured: sessionStorage.getItem('proposed_insured') ? sessionStorage.getItem('proposed_insured') : "",
             family_members:this.initFamilyDetailsList(
                 familyMembers
             ),
@@ -393,9 +285,8 @@ class Address extends Component {
             address3: addressDetails && addressDetails.address3 ? addressDetails.address3: "",
             pincode: addressDetails && addressDetails.pincode ? addressDetails.pincode: "",
             area: addressDetails && addressDetails.area ? addressDetails.area: "",
-            state: addressDetails && addressDetails.state ? addressDetails.state:"",
-            eIA: is_eia_account ?  is_eia_account : 0,
-            eia_account_no : policy_holder && policy_holder.eia_no ?  policy_holder.eia_no : ''
+            state: addressDetails && addressDetails.state ? addressDetails.state: "",
+            eIA: is_eia_account ?  is_eia_account : 0
         });
 
 
@@ -411,7 +302,7 @@ class Address extends Component {
                             <div className="col-sm-12 col-md-12 col-lg-2 col-xl-2 pd-l-0">
                                 <SideNav />
                             </div>
-                            <div className="col-sm-12 col-md-12 col-lg-10 col-xl-10">
+                            <div className="col-sm-12 col-md-12 col-lg-10 col-xl-10 infobox">
                                 <h4 className="text-center mt-3 mb-3">Arogya Sanjeevani Policy</h4>
                                 <section className="brand">
                                     <div className="boxpd">
@@ -437,7 +328,6 @@ class Address extends Component {
                                                             setFieldValue(`proposerAsInsured`, e.target.value);
                                                         }}
                                                         checked={values.proposerAsInsured == '1' ? true : false}
-                                                        disabled={selfFlag}
                                                     />
                                                         <span className="checkmark " /><span className="fs-14"> Yes</span>
                                                     </label>
@@ -454,7 +344,6 @@ class Address extends Component {
                                                             setFieldValue(`proposerAsInsured`, e.target.value);
                                                         }}
                                                         checked={values.proposerAsInsured == '0' ? true : false}
-                                                        disabled={selfFlag}
                                                     />
                                                         <span className="checkmark" />
                                                         <span className="fs-14">No</span>
@@ -700,13 +589,11 @@ class Address extends Component {
                                                             <div className="insurerName">
                                                                 <Field
                                                                     name="pincode"
-                                                                    type="number"
+                                                                    type="text"
                                                                     placeholder="Pincode"
                                                                     autoComplete="off"
-                                                                    maxlength = "6"
                                                                     onFocus={e => this.changePlaceHoldClassAdd(e)}
                                                                     onBlur={e => this.changePlaceHoldClassRemove(e)}
-                                                                    onKeyUp={e=> this.fetchAreadetails(e)}
                                                                     value={values.pincode}
                                                                 />
                                                                 {errors.pincode && touched.pincode ? (
@@ -726,11 +613,8 @@ class Address extends Component {
                                                                     className="formGrp"
                                                                 >
                                                                 <option value="">Select Area</option>
-                                                                {pinDataArr && pinDataArr.map((resource,rindex)=>
-                                                                    <option value={resource.LCLTY_SUBRB_TALUK_TEHSL_NM}>{resource.LCLTY_SUBRB_TALUK_TEHSL_NM}</option>
-                                                                )}
-                                                                    
-                                                                    {/*<option value="area2">Area 2</option>*/}
+                                                                    <option value="area1">Area 1</option>
+                                                                    <option value="area2">Area 2</option>
                                                                 </Field>     
                                                                 {errors.area && touched.area ? (
                                                                     <span className="errorMsg">{errors.area}</span>
@@ -748,7 +632,7 @@ class Address extends Component {
                                                                     autoComplete="off"
                                                                     onFocus={e => this.changePlaceHoldClassAdd(e)}
                                                                     onBlur={e => this.changePlaceHoldClassRemove(e)}
-                                                                    value={stateName ? stateName[0] : values.state} 
+                                                                    value={values.state}
                                                                 />
                                                                 {errors.state && touched.state ? (
                                                                 <span className="errorMsg">{errors.state}</span>
@@ -777,7 +661,6 @@ class Address extends Component {
                                                         key='1'  
                                                         onChange={(e) => {
                                                             setFieldValue(`eIA`, e.target.value);
-                                                            this.showEIAText(1);
                                                         }}
                                                         checked={values.eIA == '1' ? true : false}
                                                     />
@@ -794,7 +677,6 @@ class Address extends Component {
                                                         key='1'  
                                                         onChange={(e) => {
                                                             setFieldValue(`eIA`, e.target.value);
-                                                            this.showEIAText(0);
                                                         }}
                                                         checked={values.eIA == '0' ? true : false}
                                                     />
@@ -806,41 +688,7 @@ class Address extends Component {
                                                     </label>
                                                 </div>
                                             </div>
-                                            
-                                        
                                         </div>
-
-                                       {showEIA || is_eia_account == 1 ?                         
-                                        <div className="d-flex justify-content-left align-items-center m-b-40">
-                                                
-                                            <div className="proposr m-r-60"><p>EIA Number
-                                            <OverlayTrigger overlay={<Tooltip id="tooltip-disabled">The e-Insurance account or Electronic Insurance Account offers policyholders online space to hold all their insurance policies electronically under one e-insurance account number. This allows the policyholder to access all their policies with a few clicks and no risk of losing the physical insurance policy</Tooltip>}>
-                                            <a href="#" className="infoIcon"><img src={require('../../assets/images/i.svg')} alt="" /></a>
-                                            </OverlayTrigger></p>
-                            
-                              
-                                                </div>
-                                            <div className="d-inline-flex">
-                                            <FormGroup>
-                                                            <div className="insurerName">
-                                                                <Field
-                                                                    name="eia_account_no"
-                                                                    type="text"
-                                                                    placeholder="EIA NUMBER"
-                                                                    autoComplete="off"
-                                                                    value = {values.eia_account_no}
-                                                                    onFocus={e => this.changePlaceHoldClassAdd(e)}
-                                                                    onBlur={e => this.changePlaceHoldClassRemove(e)}
-                                                                />
-                                                                  {errors.eia_account_no && touched.eia_account_no ? (
-                                                        <span className="errorMsg">{errors.eia_account_no}</span>
-                                                    ) : null}                                             
-                                                            </div>
-                                                        </FormGroup>
-                                            </div>
-                                            
-                                        
-                                        </div>:''}
                                         <div className="d-flex justify-content-left resmb">
                                         <Button className={`backBtn`} type="button"  disabled={isSubmitting ? true : false} onClick= {this.sumInsured.bind(this, productId )}>
                                             {isSubmitting ? 'Wait..' : 'Back'}

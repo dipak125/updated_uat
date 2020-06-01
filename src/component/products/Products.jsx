@@ -22,7 +22,7 @@ class Products extends Component {
                                 <div className="col-sm-12 col-md-12 col-lg-2 col-xl-2">
                                     <SideNav />
                                 </div>
-                                <div className="col-sm-12 col-md-12 col-lg-10 col-xl-10">
+                                <div className="col-sm-12 col-md-12 col-lg-10 col-xl-10 infobox">
                                     <div className="messageDeskSec">
                                         <Tab.Container id="left-tabs-example" defaultActiveKey="first">
                                             <Row>

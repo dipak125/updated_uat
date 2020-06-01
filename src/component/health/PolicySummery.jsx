@@ -26,7 +26,7 @@ class PolicySummery extends Component {
                             <div className="col-sm-12 col-md-12 col-lg-2 col-xl-2 pd-l-0">
                                 <SideNav />
                             </div>
-                            <div className="col-sm-12 col-md-12 col-lg-10 col-xl-10">
+                            <div className="col-sm-12 col-md-12 col-lg-10 col-xl-10 infobox">
                                 <h4 className="text-center mt-3 mb-3">Arogya Sanjeevani Policy</h4>
                                 <section className="brand">
                                     <div className="boxpd">

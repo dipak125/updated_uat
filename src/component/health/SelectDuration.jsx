@@ -87,9 +87,10 @@ class SelectDuration extends Component {
         accessToken: "",
         policyHolderDetails: [],
         polStartDate: "",
-        polEndDate: "",
+        EndDate: "",
         insureValue: "" ,
-        error: []
+        error: [],
+        endDateFlag: false
       };
 
 
@@ -209,7 +210,7 @@ class SelectDuration extends Component {
                      "PolicyRiskList":[
                         {
                            "ProductElementCode":"R10007",
-                           "DateOfBirth":policyHolderDetails.dob,
+                           "DateOfBirth":policyHolderDetails.max_dob,
                            "ArgInsuredRelToProposer":2,
                            "ArogyaOccupation":"1",
                            "Height":163.3,
@@ -262,7 +263,11 @@ class SelectDuration extends Component {
     }
 
     handleChange =(value) => {
-        let endDate = moment(value).add(1, 'years')
+        let endDate = moment(value).add(1, 'years').format("YYYY-MM-DD")
+        this.setState({
+            EndDate: endDate,
+            endDateFlag: true
+        }) 
     }
 
 
@@ -275,23 +280,22 @@ class SelectDuration extends Component {
 
     render() {
         const {productId} = this.props.match.params
-        const {policyHolderDetails, serverResponse, error} = this.state
+        const {policyHolderDetails, serverResponse, error, EndDate, endDateFlag} = this.state
         const request_data = policyHolderDetails ? policyHolderDetails.request_data:null;
         let start_date = request_data && request_data.start_date ? new Date(request_data.start_date): '';
-        let end_date = request_data && request_data.end_date ? new Date(request_data.end_date): '';
 
-        
-    //    let insureValue = arrSumIns[parseInt(sum_insured)] ? arrSumIns[parseInt(sum_insured)] :''
-        
+        // let end_date = endDateFlag ? ( EndDate ? new Date(EndDate) : (request_data && request_data.end_date ? new Date(request_data.end_date) : "") ) 
+        // : (request_data && request_data.end_date ? new Date(request_data.end_date) : "");
+
+        let end_date = request_data && request_data.end_date ? new Date(request_data.end_date) : "";
+          
 
         const newInitialValues = Object.assign(initialValues, {
-            polStartDate: start_date ? start_date : "",
-            polEndDate: end_date  ? end_date : "",
+            polStartDate: start_date ? start_date : new Date,
+            polEndDate: end_date  ? end_date : new Date(moment().add(1, 'years').format("YYYY-MM-DD")),
             insureValue: policyHolderDetails && policyHolderDetails.request_data ? Math.floor(policyHolderDetails.request_data.sum_insured) : ""
         })
 
-        console.log("newInitialValues", newInitialValues)
-    
         const errMsg =  error && error.messages && error.messages.length > 0 ? error.messages.map((msg, qIndex)=>{  
             return(
                 <h5> {msg.message}</h5>                   
@@ -306,7 +310,7 @@ class SelectDuration extends Component {
                             <div className="col-sm-12 col-md-12 col-lg-2 col-xl-2 pd-l-0">
                                 <SideNav />
                             </div>
-                            <div className="col-sm-12 col-md-12 col-lg-10 col-xl-10">
+                            <div className="col-sm-12 col-md-12 col-lg-10 col-xl-10 infobox">
                                 <h4 className="text-center mt-3 mb-3">Arogya Sanjeevani Policy</h4>
                                 <section className="brand">
                                     <div className="boxpd">
@@ -319,7 +323,6 @@ class SelectDuration extends Component {
                                         validationSchema={validateDuration}
                                         >
                                         {({ values, errors, setFieldValue, setFieldTouched, isValid, isSubmitting, touched }) => {
-                                            console.log("aaaaaaaaaaaaaLAAAA========>",values);
                                         return (
                                         <Form>
                                         <Row>
@@ -349,7 +352,8 @@ class SelectDuration extends Component {
                                                             onChange={(value) => {
                                                                 setFieldTouched("polStartDate");
                                                                 setFieldValue("polStartDate", value);
-                                                                this.handleChange(value);
+                                                                setFieldValue("polEndDate", "");
+                                                                // this.handleChange(value);
                                                             }}
                                                             selected={values.polStartDate}
                                                         />
@@ -368,7 +372,8 @@ class SelectDuration extends Component {
                                                         <FormGroup>
                                                         <DatePicker
                                                             name="polEndDate"
-                                                            minDate={new Date()}
+                                                            minDate={new Date(moment(values.polStartDate).add(1, 'years').format("YYYY-MM-DD"))}
+                                                            maxDate={new Date(moment(values.polStartDate).add(1, 'years').format("YYYY-MM-DD"))}
                                                             dateFormat="dd MMM yyyy"
                                                             placeholderText="End Date"
                                                             peekPreviousMonth
@@ -376,6 +381,7 @@ class SelectDuration extends Component {
                                                             showMonthDropdown
                                                             showYearDropdown
                                                             dropdownMode="select"
+                                                            // disabled = {true}
                                                             className="datePckr"
                                                             onChange={(value) => {
                                                                 setFieldTouched("polEndDate");

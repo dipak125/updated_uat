@@ -55,8 +55,6 @@ export const authLogout = () => {
     sessionStorage.removeItem('pan_data');
     sessionStorage.removeItem('email_data');
     sessionStorage.removeItem('proposed_insured');
-    sessionStorage.removeItem('display_looking_for');
-    sessionStorage.removeItem('display_dob');
 
     return {
         type: AUTH_LOGOUT
