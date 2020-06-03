@@ -310,6 +310,7 @@ class NomineeDetails extends Component {
                                     </Formik>
                                     </div>
                                 </section>
+                                <Footer />
                             </div>
                         </div>
                     </div>

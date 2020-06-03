@@ -83,8 +83,8 @@ class ThankYouPage extends Component {
                          </div>
                      </div>
                      </section>
-                     <div className="dashbrd"><a href="#">Go to Dashboard</a></div>
-                     {/* <Footer/> */}
+                     {/* <div className="dashbrd"><a href="#">Go to Dashboard</a></div> */}
+                     <Footer/>
                      </div>
                    </div>
                    </div>  

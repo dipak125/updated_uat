@@ -73,10 +73,10 @@ class Table extends Component {
                                 (<tbody>
                                     {health_list.map((part, partIndex) => ( 
                                     <tr key={partIndex}>
-                                        <td className="W-10"><img src={require('../../assets/images/Miscellaneous-car.svg')} alt="" /></td>
+                                        <td className="W-10"><img src={require(`../../assets/images/${part.image}`)} alt="" /></td>
                                         <td className="W-70">{part.product}</td>
                                         <td className="W-10 text-right"> <button className="buy" onClick= {this.buy_policy.bind(this, part.id )} >Buy</button></td>
-                                        <td className="W-10 text-right"> <button className="renew">Renew</button></td>
+                                        {(part.product != 'Arogoya Sanjeevani') ? (<td className="W-10 text-right"> <button className="renew">Renew</button></td>):null}
                                     </tr>
                                     ))
                                     }

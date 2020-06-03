@@ -21,14 +21,14 @@ class UnderMaintenance extends Component {
                                 <SideNav />
                             </div>
                             <div className="col-sm-12 col-md-12 col-lg-10 col-xl-10 infobox">
-                                <h4 className="text-center mt-3 mb-3">SBI General</h4>
+                                {/* <h4 className="text-center mt-3 mb-3">SBI General</h4> */}
                                 <section className="brand">
                                     <div className="boxpd">
                                         <div className="justify-content-left brandhead  m-b-20">
-                                            <h4 className="fs-18">Page Under Maintenance</h4>
+                                            {/* <h4 className="fs-18">Page Under Maintenance</h4> */}
                                         </div>
                                         <div className="d-flex justify-content-left carloan m-b-25">
-                                            <h4> Page Under Maintenance</h4>
+                                            {/* <h4> Page Under Maintenance</h4> */}
                                         </div>
 
                                         </div>

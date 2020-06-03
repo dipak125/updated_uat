@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import BaseComponent from '.././BaseComponent';
 import SideNav from '../common/side-nav/SideNav';
+import Footer from '../common/footer/Footer';
 import { Row, Col, Modal, Button, FormGroup } from 'react-bootstrap';
 import { loaderStart, loaderStop } from "../../store/actions/loader";
 import { connect } from "react-redux";
@@ -265,7 +266,7 @@ class MedicalDetails extends Component {
                             questionList.map((question, qIndex) => ( 
 
                             <div className="d-flex justify-content-left">
-                                <div className="m-r-25"><img src={require('../../assets/images/medi-1.svg')} alt="" /></div>
+                                <div className="m-r-25"><img src={require(`../../assets/images/${question.logo}`)} alt="" /></div>
                                     <div className="medinfo"><p className="W500">{question.title}</p>
                                         
                                     <FormGroup>
@@ -347,7 +348,8 @@ class MedicalDetails extends Component {
                         }}
                         </Formik> : null }
                         </div>
-                        </section>   
+                        </section> 
+                        <Footer />  
                         </div>
                         <Modal className="customModal1" bsSize="md" show={this.state.show}
                                 onHide={this.handleClose}>

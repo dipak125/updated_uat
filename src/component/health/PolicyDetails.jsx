@@ -111,8 +111,6 @@ class PolicyDetails extends Component {
                 "ExpiryDate": policyHolderDetails.request_data.end_date,
                 "PremiumFrequency": "1",
                 "FirstPolicyInceptionDate": "2020-05-27",
-                "SanjeevaniFFCategory": 1,
-                "AdditionalChildren": "0",
                 "NonFloaterDiscount": "",
                 "ProbableMaxLoss": "100",
                 "KYCPhysicalFormat": "1",
@@ -513,7 +511,7 @@ class PolicyDetails extends Component {
                                                     <Col sm={12} md={6}>
                                                         <FormGroup>
                                                         <div className="paymntgatway">
-                                                        <img src={require('../../assets/images/down-arrow-blue.svg')} alt="" />
+                                                        {/* <img src={require('../../assets/images/down-arrow-blue.svg')} alt="" /> */}
                                                         </div>
                                                         </FormGroup>
                                                     </Col>
@@ -545,6 +543,7 @@ class PolicyDetails extends Component {
                                     </div> 
 
                                 </section>
+                                <Footer />
                             </div>
                             </div>
                         </div>

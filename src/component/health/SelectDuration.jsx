@@ -3,6 +3,7 @@ import BaseComponent from '.././BaseComponent';
 import SideNav from '../common/side-nav/SideNav';
 import { Row, Col, Modal, Button, FormGroup } from 'react-bootstrap';
 import DatePicker from "react-datepicker";
+import Footer from '../common/footer/Footer';
 import "react-datepicker/dist/react-datepicker.css"
 import 'react-datepicker/dist/react-datepicker-cssmodules.min.css'
 
@@ -90,7 +91,8 @@ class SelectDuration extends Component {
         EndDate: "",
         insureValue: "" ,
         error: [],
-        endDateFlag: false
+        endDateFlag: false,
+        serverResponse: []
       };
 
 
@@ -145,6 +147,10 @@ class SelectDuration extends Component {
             this.setState({
                 accessToken: res.data.access_token
             }) 
+            let value = []
+            value['polStartDate'] = new Date()
+            value['polEndDate'] = new Date(moment(value['polStartDate']).add(1, 'years').format("YYYY-MM-DD"))
+            this.quote(value)
           })
           .catch(err => {
             this.setState({
@@ -162,6 +168,7 @@ class SelectDuration extends Component {
             this.setState({
                 policyHolderDetails: res.data.data.policyHolder
             }) 
+            this.getAccessToken()
           })
           .catch(err => {
             this.setState({
@@ -184,7 +191,7 @@ class SelectDuration extends Component {
                "ProductCode":"ASAN001",
                "ProductVersion":"1.0",
                "ArogyaPolicyType":"1",
-               "SanjeevaniFFCategory":1,
+               "SanjeevaniFFCategory":"",
                "EffectiveDate":moment(value.polStartDate).format("YYYY-MM-DD"),
                "ExpiryDate":moment(value.polEndDate).format("YYYY-MM-DD"),
                "PremiumFrequency":"1",
@@ -223,7 +230,7 @@ class SelectDuration extends Component {
                            "PolicyCoverageList":[
                               {
                                  "ProductElementCode":"HVSC01",
-                                 "SanjeevaniSumInsured":value.insureValue
+                                 "SanjeevaniSumInsured":value.insureValue ? value.insureValue : "5"
                               }
                            ]
                         }
@@ -266,7 +273,15 @@ class SelectDuration extends Component {
         let endDate = moment(value).add(1, 'years').format("YYYY-MM-DD")
         this.setState({
             EndDate: endDate,
-            endDateFlag: true
+            endDateFlag: true,
+            serverResponse: [],
+            error: []
+        }) 
+    }
+    handleAmountChange =(e) => {
+        this.setState({
+            serverResponse: [],
+            error: []
         }) 
     }
 
@@ -275,7 +290,7 @@ class SelectDuration extends Component {
 
     componentDidMount() {
         this.getPolicyHolderDetails();
-        this.getAccessToken();
+        // this.getAccessToken();
       }
 
     render() {
@@ -302,11 +317,10 @@ class SelectDuration extends Component {
         //     )                                                
         // }) : null
         const errMsg =  error && error.message ? (            
-            <span className="errorMsg"><h4>Something went wrong</h4></span>                                
+            <span className="errorMsg"><h6><strong>Thank you for showing your interest for buying product.Due to some reasons, we are not able to issue the policy online.Please call 180 22 1111</strong></h6></span>                                
         ) : null 
                                                         
        
-
         return (
             <>
                 <BaseComponent>
@@ -322,9 +336,8 @@ class SelectDuration extends Component {
                                         <div className="d-flex justify-content-left carloan m-b-25">
                                             <h4> Select the duration for your Health Insurance</h4>                                          
                                         </div>
-                                        {errMsg}
                                         <Formik initialValues={newInitialValues} 
-                                        onSubmit={ serverResponse ? (serverResponse.message ? this.quote : this.handleSubmit ) : this.quote}
+                                        onSubmit={ serverResponse && serverResponse != "" ? (serverResponse.message ? this.quote : this.handleSubmit ) : this.quote}
                                         validationSchema={validateDuration}
                                         >
                                         {({ values, errors, setFieldValue, setFieldTouched, isValid, isSubmitting, touched }) => {
@@ -358,7 +371,7 @@ class SelectDuration extends Component {
                                                                 setFieldTouched("polStartDate");
                                                                 setFieldValue("polStartDate", value);
                                                                 setFieldValue("polEndDate", "");
-                                                                // this.handleChange(value);
+                                                                this.handleChange(value);
                                                             }}
                                                             selected={values.polStartDate}
                                                         />
@@ -415,6 +428,12 @@ class SelectDuration extends Component {
                                                                     autoComplete="off"
                                                                     value={values.insureValue}                                                                    
                                                                     className="formGrp"
+                                                                    onChange = {(e) => {
+                                                                    setFieldTouched("insureValue")
+                                                                    setFieldValue("insureValue", e.target.value);
+                                                                    this.handleAmountChange(e)
+                                                                    }
+                                                                }
                                                                 >
                                                                 <option value="">Select sum insured</option>
                                                                     <option value="1" >100 000</option>
@@ -461,7 +480,7 @@ class SelectDuration extends Component {
                                                     <Button className={`backBtn`} type="button" onClick= {this.medicalQuestions.bind(this, productId )} >
                                                         Back
                                                     </Button>
-                                                    { serverResponse ? (serverResponse.message ? 
+                                                    { serverResponse && serverResponse != "" ? (serverResponse.message ? 
                                                          <Button className={`proceedBtn`} type="submit"  >
                                                          Quote
                                                      </Button> : <Button className={`proceedBtn`} type="submit"  >
@@ -472,6 +491,8 @@ class SelectDuration extends Component {
                                                     
                                                     </div>
                                                 </Row>
+                                                <Row><div>&nbsp;</div></Row>
+                                                <Row><div>{errMsg}</div></Row>
                                             </Col>
 
                                             <Col sm={12} md={3}>
@@ -487,6 +508,7 @@ class SelectDuration extends Component {
                                     </Formik>
                                     </div>
                                 </section>
+                                <Footer /> 
                             </div>
                         </div>
                     </div>
