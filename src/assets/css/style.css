@@ -35,7 +35,7 @@ h4{font-size: 18px; line-height: 22px; font-weight: 600;}
 .ml-5 {margin-left: 5px !important;}
 .m-r-10{ margin-right:10px;}
 .m-r-60 {margin-right: 60px;}
-.m-r-15 {margin-right: 15px;}
+.m-r-15 {margin-right: 15px !important;}
 .m-r-25 {margin-right: 25px;}
 .m-r-40{ margin-right:40px;}
 .m-l-5 {margin-left: 5px;}
@@ -372,6 +372,8 @@ Note: Beware of modifying this element as it can break the animations - you shou
 .small, small {font-size: 80%; font-weight: 400;}
 
 .formSection label input[type=text] { display: block; width: 100% !important; outline: none; border: none; border-bottom: 1px solid #1167b1; color: #1e7ea4; background-color: #f6faff;}
+
+.dropinput label input[type=text] { display: block; width: 100% !important; outline: none; border: none; border-bottom: 1px solid #1167b1; color: #1e7ea4; background-color: #f6faff; margin-bottom: 15px;}
 
 .btnPrimary {background-color: #0095da; color: #fff; width: 140px; height: 47px; padding: 0 10px; text-align: center; vertical-align: middle; font-size: 16px; border: 1px solid #0095da; -webkit-box-shadow: -1px 6px 12px -7px rgba(0, 0, 0, 0.24); -moz-box-shadow: -1px 6px 12px -7px rgba(0, 0, 0, 0.24); box-shadow: -1px 6px 12px -7px rgba(0, 0, 0, 0.24); border-radius: 47px;}
 .cntrbtn {text-align: center; margin: 0 auto;}

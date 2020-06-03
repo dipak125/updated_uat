@@ -10,7 +10,6 @@ import Loader from "react-loader-spinner";
 
 import LogIn from "../common/login/LogIn";
 // import Motor from '../motor/Motor';
-import SelectBrand from '../SelectBrand/SelectBrand';
 // import SelectDuration from '../health/SelectDuration';
 // import Health from '../health/InformationYourself';
 // import MedicalDetails from '../health/MedicalDetails';
@@ -19,6 +18,13 @@ import SelectBrand from '../SelectBrand/SelectBrand';
 // import PolicyDetails from '../health/PolicyDetails';
 // import PolicySummery from '../health/PolicySummery';
 // import ThankYou from '../health/ThankYou';
+
+import Registration from '../motor/Registration';
+import SelectBrand from '../motor/SelectBrand';
+import AdditionalDetails from '../motor/AdditionalDetails';
+import OtherComprehensive from '../motor/OtherComprehensive';
+import Premium from '../motor/Premium';
+import ThankYou_motor from '../motor/ThankYou';
 
 import UnderMaintenance from '../UnderMaintenance';
 
@@ -89,7 +95,14 @@ class Routes extends Component {
                         <PrivateRoute exact path="/PolicyDetails/:productId" component={PolicyDetails} />
                         <PrivateRoute exact path="/PolicySummery/:productId" component={PolicySummery} />                 
                         <PrivateRoute exact path="/ThankYou/:policyId" component={ThankYou} />
+                        
+                        <PrivateRoute exact path="/Registration/:productId" component={Registration} />
+                        <PrivateRoute exact path="/Additional_details" component={AdditionalDetails} />
                         <PrivateRoute exact path="/Select-brand" component={SelectBrand} />
+                        <PrivateRoute exact path="/OtherComprehensive" component={OtherComprehensive} />
+                        <PrivateRoute exact path="/Premium" component={Premium} />
+                        <PrivateRoute exact path="/ThankYou_motor" component={ThankYou_motor} />
+
                         <PrivateRoute exact path="/UnderMaintenance" component={UnderMaintenance} />
                         <Redirect from="/" to="/Products" />
                     </Switch>

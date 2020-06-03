@@ -437,7 +437,7 @@ class Address extends Component {
                                                             setFieldValue(`proposerAsInsured`, e.target.value);
                                                         }}
                                                         checked={values.proposerAsInsured == '1' ? true : false}
-                                                        disabled={true}
+                                                        disabled={selfFlag}
                                                     />
                                                         <span className="checkmark " /><span className="fs-14"> Yes</span>
                                                     </label>
@@ -454,7 +454,7 @@ class Address extends Component {
                                                             setFieldValue(`proposerAsInsured`, e.target.value);
                                                         }}
                                                         checked={values.proposerAsInsured == '0' ? true : false}
-                                                        disabled={true}
+                                                        disabled={selfFlag}
                                                     />
                                                         <span className="checkmark" />
                                                         <span className="fs-14">No</span>

@@ -564,7 +564,7 @@ setStateForPreviousData=(family_members)=>{
                                                 errors.check_input && touched.check_input ?                 
                                                 <span className="error-message">{errors.check_input}</span>:''
                                             }*/}
-                                            <div className="row formSection">
+                                            <div className="row dropinput">
                                                 <div className="col-md-4">
                                                     <label className="customCheckBox formGrp formGrp">Self
                                                     <Field
@@ -634,7 +634,7 @@ setStateForPreviousData=(family_members)=>{
                                             </div>
 
 
-                                            <div className="row formSection">
+                                            <div className="row dropinput">
                                                 <div className="col-md-4">
                                                     <label className="customCheckBox formGrp formGrp">Spouse
                                                     <Field
@@ -699,7 +699,7 @@ setStateForPreviousData=(family_members)=>{
                                                 </div>
                                             </div>
 
-                                            <div className="row formSection">
+                                            <div className="row dropinput">
                                                 <div className="col-md-4">
                                                     <label className="customCheckBox formGrp formGrp">Child 1
                                                     <Field
@@ -762,7 +762,7 @@ setStateForPreviousData=(family_members)=>{
                                                     </label>
                                                 </div>
 
-                                                <div className="col-md-4">
+                                                <div className="col-md-4 formSection">
                                                     <label className="formGrp">
                                                     <Field
                                                         name="child1Gender"
@@ -783,7 +783,7 @@ setStateForPreviousData=(family_members)=>{
                                                 </div>
                                             </div>
 
-                                            <div className="row formSection">
+                                            <div className="row dropinput">
                                                 <div className="col-md-4">
                                                     <label className="customCheckBox formGrp formGrp">Father
                                                     <Field
@@ -838,7 +838,7 @@ setStateForPreviousData=(family_members)=>{
                                                 </div>
                                             </div>
 
-                                            <div className="row formSection">
+                                            <div className="row dropinput">
                                                 <div className="col-md-4">
                                                     <label className="customCheckBox formGrp formGrp">Mother
                                                     <Field
@@ -893,7 +893,7 @@ setStateForPreviousData=(family_members)=>{
                                                 </div>
                                             </div>
 
-                                            <div className="row formSection">
+                                            <div className="row dropinput">
                                                 <div className="col-md-4">
                                                     <label className="customCheckBox formGrp formGrp">Father in law
                                                     <Field
@@ -947,7 +947,7 @@ setStateForPreviousData=(family_members)=>{
                                                 </div>
                                             </div>
 
-                                            <div className="row formSection m-b-45">
+                                            <div className="row dropinput m-b-45">
                                                 <div className="col-md-4">
                                                     <label className="customCheckBox formGrp formGrp">Mother in law
                                                     <Field
@@ -1002,7 +1002,7 @@ setStateForPreviousData=(family_members)=>{
                                                 </div>
                                             </div>
                                             <div className="cntrbtn">
-                                            <Button className={`btnPrimary`} type="submit" >
+                                            <Button className={`btnPrimary m-r-15`} type="submit" >
                                                Select
                                             </Button>
                                             <Button className={`btnPrimary`} type="button" onClick={e => this.handleClose()} >

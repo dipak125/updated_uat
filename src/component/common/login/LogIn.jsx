@@ -40,10 +40,10 @@ class LogIn extends Component {
 
         // check remember me option
         const loginData = JSON.parse(localStorage.getItem('loginData'));
-        if(loginData) {
-            this.setState({ 
-                email: loginData.email, 
-                pass: loginData.pass, 
+        if (loginData) {
+            this.setState({
+                email: loginData.email,
+                pass: loginData.pass,
                 rememberMe: loginData.rememberMe ? 1 : 0
             });
         }
@@ -56,7 +56,7 @@ class LogIn extends Component {
     }
 
     rememberMeHandler = (e) => {
-        if(e.target.checked === true) {
+        if (e.target.checked === true) {
             this.setState({ rememberMe: 1 });
         } else {
             this.setState({ rememberMe: 0 });
@@ -68,15 +68,15 @@ class LogIn extends Component {
         this.props.loadingStart();
         values.rememberMe = this.state.rememberMe;
         this.setState({ errMsg: '' });
-        
-        this.props.onFormSubmit(values, 
+
+        this.props.onFormSubmit(values,
             () => {
                 this.props.loadingStop();
                 this.props.history.push('/Products');
             },
             (err) => {
                 this.props.loadingStop();
-                actions.setSubmitting(false);                
+                actions.setSubmitting(false);
                 if (err.data.message) {
                     this.setState({ errMsg: err.data.message });
                     actions.resetForm();
@@ -90,7 +90,7 @@ class LogIn extends Component {
 
     render() {
         //console.log('state', this.state);
-        const {email, pass, rememberMe} = this.state;
+        const { email, pass, rememberMe } = this.state;
 
         const newInitialValues = Object.assign(initialValues, {
             emailAddress: email ? email : '',
@@ -98,61 +98,61 @@ class LogIn extends Component {
         });
         return (
             <BaseComponent>
-            <div className="d-flex justify-content-center brand m-t-60">
-                <div className="login-box-body">
-                    {/* <p className="login-box-msg">Sign in</p> */}
-                    <Formik
-                        initialValues={newInitialValues}
-                        validationSchema={loginvalidation}
-                        onSubmit={this.handleSubmit}
-                    >
-                        {({ values, errors, isValid, touched, isSubmitting }) => {
-                            return (
-                                <Form>
-                                    {this.state.errMsg ? (
+                <div className="d-flex justify-content-center brand lginpg">
+                    <div className="login-box-body">
+                        {/* <p className="login-box-msg">Sign in</p> */}
+                        <Formik
+                            initialValues={newInitialValues}
+                            validationSchema={loginvalidation}
+                            onSubmit={this.handleSubmit}
+                        >
+                            {({ values, errors, isValid, touched, isSubmitting }) => {
+                                return (
+                                    <Form>
+                                        {this.state.errMsg ? (
+                                            <Row className="show-grid">
+                                                <Col md={12}>
+                                                    <div className="errorMsg">{this.state.errMsg}</div>
+                                                </Col>
+                                            </Row>
+                                        ) : null}
                                         <Row className="show-grid">
                                             <Col md={12}>
-                                                <div className="errorMsg">{this.state.errMsg}</div>
+                                                <div className="form-group">
+                                                    <label>Email ID</label>
+                                                    <Field
+                                                        name="emailAddress"
+                                                        type="text"
+                                                        className={`form-control`}
+                                                        placeholder="Email"
+                                                        autoComplete="off"
+                                                        value={values.emailAddress}
+                                                    />
+                                                    {errors.emailAddress && touched.emailAddress ? (
+                                                        <span className="errorMsg">{errors.emailAddress}</span>
+                                                    ) : null}
+                                                </div>
+                                            </Col>
+                                            <Col md={12}>
+                                                <div className="form-group">
+                                                    <label>Password</label>
+                                                    <Field
+                                                        name="password"
+                                                        type="password"
+                                                        className={`form-control`}
+                                                        autoComplete="off"
+                                                        placeholder="Password"
+                                                        value={values.password}
+                                                    />
+                                                    {errors.password && touched.password ? (
+                                                        <span className="errorMsg">{errors.password}</span>
+                                                    ) : null}
+                                                </div>
                                             </Col>
                                         </Row>
-                                    ) : null}
-                                    <Row className="show-grid">
-                                        <Col md={12}>
-                                            <div className="form-group">
-                                                <label>Email ID</label>
-                                                <Field
-                                                    name="emailAddress"
-                                                    type="text"
-                                                    className={`form-control`}
-                                                    placeholder="Email"
-                                                    autoComplete="off"
-                                                    value={values.emailAddress}
-                                                />
-                                                {errors.emailAddress && touched.emailAddress ? (
-                                                    <span className="errorMsg">{errors.emailAddress}</span>
-                                                ) : null}
-                                            </div>
-                                        </Col>
-                                        <Col md={12}>
-                                            <div className="form-group">
-                                                <label>Password</label>
-                                                <Field
-                                                    name="password"
-                                                    type="password"
-                                                    className={`form-control`}
-                                                    autoComplete="off"
-                                                    placeholder="Password"
-                                                    value={values.password}
-                                                />
-                                                {errors.password && touched.password ? (
-                                                    <span className="errorMsg">{errors.password}</span>
-                                                ) : null}
-                                            </div>
-                                        </Col>
-                                    </Row>
-                                    <Row className="show-grid">
-                                        <Col xs={8}>
-                                            <div className="checkbox icheck loginRemember">
+                                        <Row className="show-grid dropinput">
+                                            <Col xs={8}>
+                                                {/* <div className="checkbox icheck loginRemember">
                                                 <label className="customCkBox">
                                                     <input 
                                                         type="checkbox" 
@@ -163,27 +163,37 @@ class LogIn extends Component {
                                                     <span className="checkmark" />
                                                 </label>
                                                 <label>Remember Me</label>
-                                            </div>
-                                        </Col>
-                                        <Col xs={4}>
-                                            <Button
-                                                type="submit"
-                                                className={`btn btn-default btn-md ${
-                                                    isSubmitting ? "btn-disable" : "btn-custom-red"
-                                                    } pull-right`}
-                                                disabled={isSubmitting ? true : false}
-                                            >
-                                                {isSubmitting ? "Signing In..." : "Sign In"}
-                                            </Button>
-                                        </Col>
-                                    </Row>
-                                </Form>
-                            );
-                        }}
-                    </Formik>
+                                            </div> */}
+
+                                                <label className="customCheckBox formGrp formGrp">
+                                                 <input type="checkbox"
+                                                        checked={rememberMe ? true : false}
+                                                        value={rememberMe}
+                                                        onChange={this.rememberMeHandler}
+                                                        className="user-self"/>
+                                                    <span className="checkmark mL-0"></span>
+                                                    Remember Me
+                                                </label>
+                                            </Col>
+                                            <Col xs={4}>
+                                                <Button
+                                                    type="submit"
+                                                    className={`btn btn-default btn-md ${
+                                                        isSubmitting ? "btn-disable" : "btn-custom-red"
+                                                        } pull-right`}
+                                                    disabled={isSubmitting ? true : false}
+                                                >
+                                                    {isSubmitting ? "Signing In..." : "Sign In"}
+                                                </Button>
+                                            </Col>
+                                        </Row>
+                                    </Form>
+                                );
+                            }}
+                        </Formik>
+                    </div>
                 </div>
-            </div>
-        </BaseComponent>
+            </BaseComponent>
         );
     }
 }

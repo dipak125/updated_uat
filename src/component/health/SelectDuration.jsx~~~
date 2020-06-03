@@ -22,7 +22,7 @@ import {
 const initialValues = {
 polStartDate: "",
 polEndDate: "",
-insureValue: "5"    
+insureValue: ""    
 }
 
 const sum_assured = {
@@ -293,19 +293,14 @@ class SelectDuration extends Component {
         const newInitialValues = Object.assign(initialValues, {
             polStartDate: start_date ? start_date : new Date,
             polEndDate: end_date  ? end_date : new Date(moment().add(1, 'years').format("YYYY-MM-DD")),
-            insureValue: policyHolderDetails && policyHolderDetails.request_data && policyHolderDetails.request_data.sum_insured ? Math.floor(policyHolderDetails.request_data.sum_insured) : initialValues.insureValue
+            insureValue: policyHolderDetails && policyHolderDetails.request_data ? Math.floor(policyHolderDetails.request_data.sum_insured) : ""
         })
 
-        // const errMsg =  error && error.messages && error.messages.length > 0 ? error.messages.map((msg, qIndex)=>{  
-        //     return(
-        //         <h5> {msg.message}</h5>                   
-        //     )                                                
-        // }) : null
-        const errMsg =  error && error.message ? (            
-            <span className="errorMsg"><h4>Something went wrong</h4></span>                                
-        ) : null 
-                                                        
-       
+        const errMsg =  error && error.messages && error.messages.length > 0 ? error.messages.map((msg, qIndex)=>{  
+            return(
+                <h5> {msg.message}</h5>                   
+            )                                                
+        }) : null
 
         return (
             <>
@@ -322,7 +317,7 @@ class SelectDuration extends Component {
                                         <div className="d-flex justify-content-left carloan m-b-25">
                                             <h4> Select the duration for your Health Insurance</h4>                                          
                                         </div>
-                                        {errMsg}
+                                        <h5>{errMsg}</h5>
                                         <Formik initialValues={newInitialValues} 
                                         onSubmit={ serverResponse ? (serverResponse.message ? this.quote : this.handleSubmit ) : this.quote}
                                         validationSchema={validateDuration}

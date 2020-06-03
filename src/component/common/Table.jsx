@@ -22,6 +22,9 @@ class Table extends Component {
       };
 
     buy_policy = (productId) => {
+        if(productId < 6){
+            this.props.history.push(`/Registration/${productId}`);
+        }else
         this.props.history.push(`/Health/${productId}`);
     }   
 
@@ -60,7 +63,7 @@ class Table extends Component {
                                     <tr key={partIndex}>
                                         <td className="W-10"><img src={require(`../../assets/images/${part.logo}`)} alt="" /></td>
                                         <td className="W-70">{part.name}</td>
-                                        <td className="W-10 text-right"> <button className="buy">Buy</button></td>
+                                        <td className="W-10 text-right"> <button className="buy" onClick= {this.buy_policy.bind(this, part.id )}>Buy</button></td>
                                         <td className="W-10 text-right"> <button className="renew">Renew</button></td>
                                     </tr>
                                     ))

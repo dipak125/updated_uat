@@ -12,6 +12,7 @@ class HeaderTop extends Component {
         axios.get('/logout')
             .then(res => {
                 localStorage.removeItem('cons_reg_info');
+                this.props.history.push(`/LogIn`);
                 this.props.logout();
             })
             .catch(err => {

@@ -9,3 +9,4 @@
 .login-box-body, .register-box-body{ -webkit-border-radius: 3px 3px 3px 3px; border-radius: 3px 3px 3px 3px; padding: 30px; box-sizing: border-box;}
 .login-box-body .form-control-feedback, .register-box-body .form-control-feedback{ color:#cacaca!important;; font-size: 12px;}
 .login-box-body, .register-box-body{padding: 30px;}
+.lginpg {margin-top: 100px !important;}
