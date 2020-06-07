@@ -94,31 +94,9 @@ const validateFamilyMembers  = Yup.object().shape({
         then: Yup.string().required('Child 1 Gender field is required'),
         othewise: Yup.string()
     }),
-
-    dob_3: Yup.string().when(['looking_for_3'], {
-        is: looking_for_3 => looking_for_3 == 'child2',
-        then: Yup.string().required('Child 2 DOB field is required'),
-        othewise: Yup.string()
-    }),
-    child2Gender: Yup.string().when(['looking_for_3'], {
-        is: looking_for_3 => looking_for_3 == 'child2',
-        then: Yup.string().required('Child 2 Gender field is required'),
-        othewise: Yup.string()
-    }),
-
-    dob_4: Yup.string().when(['looking_for_4'], {
-        is: looking_for_4 => looking_for_4 == 'child3',
-        then: Yup.string().required('Child 3 DOB field is required'),
-        othewise: Yup.string()
-    }),
-    child3Gender: Yup.string().when(['looking_for_4'], {
-        is: looking_for_4 => looking_for_4 == 'child3',
-        then: Yup.string().required('Child 3 Gender field is required'),
-        othewise: Yup.string()
-    }),
     
-    dob_5: Yup.string().when(['looking_for_5'], {
-        is: looking_for_5 => looking_for_5 == 'father',
+    dob_3: Yup.string().when(['looking_for_3'], {
+        is: looking_for_3 => looking_for_3 == 'father',
         then: Yup.string().required('Father DOB field is required')
         .test(
             "18YearsChecking",
@@ -135,9 +113,8 @@ const validateFamilyMembers  = Yup.object().shape({
         ),
         othewise: Yup.string()
     }),
-
-    dob_6: Yup.string().when(['looking_for_6'], {
-        is: looking_for_6 => looking_for_6 == 'mother',
+    dob_4: Yup.string().when(['looking_for_4'], {
+        is: looking_for_4 => looking_for_4 == 'mother',
         then: Yup.string().required('Mother DOB field is required')
         .test(
             "18YearsChecking",
@@ -154,9 +131,8 @@ const validateFamilyMembers  = Yup.object().shape({
         ),
         othewise: Yup.string()
     }),
-
-    dob_7: Yup.string().when(['looking_for_7'], {
-        is: looking_for_7 => looking_for_7 == 'fatherInLaw',
+    dob_5: Yup.string().when(['looking_for_5'], {
+        is: looking_for_5 => looking_for_5 == 'fatherInLaw',
         then: Yup.string().required('Father-In-Law DOB field is required')
         .test(
             "18YearsChecking",
@@ -173,8 +149,8 @@ const validateFamilyMembers  = Yup.object().shape({
         ),
         othewise: Yup.string()
     }),
-    dob_8: Yup.string().when(['looking_for_8'], {
-        is: looking_for_8 => looking_for_8 == 'motherInLaw',
+    dob_6: Yup.string().when(['looking_for_6'], {
+        is: looking_for_6 => looking_for_6 == 'motherInLaw',
         then: Yup.string().required('Mother-In-Law DOB field is required')
         .test(
             "18YearsChecking",
@@ -470,18 +446,12 @@ setStateForPreviousData=(family_members)=>{
             child1Gender: memberInfo ? memberInfo.child1Gender : "",
             looking_for_3: display_looking_for_arr[3] ? display_looking_for_arr[3] : "",
             dob_3: display_dob_arr[3] ? new Date(display_dob_arr[3]) : "",
-            child2Gender: memberInfo ? memberInfo.child2Gender : "",
             looking_for_4: display_looking_for_arr[4] ? display_looking_for_arr[4] : "",
             dob_4: display_dob_arr[4] ? new Date(display_dob_arr[4]) : "",
-            child3Gender: memberInfo ? memberInfo.child3Gender : "",
             looking_for_5: display_looking_for_arr[5] ? display_looking_for_arr[5] : "",
             dob_5: display_dob_arr[5] ? new Date(display_dob_arr[5]) : "",
             looking_for_6: display_looking_for_arr[6] ? display_looking_for_arr[6] : "",
-            dob_6: display_dob_arr[6] ? new Date(display_dob_arr[6]) : "",                        
-            looking_for_7: display_looking_for_arr[7] ? display_looking_for_arr[7] : "",
-            dob_7: display_dob_arr[7] ? new Date(display_dob_arr[7]) : "",
-            looking_for_8: display_looking_for_arr[8] ? display_looking_for_arr[8] : "",
-            dob_8: display_dob_arr[6] ? new Date(display_dob_arr[8]) : "",
+            dob_6: display_dob_arr[6] ? new Date(display_dob_arr[6]) : "",
             insureList: insureListPrev ? insureListPrev.toString()  : (insureList ? insureList :'')
         });
            
@@ -813,14 +783,13 @@ setStateForPreviousData=(family_members)=>{
                                                 </div>
                                             </div>
 
-                                            {/*  Child 2 */}    
                                             <div className="row dropinput">
                                                 <div className="col-md-4">
-                                                    <label className="customCheckBox formGrp formGrp">Child 2
+                                                    <label className="customCheckBox formGrp formGrp">Father
                                                     <Field
                                                         type="checkbox"
                                                         name="looking_for_3"
-                                                        value="child2"
+                                                        value="father"
                                                         className="user-self"
                                                         onChange={(e) => {
                                                             if (e.target.checked === true) {
@@ -831,18 +800,8 @@ setStateForPreviousData=(family_members)=>{
                                                                 setFieldValue("dob_3", '');
                                                                 
                                                             }
-                                                            if(this.setValueData()){
-                                                                this.setState({
-                                                                    validateCheck:1
-                                                                })
-                                                            }
-                                                            else{
-                                                                this.setState({
-                                                                    validateCheck:0
-                                                                })
-                                                            }
                                                         }}
-                                                        checked={values.looking_for_3 == 'child2' ? true : false}
+                                                        checked={values.looking_for_3 == 'father' ? true : false}
                                                     />
                                                         <span className="checkmark mL-0"></span>
                                                         <span className="error-message"></span>
@@ -870,41 +829,22 @@ setStateForPreviousData=(family_members)=>{
                                                               }}
                                                             selected={values.dob_3}
                                                         />
+
                                                         {
                                                             errors.dob_3 && touched.dob_3 ?                 
                                                             <span className="error-message">{errors.dob_3}</span>:''
                                                         }
                                                     </label>
                                                 </div>
-
-                                                <div className="col-md-4 formSection">
-                                                    <label className="formGrp">
-                                                    <Field
-                                                        name="child2Gender"
-                                                        component="select"
-                                                        autoComplete="off"
-                                                        value={values.child2Gender}
-                                                        className="formGrp"
-                                                    >
-                                                    <option value="">Select gender</option>
-                                                        <option value="male">Male</option>
-                                                        <option value="female">Female</option>
-                                                    </Field>    
-                                                    </label>
-                                                    {
-                                                            errors.child2Gender && touched.child2Gender ?                 
-                                                            <span className="error-message">{errors.child2Gender}</span>:''
-                                                    }
-                                                </div>
-                                            </div>  
+                                            </div>
 
                                             <div className="row dropinput">
                                                 <div className="col-md-4">
-                                                    <label className="customCheckBox formGrp formGrp">Child 3
+                                                    <label className="customCheckBox formGrp formGrp">Mother
                                                     <Field
                                                         type="checkbox"
                                                         name="looking_for_4"
-                                                        value="child3"
+                                                        value="mother"
                                                         className="user-self"
                                                         onChange={(e) => {
                                                             if (e.target.checked === true) {
@@ -915,18 +855,8 @@ setStateForPreviousData=(family_members)=>{
                                                                 setFieldValue("dob_4", '');
                                                                 
                                                             }
-                                                            if(this.setValueData()){
-                                                                this.setState({
-                                                                    validateCheck:1
-                                                                })
-                                                            }
-                                                            else{
-                                                                this.setState({
-                                                                    validateCheck:0
-                                                                })
-                                                            }
                                                         }}
-                                                        checked={values.looking_for_4 == 'child3' ? true : false}
+                                                        checked={values.looking_for_4 == 'mother' ? true : false}
                                                     />
                                                         <span className="checkmark mL-0"></span>
                                                         <span className="error-message"></span>
@@ -954,43 +884,22 @@ setStateForPreviousData=(family_members)=>{
                                                               }}
                                                             selected={values.dob_4}
                                                         />
+
                                                         {
                                                             errors.dob_4 && touched.dob_4 ?                 
                                                             <span className="error-message">{errors.dob_4}</span>:''
                                                         }
                                                     </label>
                                                 </div>
-
-                                                <div className="col-md-4 formSection">
-                                                    <label className="formGrp">
-                                                    <Field
-                                                        name="child3Gender"
-                                                        component="select"
-                                                        autoComplete="off"
-                                                        value={values.child3Gender}
-                                                        className="formGrp"
-                                                    >
-                                                    <option value="">Select gender</option>
-                                                        <option value="male">Male</option>
-                                                        <option value="female">Female</option>
-                                                    </Field>    
-                                                    </label>
-                                                    {
-                                                            errors.child3Gender && touched.child3Gender ?                 
-                                                            <span className="error-message">{errors.child3Gender}</span>:''
-                                                    }
-                                                </div>
-                                            </div> 
-
-
+                                            </div>
 
                                             <div className="row dropinput">
                                                 <div className="col-md-4">
-                                                    <label className="customCheckBox formGrp formGrp">Father
+                                                    <label className="customCheckBox formGrp formGrp">Father in law
                                                     <Field
                                                         type="checkbox"
                                                         name="looking_for_5"
-                                                        value="father"
+                                                        value="fatherInLaw"
                                                         className="user-self"
                                                         onChange={(e) => {
                                                             if (e.target.checked === true) {
@@ -998,11 +907,10 @@ setStateForPreviousData=(family_members)=>{
                                                                 
                                                             } else {
                                                                 setFieldValue('looking_for_5', '');
-                                                                setFieldValue("dob_5", '');
-                                                                
+                                                                setFieldValue("dob_5", '');                                                                
                                                             }
                                                         }}
-                                                        checked={values.looking_for_5 == 'father' ? true : false}
+                                                        checked={values.looking_for_5 == 'fatherInLaw' ? true : false}
                                                     />
                                                         <span className="checkmark mL-0"></span>
                                                         <span className="error-message"></span>
@@ -1039,13 +947,13 @@ setStateForPreviousData=(family_members)=>{
                                                 </div>
                                             </div>
 
-                                            <div className="row dropinput">
+                                            <div className="row dropinput m-b-45">
                                                 <div className="col-md-4">
-                                                    <label className="customCheckBox formGrp formGrp">Mother
+                                                    <label className="customCheckBox formGrp formGrp">Mother in law
                                                     <Field
                                                         type="checkbox"
                                                         name="looking_for_6"
-                                                        value="mother"
+                                                        value="motherInLaw"
                                                         className="user-self"
                                                         onChange={(e) => {
                                                             if (e.target.checked === true) {
@@ -1057,7 +965,7 @@ setStateForPreviousData=(family_members)=>{
                                                                 
                                                             }
                                                         }}
-                                                        checked={values.looking_for_6 == 'mother' ? true : false}
+                                                        checked={values.looking_for_6 == 'motherInLaw' ? true : false}
                                                     />
                                                         <span className="checkmark mL-0"></span>
                                                         <span className="error-message"></span>
@@ -1089,115 +997,6 @@ setStateForPreviousData=(family_members)=>{
                                                         {
                                                             errors.dob_6 && touched.dob_6 ?                 
                                                             <span className="error-message">{errors.dob_6}</span>:''
-                                                        }
-                                                    </label>
-                                                </div>
-                                            </div>
-
-                                            <div className="row dropinput">
-                                                <div className="col-md-4">
-                                                    <label className="customCheckBox formGrp formGrp">Father in law
-                                                    <Field
-                                                        type="checkbox"
-                                                        name="looking_for_7"
-                                                        value="fatherInLaw"
-                                                        className="user-self"
-                                                        onChange={(e) => {
-                                                            if (e.target.checked === true) {
-                                                                setFieldValue('looking_for_7', e.target.value);
-                                                                
-                                                            } else {
-                                                                setFieldValue('looking_for_7', '');
-                                                                setFieldValue("dob_7", '');                                                                
-                                                            }
-                                                        }}
-                                                        checked={values.looking_for_7 == 'fatherInLaw' ? true : false}
-                                                    />
-                                                        <span className="checkmark mL-0"></span>
-                                                        <span className="error-message"></span>
-                                                    </label>
-                                                </div>
-
-                                                <div className="col-md-4">
-                                                    <label className="formGrp error">
-                                                        <DatePicker
-                                                            name="dob_7"
-                                                            minDate={new Date()}
-                                                            dateFormat="dd MMM yyyy"
-                                                            placeholderText="DOB"
-                                                            peekPreviousMonth
-                                                            peekPreviousYear
-                                                            showMonthDropdown
-                                                            showYearDropdown
-                                                            maxDate={new Date()}
-                                                            minDate={new Date(1/1/1900)}
-                                                            className="datePckr"
-                                                            dropdownMode="select"
-                                                            onChange={(value) => {
-                                                                setFieldTouched("dob_7");
-                                                                setFieldValue("dob_7", value);
-                                                              }}
-                                                            selected={values.dob_7}
-                                                        />
-
-                                                        {
-                                                            errors.dob_7 && touched.dob_7 ?                 
-                                                            <span className="error-message">{errors.dob_7}</span>:''
-                                                        }
-                                                    </label>
-                                                </div>
-                                            </div>
-
-                                            <div className="row dropinput m-b-45">
-                                                <div className="col-md-4">
-                                                    <label className="customCheckBox formGrp formGrp">Mother in law
-                                                    <Field
-                                                        type="checkbox"
-                                                        name="looking_for_8"
-                                                        value="motherInLaw"
-                                                        className="user-self"
-                                                        onChange={(e) => {
-                                                            if (e.target.checked === true) {
-                                                                setFieldValue('looking_for_8', e.target.value);
-                                                                
-                                                            } else {
-                                                                setFieldValue('looking_for_8', '');
-                                                                setFieldValue("dob_8", '');
-                                                                
-                                                            }
-                                                        }}
-                                                        checked={values.looking_for_8 == 'motherInLaw' ? true : false}
-                                                    />
-                                                        <span className="checkmark mL-0"></span>
-                                                        <span className="error-message"></span>
-                                                    </label>
-                                                </div>
-
-                                                <div className="col-md-4">
-                                                    <label className="formGrp error">
-                                                        <DatePicker
-                                                            name="dob_8"
-                                                            minDate={new Date()}
-                                                            dateFormat="dd MMM yyyy"
-                                                            placeholderText="DOB"
-                                                            peekPreviousMonth
-                                                            peekPreviousYear
-                                                            showMonthDropdown
-                                                            showYearDropdown
-                                                            maxDate={new Date()}
-                                                            minDate={new Date(1/1/1900)}
-                                                            className="datePckr"
-                                                            dropdownMode="select"
-                                                            onChange={(value) => {
-                                                                setFieldTouched("dob_8");
-                                                                setFieldValue("dob_8", value);
-                                                              }}
-                                                            selected={values.dob_8}
-                                                        />
-
-                                                        {
-                                                            errors.dob_6 && touched.dob_8 ?                 
-                                                            <span className="error-message">{errors.dob_8}</span>:''
                                                         }
                                                     </label>
                                                 </div>

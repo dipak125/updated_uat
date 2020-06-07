@@ -179,71 +179,16 @@ class SelectDuration extends Component {
       }
 
       quote = (value) => {
-        const {accessToken, policyHolderDetails} = this.state
-        let data = {
-            "RequestHeader":{
-               "requestID":"123456",
-               "action":"quickQuote",
-               "channel":"SBIG",
-               "transactionTimestamp":"27-May-2020-17:47:51"
-            },
-            "RequestBody":{
-               "ProductCode":"ASAN001",
-               "ProductVersion":"1.0",
-               "ArogyaPolicyType":"1",
-               "SanjeevaniFFCategory":"",
-               "EffectiveDate":moment(value.polStartDate).format("YYYY-MM-DD"),
-               "ExpiryDate":moment(value.polEndDate).format("YYYY-MM-DD"),
-               "PremiumFrequency":"1",
-               "NonFloaterDiscount":"",
-               "ProbableMaxLoss":"100",
-               "GSTType":"SGST",
-               "AgreementCode":"2963",
-               "SBIGBranchCode":"HO",
-               "SBIGBranchStateCode":"MH",
-               "TPACode":"",
-               "IMDCODE":"",
-               "PolicyType":"1",
-               "PolicyCustomerList":[
-                  {
-                     "State":"MH",
-                     "Mobile":"9814254758",
-                     "Email":"test@mailinator.com"
-                  }
-               ],
-               "PolicyLobList":[
-                  {
-                     "ProductCode":"ASAN001",
-                     "PolicyRiskList":[
-                        {
-                           "ProductElementCode":"R10007",
-                           "DateOfBirth":policyHolderDetails.max_dob,
-                           "ArgInsuredRelToProposer":2,
-                           "ArogyaOccupation":"1",
-                           "Height":163.3,
-                           "Weight":58,
-                           "Questionnaire2b":"0",
-                           "IsSmoker":policyHolderDetails.request_data.question_answer[0].response == 'n' ? "0" : "1",
-                           "AlcoholStatus":policyHolderDetails.request_data.question_answer[1].response == 'n' ? "0" : "1",
-                           "TobaccoLoading":policyHolderDetails.request_data.question_answer[2].response == 'n' ? "0" : "1",
-                           "AlcoholQuantity":policyHolderDetails.request_data.question_answer[3].response == 'n' ? "0" : "1",
-                           "PolicyCoverageList":[
-                              {
-                                 "ProductElementCode":"HVSC01",
-                                 "SanjeevaniSumInsured":value.insureValue ? value.insureValue : "5"
-                              }
-                           ]
-                        }
-                     ]
-                  }
-               ]
-            }
-         }
-        
-
+      const {accessToken} = this.state
+      let polStartDate = moment(value.polStartDate).format("YYYY-MM-DD");
+      let polEndDate = moment(value.polEndDate).format("YYYY-MM-DD");
+      let insureValue = value.insureValue ? value.insureValue : "5";
       const formData = new FormData(); 
       this.props.loadingStart();
-      formData.append('data', JSON.stringify(data));
+      formData.append('id', localStorage.getItem('policyHolder_id'));
+      formData.append('policyStartDate', polStartDate);
+      formData.append('policyEndDate', polEndDate);
+      formData.append('insureValue', insureValue);
       formData.append('access_token', accessToken);
       axios
         .post(`/quickQuoteService`, formData)

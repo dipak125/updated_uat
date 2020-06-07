@@ -310,6 +310,14 @@ ul.navPan li a span{ margin-bottom:8px; display: block; }
 /*---------Thank You close-------*/
 
 
+/*---------Vehicle Details Start-------*/
+
+.vehbox { box-sizing: border-box; border-radius: 12px; background-color: #2770b3; padding: 30px 25px 50px;}
+
+
+/*---------ehicle Details Close-------*/
+
+
 /*------Hamburger Menu------*/
 /* Position and sizing of burger button */
 .bm-burger-button { position: absolute; width:36px; height:30px; right:17px; top:78px;}

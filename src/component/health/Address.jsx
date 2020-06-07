@@ -109,24 +109,32 @@ const validateAddress =  Yup.object().shape({
         }),
     family_members: Yup.array().of(
             Yup.object().shape({
+                looking_for : Yup.string(),
                 fname: Yup.string().required("Required First name"),
                 lname: Yup.string().required("Required Last name"),
-                dob: Yup.date().required("Please enter DOB").max(maxDob, function() {
-                    return "Date should not be future date"
+                dob: Yup.date().when(['looking_for'],{
+                    //is: looking_for => (looking_for == 'self' || looking_for == 'spouse' || looking_for == 'child1') ,
+                    is: looking_for => ['self','spouse','mother','father','fatherInLaw','motherInLaw'].includes(looking_for) ,
+                    then: Yup.date().required("Please enter DOB").max(maxDob, function() {
+                        return "Date should not be future date"
+                        })
+                        .test(
+                            "18YearsChecking",
+                            function() {
+                                return "Age sgould me minium 18 years"
+                            },
+                            function (value) {
+                                if (value) {
+                                    const ageObj = new PersonAge();
+                                    return ageObj.whatIsMyAge(value) >= 18;
+                                }
+                                return true;
+                            }
+                        )
+
                 })
-                .test(
-                    "18YearsChecking",
-                    function() {
-                        return "Age sgould me minium 18 years"
-                    },
-                    function (value) {
-                        if (value) {
-                            const ageObj = new PersonAge();
-                            return ageObj.whatIsMyAge(value) >= 18;
-                        }
-                        return true;
-                    }
-                ),
+               
+                ,
                 gender: Yup.string().nullable().required("Require Gender"),        
 
             })     

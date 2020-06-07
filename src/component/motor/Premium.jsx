@@ -1,31 +1,37 @@
 import React, { Component } from 'react';
-import HeaderSecond from '../common/header/HeaderSecond';
 import { Row, Col, Modal, Button, FormGroup } from 'react-bootstrap';
 import Collapsible from 'react-collapsible';
 import { Formik, Field, Form } from "formik";
+import BaseComponent from '.././BaseComponent';
+import SideNav from '../common/side-nav/SideNav';
+import Footer from '../common/footer/Footer';
+import Otp from "./Otp"
 
-
+const initialValue = {}
 
 class Premium extends Component {
 
     constructor(props) {
         super(props);
 
-        this.handleShow = this.handleShow.bind(this);
         this.handleClose = this.handleClose.bind(this);
 
         this.state = {
             show: false,
+            refNo: "",
+            whatsapp: ""
         };
     }
 
 
-    handleClose() {
-        this.setState({ show: false });
+    handleClose(e) {
+        this.setState({ show: false,  });
     }
-
-    handleShow() {
-        this.setState({ show: true });
+    
+    handleOtp(e) {
+        console.log("otp", e)
+        this.setState({ show: false,  });
+        this.props.history.push(`/ThankYou_motor`)
     }
 
     changePlaceHoldClassAdd(e) {
@@ -38,16 +44,41 @@ class Premium extends Component {
         e.target.value.length === 0 && element.classList.remove('active');
     }
 
+    additionalDetails = () => {
+        this.props.history.push(`/Additional_details`);
+    }
+
+    handleSubmit = (values) => {
+        this.setState({ show: true , refNo: values.refNo, whatsapp: values.whatsapp});
+    }
+
     render() {
+        const {refNo, whatsapp, show} = this.state
         return (
             <>
-                <HeaderSecond />
-                <section className="brand topcar">
+                <BaseComponent>
+                <div className="container-fluid">
+                <div className="row">
+                    <div className="col-sm-12 col-md-12 col-lg-2 col-xl-2 pd-l-0">
+                        <SideNav />
+                    </div>
+                
+                <div className="col-sm-12 col-md-12 col-lg-10 col-xl-10 infobox">
+                <h4 className="text-center mt-3 mb-3">SBI General Insurance Company Limited</h4>
+                <Formik initialValues={initialValue} onSubmit={this.handleSubmit}
+                // validationSchema={validateNominee}
+                >
+                {({ values, errors, setFieldValue, setFieldTouched, isValid, isSubmitting, touched }) => {
+
+                return (
+                <Form>
+                <section className="brand m-t-11 m-b-25">
                     <div className="d-flex justify-content-left">
-                        <div className="premimhead">
+                        <div className="brandhead m-b-10">
                             <h4>The Summary of your Policy Premium Details is as below </h4>
                         </div>
                     </div>
+                
                     <Row>
                         <Col sm={12} md={9} lg={9}>
                             <div className="rghtsideTrigr">
@@ -57,7 +88,7 @@ class Premium extends Component {
                                             <Col sm={12} md={3}>
                                                 <div className="motopremium">
                                                     Premium:
-                                                                    </div>
+                                                </div>
                                             </Col>
 
 
@@ -163,14 +194,19 @@ class Premium extends Component {
                                         <Col sm={6}>
                                             <FormGroup>
                                                 <div className="insurerName">
-                                                    <input
-                                                        name="name"
-                                                        type="text"
-                                                        placeholder="Type No"
-                                                        className="hght30"
-                                                        onFocus={e => this.changePlaceHoldClassAdd(e)}
-                                                        onBlur={e => this.changePlaceHoldClassRemove(e)}
-                                                    />
+                                                    <Field
+                                                    name="refNo"
+                                                    type="text"
+                                                    placeholder="Type No"
+                                                    autoComplete="off"
+                                                    className="hght30"
+                                                    value = {values.refNo}
+                                                    onFocus={e => this.changePlaceHoldClassAdd(e)}
+                                                    onBlur={e => this.changePlaceHoldClassRemove(e)}
+                                                />
+                                                {errors.refNo && touched.refNo ? (
+                                                <span className="errorMsg">{errors.refNo}</span>
+                                                ) : null}     
                                                 </div>
                                             </FormGroup>
                                         </Col>
@@ -188,20 +224,21 @@ class Premium extends Component {
                             <Row>
                                 <Col sm={12}>
                                     <label className="customCheckBox formGrp formGrp fscheck">I want to receive my Quote & Policy Details on Whatsapp
-                                    <input type="checkbox"
-                                            name="family[Self][check]"
-                                            className="user-self"
-                                            id="family[Self][check]"
-                                            value="1"
-                                            aria-invalid="false" />
+                                    <Field
+                                        type="checkbox"
+                                        name='whatsapp'                                            
+                                        value='1'
+                                        className="user-self"
+                                        // checked={values.consumables ? true : false}
+                                    />
                                         <span className="checkmark mL-0"></span>
                                         <span className="error-message"></span>
                                     </label>
                                 </Col>
                             </Row>
                             <div className="d-flex justify-content-left resmb">
-                                <button className="backBtn">Back</button>
-                                <button className="proceedBtn" onClick={this.handleShow} href={'#'}>Continue</button>
+                                <Button className="backBtn" type="button" onClick= {this.additionalDetails.bind(this)}>Back</Button>
+                                <Button className="proceedBtn" type="submit" >Continue</Button>
                             </div>
                         </Col>
 
@@ -211,92 +248,25 @@ class Premium extends Component {
                         </Col>
                     </Row>
                 </section>
-
+                </Form>
+                );
+                }}
+                </Formik>
                 <Modal className="" bsSize="md"
-                    show={this.state.show}
+                    show={show}
                     onHide={this.handleClose}>
                     <div className="otpmodal">
                         <Modal.Body>
-                            <div className="text-center boxotpmodl">
-                                <img src={require('../../assets/images/desk.svg')} alt="" className="m-b-25" />
-                                <div className="verfy">Verify OTP</div>
-                                <div className="mobotp">Your one time password (OTP)  is sent to your registered mobile number XXXXXXX 445.</div>
-
-
-                                <div className="d-flex justify-content-center otpInputWrap mx-auto m-b-25">
-                                    <div className="mr-1 ml-1">
-                                        <input
-                                            name="input1"
-                                            type="tel"
-                                            className="form-control placeHCenter"
-                                            autoComplete="off"
-                                            onFocus={e => this.changePlaceHoldClassAdd(e)}
-                                            onBlur={e => this.changePlaceHoldClassRemove(e)}
-                                        />
-                                    </div>
-                                    <div className="mr-1 ml-1">
-                                        <input
-                                            name="input2"
-                                            type="tel"
-                                            className="form-control placeHCenter"
-                                            autoComplete="off"
-                                            onFocus={e => this.changePlaceHoldClassAdd(e)}
-                                            onBlur={e => this.changePlaceHoldClassRemove(e)}
-                                        />
-                                    </div>
-                                    <div className="mr-1 ml-1">
-                                        <input
-                                            name="input3"
-                                            type="tel"
-                                            className="form-control placeHCenter"
-                                            autoComplete="off"
-                                            onFocus={e => this.changePlaceHoldClassAdd(e)}
-                                            onBlur={e => this.changePlaceHoldClassRemove(e)}
-                                        />
-                                    </div>
-                                    <div className="mr-1 ml-1">
-                                        <input
-                                            name="input4"
-                                            type="tel"
-                                            className="form-control placeHCenter"
-                                            autoComplete="off"
-                                            onFocus={e => this.changePlaceHoldClassAdd(e)}
-                                            onBlur={e => this.changePlaceHoldClassRemove(e)}
-                                        />
-                                    </div>
-                                    <div className="mr-1 ml-1">
-                                        <input
-                                            name="input5"
-                                            type="tel"
-                                            className="form-control placeHCenter"
-                                            autoComplete="off"
-                                            onFocus={e => this.changePlaceHoldClassAdd(e)}
-                                            onBlur={e => this.changePlaceHoldClassRemove(e)}
-                                        />
-                                    </div>
-                                    <div className="mr-1 ml-1">
-                                        <input
-                                            name="input6"
-                                            type="tel"
-                                            className="form-control placeHCenter"
-                                            autoComplete="off"
-                                            onFocus={e => this.changePlaceHoldClassAdd(e)}
-                                            onBlur={e => this.changePlaceHoldClassRemove(e)}
-                                        />
-                                    </div>
-                                </div>
-                                <div className="m-b-25">
-                                <div className="sndSms">Resend OTP via SMS</div>
-                                <div>You can resend OTP in 17 seconds</div>
-                                </div>
-
-                                <div className="text-center">
-                                    <button className="proceedBtn" href={'#'}>Continue</button>
-                                </div>
-                            </div>
+                            <Otp refNo= {refNo} whatsapp= {whatsapp} reloadPage={(e) => this.handleOtp(e) } />
                         </Modal.Body>
                     </div>
                 </Modal>
+               
+                </div>
+                <Footer />
+                </div>
+                </div>
+                </BaseComponent>
             </>
         );
     }

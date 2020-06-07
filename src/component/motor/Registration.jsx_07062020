@@ -13,9 +13,7 @@ import swal from 'sweetalert';
 import { Formik, Form, Field, ErrorMessage } from 'formik';
 
 
-const initialValues = {
-    regNumber:''
-}
+const initialValues = {}
 
 const vehicleRegistrationValidation = Yup.object().shape({
     regNumber: Yup.string().required('Please enter valid registration number'),
@@ -25,10 +23,8 @@ const vehicleRegistrationValidation = Yup.object().shape({
 
 
 class Registration extends Component {
-    state = {
-        motorInsurance:''
-    }
-   
+
+    state = {};
 
     changePlaceHoldClassAdd(e) {
         let element = e.target.parentElement;
@@ -41,7 +37,10 @@ class Registration extends Component {
     }
 
 
-
+    handleFormSubmit = (values) => {
+    const {productId} = this.props.match.params
+    this.props.history.push(`/Select-brand`);
+    }
 
 
 componentDidMount(){
@@ -51,16 +50,23 @@ componentDidMount(){
 
 fetchData=()=>{
     const {productId } = this.props.match.params
-    let policyHolder_id = localStorage.getItem("policyHolder_id") ? localStorage.getItem("policyHolder_id"):0;
-    axios.get(`policy-holder/motor/${policyHolder_id}`)
+    let policyHolder_id = localStorage.getItem("policyHolder_id");
+    axios.get(`policy-holder/${policyHolder_id}`)
         .then(res=>{
             //console.log("aaaaaabbbbbir========>",response.data.data.policyHolder.request_data.family_members)
-            let motorInsurance = res.data.data.policyHolder.motorinsurance
-           
+            let family_members = res.data.data.policyHolder.request_data.family_members
+            let addressDetails = JSON.parse(res.data.data.policyHolder.address)
+            let is_eia_account = res.data.data.policyHolder.is_eia_account
+            let gender = res.data.data.policyHolder.gender
+            let validateCheck = family_members && family_members.length>0 ? 1:0;
             this.setState({ 
-                motorInsurance
+                familyMembers:family_members,
+                addressDetails,
+                is_eia_account,
+                gender,
+                validateCheck
             })
-           
+            this.setStateForPreviousData(family_members);
         })
         .catch(function (error) {
             // handle error
@@ -68,41 +74,11 @@ fetchData=()=>{
         })
 }
 
-    handleSubmit=(values)=>{
-       // console.log("Vehicle Type ID ----->",this.props.match.params)
-        const {productId} = this.props.match.params;
-
-
-        const formData = new FormData();
-        formData.append('registration_no',values.regNumber);
-        formData.append('menumaster_id',1);
-        formData.append('vehicle_type_id',productId);
-
-        this.props.loadingStart();
-        axios
-        .post(`/registration`, formData)
-        .then(res => {
-                localStorage.setItem('policyHolder_id', res.data.data.policyHolder_id);
-                localStorage.setItem('policyHolder_refNo', res.data.data.policyHolder_refNo);
-                this.props.history.push(`/select-brand/${productId}`);                        
-        })
-        .catch(err => {
-          console.log('Errors==============>',err.data);
-          if(err && err.data){
-             swal('Please check..something went wrong!!');
-          }
-          this.props.loadingStop();
-        });
-    }
-
 
 
     render() {
-        const {motorInsurance} = this.state
-        console.log("VVVVV======>",motorInsurance);
-        const newInitialValues = Object.assign(initialValues,{
-            regNumber: motorInsurance ? motorInsurance.registration_no:'' 
-        })
+        const {} = this.state
+        const newInitialValues = Object.assign(initialValues)
 
         return (
             <>
@@ -118,10 +94,10 @@ fetchData=()=>{
                                     <div className="boxpd">
                                         <h4 className="m-b-30">Help us with some information about yourself</h4>
                                         <Formik initialValues={newInitialValues} 
-                                        onSubmit={this.handleSubmit} 
+                                        onSubmit={this.handleFormSubmit} 
                                         validationSchema={vehicleRegistrationValidation}>
                                         {({ values, errors, setFieldValue, setFieldTouched, isValid, isSubmitting, touched }) => {
-                                            console.log("CCCCCCCC======>",values);
+
                                         return (
                                         <Form>
                                         <div className="row formSection">
