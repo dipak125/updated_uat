@@ -182,15 +182,14 @@ class Address extends Component {
 
     componentDidMount(){       
         this.fetchData();
-       // console.log("zzzzzz======>",productId)
     }
 
     fetchData=()=>{
         const {productId } = this.props.match.params
         let policyHolder_id = localStorage.getItem("policyHolder_id");
+        this.props.loadingStart();
         axios.get(`policy-holder/${policyHolder_id}`)
             .then(res=>{
-                //console.log("aaaaaabbbbbir========>",response.data.data.policyHolder.request_data.family_members)
                 let policy_holder =  res.data.data.policyHolder;
                 let family_members = res.data.data.policyHolder.request_data.family_members
                 let addressDetails = JSON.parse(res.data.data.policyHolder.address)
@@ -211,22 +210,22 @@ class Address extends Component {
                     addressDetails,
                     is_eia_account
                 })
-
+                this.props.loadingStop();
                 this.fetchPrevAreaDetails(addressDetails)
                 
             })
             .catch(function (error) {
                 // handle error
-                console.log(error);
+                this.props.loadingStop();
             })
     }
 
     fetchPrevAreaDetails=(addressDetails)=>{
-            //console.log("PPPPPPP=======>",addressDetails);
             if(addressDetails){
                 let pincode = addressDetails.pincode;
                 const formData = new FormData();
                 formData.append('pincode',pincode);
+                this.props.loadingStart();
                 axios.post('generate-pincode-details',
                 formData
                 ).then(res=>{
@@ -242,9 +241,10 @@ class Address extends Component {
                         pinDataArr,
                         stateName:unique,
                     });
+                    this.props.loadingStop();
                 }).
                 catch(err=>{
-                    console.log(err);
+                    this.props.loadingStop();
                 })
             }
             
@@ -253,12 +253,12 @@ class Address extends Component {
     fetchAreadetails=(e)=>{
         //let pinCode=obj.value;
         let pinCode = e.target.value;
-        console.log("AAAAAAAA=====>",pinCode)
        
         if(pinCode.length==6){
 
             const formData = new FormData();
             formData.append('pincode',pinCode);
+            this.props.loadingStart();
             axios.post('generate-pincode-details',
             formData
             ).then(res=>{
@@ -274,9 +274,10 @@ class Address extends Component {
                     pinDataArr,
                     stateName:unique,
                 });
+                this.props.loadingStop();
             }).
             catch(err=>{
-                console.log(err);
+                this.props.loadingStop();
             })
            
 
@@ -331,11 +332,12 @@ class Address extends Component {
         if(values.eIA == 1){
             formData.append('eia_account_no',values.eia_account_no)
         }        
-        this.props.loadingStop();
+        this.props.loadingStart();
         axios
         .post(`/insured-member-details`, formData)
         .then(res => {
            // if(res.data.completedStep == 4){
+                this.props.loadingStop();
                 this.props.history.push(`/NomineeDetails/${productId}`);
            // }        
         })
@@ -344,12 +346,7 @@ class Address extends Component {
         this.props.loadingStop();
         });
 
-       
-        //console.log("Values =======> ",values);
-
-
        // const {productId} = this.props.match.params
-
 
     }
 
@@ -387,7 +384,6 @@ class Address extends Component {
     
     render() {
         const {policy_holder,familyMembers,addressDetails,is_eia_account,selfFlag,pinDataArr,stateName,showEIA} = this.state    
-        console.log("ADDRESS DETAILS======>",stateName)
         let newInitialValues = Object.assign(initialValues, {
             proposerAsInsured: sessionStorage.getItem('proposed_insured') ? sessionStorage.getItem('proposed_insured') : (selfFlag ? 1:0),
             family_members:this.initFamilyDetailsList(
@@ -406,11 +402,7 @@ class Address extends Component {
             eia_account_no : policy_holder && policy_holder.eia_no ?  policy_holder.eia_no : ''
         });
 
-
-
-        console.log("NNNNNNN--=--->",this.state)
         const {productId} = this.props.match.params
-        console.log("Family Members ------>",familyMembers)
         return (
             <>
                 <BaseComponent>
@@ -555,7 +547,6 @@ class Address extends Component {
                                                                     className="datePckr"
                                                                     selected={values.family_members[index].dob ? new Date(values.family_members[index].dob):new Date()}
                                                                     onChange={(val) => {
-                                                                        console.log("MOLK----->",val)
                                                                         setFieldTouched(`family_members.${index}.dob`);
                                                                         setFieldValue(`family_members.${index}.dob`, val);
                                                                       }}

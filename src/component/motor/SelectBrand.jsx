@@ -226,152 +226,9 @@ class SelectBrand extends Component {
                                     <Row>
                                         <Col sm={12} md={9}>
                                             <BrandTable brandList = {brandList && brandList.length>0 ? brandList:[]} selectBrandFunc={this.setBrandName}/>
-                                            {/*<FormGroup>
-                                                <div className="formSection">
-                                                    <Field
-                                                        name="selectedBrandId"
-                                                        component="select"
-                                                        className="formGrp"                                                       
-                                                        onChange={e => {      
-                                                            console.log("aaaaaaa========>",e.target.value)                                                                                                                  
-                                                            setFieldValue('selectedBrandId', e.target.value);
-                                                            
-                                                            this.setBrandName(e.target.value);
-                                                            this.setState({
-                                                                selectedBrandId:e.target.value
-                                                            })
-                                                        }}
-                                                        value = {values.selectedBrandId}
-                                                    >
-                                                       <option value="">Select Brand</option>
-                                                       {brandList && brandList.map((v,i)=>
-                                                            <option value={v.id}>{v.name}</option>
-                                                       )}
-                                                    </Field>     
-                                                    {errors.selectedBrandId  ? (
-                                                    <span className="errorMsg">{errors.selectedBrandId}</span>
-                                                ) : null}                   
-                                                </div>
-                                                    </FormGroup> */}
-
-                                          {/*  <FormGroup>
-                                                <div className="formSection">
-                                                    <Field
-                                                        name="selectedModelId"
-                                                        component="select"
-                                                        autoComplete="off"                                                                        
-                                                        className="formGrp"
-                                                        onChange={(e) => {
-                                                            setFieldValue(`selectedModelId`, e.target.value);
-                                                            this.fetchVarient(e.target.value)
-                                                           // this.setBrandName(e.target.value);
-                                                            //this.showEIAText(1);
-                                                            this.setState({
-                                                                selectedModelId:e.target.value
-                                                            })
-                                                        }}
-                                                        value = {values.selectedModelId}
-                                                    >
-                                                        <option value="">Select Model</option>
-                                                        {brandModelList && brandModelList.length > 0 ? brandModelList.map((v,i)=>
-                                                            <option value={v.id}>{v.name}</option>
-                                                        ):''}
-                                                        
-                                                        
-                                                    </Field>     
-                                                    {errors.selectedModelId  ? (
-                                                    <span className="errorMsg">{errors.selectedModelId}</span>
-                                                ) : null}                   
-                                                </div>
-                                            </FormGroup>
-                                            {varientmodel && varientmodel.length>0 ?            
-                                            <FormGroup>
-                                                <div className="formSection">
-                                                    <Field
-                                                        name="selectedVarientId"
-                                                        component="select"
-                                                        autoComplete="off"                                                                        
-                                                        className="formGrp"
-                                                        onChange={(e) => {
-                                                            setFieldValue(`selectedVarientId`, e.target.value);
-                                                           // this.setBrandName(e.target.value);
-                                                            //this.showEIAText(1);
-                                                            this.setState({
-                                                                selectedVarientId:e.target.value
-                                                            })
-                                                        }}
-                                                        value = {values.selectedVarientId}
-                                                    >
-                                                        <option value="">Select Model</option>
-                                                        {varientmodel && varientmodel.length > 0 ? varientmodel.map((v,i)=>
-                                                            <option value={v.id}>{v.varient+'-'+v.body_style}</option>
-                                                        ):''}
-                                                        
-                                                        
-                                                    </Field>     
-                                                    {errors.selectedVarientId  ? (
-                                                    <span className="errorMsg">{errors.selectedVarientId}</span>
-                                                ) : null}                   
-                                                </div>
-                                            </FormGroup>:''}
-                                                
-                                                    */}
-                                        </Col>
-
-                                        <Col sm={12} md={3}>
-                                            <div className="regisBox">
-                                                <Row className="no-gutters m-b-25">
-                                                    <Col sm={12} md={6}>
-                                                        <div className="txtRegistr resmb-15">Registration No.
-                                                        {motorInsurance && motorInsurance.registration_no}</div>
-                                                    </Col>
-
-                                                    <Col sm={12} md={6}>
-                                                        <button className="rgistrBtn" onClick = {this.registration.bind(this,productId)}>Edit</button>
-                                                    </Col>
-                                                    
-                                                </Row>
-
-                                                <Row className="no-gutters">
-                                                    <Col sm={12} md={6}>
-                                                        <div className="txtRegistr resmb-15">Car Brand
-                                                           - {selectedBrandDetails && selectedBrandDetails.name}</div>
-                                                    </Col>
-                                                    <Col sm={12} md={6}>
-                                                            <button className="rgistrBtn">Edit</button>
-                                                        </Col>
-
-                                                    {/*<Col sm={12} md={6}>
-                                                        <button className="rgistrBtn">Edit</button>
-                                                    </Col>*/}
-                                                </Row>
-                                                
-                                                <Row className="no-gutters m-b-25">
-                                                        <Col sm={12} md={6}>
-                                                            <div className="txtRegistr">Car Model<br/>
-                                                                <strong>4S CHAMPION</strong></div>
-                                                        </Col>
-
-                                                        <Col sm={12} md={5} className="text-right">
-                                                            <button className="rgistrBtn">Edit</button>
-                                                        </Col>
-                                                    </Row>
-
-                                                <Row className="m-b-25">
-                                                    <Col sm={12} md={7}>
-                                                        <div className="txtRegistr">Fuel Type<br/>
-                                                            <strong>PETROL </strong></div>
-                                                    </Col>
-                                                </Row>
-                                            </div>
-                                        </Col>
-                                    </Row>
-
-                                    <Row>
-                                            <Col sm={12} md={9} lg={9}>
 
                                                 <Row>
-                                                    <Col sm={12} md={6} lg={6}>
+                                                    <Col sm={12} md={5} lg={5}>
                                                         <FormGroup>
                                                             <div className="fs-18">
                                                                 First Purchase/Registration Date
@@ -620,7 +477,7 @@ class SelectBrand extends Component {
                                                 </Row>
 
                                                 <Row>
-                                                    <Col sm={4}>
+                                                    <Col sm={6}>
                                                         <FormGroup>
                                                             <div className="d-inline-flex m-b-35">
                                                                 <div className="p-r-25">
@@ -698,10 +555,147 @@ class SelectBrand extends Component {
                                                     <button className="backBtn" onClick = {this.registration.bind(this,productId)}>Back</button>
                                                     <button className="proceedBtn" type = "submit" >Continue</button>
                                                 </div>                       
-                                            </Col>
-
                                             
-                                        </Row>
+                                            {/*<FormGroup>
+                                                <div className="formSection">
+                                                    <Field
+                                                        name="selectedBrandId"
+                                                        component="select"
+                                                        className="formGrp"                                                       
+                                                        onChange={e => {      
+                                                            console.log("aaaaaaa========>",e.target.value)                                                                                                                  
+                                                            setFieldValue('selectedBrandId', e.target.value);
+                                                            
+                                                            this.setBrandName(e.target.value);
+                                                            this.setState({
+                                                                selectedBrandId:e.target.value
+                                                            })
+                                                        }}
+                                                        value = {values.selectedBrandId}
+                                                    >
+                                                       <option value="">Select Brand</option>
+                                                       {brandList && brandList.map((v,i)=>
+                                                            <option value={v.id}>{v.name}</option>
+                                                       )}
+                                                    </Field>     
+                                                    {errors.selectedBrandId  ? (
+                                                    <span className="errorMsg">{errors.selectedBrandId}</span>
+                                                ) : null}                   
+                                                </div>
+                                                    </FormGroup> */}
+
+                                          {/*  <FormGroup>
+                                                <div className="formSection">
+                                                    <Field
+                                                        name="selectedModelId"
+                                                        component="select"
+                                                        autoComplete="off"                                                                        
+                                                        className="formGrp"
+                                                        onChange={(e) => {
+                                                            setFieldValue(`selectedModelId`, e.target.value);
+                                                            this.fetchVarient(e.target.value)
+                                                           // this.setBrandName(e.target.value);
+                                                            //this.showEIAText(1);
+                                                            this.setState({
+                                                                selectedModelId:e.target.value
+                                                            })
+                                                        }}
+                                                        value = {values.selectedModelId}
+                                                    >
+                                                        <option value="">Select Model</option>
+                                                        {brandModelList && brandModelList.length > 0 ? brandModelList.map((v,i)=>
+                                                            <option value={v.id}>{v.name}</option>
+                                                        ):''}
+                                                        
+                                                        
+                                                    </Field>     
+                                                    {errors.selectedModelId  ? (
+                                                    <span className="errorMsg">{errors.selectedModelId}</span>
+                                                ) : null}                   
+                                                </div>
+                                            </FormGroup>
+                                            {varientmodel && varientmodel.length>0 ?            
+                                            <FormGroup>
+                                                <div className="formSection">
+                                                    <Field
+                                                        name="selectedVarientId"
+                                                        component="select"
+                                                        autoComplete="off"                                                                        
+                                                        className="formGrp"
+                                                        onChange={(e) => {
+                                                            setFieldValue(`selectedVarientId`, e.target.value);
+                                                           // this.setBrandName(e.target.value);
+                                                            //this.showEIAText(1);
+                                                            this.setState({
+                                                                selectedVarientId:e.target.value
+                                                            })
+                                                        }}
+                                                        value = {values.selectedVarientId}
+                                                    >
+                                                        <option value="">Select Model</option>
+                                                        {varientmodel && varientmodel.length > 0 ? varientmodel.map((v,i)=>
+                                                            <option value={v.id}>{v.varient+'-'+v.body_style}</option>
+                                                        ):''}
+                                                        
+                                                        
+                                                    </Field>     
+                                                    {errors.selectedVarientId  ? (
+                                                    <span className="errorMsg">{errors.selectedVarientId}</span>
+                                                ) : null}                   
+                                                </div>
+                                            </FormGroup>:''}
+                                                
+                                                    */}
+                                        </Col>
+
+                                        <Col sm={12} md={3}>
+                                            <div className="regisBox">
+                                                <Row className=" m-b-25">
+                                                    <Col sm={12} md={6}>
+                                                        <div className="txtRegistr resmb-15">Registration No.
+                                                        {motorInsurance && motorInsurance.registration_no}</div>
+                                                    </Col>
+
+                                                    <Col sm={12} md={6} className="text-right">
+                                                        <button className="rgistrBtn" onClick = {this.registration.bind(this,productId)}>Edit</button>
+                                                    </Col>
+                                                    
+                                                </Row>
+
+                                                <Row className="m-b-25">
+                                                    <Col sm={12} md={6}>
+                                                        <div className="txtRegistr resmb-15">Car Brand
+                                                           - {selectedBrandDetails && selectedBrandDetails.name}</div>
+                                                    </Col>
+                                                    <Col sm={12} md={6} className="text-right">
+                                                            <button className="rgistrBtn">Edit</button>
+                                                        </Col>
+
+                                                    {/*<Col sm={12} md={6}>
+                                                        <button className="rgistrBtn">Edit</button>
+                                                    </Col>*/}
+                                                </Row>
+                                                
+                                                <Row className=" m-b-25">
+                                                        <Col sm={12} md={6}>
+                                                            <div className="txtRegistr">Car Model<br/>
+                                                                <strong>4S CHAMPION</strong></div>
+                                                        </Col>
+
+                                                        <Col sm={12} md={6} className="text-right">
+                                                            <button className="rgistrBtn">Edit</button>
+                                                        </Col>
+                                                    </Row>
+
+                                                <Row className="m-b-25">
+                                                    <Col sm={12} md={6}>
+                                                        <div className="txtRegistr">Fuel Type<br/>
+                                                            <strong>PETROL </strong></div>
+                                                    </Col>
+                                                </Row>
+                                            </div>
+                                        </Col>
+                                    </Row>
                                 </div>
                             </section>
                             
@@ -741,7 +735,7 @@ class SelectBrand extends Component {
                                         <span className="grey ml-5">1.2 E I-VTEC 1198CC</span>
                                     </div>
                                     <div>
-                                        <label className="slctmodalbox formGrp formGrp">
+                                        <label className="customCheckBox formGrp formGrp">
                                             <input type="checkbox"
                                                 name="family[Self][check]"
                                                 className="user-self"
@@ -761,7 +755,7 @@ class SelectBrand extends Component {
                                         <span className="grey ml-5">1.2 E MT 1198CC</span>
                                     </div>
                                     <div>
-                                        <label className="slctmodalbox formGrp formGrp">
+                                        <label className="customCheckBox formGrp formGrp">
                                             <input type="checkbox"
                                                 name="family[Self][check]"
                                                 className="user-self"
@@ -781,7 +775,7 @@ class SelectBrand extends Component {
                                         <span className="grey ml-5">1.2 EX MT 1198CC</span>
                                     </div>
                                     <div>
-                                        <label className="slctmodalbox formGrp formGrp">
+                                        <label className="customCheckBox formGrp formGrp">
                                             <input type="checkbox"
                                                 name="family[Self][check]"
                                                 className="user-self"
@@ -801,7 +795,7 @@ class SelectBrand extends Component {
                                         <span className="grey ml-5">1.2 S AT 1198CC</span>
                                     </div>
                                     <div>
-                                        <label className="slctmodalbox formGrp formGrp">
+                                        <label className="customCheckBox formGrp formGrp">
                                             <input type="checkbox"
                                                 name="family[Self][check]"
                                                 className="user-self"
@@ -821,7 +815,7 @@ class SelectBrand extends Component {
                                         <span className="grey ml-5">1.2 E I-VTEC 1198CC</span>
                                     </div>
                                     <div>
-                                        <label className="slctmodalbox formGrp formGrp">
+                                        <label className="customCheckBox formGrp formGrp">
                                             <input type="checkbox"
                                                 name="family[Self][check]"
                                                 className="user-self"
@@ -841,7 +835,7 @@ class SelectBrand extends Component {
                                         <span className="grey ml-5">1.2 E MT 1198CC</span>
                                     </div>
                                     <div>
-                                        <label className="slctmodalbox formGrp formGrp">
+                                        <label className="customCheckBox formGrp formGrp">
                                             <input type="checkbox"
                                                 name="family[Self][check]"
                                                 className="user-self"

@@ -101,7 +101,6 @@ class PolicyDetails extends Component {
   };
 
   getAccessTokenForInception = (e) => {
-    console.log("quoteNo", this.state.fulQuoteResp)
     this.props.loadingStart();
     axios
       .post(`/callTokenService`)
@@ -154,7 +153,6 @@ class PolicyDetails extends Component {
   policyInception = (access_token) => {
     const { fulQuoteResp, error } = this.state;
     const formData = new FormData();
-    this.props.loadingStart();
     formData.append("quotationNo", fulQuoteResp.QuotationNo);
     formData.append("amount", fulQuoteResp.DuePremium);
     formData.append("access_token", access_token);
@@ -175,6 +173,7 @@ class PolicyDetails extends Component {
             error1: res.data,
           });
         }
+        this.props.loadingStop();
       })
       .catch((err) => {
         this.setState({
@@ -396,12 +395,15 @@ class PolicyDetails extends Component {
                           >
                             Back
                           </button>
+                        {fulQuoteResp.QuotationNo ? 
                           <button
                             className="proceedBtn"
-                            onClick={this.getAccessTokenForInception}
+                            onClick={this.handleShow}
                           >
                             Make Payment
-                          </button>
+                          </button> : null
+                        }
+
                         </div>
                       </Col>
 

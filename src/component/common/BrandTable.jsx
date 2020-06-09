@@ -27,7 +27,7 @@ class BrandTable extends Component {
                     <img src={require('../../assets/images/car.svg')} alt="" />                                                
                     } 
                 </td>);
-                if (i % 4 === 3) {
+                if (i % 5 === 4) {
                     acc.push(<tr>{rowContents}</tr>);
                     rowContents = [];
                 }
@@ -57,7 +57,7 @@ class BrandTable extends Component {
                             <table>
                                 <tbody>
                                  {this.setTables(brandList)} 
-                                 <tr><td Colspan='4' text-align='center'>MORE</td></tr>                                                                           
+                                 <tr><td Colspan='5'>OTHER</td></tr>                                                                           
                                 </tbody>
                             </table>
                         </div>

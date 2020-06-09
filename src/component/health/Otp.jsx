@@ -4,13 +4,29 @@ import { Formik, Field, Form } from "formik";
 import { withRouter } from 'react-router-dom';
 import { loaderStart, loaderStop } from "../../store/actions/loader";
 import { connect } from "react-redux";
+import axios from "../../shared/axios";
+// import OtpInput from 'react-otp-input';
 
 const initialValue = {}
 
 class Otp extends Component {
 
+    state = {
+        otp: "",
+        errorMsg: "",
+        seconds: 10
+      };
+
     handleSubmit = (values) => {
-        this.props.reloadPage(values.otp1+values.otp2+values.otp3+values.otp4+values.otp5+values.otp6);
+        this.getOtp()
+        const {otp} = this.state
+        let otp_enter = Number(values.otp1+values.otp2+values.otp3+values.otp4+values.otp5)
+        if(otp_enter == Number(otp)){
+            this.props.reloadPage(otp_enter);
+        }
+        else {
+            this.setState({ errorMsg: "Wrong OTP" });
+        }        
         // this.props.otp(values.otp);
         // this.props.history.push(`/ThankYou_motor`);
     }
@@ -24,10 +40,79 @@ class Otp extends Component {
         let element = e.target.parentElement;
         e.target.value.length === 0 && element.classList.remove('active');
     }
+
+    generateOtp = () => {
+        this.props.loadingStart();
+        const formData = new FormData();
+        formData.append('policy_holder_id', localStorage.getItem('policyHolder_id'));
+        formData.append("menumaster_id", '2');
+        axios
+          .post('/otp/generate', formData)
+          .then((res) => {
+            this.getOtp()
+          })
+          .catch((err) => {
+            this.setState({
+              otp: "",
+            });
+            this.props.loadingStop();
+          });
+      };
+
+      getOtp = () => {
+        this.props.loadingStart();
+        const formData = new FormData();
+        formData.append('policy_holder_id', localStorage.getItem('policyHolder_id'));
+        formData.append("menumaster_id", '2');
+        axios
+          .post('/otp/check-status', formData)
+          .then((res) => {
+            if(res.data.error == false) {
+                this.setState({ otp: res.data.data.otp });
+            } 
+            else {
+                this.setState({ otp: "", errorMsg: res.data.msg });
+            }          
+          })
+          .catch((err) => {
+            this.setState({
+              otp: "",
+            });
+            this.props.loadingStop();
+          });
+      };
+
+
+    componentDidMount() {
+        this.generateOtp();
+
+            this.myInterval = setInterval(() => {
+                this.setState(({ seconds }) => ({
+                  seconds: seconds - 1
+                }))
+              }, 1000)       
+      }
     
     render() {
-        console.log(this.props)
+        const {otp, errorMsg, seconds} = this.state
         return (
+             // <div className="text-center boxotpmodl">
+            //  <img src={require('../../assets/images/desk.svg')} alt="" className="m-b-25" />
+            //     <div className="verfy">Verify OTP</div>
+            //     <div className="mobotp">Your one time password (OTP)  is sent to your registered mobile number XXXXXXX 445.</div>
+            //     <div className="d-flex justify-content-center otpInputWrap mx-auto m-b-25">
+            //         <div className="mr-1 ml-1">.
+            //         <OtpInput
+            //         onChange={otp => console.log(otp)}
+            //         numInputs={6}
+            //         containerStyle="form-control placeHCenter"
+            //         value= ""
+            //         separator={<span>-</span>}
+            //         />
+            //         </div>
+            //     </div>
+            // </div>
+           
                 <Formik initialValues={initialValue} onSubmit={this.handleSubmit}
                     // validationSchema={validateNominee}
                     >
@@ -39,7 +124,7 @@ class Otp extends Component {
                             <img src={require('../../assets/images/desk.svg')} alt="" className="m-b-25" />
                             <div className="verfy">Verify OTP</div>
                             <div className="mobotp">Your one time password (OTP)  is sent to your registered mobile number XXXXXXX 445.</div>
-
+                            <span className="errorMsg">{otp}</span>
 
                             <div className="d-flex justify-content-center otpInputWrap mx-auto m-b-25">
                                 <div className="mr-1 ml-1">
@@ -51,6 +136,7 @@ class Otp extends Component {
                                         value = {values.otp1}
                                         onFocus={e => this.changePlaceHoldClassAdd(e)}
                                         onBlur={e => this.changePlaceHoldClassRemove(e)}
+                                        maxLength="1"
                                     />
                                 </div>
                                 <div className="mr-1 ml-1">
@@ -62,6 +148,7 @@ class Otp extends Component {
                                         value = {values.otp2}
                                         onFocus={e => this.changePlaceHoldClassAdd(e)}
                                         onBlur={e => this.changePlaceHoldClassRemove(e)}
+                                        maxLength="1"
                                     />
                                 </div>
                                 <div className="mr-1 ml-1">
@@ -73,6 +160,7 @@ class Otp extends Component {
                                         value = {values.otp3}
                                         onFocus={e => this.changePlaceHoldClassAdd(e)}
                                         onBlur={e => this.changePlaceHoldClassRemove(e)}
+                                        maxLength="1"
                                     />
                                 </div>
                                 <div className="mr-1 ml-1">
@@ -84,6 +172,7 @@ class Otp extends Component {
                                         value = {values.otp4}
                                         onFocus={e => this.changePlaceHoldClassAdd(e)}
                                         onBlur={e => this.changePlaceHoldClassRemove(e)}
+                                        maxLength="1"
                                     />
                                 </div>
                                 <div className="mr-1 ml-1">
@@ -95,27 +184,20 @@ class Otp extends Component {
                                         value = {values.otp5}
                                         onFocus={e => this.changePlaceHoldClassAdd(e)}
                                         onBlur={e => this.changePlaceHoldClassRemove(e)}
-                                    />
-                                </div>
-                                <div className="mr-1 ml-1">
-                                    <Field
-                                        name="otp6"
-                                        type="text"
-                                        autoComplete="off"
-                                        className="form-control placeHCenter"
-                                        value = {values.otp6}
-                                        onFocus={e => this.changePlaceHoldClassAdd(e)}
-                                        onBlur={e => this.changePlaceHoldClassRemove(e)}
+                                        maxLength="1"
                                     />
                                 </div>
                             </div>
                             <div className="m-b-25">
                             <div className="sndSms">Resend OTP via SMS</div>
-                            <div>You can resend OTP in 17 seconds</div>
-                            </div>
+                            <div>You can resend OTP in {seconds >= 0 ? seconds : 0} seconds</div>
+                            {errorMsg ? 
+                            <span className="errorMsg">{errorMsg}</span> : null }
 
+                            </div>
+                           
                             <div className="text-center">
-                            <Button className={`proceedBtn`} type="submit"  disabled={isSubmitting ? true : false}>
+                            <Button className={`proceedBtn`} type="submit" >
                                 {isSubmitting ? 'Wait..' : 'Continue'}
                             </Button> 
                             </div>

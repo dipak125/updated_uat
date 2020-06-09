@@ -79,6 +79,12 @@ class HeaderTop extends Component {
                         </Dropdown>                       
                     </div>
                     : null }
+                    
+                    {this.props.loading ? (
+                        <div className="loading">
+                            <Loader type="Oval" color="#edae21" height="50" width="50" />
+                        </div>
+                    ) : null}
                 </section>
             </>
         )

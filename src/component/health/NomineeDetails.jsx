@@ -94,7 +94,7 @@ class NomineeDetails extends Component {
         axios
         .post(`/insert-nominee`, formData)
         .then(res => { 
-            // this.props.loadingStop();
+            this.props.loadingStop();
             this.props.history.push(`/PolicyDetails/${productId}`);
         })
         .catch(err => {
@@ -113,7 +113,7 @@ class NomineeDetails extends Component {
             this.setState({
                 NomineeDetails: res.data.data.policyHolder.request_data.nominee[0]
             }) 
-            // this.props.loadingStop();
+            this.props.loadingStop();
           })
           .catch(err => {
             this.setState({

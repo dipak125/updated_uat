@@ -73,7 +73,7 @@ class MedicalDetails extends Component {
         let selected_answer = [];
         let selected_question = [];
         const formData = new FormData(); 
-
+        
         if ( key.match(/question_id/gi)){      
         question_id.push(key.substr(12, 1));                            
         }
@@ -102,13 +102,14 @@ class MedicalDetails extends Component {
             this.setState({
                 message: res.data.msg
             });
+            this.props.loadingStop();
           })
           .catch(err => {
             this.setState({
                 message: ""
             });
             this.props.loadingStop();
-          });
+          });        
     }
 
     handleSubmit = (values) => {
@@ -155,6 +156,7 @@ class MedicalDetails extends Component {
             });
             this.props.loadingStop();
           });
+          this.props.loadingStop();
       }
 
     getPolicyHolderDetails = () => {
@@ -173,6 +175,7 @@ class MedicalDetails extends Component {
             });
             this.props.loadingStop();
           });
+          this.props.loadingStop();
       }
 
     componentDidMount() {

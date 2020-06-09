@@ -136,11 +136,11 @@ class SelectDuration extends Component {
     
           this.props.loadingStop();
         });     
+        this.props.loadingStop();
 
     }
 
     getAccessToken = () => {
-        this.props.loadingStart();
         axios
           .post(`/callTokenService`)
           .then(res => { 
@@ -150,6 +150,7 @@ class SelectDuration extends Component {
             let value = []
             value['polStartDate'] = new Date()
             value['polEndDate'] = new Date(moment(value['polStartDate']).add(1, 'years').format("YYYY-MM-DD"))
+            this.props.loadingStop();
             this.quote(value)
           })
           .catch(err => {
@@ -204,7 +205,7 @@ class SelectDuration extends Component {
                 error: res.data
             }) 
         }
-          
+        this.props.loadingStop();
         })
         .catch(err => {
           this.setState({

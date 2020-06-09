@@ -284,6 +284,7 @@ class InformationYourself extends Component {
     .then(res => {
         localStorage.setItem('policyHolder_id', res.data.data.policyHolder_id);
         localStorage.setItem('policyHolder_refNo', res.data.data.policyHolder_refNo);
+        this.props.loadingStop();
         this.props.history.push(`/MedicalDetails/${productId}`);
     })
     .catch(err => {
@@ -293,7 +294,6 @@ class InformationYourself extends Component {
       }
       this.props.loadingStop();
     });
-    
        // this.props.history.push(`/MedicalDetails/${productId}`);
     }
 
@@ -390,6 +390,7 @@ componentDidMount(){
 fetchData=()=>{
     const {productId } = this.props.match.params
     let policyHolder_id = localStorage.getItem("policyHolder_id");
+    this.props.loadingStart();
     axios.get(`policy-holder/${policyHolder_id}`)
         .then(res=>{
             //console.log("aaaaaabbbbbir========>",response.data.data.policyHolder.request_data.family_members)
@@ -411,6 +412,7 @@ fetchData=()=>{
             // handle error
             console.log(error);
         })
+        this.props.loadingStop();
 }
 
 
