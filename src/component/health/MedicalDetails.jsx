@@ -234,6 +234,7 @@ class MedicalDetails extends Component {
         return (
             <>
                 <BaseComponent>
+                <div className="container-fluid">
                     <div className="row">
                         <div className="col-sm-12 col-md-12 col-lg-2 col-xl-2 pd-l-0">
                             <SideNav />
@@ -362,6 +363,7 @@ class MedicalDetails extends Component {
                             
                         </Modal>
                       </div>      
+                      </div>
                 </BaseComponent>
             </>
         );

@@ -3,40 +3,64 @@ import { Row, Col } from 'react-bootstrap';
 
 
 class BrandTable extends Component {
+    props={};
+    constructor(props){
+        super(props);
+
+        this.props=props;
+    };
+    setModelName = (id) => {
+        console.log("AAAAAAAA======>",id)
+        this.props.selectBrandFunc(id)
+       // this.props.selectBrandFunc(id)
+    }
+    
+
+    setTables=(brandList)=>{
+        const {selectBrandFunc} = this.props;
+      //  const products = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
+		let rowContents = [];
+        const contents = brandList && brandList.reduce((acc, p, i) => {
+            rowContents.push(<td key={i} onClick = {e=>this.setModelName(p.id)}> 
+                    {p.image ?
+                    <img src={'http://14.140.119.44/sbig-csc/core/public/image/car_brand_image/'+p.image} alt={p.name} />:
+                    <img src={require('../../assets/images/car.svg')} alt="" />                                                
+                    } 
+                </td>);
+                if (i % 4 === 3) {
+                    acc.push(<tr>{rowContents}</tr>);
+                    rowContents = [];
+                }
+                
+               
+                return acc;
+            },[])
+        contents.push(<tr className="text-center">{rowContents}</tr>);
+            
+        return contents;    
+
+    }
+
+
+
+
     render() {
+        let stat = false;
+        const {brandList,selectBrandFunc} = this.props;
+        console.log("Brand Listing========>",brandList)
         return (
+            
             <>
                <Row>
                 <Col sm={12}>
-                    <div className="brand-table">
-                        <table>
-                            <tbody>
-                                <tr className="text-center">
-                                    <td><img src={require('../../assets/images/image-01.svg')} alt="" /></td>
-                                    <td><img src={require('../../assets/images/image-02.svg')} alt="" /></td>
-                                    <td><img src={require('../../assets/images/image-03.svg')} alt="" /></td>
-                                    <td><img src={require('../../assets/images/image-04.svg')} alt="" /></td>
-                                    <td><img src={require('../../assets/images/image-05.svg')} alt="" /></td>
-                                    </tr> 
-
-                                    <tr className="text-center">
-                                    <td><img src={require('../../assets/images/image-06.svg')} alt="" /></td>
-                                    <td><img src={require('../../assets/images/image-07.svg')} alt="" /></td>
-                                    <td><img src={require('../../assets/images/image-08.svg')} alt="" /></td>
-                                    <td><img src={require('../../assets/images/image-09.svg')} alt="" /></td>
-                                    <td><img src={require('../../assets/images/image-10.svg')} alt="" /></td>
-                                    </tr> 
-
-                                    <tr className="text-center">
-                                    <td><img src={require('../../assets/images/image-11.svg')} alt="" /></td>
-                                    <td><img src={require('../../assets/images/image-12.svg')} alt="" /></td>
-                                    <td><img src={require('../../assets/images/image-13.svg')} alt="" /></td>
-                                    <td><img src={require('../../assets/images/image-14.svg')} alt="" /></td>
-                                    <td><img src={require('../../assets/images/image-15.svg')} alt="" /></td>
-                                    </tr>  
+                        <div className="brand-table">
+                            <table>
+                                <tbody>
+                                 {this.setTables(brandList)} 
+                                 <tr><td Colspan='4' text-align='center'>MORE</td></tr>                                                                           
                                 </tbody>
-                              </table>
-                           </div>
+                            </table>
+                        </div>
                         </Col>
                      </Row>           
             </>

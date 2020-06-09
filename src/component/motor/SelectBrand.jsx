@@ -11,6 +11,7 @@ import { withRouter } from 'react-router-dom';
 import { loaderStart, loaderStop } from "../../store/actions/loader";
 import { connect } from "react-redux";
 import swal from 'sweetalert';
+import DatePicker from "react-datepicker";
 
 
 
@@ -87,8 +88,8 @@ class SelectBrand extends Component {
                 console.log("aaasssssss======>",productId)
                 axios.get(`vehicle/brands`)
                 .then(res=>{
-                    //console.log("aaaaaabbbbbir========>",response.data.data.policyHolder.request_data.family_members)
-                    let brandList = res && res.data ? res.data.data :[]                
+                    console.log("aaaaaabbbbbirssssss========>",res.data.data.list)
+                    let brandList = res && res.data.data.list ? res.data.data.list :[]                
                     this.setState({ 
                         brandList
                     })                
@@ -143,13 +144,14 @@ class SelectBrand extends Component {
             })
     }
 
-    buy_policy=(productId)=>{
+    registration=(productId)=>{
         this.props.history.push(`/Registration/${productId}`);
     }   
 
 
 
     setBrandName=(brand_id)=>{
+        console.log('POP=================>',brand_id)
         axios.get(`vehicle/brand/${brand_id}`).then(res=>{
             //console.log("aaaaaabbbbbir========>",response.data.data.policyHolder.request_data.family_members)
             let selectedBrandDetails = res.data && res.data.data.brand ?  res.data.data.brand:{};
@@ -157,7 +159,8 @@ class SelectBrand extends Component {
            
             this.setState({ 
                 selectedBrandDetails,
-                brandModelList
+                brandModelList,
+                show:true
             })
             
            
@@ -171,74 +174,9 @@ class SelectBrand extends Component {
 
     }
 
-    handleSubmit=(values)=>{        
+    handleSubmit=(values)=>{               
         const {productId} = this.props.match.params    
-        const selectedBrandId = values.selectedBrandId
-        const selectedModelId = values.selectedModelId
-        const selectedVarientId = values.selectedModelId
-        let policyHolder_id = localStorage.getItem("policyHolder_id") ? localStorage.getItem("policyHolder_id"):0;
-        const formData = new FormData();
-        formData.append('vehicle_type_id',productId);
-        formData.append('menumaster_id',1);
-        formData.append('policy_holder_id',policyHolder_id);
-        const formDataBrand = new FormData();
-        const formDataModel = new FormData();
-        const formDataVarient = new FormData();
-        this.props.loadingStart();
-        axios
-        .post(`/update-vehicle-type`, formData)
-        .then(res => {
-                formDataBrand.append('brand_id',selectedBrandId);
-                formDataBrand.append('menumaster_id',1);
-                formDataBrand.append('policy_holder_id',policyHolder_id);
-                axios
-                .post(`/vehicle-brand`, formDataBrand)
-                .then(res => {
-                    formDataModel.append('brand_model_id',selectedModelId);
-                    formDataModel.append('menumaster_id',1);
-                    formDataModel.append('policy_holder_id',policyHolder_id);
-                    axios
-                    .post(`/brand-model`, formDataModel)
-                    .then(res => {
-                        formDataVarient.append('model_varient_id',selectedVarientId);
-                        formDataVarient.append('menumaster_id',1);
-                        formDataVarient.append('policy_holder_id',policyHolder_id);
-                        axios
-                        .post(`/model-varient`, formDataVarient)
-                        .then(res => {
-                            this.props.history.push(`/Additional_details/${productId}`);
-                        })
-                        .catch(err => {
-                            console.log('Errors==============>',err.data);
-                            if(err && err.data){
-                                swal('Please check..something went wrong!!');
-                            }
-                            this.props.loadingStop();
-                        });  
-                    })
-                    .catch(err => {
-                    console.log('Errors==============>',err.data);
-                    if(err && err.data){
-                        swal('Please check..something went wrong!!');
-                    }
-                   // this.props.loadingStop();
-                    });     
-                })
-                .catch(err => {
-                console.log('Errors==============>',err.data);
-                if(err && err.data){
-                    swal('Please check..something went wrong!!');
-                }
-               // this.props.loadingStop();
-                });                 
-        })
-        .catch(err => {
-          console.log('Errors==============>',err.data);
-          if(err && err.data){
-             swal('Please check..something went wrong!!');
-          }
-         // this.props.loadingStop();
-        });
+        this.props.history.push(`/OtherComprehensive/${productId}`);        
     }
     
 
@@ -270,7 +208,7 @@ class SelectBrand extends Component {
                             
                             <Formik initialValues={newInitialValues} 
                              onSubmit={this.handleSubmit} 
-                             validationSchema={vehicleValidation}
+                            // validationSchema={vehicleValidation}
                             >
                             {({ values, errors, setFieldValue, setFieldTouched, isValid, isSubmitting, touched }) => {
                                 console.log("aaaaaa=GHHH====>",values)
@@ -287,8 +225,8 @@ class SelectBrand extends Component {
 
                                     <Row>
                                         <Col sm={12} md={9}>
-                                            {/*<BrandTable />*/}
-                                            <FormGroup>
+                                            <BrandTable brandList = {brandList && brandList.length>0 ? brandList:[]} selectBrandFunc={this.setBrandName}/>
+                                            {/*<FormGroup>
                                                 <div className="formSection">
                                                     <Field
                                                         name="selectedBrandId"
@@ -314,9 +252,9 @@ class SelectBrand extends Component {
                                                     <span className="errorMsg">{errors.selectedBrandId}</span>
                                                 ) : null}                   
                                                 </div>
-                                            </FormGroup> 
+                                                    </FormGroup> */}
 
-                                            <FormGroup>
+                                          {/*  <FormGroup>
                                                 <div className="formSection">
                                                     <Field
                                                         name="selectedModelId"
@@ -377,10 +315,7 @@ class SelectBrand extends Component {
                                                 </div>
                                             </FormGroup>:''}
                                                 
-                                            <div className="d-flex justify-content-left resmb">
-                                                <button className="backBtn" onClick = {this.buy_policy.bind(this,productId)}>Back</button>
-                                                <button className="proceedBtn" type = "submit" >Continue</button>
-                                            </div>
+                                                    */}
                                         </Col>
 
                                         <Col sm={12} md={3}>
@@ -392,8 +327,9 @@ class SelectBrand extends Component {
                                                     </Col>
 
                                                     <Col sm={12} md={6}>
-                                                        <button className="rgistrBtn" onClick = {this.buy_policy.bind(this,productId)}>Edit</button>
+                                                        <button className="rgistrBtn" onClick = {this.registration.bind(this,productId)}>Edit</button>
                                                     </Col>
+                                                    
                                                 </Row>
 
                                                 <Row className="no-gutters">
@@ -401,14 +337,371 @@ class SelectBrand extends Component {
                                                         <div className="txtRegistr resmb-15">Car Brand
                                                            - {selectedBrandDetails && selectedBrandDetails.name}</div>
                                                     </Col>
+                                                    <Col sm={12} md={6}>
+                                                            <button className="rgistrBtn">Edit</button>
+                                                        </Col>
 
                                                     {/*<Col sm={12} md={6}>
                                                         <button className="rgistrBtn">Edit</button>
                                                     </Col>*/}
                                                 </Row>
+                                                
+                                                <Row className="no-gutters m-b-25">
+                                                        <Col sm={12} md={6}>
+                                                            <div className="txtRegistr">Car Model<br/>
+                                                                <strong>4S CHAMPION</strong></div>
+                                                        </Col>
+
+                                                        <Col sm={12} md={5} className="text-right">
+                                                            <button className="rgistrBtn">Edit</button>
+                                                        </Col>
+                                                    </Row>
+
+                                                <Row className="m-b-25">
+                                                    <Col sm={12} md={7}>
+                                                        <div className="txtRegistr">Fuel Type<br/>
+                                                            <strong>PETROL </strong></div>
+                                                    </Col>
+                                                </Row>
                                             </div>
                                         </Col>
                                     </Row>
+
+                                    <Row>
+                                            <Col sm={12} md={9} lg={9}>
+
+                                                <Row>
+                                                    <Col sm={12} md={6} lg={6}>
+                                                        <FormGroup>
+                                                            <div className="fs-18">
+                                                                First Purchase/Registration Date
+                                                            </div>
+                                                        </FormGroup>
+                                                    </Col>
+                                                    <Col sm={12} md={3} lg={3}>
+                                                        <FormGroup>
+                                                            <div className="formSection">
+                                                            <Field
+                                                                name='fPurchaseDate'
+                                                                component="select"
+                                                                autoComplete="off"                                                                        
+                                                                className="formGrp"
+                                                                value = {values.fPurchaseDate}
+                                                            >
+                                                                <option value="">Select Year</option>
+                                                                <option value="male">2020</option>
+                                                                <option value="female">2019</option>
+                                                                <option value="female">2018</option>
+                                                                <option value="female">2017</option>
+                                                                <option value="female">2016</option>
+                                                                <option value="female">2015</option>
+                                                                <option value="female">2014</option>
+                                                                <option value="female">2013</option>
+                                                                <option value="female">2012</option>
+                                                                <option value="female">2011</option>
+                                                                <option value="female">2010</option>
+                                                                <option value="female">2009</option>
+                                                            </Field>     
+                                                            {errors.fPurchaseDate && touched.fPurchaseDate ? (
+                                                            <span className="errorMsg">{errors.fPurchaseDate}</span>
+                                                            ) : null}          
+                                                            </div>
+                                                        </FormGroup>
+                                                    </Col>
+                                                    <Col sm={12} md={3} lg={3}>
+                                                        <FormGroup>
+                                                            <div className="formSection">
+                                                            <Field
+                                                                name='fPurchaseMnt'
+                                                                component="select"
+                                                                autoComplete="off"                                                                        
+                                                                className="formGrp"
+                                                                value = {values.fPurchaseMnt}
+                                                            >
+                                                                <option value="">Select Month</option>
+                                                                <option value="male">January</option>
+                                                                <option value="female">February</option>
+                                                                <option value="female">March</option>
+                                                                <option value="female">April</option>
+                                                                <option value="female">May</option>
+                                                                <option value="female">June</option>
+                                                                <option value="female">July</option>
+                                                                <option value="female">August</option>
+                                                                <option value="female">September</option>
+                                                                <option value="female">October</option>
+                                                                <option value="female">November</option>
+                                                                <option value="female">December</option>
+                                                            </Field>     
+                                                            {errors.fPurchaseMnt && touched.fPurchaseMnt ? (
+                                                            <span className="errorMsg">{errors.gender}</span>
+                                                            ) : null}       
+                                                            </div>
+                                                        </FormGroup>
+                                                    </Col>
+                                                </Row>
+
+                                                <Row>
+                                                    <Col sm={12} md={4} lg={4}>
+                                                        <FormGroup>
+                                                            <div className="fs-18">
+                                                                Registration City
+                                                         </div>
+                                                        </FormGroup>
+                                                    </Col>
+                                                    <Col sm={12} md={6} lg={6}>
+                                                        <FormGroup>
+                                                            <div className="insurerName">
+                                                                <Field
+                                                                    name="Registration City"
+                                                                    type="text"
+                                                                    placeholder="Registration City"
+                                                                    autoComplete="off"
+                                                                    onFocus={e => this.changePlaceHoldClassAdd(e)}
+                                                                    onBlur={e => this.changePlaceHoldClassRemove(e)}
+                                                                />
+                                                                {errors.eia_account_no && touched.eia_account_no ? (
+                                                                    <span className="errorMsg">{errors.eia_account_no}</span>
+                                                                ) : null}
+                                                            </div>
+                                                        </FormGroup>
+                                                    </Col>
+                                                </Row>
+
+                                                <Row>
+                                                    <Col sm={12}>
+                                                        <FormGroup>
+                                                            <div className="carloan">
+                                                                <h4> Previous Policy Details</h4>
+                                                            </div>
+                                                        </FormGroup>
+                                                    </Col>
+                                                </Row>
+
+                                                <Row>
+                                                    <Col sm={12} md={4} lg={4}>
+                                                        <FormGroup>
+                                                            
+                                                            <DatePicker
+                                                                name="prevStartDate"
+                                                                minDate={new Date('1/1/1900')}
+                                                                maxDate={new Date()}
+                                                                dateFormat="dd MMM yyyy"
+                                                                placeholderText="Previous policy start date"
+                                                                peekPreviousMonth
+                                                                peekPreviousYear
+                                                                showMonthDropdown
+                                                                showYearDropdown
+                                                                dropdownMode="select"
+                                                                className="datePckr"
+                                                                selected={values.prevStartDate}
+                                                                onChange={(val) => {
+                                                                    setFieldTouched('prevStartDate');
+                                                                    setFieldValue('prevStartDate', val);
+                                                                }}
+                                                            />
+                                                        </FormGroup>
+                                                    </Col>
+
+                                                    <Col sm={12} md={4} lg={4}>
+                                                        <FormGroup>
+                                                        <DatePicker
+                                                                name="prevEndDate"
+                                                                dateFormat="dd MMM yyyy"
+                                                                placeholderText="Previous policy end date"
+                                                                peekPreviousMonth
+                                                                peekPreviousYear
+                                                                showMonthDropdown
+                                                                showYearDropdown
+                                                                dropdownMode="select"
+                                                                className="datePckr"
+                                                                selected={values.prevEndDate}
+                                                                onChange={(val) => {
+                                                                    setFieldTouched('prevEndDate');
+                                                                    setFieldValue('prevEndDate', val);
+                                                                }}      
+                                                            />
+                                                        </FormGroup>
+                                                    </Col>
+                                                    <Col sm={12} md={4} lg={4}>
+                                                        <FormGroup>
+                                                            <div className="formSection">
+                                                            <Field
+                                                                name='policyType'
+                                                                component="select"
+                                                                autoComplete="off"                                                                        
+                                                                className="formGrp"
+                                                                value = {values.policyType}
+                                                            >
+                                                                <option value="">Select Policy Type</option>
+                                                                <option value="male">Liability Policy</option>
+                                                                <option value="female">Package Policy</option>
+                                                            </Field>     
+                                                            {errors.policyType && touched.policyType ? (
+                                                            <span className="errorMsg">{errors.policyType}</span>
+                                                            ) : null}            
+                                                            </div>
+                                                        </FormGroup>
+                                                    </Col>
+                                                </Row>
+
+                                                <Row>
+                                                    <Col sm={12} md={6} lg={6}>
+                                                        <FormGroup>
+                                                            <div className="formSection">
+                                                            <Field
+                                                                name='policyCompany'
+                                                                component="select"
+                                                                autoComplete="off"                                                                        
+                                                                className="formGrp"
+                                                            >
+                                                                <option value="">Select Insurer Company</option>
+                                                                    <option>Agriculture Insurance Co. of India Ltd.</option>
+                                                                    <option>Apollo Munich Health Insurance Company Limited</option>
+                                                                    <option>Bajaj Allianz General Insurance Co. Ltd</option>
+                                                                    <option>Bharti AXA General Insurance Company Limited</option>
+                                                                    <option>Cholamandalam MS General Insurance Co. Ltd</option>
+                                                                    <option>Cigna TTK Health Insurance Company Limited</option>
+                                                                    <option>Export Credit Guarantee Corporation of India Ltd.</option>
+                                                                    <option>Future Generali India Insurance Company Limited</option>
+                                                                    <option>HDFC ERGO General Insurance Co. Ltd.</option>
+                                                                    <option>ICICI Lombard General Insurance Co. Ltd</option>
+                                                                    <option>ICICI Prudential LIC Ltd.</option>
+                                                                    <option>IFFCO Tokio General Insurance Co. Ltd</option>
+                                                                    <option>L T General Insurance Company</option>
+                                                                    <option>Liberty Videocon General Insurance Company Ltd.</option>
+                                                                    <option>Magma HDI General Insurance Co</option>
+                                                                    <option>Max Bupa Health Insurance Company Ltd.</option>
+                                                                    <option>National Insurance Co.Ltd.</option>
+                                                                    <option>Raheja QBE General Insurance Company Limited,</option>
+                                                                    <option>Reliance General Insurance Co. Ltd</option>
+                                                                    <option>Royal Sundaram Alliance Insurance Co. Ltd</option>
+                                                                    <option>Shriram General Insurance Company Limited,</option>
+                                                                    <option>Star Health and Allied Insurance Company Limited</option>
+                                                                    <option>Tata AIG General Insurance Co. Ltd</option>
+                                                                    <option>The New India Assurance Co. Ltd</option>
+                                                                    <option>The Oriental Insurance Co. Ltd</option>
+                                                                    <option>United India Insurance Co. Ltd</option>
+                                                                    <option>Universal Sompo General Insurance Co. Ltd.</option>
+                                                            </Field>     
+                                                            {errors.policyCompany && touched.policyCompany ? (
+                                                            <span className="errorMsg">{errors.policyCompany}</span>
+                                                            ) : null}          
+                                                            </div>
+                                                        </FormGroup>
+                                                    </Col>
+
+                                                    <Col sm={12} md={6} lg={6}>
+                                                        <FormGroup>
+                                                            <div className="insurerName">
+                                                                <Field
+                                                                    name="prevInsurerAddress"
+                                                                    type="text"
+                                                                    placeholder="Previous Insurer Address"
+                                                                    autoComplete="off"
+                                                                    onFocus={e => this.changePlaceHoldClassAdd(e)}
+                                                                    onBlur={e => this.changePlaceHoldClassRemove(e)}
+                                                                />
+                                                                {errors.prevInsurerAddress && touched.prevInsurerAddress ? (
+                                                                    <span className="errorMsg">{errors.prevInsurerAddress}</span>
+                                                                ) : null}
+                                                            </div>
+                                                        </FormGroup>
+                                                    </Col>
+                                                </Row>
+
+                                                <Row>
+                                                    <Col sm={12}>
+                                                        <FormGroup>
+                                                            <div className="carloan">
+                                                                <h4>Have you made a claim in your existing Policy</h4>
+                                                            </div>
+                                                        </FormGroup>
+                                                    </Col>
+                                                </Row>
+
+                                                <Row>
+                                                    <Col sm={4}>
+                                                        <FormGroup>
+                                                            <div className="d-inline-flex m-b-35">
+                                                                <div className="p-r-25">
+                                                                    <label className="customRadio3">
+                                                                    <Field
+                                                                        type="radio"
+                                                                        name='loan'                                            
+                                                                        value='1'
+                                                                        key='1'  
+                                                                        onChange={(e) => {
+                                                                            setFieldValue(`loan`, e.target.value);
+                                                                        }}
+                                                                        checked={values.loan == '1' ? true : false}
+                                                                    />
+                                                                        <span className="checkmark " /><span className="fs-14"> No, I haven't</span>
+                                                                    </label>
+                                                                </div>
+
+                                                                <div className="">
+                                                                    <label className="customRadio3">
+                                                                    <Field
+                                                                        type="radio"
+                                                                        name='loan'                                            
+                                                                        value='0'
+                                                                        key='1'  
+                                                                        onChange={(e) => {
+                                                                            setFieldValue(`loan`, e.target.value);
+                                                                        }}
+                                                                        checked={values.loan == '0' ? true : false}
+                                                                    />
+                                                                        <span className="checkmark" />
+                                                                        <span className="fs-14">Yes I have</span>
+                                                                    </label>
+                                                                </div>
+                                                            </div>
+                                                        </FormGroup>
+                                                    </Col>
+                                                </Row>
+
+                                                <Row className="m-b-30">
+                                                    <Col sm={12} md={5} lg={5}>
+                                                        <FormGroup>
+                                                            <div className="fs-18">
+                                                                Current No Claim Bonus
+                                                       </div>
+                                                        </FormGroup>
+                                                    </Col>
+                                                    <Col sm={12} md={6} lg={6}>
+                                                        <FormGroup>
+                                                            <div className="formSection">
+                                                                <Field
+                                                                    name='noClaimBonus'
+                                                                    component="select"
+                                                                    autoComplete="off"                                                                        
+                                                                    className="formGrp"
+                                                                    value = {values.noClaimBonus}
+                                                                >
+                                                                    <option value="">--Select--</option>
+                                                                    <option>0</option>
+                                                                    <option>20</option>
+                                                                    <option>25</option>
+                                                                    <option>35</option>
+                                                                    <option>45</option>
+                                                                    <option>50</option>
+                                                                </Field>     
+                                                                {errors.noClaimBonus && touched.noClaimBonus ? (
+                                                                <span className="errorMsg">{errors.noClaimBonus}</span>
+                                                                ) : null}       
+                                                            </div>
+                                                        </FormGroup>
+                                                    </Col>
+                                                </Row>
+
+                                                <div className="d-flex justify-content-left resmb">
+                                                    <button className="backBtn" onClick = {this.registration.bind(this,productId)}>Back</button>
+                                                    <button className="proceedBtn" type = "submit" >Continue</button>
+                                                </div>                       
+                                            </Col>
+
+                                            
+                                        </Row>
                                 </div>
                             </section>
                             
@@ -422,6 +715,152 @@ class SelectBrand extends Component {
                     </div>
                 </div>
                 </BaseComponent>
+
+                <Modal className="customModal" bsSize="md"
+                    show={this.state.show}
+                    onHide={this.handleClose}>
+                    <Modal.Body>
+                        <h3>Select Model </h3>
+                        <div><img src={require('../../assets/images/image-02.svg')} alt="" /></div>
+
+                        <div className="modalForm">
+                            <FormGroup>
+                                <div className="main">
+                                    <input
+                                        name="search"
+                                        type="text"
+                                        placeholder="Search your variant "
+                                        onFocus={e => this.changePlaceHoldClassAdd(e)}
+                                        onBlur={e => this.changePlaceHoldClassRemove(e)}
+                                    />
+                                </div>
+                            </FormGroup>
+                            <div className="brdrbottom">
+                            <div className="d-flex justify-content-between">
+                                    <div className="modalboxInfo">Accord
+                                        <span className="grey ml-5">1.2 E I-VTEC 1198CC</span>
+                                    </div>
+                                    <div>
+                                        <label className="slctmodalbox formGrp formGrp">
+                                            <input type="checkbox"
+                                                name="family[Self][check]"
+                                                className="user-self"
+                                                id="family[Self][check]"
+                                                value="1"
+                                                aria-invalid="false" />
+                                            <span className="checkmark mL-0"></span>
+                                            <span className="error-message"></span>
+                                        </label>
+                                    </div>
+                            </div>
+                            </div>
+
+                            <div className="brdrbottom">
+                            <div className="d-flex justify-content-between">
+                                    <div className="modalboxInfo">Honda City
+                                        <span className="grey ml-5">1.2 E MT 1198CC</span>
+                                    </div>
+                                    <div>
+                                        <label className="slctmodalbox formGrp formGrp">
+                                            <input type="checkbox"
+                                                name="family[Self][check]"
+                                                className="user-self"
+                                                id="family[Self][check]"
+                                                value="1"
+                                                aria-invalid="false" />
+                                            <span className="checkmark mL-0"></span>
+                                            <span className="error-message"></span>
+                                        </label>
+                                    </div>
+                            </div>
+                            </div>
+
+                            <div className="brdrbottom">
+                            <div className="d-flex justify-content-between">
+                                    <div className="modalboxInfo">NEON
+                                        <span className="grey ml-5">1.2 EX MT 1198CC</span>
+                                    </div>
+                                    <div>
+                                        <label className="slctmodalbox formGrp formGrp">
+                                            <input type="checkbox"
+                                                name="family[Self][check]"
+                                                className="user-self"
+                                                id="family[Self][check]"
+                                                value="1"
+                                                aria-invalid="false" />
+                                            <span className="checkmark mL-0"></span>
+                                            <span className="error-message"></span>
+                                        </label>
+                                    </div>
+                            </div>
+                            </div>
+
+                            <div className="brdrbottom">
+                            <div className="d-flex justify-content-between">
+                                    <div className="modalboxInfo">BRIO
+                                        <span className="grey ml-5">1.2 S AT 1198CC</span>
+                                    </div>
+                                    <div>
+                                        <label className="slctmodalbox formGrp formGrp">
+                                            <input type="checkbox"
+                                                name="family[Self][check]"
+                                                className="user-self"
+                                                id="family[Self][check]"
+                                                value="1"
+                                                aria-invalid="false" />
+                                            <span className="checkmark mL-0"></span>
+                                            <span className="error-message"></span>
+                                        </label>
+                                    </div>
+                            </div>
+                            </div>
+
+                            <div className="brdrbottom">
+                            <div className="d-flex justify-content-between">
+                                    <div className="modalboxInfo">Accord
+                                        <span className="grey ml-5">1.2 E I-VTEC 1198CC</span>
+                                    </div>
+                                    <div>
+                                        <label className="slctmodalbox formGrp formGrp">
+                                            <input type="checkbox"
+                                                name="family[Self][check]"
+                                                className="user-self"
+                                                id="family[Self][check]"
+                                                value="1"
+                                                aria-invalid="false" />
+                                            <span className="checkmark mL-0"></span>
+                                            <span className="error-message"></span>
+                                        </label>
+                                    </div>
+                            </div>
+                            </div>
+
+                            <div className="brdrbottom">
+                            <div className="d-flex justify-content-between">
+                                    <div className="modalboxInfo">Honda City
+                                        <span className="grey ml-5">1.2 E MT 1198CC</span>
+                                    </div>
+                                    <div>
+                                        <label className="slctmodalbox formGrp formGrp">
+                                            <input type="checkbox"
+                                                name="family[Self][check]"
+                                                className="user-self"
+                                                id="family[Self][check]"
+                                                value="1"
+                                                aria-invalid="false" />
+                                            <span className="checkmark mL-0"></span>
+                                            <span className="error-message"></span>
+                                        </label>
+                                    </div>
+                            </div>
+                            </div>
+
+
+
+                        </div>
+                        <button className="proceedBtn" href={'#'}>Continue</button>
+                    </Modal.Body>
+                </Modal>
             </>
         );
     }

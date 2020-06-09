@@ -21,6 +21,7 @@ import LogIn from "../common/login/LogIn";
 
 import Registration from '../motor/Registration';
 import SelectBrand from '../motor/SelectBrand';
+import VehicleDetails from '../motor/VehicleDetails';
 import AdditionalDetails from '../motor/AdditionalDetails';
 import OtherComprehensive from '../motor/OtherComprehensive';
 import Premium from '../motor/Premium';
@@ -96,11 +97,12 @@ class Routes extends Component {
                         <PrivateRoute exact path="/PolicySummery/:productId" component={PolicySummery} />                 
                         <PrivateRoute exact path="/ThankYou/:policyId" component={ThankYou} />
                         
-                        <PrivateRoute exact path="/Registration/:productId" component={Registration} />
-                        <PrivateRoute exact path="/Additional_details/:productId" component={AdditionalDetails} />
+                        <PrivateRoute exact path="/Registration/:productId" component={Registration} />                    
                         <PrivateRoute exact path="/Select-brand/:productId" component={SelectBrand} />
-                        <PrivateRoute exact path="/OtherComprehensive" component={OtherComprehensive} />
-                        <PrivateRoute exact path="/Premium" component={Premium} />
+                        <PrivateRoute exact path="/VehicleDetails/:productId" component={VehicleDetails} />
+                        <PrivateRoute exact path="/OtherComprehensive/:productId" component={OtherComprehensive} />
+                        <PrivateRoute exact path="/Additional_details/:productId" component={AdditionalDetails} />
+                        <PrivateRoute exact path="/Premium/:productId" component={Premium} />
                         <PrivateRoute exact path="/ThankYou_motor" component={ThankYou_motor} />
 
                         <PrivateRoute exact path="/UnderMaintenance" component={UnderMaintenance} />

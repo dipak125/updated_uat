@@ -24,15 +24,17 @@ class VehicleDetails extends Component {
         e.target.value.length === 0 && element.classList.remove('active');
     }
 
-    selectBrand = () => {
-        this.props.history.push(`/Select-brand`);
+    selectBrand = (productId) => {
+        this.props.history.push(`/Select-brand/${productId}`);
     }
 
     handleSubmit = () => {
-        this.props.history.push(`/OtherComprehensive`);
+        const {productId} = this.props.match.params 
+        this.props.history.push(`/OtherComprehensive/${productId}`);
     }
 
     render() {
+        const {productId} = this.props.match.params  
         return (
             <>
                 <BaseComponent>
@@ -159,148 +161,6 @@ class VehicleDetails extends Component {
                                                     <Col sm={12}>
                                                         <FormGroup>
                                                             <div className="carloan">
-                                                                <h4> Previous Policy Details</h4>
-                                                            </div>
-                                                        </FormGroup>
-                                                    </Col>
-                                                </Row>
-
-                                                <Row>
-                                                    <Col sm={12} md={4} lg={4}>
-                                                        <FormGroup>
-                                                            
-                                                            <DatePicker
-                                                                name="prevStartDate"
-                                                                minDate={new Date('1/1/1900')}
-                                                                maxDate={new Date()}
-                                                                dateFormat="dd MMM yyyy"
-                                                                placeholderText="Previous policy start date"
-                                                                peekPreviousMonth
-                                                                peekPreviousYear
-                                                                showMonthDropdown
-                                                                showYearDropdown
-                                                                dropdownMode="select"
-                                                                className="datePckr"
-                                                                selected={values.prevStartDate}
-                                                                onChange={(val) => {
-                                                                    setFieldTouched('prevStartDate');
-                                                                    setFieldValue('prevStartDate', val);
-                                                                }}
-                                                            />
-                                                        </FormGroup>
-                                                    </Col>
-
-                                                    <Col sm={12} md={4} lg={4}>
-                                                        <FormGroup>
-                                                        <DatePicker
-                                                                name="prevEndDate"
-                                                                dateFormat="dd MMM yyyy"
-                                                                placeholderText="Previous policy end date"
-                                                                peekPreviousMonth
-                                                                peekPreviousYear
-                                                                showMonthDropdown
-                                                                showYearDropdown
-                                                                dropdownMode="select"
-                                                                className="datePckr"
-                                                                selected={values.prevEndDate}
-                                                                onChange={(val) => {
-                                                                    setFieldTouched('prevEndDate');
-                                                                    setFieldValue('prevEndDate', val);
-                                                                }}      
-                                                            />
-                                                        </FormGroup>
-                                                    </Col>
-                                                    <Col sm={12} md={4} lg={4}>
-                                                        <FormGroup>
-                                                            <div className="formSection">
-                                                            <Field
-                                                                name='policyType'
-                                                                component="select"
-                                                                autoComplete="off"                                                                        
-                                                                className="formGrp"
-                                                                value = {values.policyType}
-                                                            >
-                                                                <option value="">Select Policy Type</option>
-                                                                <option value="male">Liability Policy</option>
-                                                                <option value="female">Package Policy</option>
-                                                            </Field>     
-                                                            {errors.policyType && touched.policyType ? (
-                                                            <span className="errorMsg">{errors.policyType}</span>
-                                                            ) : null}            
-                                                            </div>
-                                                        </FormGroup>
-                                                    </Col>
-                                                </Row>
-
-                                                <Row>
-                                                    <Col sm={12} md={6} lg={6}>
-                                                        <FormGroup>
-                                                            <div className="formSection">
-                                                            <Field
-                                                                name='policyCompany'
-                                                                component="select"
-                                                                autoComplete="off"                                                                        
-                                                                className="formGrp"
-                                                            >
-                                                                <option value="">Select Insurer Company</option>
-                                                                    <option>Agriculture Insurance Co. of India Ltd.</option>
-                                                                    <option>Apollo Munich Health Insurance Company Limited</option>
-                                                                    <option>Bajaj Allianz General Insurance Co. Ltd</option>
-                                                                    <option>Bharti AXA General Insurance Company Limited</option>
-                                                                    <option>Cholamandalam MS General Insurance Co. Ltd</option>
-                                                                    <option>Cigna TTK Health Insurance Company Limited</option>
-                                                                    <option>Export Credit Guarantee Corporation of India Ltd.</option>
-                                                                    <option>Future Generali India Insurance Company Limited</option>
-                                                                    <option>HDFC ERGO General Insurance Co. Ltd.</option>
-                                                                    <option>ICICI Lombard General Insurance Co. Ltd</option>
-                                                                    <option>ICICI Prudential LIC Ltd.</option>
-                                                                    <option>IFFCO Tokio General Insurance Co. Ltd</option>
-                                                                    <option>L T General Insurance Company</option>
-                                                                    <option>Liberty Videocon General Insurance Company Ltd.</option>
-                                                                    <option>Magma HDI General Insurance Co</option>
-                                                                    <option>Max Bupa Health Insurance Company Ltd.</option>
-                                                                    <option>National Insurance Co.Ltd.</option>
-                                                                    <option>Raheja QBE General Insurance Company Limited,</option>
-                                                                    <option>Reliance General Insurance Co. Ltd</option>
-                                                                    <option>Royal Sundaram Alliance Insurance Co. Ltd</option>
-                                                                    <option>Shriram General Insurance Company Limited,</option>
-                                                                    <option>Star Health and Allied Insurance Company Limited</option>
-                                                                    <option>Tata AIG General Insurance Co. Ltd</option>
-                                                                    <option>The New India Assurance Co. Ltd</option>
-                                                                    <option>The Oriental Insurance Co. Ltd</option>
-                                                                    <option>United India Insurance Co. Ltd</option>
-                                                                    <option>Universal Sompo General Insurance Co. Ltd.</option>
-                                                            </Field>     
-                                                            {errors.policyCompany && touched.policyCompany ? (
-                                                            <span className="errorMsg">{errors.policyCompany}</span>
-                                                            ) : null}          
-                                                            </div>
-                                                        </FormGroup>
-                                                    </Col>
-
-                                                    <Col sm={12} md={6} lg={6}>
-                                                        <FormGroup>
-                                                            <div className="insurerName">
-                                                                <Field
-                                                                    name="prevInsurerAddress"
-                                                                    type="text"
-                                                                    placeholder="Previous Insurer Address"
-                                                                    autoComplete="off"
-                                                                    onFocus={e => this.changePlaceHoldClassAdd(e)}
-                                                                    onBlur={e => this.changePlaceHoldClassRemove(e)}
-                                                                />
-                                                                {errors.prevInsurerAddress && touched.prevInsurerAddress ? (
-                                                                    <span className="errorMsg">{errors.prevInsurerAddress}</span>
-                                                                ) : null}
-                                                            </div>
-                                                        </FormGroup>
-                                                    </Col>
-                                                </Row>
-
-                                                <Row>
-                                                    <Col sm={12}>
-                                                        <FormGroup>
-                                                            <div className="carloan">
                                                                 <h4>Have you made a claim in your existing Policy</h4>
                                                             </div>
                                                         </FormGroup>
@@ -383,7 +243,7 @@ class VehicleDetails extends Component {
                                                 </Row>
 
                                                 <div className="d-flex justify-content-left resmb">
-                                                <Button className={`backBtn`} type="button"  disabled={isSubmitting ? true : false} onClick= {this.selectBrand.bind(this)}>
+                                                <Button className={`backBtn`} type="button"  disabled={isSubmitting ? true : false} onClick= {this.selectBrand.bind(this,productId)}>
                                                     {isSubmitting ? 'Wait..' : 'Back'}
                                                 </Button> 
                                                 <Button className={`proceedBtn`} type="submit"  disabled={isSubmitting ? true : false}>

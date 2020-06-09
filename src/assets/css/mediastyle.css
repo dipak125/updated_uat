@@ -30,6 +30,7 @@
   .modal-content .customModalfamlyForm {  min-width: 638px !important; padding: 20px; }
   .customModal1 .modal-dialog{ margin: 0;}
   .modal-content{ left: 50%; transform: translateX(-50%);}
+  .W-80 {width: 100% !important;}
 }
 
 @media (max-width: 767px) {
@@ -56,6 +57,7 @@
   .proposr p {font-size: 13px; }
   .proposr-radio{ margin-bottom: 5px;}
   .prsnlinfo .W12{ display: block; margin-right: 10px;}
+  .W-90 {width: 100% !important;}
 }
 
 @media (max-width: 576px){
@@ -67,6 +69,7 @@
   .btn-lg{ border-radius: 0; line-height: 1; height: auto;}
   .infobox { padding-left: 97px;}
   .infobox .nav-pills .nav-link { padding: 15px 10px;  font-size: 11px;}
+  .rghtsideTrigr .Collapsible__trigger {height: 50px; margin-bottom: 0 !important;}
 }
 
 @media (max-width: 479px) {

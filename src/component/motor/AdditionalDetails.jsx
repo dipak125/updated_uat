@@ -1,5 +1,4 @@
 import React, { Component } from 'react';
-import HeaderSecond from '../common/header/HeaderSecond';
 import { Row, Col, Modal, Button, FormGroup, DropdownButton, Dropdown } from 'react-bootstrap';
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css"
@@ -12,8 +11,27 @@ import * as Yup from "yup";
 import { withRouter } from 'react-router-dom';
 import { loaderStart, loaderStop } from "../../store/actions/loader";
 import { connect } from "react-redux";
+import axios from "../../shared/axios"
+import moment from "moment";
 
-const initialValue = {}
+const initialValue = {
+    first_name:"Tanmoy",
+    last_name:"Ghosh",
+    gender:"m",
+    dob:new Date("1986-11-15"),
+    pancard:"6987589",
+    location:"barasat",
+    district:"north 24",
+    pincode:"700126",
+    is_carloan:"",
+    bank_name:"SBI",
+    bank_branch:"Kolkata",
+    nominee_relation_with:"mother",
+    nominee_first_name:"Argha",
+    nominee_last_name:"Ghosh",
+    nominee_gender:"m",
+    nominee_dob:new Date("1986-11-15"),
+}
 
 class AdditionalDetails extends Component {
 
@@ -22,7 +40,8 @@ class AdditionalDetails extends Component {
         showEIA: false,
         is_eia_account: '',
         showLoan: false,
-        is_loan_account: ''
+        is_loan_account: '',
+        insurerList: []
     };
     
 
@@ -66,18 +85,67 @@ class AdditionalDetails extends Component {
         }
     }
 
-    otherComprehensive = () => {
-        this.props.history.push(`/OtherComprehensive`);
+    otherComprehensive = (productId) => {
+        this.props.history.push(`/OtherComprehensive/${productId}`);
     }
 
-    handleSubmit = () => {
-        this.props.history.push(`/Premium`);
+    getInsurerList = () => {
+        this.props.loadingStart();
+        axios
+          .get(`/company`)
+          .then(res => {
+            this.setState({
+                insurerList: res.data.data
+            });
+          })
+          .catch(err => {
+            this.setState({
+                insurerList: []
+            });
+            this.props.loadingStop();
+          });
+      }
+
+    handleSubmit = (values, actions) => {
+        const {productId} = this.props.match.params 
+        const formData = new FormData(); 
+
+        for (const key in values) {
+            if (values.hasOwnProperty(key)) {
+              if(key == "dob" || key == "nominee_dob"){
+                formData.append(key, moment(values[key]).format("YYYY-MM-DD"));
+              }
+              else {
+                 formData.append(key, values[key]);
+              }          
+            }
+          }
+        formData.append('menumaster_id',1);
+        formData.append('policy_holder_id', localStorage.getItem('policyHolder_id'));
+        this.props.loadingStart();
+        axios
+        .post(`/owner-details`, formData)
+        .then(res => { 
+            // this.props.loadingStop();
+            this.props.history.push(`/Premium/${productId}`);
+        })
+        .catch(err => {
+    
+          this.props.loadingStop();
+          this.props.history.push(`/Premium/${productId}`);
+        });
+
+    }
+
+    componentDidMount() {
+        this.getInsurerList();
     }
 
    
 
     render() {
-        const {showEIA, is_eia_account, showLoan, is_loan_account} = this.state
+        const {showEIA, is_eia_account, showLoan, is_loan_account, insurerList} = this.state
+        const {productId} = this.props.match.params 
         return (
             <>
                 <BaseComponent>
@@ -116,14 +184,14 @@ class AdditionalDetails extends Component {
                                                 <label className="customRadio3">
                                                 <Field
                                                     type="radio"
-                                                    name='loan'                                            
+                                                    name='is_carloan'                                            
                                                     value='1'
                                                     key='1'  
                                                     onChange={(e) => {
-                                                        setFieldValue(`loan`, e.target.value);
+                                                        setFieldValue(`is_carloan`, e.target.value);
                                                         this.showLoanText(1);
                                                     }}
-                                                    checked={values.loan == '1' ? true : false}
+                                                    checked={values.is_carloan == '1' ? true : false}
                                                 />
                                                     <span className="checkmark " /><span className="fs-14"> Yes</span>
                                                 </label>
@@ -133,14 +201,14 @@ class AdditionalDetails extends Component {
                                                 <label className="customRadio3">
                                                 <Field
                                                     type="radio"
-                                                    name='loan'                                            
+                                                    name='is_carloan'                                            
                                                     value='0'
                                                     key='1'  
                                                     onChange={(e) => {
-                                                        setFieldValue(`loan`, e.target.value); 
+                                                        setFieldValue(`is_carloan`, e.target.value); 
                                                         this.showLoanText(0);  
                                                     }}
-                                                    checked={values.loan == '0' ? true : false}
+                                                    checked={values.is_carloan == '0' ? true : false}
                                                 />
                                                     <span className="checkmark" />
                                                     <span className="fs-14">No</span>
@@ -153,16 +221,16 @@ class AdditionalDetails extends Component {
                                         <FormGroup>
                                             <div className="insurerName">
                                             <Field
-                                                    name='bankname'
+                                                    name='bank_name'
                                                     type="text"
                                                     placeholder="Bank Name"
                                                     autoComplete="off"
                                                     onFocus={e => this.changePlaceHoldClassAdd(e)}
                                                     onBlur={e => this.changePlaceHoldClassRemove(e)}
-                                                    value = {values.bankname}                                                                            
+                                                    value = {values.bank_name}                                                                            
                                             />
-                                                {errors.bankname && touched.bankname ? (
-                                            <span className="errorMsg">{errors.bankname}</span>
+                                                {errors.bank_name && touched.bank_name ? (
+                                            <span className="errorMsg">{errors.bank_name}</span>
                                             ) : null}
                                             </div>
                                         </FormGroup>
@@ -171,17 +239,181 @@ class AdditionalDetails extends Component {
                                         <FormGroup>
                                             <div className="insurerName">
                                             <Field
-                                                    name='prevInsurername'
+                                                    name='bank_branch'
                                                     type="text"
-                                                    placeholder="Previous Insurer Name "
+                                                    placeholder="Bank Branch"
                                                     autoComplete="off"
                                                     onFocus={e => this.changePlaceHoldClassAdd(e)}
                                                     onBlur={e => this.changePlaceHoldClassRemove(e)}
-                                                    value = {values.prevInsurername}                                                                            
+                                                    value = {values.bank_branch}                                                                            
                                             />
-                                                {errors.prevInsurername && touched.prevInsurername ? (
-                                            <span className="errorMsg">{errors.prevInsurername}</span>
+                                                {errors.bank_branch && touched.bank_branch ? (
+                                            <span className="errorMsg">{errors.bank_branch}</span>
                                             ) : null} 
+                                            </div>
+                                        </FormGroup>
+                                    </Col>
+                                </Row>
+
+                                <Row>
+                                    <Col sm={12}>
+                                        <FormGroup>
+                                            <div className="carloan">
+                                                <h4> Vehicle Details</h4>
+                                            </div>
+                                        </FormGroup>
+                                    </Col>
+                                </Row>    
+                                <Row>
+                                    <Col sm={12} md={6} lg={6}>
+                                        <FormGroup>
+                                            <div className="insurerName">
+                                                <Field
+                                                    name="engineNo"
+                                                    type="text"
+                                                    placeholder="Engine Number"
+                                                    autoComplete="off"
+                                                    onFocus={e => this.changePlaceHoldClassAdd(e)}
+                                                    onBlur={e => this.changePlaceHoldClassRemove(e)}
+                                                />
+                                                {errors.engineNo && touched.engineNo ? (
+                                                    <span className="errorMsg">{errors.engineNo}</span>
+                                                ) : null}
+                                            </div>
+                                        </FormGroup>
+                                    </Col>
+                                    <Col sm={12} md={6} lg={6}>
+                                        <FormGroup>
+                                            <div className="insurerName">
+                                                <Field
+                                                    name="chasisNo"
+                                                    type="text"
+                                                    placeholder="Chasis Number"
+                                                    autoComplete="off"
+                                                    onFocus={e => this.changePlaceHoldClassAdd(e)}
+                                                    onBlur={e => this.changePlaceHoldClassRemove(e)}
+                                                />
+                                                {errors.chasisNo && touched.chasisNo ? (
+                                                    <span className="errorMsg">{errors.chasisNo}</span>
+                                                ) : null}
+                                            </div>
+                                        </FormGroup>
+                                    </Col>
+                                </Row>
+
+                                <Row>
+                                    <Col sm={12}>
+                                        <FormGroup>
+                                            <div className="carloan">
+                                                <h4> Previous Policy Details</h4>
+                                            </div>
+                                        </FormGroup>
+                                    </Col>
+                                </Row>
+
+                                <Row>
+                                    <Col sm={12} md={4} lg={4}>
+                                        <FormGroup>
+                                            
+                                            <DatePicker
+                                                name="prevStartDate"
+                                                minDate={new Date('1/1/1900')}
+                                                maxDate={new Date()}
+                                                dateFormat="dd MMM yyyy"
+                                                placeholderText="Previous policy start date"
+                                                peekPreviousMonth
+                                                peekPreviousYear
+                                                showMonthDropdown
+                                                showYearDropdown
+                                                dropdownMode="select"
+                                                className="datePckr"
+                                                selected={values.prevStartDate}
+                                                onChange={(val) => {
+                                                    setFieldTouched('prevStartDate');
+                                                    setFieldValue('prevStartDate', val);
+                                                }}
+                                            />
+                                        </FormGroup>
+                                    </Col>
+
+                                    <Col sm={12} md={4} lg={4}>
+                                        <FormGroup>
+                                        <DatePicker
+                                                name="prevEndDate"
+                                                dateFormat="dd MMM yyyy"
+                                                placeholderText="Previous policy end date"
+                                                peekPreviousMonth
+                                                peekPreviousYear
+                                                showMonthDropdown
+                                                showYearDropdown
+                                                dropdownMode="select"
+                                                className="datePckr"
+                                                selected={values.prevEndDate}
+                                                onChange={(val) => {
+                                                    setFieldTouched('prevEndDate');
+                                                    setFieldValue('prevEndDate', val);
+                                                }}      
+                                            />
+                                        </FormGroup>
+                                    </Col>
+                                    <Col sm={12} md={4} lg={4}>
+                                        <FormGroup>
+                                            <div className="formSection">
+                                            <Field
+                                                name='policyType'
+                                                component="select"
+                                                autoComplete="off"                                                                        
+                                                className="formGrp"
+                                                value = {values.policyType}
+                                            >
+                                                <option value="">Select Policy Type</option>
+                                                <option value="male">Liability Policy</option>
+                                                <option value="female">Package Policy</option>
+                                            </Field>     
+                                            {errors.policyType && touched.policyType ? (
+                                            <span className="errorMsg">{errors.policyType}</span>
+                                            ) : null}            
+                                            </div>
+                                        </FormGroup>
+                                    </Col>
+                                </Row>
+
+                                <Row>
+                                    <Col sm={12} md={6} lg={6}>
+                                        <FormGroup>
+                                            <div className="formSection">
+                                            <Field
+                                                name='policyCompany'
+                                                component="select"
+                                                autoComplete="off"                                                                        
+                                                className="formGrp"
+                                            >
+                                                <option value="">Select Insurer Company</option>
+                                                {insurerList.map((insurer, qIndex) => ( 
+                                                    <option>{insurer.name}</option>
+                                                ))}
+                                            </Field>     
+                                            {errors.policyCompany && touched.policyCompany ? (
+                                            <span className="errorMsg">{errors.policyCompany}</span>
+                                            ) : null}          
+                                            </div>
+                                        </FormGroup>
+                                    </Col>
+
+                                    <Col sm={12} md={6} lg={6}>
+                                        <FormGroup>
+                                            <div className="insurerName">
+                                                <Field
+                                                    name="prevInsurerAddress"
+                                                    type="text"
+                                                    placeholder="Previous Insurer Address"
+                                                    autoComplete="off"
+                                                    onFocus={e => this.changePlaceHoldClassAdd(e)}
+                                                    onBlur={e => this.changePlaceHoldClassRemove(e)}
+                                                />
+                                                {errors.prevInsurerAddress && touched.prevInsurerAddress ? (
+                                                    <span className="errorMsg">{errors.prevInsurerAddress}</span>
+                                                ) : null}
                                             </div>
                                         </FormGroup>
                                     </Col>
@@ -196,16 +428,16 @@ class AdditionalDetails extends Component {
                                         <FormGroup>
                                             <div className="insurerName">
                                             <Field
-                                                name='fname'
+                                                name='first_name'
                                                 type="text"
                                                 placeholder="Full Name "
                                                 autoComplete="off"
                                                 onFocus={e => this.changePlaceHoldClassAdd(e)}
                                                 onBlur={e => this.changePlaceHoldClassRemove(e)}
-                                                value = {values.fname}                                                                            
+                                                value = {values.first_name}                                                                            
                                             />
-                                                {errors.fname && touched.fname ? (
-                                            <span className="errorMsg">{errors.fname}</span>
+                                                {errors.first_name && touched.first_name ? (
+                                            <span className="errorMsg">{errors.first_name}</span>
                                             ) : null} 
                                             </div>
                                         </FormGroup>
@@ -261,16 +493,16 @@ class AdditionalDetails extends Component {
                                         <FormGroup>
                                             <div className="insurerName">
                                             <Field
-                                                name='panNo'
+                                                name='pancard'
                                                 type="text"
                                                 placeholder="PAN Card No. "
                                                 autoComplete="off"
                                                 onFocus={e => this.changePlaceHoldClassAdd(e)}
                                                 onBlur={e => this.changePlaceHoldClassRemove(e)}
-                                                value = {values.panNo}                                                                            
+                                                value = {values.pancard}                                                                            
                                             />
-                                            {errors.panNo && touched.panNo ? (
-                                            <span className="errorMsg">{errors.panNo}</span>
+                                            {errors.pancard && touched.pancard ? (
+                                            <span className="errorMsg">{errors.pancard}</span>
                                             ) : null} 
                                             </div>
                                         </FormGroup>
@@ -343,16 +575,16 @@ class AdditionalDetails extends Component {
                                         <FormGroup>
                                             <div className="insurerName">
                                             <Field
-                                                name='nName'
+                                                name='nominee_first_name'
                                                 type="text"
                                                 placeholder="Name "
                                                 autoComplete="off"
                                                 onFocus={e => this.changePlaceHoldClassAdd(e)}
                                                 onBlur={e => this.changePlaceHoldClassRemove(e)}
-                                                value = {values.nName}                                                                            
+                                                value = {values.nominee_first_name}                                                                            
                                             />
-                                            {errors.nName && touched.nName ? (
-                                            <span className="errorMsg">{errors.nName}</span>
+                                            {errors.nominee_first_name && touched.nominee_first_name ? (
+                                            <span className="errorMsg">{errors.nominee_first_name}</span>
                                             ) : null}  
                                             </div>
                                         </FormGroup>
@@ -361,7 +593,7 @@ class AdditionalDetails extends Component {
                                         <FormGroup>
                                             <div className="formSection">
                                             <Field
-                                                name='nGender'
+                                                name='nominee_gender'
                                                 component="select"
                                                 autoComplete="off"                                                                        
                                                 className="formGrp"
@@ -370,8 +602,8 @@ class AdditionalDetails extends Component {
                                                 <option value="m">Male</option>
                                                 <option value="f">Female</option>
                                             </Field>     
-                                            {errors.nGender && touched.nGender ? (
-                                            <span className="errorMsg">{errors.nGender}</span>
+                                            {errors.nominee_gender && touched.nominee_gender ? (
+                                            <span className="errorMsg">{errors.nominee_gender}</span>
                                             ) : null}              
                                             </div>
                                         </FormGroup>
@@ -379,7 +611,7 @@ class AdditionalDetails extends Component {
                                     <Col sm={12} md={4} lg={4}>
                                         <FormGroup>
                                         <DatePicker
-                                            name="nDob"
+                                            name="nominee_dob"
                                             dateFormat="dd MMM yyyy"
                                             placeholderText="DOB"
                                             peekPreviousMonth
@@ -390,14 +622,14 @@ class AdditionalDetails extends Component {
                                             maxDate={new Date()}
                                             minDate={new Date(1/1/1900)}
                                             className="datePckr"
-                                            selected={values.nDob}
+                                            selected={values.nominee_dob}
                                             onChange={(val) => {
-                                                setFieldTouched('nDob');
-                                                setFieldValue('nDob', val);
+                                                setFieldTouched('nominee_dob');
+                                                setFieldValue('nominee_dob', val);
                                                 }}
                                         />
-                                        {errors.nDob && touched.nDob ? (
-                                            <span className="errorMsg">{errors.nDob}</span>
+                                        {errors.nominee_dob && touched.nominee_dob ? (
+                                            <span className="errorMsg">{errors.nominee_dob}</span>
                                         ) : null}  
                                         </FormGroup>
                                     </Col>
@@ -408,19 +640,19 @@ class AdditionalDetails extends Component {
                                         <FormGroup>
                                             <div className="formSection">
                                             <Field
-                                                name="relation_with"
+                                                name="nominee_relation_with"
                                                 component="select"
                                                 autoComplete="off"
-                                                value={values.relation_with}
+                                                value={values.nominee_relation_with}
                                                 className="formGrp"
                                             >
                                             <option value="">Relation with Primary Insured</option>
-                                            <option value="male">father</option>
+                                            <option value="father">father</option>
                                             <option value="mother">Mother</option>
                                             <option value="spouse">Spouse</option>
                                             </Field>     
-                                            {errors.relation_with && touched.relation_with ? (
-                                                <span className="errorMsg">{errors.relation_with}</span>
+                                            {errors.nominee_relation_with && touched.nominee_relation_with ? (
+                                                <span className="errorMsg">{errors.nominee_relation_with}</span>
                                             ) : null}        
                                             </div>
                                         </FormGroup>
@@ -499,7 +731,7 @@ class AdditionalDetails extends Component {
                                     </Col> : ''}
                                 </Row> 
                                 <div className="d-flex justify-content-left resmb">
-                                <Button className={`backBtn`} type="button"  disabled={isSubmitting ? true : false} onClick= {this.otherComprehensive.bind(this)}>
+                                <Button className={`backBtn`} type="button"  disabled={isSubmitting ? true : false} onClick= {this.otherComprehensive.bind(this,productId)}>
                                     {isSubmitting ? 'Wait..' : 'Back'}
                                 </Button> 
                                 <Button className={`proceedBtn`} type="submit"  disabled={isSubmitting ? true : false}>

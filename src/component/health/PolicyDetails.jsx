@@ -41,7 +41,7 @@ class PolicyDetails extends Component {
     show: false,
   };
 
-  handleClose(e) {
+  handleClose = () => {
     this.setState({ show: false });
   }
 
@@ -100,7 +100,8 @@ class PolicyDetails extends Component {
       });
   };
 
-  getAccessTokenForInception = () => {
+  getAccessTokenForInception = (e) => {
+    console.log("quoteNo", this.state.fulQuoteResp)
     this.props.loadingStart();
     axios
       .post(`/callTokenService`)
@@ -152,49 +153,10 @@ class PolicyDetails extends Component {
 
   policyInception = (access_token) => {
     const { fulQuoteResp, error } = this.state;
-
-    let data = {
-      RequestHeader: {
-        requestID: "123234",
-        action: "getIssurance",
-        channel: "SBIGIC",
-        transactionTimestamp: "27-May-2020-17:49:35",
-      },
-      RequestBody: {
-        QuotationNo: fulQuoteResp.QuotationNo,
-        Amount: fulQuoteResp.DuePremium,
-        CurrencyId: 1,
-        PayMode: 212,
-        FeeType: 11,
-        Payer: "payer",
-        TransactionDate: "2020-05-27T23:59:59",
-        PaymentReferNo: "PG357842",
-        InstrumentNumber: "PG357842",
-        InstrumentDate: date_DB,
-        BankCode: "2",
-        BankName: "STATE BANK OF INDIA",
-        BankBranchName: "",
-        BankBranchCode: "",
-        LocationType: "2",
-        RemitBankAccount: "30",
-        ReceiptCreatedBy: "ReceiptCreatedBy",
-        PickupDate: date_DB,
-        IFSCCode: "IFSCCode",
-        MICRNumber: "MICRNumber",
-        PANNumber: "PANNumber",
-        ReceiptBranch: "ReceiptBranch",
-        ReceiptTransactionDate: date_DB,
-        ReceiptDate: date_DB,
-        EscalationDepartment: "EscalationDepartment",
-        Comment: "Comment",
-        AccountNumber: "AccountNumber",
-        AccountName: "AccountName",
-      },
-    };
-
     const formData = new FormData();
     this.props.loadingStart();
-    formData.append("data", JSON.stringify(data));
+    formData.append("quotationNo", fulQuoteResp.QuotationNo);
+    formData.append("amount", fulQuoteResp.DuePremium);
     formData.append("access_token", access_token);
     axios
       .post(`/callIssueQuoteMod`, formData)
@@ -436,7 +398,7 @@ class PolicyDetails extends Component {
                           </button>
                           <button
                             className="proceedBtn"
-                            onClick={this.handleShow}
+                            onClick={this.getAccessTokenForInception}
                           >
                             Make Payment
                           </button>
@@ -463,6 +425,8 @@ class PolicyDetails extends Component {
                   <div className="otpmodal">
                     <Modal.Body>
                       <Otp
+                        quoteNo = {fulQuoteResp.QuotationNo}
+                        duePremium = {fulQuoteResp.DuePremium}
                         reloadPage={(e) => this.getAccessTokenForInception(e)}
                       />
                     </Modal.Body>

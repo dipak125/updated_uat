@@ -44,8 +44,8 @@ class Premium extends Component {
         e.target.value.length === 0 && element.classList.remove('active');
     }
 
-    additionalDetails = () => {
-        this.props.history.push(`/Additional_details`);
+    additionalDetails = (productId) => {
+        this.props.history.push(`/Additional_details/${productId}`);
     }
 
     handleSubmit = (values) => {
@@ -54,6 +54,7 @@ class Premium extends Component {
 
     render() {
         const {refNo, whatsapp, show} = this.state
+        const {productId} = this.props.match.params
         return (
             <>
                 <BaseComponent>
@@ -237,7 +238,7 @@ class Premium extends Component {
                                 </Col>
                             </Row>
                             <div className="d-flex justify-content-left resmb">
-                                <Button className="backBtn" type="button" onClick= {this.additionalDetails.bind(this)}>Back</Button>
+                                <Button className="backBtn" type="button" onClick= {this.additionalDetails.bind(this, productId)}>Back</Button>
                                 <Button className="proceedBtn" type="submit" >Continue</Button>
                             </div>
                         </Col>

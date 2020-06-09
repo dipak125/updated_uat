@@ -46,18 +46,20 @@ class OtherComprehensive extends Component {
         }
     }
 
-    vehicleDetails = () => {      
-        this.props.history.push(`/VehicleDetails`);
+    vehicleDetails = (productId) => {      
+        this.props.history.push(`/Select-brand/${productId}`);
     }
 
 
     handleSubmit = () => {
-        this.props.history.push(`/Additional_details`);
+        const {productId} = this.props.match.params 
+        this.props.history.push(`/Additional_details/${productId}`);
     }
 
 
     render() {
         const {showCNG, is_CNG_account} = this.state
+        const {productId} = this.props.match.params 
         return (
             <>
                 <BaseComponent>
@@ -68,7 +70,7 @@ class OtherComprehensive extends Component {
                     </div>
                 <div className="col-sm-12 col-md-12 col-lg-10 col-xl-10 infobox">
                 <h4 className="text-center mt-3 mb-3">SBI General Insurance Company Limited</h4>
-                <section className="brand m-t-11 m-b-25">
+                <section className="brand colpd m-b-25">
                     <div className="d-flex justify-content-left">
                         <div className="brandhead m-b-10">
                             <h4 className="m-b-30">Covers your Car + Damage to Others (Comprehensive)</h4>
@@ -81,7 +83,7 @@ class OtherComprehensive extends Component {
                         <Form>
                         <Row>
                             <Col sm={12} md={9} lg={9}>
-                                <div className="rghtsideTrigr m-b-30">
+                                <div className="rghtsideTrigr W-90 m-b-30">
                                     <Collapsible trigger="Default Covered Coverages & Benefit" >
                                         <div className="listrghtsideTrigr">
                                             Hello
@@ -115,9 +117,9 @@ class OtherComprehensive extends Component {
                                             </div>
                                         </FormGroup>
                                     </Col>
-                                    <Col sm={12} md={6} lg={6}>
+                                    <Col sm={12} md={12} lg={6}>
                                         <FormGroup>
-                                            <img src={require('../../assets/images/slide.svg')} alt="" />
+                                            <img src={require('../../assets/images/slide.svg')} alt="" className="W-90" />
                                         </FormGroup>
                                     </Col>
                                 </Row>
@@ -171,7 +173,7 @@ class OtherComprehensive extends Component {
                                         </FormGroup>
                                     </Col>
                                     {showCNG || is_CNG_account == 1 ?
-                                    <Col sm={12} md={4} lg={4}>
+                                    <Col sm={12} md={12} lg={4}>
                                         <FormGroup>
                                         <div className="insurerName">   
                                             <Field
@@ -179,6 +181,7 @@ class OtherComprehensive extends Component {
                                                 type="text"
                                                 placeholder="Cost of Kit"
                                                 autoComplete="off"
+                                                className="W-80"
                                                 value = {values.cngCost}
                                                 onFocus={e => this.changePlaceHoldClassAdd(e)}
                                                 onBlur={e => this.changePlaceHoldClassRemove(e)}
@@ -286,7 +289,7 @@ class OtherComprehensive extends Component {
                                     </Col>
                                     </Row>    
                                     <div className="d-flex justify-content-left resmb">
-                                        <Button className={`backBtn`} type="button"  disabled={isSubmitting ? true : false} onClick= {this.vehicleDetails.bind(this)}>
+                                        <Button className={`backBtn`} type="button"  disabled={isSubmitting ? true : false} onClick= {this.vehicleDetails.bind(this,productId)}>
                                             {isSubmitting ? 'Wait..' : 'Back'}
                                         </Button> 
                                         <Button className={`proceedBtn`} type="submit"  disabled={isSubmitting ? true : false}>
