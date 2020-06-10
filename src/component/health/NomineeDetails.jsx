@@ -14,20 +14,30 @@ import axios from "../../shared/axios";
 import { withRouter } from 'react-router-dom';
 import { loaderStart, loaderStop } from "../../store/actions/loader";
 import { connect } from "react-redux";
+import { changeFormat, get18YearsBeforeDate, PersonAge } from "../../shared/dateFunctions";
+import dateformat from "dateformat";
 
-
+const maxDob = dateformat(new Date(), 'mm/dd/yyyy');
 const initialValues = {
     first_name: "",
     last_name: "",
     gender: "",
     dob: "",
-    relation_with: ""
+    relation_with: "",
+    appointee_dob: "",
+    appointee_relation_with: ""
 }
 
 const validateNominee = Yup.object().shape({
     last_name: Yup.string().required(function() {
         return "Please enter a last name"
-    }),
+    }).min(3, function() {
+        return "Last name must be minimum 3 chracters"
+    }).max(40, function() {
+        return "Last name must be maximum 40 chracters"
+    }).matches(/^[A-Za-z][A-Za-záéíñóúüÁÉÍÑÓÚÜ\s\-']*[A-Za-z\s]$/, function() {
+        return "Please enter valid last name"
+}),
     first_name: Yup.string(function() {
         return "Please enter name"
     }).required(function() {
@@ -37,21 +47,54 @@ const validateNominee = Yup.object().shape({
             return "Name must be minimum 3 chracters"
         })
         .max(40, function() {
-            return "Name must be maximum 3 chracters"
+            return "Name must be maximum 40 chracters"
         })
         .matches(/^[A-Za-z][A-Za-záéíñóúüÁÉÍÑÓÚÜ\s\-']*[A-Za-z\s]$/, function() {
             return "Please enter valid name"
     }),
     gender: Yup.string().required(function() {
-            return "Please enter a last name"
-    }),
+            return "Please select gender"
+    }).matches(/^[MmFf]$/, function() {
+        return "Please select valid gender"
+}),
     dob: Yup
         .date()
         .required( function() {
             return "Please enter DOB"
     }),
     relation_with: Yup.string().required(function() {
-        return "Please enter relation"
+        return "Please select relation"
+    }),
+    appointee_dob:Yup.date().notRequired("Please enter DOB").max(maxDob, function() {
+        return "Date should not be future date"
+        }).test(
+            "18YearsChecking",
+            function() {
+                return "Appointee age should be more than 18 years"
+            },
+            function (value) {
+                const ageObj = new PersonAge();
+                if (value) {
+                    const age_Obj = new PersonAge();
+                    return age_Obj.whatIsMyAge(value) >= 18;
+                }
+                return true;
+            }
+        ).test(
+            "18YearsChecking",
+            function() {
+                return "Please enter Appointee date of birth"
+            },
+            function (value) {
+                const ageObj = new PersonAge();
+                if (ageObj.whatIsMyAge(this.parent.dob) < 18) {   
+                    return ageObj.whatIsMyAge(value) >= 18;    
+                }
+                return true;
+            }
+        ),
+    appointee_relation_with: Yup.string().required(function() {
+        return "Please select relation"
     })
 })
 
@@ -59,6 +102,8 @@ class NomineeDetails extends Component {
 
     state = {
         NomineeDetails: [], 
+        appointeeFlag: false,
+        is_appointee:0
       };
 
     changePlaceHoldClassAdd(e) {
@@ -71,6 +116,23 @@ class NomineeDetails extends Component {
         e.target.value.length === 0 && element.classList.remove('active');
     }
 
+    ageCheck = (value) => {
+        const ageObj = new PersonAge();
+        let age = ageObj.whatIsMyAge(value)
+        if(age < 18){
+            this.setState({
+                appointeeFlag: true,
+                is_appointee:1
+            })
+        }
+        else {
+            this.setState({
+                appointeeFlag: false,
+                is_appointee:0
+            })
+        } 
+    }
+
     addressInfo = (productId) => {
         this.props.history.push(`/Address/${productId}`);
     }
@@ -81,7 +143,7 @@ class NomineeDetails extends Component {
 
         for (const key in values) {
             if (values.hasOwnProperty(key)) {
-              if(key == "dob"){
+              if(key == "dob" || key == "appointee_dob"){
                 formData.append(key, moment(values[key]).format("YYYY-MM-DD"));
               }
               else {
@@ -90,6 +152,7 @@ class NomineeDetails extends Component {
             }
           }
         formData.append('policy_holder_id', localStorage.getItem('policyHolder_id'));
+        formData.append('is_appointee', this.state.is_appointee);
         this.props.loadingStart();
         axios
         .post(`/insert-nominee`, formData)
@@ -130,7 +193,7 @@ class NomineeDetails extends Component {
 
     render() {
         const {productId} = this.props.match.params
-        const {NomineeDetails} = this.state
+        const {NomineeDetails,appointeeFlag} = this.state
         moment.defaultFormat = "YYYY-MM-YY";
 
         const newInitialValues = Object.assign(initialValues, {
@@ -138,7 +201,9 @@ class NomineeDetails extends Component {
             last_name: NomineeDetails ? NomineeDetails.last_name : "",
             gender: NomineeDetails ? NomineeDetails.gender : "",
             dob: NomineeDetails && NomineeDetails.dob ? new Date(NomineeDetails.dob) : "",
-            relation_with: NomineeDetails ? NomineeDetails.relation_with : ""
+            relation_with: NomineeDetails ? NomineeDetails.relation_with : "",
+            appointee_dob: NomineeDetails && NomineeDetails.appointee_dob ? new Date(NomineeDetails.appointee_dob) : "",
+            appointee_relation_with: NomineeDetails ? NomineeDetails.appointee_relation_with : ""
         })
         
         
@@ -256,6 +321,7 @@ class NomineeDetails extends Component {
                                                                 onChange={(value) => {
                                                                     setFieldTouched("dob");
                                                                     setFieldValue("dob", value);
+                                                                    this.ageCheck(value)
                                                                     }}
                                                                 selected={values.dob}
                                                             />
@@ -277,7 +343,7 @@ class NomineeDetails extends Component {
                                                                     className="formGrp"
                                                                 >
                                                                 <option value="">Relation with Primary Insured</option>
-                                                                <option value="male">father</option>
+                                                                <option value="father">father</option>
                                                                 <option value="mother">Mother</option>
                                                                 <option value="spouse">Spouse</option>
                                                                 </Field>     
@@ -288,6 +354,65 @@ class NomineeDetails extends Component {
                                                         </FormGroup>
                                                     </Col>
                                                 </Row>
+                                                {appointeeFlag || NomineeDetails.is_appointee == '1' ? 
+                                                    <div>
+                                                    <div className="d-flex justify-content-left carloan m-b-25">
+                                                        <h4> Appointee  Details</h4>
+                                                    </div>
+                                                    <Row className="m-b-45">
+                                                        <Col sm={12} md={4} lg={4}>
+                                                            <FormGroup>
+                                                                <DatePicker
+                                                                    name="appointee_dob"
+                                                                    minDate={new Date()}
+                                                                    dateFormat="dd MMM yyyy"
+                                                                    placeholderText="DOB"
+                                                                    peekPreviousMonth
+                                                                    peekPreviousYear
+                                                                    showMonthDropdown
+                                                                    showYearDropdown
+                                                                    dropdownMode="select"
+                                                                    maxDate={new Date()}
+                                                                    minDate={new Date(1/1/1900)}
+                                                                    className="datePckr"
+                                                                    onChange={(value) => {
+                                                                        setFieldTouched("appointee_dob");
+                                                                        setFieldValue("appointee_dob", value);
+                                                                        }}
+                                                                    selected={values.appointee_dob}
+                                                                />
+                                                                {errors.appointappointee_dobeeDob ? (
+                                                                    <span className="errorMsg">{errors.appointee_dob}</span>
+                                                                ) : null}
+                                                            </FormGroup>
+                                                        </Col>
+
+
+                                                        <Col sm={12} md={4} lg={6}>
+                                                            <FormGroup>
+                                                                <div className="formSection">                                                           
+                                                                    <Field
+                                                                        name="appointee_relation_with"
+                                                                        component="select"
+                                                                        autoComplete="off"
+                                                                        value={values.appointee_relation_with}
+                                                                        className="formGrp"
+                                                                    >
+                                                                    <option value="">Relation with Primary Insured</option>
+                                                                    <option value="father">father</option>
+                                                                    <option value="mother">Mother</option>
+                                                                    <option value="spouse">Spouse</option>
+                                                                    </Field>     
+                                                                    {errors.appointee_relation_with && touched.appointee_relation_with ? (
+                                                                        <span className="errorMsg">{errors.appointee_relation_with}</span>
+                                                                    ) : null}        
+                                                                </div>
+                                                            </FormGroup>
+                                                        </Col>
+                                                    </Row>
+                                                    </div> : null
+                                                }
+
                                                 <div className="d-flex justify-content-left resmb">
                                                 <Button className={`backBtn`} type="button"  disabled={isSubmitting ? true : false} onClick= {this.addressInfo.bind(this, productId )}>
                                                     {isSubmitting ? 'Wait..' : 'Back'}
@@ -302,8 +427,9 @@ class NomineeDetails extends Component {
                                                 <div className="regisBox">
                                                     <h3 className="medihead">Assurance of Insurance Everywhere in India, for every Indian </h3>
                                                 </div>
-                                            </Col>
+                                            </Col>                                            
                                         </Row>
+                                       
                                     </Form>
                                     );
                                     }}

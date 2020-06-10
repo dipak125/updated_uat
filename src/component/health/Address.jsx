@@ -54,14 +54,20 @@ const validateAddress =  Yup.object().shape({
     address1: Yup.string()
         .required(function() {
             return "Enter plot number."
+        }).matches(/^([0-9A-Z\s\-\+\(\)]*)$/, function() {
+            return "Invalid plot number"
         }),
     address2: Yup.string()
         .required(function() {
             return "Enter building name / number"
+        }).matches(/^([0-9A-Z\s\-\+\(\)]*)$/, function() {
+            return "Invalid building name / number"
         }),
     address3: Yup.string()
         .required(function() {
             return "Enter street name"
+        }).matches(/^([A-Z\s\-\+\(\)]*)$/, function() {
+            return "Invalid street name"
         }),
     email: Yup.string()
         .required( function() {
@@ -78,8 +84,8 @@ const validateAddress =  Yup.object().shape({
         .matches(/^([0-9\s\-\+\(\)]*)$/, function() {
             return "Invalid number"
         })
-        .min(8, function() {
-            return "Phone number should be minimum 8 digits"
+        .min(12, function() {
+            return "Phone number should be minimum 12 digits"
         })
         .max(12, function() {
             return "Phone number should be maximum 12 digits"
@@ -88,10 +94,14 @@ const validateAddress =  Yup.object().shape({
     panNo: Yup.string()
         .required(function() {
             return "Enter PAN number"
+        }).matches(/^[A-Z]{5}[0-9]{4}[A-Z]{1}$/, function() {
+            return "Please enter valid Pan Number"
         }),
     pincode: Yup.string()
         .required(function() {
             return "Enter pin code"
+        }).matches(/^([0-9\s\-\+\(\)]*)$/, function() {
+            return "Invalid pin code"
         }).min(6, 'Must be exactly 6 digits')
         .max(6, 'Must be exactly 6 digits'),
 
@@ -110,8 +120,34 @@ const validateAddress =  Yup.object().shape({
     family_members: Yup.array().of(
             Yup.object().shape({
                 looking_for : Yup.string(),
-                fname: Yup.string().required("Required First name"),
-                lname: Yup.string().required("Required Last name"),
+                fname: Yup.string(function() {
+                    return "Please enter name"
+                }).required(function() {
+                    return "Please enter name"
+                })
+                    .min(3, function() {
+                        return "Name must be minimum 3 chracters"
+                    })
+                    .max(40, function() {
+                        return "Name must be maximum 40 chracters"
+                    })
+                    .matches(/^[A-Za-z][A-Za-záéíñóúüÁÉÍÑÓÚÜ\s\-']*[A-Za-z\s]$/, function() {
+                        return "Please enter valid name"
+                }),
+                lname: Yup.string(function() {
+                    return "Please enter last name"
+                }).required(function() {
+                    return "Please enter last name"
+                })
+                    .min(3, function() {
+                        return "Last name must be minimum 3 chracters"
+                    })
+                    .max(40, function() {
+                        return "Last name must be maximum 40 chracters"
+                    })
+                    .matches(/^[A-Za-z][A-Za-záéíñóúüÁÉÍÑÓÚÜ\s\-']*[A-Za-z\s]$/, function() {
+                        return "Please enter valid last name"
+                }),
                 dob: Yup.date().when(['looking_for'],{
                     //is: looking_for => (looking_for == 'self' || looking_for == 'spouse' || looking_for == 'child1') ,
                     is: looking_for => ['self','spouse','mother','father','fatherInLaw','motherInLaw'].includes(looking_for) ,
@@ -141,7 +177,16 @@ const validateAddress =  Yup.object().shape({
     ),
     eia_account_no:Yup.string().when(['eIA'], {
         is: eIA => eIA == 1,
-        then: Yup.string().required('Please select the EIA account number'),
+        then: Yup.string().required('Please select the EIA account number')
+        .matches(/^([0-9\s\-\+\(\)]*)$/, function() {
+            return "Invalid number"
+        })
+        .min(13, function() {
+            return "EIA number should be minimum 13 digits"
+        })
+        .max(13, function() {
+            return "EIA number should be maximum 13 digits"
+        }),
         othewise: Yup.string()
     })
 
@@ -398,7 +443,7 @@ class Address extends Component {
             pincode: addressDetails && addressDetails.pincode ? addressDetails.pincode: "",
             area: addressDetails && addressDetails.area ? addressDetails.area: "",
             state: addressDetails && addressDetails.state ? addressDetails.state:"",
-            eIA: is_eia_account ?  is_eia_account : 0,
+            eIA: is_eia_account ?  is_eia_account : "",
             eia_account_no : policy_holder && policy_holder.eia_no ?  policy_holder.eia_no : ''
         });
 
@@ -541,6 +586,7 @@ class Address extends Component {
                                                                     peekPreviousYear
                                                                     showMonthDropdown
                                                                     showYearDropdown
+                                                                    readOnly = {true}
                                                                     dropdownMode="select"
                                                                     maxDate={new Date()}
                                                                     minDate={new Date(1/1/1900)}
@@ -594,7 +640,10 @@ class Address extends Component {
                                                                 autoComplete="off"
                                                                 onFocus={e => this.changePlaceHoldClassAdd(e)}
                                                                 onBlur={e => this.changePlaceHoldClassRemove(e)}
-                                                                value={values.panNo}
+                                                                value={values.panNo.toUpperCase()}
+                                                                onChange= {(e)=> 
+                                                                setFieldValue('panNo', e.target.value.toUpperCase())
+                                                                }
                                                             />
                                                             {errors.panNo && touched.panNo ? (
                                                             <span className="errorMsg">{errors.panNo}</span>
@@ -650,7 +699,11 @@ class Address extends Component {
                                                                     autoComplete="off"
                                                                     onFocus={e => this.changePlaceHoldClassAdd(e)}
                                                                     onBlur={e => this.changePlaceHoldClassRemove(e)}
-                                                                    value={values.address1}
+                                                                    value={values.address1.toUpperCase()}
+                                                                    onChange= {(e)=> 
+                                                                    setFieldValue('address1', e.target.value.toUpperCase())
+                                                                    }
+                                                                    
                                                                 />
                                                                 {errors.address1 && touched.address1 ? (
                                                                 <span className="errorMsg">{errors.address1}</span>
@@ -668,7 +721,10 @@ class Address extends Component {
                                                                     autoComplete="off"
                                                                     onFocus={e => this.changePlaceHoldClassAdd(e)}
                                                                     onBlur={e => this.changePlaceHoldClassRemove(e)}
-                                                                    value={values.address2}
+                                                                    value={values.address2.toUpperCase()}
+                                                                    onChange= {(e)=> 
+                                                                    setFieldValue('address2', e.target.value.toUpperCase())
+                                                                    }
                                                                 />
                                                                 {errors.address2 && touched.address2 ? (
                                                                 <span className="errorMsg">{errors.address2}</span>
@@ -686,7 +742,10 @@ class Address extends Component {
                                                                     autoComplete="off"
                                                                     onFocus={e => this.changePlaceHoldClassAdd(e)}
                                                                     onBlur={e => this.changePlaceHoldClassRemove(e)}
-                                                                    value={values.address3}
+                                                                    value={values.address3.toUpperCase()}
+                                                                    onChange= {(e)=> 
+                                                                    setFieldValue('address3', e.target.value.toUpperCase())
+                                                                    }
                                                                 />
                                                                 {errors.address3 && touched.address3 ? (
                                                                 <span className="errorMsg">{errors.address3}</span>

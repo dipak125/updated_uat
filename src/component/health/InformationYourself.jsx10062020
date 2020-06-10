@@ -40,7 +40,6 @@ const initialValues = {
 }
 
 
-
 const vehicleInspectionValidation = Yup.object().shape({
     gender: Yup.string().required('Please select gender'),
    
@@ -87,20 +86,7 @@ const validateFamilyMembers  = Yup.object().shape({
     }),
     dob_2: Yup.string().when(['looking_for_2'], {
         is: looking_for_2 => looking_for_2 == 'child1',
-        then: Yup.string().required('Child 1 DOB field is required').test(
-            "3monthsChecking",
-            function() {
-                return "Age sgould be minium 3 months"
-            },
-            function (value) {
-                if (value) {
-                    const ageObj = new PersonAge();
-                    console.log("YYYYYYYYYYYYYYYYYYY=====>",ageObj.whatIsMyAgeMonth(value))
-                    return ageObj.whatIsMyAgeMonth(value) >=3;
-                }
-                return true;
-            }
-        ),
+        then: Yup.string().required('Child 1 DOB field is required'),
         othewise: Yup.string()
     }),
     child1Gender: Yup.string().when(['looking_for_2'], {
@@ -465,7 +451,7 @@ setStateForPreviousData=(family_members)=>{
     }
     render() {
         const {memberInfo, insureList,validateCheck,gender,familyMembers,lookingFor,dob,display_looking_for,display_dob} = this.state
-        console.log("FAMILY11111==ddddddddddddddd=====>",validateCheck);
+        console.log("FAMILY11111======>",display_looking_for);
         console.log("FAMILY22222======>",display_dob);
         const insureListPrev = this.getInsuredList(familyMembers);
        
@@ -1017,17 +1003,6 @@ setStateForPreviousData=(family_members)=>{
                                                                 setFieldValue("dob_5", '');
                                                                 
                                                             }
-
-                                                            if(this.setValueData()){
-                                                                this.setState({
-                                                                    validateCheck:1
-                                                                })
-                                                            }
-                                                            else{
-                                                                this.setState({
-                                                                    validateCheck:0
-                                                                })
-                                                            }
                                                         }}
                                                         checked={values.looking_for_5 == 'father' ? true : false}
                                                     />
@@ -1083,17 +1058,6 @@ setStateForPreviousData=(family_members)=>{
                                                                 setFieldValue("dob_6", '');
                                                                 
                                                             }
-
-                                                            if(this.setValueData()){
-                                                                this.setState({
-                                                                    validateCheck:1
-                                                                })
-                                                            }
-                                                            else{
-                                                                this.setState({
-                                                                    validateCheck:0
-                                                                })
-                                                            }
                                                         }}
                                                         checked={values.looking_for_6 == 'mother' ? true : false}
                                                     />
@@ -1148,17 +1112,6 @@ setStateForPreviousData=(family_members)=>{
                                                                 setFieldValue('looking_for_7', '');
                                                                 setFieldValue("dob_7", '');                                                                
                                                             }
-
-                                                            if(this.setValueData()){
-                                                                this.setState({
-                                                                    validateCheck:1
-                                                                })
-                                                            }
-                                                            else{
-                                                                this.setState({
-                                                                    validateCheck:0
-                                                                })
-                                                            }
                                                         }}
                                                         checked={values.looking_for_7 == 'fatherInLaw' ? true : false}
                                                     />
@@ -1211,18 +1164,8 @@ setStateForPreviousData=(family_members)=>{
                                                                 
                                                             } else {
                                                                 setFieldValue('looking_for_8', '');
-                                                                setFieldValue("dob_8", '');                                                                
-                                                            }
-
-                                                            if(this.setValueData()){
-                                                                this.setState({
-                                                                    validateCheck:1
-                                                                })
-                                                            }
-                                                            else{
-                                                                this.setState({
-                                                                    validateCheck:0
-                                                                })
+                                                                setFieldValue("dob_8", '');
+                                                                
                                                             }
                                                         }}
                                                         checked={values.looking_for_8 == 'motherInLaw' ? true : false}

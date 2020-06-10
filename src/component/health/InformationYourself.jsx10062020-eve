@@ -40,7 +40,6 @@ const initialValues = {
 }
 
 
-
 const vehicleInspectionValidation = Yup.object().shape({
     gender: Yup.string().required('Please select gender'),
    
@@ -87,20 +86,7 @@ const validateFamilyMembers  = Yup.object().shape({
     }),
     dob_2: Yup.string().when(['looking_for_2'], {
         is: looking_for_2 => looking_for_2 == 'child1',
-        then: Yup.string().required('Child 1 DOB field is required').test(
-            "3monthsChecking",
-            function() {
-                return "Age sgould be minium 3 months"
-            },
-            function (value) {
-                if (value) {
-                    const ageObj = new PersonAge();
-                    console.log("YYYYYYYYYYYYYYYYYYY=====>",ageObj.whatIsMyAgeMonth(value))
-                    return ageObj.whatIsMyAgeMonth(value) >=3;
-                }
-                return true;
-            }
-        ),
+        then: Yup.string().required('Child 1 DOB field is required'),
         othewise: Yup.string()
     }),
     child1Gender: Yup.string().when(['looking_for_2'], {
