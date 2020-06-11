@@ -84,11 +84,11 @@ const validateAddress =  Yup.object().shape({
         .matches(/^([0-9\s\-\+\(\)]*)$/, function() {
             return "Invalid number"
         })
-        .min(12, function() {
-            return "Phone number should be minimum 12 digits"
+        .min(10, function() {
+            return "Phone number should be minimum 10 digits"
         })
-        .max(12, function() {
-            return "Phone number should be maximum 12 digits"
+        .max(10, function() {
+            return "Phone number should be maximum 10 digits"
         }),
    
     panNo: Yup.string()

@@ -17,16 +17,15 @@ import { connect } from "react-redux";
 import { changeFormat, get18YearsBeforeDate, PersonAge } from "../../shared/dateFunctions";
 import dateformat from "dateformat";
 
-// const maxDob = dateformat(new Date(), 'mm/dd/yyyy');
+const maxDob = dateformat(new Date(), 'mm/dd/yyyy');
 const initialValues = {
     first_name: "",
     last_name: "",
     gender: "",
     dob: "",
     relation_with: "",
-    // appointee_dob: "",
-    appointee_relation_with: "",
-    appointee_name: ""
+    appointee_dob: "",
+    appointee_relation_with: ""
 }
 
 const validateNominee = Yup.object().shape({
@@ -62,86 +61,48 @@ const validateNominee = Yup.object().shape({
         .date()
         .required( function() {
             return "Please enter DOB"
-    }).test(
-        "3monthsChecking",
-        function() {
-            return "Age sgould be minium 3 months"
-        },
-        function (value) {
-            if (value) {
-                const ageObj = new PersonAge();
-                return ageObj.whatIsMyAgeMonth(value) >=3;
-            }
-            return true;
-        }
-    ),
+    }),
     relation_with: Yup.string().required(function() {
         return "Please select relation"
     }),
-    // appointee_dob:Yup.date().notRequired("Please enter DOB").max(maxDob, function() {
-    //     return "Date should not be future date"
-    //     }).test(
-    //         "18YearsChecking",
-    //         function() {
-    //             return "Appointee age should be more than 18 years"
-    //         },
-    //         function (value) {
-    //             const ageObj = new PersonAge();
-    //             if (value) {
-    //                 const age_Obj = new PersonAge();
-    //                 return age_Obj.whatIsMyAge(value) >= 18;
-    //             }
-    //             return true;
-    //         }
-    //     ).test(
-    //         "18YearsChecking",
-    //         function() {
-    //             return "Please enter Appointee date of birth"
-    //         },
-    //         function (value) {
-    //             const ageObj = new PersonAge();
-    //             if (ageObj.whatIsMyAge(this.parent.dob) < 18) {   
-    //                 return ageObj.whatIsMyAge(value) >= 18;    
-    //             }
-    //             return true;
-    //         }
-    //     ),
-    appointee_name:Yup.string(function() {
-            return "Please enter appointee name"
-        }).notRequired(function() {
-            return "Please enter appointee name"
-        })
-        .min(3, function() {
-            return "Name must be minimum 3 chracters"
-        })
-        .max(40, function() {
-            return "Name must be maximum 40 chracters"
-        })
-        .matches(/^[A-Za-z][A-Za-z\s\-']*[A-Za-z\s]$/, function() {
-            return "Please enter valid name"
-    }).test(
-        "18YearsChecking",
-        function() {
-            return "Please enter appointee name"
-        },
-        function (value) {
-            const ageObj = new PersonAge();
-            if (ageObj.whatIsMyAge(this.parent.dob) < 18 && !value) {   
-                return false;    
+    appointee_dob:Yup.date().notRequired("Please enter DOB").max(maxDob, function() {
+        return "Date should not be future date"
+        }).test(
+            "18YearsChecking",
+            function() {
+                return "Appointee age should be more than 18 years"
+            },
+            function (value) {
+                const ageObj = new PersonAge();
+                if (value) {
+                    const age_Obj = new PersonAge();
+                    return age_Obj.whatIsMyAge(value) >= 18;
+                }
+                return true;
             }
-            return true;
-        }
-    ),
+        ).test(
+            "18YearsChecking",
+            function() {
+                return "Please enter Appointee date of birth"
+            },
+            function (value) {
+                const ageObj = new PersonAge();
+                if (ageObj.whatIsMyAge(this.parent.dob) < 18) {   
+                    return ageObj.whatIsMyAge(value) >= 18;    
+                }
+                return true;
+            }
+        ),
     appointee_relation_with: Yup.string().notRequired(function() {
         return "Please select relation"
     }).test(
         "18YearsChecking",
         function() {
-            return "Please enter Appointee relation"
+            return "Please enter Appointee date of birth"
         },
         function (value) {
             const ageObj = new PersonAge();
-            if (ageObj.whatIsMyAge(this.parent.dob) < 18 && !value) {   
+            if (ageObj.whatIsMyAge(this.parent.dob) < 18) {   
                 return false;    
             }
             return true;
@@ -153,7 +114,7 @@ class NomineeDetails extends Component {
 
     state = {
         NomineeDetails: [], 
-        appointeeFlag: false,
+        appointeeFlag: true,
         is_appointee:0
       };
 
@@ -178,7 +139,7 @@ class NomineeDetails extends Component {
         }
         else {
             this.setState({
-                appointeeFlag: false,
+                appointeeFlag: true,
                 is_appointee:0
             })
         } 
@@ -194,7 +155,7 @@ class NomineeDetails extends Component {
 
         for (const key in values) {
             if (values.hasOwnProperty(key)) {
-              if(key == "dob" ){
+              if((key == "dob" || key == "appointee_dob") && values[key] != "") {
                 formData.append(key, moment(values[key]).format("YYYY-MM-DD"));
               }
               else {
@@ -225,8 +186,7 @@ class NomineeDetails extends Component {
           .get(`/policy-holder/${localStorage.getItem('policyHolder_id')}`)
           .then(res => { 
             this.setState({
-                NomineeDetails: res.data.data.policyHolder.request_data.nominee[0],
-                is_appointee: res.data.data.policyHolder.request_data.nominee[0].is_appointee
+                NomineeDetails: res.data.data.policyHolder.request_data.nominee[0]
             }) 
             this.props.loadingStop();
           })
@@ -245,7 +205,7 @@ class NomineeDetails extends Component {
 
     render() {
         const {productId} = this.props.match.params
-        const {NomineeDetails,appointeeFlag, is_appointee} = this.state
+        const {NomineeDetails,appointeeFlag} = this.state
         moment.defaultFormat = "YYYY-MM-YY";
 
         const newInitialValues = Object.assign(initialValues, {
@@ -254,10 +214,8 @@ class NomineeDetails extends Component {
             gender: NomineeDetails ? NomineeDetails.gender : "",
             dob: NomineeDetails && NomineeDetails.dob ? new Date(NomineeDetails.dob) : "",
             relation_with: NomineeDetails ? NomineeDetails.relation_with : "",
-            // appointee_dob: NomineeDetails && NomineeDetails.appointee_dob ? new Date(NomineeDetails.appointee_dob) : "",
-            appointee_relation_with: NomineeDetails ? NomineeDetails.appointee_relation_with : "",
-            appointee_name: NomineeDetails ? NomineeDetails.appointee_name : "",
-
+            appointee_dob: NomineeDetails && NomineeDetails.appointee_dob ? new Date(NomineeDetails.appointee_dob) : "",
+            appointee_relation_with: NomineeDetails ? NomineeDetails.appointee_relation_with : ""
         })
         
         
@@ -397,14 +355,9 @@ class NomineeDetails extends Component {
                                                                     className="formGrp"
                                                                 >
                                                                 <option value="">Relation with Primary Insured</option>
-                                                                <option value="1">Self</option>
-                                                                <option value="2">Spouse</option>
-                                                                <option value="3">Son</option>
-                                                                <option value="4">Daughter</option>
-                                                                <option value="5">Father</option>
-                                                                <option value="6">Mother</option>
-                                                                <option value="7">Father In Law</option>
-                                                                <option value="8">Mother In Law</option>
+                                                                <option value="father">father</option>
+                                                                <option value="mother">Mother</option>
+                                                                <option value="spouse">Spouse</option>
                                                                 </Field>     
                                                                 {errors.relation_with && touched.relation_with ? (
                                                                     <span className="errorMsg">{errors.relation_with}</span>
@@ -413,7 +366,7 @@ class NomineeDetails extends Component {
                                                         </FormGroup>
                                                     </Col>
                                                 </Row>
-                                                {appointeeFlag || is_appointee == '1' ? 
+                                                {appointeeFlag || (NomineeDetails && NomineeDetails.is_appointee == '1') ? 
                                                     <div>
                                                     <div className="d-flex justify-content-left carloan m-b-25">
                                                         <h4> Appointee  Details</h4>
@@ -421,22 +374,7 @@ class NomineeDetails extends Component {
                                                     <Row className="m-b-45">
                                                         <Col sm={12} md={4} lg={4}>
                                                             <FormGroup>
-                                                                <div className="insurerName">
-                                                                    <Field
-                                                                        name="appointee_name"
-                                                                        type="text"
-                                                                        placeholder="Appointee Name"
-                                                                        autoComplete="off"
-                                                                        onFocus={e => this.changePlaceHoldClassAdd(e)}
-                                                                        onBlur={e => this.changePlaceHoldClassRemove(e)}
-                                                                        value={values.appointee_name}
-                                                                    />
-                                                                    {errors.appointee_name && touched.appointee_name ? (
-                                                                    <span className="errorMsg">{errors.appointee_name}</span>
-                                                                    ) : null}
-                                                                    
-                                                                </div>
-                                                                {/* <DatePicker
+                                                                <DatePicker
                                                                     name="appointee_dob"
                                                                     minDate={new Date()}
                                                                     dateFormat="dd MMM yyyy"
@@ -457,7 +395,7 @@ class NomineeDetails extends Component {
                                                                 />
                                                                 {errors.appointee_dob ? (
                                                                     <span className="errorMsg">{errors.appointee_dob}</span>
-                                                                ) : null} */}
+                                                                ) : null}
                                                             </FormGroup>
                                                         </Col>
 
@@ -472,15 +410,10 @@ class NomineeDetails extends Component {
                                                                         value={values.appointee_relation_with}
                                                                         className="formGrp"
                                                                     >
-                                                                    <option value="">Relation with Nominee</option>
-                                                                    <option value="1">Self</option>
-                                                                    <option value="2">Spouse</option>
-                                                                    <option value="3">Son</option>
-                                                                    <option value="4">Daughter</option>
-                                                                    <option value="5">Father</option>
-                                                                    <option value="6">Mother</option>
-                                                                    <option value="7">Father In Law</option>
-                                                                    <option value="8">Mother In Law</option>
+                                                                    <option value="">Relation with Primary Insured</option>
+                                                                    <option value="father">father</option>
+                                                                    <option value="mother">Mother</option>
+                                                                    <option value="spouse">Spouse</option>
                                                                     </Field>     
                                                                     {errors.appointee_relation_with && touched.appointee_relation_with ? (
                                                                         <span className="errorMsg">{errors.appointee_relation_with}</span>
