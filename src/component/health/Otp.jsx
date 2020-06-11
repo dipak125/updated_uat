@@ -49,6 +49,7 @@ class Otp extends Component {
         axios
           .post('/otp/generate', formData)
           .then((res) => {
+            this.props.loadingStop();
             this.getOtp()
           })
           .catch((err) => {
@@ -72,7 +73,8 @@ class Otp extends Component {
             } 
             else {
                 this.setState({ otp: "", errorMsg: res.data.msg });
-            }          
+            } 
+            this.props.loadingStop();         
           })
           .catch((err) => {
             this.setState({

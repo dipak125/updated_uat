@@ -356,20 +356,13 @@ class Address extends Component {
             formData.append(`first_name[${i}]`, family_members[i].fname);
             formData.append(`last_name[${i}]`, family_members[i].lname);
             formData.append(`dob[${i}]`, moment(family_members[i].dob).format("YYYY-MM-DD"));
-            
-            formData.append(`pancard_no[${i}]`, values.panNo);
+          //  formData.append(`pancard_no[${i}]`, values.panNo);
          //   formData.append(`pancard_no[${i}]`, values.panNo);
         }  
         let email = values.email;
-     // formData.append('panNo',values.panNo);
-        formData.append('phoneNo',values.phoneNo);
-        formData.append('email_id',values.email);
-
         sessionStorage.setItem('email_data',email);
         formData.append('is_eia_account',values.eIA);
         sessionStorage.setItem('pan_data',values.panNo);
-        sessionStorage.setItem('email_data',values.email);
-
         let address_object = {}
         Object.assign(address_object,{
             address1:values.address1,
@@ -436,13 +429,12 @@ class Address extends Component {
     
     render() {
         const {policy_holder,familyMembers,addressDetails,is_eia_account,selfFlag,pinDataArr,stateName,showEIA} = this.state    
-        console.log("aaaa======> ", is_eia_account)
         let newInitialValues = Object.assign(initialValues, {
             proposerAsInsured: sessionStorage.getItem('proposed_insured') ? sessionStorage.getItem('proposed_insured') : (selfFlag ? 1:0),
             family_members:this.initFamilyDetailsList(
                 familyMembers
             ),
-            panNo: sessionStorage.getItem('pan_data') ? sessionStorage.getItem('pan_data') : "",
+            panNo: sessionStorage.getItem('pan_data') ? sessionStorage.getItem('pan_data') : "" ,
             phoneNo: addressDetails && addressDetails.phoneNo ? addressDetails.phoneNo: "",
             email: sessionStorage.getItem('email_data') ? sessionStorage.getItem('email_data') : "",
             address1: addressDetails && addressDetails.address1 ? addressDetails.address1: "",

@@ -21,9 +21,20 @@ import moment from "moment";
 import Otp from "./Otp";
 
 const genderArr = {
-  m: "M",
-  f: "F",
+  M: "Male",
+  F: "Female",
 };
+
+const relationArr = {
+1:"Self",
+2:"Spouse",
+3:"Son",
+4:"Daughter",
+5:"Father",
+6:"Mother",
+7:"Father In Law",
+8:"Mother In Law"
+}
 
 // const date_UTC = moment().format();
 const date_cstom = moment().format("D-MMMM-YYYY-h:mm:ss");
@@ -164,8 +175,13 @@ class PolicyDetails extends Component {
             purchaseData: res.data,
             error1: [],
           });
-          localStorage.removeItem("policyHolder_id");
-          localStorage.removeItem("policyHolder_refNo");
+          // localStorage.removeItem("policyHolder_id");
+          // localStorage.removeItem("policyHolder_refNo");
+          // sessionStorage.removeItem('pan_data');
+          // sessionStorage.removeItem('email_data');
+          // sessionStorage.removeItem('proposed_insured');
+          // sessionStorage.removeItem('display_looking_for');
+          // sessionStorage.removeItem('display_dob');
           this.policySummery(res.data.PolicyNo);
         } else {
           this.setState({
@@ -194,10 +210,11 @@ class PolicyDetails extends Component {
     console.log("fulQuoteResp ", fulQuoteResp)
     const items =
       fulQuoteResp &&
-      fulQuoteResp.PolicyCustomerList &&
-      fulQuoteResp.PolicyCustomerList.length > 0
-        ? fulQuoteResp.PolicyCustomerList.map((member, qIndex) => {
+      fulQuoteResp.PolicyLobList && fulQuoteResp.PolicyLobList.length > 0 && 
+      fulQuoteResp.PolicyLobList[0].PolicyRiskList
+        ? fulQuoteResp.PolicyLobList[0].PolicyRiskList.map((member, qIndex) => {
             return (
+              <div>
               <Row>
                 <Col sm={12} md={6}>
                   <Row>
@@ -205,7 +222,7 @@ class PolicyDetails extends Component {
                       <FormGroup>Name:</FormGroup>
                     </Col>
                     <Col sm={12} md={6}>
-                      <FormGroup>{member.FirstName}</FormGroup>
+                      <FormGroup>{member.FirstName+" "+member.LastName}</FormGroup>
                     </Col>
                   </Row>
 
@@ -223,7 +240,7 @@ class PolicyDetails extends Component {
                       <FormGroup>Relation With Proposer:</FormGroup>
                     </Col>
                     <Col sm={12} md={6}>
-                      <FormGroup>self</FormGroup>
+                      <FormGroup>{relationArr[member.ArgInsuredRelToProposer]}</FormGroup>
                     </Col>
                   </Row>
 
@@ -232,11 +249,15 @@ class PolicyDetails extends Component {
                       <FormGroup>Gender</FormGroup>
                     </Col>
                     <Col sm={12} md={6}>
-                      <FormGroup>{member.GenderCode}</FormGroup>
+                      <FormGroup>{genderArr[member.GenderCode]}</FormGroup>
                     </Col>
                   </Row>
                 </Col>
               </Row>
+              <Row>
+              <p></p>
+              </Row>
+              </div>
             );
           })
         : null;
@@ -343,7 +364,7 @@ class PolicyDetails extends Component {
                                       Mobile number:
                                     </Col>
                                     <Col sm={12} md={6}>
-                                      {fulQuoteResp.ContactNo}
+                                      {fulQuoteResp.ContactPersonNumber}
                                     </Col>
                                   </Row>
 

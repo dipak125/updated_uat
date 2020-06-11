@@ -49,43 +49,22 @@ const vehicleInspectionValidation = Yup.object().shape({
 
 const validateFamilyMembers  = Yup.object().shape({
     //check_input : Yup.string().required('Please select an options'),
-  
-    looking_for_0: Yup.string().when(['looking_for_2'], {
-        is: looking_for_2 => looking_for_2 == 'child1',       
-        then: Yup.string().required('Please select self'),
-        othewise: Yup.string()
-    }).when(['looking_for_3'], {
-        is: looking_for_3 => looking_for_3 == 'child2',       
-        then: Yup.string().required('Please select self'),
-        othewise: Yup.string()
-    }).when(['looking_for_4'], {
-        is: looking_for_4 => looking_for_4 == 'child3',       
-        then: Yup.string().required('Please select self'),
-        othewise: Yup.string()
-    }),
-    
-
-    
-    
-
-  
-
     dob_0: Yup.string().when(['looking_for_0'], {
       is: looking_for_0 => looking_for_0 == 'self',
       then: Yup.string().required('Self DOB field is required')
     .test(
         "18YearsChecking",
         function() {
-            return "Age sgould me minium 18 and maximum 45 years"
+            return "Age sgould me minium 18 years"
         },
         function (value) {
             if (value) {
                 const ageObj = new PersonAge();
-                return ageObj.whatIsMyAge(value) <= 45 && ageObj.whatIsMyAge(value) >= 18 ;
+                return ageObj.whatIsMyAge(value) >= 18;
             }
             return true;
         }
-    ).nullable(),
+    ),
       othewise: Yup.string()
     }),
     dob_1: Yup.string().when(['looking_for_1'], {
@@ -122,14 +101,13 @@ const validateFamilyMembers  = Yup.object().shape({
                 return true;
             }
         ),
-        
         othewise: Yup.string()
     }),
     child1Gender: Yup.string().when(['looking_for_2'], {
         is: looking_for_2 => looking_for_2 == 'child1',
         then: Yup.string().required('Child 1 Gender field is required'),
         othewise: Yup.string()
-    }).nullable(),
+    }),
 
     dob_3: Yup.string().when(['looking_for_3'], {
         is: looking_for_3 => looking_for_3 == 'child2',
@@ -140,7 +118,7 @@ const validateFamilyMembers  = Yup.object().shape({
         is: looking_for_3 => looking_for_3 == 'child2',
         then: Yup.string().required('Child 2 Gender field is required'),
         othewise: Yup.string()
-    }).nullable(),
+    }),
 
     dob_4: Yup.string().when(['looking_for_4'], {
         is: looking_for_4 => looking_for_4 == 'child3',
@@ -151,7 +129,7 @@ const validateFamilyMembers  = Yup.object().shape({
         is: looking_for_4 => looking_for_4 == 'child3',
         then: Yup.string().required('Child 3 Gender field is required'),
         othewise: Yup.string()
-    }).nullable(),
+    }),
     
     dob_5: Yup.string().when(['looking_for_5'], {
         is: looking_for_5 => looking_for_5 == 'father',
@@ -197,7 +175,7 @@ const validateFamilyMembers  = Yup.object().shape({
         .test(
             "18YearsChecking",
             function() {
-                return "Age sgould be minium 18 years"
+                return "Age sgould me minium 18 years"
             },
             function (value) {
                 if (value) {
@@ -261,10 +239,7 @@ class InformationYourself extends Component {
             addressDetails:{},
             is_eia_account:'',
             display_dob:[],
-            display_looking_for:[],
-            relationList:[],
-            display_gender:[],
-            gender_for:[]
+            display_looking_for:[]
         };
     }
 
@@ -297,9 +272,9 @@ class InformationYourself extends Component {
     handleFormSubmit = (values) => {
         const {productId} = this.props.match.params
         const formData = new FormData();
-       // let gender = values.gender
-    // console.log("gender=========>",gender);
-   // formData.append(`gender`, gender);
+        let gender = values.gender
+    console.log("gender=========>",gender);
+    formData.append(`gender`, gender);
     let lookingFor = this.state.lookingFor ;
     console.log("lookingFor=========>",lookingFor);
     let dob = this.state.dob ;
@@ -316,26 +291,13 @@ class InformationYourself extends Component {
     for(let i=0;i<lookingFor.length;i++){
         let looking_for = lookingFor[i] ? lookingFor[i] : familyMembers[i].relation_with;
         formData.append(`looking_for[${i}]`, looking_for);
-    }  
-    
-    for(let i=0;i<lookingFor.length;i++){
-        let looking_for = lookingFor[i] ? lookingFor[i] : familyMembers[i].relation_with;
-        formData.append(`looking_for[${i}]`, looking_for);
-    } 
-    let gender_for = this.state.gender_for
-    for(let i=0;i<gender_for.length;i++){
-        let gender_val = gender_for[i] ? gender_for[i] : familyMembers[i].gender;
-        formData.append(`gender[${i}]`, gender_val);
-    } 
-    
-
+    }   
     this.props.loadingStart();
     axios
     .post(`/yourself`, formData)
     .then(res => {
         localStorage.setItem('policyHolder_id', res.data.data.policyHolder_id);
         localStorage.setItem('policyHolder_refNo', res.data.data.policyHolder_refNo);
-        localStorage.setItem('display_gender', JSON.stringify(this.state.display_gender));
         this.props.loadingStop();
         this.props.history.push(`/MedicalDetails/${productId}`);
     })
@@ -354,20 +316,7 @@ class InformationYourself extends Component {
         var drv = []; 
         var display_looking_for = [];
         var display_dob = [];
-        let display_gender = [];
         console.log("VALUES --------->",values);
-
-        display_gender[0] = this.state.gender ? this.state.gender:null
-        display_gender[1] = this.state.gender ? (this.state.gender == 'm') ?'f':'m' :null
-        display_gender[2] = values.child1Gender ? values.child1Gender :null
-        display_gender[3] = values.child2Gender ? values.child2Gender :null
-        display_gender[4] = values.child3Gender ? values.child3Gender :null
-        display_gender[5] = this.state.gender ? 'm' : null
-        display_gender[6] = this.state.gender ? 'f' : null
-        display_gender[7] = this.state.gender ? 'm' : null
-        display_gender[8] = this.state.gender ? 'f' : null
-
-
         //var check_input = values.check_input
         if(this.state.validateCheck == 1){
             for (const key in values) {
@@ -389,20 +338,18 @@ class InformationYourself extends Component {
             const {gender} = this.state
             const formData = new FormData();
             let looking_for = []
-            let gender_for = []
             let dob = []
             let i=[];
             let j=[];
-            
             for (const key in values) {
                 if (values.hasOwnProperty(key)) {
                     if ( key.match(/looking_for/gi)){                  
                         i = key.substr(12, 1);                                             
                         console.log("ASSSS1111======>", values[key]);
-                        display_looking_for[i] = values[key] ? values[key] : '';                       
+                        display_looking_for[i] = values[key] ? values[key] : '';
                         if(values[key]){
                             looking_for.push(values[key]);
-                            gender_for.push(display_gender[i])    
+                                
                         }                           // formData.append(`looking_for[${i}]`, values[key]);
                     }
 
@@ -418,15 +365,11 @@ class InformationYourself extends Component {
                     }
                 } 
             }
-
-            
             sessionStorage.setItem('display_looking_for',JSON.stringify(display_looking_for));
             sessionStorage.setItem('display_dob',JSON.stringify(display_dob));
             this.setState({
                 lookingFor:looking_for,
-                display_looking_for,
-                display_gender:display_gender,
-                gender_for:gender_for
+                display_looking_for
              });
              this.setState({
                 dob:dob,
@@ -455,7 +398,7 @@ class InformationYourself extends Component {
 }
 componentDidMount(){
     this.fetchData();
-    this.fetchRelations();
+    
 }
 
 fetchData=()=>{
@@ -465,8 +408,7 @@ fetchData=()=>{
     axios.get(`policy-holder/${policyHolder_id}`)
         .then(res=>{
             //console.log("aaaaaabbbbbir========>",response.data.data.policyHolder.request_data.family_members)
-            let family_members =  res.data.data.policyHolder && res.data.data.policyHolder.request_data && res.data.data.policyHolder.request_data.family_members ? res.data.data.policyHolder.request_data.family_members : []
-            console.log("Family Members =======>",family_members)
+            let family_members = res.data.data.policyHolder.request_data.family_members
             let addressDetails = JSON.parse(res.data.data.policyHolder.address)
             let is_eia_account = res.data.data.policyHolder.is_eia_account
             let gender = res.data.data.policyHolder.gender
@@ -485,22 +427,6 @@ fetchData=()=>{
             console.log(error);
         })
         this.props.loadingStop();
-}
-
-fetchRelations = () => {
-    axios.get(`relations`)
-    .then(res=>{
-       // console.log("AAAAAAAAAAAA=====>",res.data.data)
-        //let relationsData = res.data. 
-        const relationList = res.data && res.data.data ? res.data.data : []
-        this.setState({
-            relationList            
-        })
-    })
-    .catch(function (error) {
-        // handle error
-        console.log(error);
-    })
 }
 
 
@@ -538,16 +464,15 @@ setStateForPreviousData=(family_members)=>{
 		}
     }
     render() {
-        const {memberInfo, insureList,validateCheck,gender,familyMembers,lookingFor,dob,display_looking_for,display_dob,display_gender} = this.state
-        console.log("FAMILY11111==ddddddddddddddd=sssssss====>",JSON.parse(sessionStorage.getItem('display_gender')));
+        const {memberInfo, insureList,validateCheck,gender,familyMembers,lookingFor,dob,display_looking_for,display_dob} = this.state
+        console.log("FAMILY11111==ddddddddddddddd=====>",validateCheck);
         console.log("FAMILY22222======>",display_dob);
         const insureListPrev = this.getInsuredList(familyMembers);
+       
         console.log("insureList =====",familyMembers);
         let display_looking_for_arr = display_looking_for  && display_looking_for.length >0 ? display_looking_for : (sessionStorage.getItem('display_looking_for') ? JSON.parse(sessionStorage.getItem('display_looking_for')) : []);
         let display_dob_arr = display_dob && display_dob.length >0 ? display_dob : (sessionStorage.getItem('display_dob') ? JSON.parse(sessionStorage.getItem('display_dob')) : []);
-        let display_gender_arr = display_gender && display_gender.length > 0 ? display_gender : (localStorage.getItem('display_gender') ? (localStorage.getItem('display_gender')) : []);
-        
-        console.log("insureList Gender=====",display_gender_arr);
+        console.log("insureList =====",display_looking_for_arr);
 
         const newInitialValues = Object.assign(initialValues, {
             check_input: validateCheck ? validateCheck :0,
@@ -558,13 +483,13 @@ setStateForPreviousData=(family_members)=>{
             dob_1: display_dob_arr[1] ? new Date(display_dob_arr[1]) : "",
             looking_for_2: display_looking_for_arr[2] ? display_looking_for_arr[2] : "",
             dob_2: display_dob_arr[2] ? new Date(display_dob_arr[2]) : "",
-            child1Gender: display_gender_arr  ? display_gender_arr[2] : "",
+            child1Gender: memberInfo ? memberInfo.child1Gender : "",
             looking_for_3: display_looking_for_arr[3] ? display_looking_for_arr[3] : "",
             dob_3: display_dob_arr[3] ? new Date(display_dob_arr[3]) : "",
-            child2Gender: display_gender_arr  ? display_gender_arr[3] : "",
+            child2Gender: memberInfo ? memberInfo.child2Gender : "",
             looking_for_4: display_looking_for_arr[4] ? display_looking_for_arr[4] : "",
             dob_4: display_dob_arr[4] ? new Date(display_dob_arr[4]) : "",
-            child3Gender: display_gender_arr  ? display_gender_arr[4] : "",
+            child3Gender: memberInfo ? memberInfo.child3Gender : "",
             looking_for_5: display_looking_for_arr[5] ? display_looking_for_arr[5] : "",
             dob_5: display_dob_arr[5] ? new Date(display_dob_arr[5]) : "",
             looking_for_6: display_looking_for_arr[6] ? display_looking_for_arr[6] : "",
@@ -612,9 +537,6 @@ setStateForPreviousData=(family_members)=>{
                                                 className="formGrp"
                                                 onChange={(e) => {
                                                     setFieldValue('gender', e.target.value);
-                                                    this.setState({
-                                                        gender:e.target.value
-                                                    })
                                                    // this.handleChangeSubmit(e.target.value)
                                                 }}
                                             >
@@ -741,10 +663,7 @@ setStateForPreviousData=(family_members)=>{
                                                             minDate={new Date(1/1/1900)}
                                                             className="datePckr"
                                                             dropdownMode="select"
-                                                            onChange={(value,e) => {
-                                                                if (e && typeof e.preventDefault === 'function') {
-                                                                    e.preventDefault();
-                                                                 }
+                                                            onChange={(value) => {
                                                                 setFieldTouched("dob_0");
                                                                 setFieldValue("dob_0", value);
 
@@ -756,13 +675,6 @@ setStateForPreviousData=(family_members)=>{
                                                             errors.dob_0 && touched.dob_0 ?                 
                                                             <span className="error-message">{errors.dob_0}</span>:''
                                                         }
-
-                                                        {
-                                                            errors.looking_for_0 && touched.looking_for_0 ?                 
-                                                            <span className="error-message">{errors.looking_for_0}</span>:''
-                                                        }
-                                                        
-                                                        
                                                     </label>
                                                 </div>
                                             </div>
@@ -818,10 +730,7 @@ setStateForPreviousData=(family_members)=>{
                                                             minDate={new Date(1/1/1900)}
                                                             className="datePckr"
                                                             dropdownMode="select"
-                                                            onChange={(value,e) => {
-                                                                if (e && typeof e.preventDefault === 'function') {
-                                                                    e.preventDefault();
-                                                                }
+                                                            onChange={(value) => {
                                                                 setFieldTouched("dob_1");
                                                                 setFieldValue("dob_1", value);
                                                               }}
@@ -886,10 +795,7 @@ setStateForPreviousData=(family_members)=>{
                                                             minDate={new Date(1/1/1900)}
                                                             className="datePckr"
                                                             dropdownMode="select"
-                                                            onChange={(value,e) => {
-                                                                if (e && typeof e.preventDefault === 'function') {
-                                                                    e.preventDefault();
-                                                                }
+                                                            onChange={(value) => {
                                                                 setFieldTouched("dob_2");
                                                                 setFieldValue("dob_2", value);
                                                               }}
@@ -912,8 +818,8 @@ setStateForPreviousData=(family_members)=>{
                                                         className="formGrp"
                                                     >
                                                     <option value="">Select gender</option>
-                                                        <option value="m">Male</option>
-                                                        <option value="f">Female</option>
+                                                        <option value="male">Male</option>
+                                                        <option value="female">Female</option>
                                                     </Field>    
                                                     </label>
                                                     {
@@ -974,10 +880,7 @@ setStateForPreviousData=(family_members)=>{
                                                             minDate={new Date(1/1/1900)}
                                                             className="datePckr"
                                                             dropdownMode="select"
-                                                            onChange={(value,e) => {
-                                                                if (e && typeof e.preventDefault === 'function') {
-                                                                    e.preventDefault();
-                                                                }
+                                                            onChange={(value) => {
                                                                 setFieldTouched("dob_3");
                                                                 setFieldValue("dob_3", value);
                                                               }}
@@ -1000,8 +903,8 @@ setStateForPreviousData=(family_members)=>{
                                                         className="formGrp"
                                                     >
                                                     <option value="">Select gender</option>
-                                                        <option value="m">Male</option>
-                                                        <option value="f">Female</option>
+                                                        <option value="male">Male</option>
+                                                        <option value="female">Female</option>
                                                     </Field>    
                                                     </label>
                                                     {
@@ -1061,10 +964,7 @@ setStateForPreviousData=(family_members)=>{
                                                             minDate={new Date(1/1/1900)}
                                                             className="datePckr"
                                                             dropdownMode="select"
-                                                            onChange={(value,e) => {
-                                                                if (e && typeof e.preventDefault === 'function') {
-                                                                    e.preventDefault();
-                                                                }
+                                                            onChange={(value) => {
                                                                 setFieldTouched("dob_4");
                                                                 setFieldValue("dob_4", value);
                                                               }}
@@ -1087,8 +987,8 @@ setStateForPreviousData=(family_members)=>{
                                                         className="formGrp"
                                                     >
                                                     <option value="">Select gender</option>
-                                                        <option value="m">Male</option>
-                                                        <option value="f">Female</option>
+                                                        <option value="male">Male</option>
+                                                        <option value="female">Female</option>
                                                     </Field>    
                                                     </label>
                                                     {
@@ -1151,10 +1051,7 @@ setStateForPreviousData=(family_members)=>{
                                                             minDate={new Date(1/1/1900)}
                                                             className="datePckr"
                                                             dropdownMode="select"
-                                                            onChange={(value,e) => {
-                                                                if (e && typeof e.preventDefault === 'function') {
-                                                                    e.preventDefault();
-                                                                }
+                                                            onChange={(value) => {
                                                                 setFieldTouched("dob_5");
                                                                 setFieldValue("dob_5", value);
                                                               }}
@@ -1220,10 +1117,7 @@ setStateForPreviousData=(family_members)=>{
                                                             minDate={new Date(1/1/1900)}
                                                             className="datePckr"
                                                             dropdownMode="select"
-                                                            onChange={(value,e) => {
-                                                                if (e && typeof e.preventDefault === 'function') {
-                                                                    e.preventDefault();
-                                                                }
+                                                            onChange={(value) => {
                                                                 setFieldTouched("dob_6");
                                                                 setFieldValue("dob_6", value);
                                                               }}
@@ -1288,10 +1182,7 @@ setStateForPreviousData=(family_members)=>{
                                                             minDate={new Date(1/1/1900)}
                                                             className="datePckr"
                                                             dropdownMode="select"
-                                                            onChange={(value,e) => {
-                                                                if (e && typeof e.preventDefault === 'function') {
-                                                                    e.preventDefault();
-                                                                }
+                                                            onChange={(value) => {
                                                                 setFieldTouched("dob_7");
                                                                 setFieldValue("dob_7", value);
                                                               }}
@@ -1356,10 +1247,7 @@ setStateForPreviousData=(family_members)=>{
                                                             minDate={new Date(1/1/1900)}
                                                             className="datePckr"
                                                             dropdownMode="select"
-                                                            onChange={(value,e) => {
-                                                                if (e && typeof e.preventDefault === 'function') {
-                                                                    e.preventDefault();
-                                                                }
+                                                            onChange={(value) => {
                                                                 setFieldTouched("dob_8");
                                                                 setFieldValue("dob_8", value);
                                                               }}

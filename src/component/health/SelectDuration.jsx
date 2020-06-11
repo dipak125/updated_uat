@@ -3,6 +3,7 @@ import BaseComponent from '.././BaseComponent';
 import SideNav from '../common/side-nav/SideNav';
 import { Row, Col, Modal, Button, FormGroup } from 'react-bootstrap';
 import DatePicker from "react-datepicker";
+import { addDays } from 'date-fns';
 import Footer from '../common/footer/Footer';
 import "react-datepicker/dist/react-datepicker.css"
 import 'react-datepicker/dist/react-datepicker-cssmodules.min.css'
@@ -12,6 +13,7 @@ import { withRouter } from 'react-router-dom';
 import { loaderStart, loaderStop } from "../../store/actions/loader";
 import { connect } from "react-redux";
 import moment from "moment";
+import swal from 'sweetalert';
 
 import { Formik, Form, Field, ErrorMessage } from 'formik';
 import * as Yup from "yup";
@@ -25,6 +27,11 @@ polStartDate: "",
 polEndDate: "",
 insureValue: "5"    
 }
+
+const today = moment().add(30, 'days');;
+    const disableFutureDt = current => {
+    return current.isBefore(today)
+  }
 
 const sum_assured = {
     "100000.00" : 1,
@@ -143,15 +150,21 @@ class SelectDuration extends Component {
     getAccessToken = () => {
         axios
           .post(`/callTokenService`)
-          .then(res => { 
-            this.setState({
-                accessToken: res.data.access_token
-            }) 
-            let value = []
-            value['polStartDate'] = new Date()
-            value['polEndDate'] = new Date(moment(value['polStartDate']).add(1, 'years').format("YYYY-MM-DD"))
-            this.props.loadingStop();
-            this.quote(value)
+          .then(res => {
+            if(res.data.access_token){ 
+                this.setState({
+                    accessToken: res.data.access_token
+                }) 
+                let value = []
+                value['polStartDate'] = new Date()
+                value['polEndDate'] = new Date(moment(value['polStartDate']).add(1, 'years').format("YYYY-MM-DD"))
+                this.props.loadingStop();
+                this.quote(value)
+            }
+            else {
+                swal("Thank you for showing your interest for buying product.Due to some reasons, we are not able to issue the policy online.Please call 180 22 1111");
+                this.props.loadingStop();
+            }
           })
           .catch(err => {
             this.setState({
@@ -181,38 +194,45 @@ class SelectDuration extends Component {
 
       quote = (value) => {
       const {accessToken} = this.state
-      let polStartDate = moment(value.polStartDate).format("YYYY-MM-DD");
-      let polEndDate = moment(value.polEndDate).format("YYYY-MM-DD");
-      let insureValue = value.insureValue ? value.insureValue : "5";
-      const formData = new FormData(); 
-      this.props.loadingStart();
-      formData.append('id', localStorage.getItem('policyHolder_id'));
-      formData.append('policyStartDate', polStartDate);
-      formData.append('policyEndDate', polEndDate);
-      formData.append('insureValue', insureValue);
-      formData.append('access_token', accessToken);
-      axios
-        .post(`/quickQuoteService`, formData)
-        .then(res => { 
-        if(res.data.AdjustedPremium){
-            this.setState({
-                serverResponse: res.data,
-                error: []
-            }) 
-        }else {
-            this.setState({
-                serverResponse: res.data,
-                error: res.data
-            }) 
-        }
-        this.props.loadingStop();
-        })
-        .catch(err => {
-          this.setState({
-            serverResponse: []
-          });
+      if(accessToken)
+      {
+        let polStartDate = moment(value.polStartDate).format("YYYY-MM-DD");
+        let polEndDate = moment(value.polEndDate).format("YYYY-MM-DD");
+        let insureValue = value.insureValue ? value.insureValue : "5";
+        const formData = new FormData(); 
+        this.props.loadingStart();
+        formData.append('id', localStorage.getItem('policyHolder_id'));
+        formData.append('policyStartDate', polStartDate);
+        formData.append('policyEndDate', polEndDate);
+        formData.append('insureValue', insureValue);
+        formData.append('access_token', accessToken);
+        axios
+          .post(`/quickQuoteService`, formData)
+          .then(res => { 
+          if(res.data.AdjustedPremium){
+              this.setState({
+                  serverResponse: res.data,
+                  error: []
+              }) 
+          }else {
+              this.setState({
+                  serverResponse: res.data,
+                  error: res.data
+              }) 
+          }
           this.props.loadingStop();
-        });
+          })
+          .catch(err => {
+            this.setState({
+              serverResponse: []
+            });
+            this.props.loadingStop();
+          });
+      }
+      else {
+        swal("Thank you for showing your interest for buying product.Due to some reasons, we are not able to issue the policy online.Please call 180 22 1111");
+    }
+      
     }
 
     handleChange =(value) => {
@@ -305,18 +325,16 @@ class SelectDuration extends Component {
                                                         <DatePicker
                                                             name="polStartDate"
                                                             minDate={new Date()}
+                                                            maxDate={addDays(new Date(), 30)}
+                                                            showDisabledMonthNavigation
                                                             dateFormat="dd MMM yyyy"
                                                             placeholderText="Start Date"
-                                                            peekPreviousMonth
-                                                            peekPreviousYear
-                                                            showMonthDropdown
-                                                            showYearDropdown
                                                             dropdownMode="select"
                                                             className="datePckr"
                                                             onChange={(value) => {
                                                                 setFieldTouched("polStartDate");
                                                                 setFieldValue("polStartDate", value);
-                                                                setFieldValue("polEndDate", "");
+                                                                setFieldValue("polEndDate", addDays(new Date(), 364));
                                                                 this.handleChange(value);
                                                             }}
                                                             selected={values.polStartDate}
@@ -336,23 +354,11 @@ class SelectDuration extends Component {
                                                         <FormGroup>
                                                         <DatePicker
                                                             name="polEndDate"
-                                                            minDate={new Date(moment(values.polStartDate).add(1, 'years').format("YYYY-MM-DD"))}
-                                                            maxDate={new Date(moment(values.polStartDate).add(1, 'years').format("YYYY-MM-DD"))}
                                                             dateFormat="dd MMM yyyy"
                                                             placeholderText="End Date"
-                                                            peekPreviousMonth
-                                                            peekPreviousYear
-                                                            showMonthDropdown
-                                                            showYearDropdown
-                                                            dropdownMode="select"
-                                                            // disabled = {true}
+                                                            disabled = {true}
                                                             className="datePckr"
-                                                            onChange={(value) => {
-                                                                setFieldTouched("polEndDate");
-                                                                setFieldValue("polEndDate", value);
-                                                                // this.handleChange();
-                                                                }}
-                                                            selected={values.polEndDate}
+                                                            selected={addDays(new Date(values.polStartDate), 364)}
                                                         />
                                                         {errors.polEndDate && touched.polEndDate ? (
                                                         <span className="errorMsg">{errors.polEndDate}</span>

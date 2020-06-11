@@ -53,8 +53,7 @@ class MedicalDetails extends Component {
         selected_question:[],
         validation_message:"",
         show:false,
-        isForwarded : true,
-        showImg: false
+        isForwarded : true
       };
 
     sumInsured = (productId) => {
@@ -272,7 +271,7 @@ class MedicalDetails extends Component {
 
                             <div className="d-flex justify-content-left">
                                 <div className="m-r-25"><img src={require(`../../assets/images/${question.logo}`)} alt="" /></div>
-                                    <div className="medinfo"><p className="W500 m-r-15">{question.title}</p>
+                                    <div className="medinfo"><p className="W500">{question.title}</p>
                                         
                                     <FormGroup>
                                         <div className="d-inline-flex m-b-30">
@@ -287,14 +286,13 @@ class MedicalDetails extends Component {
                                                     onChange={(e) => {
                                                         setFieldValue(`question_id_${question.id}`, e.target.value);
                                                         this.handleChangeSubmit(`question_id_${question.id}`,e.target.value)
-                                                      //  this.setState({ showImg: !this.state.showImg })
                                                         if(qIndex == qlength -1){
                                                             this.showRestriction('y');
                                                         } 
                                                     }}
                                                     checked={values[`question_id_${question.id}`] == 'y' ? true : false}
                                                 />
-                                                    <span className="checkmark " /><span className="fs-14" > Yes</span>                      
+                                                    <span className="checkmark " /><span className="fs-14"> Yes</span>                      
                                                 </label>
                                             </div>
 
@@ -327,31 +325,6 @@ class MedicalDetails extends Component {
                                         </FormGroup>
 
                                     </div>
-
-                                    {this.state.showImg ?
-                                    <div class="gender">
-                                    
-                                    <input type="checkbox"
-                                    name="cigrate_smokeSelf"
-                                    value="1" id="cigrate_smokeSelf"/>
-                                    <label for="cigrate_smokeSelf"> <img src={require('../../assets/images/self.svg')} alt=""/>Self</label>
-                                    
-
-                                    
-                                    <input type="checkbox"
-                                    name="cigrate_smokeSpouse"
-                                    value="1" id="cigrate_smokeSpouse"/>
-                                    <label for="cigrate_smokeSpouse"> <img src={require('../../assets/images/Spouse.svg')} alt=""/>Spouse</label>
-                                    
-
-                                    
-                                    <input type="checkbox"
-                                    name="cigrate_smokeChild_1"
-                                    value="1" id="cigrate_smokeChild_1"/>
-                                    <label for="cigrate_smokeChild_1"> <img src={require('../../assets/images/kids-boy.svg')} alt=""/>Child</label>
-                                    
-                                        </div>
-                                        : null}
                                 </div>
                                 )) 
                             )}}
