@@ -54,19 +54,19 @@ const validateAddress =  Yup.object().shape({
     address1: Yup.string()
         .required(function() {
             return "Enter plot number."
-        }).matches(/^([0-9A-Z\s\-\+\(\)]*)$/, function() {
+        }).matches(/^([0-9A-Za-z\s\-\+\(\)]*)$/, function() {
             return "Invalid plot number"
         }),
     address2: Yup.string()
         .required(function() {
             return "Enter building name / number"
-        }).matches(/^([0-9A-Z\s\-\+\(\)]*)$/, function() {
+        }).matches(/^([0-9A-Za-z\s\-\+\(\)]*)$/, function() {
             return "Invalid building name / number"
         }),
     address3: Yup.string()
         .required(function() {
             return "Enter street name"
-        }).matches(/^([A-Z\s\-\+\(\)]*)$/, function() {
+        }).matches(/^([A-Za-z\s\-\+\(\)]*)$/, function() {
             return "Invalid street name"
         }),
     email: Yup.string()
@@ -586,7 +586,6 @@ class Address extends Component {
                                                                     peekPreviousYear
                                                                     showMonthDropdown
                                                                     showYearDropdown
-                                                                    readOnly = {true}
                                                                     dropdownMode="select"
                                                                     maxDate={new Date()}
                                                                     minDate={new Date(1/1/1900)}
@@ -699,9 +698,9 @@ class Address extends Component {
                                                                     autoComplete="off"
                                                                     onFocus={e => this.changePlaceHoldClassAdd(e)}
                                                                     onBlur={e => this.changePlaceHoldClassRemove(e)}
-                                                                    value={values.address1.toUpperCase()}
+                                                                    value={values.address1}
                                                                     onChange= {(e)=> 
-                                                                    setFieldValue('address1', e.target.value.toUpperCase())
+                                                                    setFieldValue('address1', e.target.value)
                                                                     }
                                                                     
                                                                 />
@@ -721,9 +720,9 @@ class Address extends Component {
                                                                     autoComplete="off"
                                                                     onFocus={e => this.changePlaceHoldClassAdd(e)}
                                                                     onBlur={e => this.changePlaceHoldClassRemove(e)}
-                                                                    value={values.address2.toUpperCase()}
+                                                                    value={values.address2}
                                                                     onChange= {(e)=> 
-                                                                    setFieldValue('address2', e.target.value.toUpperCase())
+                                                                    setFieldValue('address2', e.target.value)
                                                                     }
                                                                 />
                                                                 {errors.address2 && touched.address2 ? (
@@ -742,9 +741,9 @@ class Address extends Component {
                                                                     autoComplete="off"
                                                                     onFocus={e => this.changePlaceHoldClassAdd(e)}
                                                                     onBlur={e => this.changePlaceHoldClassRemove(e)}
-                                                                    value={values.address3.toUpperCase()}
+                                                                    value={values.address3}
                                                                     onChange= {(e)=> 
-                                                                    setFieldValue('address3', e.target.value.toUpperCase())
+                                                                    setFieldValue('address3', e.target.value)
                                                                     }
                                                                 />
                                                                 {errors.address3 && touched.address3 ? (

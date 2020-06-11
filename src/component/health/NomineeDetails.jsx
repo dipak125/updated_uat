@@ -354,7 +354,7 @@ class NomineeDetails extends Component {
                                                         </FormGroup>
                                                     </Col>
                                                 </Row>
-                                                {appointeeFlag || NomineeDetails.is_appointee == '1' ? 
+                                                {appointeeFlag || (NomineeDetails && NomineeDetails.is_appointee == '1') ? 
                                                     <div>
                                                     <div className="d-flex justify-content-left carloan m-b-25">
                                                         <h4> Appointee  Details</h4>
@@ -381,7 +381,7 @@ class NomineeDetails extends Component {
                                                                         }}
                                                                     selected={values.appointee_dob}
                                                                 />
-                                                                {errors.appointappointee_dobeeDob ? (
+                                                                {errors.appointee_dob ? (
                                                                     <span className="errorMsg">{errors.appointee_dob}</span>
                                                                 ) : null}
                                                             </FormGroup>

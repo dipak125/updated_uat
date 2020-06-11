@@ -190,8 +190,6 @@ class PolicyDetails extends Component {
   render() {
     const { productId } = this.props.match.params;
     const { fulQuoteResp, error, show } = this.state;
-
-    console.log("fulQuoteResp ", fulQuoteResp)
     const items =
       fulQuoteResp &&
       fulQuoteResp.PolicyCustomerList &&
