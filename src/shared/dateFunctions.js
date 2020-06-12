@@ -63,19 +63,18 @@ export class PersonAge {
         var ageDay = calculateDay - birthDay;
 
            // ageMonth
-            age = parseInt(age) - 1;
-            if(age === 0){
-                ageMonth = parseInt(ageMonth) - 1
-               /// ageMonth=parseFloat('0.'+ageMonth);
+            if(age === 0 && ageDay >= 0){
+                ageMonth = parseInt(ageMonth)
             } 
+            else if(age === 0 && ageDay < 0) {
+                ageMonth = parseInt(ageMonth) -1
+            }
             else{
                 if(age > 0){ 
                     ageMonth = 3 
                 }
             }
           
-        
-        
         return ageMonth;
     }
 

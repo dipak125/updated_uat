@@ -43,7 +43,11 @@ const initialValues = {
     area: "",
     state: "",
     eIA: "",
-    eia_account_no:""
+    eia_account_no:"",
+    proposerName: "",
+    proposerLname: "",
+    proposerDob: "",
+    proposerGender: ""
     };
 
 const validateAddress =  Yup.object().shape({
@@ -109,10 +113,10 @@ const validateAddress =  Yup.object().shape({
         .required(function() {
             return "Select area"
         }),
-    /*state: Yup.string()
-        .required(function() {
-            return "Enter state"
-        }),*/
+    // state: Yup.string()
+    //     .required(function() {
+    //         return "Enter state"
+    //     }),
     eIA: Yup.string()
         .required(function() {
             return "Select eIA option"
@@ -188,7 +192,96 @@ const validateAddress =  Yup.object().shape({
             return "EIA number should be maximum 13 digits"
         }),
         othewise: Yup.string()
-    })
+    }),
+    proposerName: Yup.string(function() {
+        return "Please enter proposer name"
+        }).notRequired(function() {
+            return "Please enter proposer name"
+        })
+        .min(3, function() {
+            return "Name must be minimum 3 chracters"
+        })
+        .max(40, function() {
+            return "Name must be maximum 40 chracters"
+        })
+        .matches(/^[A-Za-z][A-Za-z\s\-']*[A-Za-z\s]$/, function() {
+            return "Please enter valid name"
+        }).test(
+        "proposerAsInsured",
+        function() {
+            return "Please enter proposer name"
+        },
+        function (value) {
+            if (this.parent.proposerAsInsured == '0' && !value) {   
+                return false;    
+            }
+            return true;
+    }),
+    proposerLname: Yup.string(function() {
+        return "Please enter proposer last name"
+        }).notRequired(function() {
+            return "Please enter proposer last name"
+        })
+        .min(3, function() {
+            return "Name must be minimum 3 chracters"
+        })
+        .max(40, function() {
+            return "Name must be maximum 40 chracters"
+        })
+        .matches(/^[A-Za-z][A-Za-z\s\-']*[A-Za-z\s]$/, function() {
+            return "Please enter valid name"
+        }).test(
+        "proposerAsInsured",
+        function() {
+            return "Please enter proposer last name"
+        },
+        function (value) {
+            if (this.parent.proposerAsInsured == '0' && !value) {   
+                return false;    
+            }
+            return true;
+    }),
+    proposerDob: Yup.date()
+        .notRequired( function() {
+        return "Please enter proposer date of birth"
+        }).test(
+        "proposerAsInsured",
+        function() {
+            return "Please enter proposer date of birth"
+        },
+        function (value) {
+            if (this.parent.proposerAsInsured == '0' && !value) {   
+                return false;    
+            }
+            return true;
+    }).test(
+        "18YearsChecking",
+        function() {
+            return "Proposer age should be more than 18 years"
+        },
+        function (value) {
+            const ageObj = new PersonAge();
+            if (value) {
+                const age_Obj = new PersonAge();
+                return age_Obj.whatIsMyAge(value) >= 18;
+            }
+            return true;
+    }),
+    proposerGender: Yup.string().notRequired(function() {
+        return "Please select gender"
+        }).matches(/^[MmFf]$/, function() {
+        return "Please select valid gender"
+    }).test(
+        "proposerAsInsured",
+        function() {
+            return "Please select proposer gender"
+        },
+        function (value) {
+            if (this.parent.proposerAsInsured == '0' && !value) {   
+                return false;    
+            }
+            return true;
+    }),
 
 });
 
@@ -261,8 +354,9 @@ class Address extends Component {
             })
             .catch(function (error) {
                 // handle error
-                this.props.loadingStop();
+                // this.props.loadingStop();
             })
+            this.props.loadingStop();
     }
 
     fetchPrevAreaDetails=(addressDetails)=>{
@@ -380,7 +474,16 @@ class Address extends Component {
             pincode:values.pincode,
             state:values.state,
         })
-        formData.append('communication_address',JSON.stringify(address_object));        
+        formData.append('communication_address',JSON.stringify(address_object));       
+        formData.append('panNo',values.panNo);
+        formData.append('phoneNo',values.phoneNo);
+        formData.append('email',values.email); 
+
+        formData.append('proposerName',values.proposerName);
+        formData.append('proposerLname',values.proposerLname);
+        formData.append('proposerDob',moment(values.proposerDob).format("YYYY-MM-DD") ); 
+        formData.append('proposerGender',values.proposerGender); 
+
         if(values.eIA == 1){
             formData.append('eia_account_no',values.eia_account_no)
         }        
@@ -451,8 +554,13 @@ class Address extends Component {
             pincode: addressDetails && addressDetails.pincode ? addressDetails.pincode: "",
             area: addressDetails && addressDetails.area ? addressDetails.area: "",
             state: addressDetails && addressDetails.state ? addressDetails.state:"",
-            eIA: is_eia_account ?  is_eia_account : "",
-            eia_account_no : policy_holder && policy_holder.eia_no ?  policy_holder.eia_no : ''
+            eIA: is_eia_account,
+            eia_account_no : policy_holder && policy_holder.eia_no ?  policy_holder.eia_no : '',
+
+            proposerName : policy_holder && policy_holder.first_name ?  policy_holder.first_name : '',
+            proposerLname : policy_holder && policy_holder.last_name ?  policy_holder.last_name : '',
+            proposerDob : policy_holder && policy_holder.dob ?  new Date(policy_holder.dob) : '',
+            proposerGender : policy_holder && policy_holder.gender ?  policy_holder.gender : ''
         });
 
         const {productId} = this.props.match.params
@@ -518,11 +626,118 @@ class Address extends Component {
                                                 </div>
                                             </div>
                                         </div>
+                                        {newInitialValues.proposerAsInsured == '0' ? 
+                                        <div>
+                                        <div className="d-flex justify-content-left carloan m-b-25">
+                                            <h4> Proposer Details</h4>
+                                        </div>
+                                        <div className="d-flex justify-content-left prsnlinfo">
+                                            <div className="W12">
+                                                Proposer
+                                                <Field
+                                                    name="name"
+                                                    type="hidden"
+                                                    value={values.name}
+                                                />
+                                                <Field
+                                                    name="name"
+                                                    type="hidden"
+                                                    value={values.name}
+                                                />
+                                            </div>
+                                            <Row>
+                                            <Col sm={12} md={3} lg={3}>
+                                                <FormGroup>
+                                                    <div className="insurerName">
+                                                        <Field
+                                                            name="proposerName"
+                                                            type="text"
+                                                            placeholder="First Name"
+                                                            autoComplete="off"
+                                                            onFocus={e => this.changePlaceHoldClassAdd(e)}
+                                                            onBlur={e => this.changePlaceHoldClassRemove(e)}
+                                                            value = {values.proposerName}
+                                                        />
+                                                            {errors.proposerName && touched.proposerName ? (
+                                                        <span className="errorMsg">{errors.proposerName}</span>
+                                                        ) : null}
+                                                    </div>
+                                                </FormGroup>
+                                            </Col>
+                                            <Col sm={12} md={3} lg={3}>
+                                                <FormGroup>
+                                                    <div className="insurerName">
+                                                        <Field
+                                                                name="proposerLname"
+                                                                type="text"
+                                                                placeholder="Last Name"
+                                                                autoComplete="off"
+                                                                onFocus={e => this.changePlaceHoldClassAdd(e)}
+                                                                onBlur={e => this.changePlaceHoldClassRemove(e)}
+                                                                value = {values.proposerLname}                                                                            
+                                                        />
+                                                            {errors.proposerLname && touched.proposerLname? (
+                                                        <span className="errorMsg">{errors.proposerLname}</span>
+                                                        ) : null}
+                                                    </div>
+                                                </FormGroup>
+                                            </Col>
+                                            <Col sm={12} md={3} lg={3}>
+                                                <FormGroup>
+                                                    <DatePicker
+                                                        name="proposerDob"
+                                                        minDate={new Date()}
+                                                        dateFormat="dd MMM yyyy"
+                                                        placeholderText="DOB"
+                                                        peekPreviousMonth
+                                                        peekPreviousYear
+                                                        showMonthDropdown
+                                                        showYearDropdown
+                                                        dropdownMode="select"
+                                                        maxDate={new Date()}
+                                                        minDate={new Date(1/1/1900)}
+                                                        className="datePckr"
+                                                        selected={values.proposerDob }
+                                                        onChange={(val) => {
+                                                            setFieldTouched("proposerDob");
+                                                            setFieldValue("proposerDob", val);
+                                                            }}
+                                                            
+                                                        //selected={moment(values.family_members[index].dob).format("dd MMM yyyy")}
+                                                        
+                                                    />
+                                                    {errors.proposerDob && touched.proposerDob ? (
+                                                        <span className="errorMsg">{errors.proposerDob}</span>
+                                                    ) : null}  
+                                                </FormGroup>
+                                            </Col>
+                                            <Col sm={12} md={3} lg={3}>
+                                                <FormGroup>
+                                                    <div className="formSection">
+                                                        <Field
+                                                            name="proposerGender"
+                                                            component="select"
+                                                            autoComplete="off"                                                                        
+                                                            className="formGrp"
+                                                        >
+                                                        <option value="">Select gender</option>
+                                                            <option value="m">Male</option>
+                                                            <option value="f">Female</option>
+                                                        </Field>     
+                                                        {errors.proposerGender && touched.proposerGender ? (
+                                                        <span className="errorMsg">{errors.proposerGender}</span>
+                                                    ) : null}                   
+                                                    </div>
+                                                </FormGroup>
+                                            </Col>
+                                            </Row>   
+                                        </div>
+                                        </div>
+                                         : null
+                                        } 
                                         <div className="d-flex justify-content-left carloan m-b-25">
                                             <h4> Tell us more about the Insured Members</h4>
                                         </div>
-
-                                       
                                                         
                                         <Row>
                                             <Col sm={12} md={9} lg={9}>
@@ -598,6 +813,7 @@ class Address extends Component {
                                                                     maxDate={new Date()}
                                                                     minDate={new Date(1/1/1900)}
                                                                     className="datePckr"
+                                                                    disabled = {true}
                                                                     selected={values.family_members[index].dob ? new Date(values.family_members[index].dob):new Date()}
                                                                     onChange={(val) => {
                                                                         setFieldTouched(`family_members.${index}.dob`);
@@ -620,6 +836,7 @@ class Address extends Component {
                                                                         component="select"
                                                                         autoComplete="off"                                                                        
                                                                         className="formGrp"
+                                                                        disabled = {true}
                                                                     >
                                                                     <option value="">Select gender</option>
                                                                         <option value="m">Male</option>
@@ -773,6 +990,12 @@ class Address extends Component {
                                                                     onBlur={e => this.changePlaceHoldClassRemove(e)}
                                                                     onKeyUp={e=> this.fetchAreadetails(e)}
                                                                     value={values.pincode}
+                                                                    onInput= {(e)=> {
+                                                                        setFieldTouched("state");
+                                                                        setFieldTouched("pincode");
+                                                                        setFieldValue("pincode", e.target.value);
+                                                                        setFieldValue("state", stateName ? stateName[0] : values.state);
+                                                                    }}
                                                                 />
                                                                 {errors.pincode && touched.pincode ? (
                                                                 <span className="errorMsg">{errors.pincode}</span>
@@ -814,6 +1037,8 @@ class Address extends Component {
                                                                     onFocus={e => this.changePlaceHoldClassAdd(e)}
                                                                     onBlur={e => this.changePlaceHoldClassRemove(e)}
                                                                     value={stateName ? stateName[0] : values.state} 
+                                                                    disabled = {true}
+                                                                    
                                                                 />
                                                                 {errors.state && touched.state ? (
                                                                 <span className="errorMsg">{errors.state}</span>

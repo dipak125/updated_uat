@@ -133,20 +133,7 @@ const validateFamilyMembers  = Yup.object().shape({
 
     dob_3: Yup.string().when(['looking_for_3'], {
         is: looking_for_3 => looking_for_3 == 'child2',
-        then: Yup.string().required('Child 2 DOB field is required').test(
-            "3monthsChecking",
-            function() {
-                return "Age sgould be minium 3 months"
-            },
-            function (value) {
-                if (value) {
-                    const ageObj = new PersonAge();
-                    console.log("YYYYYYYYYYYYYYYYYYY=====>",ageObj.whatIsMyAgeMonth(value))
-                    return ageObj.whatIsMyAgeMonth(value) >=3;
-                }
-                return true;
-            }
-        ),
+        then: Yup.string().required('Child 2 DOB field is required'),
         othewise: Yup.string()
     }),
     child2Gender: Yup.string().when(['looking_for_3'], {
@@ -157,20 +144,7 @@ const validateFamilyMembers  = Yup.object().shape({
 
     dob_4: Yup.string().when(['looking_for_4'], {
         is: looking_for_4 => looking_for_4 == 'child3',
-        then: Yup.string().required('Child 3 DOB field is required').test(
-            "3monthsChecking",
-            function() {
-                return "Age sgould be minium 3 months"
-            },
-            function (value) {
-                if (value) {
-                    const ageObj = new PersonAge();
-                    console.log("YYYYYYYYYYYYYYYYYYY=====>",ageObj.whatIsMyAgeMonth(value))
-                    return ageObj.whatIsMyAgeMonth(value) >=3;
-                }
-                return true;
-            }
-        ),
+        then: Yup.string().required('Child 3 DOB field is required'),
         othewise: Yup.string()
     }),
     child3Gender: Yup.string().when(['looking_for_4'], {

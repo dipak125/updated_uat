@@ -155,7 +155,7 @@ ul.navPan li a span{ margin-bottom:8px; display: block; }
 
 
 .brand-table {background-color: #ffffff; border-radius: 16.5px; overflow: hidden; max-width: 670px; border-right: 1px solid #D4D4D4; margin-top: 30px; margin-bottom: 50px;}
-.brand-table td {border: 1px solid #D4D4D4; padding: 15px 17px; cursor: pointer;}
+.brand-table td {border: 1px solid #D4D4D4; padding: 15px 17px; cursor: pointer; text-align: center;}
 .brand-table td:hover {transform: scale(1); box-shadow: 0 3px 16px rgba(0, 0, 0, .26);}
 
 .backBtn {padding: 10px 45px; color: #AEAEAE; border: 1px solid #AEAEAE; border-radius: 23px; background-color: #ffffff; margin-right: 15px; outline: none !important;}

@@ -217,7 +217,7 @@ class SelectBrand extends Component {
                                         return (
                                             <Form>
                                                 <section className="brand">
-                                                    <div className="brand-bg pd-30">
+                                                    <div className="brand-bg">
                                                         <div className="d-flex justify-content-left">
                                                             <div className="brandhead">
                                                                 <h4>Please select  your car brand </h4>
@@ -300,7 +300,7 @@ class SelectBrand extends Component {
                                                                 </Row>
 
                                                                 <Row>
-                                                                    <Col sm={12} md={4} lg={4}>
+                                                                    <Col sm={12} md={5} lg={5}>
                                                                         <FormGroup>
                                                                             <div className="fs-18">
                                                                                 Registration City
@@ -337,7 +337,7 @@ class SelectBrand extends Component {
                                                                 </Row>
 
                                                                 <Row>
-                                                                    <Col sm={12} md={4} lg={4}>
+                                                                    <Col sm={12} md={11} lg={4}>
                                                                         <FormGroup>
 
                                                                             <DatePicker
@@ -351,7 +351,7 @@ class SelectBrand extends Component {
                                                                                 showMonthDropdown
                                                                                 showYearDropdown
                                                                                 dropdownMode="select"
-                                                                                className="datePckr"
+                                                                                className="datePckr inputfs12"
                                                                                 selected={values.prevStartDate}
                                                                                 onChange={(val) => {
                                                                                     setFieldTouched('prevStartDate');
@@ -361,7 +361,7 @@ class SelectBrand extends Component {
                                                                         </FormGroup>
                                                                     </Col>
 
-                                                                    <Col sm={12} md={4} lg={4}>
+                                                                    <Col sm={12} md={11} lg={4}>
                                                                         <FormGroup>
                                                                             <DatePicker
                                                                                 name="prevEndDate"
@@ -372,7 +372,7 @@ class SelectBrand extends Component {
                                                                                 showMonthDropdown
                                                                                 showYearDropdown
                                                                                 dropdownMode="select"
-                                                                                className="datePckr"
+                                                                                className="datePckr inputfs12"
                                                                                 selected={values.prevEndDate}
                                                                                 onChange={(val) => {
                                                                                     setFieldTouched('prevEndDate');
@@ -381,14 +381,14 @@ class SelectBrand extends Component {
                                                                             />
                                                                         </FormGroup>
                                                                     </Col>
-                                                                    <Col sm={12} md={4} lg={4}>
+                                                                    <Col sm={12} md={11} lg={3}>
                                                                         <FormGroup>
                                                                             <div className="formSection">
                                                                                 <Field
                                                                                     name='policyType'
                                                                                     component="select"
                                                                                     autoComplete="off"
-                                                                                    className="formGrp"
+                                                                                    className="formGrp inputfs12"
                                                                                     value={values.policyType}
                                                                                 >
                                                                                     <option value="">Select Policy Type</option>
@@ -449,7 +449,7 @@ class SelectBrand extends Component {
                                                                         </FormGroup>
                                                                     </Col>
 
-                                                                    <Col sm={12} md={6} lg={6}>
+                                                                    <Col sm={12} md={5} lg={5}>
                                                                         <FormGroup>
                                                                             <div className="insurerName">
                                                                                 <Field
@@ -479,7 +479,7 @@ class SelectBrand extends Component {
                                                                 </Row>
 
                                                                 <Row>
-                                                                    <Col sm={6}>
+                                                                    <Col sm={6} md={7}>
                                                                         <FormGroup>
                                                                             <div className="d-inline-flex m-b-35">
                                                                                 <div className="p-r-25">
@@ -652,49 +652,35 @@ class SelectBrand extends Component {
 
                                                             <Col sm={12} md={3}>
                                                                 <div className="regisBox">
-                                                                    <Row className=" m-b-25">
-                                                                        <Col sm={12} md={6}>
-                                                                            <div className="txtRegistr resmb-15">Registration No.
+                                                                <div className="d-flex justify-content-between flex-lg-row flex-md-column m-b-25">
+                                                                   
+                                                                            <div className="txtRegistr resmb-15">Registration No.<br/>
                                                         {motorInsurance && motorInsurance.registration_no}</div>
-                                                                        </Col>
+                                                                       
+                                                                           <div> <button className="rgistrBtn" onClick={this.registration.bind(this, productId)}>Edit</button></div>
+                                                                            </div>
+                                                                      
 
-                                                                        <Col sm={12} md={6} className="text-right">
-                                                                            <button className="rgistrBtn" onClick={this.registration.bind(this, productId)}>Edit</button>
-                                                                        </Col>
-
-                                                                    </Row>
-
-                                                                    <Row className="m-b-25">
-                                                                        <Col sm={12} md={6}>
+                                                                    
+                                                                        <div className="d-flex justify-content-between flex-lg-row flex-md-column m-b-25">
                                                                             <div className="txtRegistr resmb-15">Car Brand
                                                            - {selectedBrandDetails && selectedBrandDetails.name}</div>
-                                                                        </Col>
-                                                                        <Col sm={12} md={6} className="text-right">
-                                                                            <button className="rgistrBtn">Edit</button>
-                                                                        </Col>
-
-                                                                        {/*<Col sm={12} md={6}>
-                                                        <button className="rgistrBtn">Edit</button>
-                                                    </Col>*/}
-                                                                    </Row>
-
-                                                                    <Row className=" m-b-25">
-                                                                        <Col sm={12} md={6}>
+                                                                        
+                                                           <div> <button className="rgistrBtn">Edit</button></div>
+                                                                            </div>
+                                                                       
+                                                                        <div className="d-flex justify-content-between flex-lg-row flex-md-column m-b-25">
                                                                             <div className="txtRegistr">Car Model<br />
                                                                                 <strong>4S CHAMPION</strong></div>
-                                                                        </Col>
-
-                                                                        <Col sm={12} md={6} className="text-right">
-                                                                            <button className="rgistrBtn">Edit</button>
-                                                                        </Col>
-                                                                    </Row>
-
-                                                                    <Row className="m-b-25">
-                                                                        <Col sm={12} md={6}>
+                                                                        
+                                                                                <div> <button className="rgistrBtn">Edit</button></div>
+                                                                            </div>
+                                                                     
+                                                                        <div className="d-flex justify-content-between flex-lg-row flex-md-column m-b-25">
                                                                             <div className="txtRegistr">Fuel Type<br />
                                                                                 <strong>PETROL </strong></div>
-                                                                        </Col>
-                                                                    </Row>
+                                                                       
+                                                                </div>
                                                                 </div>
                                                             </Col>
                                                         </Row>

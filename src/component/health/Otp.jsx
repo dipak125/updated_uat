@@ -17,9 +17,31 @@ class Otp extends Component {
         seconds: 10
       };
 
-    handleSubmit = (values) => {
-        this.getOtp()
-        const {otp} = this.state
+    checkOtp = (values) => {
+        this.props.loadingStart();
+        const formData = new FormData();
+        formData.append('policy_holder_id', localStorage.getItem('policyHolder_id'));
+        formData.append("menumaster_id", '2');
+        axios
+          .post('/otp/check-status', formData)
+          .then((res) => {
+            if(res.data.error == false) {
+                this.handleSubmit(values, res.data.data.otp)
+            } 
+            else {
+                this.setState({ otp: "", errorMsg: res.data.msg });
+            } 
+            this.props.loadingStop();         
+          })
+          .catch((err) => {
+            this.setState({
+              otp: "",
+            });
+            this.props.loadingStop();
+          });
+    };
+
+    handleSubmit = (values,otp) => {
         let otp_enter = Number(values.otp1+values.otp2+values.otp3+values.otp4+values.otp5)
         if(otp_enter == Number(otp)){
             this.props.reloadPage(otp_enter);
@@ -115,7 +137,7 @@ class Otp extends Component {
             //     </div>
             // </div>
            
-                <Formik initialValues={initialValue} onSubmit={this.handleSubmit}
+                <Formik initialValues={initialValue} onSubmit={this.checkOtp}
                     // validationSchema={validateNominee}
                     >
                     {({ values, errors, setFieldValue, setFieldTouched, isValid, isSubmitting, touched }) => {

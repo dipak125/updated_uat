@@ -35,6 +35,13 @@ class Table extends Component {
             this.setState({
                 motor_list: res.data.data
             });
+            localStorage.removeItem('policyHolder_id');
+            localStorage.removeItem('policyHolder_refNo');
+            sessionStorage.removeItem('pan_data');
+            sessionStorage.removeItem('email_data');
+            sessionStorage.removeItem('proposed_insured');
+            sessionStorage.removeItem('display_looking_for');
+            sessionStorage.removeItem('display_dob');
             this.props.loadingStop();
           })
           .catch(err => {

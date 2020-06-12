@@ -19,6 +19,7 @@ import { connect } from "react-redux";
 // import { Formik, Form, Field, ErrorMessage, FieldArray } from 'formik'
 import moment from "moment";
 import Otp from "./Otp";
+import swal from 'sweetalert';
 
 const genderArr = {
   M: "Male",
@@ -170,24 +171,18 @@ class PolicyDetails extends Component {
     axios
       .post(`/callIssueQuoteMod`, formData)
       .then((res) => {
-        if (res.data) {
+        if (res.data.PolicyNo) {
           this.setState({
             purchaseData: res.data,
             error1: [],
           });
-          // localStorage.removeItem("policyHolder_id");
-          // localStorage.removeItem("policyHolder_refNo");
-          // sessionStorage.removeItem('pan_data');
-          // sessionStorage.removeItem('email_data');
-          // sessionStorage.removeItem('proposed_insured');
-          // sessionStorage.removeItem('display_looking_for');
-          // sessionStorage.removeItem('display_dob');
           this.policySummery(res.data.PolicyNo);
         } else {
           this.setState({
             purchaseData: [],
             error1: res.data,
           });
+          swal("Thank you for showing your interest for buying product.Due to some reasons, we are not able to issue the policy online.Please call 180 22 1111");
         }
         this.props.loadingStop();
       })
