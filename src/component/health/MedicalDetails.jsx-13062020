@@ -58,9 +58,7 @@ class MedicalDetails extends Component {
         family_members:[],
         tempSelectedFamily:[],
         selectedQuestion:[],
-        famArr:[],
-        clickCheckbox:false,
-        selected_family_members:[]
+        famArr:[]
       };
 
     sumInsured = (productId) => {
@@ -95,7 +93,10 @@ class MedicalDetails extends Component {
             })           
         );
             console.log("SSSSSSSSSSS=======>",newShowImage)
-      
+       this.setState({
+        showImage:newShowImage
+       })   
+
        formData.append('question_id', question_id[0]);
        formData.append('answer', value);
        selected_answer.push(value);
@@ -103,12 +104,6 @@ class MedicalDetails extends Component {
        selected_question = this.state.selected_question;
        selected_question.push(question_id[0]);
        selected_question = [...new Set(selected_question)];
-
-       this.setState({
-            showImage:newShowImage,
-            selected_question,
-            selected_answer
-      })
 
 
        let familyMembers=document.getElementsByClassName(`familyMembers${question_id[0]}`)
@@ -311,49 +306,21 @@ class MedicalDetails extends Component {
     }
     
     setAnswer = (e) =>{
-        let selected_answer = [];
-        let selected_question = [];    
-        let selected_family_members = [];   
         const formData = new FormData(); 
         console.log('aaaassss====>',e.target)
         
         console.log('aaaa====>',e.target.checked)
         let classId = e.target.className[e.target.className.length-1]
-        
+        let familyMembers=document.getElementsByClassName(e.target.className)
         formData.append('question_id',classId);
         formData.append('answer','y');
         let cnt = 0;
 
             let tempSelectedFamily = this.state.tempSelectedFamily;
-            console.log('11111222===>',document.getElementsByClassName(`${e.target.id}:checkbox:checked`))
+            console.log('11111222===>',document.getElementsByClassName(`${e.target.className}:checkbox:checked`))
 
-            console.log("aaaaa========>",document.getElementById(`${e.target.id}:checkbox:checked`)!=null);
-            if(document.getElementById(`${e.target.id}:checkbox:checked`)!=null){
-                this.setState({
-                    clickCheckbox:false
-                })
-                document.getElementsByClassName(`${e.target.id}`).checked = false
-            }
-            else{
-                this.setState({
-                    clickCheckbox:true
-                })
-                document.getElementsByClassName(`${e.target.id}`).checked = true
-            }
-            selected_answer.push('y');
-            selected_answer = [...new Set(selected_answer)];
-            selected_question = this.state.selected_question;
-            selected_question.push(classId);
-            selected_question = [...new Set(selected_question)];
-
-            this.setState({
-                    selected_question,
-                    selected_answer
-            })
-
-
-            let familyMembers=document.getElementsByClassName(e.target.className)
-            console.log("Family Members =====> ",familyMembers);
+       
+            console.log('111112222222===>',document.getElementsByClassName(`${e.target.className}:checkbox:checked`)!=null)
            // document.getElementsByClassName(`${e.target.className}`).cheked  =  true 
            // let familyMembers = document.getElementsByClassName(`${e.target.className}`);
            formData.append('policy_holder_id', localStorage.getItem('policyHolder_id'));
@@ -361,22 +328,13 @@ class MedicalDetails extends Component {
            if(familyMembers.length>0){
             for(let i=0;i<familyMembers.length;i++){
                 if(familyMembers[i].checked){
-                     formData.append(`family_member_ids[${i}]`,familyMembers[i].value);   
-                     selected_family_members.push(familyMembers[i].value)                                         
+                     formData.append(`family_member_ids[${i}]`,familyMembers[i].value);                                            
                     }
                     else{
-                        let rand_val = Math.floor(Math.random() * 6) <1 ? 1: (Math.floor(Math.random() * 6)+1)
-                        formData.append(`family_member_ids[${i}]`,rand_val);                        
-                        selected_family_members.push(rand_val) 
+                        formData.append(`family_member_ids[${i}]`,Math.floor(Math.random() * 6) <1 ? 1: (Math.floor(Math.random() * 6)+1));                        
                     }                                                 
                 }
            }
-           selected_family_members=[...new Set(selected_family_members)];
-           this.setState({
-                selected_question,
-                selected_answer,
-                selected_family_members
-            })
 
            this.props.loadingStart();
                     axios
@@ -385,9 +343,6 @@ class MedicalDetails extends Component {
                         this.setState({
                             message: res.data.msg
                         });
-                       // this.getQuestionList();
-                       // this.getPolicyHolderDetails();
-                       window.location.reload(true)
                         this.props.loadingStop();
                         })
                         .catch(err => {
@@ -397,7 +352,9 @@ class MedicalDetails extends Component {
                         this.props.loadingStop();
                         });
 
-           
+           if(count==familyMembers.length){
+            swal('Please select a family member') ;
+        }      
            
             
   
@@ -425,7 +382,7 @@ class MedicalDetails extends Component {
     
     render() {
         const {productId } = this.props.match.params
-        const {questionList, question_answer, flag,selected_question,selected_answer,showImg,family_members,famArr,selected_family_members} = this.state
+        const {questionList, question_answer, flag,selected_question,selected_answer,showImg,family_members,famArr} = this.state
       
        console.log("SHOW IMAGE DATA=======>",question_answer)
        // let showImage = {}
@@ -567,9 +524,7 @@ console.log("FORM ARRAY----------=====>",famArr)
                                         </FormGroup>
 
                                     </div>
-                                       {
-                                          console.log("HHHHHHHHIIIIIOOOOO==============>",values[`family_members_${question.id}`]) 
-                                       }             
+
                                     {(values[`question_id_${question.id}`] =='y' && values[`family_members_${question.id}`]) ||(this.state.showImage && this.state.showImage[qIndex].status == true)  ?
                                     <div class="gender">
                                     {family_members && family_members.map((resource,index)=>(
@@ -580,8 +535,6 @@ console.log("FORM ARRAY----------=====>",famArr)
                                             className={`familyMembers${question.id}`}
                                             name={`family_members.${question.id}.${index}.${resource.relation_with}`}
                                             value={resource.id} id={`family_members.${question.id}.${index}.${resource.relation_with}`}
-                                            checked = {values[`question_id_${question.id}`] =='y' ? (values[`family_members_${question.id}`] && values[`family_members_${question.id}`].includes(resource.id.toString())?'checked':''):''}
-                                            //checked = {values[`question_id_${question.id}`] =='y' ? (values[`family_members_${question.id}`] && values[`family_members_${question.id}`].includes(resource.id)?'checked':''):''}
                                            // checked = {this.state.famArr && this.state.famArr[question.id].indexOf(resource.id)==-1}
                                             //checked = {values[`family_members_${question.id}`] && values[`family_members_${question.id}`].length && values[`family_members_${question.id}`].indexOf(resource.id) && (values[`question_id_${question.id}`]=='y') ? 'checked':''}
                                             onClick = {(e) => {
@@ -598,7 +551,6 @@ console.log("FORM ARRAY----------=====>",famArr)
                                             className={`familyMembers${question.id}`}
                                             name={`family_members.${question.id}.${index}.${resource.relation_with}`}
                                             value={resource.id} id={`family_members.${question.id}.${index}.${resource.relation_with}`}
-                                            checked = {values[`question_id_${question.id}`] =='y' ? (values[`family_members_${question.id}`] && values[`family_members_${question.id}`].includes(resource.id.toString())?'checked':''):''}
                                             //checked = {values[`family_members_${question.id}`] && values[`family_members_${question.id}`].length && values[`family_members_${question.id}`].indexOf(resource.id) && (values[`question_id_${question.id}`]=='y')} 
                                             onClick = {(e) => {
                                                 this.setAnswer(e)
@@ -614,7 +566,6 @@ console.log("FORM ARRAY----------=====>",famArr)
                                             className={`familyMembers${question.id}`}
                                             name={`family_members.${question.id}.${index}.${resource.relation_with}`}
                                             value={resource.id} id={`family_members.${question.id}.${index}.${resource.relation_with}`}
-                                            checked = {values[`question_id_${question.id}`] =='y' ? (values[`family_members_${question.id}`] && values[`family_members_${question.id}`].includes(resource.id.toString())?'checked':''):''}
                                             //checked = {values[`family_members_${question.id}`] && values[`family_members_${question.id}`].length && values[`family_members_${question.id}`].indexOf(resource.id) && (values[`question_id_${question.id}`]=='y')}
                                             onClick = {(e) => {
                                                 this.setAnswer(e)
@@ -633,7 +584,6 @@ console.log("FORM ARRAY----------=====>",famArr)
                                             className={`familyMembers${question.id}`}
                                             name={`family_members.${question.id}.${index}.${resource.relation_with}`}
                                             value={resource.id} id={`family_members.${question.id}.${index}.${resource.relation_with}`}
-                                            checked = {values[`question_id_${question.id}`] =='y' ? (values[`family_members_${question.id}`] && values[`family_members_${question.id}`].includes(resource.id.toString())?'checked':''):''}
                                             //checked = {values[`family_members_${question.id}`] && values[`family_members_${question.id}`].length && values[`family_members_${question.id}`].indexOf(resource.id) && (values[`question_id_${question.id}`]=='y')}
                                             onClick = {(e) => {
                                                 this.setAnswer(e)
@@ -647,7 +597,6 @@ console.log("FORM ARRAY----------=====>",famArr)
                                             className={`familyMembers${question.id}`}
                                             name={`family_members.${question.id}.${index}.${resource.relation_with}`}
                                             value={resource.id} id={`family_members.${question.id}.${index}.${resource.relation_with}`}
-                                            checked = {values[`question_id_${question.id}`] =='y' ? (values[`family_members_${question.id}`] && values[`family_members_${question.id}`].includes(resource.id.toString())?'checked':''):''}
                                             //checked = {values[`family_members_${question.id}`] && values[`family_members_${question.id}`].length && values[`family_members_${question.id}`].indexOf(resource.id) && (values[`question_id_${question.id}`]=='y')}
                                             onClick = {(e) => {
                                                 this.setAnswer(e)

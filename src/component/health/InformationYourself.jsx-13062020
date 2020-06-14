@@ -346,8 +346,7 @@ class InformationYourself extends Component {
             formData.append(`looking_for[${i}]`, looking_for);                
     }  
     
-    let policyHolder_id = localStorage.getItem('policyHolder_id') ? localStorage.getItem('policyHolder_id') :0
-    
+
     let gender_for = this.state.gender_for
 
     console.log("WWWWW+======>>>>>>",gender_for)
@@ -356,46 +355,24 @@ class InformationYourself extends Component {
         formData.append(`gender[${i}]`, gender_val);
     } 
     
-    if(policyHolder_id > 0){
-        formData.append(`policy_holder_id`, policyHolder_id);
-        this.props.loadingStart();
-        axios
-        .post(`/update-yourself`, formData)
-        .then(res => {
-            localStorage.setItem('policyHolder_id', res.data.data.policyHolder_id);
-            localStorage.setItem('policyHolder_refNo', res.data.data.policyHolder_refNo);
-            localStorage.setItem('display_gender', JSON.stringify(this.state.display_gender));
-            this.props.loadingStop();
-            this.props.history.push(`/MedicalDetails/${productId}`);
-        })
-        .catch(err => {
-        console.log('Errors==============>',err.data);
-        if(err && err.data){
-            swal('Family Member fields are required...');
-        }
+
+    this.props.loadingStart();
+    axios
+    .post(`/yourself`, formData)
+    .then(res => {
+        localStorage.setItem('policyHolder_id', res.data.data.policyHolder_id);
+        localStorage.setItem('policyHolder_refNo', res.data.data.policyHolder_refNo);
+        localStorage.setItem('display_gender', JSON.stringify(this.state.display_gender));
         this.props.loadingStop();
-        });
-    }
-    else{
-        this.props.loadingStart();
-        axios
-        .post(`/yourself`, formData)
-        .then(res => {
-            localStorage.setItem('policyHolder_id', res.data.data.policyHolder_id);
-            localStorage.setItem('policyHolder_refNo', res.data.data.policyHolder_refNo);
-            localStorage.setItem('display_gender', JSON.stringify(this.state.display_gender));
-            this.props.loadingStop();
-            this.props.history.push(`/MedicalDetails/${productId}`);
-        })
-        .catch(err => {
-        console.log('Errors==============>',err.data);
-        if(err && err.data){
-            swal('Family Member fields are required...');
-        }
-        this.props.loadingStop();
-        });
-    }
-    
+        this.props.history.push(`/MedicalDetails/${productId}`);
+    })
+    .catch(err => {
+      console.log('Errors==============>',err.data);
+      if(err && err.data){
+         swal('Family Member fields are required...');
+      }
+      this.props.loadingStop();
+    });
        // this.props.history.push(`/MedicalDetails/${productId}`);
     }
 
