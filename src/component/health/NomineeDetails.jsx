@@ -36,7 +36,7 @@ const validateNominee = Yup.object().shape({
         return "Last name must be minimum 3 chracters"
     }).max(40, function() {
         return "Last name must be maximum 40 chracters"
-    }).matches(/^[A-Za-z][A-Za-záéíñóúüÁÉÍÑÓÚÜ\s\-']*[A-Za-z\s]$/, function() {
+    }).matches(/^[A-Za-z][A-Za-z\-']*[A-Za-z]$/, function() {
         return "Please enter valid last name"
 }),
     first_name: Yup.string(function() {
@@ -50,14 +50,14 @@ const validateNominee = Yup.object().shape({
         .max(40, function() {
             return "Name must be maximum 40 chracters"
         })
-        .matches(/^[A-Za-z][A-Za-záéíñóúüÁÉÍÑÓÚÜ\s\-']*[A-Za-z\s]$/, function() {
+        .matches(/^[A-Za-z][A-Za-z\-']*[A-Za-z]$/, function() {
             return "Please enter valid name"
     }),
-    gender: Yup.string().required(function() {
-            return "Please select gender"
-    }).matches(/^[MmFf]$/, function() {
-        return "Please select valid gender"
-}),
+        gender: Yup.string().required(function() {
+                return "Please select gender"
+        }).matches(/^[MmFf]$/, function() {
+            return "Please select valid gender"
+    }),
     dob: Yup
         .date()
         .required( function() {

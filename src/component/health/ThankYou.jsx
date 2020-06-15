@@ -56,7 +56,7 @@ class ThankYouPage extends Component {
           .then(res => {  
             this.props.loadingStop();
             if(res.data.getPolicyDocumentResponseBody.payload.URL[0] == "No Results found for the given Criteria") {
-                swal(res.data.getPolicyDocumentResponseBody.payload.URL[0]);
+                // swal(res.data.getPolicyDocumentResponseBody.payload.URL[0]);
             }
             else{
                 this.setState({

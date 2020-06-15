@@ -65,9 +65,6 @@ const validateFamilyMembers  = Yup.object().shape({
     }),
     
 
-    
-    
-
   
 
     dob_0: Yup.string().when(['looking_for_0'], {
@@ -81,7 +78,7 @@ const validateFamilyMembers  = Yup.object().shape({
         function (value) {
             if (value) {
                 const ageObj = new PersonAge();
-                return ageObj.whatIsMyAge(value) <= 45 && ageObj.whatIsMyAge(value) >= 18 ;
+                return ageObj.whatIsMyAge(value) < 45 && ageObj.whatIsMyAge(value) >= 18 ;
             }
             return true;
         }
@@ -111,13 +108,12 @@ const validateFamilyMembers  = Yup.object().shape({
         then: Yup.string().required('Child 1 DOB field is required').test(
             "3monthsChecking",
             function() {
-                return "Age sgould be minium 3 months"
+                return "Age sgould be minium 3 months and maximum 25 years"
             },
             function (value) {
                 if (value) {
                     const ageObj = new PersonAge();
-                    console.log("YYYYYYYYYYYYYYYYYYY=====>",ageObj.whatIsMyAgeMonth(value))
-                    return ageObj.whatIsMyAgeMonth(value) >=3;
+                    return ageObj.whatIsMyAge(value) < 25 && ageObj.whatIsMyAgeMonth(value) >=3 ;
                 }
                 return true;
             }
@@ -136,13 +132,12 @@ const validateFamilyMembers  = Yup.object().shape({
         then: Yup.string().required('Child 2 DOB field is required').test(
             "3monthsChecking",
             function() {
-                return "Age sgould be minium 3 months"
+                return "Age sgould be minium 3 months and maximum 25 years"
             },
             function (value) {
                 if (value) {
                     const ageObj = new PersonAge();
-                    console.log("YYYYYYYYYYYYYYYYYYY=====>",ageObj.whatIsMyAgeMonth(value))
-                    return ageObj.whatIsMyAgeMonth(value) >=3;
+                    return ageObj.whatIsMyAge(value) < 25 && ageObj.whatIsMyAgeMonth(value) >=3;
                 }
                 return true;
             }
@@ -160,13 +155,12 @@ const validateFamilyMembers  = Yup.object().shape({
         then: Yup.string().required('Child 3 DOB field is required').test(
             "3monthsChecking",
             function() {
-                return "Age sgould be minium 3 months"
+                return "Age sgould be minium 3 months and maximum 25 years"
             },
             function (value) {
                 if (value) {
                     const ageObj = new PersonAge();
-                    console.log("YYYYYYYYYYYYYYYYYYY=====>",ageObj.whatIsMyAgeMonth(value))
-                    return ageObj.whatIsMyAgeMonth(value) >=3;
+                    return ageObj.whatIsMyAge(value) < 25 && ageObj.whatIsMyAgeMonth(value) >=3 ;
                 }
                 return true;
             }

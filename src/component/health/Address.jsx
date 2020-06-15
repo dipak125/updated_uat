@@ -135,7 +135,7 @@ const validateAddress =  Yup.object().shape({
                     .max(40, function() {
                         return "Name must be maximum 40 chracters"
                     })
-                    .matches(/^[A-Za-z][A-Za-záéíñóúüÁÉÍÑÓÚÜ\s\-']*[A-Za-z\s]$/, function() {
+                    .matches(/^[A-Za-z][A-Za-z\-']*[A-Za-z]$/, function() {
                         return "Please enter valid name"
                 }),
                 lname: Yup.string(function() {
@@ -149,7 +149,7 @@ const validateAddress =  Yup.object().shape({
                     .max(40, function() {
                         return "Last name must be maximum 40 chracters"
                     })
-                    .matches(/^[A-Za-z][A-Za-záéíñóúüÁÉÍÑÓÚÜ\s\-']*[A-Za-z\s]$/, function() {
+                    .matches(/^[A-Za-z][A-Za-z\-']*[A-Za-z]$/, function() {
                         return "Please enter valid last name"
                 }),
                 dob: Yup.date().when(['looking_for'],{
@@ -161,7 +161,7 @@ const validateAddress =  Yup.object().shape({
                         .test(
                             "18YearsChecking",
                             function() {
-                                return "Age sgould me minium 18 years"
+                                return "Age should me minium 18 years"
                             },
                             function (value) {
                                 if (value) {
@@ -204,7 +204,7 @@ const validateAddress =  Yup.object().shape({
         .max(40, function() {
             return "Name must be maximum 40 chracters"
         })
-        .matches(/^[A-Za-z][A-Za-z\s\-']*[A-Za-z\s]$/, function() {
+        .matches(/^[A-Za-z][A-Za-z\-']*[A-Za-z]$/, function() {
             return "Please enter valid name"
         }).test(
         "proposerAsInsured",
@@ -228,7 +228,7 @@ const validateAddress =  Yup.object().shape({
         .max(40, function() {
             return "Name must be maximum 40 chracters"
         })
-        .matches(/^[A-Za-z][A-Za-z\s\-']*[A-Za-z\s]$/, function() {
+        .matches(/^[A-Za-z][A-Za-z\-']*[A-Za-z]$/, function() {
             return "Please enter valid name"
         }).test(
         "proposerAsInsured",
@@ -257,13 +257,13 @@ const validateAddress =  Yup.object().shape({
     }).test(
         "18YearsChecking",
         function() {
-            return "Proposer age should be more than 18 years"
+            return "Proposer age should be between 18 to 45 years"
         },
         function (value) {
             const ageObj = new PersonAge();
             if (value) {
                 const age_Obj = new PersonAge();
-                return age_Obj.whatIsMyAge(value) >= 18;
+                return ageObj.whatIsMyAge(value) < 45 && ageObj.whatIsMyAge(value) >= 18;
             }
             return true;
     }),
