@@ -32,26 +32,25 @@ const initialValues = {
 const validateNominee = Yup.object().shape({
     last_name: Yup.string().required(function() {
         return "Please enter a last name"
-    }).min(3, function() {
-        return "Last name must be minimum 3 chracters"
-    }).max(40, function() {
-        return "Last name must be maximum 40 chracters"
     }).matches(/^[A-Za-z]*$/, function() {
         return "Please enter valid last name"
-}),
+    }).min(1, function() {
+        return "Name must be minimum 1 chracters"
+    })
+    .max(40, function() {
+        return "Name must be maximum 40 chracters"
+    }),
     first_name: Yup.string(function() {
         return "Please enter name"
     }).required(function() {
         return "Please enter name"
-    })
-        .min(3, function() {
-            return "Name must be minimum 3 chracters"
-        })
-        .max(40, function() {
-            return "Name must be maximum 40 chracters"
-        })
-        .matches(/^[A-Za-z]*$/, function() {
+    }).matches(/^[A-Za-z]*$/, function() {
             return "Please enter valid name"
+    }).min(3, function() {
+        return "Name must be minimum 3 chracters"
+    })
+    .max(40, function() {
+        return "Name must be maximum 40 chracters"
     }),
         gender: Yup.string().required(function() {
                 return "Please select gender"
@@ -70,7 +69,7 @@ const validateNominee = Yup.object().shape({
         function (value) {
             if (value) {
                 const ageObj = new PersonAge();
-                return ageObj.whatIsMyAgeMonth(value) >=3;
+                return ageObj.whatIsMyAge(value) < 111 && ageObj.whatIsMyAgeMonth(value) >=3;
             }
             return true;
         }
@@ -110,13 +109,7 @@ const validateNominee = Yup.object().shape({
             return "Please enter appointee name"
         }).notRequired(function() {
             return "Please enter appointee name"
-        })
-        .min(3, function() {
-            return "Name must be minimum 3 chracters"
-        })
-        .max(40, function() {
-            return "Name must be maximum 40 chracters"
-        })
+        })        
         .matches(/^[A-Za-z][A-Za-z\s\-']*$/, function() {
             return "Please enter valid name"
     }).test(
@@ -131,7 +124,12 @@ const validateNominee = Yup.object().shape({
             }
             return true;
         }
-    ),
+    ).min(3, function() {
+        return "Name must be minimum 3 chracters"
+    })
+    .max(40, function() {
+        return "Name must be maximum 40 chracters"
+    }),
     appointee_relation_with: Yup.string().notRequired(function() {
         return "Please select relation"
     }).test(
@@ -369,6 +367,7 @@ class NomineeDetails extends Component {
                                                                 showYearDropdown
                                                                 dropdownMode="select"
                                                                 maxDate={new Date(moment().subtract(3, 'months').calendar())}
+                                                                minDate={new Date(moment().subtract(110, 'years').calendar())}
                                                                 className="datePckr"
                                                                 onChange={(value) => {
                                                                     setFieldTouched("dob");

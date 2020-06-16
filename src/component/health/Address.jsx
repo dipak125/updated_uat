@@ -144,7 +144,7 @@ const validateAddress =  Yup.object().shape({
                     return "Please enter last name"
                 })
                     .min(1, function() {
-                        return "Last name must be minimum 3 chracters"
+                        return "Last name must be minimum 1 chracters"
                     })
                     .max(40, function() {
                         return "Last name must be maximum 40 chracters"
@@ -222,7 +222,7 @@ const validateAddress =  Yup.object().shape({
             return "Please enter proposer last name"
         })
         .min(1, function() {
-            return "Name must be minimum 3 chracters"
+            return "Name must be minimum 1 chracters"
         })
         .max(40, function() {
             return "Name must be maximum 40 chracters"
@@ -330,7 +330,7 @@ class Address extends Component {
                 let policy_holder =  res.data.data.policyHolder;
                 let family_members = res.data.data.policyHolder.request_data.family_members
                 let addressDetails = JSON.parse(res.data.data.policyHolder.address)
-                let is_eia_account = res.data.data.policyHolder.is_eia_account
+                let is_eia_account = res.data.data.policyHolder.is_eia_account == 2 ? "" : res.data.data.policyHolder.is_eia_account
                 let selfFlag = false;
                 for(let i=0;i<family_members.length;i++){
                     if(family_members[i].relation_with=='self'){

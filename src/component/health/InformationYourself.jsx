@@ -1018,10 +1018,12 @@ setStateForPreviousData=(family_members)=>{
                                                         <option value="f">Female</option>
                                                     </Field>    
                                                     </label>
+                                                    <label className="formGrp error">
                                                     {
                                                             errors.child1Gender && touched.child1Gender ?                 
                                                             <span className="error-message">{errors.child1Gender}</span>:''
                                                     }
+                                                    </label>
                                                 </div>
                                             </div>
 
@@ -1107,10 +1109,12 @@ setStateForPreviousData=(family_members)=>{
                                                         <option value="f">Female</option>
                                                     </Field>    
                                                     </label>
+                                                    <label className="formGrp error">
                                                     {
                                                             errors.child2Gender && touched.child2Gender ?                 
                                                             <span className="error-message">{errors.child2Gender}</span>:''
                                                     }
+                                                    </label>
                                                 </div>
                                             </div>  
 
@@ -1195,10 +1199,12 @@ setStateForPreviousData=(family_members)=>{
                                                         <option value="f">Female</option>
                                                     </Field>    
                                                     </label>
+                                                    <label className="formGrp error">
                                                     {
                                                             errors.child3Gender && touched.child3Gender ?                 
                                                             <span className="error-message">{errors.child3Gender}</span>:''
                                                     }
+                                                    </label>
                                                 </div>
                                             </div> 
 
@@ -1480,7 +1486,7 @@ setStateForPreviousData=(family_members)=>{
                                             </div>
                                             <div className="cntrbtn">
                                             <Button className={`btnPrimary m-r-15`} type="submit" >
-                                            {this.setValueData() || this.state.validateCheck == 1 ? ( 'Submit' ) : 'Select'} 
+                                               Select
                                             </Button>
                                             <Button className={`btnPrimary`} type="button" onClick={e => this.handleClose()} >
                                              Cancel
