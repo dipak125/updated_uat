@@ -149,7 +149,7 @@ class MedicalDetails extends Component {
                     //formData.append(familyMembers[i].value);
                 }
                 if(cnt==0){
-                    // swal("Please select a family member");
+                    swal("Please select a family member");
                 }
            }
            
@@ -257,6 +257,7 @@ class MedicalDetails extends Component {
                
             }
         }
+        
         return famArr;
     }   
 
@@ -405,7 +406,8 @@ class MedicalDetails extends Component {
         const {productId } = this.props.match.params
         const {questionList, question_answer, flag,selected_question,selected_answer,showImg,family_members,famArr,selected_family_members} = this.state
       
-       console.log("SHOW IMAGE DATA=======>",question_answer)
+       console.log("SHOW IMAGE DATA=======>",selected_question)
+       console.log("SELECTED FAMILY MEMBERS=====================>",selected_family_members)
        // let showImage = {}
        let qlength = questionList ? questionList.length:0;
         console.log('Selected Questions==>',selected_question)
@@ -475,7 +477,7 @@ console.log("FORM ARRAY----------=====>",famArr)
                            //  validationSchema={validateMedicalDetails}
                             >
                             {({ values, errors, setFieldValue, setFieldTouched, isValid, isSubmitting, touched }) => {
-                               console.log("aaaaaa=====>",values)
+                               console.log("aaaaaaABIRRRRR=====>",values)
                             return (
                             <Form>
                             <Row>

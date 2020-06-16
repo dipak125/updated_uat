@@ -49,8 +49,7 @@ const vehicleInspectionValidation = Yup.object().shape({
 
 const validateFamilyMembers  = Yup.object().shape({
     //check_input : Yup.string().required('Please select an options'),
-    looking_for_1 : Yup.string(),
-    looking_for_5 : Yup.string(),
+  
     looking_for_0: Yup.string().when(['looking_for_2'], {
         is: looking_for_2 => looking_for_2 == 'child1',       
         then: Yup.string().required('Please select self'),
@@ -63,60 +62,23 @@ const validateFamilyMembers  = Yup.object().shape({
         is: looking_for_4 => looking_for_4 == 'child3',       
         then: Yup.string().required('Please select self'),
         othewise: Yup.string()
-    }).when(['looking_for_1','looking_for_5'], {
-        is: (looking_for_1,looking_for_5) => (looking_for_1 == 'spouse' && looking_for_5 == 'father'),       
-        then: Yup.string().required('Please select self'),
-        othewise: Yup.string()
-    }).when(['looking_for_1','looking_for_6'], {
-        is: (looking_for_1,looking_for_6) => (looking_for_1 == 'spouse' && looking_for_6 == 'mother'),       
-        then: Yup.string().required('Please select self'),
-        othewise: Yup.string()
-    }).when(['looking_for_1','looking_for_7'], {
-        is: (looking_for_1,looking_for_7) => (looking_for_1 == 'spouse' && looking_for_7 == 'fatherInLaw'),       
-        then: Yup.string().required('Please select self'),
-        othewise: Yup.string()
-    }).when(['looking_for_1','looking_for_8'], {
-        is: (looking_for_1,looking_for_8) => (looking_for_1 == 'spouse' && looking_for_8 == 'motherInLaw'),       
-        then: Yup.string().required('Please select self'),
-        othewise: Yup.string()
-    }).when(['looking_for_5','looking_for_6'], {
-        is: (looking_for_5,looking_for_6) => (looking_for_5 == 'father' && looking_for_6 == 'mother'),       
-        then: Yup.string().required('Please select self'),
-        othewise: Yup.string()
-    }).when(['looking_for_5','looking_for_7'], {
-        is: (looking_for_5,looking_for_7) => (looking_for_5 == 'father' && looking_for_7 == 'fatherInLaw'),       
-        then: Yup.string().required('Please select self'),
-        othewise: Yup.string()
-    }).when(['looking_for_5','looking_for_8'], {
-        is: (looking_for_5,looking_for_8) => (looking_for_5 == 'father' && looking_for_8 == 'motherInLaw'),       
-        then: Yup.string().required('Please select self'),
-        othewise: Yup.string()
-    }).when(['looking_for_6','looking_for_7'], {
-        is: (looking_for_6,looking_for_7) => (looking_for_6 == 'mother' && looking_for_7 == 'fatherInLaw'),       
-        then: Yup.string().required('Please select self'),
-        othewise: Yup.string()
-    }).when(['looking_for_6','looking_for_8'], {
-        is: (looking_for_6,looking_for_8) => (looking_for_6 == 'mother' && looking_for_8 == 'motherInLaw'),       
-        then: Yup.string().required('Please select self'),
-        othewise: Yup.string()
-    }).when(['looking_for_7','looking_for_8'], {
-        is: (looking_for_7,looking_for_8) => (looking_for_7 == 'fatherInLaw' && looking_for_8 == 'motherInLaw'),       
-        then: Yup.string().required('Please select self'),
-        othewise: Yup.string()
     }),
     
+
+  
+
     dob_0: Yup.string().when(['looking_for_0'], {
       is: looking_for_0 => looking_for_0 == 'self',
       then: Yup.string().required('Self DOB field is required')
     .test(
         "18YearsChecking",
         function() {
-            return "Age should be minimum 18 and maximum 45 years"
+            return "Age should me minium 18 and maximum 45 years"
         },
         function (value) {
             if (value) {
                 const ageObj = new PersonAge();
-                return ageObj.whatIsMyAge(value) < 45 && ageObj.whatIsMyAge(value) >= 18 ;
+                return ageObj.whatIsMyAge(value) < 46 && ageObj.whatIsMyAge(value) >= 18 ;
             }
             return true;
         }
@@ -129,12 +91,12 @@ const validateFamilyMembers  = Yup.object().shape({
         .test(
             "18YearsChecking",
             function() {
-                return "Age should be minimum 18 years"
+                return "Age should me minium 18 years"
             },
             function (value) {
                 if (value) {
                     const ageObj = new PersonAge();
-                    return ageObj.whatIsMyAge(value) >= 18;
+                    return ageObj.whatIsMyAge(value) < 46 && ageObj.whatIsMyAge(value) >= 18;
                 }
                 return true;
             }
@@ -146,12 +108,12 @@ const validateFamilyMembers  = Yup.object().shape({
         then: Yup.string().required('Child 1 DOB field is required').test(
             "3monthsChecking",
             function() {
-                return "Age should be minimum 3 months and maximum 25 years"
+                return "Age should be minium 3 months and maximum 25 years"
             },
             function (value) {
                 if (value) {
                     const ageObj = new PersonAge();
-                    return ageObj.whatIsMyAge(value) < 25 && ageObj.whatIsMyAgeMonth(value) >=3 ;
+                    return ageObj.whatIsMyAge(value) < 26 && ageObj.whatIsMyAgeMonth(value) >=3 ;
                 }
                 return true;
             }
@@ -170,12 +132,12 @@ const validateFamilyMembers  = Yup.object().shape({
         then: Yup.string().required('Child 2 DOB field is required').test(
             "3monthsChecking",
             function() {
-                return "Age should be minimum 3 months and maximum 25 years"
+                return "Age should be minium 3 months and maximum 25 years"
             },
             function (value) {
                 if (value) {
                     const ageObj = new PersonAge();
-                    return ageObj.whatIsMyAge(value) < 25 && ageObj.whatIsMyAgeMonth(value) >=3;
+                    return ageObj.whatIsMyAge(value) < 26 && ageObj.whatIsMyAgeMonth(value) >=3;
                 }
                 return true;
             }
@@ -193,12 +155,12 @@ const validateFamilyMembers  = Yup.object().shape({
         then: Yup.string().required('Child 3 DOB field is required').test(
             "3monthsChecking",
             function() {
-                return "Age should be minimum 3 months and maximum 25 years"
+                return "Age should be minium 3 months and maximum 25 years"
             },
             function (value) {
                 if (value) {
                     const ageObj = new PersonAge();
-                    return ageObj.whatIsMyAge(value) < 25 && ageObj.whatIsMyAgeMonth(value) >=3 ;
+                    return ageObj.whatIsMyAge(value) < 26 && ageObj.whatIsMyAgeMonth(value) >=3 ;
                 }
                 return true;
             }
@@ -217,7 +179,7 @@ const validateFamilyMembers  = Yup.object().shape({
         .test(
             "18YearsChecking",
             function() {
-                return "Age should be minimum 18 years"
+                return "Age should me minium 18 years"
             },
             function (value) {
                 if (value) {
@@ -236,7 +198,7 @@ const validateFamilyMembers  = Yup.object().shape({
         .test(
             "18YearsChecking",
             function() {
-                return "Age should be minimum 18 years"
+                return "Age should me minium 18 years"
             },
             function (value) {
                 if (value) {
@@ -255,7 +217,7 @@ const validateFamilyMembers  = Yup.object().shape({
         .test(
             "18YearsChecking",
             function() {
-                return "Age should be minimum 18 years"
+                return "Age should be minium 18 years"
             },
             function (value) {
                 if (value) {
@@ -273,7 +235,7 @@ const validateFamilyMembers  = Yup.object().shape({
         .test(
             "18YearsChecking",
             function() {
-                return "Age should be minimum 18 years"
+                return "Age should me minium 18 years"
             },
             function (value) {
                 if (value) {
@@ -289,15 +251,14 @@ const validateFamilyMembers  = Yup.object().shape({
     
 })
 
-function checkSelfData(str)
+function checkInputdata(str)
 {
     let error;
-
-    let looking_for = document.getelementsbyname("looking_for_1").value
-
-    console.log("Looking for===-==============>",looking_for)
-    return 'sssss'
-   
+    //I use the following script for min 8 letter password, with at least a symbol, upper and lower case letters and a number
+    if(str==0){
+        error = 'Please select an options.';
+    }
+    return error;
 }
 
 const newInitialValues = {}
@@ -367,19 +328,15 @@ class InformationYourself extends Component {
     
     let menumaster_id = 2;
     console.log("menumaster_id=========>",menumaster_id);
-    formData.append(`menumaster_id`, menumaster_id);  
-    formData.append(`proposer_gender`, values.gender);  
+    formData.append(`menumaster_id`, menumaster_id);    
     
-    
-    for(let i=0;i<dob.length;i++){        
+    for(let i=0;i<dob.length;i++){
+        
         let date_of_birth= dob[i] ? dob[i] : familyMembers[i].dob;    
         formData.append(`dob[${i}]`, date_of_birth);
     }  
-    let is_self_select = false;
     for(let i=0;i<lookingFor.length;i++){        
-            
-            let looking_for = lookingFor[i] ? lookingFor[i] : familyMembers[i].relation_with; 
-            is_self_select =  looking_for == 'self' ? true:false         
+            let looking_for = lookingFor[i] ? lookingFor[i] : familyMembers[i].relation_with;
             formData.append(`looking_for[${i}]`, looking_for);                
     }  
     
@@ -388,10 +345,8 @@ class InformationYourself extends Component {
     let gender_for = this.state.gender_for
 
     console.log("WWWWW+======>>>>>>",gender_for)
-    
     for(let i=0;i<gender_for.length;i++){
-        let gender_val;
-        gender_val = gender_for[i] ? gender_for[i] : familyMembers[i].gender;                         
+        let gender_val = gender_for[i] ? gender_for[i] : familyMembers[i].gender;
         formData.append(`gender[${i}]`, gender_val);
     } 
     
@@ -777,7 +732,7 @@ setStateForPreviousData=(family_members)=>{
                                 <Formik initialValues={newInitialValues} onSubmit={this.handleSubmitForm}
                                  validationSchema={validateFamilyMembers}
                                 >
-                                {({ values, errors, setFieldValue, setFieldTouched, isValid, isValidating ,isSubmitting, touched }) => {
+                                {({ values, errors, setFieldValue, setFieldTouched, isValid, isSubmitting, touched }) => {
 
                                 return (
                                 <Form>
@@ -835,15 +790,14 @@ setStateForPreviousData=(family_members)=>{
                                                     <label className="formGrp error">                                                  
                                                         <DatePicker
                                                             name="dob_0"
-                                                            minDate={new Date()}
                                                             dateFormat="dd MMM yyyy"
                                                             placeholderText="DOB"
                                                             peekPreviousMonth
                                                             peekPreviousYear
                                                             showMonthDropdown
                                                             showYearDropdown
-                                                            maxDate={new Date()}
-                                                            minDate={new Date(1/1/1900)}
+                                                            maxDate={new Date(moment().subtract(18, 'years').calendar())}
+                                                            minDate={new Date(moment().subtract(45, 'years').calendar())}
                                                             className="datePckr"
                                                             dropdownMode="select"
                                                             onChange={(value,e) => {
@@ -912,15 +866,14 @@ setStateForPreviousData=(family_members)=>{
                                                     <label className="formGrp error">
                                                         <DatePicker
                                                             name="dob_1"
-                                                            minDate={new Date()}
                                                             dateFormat="dd MMM yyyy"
                                                             placeholderText="DOB"
                                                             peekPreviousMonth
                                                             peekPreviousYear
                                                             showMonthDropdown
                                                             showYearDropdown
-                                                            maxDate={new Date()}
-                                                            minDate={new Date(1/1/1900)}
+                                                            maxDate={new Date(moment().subtract(18, 'years').calendar())}
+                                                            minDate={new Date(moment().subtract(45, 'years').calendar())}
                                                             className="datePckr"
                                                             dropdownMode="select"
                                                             onChange={(value,e) => {
@@ -980,15 +933,14 @@ setStateForPreviousData=(family_members)=>{
                                                     <label className="formGrp error">
                                                         <DatePicker
                                                             name="dob_2"
-                                                            minDate={new Date()}
                                                             dateFormat="dd MMM yyyy"
                                                             placeholderText="DOB"
                                                             peekPreviousMonth
                                                             peekPreviousYear
                                                             showMonthDropdown
                                                             showYearDropdown
-                                                            maxDate={new Date()}
-                                                            minDate={new Date(1/1/1900)}
+                                                            maxDate={new Date(moment().subtract(3, 'months').calendar())}
+                                                            minDate={new Date(moment().subtract(25, 'years').calendar())}
                                                             className="datePckr"
                                                             dropdownMode="select"
                                                             onChange={(value,e) => {
@@ -1068,15 +1020,14 @@ setStateForPreviousData=(family_members)=>{
                                                     <label className="formGrp error">
                                                         <DatePicker
                                                             name="dob_3"
-                                                            minDate={new Date()}
                                                             dateFormat="dd MMM yyyy"
                                                             placeholderText="DOB"
                                                             peekPreviousMonth
                                                             peekPreviousYear
                                                             showMonthDropdown
                                                             showYearDropdown
-                                                            maxDate={new Date()}
-                                                            minDate={new Date(1/1/1900)}
+                                                            maxDate={new Date(moment().subtract(3, 'months').calendar())}
+                                                            minDate={new Date(moment().subtract(25, 'years').calendar())}
                                                             className="datePckr"
                                                             dropdownMode="select"
                                                             onChange={(value,e) => {
@@ -1155,15 +1106,14 @@ setStateForPreviousData=(family_members)=>{
                                                     <label className="formGrp error">
                                                         <DatePicker
                                                             name="dob_4"
-                                                            minDate={new Date()}
                                                             dateFormat="dd MMM yyyy"
                                                             placeholderText="DOB"
                                                             peekPreviousMonth
                                                             peekPreviousYear
                                                             showMonthDropdown
                                                             showYearDropdown
-                                                            maxDate={new Date()}
-                                                            minDate={new Date(1/1/1900)}
+                                                            maxDate={new Date(moment().subtract(3, 'months').calendar())}
+                                                            minDate={new Date(moment().subtract(25, 'years').calendar())}
                                                             className="datePckr"
                                                             dropdownMode="select"
                                                             onChange={(value,e) => {
@@ -1245,15 +1195,13 @@ setStateForPreviousData=(family_members)=>{
                                                     <label className="formGrp error">
                                                         <DatePicker
                                                             name="dob_5"
-                                                            minDate={new Date()}
                                                             dateFormat="dd MMM yyyy"
                                                             placeholderText="DOB"
                                                             peekPreviousMonth
                                                             peekPreviousYear
                                                             showMonthDropdown
                                                             showYearDropdown
-                                                            maxDate={new Date()}
-                                                            minDate={new Date(1/1/1900)}
+                                                            maxDate={new Date(moment().subtract(18, 'years').calendar())}
                                                             className="datePckr"
                                                             dropdownMode="select"
                                                             onChange={(value,e) => {
@@ -1314,15 +1262,13 @@ setStateForPreviousData=(family_members)=>{
                                                     <label className="formGrp error">
                                                         <DatePicker
                                                             name="dob_6"
-                                                            minDate={new Date()}
                                                             dateFormat="dd MMM yyyy"
                                                             placeholderText="DOB"
                                                             peekPreviousMonth
                                                             peekPreviousYear
                                                             showMonthDropdown
                                                             showYearDropdown
-                                                            maxDate={new Date()}
-                                                            minDate={new Date(1/1/1900)}
+                                                            maxDate={new Date(moment().subtract(18, 'years').calendar())}
                                                             className="datePckr"
                                                             dropdownMode="select"
                                                             onChange={(value,e) => {
@@ -1382,15 +1328,13 @@ setStateForPreviousData=(family_members)=>{
                                                     <label className="formGrp error">
                                                         <DatePicker
                                                             name="dob_7"
-                                                            minDate={new Date()}
                                                             dateFormat="dd MMM yyyy"
                                                             placeholderText="DOB"
                                                             peekPreviousMonth
                                                             peekPreviousYear
                                                             showMonthDropdown
                                                             showYearDropdown
-                                                            maxDate={new Date()}
-                                                            minDate={new Date(1/1/1900)}
+                                                            maxDate={new Date(moment().subtract(18, 'years').calendar())}
                                                             className="datePckr"
                                                             dropdownMode="select"
                                                             onChange={(value,e) => {
@@ -1450,15 +1394,13 @@ setStateForPreviousData=(family_members)=>{
                                                     <label className="formGrp error">
                                                         <DatePicker
                                                             name="dob_8"
-                                                            minDate={new Date()}
                                                             dateFormat="dd MMM yyyy"
                                                             placeholderText="DOB"
                                                             peekPreviousMonth
                                                             peekPreviousYear
                                                             showMonthDropdown
                                                             showYearDropdown
-                                                            maxDate={new Date()}
-                                                            minDate={new Date(1/1/1900)}
+                                                            maxDate={new Date(moment().subtract(18, 'years').calendar())}
                                                             className="datePckr"
                                                             dropdownMode="select"
                                                             onChange={(value,e) => {

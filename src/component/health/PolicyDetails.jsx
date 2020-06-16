@@ -350,7 +350,7 @@ class PolicyDetails extends Component {
                           <Collapsible trigger=" Contact information">
                             <div className="listrghtsideTrigr">
                               <div className="d-flex justify-content-end carloan">
-                                <a href="#"> Edit</a>
+                                <a href={`/Address/${productId}`}> Edit</a>
                               </div>
                               <Row>
                                 <Col sm={12} md={6}>

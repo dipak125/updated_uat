@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Route, Switch, BrowserRouter,Redirect, withRouter } from "react-router-dom";
+import { Route, Switch, BrowserRouter,Redirect, withRouter, HashRouter } from "react-router-dom";
 import { Formik, Field, Form } from "formik";
 
 import { connect } from "react-redux";
@@ -84,7 +84,7 @@ class Routes extends Component {
         this.props.onAuthPersist();
         return (
             <>
-                <BrowserRouter>
+                <HashRouter>
                     <Switch>
                         <Route exact path="/login" component={LogIn} />                        
                         <PrivateRoute exact path="/Products" component={Products} />
@@ -108,7 +108,7 @@ class Routes extends Component {
                         <PrivateRoute exact path="/UnderMaintenance" component={UnderMaintenance} />
                         <Redirect from="/" to="/Products" />
                     </Switch>
-                </BrowserRouter>
+                </HashRouter>
             </>
         )
     }

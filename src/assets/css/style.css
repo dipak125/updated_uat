@@ -279,6 +279,25 @@ ul.navPan li a span{ margin-bottom:8px; display: block; }
 
 /*---------Premium section start-------*/
 .premimhead h4 {font-size: 18px; color: #707070; font-weight: 600 !important;}
+.motopremium {font-size: 15px; color: #073B68; font-weight: 700; margin-bottom: 5px;}
+.premamount {font-size: 15px; color: #787878;}
+.refno {font-size: 16px; font-weight: 400; color: #262626;}
+.hght30 {height: 30px;}
+.fscheck {font-size: 13px !important; margin-bottom: 35px !important;}
+
+
+/*---------Premium Modal start-------*/
+.boxotpmodl {padding: 30px 45px;}
+.verfy {font-size: 22px; font-weight: 600; margin-bottom: 25px;}
+.mobotp {font-size: 16px; margin-bottom: 20px;}
+.sndSms {font-weight: 600; margin-bottom: 10px; cursor: pointer;}
+
+.modal-content .otpmodal {min-width: 625px !important; background-color: #ffffff; border-radius: 15px;}
+.form-control.placeHCenter{ text-align: center; border-radius: 10px!important; width: 50px !important; height: 50px !important; }
+.form-control:focus { border-color: #E4BC88 !important; box-shadow: 0 1px 2px #E4BC88 !important; outline: none !important;}
+
+
+/*---------Premium Modal close-------*/
 
 /*---------Premium section close-------*/
 

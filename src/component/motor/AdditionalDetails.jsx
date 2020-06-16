@@ -156,7 +156,7 @@ class AdditionalDetails extends Component {
                     </div>
                 <div className="col-sm-12 col-md-12 col-lg-10 col-xl-10 infobox">
                 <h4 className="text-center mt-3 mb-3">SBI General Insurance Company Limited</h4>
-                <section className="brand m-t-11 m-b-25">
+                <section className="brand m-b-25">
                     <div className="brand-bg">
                         <div className="d-flex justify-content-left">
                             <div className="brandhead m-b-10">
@@ -301,7 +301,7 @@ class AdditionalDetails extends Component {
                                     </Col>
                                 </Row>
 
-                                <Row>
+                                {/* <Row>
                                     <Col sm={12}>
                                         <FormGroup>
                                             <div className="carloan">
@@ -312,7 +312,7 @@ class AdditionalDetails extends Component {
                                 </Row>
 
                                 <Row>
-                                    <Col sm={12} md={4} lg={4}>
+                                    <Col sm={12} md={6} lg={4}>
                                         <FormGroup>
                                             
                                             <DatePicker
@@ -326,7 +326,7 @@ class AdditionalDetails extends Component {
                                                 showMonthDropdown
                                                 showYearDropdown
                                                 dropdownMode="select"
-                                                className="datePckr"
+                                                className="datePckr inputadd"
                                                 selected={values.prevStartDate}
                                                 onChange={(val) => {
                                                     setFieldTouched('prevStartDate');
@@ -336,7 +336,7 @@ class AdditionalDetails extends Component {
                                         </FormGroup>
                                     </Col>
 
-                                    <Col sm={12} md={4} lg={4}>
+                                    <Col sm={12} md={6} lg={4}>
                                         <FormGroup>
                                         <DatePicker
                                                 name="prevEndDate"
@@ -347,7 +347,7 @@ class AdditionalDetails extends Component {
                                                 showMonthDropdown
                                                 showYearDropdown
                                                 dropdownMode="select"
-                                                className="datePckr"
+                                                className="datePckr inputadd"
                                                 selected={values.prevEndDate}
                                                 onChange={(val) => {
                                                     setFieldTouched('prevEndDate');
@@ -356,14 +356,14 @@ class AdditionalDetails extends Component {
                                             />
                                         </FormGroup>
                                     </Col>
-                                    <Col sm={12} md={4} lg={4}>
+                                    <Col sm={12} md={6} lg={4}>
                                         <FormGroup>
                                             <div className="formSection">
                                             <Field
                                                 name='policyType'
                                                 component="select"
                                                 autoComplete="off"                                                                        
-                                                className="formGrp"
+                                                className="formGrp inputadd"
                                                 value = {values.policyType}
                                             >
                                                 <option value="">Select Policy Type</option>
@@ -417,7 +417,234 @@ class AdditionalDetails extends Component {
                                             </div>
                                         </FormGroup>
                                     </Col>
-                                </Row>
+                                </Row> */}
+
+                                <Row>
+                                                                    <Col sm={12}>
+                                                                        <FormGroup>
+                                                                            <div className="carloan">
+                                                                                <h4> Previous Policy Details</h4>
+                                                                            </div>
+                                                                        </FormGroup>
+                                                                    </Col>
+                                                                </Row>
+
+                                                                <Row>
+                                                                    <Col sm={12} md={11} lg={4}>
+                                                                        <FormGroup>
+
+                                                                            <DatePicker
+                                                                                name="prevStartDate"
+                                                                                minDate={new Date('1/1/1900')}
+                                                                                maxDate={new Date()}
+                                                                                dateFormat="dd MMM yyyy"
+                                                                                placeholderText="Previous policy start date"
+                                                                                peekPreviousMonth
+                                                                                peekPreviousYear
+                                                                                showMonthDropdown
+                                                                                showYearDropdown
+                                                                                dropdownMode="select"
+                                                                                className="datePckr inputfs12"
+                                                                                selected={values.prevStartDate}
+                                                                                onChange={(val) => {
+                                                                                    setFieldTouched('prevStartDate');
+                                                                                    setFieldValue('prevStartDate', val);
+                                                                                }}
+                                                                            />
+                                                                        </FormGroup>
+                                                                    </Col>
+
+                                                                    <Col sm={12} md={11} lg={4}>
+                                                                        <FormGroup>
+                                                                            <DatePicker
+                                                                                name="prevEndDate"
+                                                                                dateFormat="dd MMM yyyy"
+                                                                                placeholderText="Previous policy end date"
+                                                                                peekPreviousMonth
+                                                                                peekPreviousYear
+                                                                                showMonthDropdown
+                                                                                showYearDropdown
+                                                                                dropdownMode="select"
+                                                                                className="datePckr inputfs12"
+                                                                                selected={values.prevEndDate}
+                                                                                onChange={(val) => {
+                                                                                    setFieldTouched('prevEndDate');
+                                                                                    setFieldValue('prevEndDate', val);
+                                                                                }}
+                                                                            />
+                                                                        </FormGroup>
+                                                                    </Col>
+                                                                    <Col sm={12} md={11} lg={3}>
+                                                                        <FormGroup>
+                                                                            <div className="formSection">
+                                                                                <Field
+                                                                                    name='policyType'
+                                                                                    component="select"
+                                                                                    autoComplete="off"
+                                                                                    className="formGrp inputfs12"
+                                                                                    value={values.policyType}
+                                                                                >
+                                                                                    <option value="">Select Policy Type</option>
+                                                                                    <option value="male">Liability Policy</option>
+                                                                                    <option value="female">Package Policy</option>
+                                                                                </Field>
+                                                                                {errors.policyType && touched.policyType ? (
+                                                                                    <span className="errorMsg">{errors.policyType}</span>
+                                                                                ) : null}
+                                                                            </div>
+                                                                        </FormGroup>
+                                                                    </Col>
+                                                                </Row>
+
+                                                                <Row>
+                                                                    <Col sm={12} md={6} lg={6}>
+                                                                        <FormGroup>
+                                                                            <div className="formSection">
+                                                                                <Field
+                                                                                    name='policyCompany'
+                                                                                    component="select"
+                                                                                    autoComplete="off"
+                                                                                    className="formGrp"
+                                                                                >
+                                                                                    <option value="">Select Insurer Company</option>
+                                                                                    <option>Agriculture Insurance Co. of India Ltd.</option>
+                                                                                    <option>Apollo Munich Health Insurance Company Limited</option>
+                                                                                    <option>Bajaj Allianz General Insurance Co. Ltd</option>
+                                                                                    <option>Bharti AXA General Insurance Company Limited</option>
+                                                                                    <option>Cholamandalam MS General Insurance Co. Ltd</option>
+                                                                                    <option>Cigna TTK Health Insurance Company Limited</option>
+                                                                                    <option>Export Credit Guarantee Corporation of India Ltd.</option>
+                                                                                    <option>Future Generali India Insurance Company Limited</option>
+                                                                                    <option>HDFC ERGO General Insurance Co. Ltd.</option>
+                                                                                    <option>ICICI Lombard General Insurance Co. Ltd</option>
+                                                                                    <option>ICICI Prudential LIC Ltd.</option>
+                                                                                    <option>IFFCO Tokio General Insurance Co. Ltd</option>
+                                                                                    <option>L T General Insurance Company</option>
+                                                                                    <option>Liberty Videocon General Insurance Company Ltd.</option>
+                                                                                    <option>Magma HDI General Insurance Co</option>
+                                                                                    <option>Max Bupa Health Insurance Company Ltd.</option>
+                                                                                    <option>National Insurance Co.Ltd.</option>
+                                                                                    <option>Raheja QBE General Insurance Company Limited,</option>
+                                                                                    <option>Reliance General Insurance Co. Ltd</option>
+                                                                                    <option>Royal Sundaram Alliance Insurance Co. Ltd</option>
+                                                                                    <option>Shriram General Insurance Company Limited,</option>
+                                                                                    <option>Star Health and Allied Insurance Company Limited</option>
+                                                                                    <option>Tata AIG General Insurance Co. Ltd</option>
+                                                                                    <option>The New India Assurance Co. Ltd</option>
+                                                                                    <option>The Oriental Insurance Co. Ltd</option>
+                                                                                    <option>United India Insurance Co. Ltd</option>
+                                                                                    <option>Universal Sompo General Insurance Co. Ltd.</option>
+                                                                                </Field>
+                                                                                {errors.policyCompany && touched.policyCompany ? (
+                                                                                    <span className="errorMsg">{errors.policyCompany}</span>
+                                                                                ) : null}
+                                                                            </div>
+                                                                        </FormGroup>
+                                                                    </Col>
+
+                                                                    <Col sm={12} md={5} lg={5}>
+                                                                        <FormGroup>
+                                                                            <div className="insurerName">
+                                                                                <Field
+                                                                                    name="prevInsurerAddress"
+                                                                                    type="text"
+                                                                                    placeholder="Previous Insurer Address"
+                                                                                    autoComplete="off"
+                                                                                    onFocus={e => this.changePlaceHoldClassAdd(e)}
+                                                                                    onBlur={e => this.changePlaceHoldClassRemove(e)}
+                                                                                />
+                                                                                {errors.prevInsurerAddress && touched.prevInsurerAddress ? (
+                                                                                    <span className="errorMsg">{errors.prevInsurerAddress}</span>
+                                                                                ) : null}
+                                                                            </div>
+                                                                        </FormGroup>
+                                                                    </Col>
+                                                                </Row>
+
+                                                                <Row>
+                                                                    <Col sm={12}>
+                                                                        <FormGroup>
+                                                                            <div className="carloan">
+                                                                                <h4>Have you made a claim in your existing Policy</h4>
+                                                                            </div>
+                                                                        </FormGroup>
+                                                                    </Col>
+                                                                </Row>
+
+                                                                <Row>
+                                                                    <Col sm={6} md={7}>
+                                                                        <FormGroup>
+                                                                            <div className="d-inline-flex m-b-35">
+                                                                                <div className="p-r-25">
+                                                                                    <label className="customRadio3">
+                                                                                        <Field
+                                                                                            type="radio"
+                                                                                            name='loan'
+                                                                                            value='1'
+                                                                                            key='1'
+                                                                                            onChange={(e) => {
+                                                                                                setFieldValue(`loan`, e.target.value);
+                                                                                            }}
+                                                                                            checked={values.loan == '1' ? true : false}
+                                                                                        />
+                                                                                        <span className="checkmark " /><span className="fs-14"> No, I haven't</span>
+                                                                                    </label>
+                                                                                </div>
+
+                                                                                <div className="">
+                                                                                    <label className="customRadio3">
+                                                                                        <Field
+                                                                                            type="radio"
+                                                                                            name='loan'
+                                                                                            value='0'
+                                                                                            key='1'
+                                                                                            onChange={(e) => {
+                                                                                                setFieldValue(`loan`, e.target.value);
+                                                                                            }}
+                                                                                            checked={values.loan == '0' ? true : false}
+                                                                                        />
+                                                                                        <span className="checkmark" />
+                                                                                        <span className="fs-14">Yes I have</span>
+                                                                                    </label>
+                                                                                </div>
+                                                                            </div>
+                                                                        </FormGroup>
+                                                                    </Col>
+                                                                </Row>
+
+                                                                <Row className="m-b-30">
+                                                                    <Col sm={12} md={5} lg={5}>
+                                                                        <FormGroup>
+                                                                            <div className="fs-18">
+                                                                                Current No Claim Bonus
+                                                       </div>
+                                                                        </FormGroup>
+                                                                    </Col>
+                                                                    <Col sm={12} md={6} lg={6}>
+                                                                        <FormGroup>
+                                                                            <div className="formSection">
+                                                                                <Field
+                                                                                    name='noClaimBonus'
+                                                                                    component="select"
+                                                                                    autoComplete="off"
+                                                                                    className="formGrp"
+                                                                                    value={values.noClaimBonus}
+                                                                                >
+                                                                                    <option value="">--Select--</option>
+                                                                                    <option>0</option>
+                                                                                    <option>20</option>
+                                                                                    <option>25</option>
+                                                                                    <option>35</option>
+                                                                                    <option>45</option>
+                                                                                    <option>50</option>
+                                                                                </Field>
+                                                                                {errors.noClaimBonus && touched.noClaimBonus ? (
+                                                                                    <span className="errorMsg">{errors.noClaimBonus}</span>
+                                                                                ) : null}
+                                                                            </div>
+                                                                        </FormGroup>
+                                                                    </Col>
+                                                                </Row>
 
                                 <div className="d-flex justify-content-left carloan">
                                     <h4> Owners Details</h4>

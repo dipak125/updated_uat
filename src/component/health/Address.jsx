@@ -58,19 +58,19 @@ const validateAddress =  Yup.object().shape({
     address1: Yup.string()
         .required(function() {
             return "Enter plot number."
-        }).matches(/^([0-9A-Za-z\s\-\+\(\)]*)$/, function() {
+        }).matches(/^([0-9A-Za-z\s]*)$/, function() {
             return "Invalid plot number"
         }),
     address2: Yup.string()
         .required(function() {
             return "Enter building name / number"
-        }).matches(/^([0-9A-Za-z\s\-\+\(\)]*)$/, function() {
+        }).matches(/^([0-9A-Za-z\s]*)$/, function() {
             return "Invalid building name / number"
         }),
     address3: Yup.string()
         .required(function() {
             return "Enter street name"
-        }).matches(/^([A-Za-z\s\-\+\(\)]*)$/, function() {
+        }).matches(/^([A-Za-z\s]*)$/, function() {
             return "Invalid street name"
         }),
     email: Yup.string()
@@ -85,7 +85,7 @@ const validateAddress =  Yup.object().shape({
         .required(function() {
             return "Please enter phone number"
         })
-        .matches(/^([0-9\s\-\+\(\)]*)$/, function() {
+        .matches(/^([0-9]*)$/, function() {
             return "Invalid number"
         })
         .min(10, function() {
@@ -104,7 +104,7 @@ const validateAddress =  Yup.object().shape({
     pincode: Yup.string()
         .required(function() {
             return "Enter pin code"
-        }).matches(/^([0-9\s\-\+\(\)]*)$/, function() {
+        }).matches(/^([0-9]*)$/, function() {
             return "Invalid pin code"
         }).min(6, 'Must be exactly 6 digits')
         .max(6, 'Must be exactly 6 digits'),
@@ -135,7 +135,7 @@ const validateAddress =  Yup.object().shape({
                     .max(40, function() {
                         return "Name must be maximum 40 chracters"
                     })
-                    .matches(/^[A-Za-z][A-Za-z\-']*[A-Za-z]$/, function() {
+                    .matches(/^[A-Za-z]*$/, function() {
                         return "Please enter valid name"
                 }),
                 lname: Yup.string(function() {
@@ -149,7 +149,7 @@ const validateAddress =  Yup.object().shape({
                     .max(40, function() {
                         return "Last name must be maximum 40 chracters"
                     })
-                    .matches(/^[A-Za-z][A-Za-z\-']*[A-Za-z]$/, function() {
+                    .matches(/^[A-Za-z]*$/, function() {
                         return "Please enter valid last name"
                 }),
                 dob: Yup.date().when(['looking_for'],{
@@ -182,14 +182,13 @@ const validateAddress =  Yup.object().shape({
     eia_account_no:Yup.string().when(['eIA'], {
         is: eIA => eIA == 1,
         then: Yup.string().required('Please select the EIA account number')
-        .matches(/^([0-9\s\-\+\(\)]*)$/, function() {
-            return "Invalid number"
-        })
         .min(13, function() {
             return "EIA number should be minimum 13 digits"
         })
         .max(13, function() {
             return "EIA number should be maximum 13 digits"
+        }).matches(/^[1245]{1}[0-9]{12}$/, function() {
+            return "Invalid number"
         }),
         othewise: Yup.string()
     }),
@@ -204,7 +203,7 @@ const validateAddress =  Yup.object().shape({
         .max(40, function() {
             return "Name must be maximum 40 chracters"
         })
-        .matches(/^[A-Za-z][A-Za-z\-']*[A-Za-z]$/, function() {
+        .matches(/^[A-Za-z]*$/, function() {
             return "Please enter valid name"
         }).test(
         "proposerAsInsured",
@@ -228,7 +227,7 @@ const validateAddress =  Yup.object().shape({
         .max(40, function() {
             return "Name must be maximum 40 chracters"
         })
-        .matches(/^[A-Za-z][A-Za-z\-']*[A-Za-z]$/, function() {
+        .matches(/^[A-Za-z]*$/, function() {
             return "Please enter valid name"
         }).test(
         "proposerAsInsured",
@@ -263,7 +262,7 @@ const validateAddress =  Yup.object().shape({
             const ageObj = new PersonAge();
             if (value) {
                 const age_Obj = new PersonAge();
-                return ageObj.whatIsMyAge(value) < 45 && ageObj.whatIsMyAge(value) >= 18;
+                return ageObj.whatIsMyAge(value) < 46 && ageObj.whatIsMyAge(value) >= 18;
             }
             return true;
     }),
@@ -686,7 +685,6 @@ class Address extends Component {
                                                 <FormGroup>
                                                     <DatePicker
                                                         name="proposerDob"
-                                                        minDate={new Date()}
                                                         dateFormat="dd MMM yyyy"
                                                         placeholderText="DOB"
                                                         peekPreviousMonth
@@ -694,8 +692,8 @@ class Address extends Component {
                                                         showMonthDropdown
                                                         showYearDropdown
                                                         dropdownMode="select"
-                                                        maxDate={new Date()}
-                                                        minDate={new Date(1/1/1900)}
+                                                        maxDate={new Date(moment().subtract(18, 'years').calendar())}
+                                                        minDate={new Date(moment().subtract(45, 'years').calendar())}
                                                         className="datePckr"
                                                         selected={values.proposerDob }
                                                         onChange={(val) => {

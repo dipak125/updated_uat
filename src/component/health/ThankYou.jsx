@@ -8,13 +8,13 @@ import { loaderStart, loaderStop } from "../../store/actions/loader";
 import { connect } from "react-redux";
 import swal from 'sweetalert';
 
-const policy_holder_id = localStorage.getItem("policyHolder_id")
 
 class ThankYouPage extends Component {
 
     state = {
         accessToken: "",
-        response_text: ""
+        response_text: [],
+        policy_holder_id: localStorage.getItem("policyHolder_id")
       };
 
       
@@ -43,13 +43,6 @@ class ThankYouPage extends Component {
         formData.append('access_token', access_token);
         formData.append('policyNo', policyId)
         
-        localStorage.removeItem("policyHolder_id");
-        localStorage.removeItem("policyHolder_refNo");
-        sessionStorage.removeItem('pan_data');
-        sessionStorage.removeItem('email_data');
-        sessionStorage.removeItem('proposed_insured');
-        sessionStorage.removeItem('display_looking_for');
-        sessionStorage.removeItem('display_dob');
         this.props.loadingStart();
         axios
           .post(`/callDocApi`, formData)
@@ -60,9 +53,10 @@ class ThankYouPage extends Component {
             }
             else{
                 this.setState({
-                    response_text: res.data.getPolicyDocumentResponseBody.payload.URL[1]
+                    response_text: res.data,
+                    res_error: false
                 })
-                this.generate_pdf(res.data.getPolicyDocumentResponseBody.payload.URL[1]) 
+                this.generate_pdf(res.data, localStorage.getItem("policyHolder_id")) 
             }
                   
           })
@@ -74,29 +68,42 @@ class ThankYouPage extends Component {
           });
       }
 
-      generate_pdf = (responseText) => {
-        const formData = new FormData();
-        formData.append('policy_holder_id', policy_holder_id);
-        formData.append('response_text', responseText)
-        this.props.loadingStart();
-        axios
-          .post(`/generate-pdf`, formData)
-          .then(res => { 
-            this.setState({
-               
-            }) 
-            
-            this.props.loadingStop();
-          })
-          .catch(err => {
-            this.setState({
+      generate_pdf = (response_text, policy_holder_id) => {
+        // const {response_text, policy_holder_id, res_error} = this.state
+        const {policyId} = this.props.match.params
+        if(response_text && policy_holder_id) {
+          const formData = new FormData();
+          formData.append('policy_holder_id', policy_holder_id);
+          formData.append('policy_no', policyId);
+          formData.append('response_text', JSON.stringify(response_text))
+          this.props.loadingStart();
+          axios
+            .post(`/generate-pdf`, formData)
+            .then(res => {             
+              this.props.loadingStop();
+              localStorage.removeItem("policyHolder_id");
+              localStorage.removeItem("policyHolder_refNo");
+              sessionStorage.removeItem('pan_data');
+              sessionStorage.removeItem('email_data');
+              sessionStorage.removeItem('proposed_insured');
+              sessionStorage.removeItem('display_looking_for');
+              sessionStorage.removeItem('display_dob');
+              this.downloadDoc(res.data.data.uploded_path)
+            })
+            .catch(err => {
+              this.setState({
+              });
+              this.props.loadingStop();
             });
-            this.props.loadingStop();
-          });
+        }
+        else {
+          swal("Could not get policy document")
+        }
+        
       }
 
-      downloadDoc = () => {
-        const url = "https://content.sbigeneral.in/uploads/b7b98d12c9da4f44b7f5e372945fbf7f.pdf";
+      downloadDoc = (file_path) => {
+        const url = file_path ;
         const fileName = "b7b98d12c9da4f44b7f5e372945fbf7f.pdf"
         const pom = document.createElement('a');
         pom.setAttribute('href', url);
@@ -109,7 +116,7 @@ class ThankYouPage extends Component {
       }
 
     componentDidMount() {
-        this.getAccessToken();       
+        // this.getAccessToken();       
         window.addEventListener("popstate", () => {
         this.props.history.push('/Products');
           });
@@ -134,7 +141,7 @@ class ThankYouPage extends Component {
                          <p className="fs-16 m-b-30">Policy No <span className="lghtBlue"> {policyId}</span></p>
                          <div className="d-flex justify-content-center align-items-center">
                              {/* <button className="proposal" onClick={this.downloadDoc}>Eproposal Form</button> */}
-                             <button className="policy m-l-20">Policy Copy</button>
+                             <button className="policy m-l-20" onClick={this.getAccessToken}>Policy Copy</button>
                          </div>
                          </div>
                      </div>

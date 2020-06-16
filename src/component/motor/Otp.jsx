@@ -38,7 +38,7 @@ class Otp extends Component {
                         <div className="text-center boxotpmodl">
                             <img src={require('../../assets/images/desk.svg')} alt="" className="m-b-25" />
                             <div className="verfy">Verify OTP</div>
-                            <div className="mobotp">Your one time password (OTP)  is sent to your registered mobile number XXXXXXX 445.</div>
+                            <div className="mobotp m-b-25">Your one time password (OTP)  is sent to your registered mobile number XXXXXXX 445.</div>
 
 
                             <div className="d-flex justify-content-center otpInputWrap mx-auto m-b-25">

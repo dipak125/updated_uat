@@ -20,9 +20,9 @@ class ThankYouPage extends Component {
                          <img src={require('../../assets/images/like.svg')} alt="" className="m-b-30"/>
                          <p>Thank you for choosing SBI General Motor Insurance</p>
                          <p className="fs-16 m-b-30">Policy No <span className="lghtBlue"> 004500003277045</span></p>
-                         <div className="d-flex justify-content-center align-items-center">
-                             <button className="proposal">Eproposal Form</button>
-                             <button className="policy m-l-20">Policy Copy</button>
+                         <div className="d-flex flex-column flex-sm-column flex-md-row flex-lg-row justify-content-center align-items-center">
+                             <button className="proposal m-b-10">Eproposal Form</button>
+                             <button className="policy m-l-20 m-b-10">Policy Copy</button>
                          </div>
                          </div>
                      </div>

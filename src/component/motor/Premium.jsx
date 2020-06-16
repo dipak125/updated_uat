@@ -73,7 +73,7 @@ class Premium extends Component {
 
                 return (
                 <Form>
-                <section className="brand m-t-11 m-b-25">
+                <section className="brand m-b-25">
                     <div className="d-flex justify-content-left">
                         <div className="brandhead m-b-10">
                             <h4>The Summary of your Policy Premium Details is as below </h4>

@@ -99,7 +99,7 @@ class OtherComprehensive extends Component {
                                             </div>
                                         </FormGroup>
                                     </Col>
-                                    <Col sm={12} md={2} lg={2}>
+                                    <Col sm={12} md={3} lg={2}>
                                         <FormGroup>
                                             <div className="insurerName">
                                             <Field
