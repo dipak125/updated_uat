@@ -48,6 +48,8 @@
   .inputadd {height: initial;}
   .modal-content .otpmodal {min-width: auto !important;}
   .nomfs16 {font-size: 16px !important;}
+  .prsnlinfo .W12 {margin-right: 20px;}
+  .medihead { font-size: 16px;  line-height: normal;}
   
 }
 
@@ -74,9 +76,10 @@
   .proposr-main{ display: block!important;}
   .proposr p {font-size: 13px; }
   .proposr-radio{ margin-bottom: 5px;}
-  .prsnlinfo .W12{ display: block; margin-right: 10px;}
+  .prsnlinfo .W12{ display: block; margin-right: 20px;}
   .W-90 {width: 100% !important;}
   .inputfs12 {font-size: 14px;}
+  .prsres p {font-size: 16px !important;}
   
   
   
@@ -95,6 +98,8 @@
   .policy {font-size: 14px;}
   .proposal {font-size: 14px;}
   .form-control.placeHCenter {width: 40px !important; height: 40px !important;}
+  .m-r-60 {margin-right: 15px;}
+  .prsnlinfo .W12 {margin-right: 40px;}
 }
 
 @media (max-width: 479px) {

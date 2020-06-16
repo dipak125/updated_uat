@@ -56,9 +56,9 @@ const validateAddress =  Yup.object().shape({
             return "Please select a value"
         }),    
     address1: Yup.string()
-        .required(function() {
+        .notRequired(function() {
             return "Enter plot number."
-        }).matches(/^([0-9A-Za-z\s]*)$/, function() {
+        }).matches(/^([0-9]*)$/, function() {
             return "Invalid plot number"
         }),
     address2: Yup.string()
@@ -98,7 +98,7 @@ const validateAddress =  Yup.object().shape({
     panNo: Yup.string()
         .required(function() {
             return "Enter PAN number"
-        }).matches(/^[A-Z]{5}[0-9]{4}[A-Z]{1}$/, function() {
+        }).matches(/^[A-Z]{3}[CPHFATBLJG]{1}[A-Z]{1}[0-9]{4}[A-Z]{1}$/, function() {
             return "Please enter valid Pan Number"
         }),
     pincode: Yup.string()
@@ -143,7 +143,7 @@ const validateAddress =  Yup.object().shape({
                 }).required(function() {
                     return "Please enter last name"
                 })
-                    .min(3, function() {
+                    .min(1, function() {
                         return "Last name must be minimum 3 chracters"
                     })
                     .max(40, function() {
@@ -166,7 +166,7 @@ const validateAddress =  Yup.object().shape({
                             function (value) {
                                 if (value) {
                                     const ageObj = new PersonAge();
-                                    return ageObj.whatIsMyAge(value) >= 18;
+                                    return ageObj.whatIsMyAge(value) < 46 && ageObj.whatIsMyAge(value) >= 18;
                                 }
                                 return true;
                             }
@@ -221,7 +221,7 @@ const validateAddress =  Yup.object().shape({
         }).notRequired(function() {
             return "Please enter proposer last name"
         })
-        .min(3, function() {
+        .min(1, function() {
             return "Name must be minimum 3 chracters"
         })
         .max(40, function() {
@@ -583,8 +583,8 @@ class Address extends Component {
                                         
                                     return (
                                     <Form>
-                                        <div className="d-flex justify-content-left align-items-center">
-                                            <div className="proposr m-r-60"><p>Is the Proposer same as insured</p></div>
+                                        <div className="d-flex flex-column flex-sm-column flex-md-column flex-lg-row justify-content-left m-b-15">
+                                            <div className="proposr prsres m-r-60"><p>Is the Proposer same as insured</p></div>
                                             <div className="d-inline-flex">
                                                 <div className="p-r-25">
                                                     <label className="customRadio3">
@@ -625,7 +625,11 @@ class Address extends Component {
                                                 </div>
                                             </div>
                                         </div>
+                                        <Row>
+                                        <Col sm={12} md={9} lg={9}>
+                                        <>
                                         {newInitialValues.proposerAsInsured == '0' ? 
+                                       
                                         <div>
                                         <div className="d-flex justify-content-left carloan m-b-25">
                                             <h4> Proposer Details</h4>
@@ -645,7 +649,7 @@ class Address extends Component {
                                                 />
                                             </div>
                                             <Row>
-                                            <Col sm={12} md={3} lg={3}>
+                                            <Col sm={12} md={6} lg={3}>
                                                 <FormGroup>
                                                     <div className="insurerName">
                                                         <Field
@@ -663,7 +667,7 @@ class Address extends Component {
                                                     </div>
                                                 </FormGroup>
                                             </Col>
-                                            <Col sm={12} md={3} lg={3}>
+                                            <Col sm={12} md={6} lg={3}>
                                                 <FormGroup>
                                                     <div className="insurerName">
                                                         <Field
@@ -681,7 +685,7 @@ class Address extends Component {
                                                     </div>
                                                 </FormGroup>
                                             </Col>
-                                            <Col sm={12} md={3} lg={3}>
+                                            <Col sm={12} md={6} lg={3}>
                                                 <FormGroup>
                                                     <DatePicker
                                                         name="proposerDob"
@@ -709,7 +713,7 @@ class Address extends Component {
                                                     ) : null}  
                                                 </FormGroup>
                                             </Col>
-                                            <Col sm={12} md={3} lg={3}>
+                                            <Col sm={12} md={6} lg={3}>
                                                 <FormGroup>
                                                     <div className="formSection">
                                                         <Field
@@ -737,9 +741,7 @@ class Address extends Component {
                                             <h4> Tell us more about the Insured Members</h4>
                                         </div>
                                                         
-                                        <Row>
-                                            <Col sm={12} md={9} lg={9}>
-                                            <>
+                                        
                                             <FieldArray
                                                 name="family_members"
                                                 render={arrayHelpers => (
@@ -876,7 +878,7 @@ class Address extends Component {
                                                         <div className="insurerName">
                                                             <Field
                                                                 name="phoneNo"
-                                                                type="number"
+                                                                type="text"
                                                                 placeholder="PHONE NO"
                                                                 autoComplete="off"
                                                                 onFocus={e => this.changePlaceHoldClassAdd(e)}
@@ -911,7 +913,7 @@ class Address extends Component {
                                                 </div>
 
                                                 <Row className="m-b-45">
-                                                    <Col sm={12} md={4} lg={4}>
+                                                    <Col sm={12} md={5} lg={4}>
                                                         <FormGroup>
                                                             <div className="insurerName">
                                                                 <Field
@@ -933,7 +935,7 @@ class Address extends Component {
                                                             </div>
                                                         </FormGroup>
                                                     </Col>
-                                                    <Col sm={12} md={4} lg={4}>
+                                                    <Col sm={12} md={5} lg={4}>
                                                         <FormGroup>
                                                             <div className="insurerName">
                                                                 <Field
@@ -954,7 +956,7 @@ class Address extends Component {
                                                             </div>
                                                         </FormGroup>
                                                     </Col>
-                                                    <Col sm={12} md={4} lg={4}>
+                                                    <Col sm={12} md={5} lg={4}>
                                                         <FormGroup>
                                                             <div className="insurerName">
                                                                 <Field
@@ -975,7 +977,7 @@ class Address extends Component {
                                                             </div>
                                                         </FormGroup>
                                                     </Col>
-                                                    <Col sm={12} md={4} lg={4}>
+                                                    <Col sm={12} md={5} lg={4}>
                                                         <FormGroup>
                                                             <div className="insurerName">
                                                                 <Field

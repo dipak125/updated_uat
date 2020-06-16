@@ -8,12 +8,13 @@ import {
   OverlayTrigger,
   Tooltip,
 } from "react-bootstrap";
+
 import BaseComponent from ".././BaseComponent";
 import SideNav from "../common/side-nav/SideNav";
 import Footer from "../common/footer/Footer";
 import Collapsible from "react-collapsible";
 import axios from "../../shared/axios";
-import { withRouter } from "react-router-dom";
+import { withRouter, Link } from "react-router-dom";
 import { loaderStart, loaderStop } from "../../store/actions/loader";
 import { connect } from "react-redux";
 // import { Formik, Form, Field, ErrorMessage, FieldArray } from 'formik'
@@ -200,7 +201,7 @@ class PolicyDetails extends Component {
 
   render() {
     const { productId } = this.props.match.params;
-    const { fulQuoteResp, error, show } = this.state;
+    const { fulQuoteResp, error, show, policyHolderDetails } = this.state;
 
     console.log("fulQuoteResp ", fulQuoteResp)
     const items =
@@ -350,7 +351,7 @@ class PolicyDetails extends Component {
                           <Collapsible trigger=" Contact information">
                             <div className="listrghtsideTrigr">
                               <div className="d-flex justify-content-end carloan">
-                                <a href={`/Address/${productId}`}> Edit</a>
+                                <Link to ={`/Address/${productId}`}> Edit</Link>
                               </div>
                               <Row>
                                 <Col sm={12} md={6}>
@@ -359,7 +360,7 @@ class PolicyDetails extends Component {
                                       Mobile number:
                                     </Col>
                                     <Col sm={12} md={6}>
-                                      {fulQuoteResp.ContactPersonNumber}
+                                      {policyHolderDetails.mobile}
                                     </Col>
                                   </Row>
 
@@ -368,7 +369,7 @@ class PolicyDetails extends Component {
                                       Email:
                                     </Col>
                                     <Col sm={12} md={6}>
-                                      {fulQuoteResp.ContactEmail}
+                                      {policyHolderDetails.email_id}
                                     </Col>
                                   </Row>
                                 </Col>

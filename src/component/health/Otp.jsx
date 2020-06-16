@@ -14,7 +14,7 @@ class Otp extends Component {
     state = {
         otp: "",
         errorMsg: "",
-        seconds: 10
+        seconds: 20
       };
 
     checkOtp = (values) => {
@@ -68,6 +68,9 @@ class Otp extends Component {
         const formData = new FormData();
         formData.append('policy_holder_id', localStorage.getItem('policyHolder_id'));
         formData.append("menumaster_id", '2');
+        this.setState({
+            seconds: 20,
+          });
         axios
           .post('/otp/generate', formData)
           .then((res) => {
@@ -106,15 +109,19 @@ class Otp extends Component {
           });
       };
 
+      coundown = () => {
+        this.myInterval = setInterval(() => {
+            this.setState(({ seconds }) => ({
+              seconds: seconds - 1
+            }))
+          }, 1000) 
+      }
+
 
     componentDidMount() {
-        this.generateOtp();
-
-            this.myInterval = setInterval(() => {
-                this.setState(({ seconds }) => ({
-                  seconds: seconds - 1
-                }))
-              }, 1000)       
+        this.generateOtp();  
+        this.coundown();
+        
       }
     
     render() {
@@ -221,6 +228,10 @@ class Otp extends Component {
                             </div>
                            
                             <div className="text-center">
+                            <Button className={`proceedBtn`} type="button" onClick={this.generateOtp} >
+                            Resend OTP
+                            </Button>
+
                             <Button className={`proceedBtn`} type="submit" >
                                 {isSubmitting ? 'Wait..' : 'Continue'}
                             </Button> 

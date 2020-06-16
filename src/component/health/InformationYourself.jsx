@@ -1,6 +1,8 @@
 import React, { Component } from 'react';
 import { Row, Col, Modal, Button, FormGroup } from 'react-bootstrap';
 import DatePicker from "react-datepicker";
+import "react-datepicker/dist/react-datepicker.css"
+import 'react-datepicker/dist/react-datepicker-cssmodules.min.css'
 import BaseComponent from '.././BaseComponent';
 import SideNav from '../common/side-nav/SideNav';
 import Footer from '../common/footer/Footer';
@@ -116,7 +118,7 @@ const validateFamilyMembers  = Yup.object().shape({
         function (value) {
             if (value) {
                 const ageObj = new PersonAge();
-                return ageObj.whatIsMyAge(value) < 45 && ageObj.whatIsMyAge(value) >= 18 ;
+                return ageObj.whatIsMyAge(value) < 46 && ageObj.whatIsMyAge(value) >= 18 ;
             }
             return true;
         }
@@ -134,7 +136,7 @@ const validateFamilyMembers  = Yup.object().shape({
             function (value) {
                 if (value) {
                     const ageObj = new PersonAge();
-                    return ageObj.whatIsMyAge(value) >= 18;
+                    return ageObj.whatIsMyAge(value) < 46 && ageObj.whatIsMyAge(value) >= 18;
                 }
                 return true;
             }
@@ -151,7 +153,7 @@ const validateFamilyMembers  = Yup.object().shape({
             function (value) {
                 if (value) {
                     const ageObj = new PersonAge();
-                    return ageObj.whatIsMyAge(value) < 25 && ageObj.whatIsMyAgeMonth(value) >=3 ;
+                    return ageObj.whatIsMyAge(value) < 26 && ageObj.whatIsMyAgeMonth(value) >=3 ;
                 }
                 return true;
             }
@@ -175,7 +177,7 @@ const validateFamilyMembers  = Yup.object().shape({
             function (value) {
                 if (value) {
                     const ageObj = new PersonAge();
-                    return ageObj.whatIsMyAge(value) < 25 && ageObj.whatIsMyAgeMonth(value) >=3;
+                    return ageObj.whatIsMyAge(value) < 26 && ageObj.whatIsMyAgeMonth(value) >=3;
                 }
                 return true;
             }
@@ -198,7 +200,7 @@ const validateFamilyMembers  = Yup.object().shape({
             function (value) {
                 if (value) {
                     const ageObj = new PersonAge();
-                    return ageObj.whatIsMyAge(value) < 25 && ageObj.whatIsMyAgeMonth(value) >=3 ;
+                    return ageObj.whatIsMyAge(value) < 26 && ageObj.whatIsMyAgeMonth(value) >=3 ;
                 }
                 return true;
             }
@@ -222,7 +224,7 @@ const validateFamilyMembers  = Yup.object().shape({
             function (value) {
                 if (value) {
                     const ageObj = new PersonAge();
-                    return ageObj.whatIsMyAge(value) >= 18;
+                    return ageObj.whatIsMyAge(value) < 46 && ageObj.whatIsMyAge(value) >= 18;
                 }
                 return true;
             }
@@ -241,7 +243,7 @@ const validateFamilyMembers  = Yup.object().shape({
             function (value) {
                 if (value) {
                     const ageObj = new PersonAge();
-                    return ageObj.whatIsMyAge(value) >= 18;
+                    return ageObj.whatIsMyAge(value) < 46 && ageObj.whatIsMyAge(value) >= 18;
                 }
                 return true;
             }
@@ -260,7 +262,7 @@ const validateFamilyMembers  = Yup.object().shape({
             function (value) {
                 if (value) {
                     const ageObj = new PersonAge();
-                    return ageObj.whatIsMyAge(value) >= 18;
+                    return ageObj.whatIsMyAge(value) < 46 && ageObj.whatIsMyAge(value) >= 18;
                 }
                 return true;
             }
@@ -278,7 +280,7 @@ const validateFamilyMembers  = Yup.object().shape({
             function (value) {
                 if (value) {
                     const ageObj = new PersonAge();
-                    return ageObj.whatIsMyAge(value) >= 18;
+                    return ageObj.whatIsMyAge(value) < 46 && ageObj.whatIsMyAge(value) >= 18;
                 }
                 return true;
             }
@@ -682,10 +684,6 @@ setStateForPreviousData=(family_members)=>{
         });
            
 
-        
-       
-
-
         return (
             <>
                 <BaseComponent>
@@ -832,18 +830,17 @@ setStateForPreviousData=(family_members)=>{
                                                 </div>
 
                                                 <div className="col-md-4">
-                                                    <label className="formGrp error">                                                  
+                                                    <FormGroup>                                                  
                                                         <DatePicker
                                                             name="dob_0"
-                                                            minDate={new Date()}
                                                             dateFormat="dd MMM yyyy"
                                                             placeholderText="DOB"
                                                             peekPreviousMonth
                                                             peekPreviousYear
                                                             showMonthDropdown
                                                             showYearDropdown
-                                                            maxDate={new Date()}
-                                                            minDate={new Date(1/1/1900)}
+                                                            maxDate={new Date(moment().subtract(18, 'years').calendar())}
+                                                            minDate={new Date(moment().subtract(45, 'years').calendar())}
                                                             className="datePckr"
                                                             dropdownMode="select"
                                                             onChange={(value,e) => {
@@ -852,11 +849,10 @@ setStateForPreviousData=(family_members)=>{
                                                                  }
                                                                 setFieldTouched("dob_0");
                                                                 setFieldValue("dob_0", value);
-
                                                               }}
                                                             selected={values.dob_0}
                                                         />
-
+                                                        <label className="formGrp error">
                                                         {
                                                             errors.dob_0 && touched.dob_0 ?                 
                                                             <span className="error-message">{errors.dob_0}</span>:''
@@ -866,9 +862,9 @@ setStateForPreviousData=(family_members)=>{
                                                             errors.looking_for_0 && touched.looking_for_0 ?                 
                                                             <span className="error-message">{errors.looking_for_0}</span>:''
                                                         }
+                                                        </label>
                                                         
-                                                        
-                                                    </label>
+                                                    </FormGroup>
                                                 </div>
                                             </div>
 
@@ -909,18 +905,17 @@ setStateForPreviousData=(family_members)=>{
                                                 </div>
 
                                                 <div className="col-md-4">
-                                                    <label className="formGrp error">
+                                                    <FormGroup >
                                                         <DatePicker
                                                             name="dob_1"
-                                                            minDate={new Date()}
                                                             dateFormat="dd MMM yyyy"
                                                             placeholderText="DOB"
                                                             peekPreviousMonth
                                                             peekPreviousYear
                                                             showMonthDropdown
                                                             showYearDropdown
-                                                            maxDate={new Date()}
-                                                            minDate={new Date(1/1/1900)}
+                                                            maxDate={new Date(moment().subtract(18, 'years').calendar())}
+                                                            minDate={new Date(moment().subtract(45, 'years').calendar())}
                                                             className="datePckr"
                                                             dropdownMode="select"
                                                             onChange={(value,e) => {
@@ -932,12 +927,13 @@ setStateForPreviousData=(family_members)=>{
                                                               }}
                                                             selected={values.dob_1}
                                                         />
-
+                                                        <label className="formGrp error">
                                                         {
                                                             errors.dob_1 && touched.dob_1 ?                 
                                                             <span className="error-message">{errors.dob_1}</span>:''
                                                         }
-                                                    </label>
+                                                        </label>
+                                                    </FormGroup>
                                                 </div>
                                             </div>
 
@@ -977,18 +973,17 @@ setStateForPreviousData=(family_members)=>{
                                                 </div>
 
                                                 <div className="col-md-4">
-                                                    <label className="formGrp error">
+                                                    <FormGroup >
                                                         <DatePicker
                                                             name="dob_2"
-                                                            minDate={new Date()}
                                                             dateFormat="dd MMM yyyy"
                                                             placeholderText="DOB"
                                                             peekPreviousMonth
                                                             peekPreviousYear
                                                             showMonthDropdown
                                                             showYearDropdown
-                                                            maxDate={new Date()}
-                                                            minDate={new Date(1/1/1900)}
+                                                            maxDate={new Date(moment().subtract(3, 'months').calendar())}
+                                                            minDate={new Date(moment().subtract(25, 'years').calendar())}
                                                             className="datePckr"
                                                             dropdownMode="select"
                                                             onChange={(value,e) => {
@@ -1000,11 +995,13 @@ setStateForPreviousData=(family_members)=>{
                                                               }}
                                                             selected={values.dob_2}
                                                         />
+                                                        <label className="formGrp error">
                                                         {
                                                             errors.dob_2 && touched.dob_2 ?                 
                                                             <span className="error-message">{errors.dob_2}</span>:''
                                                         }
-                                                    </label>
+                                                        </label>
+                                                    </FormGroup>
                                                 </div>
 
                                                 <div className="col-md-4 formSection">
@@ -1065,18 +1062,17 @@ setStateForPreviousData=(family_members)=>{
                                                 </div>
 
                                                 <div className="col-md-4">
-                                                    <label className="formGrp error">
+                                                    <FormGroup >
                                                         <DatePicker
                                                             name="dob_3"
-                                                            minDate={new Date()}
                                                             dateFormat="dd MMM yyyy"
                                                             placeholderText="DOB"
                                                             peekPreviousMonth
                                                             peekPreviousYear
                                                             showMonthDropdown
                                                             showYearDropdown
-                                                            maxDate={new Date()}
-                                                            minDate={new Date(1/1/1900)}
+                                                            maxDate={new Date(moment().subtract(3, 'months').calendar())}
+                                                            minDate={new Date(moment().subtract(25, 'years').calendar())}
                                                             className="datePckr"
                                                             dropdownMode="select"
                                                             onChange={(value,e) => {
@@ -1088,11 +1084,13 @@ setStateForPreviousData=(family_members)=>{
                                                               }}
                                                             selected={values.dob_3}
                                                         />
+                                                        <label className="formGrp error">
                                                         {
                                                             errors.dob_3 && touched.dob_3 ?                 
                                                             <span className="error-message">{errors.dob_3}</span>:''
                                                         }
-                                                    </label>
+                                                        </label>
+                                                    </FormGroup>
                                                 </div>
 
                                                 <div className="col-md-4 formSection">
@@ -1152,18 +1150,17 @@ setStateForPreviousData=(family_members)=>{
                                                 </div>
 
                                                 <div className="col-md-4">
-                                                    <label className="formGrp error">
+                                                    <FormGroup >
                                                         <DatePicker
                                                             name="dob_4"
-                                                            minDate={new Date()}
                                                             dateFormat="dd MMM yyyy"
                                                             placeholderText="DOB"
                                                             peekPreviousMonth
                                                             peekPreviousYear
                                                             showMonthDropdown
                                                             showYearDropdown
-                                                            maxDate={new Date()}
-                                                            minDate={new Date(1/1/1900)}
+                                                            maxDate={new Date(moment().subtract(3, 'months').calendar())}
+                                                            minDate={new Date(moment().subtract(25, 'years').calendar())}
                                                             className="datePckr"
                                                             dropdownMode="select"
                                                             onChange={(value,e) => {
@@ -1175,11 +1172,13 @@ setStateForPreviousData=(family_members)=>{
                                                               }}
                                                             selected={values.dob_4}
                                                         />
+                                                        <label className="formGrp error">
                                                         {
                                                             errors.dob_4 && touched.dob_4 ?                 
                                                             <span className="error-message">{errors.dob_4}</span>:''
                                                         }
-                                                    </label>
+                                                        </label>
+                                                    </FormGroup>
                                                 </div>
 
                                                 <div className="col-md-4 formSection">
@@ -1242,18 +1241,17 @@ setStateForPreviousData=(family_members)=>{
                                                 </div>
 
                                                 <div className="col-md-4">
-                                                    <label className="formGrp error">
+                                                    <FormGroup>
                                                         <DatePicker
                                                             name="dob_5"
-                                                            minDate={new Date()}
                                                             dateFormat="dd MMM yyyy"
                                                             placeholderText="DOB"
                                                             peekPreviousMonth
                                                             peekPreviousYear
                                                             showMonthDropdown
                                                             showYearDropdown
-                                                            maxDate={new Date()}
-                                                            minDate={new Date(1/1/1900)}
+                                                            maxDate={new Date(moment().subtract(18, 'years').calendar())}
+                                                            minDate={new Date(moment().subtract(45, 'years').calendar())}
                                                             className="datePckr"
                                                             dropdownMode="select"
                                                             onChange={(value,e) => {
@@ -1265,12 +1263,14 @@ setStateForPreviousData=(family_members)=>{
                                                               }}
                                                             selected={values.dob_5}
                                                         />
-
+                                                        <label className="formGrp error">
                                                         {
                                                             errors.dob_5 && touched.dob_5 ?                 
                                                             <span className="error-message">{errors.dob_5}</span>:''
                                                         }
-                                                    </label>
+                                                        </label>
+                                                        
+                                                    </FormGroup>
                                                 </div>
                                             </div>
 
@@ -1311,18 +1311,17 @@ setStateForPreviousData=(family_members)=>{
                                                 </div>
 
                                                 <div className="col-md-4">
-                                                    <label className="formGrp error">
+                                                    <FormGroup >
                                                         <DatePicker
                                                             name="dob_6"
-                                                            minDate={new Date()}
                                                             dateFormat="dd MMM yyyy"
                                                             placeholderText="DOB"
                                                             peekPreviousMonth
                                                             peekPreviousYear
                                                             showMonthDropdown
                                                             showYearDropdown
-                                                            maxDate={new Date()}
-                                                            minDate={new Date(1/1/1900)}
+                                                            maxDate={new Date(moment().subtract(18, 'years').calendar())}
+                                                            minDate={new Date(moment().subtract(45, 'years').calendar())}
                                                             className="datePckr"
                                                             dropdownMode="select"
                                                             onChange={(value,e) => {
@@ -1334,12 +1333,13 @@ setStateForPreviousData=(family_members)=>{
                                                               }}
                                                             selected={values.dob_6}
                                                         />
-
+                                                        <label className="formGrp error">
                                                         {
                                                             errors.dob_6 && touched.dob_6 ?                 
                                                             <span className="error-message">{errors.dob_6}</span>:''
                                                         }
-                                                    </label>
+                                                        </label>
+                                                    </FormGroup>
                                                 </div>
                                             </div>
 
@@ -1379,18 +1379,17 @@ setStateForPreviousData=(family_members)=>{
                                                 </div>
 
                                                 <div className="col-md-4">
-                                                    <label className="formGrp error">
+                                                    <FormGroup >
                                                         <DatePicker
                                                             name="dob_7"
-                                                            minDate={new Date()}
                                                             dateFormat="dd MMM yyyy"
                                                             placeholderText="DOB"
                                                             peekPreviousMonth
                                                             peekPreviousYear
                                                             showMonthDropdown
                                                             showYearDropdown
-                                                            maxDate={new Date()}
-                                                            minDate={new Date(1/1/1900)}
+                                                            maxDate={new Date(moment().subtract(18, 'years').calendar())}
+                                                            minDate={new Date(moment().subtract(45, 'years').calendar())}
                                                             className="datePckr"
                                                             dropdownMode="select"
                                                             onChange={(value,e) => {
@@ -1402,12 +1401,13 @@ setStateForPreviousData=(family_members)=>{
                                                               }}
                                                             selected={values.dob_7}
                                                         />
-
+                                                        <label className="formGrp error">
                                                         {
                                                             errors.dob_7 && touched.dob_7 ?                 
                                                             <span className="error-message">{errors.dob_7}</span>:''
                                                         }
-                                                    </label>
+                                                        </label>
+                                                    </FormGroup>
                                                 </div>
                                             </div>
 
@@ -1447,18 +1447,17 @@ setStateForPreviousData=(family_members)=>{
                                                 </div>
 
                                                 <div className="col-md-4">
-                                                    <label className="formGrp error">
+                                                    <FormGroup >
                                                         <DatePicker
                                                             name="dob_8"
-                                                            minDate={new Date()}
                                                             dateFormat="dd MMM yyyy"
                                                             placeholderText="DOB"
                                                             peekPreviousMonth
                                                             peekPreviousYear
                                                             showMonthDropdown
                                                             showYearDropdown
-                                                            maxDate={new Date()}
-                                                            minDate={new Date(1/1/1900)}
+                                                            maxDate={new Date(moment().subtract(18, 'years').calendar())}
+                                                            minDate={new Date(moment().subtract(45, 'years').calendar())}
                                                             className="datePckr"
                                                             dropdownMode="select"
                                                             onChange={(value,e) => {
@@ -1470,17 +1469,18 @@ setStateForPreviousData=(family_members)=>{
                                                               }}
                                                             selected={values.dob_8}
                                                         />
-
+                                                        <label className="formGrp error">
                                                         {
                                                             errors.dob_6 && touched.dob_8 ?                 
                                                             <span className="error-message">{errors.dob_8}</span>:''
                                                         }
-                                                    </label>
+                                                        </label>
+                                                    </FormGroup>
                                                 </div>
                                             </div>
                                             <div className="cntrbtn">
                                             <Button className={`btnPrimary m-r-15`} type="submit" >
-                                               Select
+                                            {this.setValueData() || this.state.validateCheck == 1 ? ( 'Submit' ) : 'Select'} 
                                             </Button>
                                             <Button className={`btnPrimary`} type="button" onClick={e => this.handleClose()} >
                                              Cancel

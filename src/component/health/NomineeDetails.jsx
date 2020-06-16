@@ -32,25 +32,26 @@ const initialValues = {
 const validateNominee = Yup.object().shape({
     last_name: Yup.string().required(function() {
         return "Please enter a last name"
+    }).min(3, function() {
+        return "Last name must be minimum 3 chracters"
+    }).max(40, function() {
+        return "Last name must be maximum 40 chracters"
     }).matches(/^[A-Za-z]*$/, function() {
         return "Please enter valid last name"
-    }).min(3, function() {
-        return "Name must be minimum 3 chracters"
-    })
-    .max(40, function() {
-        return "Name must be maximum 40 chracters"
-    }),
+}),
     first_name: Yup.string(function() {
         return "Please enter name"
     }).required(function() {
         return "Please enter name"
-    }).matches(/^[A-Za-z]*$/, function() {
-            return "Please enter valid name"
-    }).min(3, function() {
-        return "Name must be minimum 3 chracters"
     })
-    .max(40, function() {
-        return "Name must be maximum 40 chracters"
+        .min(3, function() {
+            return "Name must be minimum 3 chracters"
+        })
+        .max(40, function() {
+            return "Name must be maximum 40 chracters"
+        })
+        .matches(/^[A-Za-z]*$/, function() {
+            return "Please enter valid name"
     }),
         gender: Yup.string().required(function() {
                 return "Please select gender"
@@ -109,7 +110,13 @@ const validateNominee = Yup.object().shape({
             return "Please enter appointee name"
         }).notRequired(function() {
             return "Please enter appointee name"
-        })        
+        })
+        .min(3, function() {
+            return "Name must be minimum 3 chracters"
+        })
+        .max(40, function() {
+            return "Name must be maximum 40 chracters"
+        })
         .matches(/^[A-Za-z][A-Za-z\s\-']*$/, function() {
             return "Please enter valid name"
     }).test(
@@ -124,12 +131,7 @@ const validateNominee = Yup.object().shape({
             }
             return true;
         }
-    ).min(3, function() {
-        return "Name must be minimum 3 chracters"
-    })
-    .max(40, function() {
-        return "Name must be maximum 40 chracters"
-    }),
+    ),
     appointee_relation_with: Yup.string().notRequired(function() {
         return "Please select relation"
     }).test(
@@ -382,7 +384,7 @@ class NomineeDetails extends Component {
                                                     </Col>
 
 
-                                                    <Col sm={12} md={4} lg={6}>
+                                                    <Col sm={12} md={8} lg={8}>
                                                         <FormGroup>
                                                             <div className="formSection">                                                           
                                                                 <Field
