@@ -349,7 +349,7 @@ class PolicyDetails extends Component {
                                 <Col sm={12} md={3}>
                                   <FormGroup>
                                     <strong>Rs:</strong>{" "}
-                                    {fulQuoteResp.GrossPremium}
+                                    {fulQuoteResp.GrossPremium+fulQuoteResp.AlcoholLoadingAmount+fulQuoteResp.SmokerLoadingAmount+fulQuoteResp.TobaccoLoadingAmount}
                                   </FormGroup>
                                 </Col>
                                 <Col sm={12} md={3}>
