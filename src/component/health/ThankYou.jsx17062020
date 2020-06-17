@@ -7,7 +7,7 @@ import { withRouter } from 'react-router-dom';
 import { loaderStart, loaderStop } from "../../store/actions/loader";
 import { connect } from "react-redux";
 import swal from 'sweetalert';
-import Encryption from '../../shared/payload-encryption';
+
 
 class ThankYouPage extends Component {
 
@@ -40,14 +40,9 @@ class ThankYouPage extends Component {
 
         const {policyId} = this.props.match.params
         const formData = new FormData();
-        //formData.append('access_token', access_token);
-        //formData.append('policyNo', policyId)
-        const post_data_obj = {
-          'access_token':access_token,
-          'policyNo':policyId
-        }
-        let encryption = new Encryption();
-        formData.append('enc_data',encryption.encrypt(JSON.stringify(post_data_obj)))
+        formData.append('access_token', access_token);
+        formData.append('policyNo', policyId)
+        
         this.props.loadingStart();
         axios
           .post(`/callDocApi`, formData)
@@ -78,17 +73,9 @@ class ThankYouPage extends Component {
         const {policyId} = this.props.match.params
         if(response_text && policy_holder_id) {
           const formData = new FormData();
-        //  formData.append('policy_holder_id', policy_holder_id);
-         // formData.append('policy_no', policyId);
-          //formData.append('response_text', JSON.stringify(response_text))
-          const post_data_obj = {
-            'policy_holder_id':policy_holder_id,
-            'policy_no':policyId,
-            'response_text':JSON.stringify(response_text)
-          }
-
-          let encryption = new Encryption();
-          formData.append('enc_data',encryption.encrypt(JSON.stringify(post_data_obj)))
+          formData.append('policy_holder_id', policy_holder_id);
+          formData.append('policy_no', policyId);
+          formData.append('response_text', JSON.stringify(response_text))
           this.props.loadingStart();
           axios
             .post(`/generate-pdf`, formData)

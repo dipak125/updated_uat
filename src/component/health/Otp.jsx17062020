@@ -5,8 +5,6 @@ import { withRouter } from 'react-router-dom';
 import { loaderStart, loaderStop } from "../../store/actions/loader";
 import { connect } from "react-redux";
 import axios from "../../shared/axios";
-import Encryption from '../../shared/payload-encryption';
-
 // import OtpInput from 'react-otp-input';
 
 const initialValue = {}
@@ -22,15 +20,8 @@ class Otp extends Component {
     checkOtp = (values) => {
         this.props.loadingStart();
         const formData = new FormData();
-       // formData.append('policy_holder_id', localStorage.getItem('policyHolder_id'));
-       // formData.append("menumaster_id", '2');
-       let post_data_obj = {
-         'policy_holder_id':localStorage.getItem('policyHolder_id'),
-         'menumaster_id':'2'
-       }
-       let encryption = new Encryption();
-       formData.append('enc_data',encryption.encrypt(JSON.stringify(post_data_obj)))
-
+        formData.append('policy_holder_id', localStorage.getItem('policyHolder_id'));
+        formData.append("menumaster_id", '2');
         axios
           .post('/otp/check-status', formData)
           .then((res) => {
@@ -75,15 +66,8 @@ class Otp extends Component {
     generateOtp = () => {
         this.props.loadingStart();
         const formData = new FormData();
-       // formData.append('policy_holder_id', localStorage.getItem('policyHolder_id'));
-       // formData.append("menumaster_id", '2');
-        let post_data_obj = {
-          'policy_holder_id':localStorage.getItem('policyHolder_id'),
-          'menumaster_id':'2'
-        }
-        let encryption = new Encryption();
-        formData.append('enc_data',encryption.encrypt(JSON.stringify(post_data_obj)))
-
+        formData.append('policy_holder_id', localStorage.getItem('policyHolder_id'));
+        formData.append("menumaster_id", '2');
         this.setState({
             seconds: 20,
           });
@@ -104,14 +88,8 @@ class Otp extends Component {
       getOtp = () => {
         this.props.loadingStart();
         const formData = new FormData();
-        //formData.append('policy_holder_id', localStorage.getItem('policyHolder_id'));
-        //formData.append("menumaster_id", '2');
-        let post_data_obj = {
-          'policy_holder_id':localStorage.getItem('policyHolder_id'),
-          'menumaster_id':'2'
-        }
-        let encryption = new Encryption();
-        formData.append('enc_data',encryption.encrypt(JSON.stringify(post_data_obj)))
+        formData.append('policy_holder_id', localStorage.getItem('policyHolder_id'));
+        formData.append("menumaster_id", '2');
         axios
           .post('/otp/check-status', formData)
           .then((res) => {

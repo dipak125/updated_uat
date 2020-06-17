@@ -12,7 +12,6 @@ import { Formik, Form, Field, ErrorMessage, FieldArray } from 'formik'
 import * as Yup from "yup";
 import mapValues from 'lodash/mapValues';
 import swal from 'sweetalert';
-import Encryption from '../../shared/payload-encryption';
 
 
 
@@ -97,8 +96,8 @@ class MedicalDetails extends Component {
         );
             console.log("SSSSSSSSSSS=======>",newShowImage)
       
-      // formData.append('question_id', question_id[0]);
-      // formData.append('answer', value);
+       formData.append('question_id', question_id[0]);
+       formData.append('answer', value);
        selected_answer.push(value);
        selected_answer = [...new Set(selected_answer)];
        selected_question = this.state.selected_question;
@@ -117,24 +116,12 @@ class MedicalDetails extends Component {
        console.log("AAAAA====>",familyMembers);
        if(answerStr=='n'){
             let family_members = this.state.family_members
-            let arr_data = []
-                family_members && family_members.map((resource,index) =>{
-                    // console.log('aaaaa123344======>',resource.id)
-                    // formData.append(`family_member_ids[${index}]`,resource.id);  
-                    arr_data.push(resource.id)
-                }                
+            family_members && family_members.map((resource,index) =>{
+                console.log('aaaaa123344======>',resource.id)
+                formData.append(`family_member_ids[${index}]`,resource.id);  
+                }
             );  
-            //formData.append('policy_holder_id', localStorage.getItem('policyHolder_id'));
-
-            let policy_holder_id = localStorage.getItem('policyHolder_id') ? localStorage.getItem('policyHolder_id') : 0
-            let encryption = new Encryption();
-            let post_data = {
-                'question_id':question_id[0],
-                'answer':value,
-                'family_member_ids':arr_data,
-                'policy_holder_id':policy_holder_id
-            }   
-            formData.append('enc_data',encryption.encrypt(JSON.stringify(post_data)))
+            formData.append('policy_holder_id', localStorage.getItem('policyHolder_id'));
             this.props.loadingStart();
             axios
                 .post(`/medical-question`, formData)
@@ -376,27 +363,20 @@ class MedicalDetails extends Component {
              selected_family_members
          })
 
-        // formData.append('policy_holder_id', localStorage.getItem('policyHolder_id'));
-        // formData.append('question_id',classId);
-        // formData.append('answer','y');
-         let arr_data = []
+         formData.append('policy_holder_id', localStorage.getItem('policyHolder_id'));
+         formData.append('question_id',classId);
+         formData.append('answer','y');
          for(let i=0;i<selected_family_members.length;i++){
             let arr_selected = selected_family_members[i].split('~')
             if(arr_selected[0]==classId){
-                arr_data.push(arr_selected[1])
-              //  formData.append(`family_member_ids[${i}]`,arr_selected[1]);       
+                formData.append(`family_member_ids[${i}]`,arr_selected[1]);       
             }
           //  console.log("ARRAY SELECTED======>",arr_selected)
          }
-         let policy_holder_id = localStorage.getItem('policyHolder_id') ? localStorage.getItem('policyHolder_id') : 0
-         const post_data = {             
-            'policy_holder_id':policy_holder_id,
-            'family_member_ids':arr_data,
-            'question_id':classId,
-            'answer':'y'
-         }
-         let encryption = new Encryption();
-        formData.append('enc_data',encryption.encrypt(JSON.stringify(post_data)))   
+
+
+       // formData.append(`family_member_ids[${i}]`,familyMembers[i].value);   
+
 
         this.props.loadingStart();
                 axios

@@ -18,7 +18,6 @@ import moment from "moment";
 
 import "react-datepicker/dist/react-datepicker.css"
 import 'react-datepicker/dist/react-datepicker-cssmodules.min.css'
-import Encryption from '../../shared/payload-encryption';
 
 const maxDob = dateformat(new Date(), 'mm/dd/yyyy');
 
@@ -363,14 +362,7 @@ class Address extends Component {
             if(addressDetails){
                 let pincode = addressDetails.pincode;
                 const formData = new FormData();
-                let encryption = new Encryption();
-
-               const post_data_obj = {
-                    'pincode':pincode.toString()
-                };
-               // let encryption = new Encryption();
-               formData.append('enc_data',encryption.encrypt(JSON.stringify(post_data_obj)))
-
+                formData.append('pincode',pincode);
                 this.props.loadingStart();
                 axios.post('generate-pincode-details',
                 formData
@@ -403,18 +395,9 @@ class Address extends Component {
         if(pinCode.length==6){
 
             const formData = new FormData();
-            ///formData.append('pincode',pinCode);
+            formData.append('pincode',pinCode);
             this.props.loadingStart();
-
-            let encryption = new Encryption();
-
-           // formData.append('pincode',pinCode);
-            const post_data_obj = {
-                'pincode':pinCode
-            };
-           // let encryption = new Encryption();
-           formData.append('enc_data',encryption.encrypt(JSON.stringify(post_data_obj)))
-           axios.post('generate-pincode-details',
+            axios.post('generate-pincode-details',
             formData
             ).then(res=>{
                 let pinData = res.data.trim();               
@@ -453,61 +436,30 @@ class Address extends Component {
         const {productId } = this.props.match.params
         const policyHolder_id =  localStorage.getItem('policyHolder_id');
         const formData = new FormData();
-
-        let formArr = []
         
-      //  formData.append('policy_holder_id',policyHolder_id);
-        formArr['policy_holder_id'] = policyHolder_id;
+        formData.append('policy_holder_id',policyHolder_id);
         const family_members = values.family_members;
         let proposerAsInsured = values.proposerAsInsured;
         sessionStorage.setItem('proposed_insured',proposerAsInsured);
- 
-        let looking_for = []
-        let family_member_id = []
-        let gender = []
-        let first_name = []
-        let last_name = []
-        let dob = []
-        let pancard_no = []
 
         for(let i=0;i<family_members.length;i++){
-           // formData.append(`looking_for[${i}]`, family_members[i].looking_for);
-             looking_for.push(family_members[i].looking_for)
-          //  formData.append(`family_member_id[${i}]`, family_members[i].family_member_id);
-            family_member_id.push(family_members[i].family_member_id)
-          //  formData.append(`gender[${i}]`, family_members[i].gender);
-            gender.push(family_members[i].gender)
-           // formData.append(`first_name[${i}]`, family_members[i].fname);
-            first_name.push(family_members[i].fname)
-            //formData.append(`last_name[${i}]`, family_members[i].lname);
-            last_name.push(family_members[i].lname)
-           // formData.append(`dob[${i}]`, moment(family_members[i].dob).format("YYYY-MM-DD"));
-           dob.push(moment(family_members[i].dob).format("YYYY-MM-DD"))
-           pancard_no.push(values.panNo)
-          //  formData.append(`pancard_no[${i}]`, values.panNo);
+            formData.append(`looking_for[${i}]`, family_members[i].looking_for);
+            formData.append(`family_member_id[${i}]`, family_members[i].family_member_id);
+            formData.append(`gender[${i}]`, family_members[i].gender);
+            formData.append(`first_name[${i}]`, family_members[i].fname);
+            formData.append(`last_name[${i}]`, family_members[i].lname);
+            formData.append(`dob[${i}]`, moment(family_members[i].dob).format("YYYY-MM-DD"));
+            
+            formData.append(`pancard_no[${i}]`, values.panNo);
          //   formData.append(`pancard_no[${i}]`, values.panNo);
         }  
-
-        formArr['looking_for'] = looking_for
-        formArr['family_member_id'] = family_member_id
-        formArr['gender'] = gender
-        formArr['first_name'] = first_name
-        formArr['last_name'] = last_name
-        formArr['dob'] = dob
-        formArr['pancard_no'] = pancard_no
-
-        formArr['policy_holder_id'] = policyHolder_id;
-
-
         let email = values.email;
      // formData.append('panNo',values.panNo);
-       // formData.append('phoneNo',values.phoneNo);
-        formArr['phoneNo'] = values.phoneNo;
-        //formData.append('email_id',values.email);
-        formArr['email_id'] = values.email;
+        formData.append('phoneNo',values.phoneNo);
+        formData.append('email_id',values.email);
+
         sessionStorage.setItem('email_data',email);
-        formArr['is_eia_account'] = values.eIA;
-        //formData.append('is_eia_account',values.eIA);        
+        formData.append('is_eia_account',values.eIA);
         sessionStorage.setItem('pan_data',values.panNo);
         sessionStorage.setItem('email_data',values.email);
 
@@ -521,32 +473,19 @@ class Address extends Component {
             pincode:values.pincode,
             state:values.state,
         })
-        //formData.append('communication_address',JSON.stringify(address_object));   
-        formArr['communication_address'] = JSON.stringify(address_object);   
-       // formData.append('panNo',values.panNo);
-        formArr['panNo'] = values.panNo;
-        //formData.append('phoneNo',values.phoneNo);
-        formArr['phoneNo'] = values.phoneNo;
-        //formData.append('email',values.email); 
-        formArr['email'] = values.email;
-       // formData.append('proposerName',values.proposerName);
-        formArr['proposerName'] = values.proposerName;
-       // formData.append('proposerLname',values.proposerLname);
-        formArr['proposerLname'] = values.proposerLname;
-        //formData.append('proposerDob',moment(values.proposerDob).format("YYYY-MM-DD") ); 
-        formArr['proposerDob'] = moment(values.proposerDob).format("YYYY-MM-DD");
-        //formData.append('proposerGender',values.proposerGender); 
-        formArr['proposerGender'] = values.proposerGender;
+        formData.append('communication_address',JSON.stringify(address_object));       
+        formData.append('panNo',values.panNo);
+        formData.append('phoneNo',values.phoneNo);
+        formData.append('email',values.email); 
+
+        formData.append('proposerName',values.proposerName);
+        formData.append('proposerLname',values.proposerLname);
+        formData.append('proposerDob',moment(values.proposerDob).format("YYYY-MM-DD") ); 
+        formData.append('proposerGender',values.proposerGender); 
+
         if(values.eIA == 1){
-            //formData.append('eia_account_no',values.eia_account_no)
-            formArr['eia_account_no'] = values.eia_account_no;
-        }       
-
-        let formObj = {}
-        Object.assign(formObj,formArr);
-        let encryption = new Encryption();
-        formData.append('enc_data',encryption.encrypt(JSON.stringify(formObj)))
-
+            formData.append('eia_account_no',values.eia_account_no)
+        }        
         this.props.loadingStart();
         axios
         .post(`/insured-member-details`, formData)

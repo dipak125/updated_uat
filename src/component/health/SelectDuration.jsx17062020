@@ -22,9 +22,6 @@ import {
     checkGreaterStartEndTimes
   } from "../../shared/validationFunctions";
 
-import Encryption from '../../shared/payload-encryption';  
-
-
 const initialValues = {
 polStartDate: "",
 polEndDate: "",
@@ -125,12 +122,9 @@ class SelectDuration extends Component {
         const {productId} = this.props.match.params
         const {serverResponse} = this.state
         const formData = new FormData(); 
-        let encryption = new Encryption();
 
-       // formData.append('policy_holder_id', localStorage.getItem('policyHolder_id'));
-        let policy_holder_id = localStorage.getItem('policyHolder_id') ? localStorage.getItem('policyHolder_id') : 0
-
-       /* formData.append('start_date', serverResponse.EffectiveDate);
+        formData.append('policy_holder_id', localStorage.getItem('policyHolder_id'));
+        formData.append('start_date', serverResponse.EffectiveDate);
         formData.append('end_date', serverResponse.ExpiryDate);
         formData.append('gross_premium', serverResponse.GrossPremium);
         formData.append('service_tax', serverResponse.TGST);
@@ -138,22 +132,6 @@ class SelectDuration extends Component {
         formData.append('krishi_kalayan_cess', '0');
         formData.append('net_premium', serverResponse.DuePremium);
         formData.append('sum_insured', values.insureValue);
-        */
-
-
-        const post_data = {
-            'policy_holder_id':policy_holder_id,
-            'start_date':serverResponse.EffectiveDate,
-            'end_date':serverResponse.ExpiryDate,
-            'gross_premium':serverResponse.GrossPremium,
-            'service_tax':serverResponse.TGST,
-            'swatch_bharat_cess':0,
-            'krishi_kalayan_cess':0,
-            'net_premium':serverResponse.DuePremium,
-            'sum_insured':values.insureValue
-        }
-        formData.append('enc_data',encryption.encrypt(JSON.stringify(post_data)))
-
 
         this.props.loadingStart();
         axios
@@ -223,22 +201,11 @@ class SelectDuration extends Component {
         let insureValue = value.insureValue ? value.insureValue : "5";
         const formData = new FormData(); 
         this.props.loadingStart();
-      /*formData.append('id', localStorage.getItem('policyHolder_id'));
+        formData.append('id', localStorage.getItem('policyHolder_id'));
         formData.append('policyStartDate', polStartDate);
-      formData.append('policyEndDate', polEndDate);
-      formData.append('insureValue', insureValue);
-      formData.append('access_token', accessToken);*/
-
-
-      const post_data = {
-        'id':localStorage.getItem('policyHolder_id'),
-        'policyStartDate':polStartDate,
-        'policyEndDate':polEndDate,
-        'insureValue':insureValue,
-        'access_token':accessToken
-    }
-    let encryption = new Encryption();
-        formData.append('enc_data',encryption.encrypt(JSON.stringify(post_data)))
+        formData.append('policyEndDate', polEndDate);
+        formData.append('insureValue', insureValue);
+        formData.append('access_token', accessToken);
         axios
           .post(`/quickQuoteService`, formData)
           .then(res => { 

@@ -16,7 +16,6 @@ import { loaderStart, loaderStop } from "../../store/actions/loader";
 import { connect } from "react-redux";
 import { changeFormat, get18YearsBeforeDate, PersonAge } from "../../shared/dateFunctions";
 import dateformat from "dateformat";
-import Encryption from '../../shared/payload-encryption';
 
 // const maxDob = dateformat(new Date(), 'mm/dd/yyyy');
 const initialValues = {
@@ -190,31 +189,19 @@ class NomineeDetails extends Component {
     handleSubmit = (values, actions) => {
         const {productId} = this.props.match.params
         const formData = new FormData(); 
-        let formArr = []
 
         for (const key in values) {
             if (values.hasOwnProperty(key)) {
               if(key == "dob" ){
-
-                //formData.append(key, moment(values[key]).format("YYYY-MM-DD"));
-                formArr[key] = moment(values[key]).format("YYYY-MM-DD")
+                formData.append(key, moment(values[key]).format("YYYY-MM-DD"));
               }
               else {
-                // formData.append(key, values[key]);
-                formArr[key] = values[key]
+                 formData.append(key, values[key]);
               }          
             }
           }
-
-        //formData.append('policy_holder_id', localStorage.getItem('policyHolder_id'));
-        formArr['policy_holder_id'] = localStorage.getItem('policyHolder_id')
-       // formData.append('is_appointee', this.state.is_appointee);
-        formArr['is_appointee'] = this.state.is_appointee
-        let formObj = {}
-        Object.assign(formObj,formArr)
-        let encryption = new Encryption();
-        formData.append('enc_data',encryption.encrypt(JSON.stringify(formObj)))
-
+        formData.append('policy_holder_id', localStorage.getItem('policyHolder_id'));
+        formData.append('is_appointee', this.state.is_appointee);
         this.props.loadingStart();
         axios
         .post(`/insert-nominee`, formData)

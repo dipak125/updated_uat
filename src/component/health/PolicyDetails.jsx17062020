@@ -21,7 +21,6 @@ import { connect } from "react-redux";
 import moment from "moment";
 import Otp from "./Otp";
 import swal from 'sweetalert';
-import Encryption from '../../shared/payload-encryption';
 
 const genderArr = {
   M: "Male",
@@ -137,20 +136,9 @@ class PolicyDetails extends Component {
     let insureValue = Math.floor(policyHolderDetails.request_data.sum_insured);
 
     const formData = new FormData();
-    let encryption = new Encryption();
-
-    //formData.append("id", id);
-    //formData.append("insureValue", insureValue);
-    //formData.append("access_token", access_token);
-   const post_data = {
-      "id":id,
-      "insureValue":insureValue,
-      "access_token":access_token
-    }
-    formData.append('enc_data',encryption.encrypt(JSON.stringify(post_data)))    
-
-
-
+    formData.append("id", id);
+    formData.append("insureValue", insureValue);
+    formData.append("access_token", access_token);
     axios
       .post(`/fullQuoteServiceArogyaSeries`, formData)
       .then((res) => {
@@ -178,22 +166,9 @@ class PolicyDetails extends Component {
   policyInception = (access_token) => {
     const { fulQuoteResp, error } = this.state;
     const formData = new FormData();
-   // formData.append("quotationNo", fulQuoteResp.QuotationNo);
-    //formData.append("amount", fulQuoteResp.DuePremium);
-    //formData.append("access_token", access_token);
-
-    let encryption = new Encryption();
-
-    //formData.append("id", id);
-    //formData.append("insureValue", insureValue);
-    //formData.append("access_token", access_token);
-    const post_data = {
-      "quotationNo":fulQuoteResp.QuotationNo,
-      "amount":fulQuoteResp.DuePremium,
-      "access_token":access_token
-    }
-    formData.append('enc_data',encryption.encrypt(JSON.stringify(post_data)))    
-
+    formData.append("quotationNo", fulQuoteResp.QuotationNo);
+    formData.append("amount", fulQuoteResp.DuePremium);
+    formData.append("access_token", access_token);
     axios
       .post(`/callIssueQuoteMod`, formData)
       .then((res) => {

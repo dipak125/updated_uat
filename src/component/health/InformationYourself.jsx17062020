@@ -17,7 +17,6 @@ import swal from 'sweetalert';
 import { Formik, Form, Field, ErrorMessage } from 'formik';
 import dateformat from "dateformat";
 import { changeFormat, get18YearsBeforeDate, PersonAge } from "../../shared/dateFunctions";
-import Encryption from '../../shared/payload-encryption';
 
 const maxDob = dateformat(new Date(), 'mm/dd/yyyy');
 
@@ -367,66 +366,39 @@ class InformationYourself extends Component {
     let dob = this.state.dob ;
     console.log("dob=========>",dob);
     let familyMembers = this.state.familyMembers;
-    let post_data = []
+    
     let menumaster_id = 2;
     console.log("menumaster_id=========>",menumaster_id);
-    post_data['menumaster_id'] = menumaster_id
-    //formData.append(`menumaster_id`, menumaster_id);  
-    post_data['proposer_gender'] = values.gender    
-    //formData.append(`proposer_gender`, values.gender);  
+    formData.append(`menumaster_id`, menumaster_id);  
+    formData.append(`proposer_gender`, values.gender);  
     
-    let arr_date=[]
+    
     for(let i=0;i<dob.length;i++){        
         let date_of_birth= dob[i] ? dob[i] : familyMembers[i].dob;    
-       // formData.append(`dob[${i}]`, date_of_birth);
-      // post_data[`dob[${i}]`] = date_of_birth  
-      arr_date.push(date_of_birth)
-      
+        formData.append(`dob[${i}]`, date_of_birth);
     }  
-    post_data['dob'] = arr_date
     let is_self_select = false;
-    arr_date=[]
     for(let i=0;i<lookingFor.length;i++){        
             
             let looking_for = lookingFor[i] ? lookingFor[i] : familyMembers[i].relation_with; 
-            is_self_select =  looking_for == 'self' ? true:false   
-            arr_date.push(looking_for)
-             //= arr_date[i]
-          //  post_data[`looking_for[${i}]`] = looking_for  
-           // formData.append(`looking_for[${i}]`, looking_for);                
+            is_self_select =  looking_for == 'self' ? true:false         
+            formData.append(`looking_for[${i}]`, looking_for);                
     }  
-    post_data['looking_for'] = arr_date
+    
     let policyHolder_id = localStorage.getItem('policyHolder_id') ? localStorage.getItem('policyHolder_id') :0
     
     let gender_for = this.state.gender_for
 
     console.log("WWWWW+======>>>>>>",gender_for)
-    arr_date=[]
+    
     for(let i=0;i<gender_for.length;i++){
         let gender_val;
-        gender_val = gender_for[i] ? gender_for[i] : familyMembers[i].gender; 
-        arr_date.push(gender_val); 
-        
-       // post_data[`gender[${i}]`] = gender_val         
-       // post_data[`gender[${i}]`] = gender_val                
-       // formData.append(`gender[${i}]`, gender_val);
+        gender_val = gender_for[i] ? gender_for[i] : familyMembers[i].gender;                         
+        formData.append(`gender[${i}]`, gender_val);
     } 
-    post_data['gender'] = arr_date
     
-
-    let encryption = new Encryption();
-    let post_data_obj = {}
-
-
-
-
-
     if(policyHolder_id > 0){
-        post_data['policy_holder_id'] = policyHolder_id
-        Object.assign(post_data_obj, post_data); // {0:"a", 1:"b", 2:"c"}
-        console.log("POST DATA=============>>",post_data_obj)
-        formData.append('enc_data',encryption.encrypt(JSON.stringify(post_data_obj)))
-        //let vvv = encryption.encrypt(JSON.stringify(target))        
+        formData.append(`policy_holder_id`, policyHolder_id);
         this.props.loadingStart();
         axios
         .post(`/update-yourself`, formData)
@@ -446,10 +418,6 @@ class InformationYourself extends Component {
         });
     }
     else{
-        Object.assign(post_data_obj, post_data); // {0:"a", 1:"b", 2:"c"}
-        console.log("POST DATA=============>>",post_data_obj)
-        formData.append('enc_data',encryption.encrypt(JSON.stringify(post_data_obj)))
-
         this.props.loadingStart();
         axios
         .post(`/yourself`, formData)
@@ -1512,7 +1480,7 @@ setStateForPreviousData=(family_members)=>{
                                             </div>
                                             <div className="cntrbtn">
                                             <Button className={`btnPrimary m-r-15`} type="submit" >
-                                            {this.setValueData() || this.state.validateCheck == '1' ? 'Submit':'Select' }
+                                               Select
                                             </Button>
                                             <Button className={`btnPrimary`} type="button" onClick={e => this.handleClose()} >
                                              Cancel
