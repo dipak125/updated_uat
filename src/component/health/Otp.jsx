@@ -19,7 +19,7 @@ class Otp extends Component {
         seconds: 20
       };
 
-    checkOtp = (values) => {
+    checkOtp = (values, actions) => {
         this.props.loadingStart();
         const formData = new FormData();
        // formData.append('policy_holder_id', localStorage.getItem('policyHolder_id'));
@@ -35,9 +35,11 @@ class Otp extends Component {
           .post('/otp/check-status', formData)
           .then((res) => {
             if(res.data.error == false) {
+                actions.setSubmitting(false);
                 this.handleSubmit(values, res.data.data.otp)
             } 
             else {
+                actions.setSubmitting(false);
                 this.setState({ otp: "", errorMsg: res.data.msg });
             } 
             this.props.loadingStop();         
@@ -255,8 +257,7 @@ class Otp extends Component {
                             </Button>
 
                             <Button className={`proceedBtn`} type="submit" >
-                                {/*isSubmitting ? 'Wait..' : 'Continue'*/}
-                                Continue                              
+                                {isSubmitting ? 'Wait..' : 'Continue'}                            
                             </Button> 
                             </div>
                         </div>  

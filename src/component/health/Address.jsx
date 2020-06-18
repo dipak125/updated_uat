@@ -15,6 +15,7 @@ import { connect } from "react-redux";
 import { changeFormat, get18YearsBeforeDate, PersonAge } from "../../shared/dateFunctions";
 import dateformat from "dateformat";
 import moment from "moment";
+import swal from 'sweetalert';
 
 import "react-datepicker/dist/react-datepicker.css"
 import 'react-datepicker/dist/react-datepicker-cssmodules.min.css'
@@ -451,7 +452,7 @@ class Address extends Component {
         this.props.history.push(`/SelectDuration/${productId}`);
     }
 
-    handleSubmit = (values) => {
+    handleSubmit = (values, actions) => {
         const {productId } = this.props.match.params
         const policyHolder_id =  localStorage.getItem('policyHolder_id');
         const formData = new FormData();
@@ -559,12 +560,13 @@ class Address extends Component {
            // }        
         })
         .catch(err => {
-        
+            if(err.status == 401) {
+                swal("Session out. Please login")
+            }
+            else swal("Something wrong happened. Please try after some")
+            actions.setSubmitting(false);
         this.props.loadingStop();
         });
-
-       // const {productId} = this.props.match.params
-
     }
 
     initFamilyDetailsList = familyDetails => {

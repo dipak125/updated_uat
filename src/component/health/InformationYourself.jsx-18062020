@@ -474,50 +474,9 @@ class InformationYourself extends Component {
         e.target.value.length === 0 && element.classList.remove('active');
     }
 
-    chanageGender = (value) => {
-        let display_gender = localStorage.getItem('display_gender') ? JSON.parse(localStorage.getItem('display_gender')):[];
-        let display_gender_new = []
-        let display_looking_for = sessionStorage.getItem('display_looking_for') ? JSON.parse(sessionStorage.getItem('display_looking_for')):[];
-
-
-        if(display_gender){
-            display_gender_new[0] = value ? value:null
-            display_gender_new[1] = value ? (value == 'm') ?'f':'m' :null
-            display_gender_new[2] = display_gender[2] ? display_gender[2] :null
-            display_gender_new[3] = display_gender[3] ? display_gender[3] :null
-            display_gender_new[4] = display_gender[4] ? display_gender[4] :null
-            display_gender_new[5] = 'm'
-            display_gender_new[6] = 'f'
-            display_gender_new[7] = 'm' 
-            display_gender_new[8] = 'f'
-            
-            let looking_for = []
-            let gender_for = []
-            for(let i=0;i<display_looking_for.length;i++){
-                if(display_looking_for[i]!=''){
-                    looking_for.push(display_looking_for[i])
-                    gender_for.push(display_gender_new[i])
-                }
-            }
-
-            console.log("GENDER FOR =====>", display_looking_for)
-
-            localStorage.setItem('display_gender',JSON.stringify(display_gender_new))
-
-            this.setState({
-                display_gender:display_gender_new,
-                display_looking_for:display_looking_for,
-                looking_for,
-                gender_for
-            });
-
-        }
-        
-
-
+    handleChangeSubmit = (value) => {
         this.setState({
-            gender: value,
-          //  display_gender:display_gender_new
+            gender: value
         });
     }
 
@@ -876,7 +835,7 @@ setStateForPreviousData=(family_members)=>{
             looking_for_7: display_looking_for_arr[7] ? display_looking_for_arr[7] : "",
             dob_7: display_dob_arr[7] ? new Date(display_dob_arr[7]) : "",
             looking_for_8: display_looking_for_arr[8] ? display_looking_for_arr[8] : "",
-            dob_8: display_dob_arr[8] ? new Date(display_dob_arr[8]) : "",
+            dob_8: display_dob_arr[6] ? new Date(display_dob_arr[8]) : "",
             insureList: insureListPrev ? insureListPrev.toString()  : (insureList ? insureList :'')
         });
            
@@ -912,10 +871,9 @@ setStateForPreviousData=(family_members)=>{
                                                 className="formGrp"
                                                 onChange={(e) => {
                                                     setFieldValue('gender', e.target.value);
-                                                    this.chanageGender(e.target.value)
-                                                   /* this.setState({
+                                                    this.setState({
                                                         gender:e.target.value
-                                                    }) */
+                                                    })
                                                    // this.handleChangeSubmit(e.target.value)
                                                 }}
                                             >
@@ -1669,7 +1627,7 @@ setStateForPreviousData=(family_members)=>{
                                                         />
                                                         <label className="formGrp error">
                                                         {
-                                                            errors.dob_8 && touched.dob_8 ?                 
+                                                            errors.dob_6 && touched.dob_8 ?                 
                                                             <span className="error-message">{errors.dob_8}</span>:''
                                                         }
                                                         </label>

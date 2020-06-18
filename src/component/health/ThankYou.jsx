@@ -55,6 +55,7 @@ class ThankYouPage extends Component {
             this.props.loadingStop();
             if(res.data.getPolicyDocumentResponseBody.payload.URL[0] == "No Results found for the given Criteria") {
                 // swal(res.data.getPolicyDocumentResponseBody.payload.URL[0]);
+                swal("Thank you for showing your interest for buying product.Due to some reasons, we are not able to issue the policy document online. Please call 180 22 1111");
             }
             else{
                 this.setState({
@@ -130,8 +131,9 @@ class ThankYouPage extends Component {
 
     componentDidMount() {
         // this.getAccessToken();       
+        const {policyId} = this.props.match.params
         window.addEventListener("popstate", () => {
-        this.props.history.push('/Products');
+        this.props.history.push(`/ThankYou/${policyId}`);
           });
       }
 

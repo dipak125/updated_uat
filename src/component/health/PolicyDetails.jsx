@@ -115,6 +115,7 @@ class PolicyDetails extends Component {
   };
 
   getAccessTokenForInception = (e) => {
+    this.handleClose()
     this.props.loadingStart();
     axios
       .post(`/callTokenService`)
@@ -261,7 +262,10 @@ class PolicyDetails extends Component {
                       <FormGroup>Relation With Proposer:</FormGroup>
                     </Col>
                     <Col sm={12} md={6}>
-                      <FormGroup>{relationArr[member.ArgInsuredRelToProposer]}</FormGroup>
+                      <FormGroup>{
+                      member.GenderCode == 'F' && member.ArgInsuredRelToProposer > 2?
+                      (member.ArgInsuredRelToProposer==3 || member.ArgInsuredRelToProposer==5 || member.ArgInsuredRelToProposer==7)?
+                      relationArr[parseInt(member.ArgInsuredRelToProposer)+1]:relationArr[member.ArgInsuredRelToProposer]:relationArr[member.ArgInsuredRelToProposer]}</FormGroup>
                     </Col>
                   </Row>
 

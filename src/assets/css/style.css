@@ -107,7 +107,7 @@ ul.navPan li a p{ margin-bottom:0;}
 ul.navPan li a span{ margin-bottom:8px; display: block; }
 
 .leftIcon01 {display: inline-block !important; margin-right: 10px;}
-.btn-lg {border-radius:0px 50px 50px 0px; -moz-border-radius:0px 50px 50px 0px; -webkit-border-radius:0px 50px 50px 0px; background-color: #17446c !important; width: 157px; height: 52px; position: absolute; bottom: 30px; border: none !important ; text-decoration: none; box-shadow: none !important; outline: none !important;}
+.btn-lg {border-radius:0px 50px 50px 0px; -moz-border-radius:0px 50px 50px 0px; -webkit-border-radius:0px 50px 50px 0px; background-color: #17446c !important; width: 157px; height: 52px; position: absolute; bottom: 80px; border: none !important ; text-decoration: none; box-shadow: none !important; outline: none !important;}
 .btn-lg a {color: #ffffff !important; font-size: 14px;}
 .btn-lg a:hover {text-decoration: none !important;}
 /* ul.navPan li a span.leftIcon01{ background:url('../images/leftIcon01.svg') no-repeat 50% 100%; width: 40px; height: 40px;} */

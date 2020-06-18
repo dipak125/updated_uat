@@ -9,6 +9,7 @@ import Footer from '../common/footer/Footer';
 import { Formik, Field, Form } from "formik";
 import * as Yup from "yup";
 import moment from "moment";
+import swal from 'sweetalert';
 
 import axios from "../../shared/axios";
 import { withRouter } from 'react-router-dom';
@@ -226,8 +227,12 @@ class NomineeDetails extends Component {
             this.props.history.push(`/PolicyDetails/${productId}`);
         })
         .catch(err => {
-    
-          this.props.loadingStop();
+            if(err.status == 401) {
+                swal("Session out. Please login")
+            }
+            else swal("Something wrong happened. Please try after some")
+            actions.setSubmitting(false);
+            this.props.loadingStop();
         });
 
         
