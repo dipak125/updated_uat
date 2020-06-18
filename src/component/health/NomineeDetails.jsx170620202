@@ -233,25 +233,11 @@ class NomineeDetails extends Component {
         
     }
 
-    fetchPolicyRelations = (family_relations)=>{        
-        let relations = family_relations.map(resource=>resource.relation_with=='self'?1:0)
-        console.log("UDAAAAAAAAAAA=======>",relations)
-        let self_selected = relations && relations.length>0 && relations.includes(1)
-        console.log("UDAAAAAAAAAAA=11111111======>",self_selected)
-        this.setState({
-            self_selected
-        })
-        //return self_selected
-    }
-
     getNomineeDetails = () => {
         this.props.loadingStart();
         axios
           .get(`/policy-holder/${localStorage.getItem('policyHolder_id')}`)
           .then(res => { 
-           let family_members = res.data.data.policyHolder.request_data ? res.data.data.policyHolder.request_data.family_members:[]
-            this.fetchPolicyRelations(family_members)
-           // console.log("SELF SELECTED==============>",self_selected)
             this.setState({
                 NomineeDetails: res.data.data.policyHolder.request_data.nominee[0],
                 is_appointee: res.data.data.policyHolder.request_data.nominee[0].is_appointee
@@ -273,8 +259,7 @@ class NomineeDetails extends Component {
 
     render() {
         const {productId} = this.props.match.params
-        const {NomineeDetails,appointeeFlag, is_appointee,self_selected} = this.state
-      //  console.log('SELF SELECTED============>',this.state.self_selected)
+        const {NomineeDetails,appointeeFlag, is_appointee} = this.state
         moment.defaultFormat = "YYYY-MM-YY";
 
         const newInitialValues = Object.assign(initialValues, {
@@ -426,7 +411,7 @@ class NomineeDetails extends Component {
                                                                     className="formGrp"
                                                                 >
                                                                 <option value="">Relation with Primary Insured</option>
-                                                                {self_selected ? '': <option value="1">Self</option>}
+                                                                <option value="1">Self</option>
                                                                 <option value="2">Spouse</option>
                                                                 <option value="3">Son</option>
                                                                 <option value="4">Daughter</option>
@@ -502,7 +487,7 @@ class NomineeDetails extends Component {
                                                                         className="formGrp"
                                                                     >
                                                                     <option value="">Relation with Nominee</option>
-                                                                    {self_selected ? '':<option value="1">Self</option>}
+                                                                    <option value="1">Self</option>
                                                                     <option value="2">Spouse</option>
                                                                     <option value="3">Son</option>
                                                                     <option value="4">Daughter</option>

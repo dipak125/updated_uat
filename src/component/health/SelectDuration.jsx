@@ -217,10 +217,43 @@ class SelectDuration extends Component {
       quote = (value) => {
       const {accessToken} = this.state
       if(accessToken)
-      {
+      {   
+        let si = '';
+        switch (this.state.policyHolderDetails['request_data']['sum_insured']) {
+            case "100000.00":
+                si = '1';
+                break;
+            case "150000.00":
+                si = '2';
+                break;
+            case "200000.00":
+                si = '3';
+                break;
+            case "250000.00":
+                si = '4';
+                break;
+            case "300000.00":
+                si = '5';
+                break;
+            case "350000.00":
+                si = '6';
+                break;
+            case "400000.00":
+                si = '7';
+                break;
+            case "450000.00":
+                si = '8';
+                break;
+            case "500000.00":
+                si = '9';
+                break;
+            default:
+                si = '5';
+        }
+        // console.log('sum_insured', si);
         let polStartDate = moment(value.polStartDate).format("YYYY-MM-DD");
         let polEndDate = moment(value.polEndDate).format("YYYY-MM-DD");
-        let insureValue = value.insureValue ? value.insureValue : "5";
+        let insureValue = value.insureValue ? value.insureValue : si;
         const formData = new FormData(); 
         this.props.loadingStart();
       /*formData.append('id', localStorage.getItem('policyHolder_id'));
@@ -228,6 +261,7 @@ class SelectDuration extends Component {
       formData.append('policyEndDate', polEndDate);
       formData.append('insureValue', insureValue);
       formData.append('access_token', accessToken);*/
+      console.log('insureValue', insureValue);
 
 
       const post_data = {

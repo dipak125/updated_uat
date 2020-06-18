@@ -551,19 +551,107 @@ class InformationYourself extends Component {
             }
 
             
-            sessionStorage.setItem('display_looking_for',JSON.stringify(display_looking_for));
-            sessionStorage.setItem('display_dob',JSON.stringify(display_dob));
-            this.setState({
-                lookingFor:looking_for,
-                display_looking_for,
-                display_gender:display_gender,
-                gender_for:gender_for
-             });
-             this.setState({
-                dob:dob,
-                display_dob
-             });  
-             this.handleClose()
+           /* let self_dob = display_dob[0]!='' ?  moment(display_dob[0]).format("YYYY-MM-DD") : null
+            let spouse_dob = display_dob[1]!='' ?  moment(display_dob[1]).format("YYYY-MM-DD") : null
+            let child1_dob = display_dob[2]!='' ?  moment(display_dob[2]).format("YYYY-MM-DD") : null
+            let child2_dob = display_dob[3]!='' ?  moment(display_dob[3]).format("YYYY-MM-DD") : null
+            let child3_dob = display_dob[4]!='' ?  moment(display_dob[4]).format("YYYY-MM-DD") : null
+            let father_dob = display_dob[5]!='' ?  moment(display_dob[5]).format("YYYY-MM-DD") : null
+            let mother_dob = display_dob[6]!='' ?  moment(display_dob[6]).format("YYYY-MM-DD") : null
+            let fatherInLaw_dob = display_dob[7].length ?  moment(display_dob[7]).format("YYYY-MM-DD") : null
+            let motherInLaw_dob = display_dob[8].length ?  moment(display_dob[8]).format("YYYY-MM-DD") : null*/
+
+            let self_dob = display_dob[0]!='' ?  display_dob[0] : null
+            let spouse_dob = display_dob[1]!='' ?  display_dob[1] : null
+            let child1_dob = display_dob[2]!='' ?  display_dob[2]: null
+            let child2_dob = display_dob[3]!='' ?  display_dob[3] : null
+            let child3_dob = display_dob[4]!='' ?  display_dob[4] : null
+            let father_dob = display_dob[5]!='' ?  display_dob[5] : null
+            let mother_dob = display_dob[6]!='' ?  display_dob[6] : null
+            let fatherInLaw_dob = display_dob[7]!='' ?  display_dob[7] : null
+            let motherInLaw_dob = display_dob[8]!='' ?  display_dob[8] : null
+
+            const ageObj = new PersonAge();
+            let flagSubmit = [];
+            let age = -1
+            let message = ''
+
+             age = child1_dob!=null && self_dob!=null  ? ageObj.calculateAge(self_dob,child1_dob):0
+             let chld1_age = age?age:0
+            // console.log("Child1_age",chld1_age)
+             if(chld1_age<0){
+                swal('Date of birth difference Between child 1 and self must be 1 yers')
+             }
+             
+             age = child2_dob!=null && self_dob!=null ? ageObj.calculateAge(self_dob,child2_dob):0
+             let chld2_age = age?age:0
+             if(chld2_age<0){
+                swal('Date of birth difference Between child 2 and self must be 1 yers')
+                
+             }
+            // console.log("chld2_age",chld2_age)
+             age =  child3_dob!=null && self_dob!=null ? ageObj.calculateAge(self_dob,child3_dob):0
+             let chld3_age = age?age:0
+             //console.log("chld3_age",chld3_age)
+             if(chld3_age<0){
+                swal('Date of birth difference Between child 3 and self must be 1 yers')
+             }
+
+             age = father_dob!=null && self_dob!=null ? ageObj.calculateAge(father_dob,self_dob):0 
+             let father_age = age?age:0
+             if(father_age<0){
+                swal('Date of birth difference Between Father and self must be 1 yers')
+             }
+             age = mother_dob!=null && self_dob!=null  ? ageObj.calculateAge(mother_dob,self_dob):0
+             let mother_age = age?age:0
+             if(mother_age<0){
+                swal('Date of birth difference Between Mother and self must be 1 yers')
+             }
+             age = fatherInLaw_dob!=null && self_dob!=null ? ageObj.calculateAge(fatherInLaw_dob,self_dob):0
+             let father_inlaw_age = age?age:0
+
+             if(father_inlaw_age<0){
+                swal('Date of birth difference Between Father-In-laws and self must be 1 yers')
+             }             
+             age =  motherInLaw_dob!=null && self_dob!=null ? ageObj.calculateAge(motherInLaw_dob,self_dob):0
+             let mother_inlaw_age = age?age:0
+             if(mother_inlaw_age<0){
+                swal('Date of birth difference Between Mother-In-laws and self must be 1 yers')
+             }
+
+             age =   motherInLaw_dob!=null && spouse_dob!=null ? ageObj.calculateAge(motherInLaw_dob,spouse_dob):0
+             let mother_spouse_age = age?age:0
+             if(mother_spouse_age<0){
+                swal('Date of birth difference Between Mother-In-laws and Spouse must be 1 yers')
+             }
+
+             age = fatherInLaw_dob!=null && spouse_dob!=null ? ageObj.calculateAge(fatherInLaw_dob,spouse_dob):0 
+             let father_spouse_age = age?age:0
+             if(father_spouse_age<0){
+                swal('Date of birth difference Between Father-In-laws and Spouse must be 1 yers')
+             }
+
+            console.log("FAAAACTSSSSSS=====>",flagSubmit)
+
+             if(chld1_age>=0 && chld2_age>=0 && chld3_age>=0 && father_age>=0 && mother_age>=0
+                 && father_inlaw_age>=0 && mother_inlaw_age>=0 && mother_spouse_age >= 0 && father_spouse_age>=0){
+                    sessionStorage.setItem('display_looking_for',JSON.stringify(display_looking_for));
+                    sessionStorage.setItem('display_dob',JSON.stringify(display_dob));
+                    this.setState({
+                        lookingFor:looking_for,
+                        display_looking_for,
+                        display_gender:display_gender,
+                        gender_for:gender_for
+                    });
+                    this.setState({
+                        dob:dob,
+                        display_dob
+                    });  
+                    this.handleClose()
+             }
+
+
+            
         /*formData.append('menumaster_id', 2);
         formData.append('gender', gender);
         axios

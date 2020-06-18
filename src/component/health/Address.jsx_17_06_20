@@ -21,8 +21,6 @@ import 'react-datepicker/dist/react-datepicker-cssmodules.min.css'
 import Encryption from '../../shared/payload-encryption';
 
 const maxDob = dateformat(new Date(), 'mm/dd/yyyy');
-const minDobAdult = moment(moment().subtract(46, 'years').calendar()).add(1, 'day').calendar()
-const maxDobAdult = moment().subtract(18, 'years').calendar();
 
 const initialFamilyDetails = {
 	fname: "",
@@ -759,8 +757,8 @@ class Address extends Component {
                                                         showMonthDropdown
                                                         showYearDropdown
                                                         dropdownMode="select"
-                                                        maxDate={new Date(maxDobAdult)}
-                                                        minDate={new Date(minDobAdult)}
+                                                        maxDate={new Date(moment().subtract(18, 'years').calendar())}
+                                                        minDate={new Date(moment().subtract(45, 'years').calendar())}
                                                         className="datePckr"
                                                         selected={values.proposerDob }
                                                         onChange={(val) => {
@@ -865,6 +863,7 @@ class Address extends Component {
                                                             <FormGroup>
                                                                 <DatePicker
                                                                     name={`family_members.${index}.dob`}
+                                                                    minDate={new Date()}
                                                                     dateFormat="dd MMM yyyy"
                                                                     placeholderText="DOB"
                                                                     peekPreviousMonth
@@ -872,8 +871,8 @@ class Address extends Component {
                                                                     showMonthDropdown
                                                                     showYearDropdown
                                                                     dropdownMode="select"
-                                                                    maxDate={new Date(maxDobAdult)}
-                                                                    minDate={new Date(minDobAdult)}
+                                                                    maxDate={new Date()}
+                                                                    minDate={new Date(1/1/1900)}
                                                                     className="datePckr"
                                                                     disabled = {true}
                                                                     selected={values.family_members[index].dob ? new Date(values.family_members[index].dob):new Date()}

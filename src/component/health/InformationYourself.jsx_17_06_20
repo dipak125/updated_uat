@@ -19,11 +19,7 @@ import dateformat from "dateformat";
 import { changeFormat, get18YearsBeforeDate, PersonAge } from "../../shared/dateFunctions";
 import Encryption from '../../shared/payload-encryption';
 
-const minDobAdult = moment(moment().subtract(46, 'years').calendar()).add(1, 'day').calendar()
-const maxDobAdult = moment().subtract(18, 'years').calendar();
-
-const minDobChild = moment(moment().subtract(26, 'years').calendar()).add(1, 'day').calendar()
-const maxDobChild = moment().subtract(3, 'months').calendar();
+const maxDob = dateformat(new Date(), 'mm/dd/yyyy');
 
 const initialValues = {
     self: 0,
@@ -875,8 +871,8 @@ setStateForPreviousData=(family_members)=>{
                                                             peekPreviousYear
                                                             showMonthDropdown
                                                             showYearDropdown
-                                                            maxDate={new Date(maxDobAdult)}
-                                                            minDate={new Date(minDobAdult)}
+                                                            maxDate={new Date(moment().subtract(18, 'years').calendar())}
+                                                            minDate={new Date(moment().subtract(45, 'years').calendar())}
                                                             className="datePckr"
                                                             dropdownMode="select"
                                                             onChange={(value,e) => {
@@ -950,8 +946,8 @@ setStateForPreviousData=(family_members)=>{
                                                             peekPreviousYear
                                                             showMonthDropdown
                                                             showYearDropdown
-                                                            maxDate={new Date(maxDobAdult)}
-                                                            minDate={new Date(minDobAdult)}
+                                                            maxDate={new Date(moment().subtract(18, 'years').calendar())}
+                                                            minDate={new Date(moment().subtract(45, 'years').calendar())}
                                                             className="datePckr"
                                                             dropdownMode="select"
                                                             onChange={(value,e) => {
@@ -1018,8 +1014,8 @@ setStateForPreviousData=(family_members)=>{
                                                             peekPreviousYear
                                                             showMonthDropdown
                                                             showYearDropdown
-                                                            maxDate={new Date(maxDobChild)}
-                                                            minDate={new Date(minDobChild)}
+                                                            maxDate={new Date(moment().subtract(3, 'months').calendar())}
+                                                            minDate={new Date(moment().subtract(25, 'years').calendar())}
                                                             className="datePckr"
                                                             dropdownMode="select"
                                                             onChange={(value,e) => {
@@ -1107,8 +1103,8 @@ setStateForPreviousData=(family_members)=>{
                                                             peekPreviousYear
                                                             showMonthDropdown
                                                             showYearDropdown
-                                                            maxDate={new Date(maxDobChild)}
-                                                            minDate={new Date(minDobChild)}
+                                                            maxDate={new Date(moment().subtract(3, 'months').calendar())}
+                                                            minDate={new Date(moment().subtract(25, 'years').calendar())}
                                                             className="datePckr"
                                                             dropdownMode="select"
                                                             onChange={(value,e) => {
@@ -1195,8 +1191,8 @@ setStateForPreviousData=(family_members)=>{
                                                             peekPreviousYear
                                                             showMonthDropdown
                                                             showYearDropdown
-                                                            maxDate={new Date(maxDobChild)}
-                                                            minDate={new Date(minDobChild)}
+                                                            maxDate={new Date(moment().subtract(3, 'months').calendar())}
+                                                            minDate={new Date(moment().subtract(25, 'years').calendar())}
                                                             className="datePckr"
                                                             dropdownMode="select"
                                                             onChange={(value,e) => {
@@ -1286,8 +1282,8 @@ setStateForPreviousData=(family_members)=>{
                                                             peekPreviousYear
                                                             showMonthDropdown
                                                             showYearDropdown
-                                                            maxDate={new Date(maxDobAdult)}
-                                                            minDate={new Date(minDobAdult)}
+                                                            maxDate={new Date(moment().subtract(18, 'years').calendar())}
+                                                            minDate={new Date(moment().subtract(45, 'years').calendar())}
                                                             className="datePckr"
                                                             dropdownMode="select"
                                                             onChange={(value,e) => {
@@ -1356,8 +1352,8 @@ setStateForPreviousData=(family_members)=>{
                                                             peekPreviousYear
                                                             showMonthDropdown
                                                             showYearDropdown
-                                                            maxDate={new Date(maxDobAdult)}
-                                                            minDate={new Date(minDobAdult)}
+                                                            maxDate={new Date(moment().subtract(18, 'years').calendar())}
+                                                            minDate={new Date(moment().subtract(45, 'years').calendar())}
                                                             className="datePckr"
                                                             dropdownMode="select"
                                                             onChange={(value,e) => {
@@ -1424,8 +1420,8 @@ setStateForPreviousData=(family_members)=>{
                                                             peekPreviousYear
                                                             showMonthDropdown
                                                             showYearDropdown
-                                                            maxDate={new Date(maxDobAdult)}
-                                                            minDate={new Date(minDobAdult)}
+                                                            maxDate={new Date(moment().subtract(18, 'years').calendar())}
+                                                            minDate={new Date(moment().subtract(45, 'years').calendar())}
                                                             className="datePckr"
                                                             dropdownMode="select"
                                                             onChange={(value,e) => {
@@ -1492,8 +1488,8 @@ setStateForPreviousData=(family_members)=>{
                                                             peekPreviousYear
                                                             showMonthDropdown
                                                             showYearDropdown
-                                                            maxDate={new Date(maxDobAdult)}
-                                                            minDate={new Date(minDobAdult)}
+                                                            maxDate={new Date(moment().subtract(18, 'years').calendar())}
+                                                            minDate={new Date(moment().subtract(45, 'years').calendar())}
                                                             className="datePckr"
                                                             dropdownMode="select"
                                                             onChange={(value,e) => {
