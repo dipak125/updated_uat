@@ -87,7 +87,7 @@ class Otp extends Component {
         formData.append('enc_data',encryption.encrypt(JSON.stringify(post_data_obj)))
 
         this.setState({
-            seconds: 20,
+            seconds: 20, errorMsg: ""
           });
         axios
           .post('/otp/generate', formData)

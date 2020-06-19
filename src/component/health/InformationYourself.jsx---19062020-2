@@ -168,22 +168,15 @@ const validateFamilyMembers  = Yup.object().shape({
                 return "Self and child age difference should be 1 year"
             },
             function (value) {
-                if(typeof this.parent.dob_0 != 'undefined'){
-                    var ageDiff = Math.floor(Math.abs(moment(value).diff(this.parent.dob_0, 'years', true)));
-                    console.log("AGE============>",ageDiff)
-                    console.log("AGE______wqwwwww======>",this.parent.dob_1)
-                    if (ageDiff <= 0 ) {   
-                        return false;    
-                    }
-                    else{
-                        return true;
-                    }                    
+                let a_date = moment(this.parent.dob_0).format("YYYY,M")
+                let a_date_arr = moment(a_date.split(','))
+                let b_date = moment(value).format("YYYY,M")
+                let b_date_arr = moment(b_date.split(','))
+                let ageDiff = b_date_arr.diff(a_date_arr, 'years');
+                if (ageDiff <= 0 ) {   
+                    return false;    
                 }
-                else{
-                    return true;
-                }
-                
-                
+                return true;
             }
         ).test(
             "1yearAgeDiffChecking",
@@ -191,18 +184,15 @@ const validateFamilyMembers  = Yup.object().shape({
                 return "Spouse and child age difference should be 1 year"
             },
             function (value) {
-                if(typeof this.parent.dob_1 != 'undefined'){
-                var ageDiff = Math.floor(Math.abs(moment(value).diff(this.parent.dob_1, 'years', true)));
-                    if (ageDiff <= 0 ) {   
-                        return false;    
-                    }
-                    else{
-                        return true;
-                    }                
+                let a_date = moment(this.parent.dob_1).format("YYYY,M")
+                let a_date_arr = moment(a_date.split(','))
+                let b_date = moment(value).format("YYYY,M")
+                let b_date_arr = moment(b_date.split(','))
+                let ageDiff = b_date_arr.diff(a_date_arr, 'years');
+                if (ageDiff <= 0 ) {   
+                    return false;    
                 }
-                else{
-                    return true;
-                }
+                return true;
                // var ageDiff = Math.floor(Math.abs(moment(this.parent.dob_1).diff(value, 'years', true)));
                 
             }
@@ -236,7 +226,11 @@ const validateFamilyMembers  = Yup.object().shape({
                 return "Self and child age difference should be 1 year"
             },
             function (value) {
-                var ageDiff = Math.floor(Math.abs(moment(this.parent.dob_0).diff(value, 'years', true)));
+                let a_date = moment(this.parent.dob_0).format("YYYY,M")
+                let a_date_arr = moment(a_date.split(','))
+                let b_date = moment(value).format("YYYY,M")
+                let b_date_arr = moment(b_date.split(','))
+                let ageDiff = b_date_arr.diff(a_date_arr, 'years');
                 if (ageDiff <= 0 ) {   
                     return false;    
                 }
@@ -248,7 +242,11 @@ const validateFamilyMembers  = Yup.object().shape({
                 return "Spouse and child age difference should be 1 year"
             },
             function (value) {
-                var ageDiff = Math.floor(Math.abs(moment(this.parent.dob_1).diff(value, 'years', true)));
+                let a_date = moment(this.parent.dob_1).format("YYYY,M")
+                let a_date_arr = moment(a_date.split(','))
+                let b_date = moment(value).format("YYYY,M")
+                let b_date_arr = moment(b_date.split(','))
+                let ageDiff = b_date_arr.diff(a_date_arr, 'years');
                 if (ageDiff <= 0 ) {   
                     return false;    
                 }
@@ -283,7 +281,11 @@ const validateFamilyMembers  = Yup.object().shape({
                 return "Self and child age difference should be 1 year"
             },
             function (value) {
-                var ageDiff = Math.floor(Math.abs(moment(this.parent.dob_0).diff(value, 'years', true)));
+                let a_date = moment(this.parent.dob_0).format("YYYY,M")
+                let a_date_arr = moment(a_date.split(','))
+                let b_date = moment(value).format("YYYY,M")
+                let b_date_arr = moment(b_date.split(','))
+                let ageDiff = b_date_arr.diff(a_date_arr, 'years');
                 if (ageDiff <= 0 ) {   
                     return false;    
                 }
@@ -295,7 +297,11 @@ const validateFamilyMembers  = Yup.object().shape({
                 return "Spouse and child age difference should be 1 year"
             },
             function (value) {
-                var ageDiff = Math.floor(Math.abs(moment(this.parent.dob_1).diff(value, 'years', true)));
+                let a_date = moment(this.parent.dob_1).format("YYYY,M")
+                let a_date_arr = moment(a_date.split(','))
+                let b_date = moment(value).format("YYYY,M")
+                let b_date_arr = moment(b_date.split(','))
+                let ageDiff = b_date_arr.diff(a_date_arr, 'years');
                 if (ageDiff <= 0 ) {   
                     return false;    
                 }
@@ -330,20 +336,12 @@ const validateFamilyMembers  = Yup.object().shape({
             function() {
                 return "Self and father age difference should be 1 year"
             },
-            function (value) {              
-                var ageDiff = Math.floor(Math.abs(moment(this.parent.dob_0).diff(value, 'years', true)));
-                if (ageDiff <= 0 ) {   
-                    return false;    
-                }
-                return true;
-            }
-        ).test(
-            "1yearAgeDiffChecking",
-            function() {
-                return "Spouse and father difference should be 1 year"
-            },
             function (value) {
-                var ageDiff = Math.floor(Math.abs(moment(this.parent.dob_1).diff(value, 'years', true)));
+                let a_date = moment(this.parent.dob_0).format("YYYY,M")
+                let a_date_arr = moment(a_date.split(','))
+                let b_date = moment(value).format("YYYY,M")
+                let b_date_arr = moment(b_date.split(','))
+                let ageDiff = a_date_arr.diff(b_date_arr, 'years');
                 if (ageDiff <= 0 ) {   
                     return false;    
                 }
@@ -374,19 +372,11 @@ const validateFamilyMembers  = Yup.object().shape({
                 return "Self and mother age difference should be 1 year"
             },
             function (value) {
-                var ageDiff = Math.floor(Math.abs(moment(this.parent.dob_0).diff(value, 'years', true)));
-                if (ageDiff <= 0 ) {   
-                    return false;    
-                }
-                return true;
-            }
-        ).test(
-            "1yearAgeDiffChecking",
-            function() {
-                return "Spouse and mother difference should be 1 year"
-            },
-            function (value) {
-                var ageDiff = Math.floor(Math.abs(moment(this.parent.dob_1).diff(value, 'years', true)));
+                let a_date = moment(this.parent.dob_0).format("YYYY,M")
+                let a_date_arr = moment(a_date.split(','))
+                let b_date = moment(value).format("YYYY,M")
+                let b_date_arr = moment(b_date.split(','))
+                let ageDiff = a_date_arr.diff(b_date_arr, 'years');
                 if (ageDiff <= 0 ) {   
                     return false;    
                 }
@@ -417,7 +407,11 @@ const validateFamilyMembers  = Yup.object().shape({
                 return "Spouse and father-in-law age difference should be 1 year"
             },
             function (value) {
-                var ageDiff = Math.floor(Math.abs(moment(this.parent.dob_1).diff(value, 'years', true)));
+                let a_date = moment(this.parent.dob_1).format("YYYY,M")
+                let a_date_arr = moment(a_date.split(','))
+                let b_date = moment(value).format("YYYY,M")
+                let b_date_arr = moment(b_date.split(','))
+                let ageDiff = a_date_arr.diff(b_date_arr, 'years');
                 if (ageDiff <= 0 ) {   
                     return false;    
                 }
@@ -429,7 +423,11 @@ const validateFamilyMembers  = Yup.object().shape({
                 return "Self and father-in-law age difference should be 1 year"
             },
             function (value) {
-                var ageDiff = Math.floor(Math.abs(moment(this.parent.dob_0).diff(value, 'years', true)));
+                let a_date = moment(this.parent.dob_0).format("YYYY,M")
+                let a_date_arr = moment(a_date.split(','))
+                let b_date = moment(value).format("YYYY,M")
+                let b_date_arr = moment(b_date.split(','))
+                let ageDiff = a_date_arr.diff(b_date_arr, 'years');
                 if (ageDiff <= 0 ) {   
                     return false;    
                 }
@@ -459,7 +457,11 @@ const validateFamilyMembers  = Yup.object().shape({
                 return "Spouse and mother-in-law age difference should be 1 year"
             },
             function (value) {
-                var ageDiff = Math.floor(Math.abs(moment(this.parent.dob_1).diff(value, 'years', true)));
+                let a_date = moment(this.parent.dob_1).format("YYYY,M")
+                let a_date_arr = moment(a_date.split(','))
+                let b_date = moment(value).format("YYYY,M")
+                let b_date_arr = moment(b_date.split(','))
+                let ageDiff = a_date_arr.diff(b_date_arr, 'years');
                 if (ageDiff <= 0 ) {   
                     return false;    
                 }
@@ -471,7 +473,11 @@ const validateFamilyMembers  = Yup.object().shape({
                 return "Self and mother-in-law age difference should be 1 year"
             },
             function (value) {
-                var ageDiff = Math.floor(Math.abs(moment(this.parent.dob_0).diff(value, 'years', true)));
+                let a_date = moment(this.parent.dob_0).format("YYYY,M")
+                let a_date_arr = moment(a_date.split(','))
+                let b_date = moment(value).format("YYYY,M")
+                let b_date_arr = moment(b_date.split(','))
+                let ageDiff = a_date_arr.diff(b_date_arr, 'years');
                 if (ageDiff <= 0 ) {   
                     return false;    
                 }

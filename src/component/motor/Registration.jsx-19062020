@@ -9,7 +9,7 @@ import { loaderStart, loaderStop } from "../../store/actions/loader";
 import { connect } from "react-redux";
 import * as Yup from 'yup';
 import swal from 'sweetalert';
-import Encryption from '../../shared/payload-encryption';
+
 import { Formik, Form, Field, ErrorMessage } from 'formik';
 
 
@@ -74,18 +74,10 @@ fetchData=()=>{
 
 
         const formData = new FormData();
-        let encryption = new Encryption();
-
-        /*formData.append('registration_no',values.regNumber);
+        formData.append('registration_no',values.regNumber);
         formData.append('menumaster_id',1);
-        formData.append('vehicle_type_id',productId);*/
+        formData.append('vehicle_type_id',productId);
 
-        const post_data = {
-            'registration_no':values.regNumber,
-            'menumaster_id':1,
-            'vehicle_type_id':productId
-        } 
-        formData.append('enc_data',encryption.encrypt(JSON.stringify(post_data)))
         this.props.loadingStart();
         axios
         .post(`/registration`, formData)
