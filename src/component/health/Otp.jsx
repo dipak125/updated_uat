@@ -9,7 +9,13 @@ import Encryption from '../../shared/payload-encryption';
 
 // import OtpInput from 'react-otp-input';
 
-const initialValue = {}
+const initialValue = {
+    otp1: "",
+    otp2: "",
+    otp3: "",
+    otp4: "",
+    otp5: ""
+}
 
 class Otp extends Component {
 
@@ -36,7 +42,7 @@ class Otp extends Component {
           .then((res) => {
             if(res.data.error == false) {
                 actions.setSubmitting(false);
-                this.handleSubmit(values, res.data.data.otp)
+                this.handleSubmit(values, actions, res.data.data.otp)
             } 
             else {
                 actions.setSubmitting(false);
@@ -52,12 +58,17 @@ class Otp extends Component {
           });
     };
 
-    handleSubmit = (values,otp) => {
+    handleSubmit = (values,actions, otp) => {
         let otp_enter = Number(values.otp1+values.otp2+values.otp3+values.otp4+values.otp5)
         if(otp_enter == Number(otp)){
             this.props.reloadPage(otp_enter);
         }
         else {
+            actions.setFieldValue('otp1', "")
+            actions.setFieldValue('otp2', "")
+            actions.setFieldValue('otp3', "")
+            actions.setFieldValue('otp4', "")
+            actions.setFieldValue('otp5', "")
             this.setState({ errorMsg: "Wrong OTP" });
         }        
         // this.props.otp(values.otp);
@@ -150,23 +161,15 @@ class Otp extends Component {
     
     render() {
         const {otp, errorMsg, seconds} = this.state
+
+        const newInitialValues = Object.assign(initialValue, {
+            otp1: errorMsg ? "" : "",
+            otp2: errorMsg ? "" : "",
+            otp3: errorMsg ? "" : "",
+            otp4: errorMsg ? "" : "",
+            otp5: errorMsg ? "" : "",
+        })
         return (
-             // <div className="text-center boxotpmodl">
-            //  <img src={require('../../assets/images/desk.svg')} alt="" className="m-b-25" />
-            //     <div className="verfy">Verify OTP</div>
-            //     <div className="mobotp">Your one time password (OTP)  is sent to your registered mobile number XXXXXXX 445.</div>
-            //     <div className="d-flex justify-content-center otpInputWrap mx-auto m-b-25">
-            //         <div className="mr-1 ml-1">.
-            //         <OtpInput
-            //         onChange={otp => console.log(otp)}
-            //         numInputs={6}
-            //         containerStyle="form-control placeHCenter"
-            //         value= ""
-            //         separator={<span>-</span>}
-            //         />
-            //         </div>
-            //     </div>
-            // </div>
            
                 <Formik initialValues={initialValue} onSubmit={this.checkOtp}
                     // validationSchema={validateNominee}
@@ -192,6 +195,9 @@ class Otp extends Component {
                                         onFocus={e => this.changePlaceHoldClassAdd(e)}
                                         onBlur={e => this.changePlaceHoldClassRemove(e)}
                                         maxLength="1"
+                                        onChange={(e) => {
+                                                setFieldValue('otp1', e.target.value);  
+                                        }}
                                     />
                                 </div>
                                 <div className="mr-1 ml-1">
@@ -204,6 +210,9 @@ class Otp extends Component {
                                         onFocus={e => this.changePlaceHoldClassAdd(e)}
                                         onBlur={e => this.changePlaceHoldClassRemove(e)}
                                         maxLength="1"
+                                        onChange={(e) => {
+                                            setFieldValue('otp2', e.target.value);  
+                                    }}
                                     />
                                 </div>
                                 <div className="mr-1 ml-1">
@@ -216,6 +225,9 @@ class Otp extends Component {
                                         onFocus={e => this.changePlaceHoldClassAdd(e)}
                                         onBlur={e => this.changePlaceHoldClassRemove(e)}
                                         maxLength="1"
+                                        onChange={(e) => {
+                                            setFieldValue('otp3', e.target.value);  
+                                    }}
                                     />
                                 </div>
                                 <div className="mr-1 ml-1">
@@ -228,6 +240,9 @@ class Otp extends Component {
                                         onFocus={e => this.changePlaceHoldClassAdd(e)}
                                         onBlur={e => this.changePlaceHoldClassRemove(e)}
                                         maxLength="1"
+                                        onChange={(e) => {
+                                            setFieldValue('otp4', e.target.value);  
+                                    }}
                                     />
                                 </div>
                                 <div className="mr-1 ml-1">
@@ -240,6 +255,9 @@ class Otp extends Component {
                                         onFocus={e => this.changePlaceHoldClassAdd(e)}
                                         onBlur={e => this.changePlaceHoldClassRemove(e)}
                                         maxLength="1"
+                                        onChange={(e) => {
+                                            setFieldValue('otp5', e.target.value);  
+                                    }}
                                     />
                                 </div>
                             </div>
