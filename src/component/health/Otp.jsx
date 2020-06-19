@@ -47,6 +47,11 @@ class Otp extends Component {
             else {
                 actions.setSubmitting(false);
                 this.setState({ otp: "", errorMsg: res.data.msg });
+                actions.setFieldValue('otp1', "")
+                actions.setFieldValue('otp2', "")
+                actions.setFieldValue('otp3', "")
+                actions.setFieldValue('otp4', "")
+                actions.setFieldValue('otp5', "")
             } 
             this.props.loadingStop();         
           })
