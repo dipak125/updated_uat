@@ -132,11 +132,20 @@ class ThankYouPage extends Component {
     componentDidMount() {
         // this.getAccessToken();       
         const {policyId} = this.props.match.params
-        window.addEventListener("popstate", () => {
-        this.props.history.push(`/ThankYou/${policyId}`);
-          });
-      }
+        // window.addEventListener("popstate", (e) => {
+        // this.props.history.go(`/ThankYou/${policyId}`);
+        //   });
 
+        // window.history.pushState(null, document.title, window.location.href);
+        // window.addEventListener('popstate', function (event){
+        // window.history.pushState(null, document.title,  window.location.href);
+        // }); 
+
+        window.history.pushState(null, null, window.location.href);
+        window.onpopstate = function () {
+        window.history.go(1);
+    };
+      }
     render() {
         const {policyId} = this.props.match.params
         return (

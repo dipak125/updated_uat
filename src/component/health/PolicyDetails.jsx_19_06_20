@@ -54,8 +54,7 @@ class PolicyDetails extends Component {
     purchaseData: [],
     error1: [],
     show: false,
-    refNumber: "",
-    paymentStatus: []
+    refNumber: ""
   };
 
   handleClose = () => {
@@ -82,8 +81,7 @@ class PolicyDetails extends Component {
         this.setState({
           policyHolderDetails: res.data.data.policyHolder,
           familyMember: res.data.data.policyHolder.request_data.family_members,
-          refNumber: res.data.data.policyHolder.reference_no,
-          paymentStatus: res.data.data.policyHolder.payment ? res.data.data.policyHolder.payment[0] : []
+          refNumber: res.data.data.policyHolder.reference_no
         });
         this.getAccessToken(
           res.data.data.policyHolder,
@@ -124,24 +122,24 @@ class PolicyDetails extends Component {
       });
   };
 
-  // getAccessTokenForInception = (e) => {
-  //   this.handleClose()
-  //   this.props.loadingStart();
-  //   axios
-  //     .post(`/callTokenService`)
-  //     .then((res) => {
-  //       this.setState({
-  //         accessToken: res.data.access_token,
-  //       });
-  //       this.policyInception(res.data.access_token);
-  //     })
-  //     .catch((err) => {
-  //       this.setState({
-  //         accessToken: [],
-  //       });
-  //       this.props.loadingStop();
-  //     });
-  // };
+  getAccessTokenForInception = (e) => {
+    this.handleClose()
+    this.props.loadingStart();
+    axios
+      .post(`/callTokenService`)
+      .then((res) => {
+        this.setState({
+          accessToken: res.data.access_token,
+        });
+        this.policyInception(res.data.access_token);
+      })
+      .catch((err) => {
+        this.setState({
+          accessToken: [],
+        });
+        this.props.loadingStop();
+      });
+  };
 
   fullQuote = (access_token, policyHolderDetails) => {
     let id = localStorage.getItem("policyHolder_id");
@@ -186,50 +184,50 @@ class PolicyDetails extends Component {
       });
   };
 
-  // policyInception = (access_token) => {
-  //   const { fulQuoteResp, error } = this.state;
-  //   const formData = new FormData();
-  //  // formData.append("quotationNo", fulQuoteResp.QuotationNo);
-  //   //formData.append("amount", fulQuoteResp.DuePremium);
-  //   //formData.append("access_token", access_token);
+  policyInception = (access_token) => {
+    const { fulQuoteResp, error } = this.state;
+    const formData = new FormData();
+   // formData.append("quotationNo", fulQuoteResp.QuotationNo);
+    //formData.append("amount", fulQuoteResp.DuePremium);
+    //formData.append("access_token", access_token);
 
-  //   let encryption = new Encryption();
+    let encryption = new Encryption();
 
-  //   //formData.append("id", id);
-  //   //formData.append("insureValue", insureValue);
-  //   //formData.append("access_token", access_token);
-  //   const post_data = {
-  //     "quotationNo":fulQuoteResp.QuotationNo,
-  //     "amount":fulQuoteResp.DuePremium,
-  //     "access_token":access_token
-  //   }
-  //   formData.append('enc_data',encryption.encrypt(JSON.stringify(post_data)))    
+    //formData.append("id", id);
+    //formData.append("insureValue", insureValue);
+    //formData.append("access_token", access_token);
+    const post_data = {
+      "quotationNo":fulQuoteResp.QuotationNo,
+      "amount":fulQuoteResp.DuePremium,
+      "access_token":access_token
+    }
+    formData.append('enc_data',encryption.encrypt(JSON.stringify(post_data)))    
 
-  //   axios
-  //     .post(`/callIssueQuoteMod`, formData)
-  //     .then((res) => {
-  //       if (res.data.PolicyNo) {
-  //         this.setState({
-  //           purchaseData: res.data,
-  //           error1: [],
-  //         });
-  //         this.policySummery(res.data.PolicyNo);
-  //       } else {
-  //         this.setState({
-  //           purchaseData: [],
-  //           error1: res.data,
-  //         });
-  //         swal("Thank you for showing your interest for buying product.Due to some reasons, we are not able to issue the policy online.Please call 180 22 1111");
-  //       }
-  //       this.props.loadingStop();
-  //     })
-  //     .catch((err) => {
-  //       this.setState({
-  //         serverResponse: [],
-  //       });
-  //       this.props.loadingStop();
-  //     });
-  // };
+    axios
+      .post(`/callIssueQuoteMod`, formData)
+      .then((res) => {
+        if (res.data.PolicyNo) {
+          this.setState({
+            purchaseData: res.data,
+            error1: [],
+          });
+          this.policySummery(res.data.PolicyNo);
+        } else {
+          this.setState({
+            purchaseData: [],
+            error1: res.data,
+          });
+          swal("Thank you for showing your interest for buying product.Due to some reasons, we are not able to issue the policy online.Please call 180 22 1111");
+        }
+        this.props.loadingStop();
+      })
+      .catch((err) => {
+        this.setState({
+          serverResponse: [],
+        });
+        this.props.loadingStop();
+      });
+  };
 
   payment = () => {
     const { refNumber } = this.state;
@@ -243,9 +241,9 @@ class PolicyDetails extends Component {
 
   render() {
     const { productId } = this.props.match.params;
-    const { fulQuoteResp, error, show, policyHolderDetails, refNumber, paymentStatus } = this.state;
+    const { fulQuoteResp, error, show, policyHolderDetails, refNumber } = this.state;
 
-    console.log("fulQuoteResp ", paymentStatus)
+    console.log("fulQuoteResp ", fulQuoteResp)
     const items =
       fulQuoteResp &&
       fulQuoteResp.PolicyLobList && fulQuoteResp.PolicyLobList.length > 0 && 
@@ -316,17 +314,6 @@ class PolicyDetails extends Component {
         </span>
       ) : null;
 
-    const paymentErrMsg =
-    paymentStatus && paymentStatus.transaction_status == 103 ? (
-        <span className="errorMsg">
-          <h6>
-            <strong>
-              Payment failed. Please try again
-            </strong>
-          </h6>
-        </span>
-      ) : null;
-
     return (
       <>
         <BaseComponent>
@@ -346,7 +333,6 @@ class PolicyDetails extends Component {
                     </div>
                     <div className="brandhead m-b-30">
                       <h5>{errMsg}</h5>
-                      <h5>{paymentErrMsg}</h5>
                       <h4>
                         Policy Reference Number {fulQuoteResp.QuotationNo}
                       </h4>
