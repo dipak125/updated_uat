@@ -20,7 +20,7 @@ import LogIn from "../common/login/LogIn";
 // import ThankYou from '../health/ThankYou';
 
 import Registration from '../motor/Registration';
-import SelectBrand from '../motor/SelectBrand';
+// import SelectBrand from '../motor/SelectBrand';
 import VehicleDetails from '../motor/VehicleDetails';
 import AdditionalDetails from '../motor/AdditionalDetails';
 import OtherComprehensive from '../motor/OtherComprehensive';
@@ -79,6 +79,13 @@ const PolicySummery = Loadable({
 });
 
 
+
+const SelectBrand = Loadable({
+    loader: () => import(/*webpackChunkName: "Products" */"../motor/SelectBrand.jsx"),
+    loading: () => loadingContent
+});
+
+
 class Routes extends Component {
     render() {
         this.props.onAuthPersist();
@@ -96,6 +103,7 @@ class Routes extends Component {
                         <PrivateRoute exact path="/PolicyDetails/:productId" component={PolicyDetails} />
                         <PrivateRoute exact path="/PolicySummery/:productId" component={PolicySummery} />                 
                         <PrivateRoute exact path="/ThankYou/:policyId" component={ThankYou} />
+                    
                         
                         <PrivateRoute exact path="/Registration/:productId" component={Registration} />                    
                         <PrivateRoute exact path="/Select-brand/:productId" component={SelectBrand} />
@@ -103,7 +111,7 @@ class Routes extends Component {
                         <PrivateRoute exact path="/OtherComprehensive/:productId" component={OtherComprehensive} />
                         <PrivateRoute exact path="/Additional_details/:productId" component={AdditionalDetails} />
                         <PrivateRoute exact path="/Premium/:productId" component={Premium} />
-                        <PrivateRoute exact path="/ThankYou_motor" component={ThankYou_motor} />
+                        <PrivateRoute exact path="/ThankYou_motor/:policyId" component={ThankYou_motor} />
 
                         <PrivateRoute exact path="/UnderMaintenance" component={UnderMaintenance} />
                         <Redirect from="/" to="/Products" />

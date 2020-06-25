@@ -5,53 +5,31 @@ import { withRouter } from 'react-router-dom';
 import { loaderStart, loaderStop } from "../../store/actions/loader";
 import { connect } from "react-redux";
 import axios from "../../shared/axios";
-import Encryption from '../../shared/payload-encryption';
-
 // import OtpInput from 'react-otp-input';
 
-const initialValue = {
-    otp1: "",
-    otp2: "",
-    otp3: "",
-    otp4: "",
-    otp5: ""
-}
+const initialValue = {}
 
 class Otp extends Component {
 
     state = {
         otp: "",
         errorMsg: "",
-        seconds: 20
+        seconds: 10
       };
 
-    checkOtp = (values, actions) => {
+    checkOtp = (values) => {
         this.props.loadingStart();
         const formData = new FormData();
-       // formData.append('policy_holder_id', localStorage.getItem('policyHolder_id'));
-       // formData.append("menumaster_id", '2');
-       let post_data_obj = {
-         'policy_holder_id':localStorage.getItem("policyHolder_id"),
-         'menumaster_id':'1'
-       }
-       let encryption = new Encryption();
-       formData.append('enc_data',encryption.encrypt(JSON.stringify(post_data_obj)))
-
+        formData.append('policy_holder_id', localStorage.getItem('policyHolder_id'));
+        formData.append("menumaster_id", '1');
         axios
           .post('/otp/check-status', formData)
           .then((res) => {
             if(res.data.error == false) {
-                actions.setSubmitting(false);
-                this.handleSubmit(values, actions, res.data.data.otp)
+                this.handleSubmit(values, res.data.data.otp)
             } 
             else {
-                actions.setSubmitting(false);
                 this.setState({ otp: "", errorMsg: res.data.msg });
-                actions.setFieldValue('otp1', "")
-                actions.setFieldValue('otp2', "")
-                actions.setFieldValue('otp3', "")
-                actions.setFieldValue('otp4', "")
-                actions.setFieldValue('otp5', "")
             } 
             this.props.loadingStop();         
           })
@@ -63,17 +41,12 @@ class Otp extends Component {
           });
     };
 
-    handleSubmit = (values,actions, otp) => {
+    handleSubmit = (values,otp) => {
         let otp_enter = Number(values.otp1+values.otp2+values.otp3+values.otp4+values.otp5)
         if(otp_enter == Number(otp)){
             this.props.reloadPage(otp_enter);
         }
         else {
-            actions.setFieldValue('otp1', "")
-            actions.setFieldValue('otp2', "")
-            actions.setFieldValue('otp3', "")
-            actions.setFieldValue('otp4', "")
-            actions.setFieldValue('otp5', "")
             this.setState({ errorMsg: "Wrong OTP" });
         }        
         // this.props.otp(values.otp);
@@ -93,18 +66,8 @@ class Otp extends Component {
     generateOtp = () => {
         this.props.loadingStart();
         const formData = new FormData();
-       // formData.append('policy_holder_id', localStorage.getItem('policyHolder_id'));
-       // formData.append("menumaster_id", '2');
-        let post_data_obj = {
-          'policy_holder_id':localStorage.getItem("policyHolder_id"),
-          'menumaster_id':'1'
-        }
-        let encryption = new Encryption();
-        formData.append('enc_data',encryption.encrypt(JSON.stringify(post_data_obj)))
-
-        this.setState({
-            seconds: 20, errorMsg: ""
-          });
+        formData.append('policy_holder_id', localStorage.getItem('policyHolder_id'));
+        formData.append("menumaster_id", '1');
         axios
           .post('/otp/generate', formData)
           .then((res) => {
@@ -122,14 +85,8 @@ class Otp extends Component {
       getOtp = () => {
         this.props.loadingStart();
         const formData = new FormData();
-        //formData.append('policy_holder_id', localStorage.getItem('policyHolder_id'));
-        //formData.append("menumaster_id", '2');
-        let post_data_obj = {
-          'policy_holder_id':localStorage.getItem("policyHolder_id"),
-          'menumaster_id':'1'
-        }
-        let encryption = new Encryption();
-        formData.append('enc_data',encryption.encrypt(JSON.stringify(post_data_obj)))
+        formData.append('policy_holder_id', localStorage.getItem('policyHolder_id'));
+        formData.append("menumaster_id", '1');
         axios
           .post('/otp/check-status', formData)
           .then((res) => {
@@ -149,32 +106,36 @@ class Otp extends Component {
           });
       };
 
-      coundown = () => {
-        this.myInterval = setInterval(() => {
-            this.setState(({ seconds }) => ({
-              seconds: seconds - 1
-            }))
-          }, 1000) 
-      }
-
 
     componentDidMount() {
-        this.generateOtp();  
-        this.coundown();
-        
+        this.generateOtp();
+
+            this.myInterval = setInterval(() => {
+                this.setState(({ seconds }) => ({
+                  seconds: seconds - 1
+                }))
+              }, 1000)       
       }
     
     render() {
         const {otp, errorMsg, seconds} = this.state
-
-        const newInitialValues = Object.assign(initialValue, {
-            otp1: errorMsg ? "" : "",
-            otp2: errorMsg ? "" : "",
-            otp3: errorMsg ? "" : "",
-            otp4: errorMsg ? "" : "",
-            otp5: errorMsg ? "" : "",
-        })
         return (
+             // <div className="text-center boxotpmodl">
+            //  <img src={require('../../assets/images/desk.svg')} alt="" className="m-b-25" />
+            //     <div className="verfy">Verify OTP</div>
+            //     <div className="mobotp">Your one time password (OTP)  is sent to your registered mobile number XXXXXXX 445.</div>
+            //     <div className="d-flex justify-content-center otpInputWrap mx-auto m-b-25">
+            //         <div className="mr-1 ml-1">.
+            //         <OtpInput
+            //         onChange={otp => console.log(otp)}
+            //         numInputs={6}
+            //         containerStyle="form-control placeHCenter"
+            //         value= ""
+            //         separator={<span>-</span>}
+            //         />
+            //         </div>
+            //     </div>
+            // </div>
            
                 <Formik initialValues={initialValue} onSubmit={this.checkOtp}
                     // validationSchema={validateNominee}
@@ -200,9 +161,6 @@ class Otp extends Component {
                                         onFocus={e => this.changePlaceHoldClassAdd(e)}
                                         onBlur={e => this.changePlaceHoldClassRemove(e)}
                                         maxLength="1"
-                                        onChange={(e) => {
-                                                setFieldValue('otp1', e.target.value);  
-                                        }}
                                     />
                                 </div>
                                 <div className="mr-1 ml-1">
@@ -215,9 +173,6 @@ class Otp extends Component {
                                         onFocus={e => this.changePlaceHoldClassAdd(e)}
                                         onBlur={e => this.changePlaceHoldClassRemove(e)}
                                         maxLength="1"
-                                        onChange={(e) => {
-                                            setFieldValue('otp2', e.target.value);  
-                                    }}
                                     />
                                 </div>
                                 <div className="mr-1 ml-1">
@@ -230,9 +185,6 @@ class Otp extends Component {
                                         onFocus={e => this.changePlaceHoldClassAdd(e)}
                                         onBlur={e => this.changePlaceHoldClassRemove(e)}
                                         maxLength="1"
-                                        onChange={(e) => {
-                                            setFieldValue('otp3', e.target.value);  
-                                    }}
                                     />
                                 </div>
                                 <div className="mr-1 ml-1">
@@ -245,9 +197,6 @@ class Otp extends Component {
                                         onFocus={e => this.changePlaceHoldClassAdd(e)}
                                         onBlur={e => this.changePlaceHoldClassRemove(e)}
                                         maxLength="1"
-                                        onChange={(e) => {
-                                            setFieldValue('otp4', e.target.value);  
-                                    }}
                                     />
                                 </div>
                                 <div className="mr-1 ml-1">
@@ -260,9 +209,6 @@ class Otp extends Component {
                                         onFocus={e => this.changePlaceHoldClassAdd(e)}
                                         onBlur={e => this.changePlaceHoldClassRemove(e)}
                                         maxLength="1"
-                                        onChange={(e) => {
-                                            setFieldValue('otp5', e.target.value);  
-                                    }}
                                     />
                                 </div>
                             </div>
@@ -275,12 +221,8 @@ class Otp extends Component {
                             </div>
                            
                             <div className="text-center">
-                            <Button className={`proceedBtn`} type="button" onClick={this.generateOtp} >
-                            Resend OTP
-                            </Button>
-
                             <Button className={`proceedBtn`} type="submit" >
-                                {isSubmitting ? 'Wait..' : 'Continue'}                            
+                                {isSubmitting ? 'Wait..' : 'Continue'}
                             </Button> 
                             </div>
                         </div>  

@@ -6,10 +6,6 @@ import BaseComponent from '.././BaseComponent';
 import SideNav from '../common/side-nav/SideNav';
 import Footer from '../common/footer/Footer';
 import Otp from "./Otp"
-import axios from "../../shared/axios";
-import { withRouter, Link, Route } from "react-router-dom";
-import { loaderStart, loaderStop } from "../../store/actions/loader";
-import { connect } from "react-redux";
 
 const initialValue = {}
 
@@ -23,16 +19,7 @@ class Premium extends Component {
         this.state = {
             show: false,
             refNo: "",
-            whatsapp: "",
-            fulQuoteResp: [],
-            motorInsurance: [],
-            error: [],
-            purchaseData: [],
-            error1: [],
-            refNumber: "",
-            paymentStatus: [],
-            accessToken: "",
-            PolicyArray: []
+            whatsapp: ""
         };
     }
 
@@ -65,111 +52,9 @@ class Premium extends Component {
         this.setState({ show: true , refNo: values.refNo, whatsapp: values.whatsapp});
     }
 
-    fetchData = () => {
-        const { productId } = this.props.match.params
-        let policyHolder_id = localStorage.getItem("policyHolder_id") ? localStorage.getItem("policyHolder_id") : 0;
-        this.props.loadingStart();
-        axios.get(`policy-holder/motor/${policyHolder_id}`)
-            .then(res => {
-                let motorInsurance = res.data.data.policyHolder ? res.data.data.policyHolder.motorinsurance : {}
-                this.setState({
-                    motorInsurance,
-                    refNumber: res.data.data.policyHolder.reference_no,
-                    paymentStatus: res.data.data.policyHolder.payment ? res.data.data.policyHolder.payment[0] : []
-                })
-                this.getAccessToken()
-            })
-            .catch(err => {
-                // handle error
-                this.props.loadingStop();
-            })
-    }
-
-    getAccessToken = () => {
-        axios
-          .post(`/callTokenService`)
-          .then((res) => {
-            this.setState({
-              accessToken: res.data.access_token,
-            });
-            this.fullQuote(res.data.access_token)
-          })
-          .catch((err) => {
-            this.setState({
-              accessToken: '',
-            });
-            this.props.loadingStop();
-          });
-      };
-
-    fullQuote = (access_token) => {
-    const formData = new FormData();
-    formData.append("access_token", access_token);
-    formData.append("id", localStorage.getItem("policyHolder_id"));
-    axios.post('fullQuotePMCAR',formData)
-        .then(res => {
-            if (res.data.PolicyObject) {
-                this.setState({
-                    fulQuoteResp: res.data.PolicyObject,
-                    PolicyArray: res.data.PolicyObject.PolicyLobList,
-                    error: [],
-                });
-                } else {
-                this.setState({
-                    fulQuoteResp: [],
-                    error: res.data,
-                });
-                }
-            this.props.loadingStop();
-        })
-        .catch(err => {
-            this.setState({
-                serverResponse: [],
-            });
-            this.props.loadingStop();
-        })
-    }
-
-    payment = () => {
-        const { refNumber } = this.state;
-        // window.location = `http://14.140.119.44/sbig-csc/ConnectPG/payment.php?refrence_no=${refNumber}`
-        // window.location = `${process.env.REACT_APP_PAYMENT_URL}/sbig-csc/ConnectPG/payment_motor.php?refrence_no=${refNumber}`
-        window.location = `${process.env.REACT_APP_PAYMENT_URL}/sbig-csc/ConnectPG/payment_motor.php?refrence_no=d4e3fae155cb7e925e0fad4adeb1f6c1`
-      }
-    
-
-    componentDidMount() {
-        this.fetchData()
-    }
-
     render() {
-        const {refNo, whatsapp, show, fulQuoteResp, motorInsurance, error, error1, refNumber, paymentStatus, PolicyArray} = this.state
+        const {refNo, whatsapp, show} = this.state
         const {productId} = this.props.match.params
-
-        const errMsg =
-            error && error.message ? (
-                <span className="errorMsg">
-                <h6>
-                    <strong>
-                    Thank you for showing your interest for buying product.Due to some
-                    reasons, we are not able to issue the policy online.Please call
-                    180 22 1111
-                    </strong>
-                </h6>
-                </span>
-        ) : null;
-
-        const paymentErrMsg =
-            paymentStatus && paymentStatus.transaction_status == 103 ? (
-                <span className="errorMsg">
-                <h6>
-                    <strong>
-                    Payment failed. Please try again
-                    </strong>
-                </h6>
-                </span>
-        ) : null;
-
         return (
             <>
                 <BaseComponent>
@@ -194,13 +79,6 @@ class Premium extends Component {
                             <h4>The Summary of your Policy Premium Details is as below </h4>
                         </div>
                     </div>
-                    <div className="brandhead m-b-30">
-                      <h5>{errMsg}</h5>
-                      <h5>{paymentErrMsg}</h5>
-                      <h4>
-                        Policy Reference Number {fulQuoteResp.QuotationNo}
-                      </h4>
-                    </div>
                 
                     <Row>
                         <Col sm={12} md={9} lg={9}>
@@ -217,7 +95,21 @@ class Premium extends Component {
 
                                             <Col sm={12} md={3}>
                                                 <div className="premamount">
-                                                    ₹ {fulQuoteResp.DuePremium}
+                                                    ₹ 4000
+                                                </div>
+                                            </Col>
+
+
+                                            <Col sm={12} md={3}>
+                                                <div className="motopremium">
+                                                    Swachh Bharat cess:
+                                                                    </div>
+                                            </Col>
+
+
+                                            <Col sm={12} md={3}>
+                                                <div className="premamount">
+                                                    ₹ 4000
                                                 </div>
                                             </Col>
 
@@ -230,9 +122,24 @@ class Premium extends Component {
 
                                             <Col sm={12} md={3}>
                                                 <div className="premamount">
-                                                    ₹ {fulQuoteResp.BeforeVatPremium}
+                                                    ₹ 1000
                                                 </div>
                                             </Col>
+
+
+                                            <Col sm={12} md={3}>
+                                                <div className="motopremium">
+                                                    Krishi Kalyan cess:
+                                                                    </div>
+                                            </Col>
+
+
+                                            <Col sm={12} md={3}>
+                                                <div className="premamount">
+                                                    ₹ 1000
+                                                </div>
+                                            </Col>
+
 
                                             <Col sm={12} md={3}>
                                                 <div className="motopremium">
@@ -243,7 +150,7 @@ class Premium extends Component {
 
                                             <Col sm={12} md={3}>
                                                 <div className="premamount">
-                                                    ₹ {fulQuoteResp.TGST}
+                                                    ₹ 5000
                                                 </div>
                                             </Col>
                                         </Row>
@@ -332,13 +239,7 @@ class Premium extends Component {
                             </Row>
                             <div className="d-flex justify-content-left resmb">
                                 <Button className="backBtn" type="button" onClick= {this.additionalDetails.bind(this, productId)}>Back</Button>
-                                {fulQuoteResp.QuotationNo ? 
-                                <Button type="submit"
-                                    className="proceedBtn"
-                                >
-                                    Make Payment
-                                </Button> : null
-                                } 
+                                <Button className="proceedBtn" type="submit" >Continue</Button>
                             </div>
                         </Col>
 
@@ -357,13 +258,7 @@ class Premium extends Component {
                     onHide={this.handleClose}>
                     <div className="otpmodal">
                         <Modal.Body>
-                            <Otp 
-                             quoteNo = {fulQuoteResp.QuotationNo}
-                             duePremium = {fulQuoteResp.DuePremium}
-                             refNumber = {refNumber}
-                             whatsapp= {whatsapp} 
-                             reloadPage={(e) => this.payment(e)} 
-                             />
+                            <Otp refNo= {refNo} whatsapp= {whatsapp} reloadPage={(e) => this.handleOtp(e) } />
                         </Modal.Body>
                     </div>
                 </Modal>
@@ -378,19 +273,4 @@ class Premium extends Component {
     }
 }
 
-const mapStateToProps = (state) => {
-    return {
-      loading: state.loader.loading,
-    };
-  };
-  
-  const mapDispatchToProps = (dispatch) => {
-    return {
-      loadingStart: () => dispatch(loaderStart()),
-      loadingStop: () => dispatch(loaderStop()),
-    };
-  };
-  
-  export default withRouter(
-    connect(mapStateToProps, mapDispatchToProps)(Premium)
-  );
+export default Premium;

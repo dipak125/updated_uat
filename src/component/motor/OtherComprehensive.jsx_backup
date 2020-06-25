@@ -1,10 +1,8 @@
 import React, { Component } from 'react';
 import { Row, Col, Modal, Button, FormGroup, OverlayTrigger, Tooltip } from 'react-bootstrap';
+// import {Slider } from 'bootstrap';
 import Collapsible from 'react-collapsible';
 import BackContinueButton from '../common/button/BackContinueButton';
-import DatePicker from "react-datepicker";
-import "react-datepicker/dist/react-datepicker.css"
-import 'react-datepicker/dist/react-datepicker-cssmodules.min.css'
 import { Formik, Field, Form, FieldArray } from "formik";
 import BaseComponent from '.././BaseComponent';
 import SideNav from '../common/side-nav/SideNav';
@@ -12,44 +10,17 @@ import Footer from '../common/footer/Footer';
 import { withRouter } from 'react-router-dom';
 import { loaderStart, loaderStop } from "../../store/actions/loader";
 import { connect } from "react-redux";
-import axios from "../../shared/axios"
-import Encryption from '../../shared/payload-encryption';
-import * as Yup from "yup";
-
 
 const initialValue = {}
-const ComprehensiveValidation = Yup.object().shape({
-    // is_carloan: Yup.number().required('Please select one option')
-    engine_no:Yup.string().required('Engine no is required'),
-    chasis_no:Yup.string().required('Insurer Pan no is required'),
-    cng_kit:Yup.number().required('please checked an option'),
-    // IDV:Yup.number().required('Declared value is required'),
-    
-   
-    // eIA:Yup.number().required('Please select one option')
-   
-});
 
 class OtherComprehensive extends Component {
 
-    constructor(props) {
-        super(props);
-
-        this.handleShow = this.handleShow.bind(this);
-        this.handleClose = this.handleClose.bind(this);
-
-        this.state = {
-            showCNG: false,
-            is_CNG_account: '',
-            accessToken: '',
-            serverResponse: [],
-            fulQuoteResp: [],
-            PolicyArray: [],
-            show: false,
-            sliderVal: '',
-            motorInsurance: []
-        };
-    }
+    state = {
+        showCNG: false,
+        is_CNG_account: '',
+        showLoan: false,
+        is_loan_account: ''
+    };
 
     changePlaceHoldClassAdd(e) {
         let element = e.target.parentElement;
@@ -59,14 +30,6 @@ class OtherComprehensive extends Component {
     changePlaceHoldClassRemove(e) {
         let element = e.target.parentElement;
         e.target.value.length === 0 && element.classList.remove('active');
-    }
-
-    handleClose() {
-        this.setState({ show: false });
-    }
-
-    handleShow() {
-        this.setState({ show: true });
     }
 
     showCNGText = (value) =>{
@@ -84,149 +47,20 @@ class OtherComprehensive extends Component {
         }
     }
 
-    sliderValue = (value) => {
-        this.setState({
-            sliderVal: value,
-            serverResponse: [],
-            error: []
-        })
-    }
-
     vehicleDetails = (productId) => {      
         this.props.history.push(`/VehicleDetails/${productId}`);
     }
 
 
-    fetchData = () => {
-        const { productId } = this.props.match.params
-        let policyHolder_id = localStorage.getItem("policyHolder_id") ? localStorage.getItem("policyHolder_id") : 0;
-        this.props.loadingStart();
-        axios.get(`policy-holder/motor/${policyHolder_id}`)
-            .then(res => {
-                let motorInsurance = res.data.data.policyHolder ? res.data.data.policyHolder.motorinsurance : {}
-                this.setState({
-                    motorInsurance
-                })
-                this.props.loadingStop();
-                this.getAccessToken()
-            })
-            .catch(err => {
-                // handle error
-                this.props.loadingStop();
-            })
-    }
-
-    getAccessToken = () => {
-        this.props.loadingStart();
-        axios
-          .post(`/callTokenService`)
-          .then((res) => {
-            this.setState({
-              accessToken: res.data.access_token,
-            });
-            this.fullQuote(res.data.access_token)
-          })
-          .catch((err) => {
-            this.setState({
-              accessToken: '',
-            });
-            this.props.loadingStop();
-          });
-      };
-
-    fullQuote = (access_token) => {
-        const formData = new FormData();
-        formData.append("access_token", access_token);
-        formData.append("id", localStorage.getItem("policyHolder_id"));
-        // const post_data = {
-        //     'id':localStorage.getItem('policyHolder_id'),
-        //     'access_token':access_token
-        // }
-        // let encryption = new Encryption();
-            // formData.append('enc_data',encryption.encrypt(JSON.stringify(post_data)))
-        axios.post('fullQuotePMCAR',formData)
-            .then(res => {
-                if (res.data.PolicyObject) {
-                    this.setState({
-                      fulQuoteResp: res.data.PolicyObject,
-                      PolicyArray: res.data.PolicyObject.PolicyLobList,
-                      error: [],
-                      serverResponse: res.data.PolicyObject
-                    });
-                  } else {
-                    this.setState({
-                      fulQuoteResp: [],
-                      error: res.data,
-                      serverResponse: []
-                    });
-                  }
-                this.props.loadingStop();
-            })
-            .catch(err => {
-                this.setState({
-                    serverResponse: [],
-                });
-                this.props.loadingStop();
-            })
-    }
-
-
-    handleSubmit = (values) => {
-        const { productId } = this.props.match.params
-        const { motorInsurance } = this.state
-        const formData = new FormData();
-        let encryption = new Encryption();
-        const post_data = {
-            'policy_holder_id': localStorage.getItem('policyHolder_id'),
-            'menumaster_id': 1,
-            'registration_no': motorInsurance.registration_no,
-            'chasis_no': values.chasis_no,
-            'chasis_no_last_part': values.chasis_no_last_part,
-            'add_more_coverage': 0,
-            'cng_kit': values.cng_kit,
-            'cngKit_Cost': values.cngKit_Cost,
-            'engine_no': values.engine_no
-
-        }
-        formData.append('enc_data', encryption.encrypt(JSON.stringify(post_data)))
-        this.props.loadingStart();
-        axios.post('update-insured-value', formData).then(res => {
-            this.props.loadingStop();
-            if (res.data.error == false) {
-                this.props.history.push(`/Additional_details/${productId}`);
-            }
-
-        })
-            .catch(err => {
-                // handle error
-                this.props.loadingStop();
-            })
-    }
-
-    componentDidMount() {
-        this.fetchData()
+    handleSubmit = () => {
+        const {productId} = this.props.match.params 
+        this.props.history.push(`/Additional_details/${productId}`);
     }
 
 
     render() {
-        const {showCNG, is_CNG_account, fulQuoteResp, PolicyArray, sliderVal, motorInsurance, serverResponse} = this.state
+        const {showCNG, is_CNG_account} = this.state
         const {productId} = this.props.match.params 
-        let defaultSliderValue = PolicyArray.length > 0 ? Math.floor(PolicyArray[0].PolicyRiskList[0].IDV_Suggested) : 0
-        let sliderValue = sliderVal
-        let minIDV = PolicyArray.length > 0 ? Math.floor(PolicyArray[0].PolicyRiskList[0].MinIDV_Suggested) : null
-        let maxIDV = PolicyArray.length > 0 ? Math.floor(PolicyArray[0].PolicyRiskList[0].MaxIDV_Suggested) : null
-        
-        let newInitialValues = Object.assign(initialValue, {
-            registration_no: motorInsurance.registration_no ? motorInsurance.registration_no : "",
-            chasis_no: motorInsurance.chasis_no ? motorInsurance.chasis_no : "",
-            chasis_no_last_part: motorInsurance.chasis_no_last_part ? motorInsurance.chasis_no_last_part : "",
-            add_more_coverage: motorInsurance.add_more_coverage ? motorInsurance.add_more_coverage : "",
-            cng_kit: motorInsurance.cng_kit ? motorInsurance.cng_kit : 0,
-            cngKit_Cost: motorInsurance.cngkit_cost ? motorInsurance.cngkit_cost : "",
-            engine_no: motorInsurance.engine_no ? motorInsurance.engine_no : "",
-
-        });
-        console.log("IDV", sliderValue)
         return (
             <>
                 <BaseComponent>
@@ -237,131 +71,26 @@ class OtherComprehensive extends Component {
                     </div>
                 <div className="col-sm-12 col-md-12 col-lg-10 col-xl-10 infobox">
                 <h4 className="text-center mt-3 mb-3">SBI General Insurance Company Limited</h4>
-                <section className="brand colpd m-b-25">
+                <section className="brand m-t-11 m-b-25">
                     <div className="d-flex justify-content-left">
                         <div className="brandhead m-b-10">
                             <h4 className="m-b-30">Covers your Car + Damage to Others (Comprehensive)</h4>
                         </div>
                     </div>
-                    <Formik initialValues={newInitialValues} 
-                    onSubmit={ serverResponse && serverResponse != "" ? (serverResponse.message ? this.getAccessToken : this.handleSubmit ) : this.getAccessToken} 
-                    validationSchema={ComprehensiveValidation}>
+                    <Formik initialValues={initialValue} onSubmit={this.handleSubmit}>
                     {({ values, errors, setFieldValue, setFieldTouched, isValid, isSubmitting, touched }) => {
 
                     return (
                         <Form>
                         <Row>
                             <Col sm={12} md={9} lg={9}>
-                                <div className="rghtsideTrigr W-90 m-b-30">
+                                <div className="rghtsideTrigr m-b-30">
                                     <Collapsible trigger="Default Covered Coverages & Benefit" >
                                         <div className="listrghtsideTrigr">
                                             Hello
                                         </div>
                                     </Collapsible>
                                 </div>
-
-                            <Row>
-                            <Col sm={12} md={6} lg={4}>
-                            <Row>
-                            <Col sm={12} md={5} lg={6}>
-                                        <FormGroup>
-                                            <div className="insurerName">
-                                            Registration No:
-                                            </div>
-                                        </FormGroup>
-                                        </Col>
-                                
-                                <Col sm={12} md={5} lg={6}>
-                                        <FormGroup>
-                                            <div className="insurerName">
-                                                    <Field
-                                                        type="text"
-                                                        name='registration_no' 
-                                                        autoComplete="off"
-                                                        className="premiumslid"   
-                                                        value= {values.registration_no}                                        
-                                                        
-                                                    />
-                                            </div>
-                                        </FormGroup>
-                                    </Col>
-                                    </Row>
-                                    </Col>
-
-                                    <Col sm={12} md={6} lg={5}>
-                                    <Row>
-                            <Col sm={12} md={5} lg={6}>
-                                        <FormGroup>
-                                            <div className="insurerName">
-                                            Please Enter Last 5 digits of Chassis no.
-                                            </div>
-                                        </FormGroup>
-                                    </Col>
-                                
-                                <Col sm={12} md={5} lg={6}>
-                                        <FormGroup>
-                                            <div className="insurerName">
-                                                    <Field
-                                                        type="text"
-                                                        name='chasis_no_last_part' 
-                                                        autoComplete="off"
-                                                        className="premiumslid"       
-                                                        value= {values.chasis_no_last_part}                                    
-                                                        
-                                                    />
-                                            </div>
-                                        </FormGroup>
-                                    </Col>
-                                    </Row>
-                                    </Col>
-
-                                    <Col sm={12} md={2} lg={2}>
-                                        <FormGroup>
-                                            
-                                            <Button className="btn btn-primary vrifyBtn">Verify</Button>
-                                            
-                                        </FormGroup>
-                                    </Col>
-                                    </Row>
-
-                                <Row>
-                                    <Col sm={12} md={6} lg={5}>
-                                        <FormGroup>
-                                            <div className="insurerName">
-                                                <Field
-                                                    name="engine_no"
-                                                    type="text"
-                                                    placeholder="Engine Number"
-                                                    autoComplete="off"
-                                                    onFocus={e => this.changePlaceHoldClassAdd(e)}
-                                                    onBlur={e => this.changePlaceHoldClassRemove(e)}
-                                                    value= {values.engine_no}
-                                                />
-                                                {errors.engine_no && touched.engine_no ? (
-                                                    <span className="errorMsg">{errors.engine_no}</span>
-                                                ) : null}
-                                            </div>
-                                        </FormGroup>
-                                    </Col>
-                                    <Col sm={12} md={6} lg={5}>
-                                        <FormGroup>
-                                            <div className="insurerName">
-                                                <Field
-                                                    name="chasis_no"
-                                                    type="text"
-                                                    placeholder="Chasis Number"
-                                                    autoComplete="off"
-                                                    onFocus={e => this.changePlaceHoldClassAdd(e)}
-                                                    onBlur={e => this.changePlaceHoldClassRemove(e)}
-                                                    value= {values.chasis_no}
-                                                />
-                                                {errors.chasis_no && touched.chasis_no ? (
-                                                    <span className="errorMsg">{errors.chasis_no}</span>
-                                                ) : null}
-                                            </div>
-                                        </FormGroup>
-                                    </Col>
-                                </Row>
 
                                 <Row>
                                     <Col sm={12} md={4} lg={4}>
@@ -371,18 +100,17 @@ class OtherComprehensive extends Component {
                                             </div>
                                         </FormGroup>
                                     </Col>
-                                    <Col sm={12} md={3} lg={2}>
+                                    <Col sm={12} md={2} lg={2}>
                                         <FormGroup>
                                             <div className="insurerName">
                                             <Field
                                                 name="IDV"
                                                 type="text"
-                                                placeholder=""
+                                                placeholder="5,00,000"
                                                 autoComplete="off"
                                                 className="premiumslid"
                                                 onFocus={e => this.changePlaceHoldClassAdd(e)}
                                                 onBlur={e => this.changePlaceHoldClassRemove(e)}
-                                                value={sliderValue ? sliderValue : defaultSliderValue}
                                             />
                                             {errors.IDV && touched.IDV ? (
                                                 <span className="errorMsg">{errors.IDV}</span>
@@ -390,27 +118,22 @@ class OtherComprehensive extends Component {
                                             </div>
                                         </FormGroup>
                                     </Col>
-                                    <Col sm={12} md={12} lg={6}>
+                                    {/* <Col sm={12} md={6} lg={6}>
                                         <FormGroup>
-                                        <input type="range" className="W-90" 
-                                        name= 'slider'
-                                        defaultValue= {defaultSliderValue}
-                                        min= {minIDV}
-                                        max= {maxIDV}
-                                        step= '1'
-                                        value={values.slider}
-                                        onChange= {(e) =>{
-                                        setFieldTouched("slider");
-                                        setFieldValue("slider",values.slider);
-                                        this.sliderValue(e.target.value)
-                                    }}
-                                        />
-                                            {/* <img src={require('../../assets/images/slide.svg')} alt="" className="W-90" /> */}
+                                        <Slider
+                                            defaultValue={0.00000005}
+                                            getAriaValueText={1}
+                                            aria-labelledby="discrete-slider-small-steps"
+                                            step={0.00000001}
+                                            marks
+                                            min={-0.00000005}
+                                            max={0.0000001}
+                                            valueLabelDisplay="auto"
+                                            />
+                                             <img src={require('../../assets/images/slide.svg')} alt="" /> 
                                         </FormGroup>
-                                    </Col>
+                                    </Col> */}
                                 </Row>
-
-                                                               
 
                                 <Row>
                                     <Col sm={12} md={5} lg={5}>
@@ -427,14 +150,14 @@ class OtherComprehensive extends Component {
                                                     <label className="customRadio3">
                                                     <Field
                                                         type="radio"
-                                                        name='cng_kit'                                            
+                                                        name='cngKit'                                            
                                                         value='1'
                                                         key='1'  
                                                         onChange={(e) => {
-                                                            setFieldValue(`cng_kit`, e.target.value);
+                                                            setFieldValue(`cngKit`, e.target.value);
                                                             this.showCNGText(1);
                                                         }}
-                                                        checked={values.cng_kit == '1' ? true : false}
+                                                        checked={values.cngKit == '1' ? true : false}
                                                     />
                                                         <span className="checkmark " /><span className="fs-14"> Yes</span>
                                                     </label>
@@ -444,14 +167,14 @@ class OtherComprehensive extends Component {
                                                     <label className="customRadio3">
                                                     <Field
                                                         type="radio"
-                                                        name='cng_kit'                                            
+                                                        name='cngKit'                                            
                                                         value='0'
                                                         key='1'  
                                                         onChange={(e) => {
-                                                            setFieldValue(`cng_kit`, e.target.value);
+                                                            setFieldValue(`cngKit`, e.target.value);
                                                             this.showCNGText(0);
                                                         }}
-                                                        checked={values.cng_kit == '0' ? true : false}
+                                                        checked={values.cngKit == '0' ? true : false}
                                                     />
                                                         <span className="checkmark" />
                                                         <span className="fs-14">No</span>
@@ -461,21 +184,20 @@ class OtherComprehensive extends Component {
                                         </FormGroup>
                                     </Col>
                                     {showCNG || is_CNG_account == 1 ?
-                                    <Col sm={12} md={12} lg={4}>
+                                    <Col sm={12} md={4} lg={4}>
                                         <FormGroup>
                                         <div className="insurerName">   
                                             <Field
-                                                name="cngKit_Cost"
+                                                name="cngCost"
                                                 type="text"
                                                 placeholder="Cost of Kit"
                                                 autoComplete="off"
-                                                className="W-80"
-                                                value = {values.cngKit_Cost}
+                                                value = {values.cngCost}
                                                 onFocus={e => this.changePlaceHoldClassAdd(e)}
                                                 onBlur={e => this.changePlaceHoldClassRemove(e)}
                                             />
-                                            {errors.cngKit_Cost && touched.cngKit_Cost ? (
-                                            <span className="errorMsg">{errors.cngKit_Cost}</span>
+                                            {errors.cngCost && touched.cngCost ? (
+                                            <span className="errorMsg">{errors.cngCost}</span>
                                             ) : null}                                             
                                             </div>
                                         </FormGroup>
@@ -577,29 +299,20 @@ class OtherComprehensive extends Component {
                                     </Col>
                                     </Row>    
                                     <div className="d-flex justify-content-left resmb">
-                                        <Button className={`backBtn`} type="button"  onClick= {this.vehicleDetails.bind(this,productId)}>
-                                            Back
+                                        <Button className={`backBtn`} type="button"  disabled={isSubmitting ? true : false} onClick= {this.vehicleDetails.bind(this,productId)}>
+                                            {isSubmitting ? 'Wait..' : 'Back'}
                                         </Button> 
-                                        { serverResponse && serverResponse != "" ? (serverResponse.message ? 
-                                        <Button className={`proceedBtn`} type="submit"  >
-                                            Quote
-                                        </Button> : <Button className={`proceedBtn`} type="submit"  >
-                                            Continue
-                                        </Button> ) : <Button className={`proceedBtn`} type="submit"  >
-                                            Quote
-                                        </Button>}
+                                        <Button className={`proceedBtn`} type="submit"  disabled={isSubmitting ? true : false}>
+                                            {isSubmitting ? 'Wait..' : 'Next'}
+                                        </Button> 
                                         </div>
                                     </Col>
 
                                     <Col sm={12} md={3}>
                                         <div className="justify-content-left regisBox">
                                             <h3 className="premamnt"> Total Premium Amount</h3>
-                                            <div className="rupee"> ₹ {fulQuoteResp.DuePremium}</div>
-                                            <div className="text-center">
-                                                <Button className={`brkbtn`} type="button" onClick= {this.handleShow}>
-                                                Breakup
-                                                </Button> 
-                                             </div>
+                                            <div className="rupee"> ₹ 5000</div>
+                                            <div className="text-center"> <button className="brkbtn">Breakup</button></div>
                                         </div>
                                     </Col>
                                 </Row>
@@ -613,20 +326,6 @@ class OtherComprehensive extends Component {
                     </div>
                     </div>
                 </BaseComponent>
-                <Modal className="customModal" bsSize="md"
-                    show={this.state.show}
-                    onHide={this.handleClose}>
-                    <Modal.Header closeButton className="custmModlHead">
-                        <div className="cntrbody">
-                            <h3>Premium breakup </h3>                           
-                        </div>
-                    </Modal.Header>
-                    <Modal.Body>
-                    <h5> Total Premium Amount  ₹ {fulQuoteResp.DuePremium}</h5>
-                    <h5> Service Tax  ₹ {fulQuoteResp.TGST}</h5>
-                    
-                    </Modal.Body>
-                </Modal>
 
             </>
         );

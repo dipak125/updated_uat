@@ -14,21 +14,9 @@ import { loaderStart, loaderStop } from "../../store/actions/loader";
 import { connect } from "react-redux";
 import axios from "../../shared/axios"
 import Encryption from '../../shared/payload-encryption';
-import * as Yup from "yup";
 
 
 const initialValue = {}
-const ComprehensiveValidation = Yup.object().shape({
-    // is_carloan: Yup.number().required('Please select one option')
-    engine_no:Yup.string().required('Engine no is required'),
-    chasis_no:Yup.string().required('Insurer Pan no is required'),
-    cng_kit:Yup.number().required('please checked an option'),
-    // IDV:Yup.number().required('Declared value is required'),
-    
-   
-    // eIA:Yup.number().required('Please select one option')
-   
-});
 
 class OtherComprehensive extends Component {
 
@@ -86,9 +74,7 @@ class OtherComprehensive extends Component {
 
     sliderValue = (value) => {
         this.setState({
-            sliderVal: value,
-            serverResponse: [],
-            error: []
+            sliderVal: value
         })
     }
 
@@ -107,7 +93,6 @@ class OtherComprehensive extends Component {
                 this.setState({
                     motorInsurance
                 })
-                this.props.loadingStop();
                 this.getAccessToken()
             })
             .catch(err => {
@@ -117,7 +102,6 @@ class OtherComprehensive extends Component {
     }
 
     getAccessToken = () => {
-        this.props.loadingStart();
         axios
           .post(`/callTokenService`)
           .then((res) => {
@@ -137,13 +121,6 @@ class OtherComprehensive extends Component {
     fullQuote = (access_token) => {
         const formData = new FormData();
         formData.append("access_token", access_token);
-        formData.append("id", localStorage.getItem("policyHolder_id"));
-        // const post_data = {
-        //     'id':localStorage.getItem('policyHolder_id'),
-        //     'access_token':access_token
-        // }
-        // let encryption = new Encryption();
-            // formData.append('enc_data',encryption.encrypt(JSON.stringify(post_data)))
         axios.post('fullQuotePMCAR',formData)
             .then(res => {
                 if (res.data.PolicyObject) {
@@ -151,13 +128,11 @@ class OtherComprehensive extends Component {
                       fulQuoteResp: res.data.PolicyObject,
                       PolicyArray: res.data.PolicyObject.PolicyLobList,
                       error: [],
-                      serverResponse: res.data.PolicyObject
                     });
                   } else {
                     this.setState({
                       fulQuoteResp: [],
                       error: res.data,
-                      serverResponse: []
                     });
                   }
                 this.props.loadingStop();
@@ -169,7 +144,6 @@ class OtherComprehensive extends Component {
                 this.props.loadingStop();
             })
     }
-
 
     handleSubmit = (values) => {
         const { productId } = this.props.match.params
@@ -209,7 +183,7 @@ class OtherComprehensive extends Component {
 
 
     render() {
-        const {showCNG, is_CNG_account, fulQuoteResp, PolicyArray, sliderVal, motorInsurance, serverResponse} = this.state
+        const {showCNG, is_CNG_account, fulQuoteResp, PolicyArray, sliderVal, motorInsurance} = this.state
         const {productId} = this.props.match.params 
         let defaultSliderValue = PolicyArray.length > 0 ? Math.floor(PolicyArray[0].PolicyRiskList[0].IDV_Suggested) : 0
         let sliderValue = sliderVal
@@ -243,9 +217,7 @@ class OtherComprehensive extends Component {
                             <h4 className="m-b-30">Covers your Car + Damage to Others (Comprehensive)</h4>
                         </div>
                     </div>
-                    <Formik initialValues={newInitialValues} 
-                    onSubmit={ serverResponse && serverResponse != "" ? (serverResponse.message ? this.getAccessToken : this.handleSubmit ) : this.getAccessToken} 
-                    validationSchema={ComprehensiveValidation}>
+                    <Formik initialValues={newInitialValues} onSubmit={this.handleSubmit}>
                     {({ values, errors, setFieldValue, setFieldTouched, isValid, isSubmitting, touched }) => {
 
                     return (
@@ -577,17 +549,12 @@ class OtherComprehensive extends Component {
                                     </Col>
                                     </Row>    
                                     <div className="d-flex justify-content-left resmb">
-                                        <Button className={`backBtn`} type="button"  onClick= {this.vehicleDetails.bind(this,productId)}>
-                                            Back
+                                        <Button className={`backBtn`} type="button"  disabled={isSubmitting ? true : false} onClick= {this.vehicleDetails.bind(this,productId)}>
+                                            {isSubmitting ? 'Wait..' : 'Back'}
                                         </Button> 
-                                        { serverResponse && serverResponse != "" ? (serverResponse.message ? 
-                                        <Button className={`proceedBtn`} type="submit"  >
-                                            Quote
-                                        </Button> : <Button className={`proceedBtn`} type="submit"  >
-                                            Continue
-                                        </Button> ) : <Button className={`proceedBtn`} type="submit"  >
-                                            Quote
-                                        </Button>}
+                                        <Button className={`proceedBtn`} type="submit"  disabled={isSubmitting ? true : false}>
+                                            {isSubmitting ? 'Wait..' : 'Next'}
+                                        </Button> 
                                         </div>
                                     </Col>
 

@@ -1,4 +1,4 @@
-import React, { Component, Fragment } from 'react';
+import React, { Component } from 'react';
 import { Row, Col, Modal, Button, FormGroup, OverlayTrigger, Tooltip } from 'react-bootstrap';
 import DatePicker from "react-datepicker";
 import BaseComponent from '.././BaseComponent';
@@ -13,9 +13,6 @@ import { Formik, Field, Form, FieldArray } from "formik";
 import axios from "../../shared/axios"
 import moment from "moment";
 import Encryption from '../../shared/payload-encryption';
-import { changeFormat, get18YearsBeforeDate, PersonAge } from "../../shared/dateFunctions";
-
-const ageObj = new PersonAge();
 
 const initialValue = {
     registration_date: "",
@@ -42,20 +39,12 @@ const vehicleRegistrationValidation = Yup.object().shape({
    
 });
 
-const fuel = {
-    1: 'Petrol',
-    2: 'Diesel'
-}
-
-
 class VehicleDetails extends Component {
 
     state = {
         insurerList: [],
         showClaim: false,
-        previous_is_claim: "",
-        motorInsurance:{},
-        previousPolicy: {}
+        previous_is_claim: ""
     };
 
     changePlaceHoldClassAdd(e) {
@@ -95,12 +84,12 @@ class VehicleDetails extends Component {
             'policy_holder_id':localStorage.getItem('policyHolder_id'),
             'menumaster_id':1,
             'registration_date':moment(values.registration_date).format("YYYY-MM-DD"),
-            'registration_city':'11',
+            'registration_city':values.registration_city,
             'previous_start_date':moment(values.previous_start_date).format("YYYY-MM-DD"),
             'previous_end_date':moment(values.previous_end_date).format("YYYY-MM-DD"),
             'previous_policy_name':values.previous_policy_name,
             'insurance_company_id':values.insurance_company_id,
-            'previous_city':'11',
+            'previous_city':values.previous_city,
             'previous_is_claim':values.previous_is_claim,
             'previous_claim_bonus': values.previous_claim_bonus,
             'previous_claim_for': values.previous_claim_for,
@@ -150,12 +139,9 @@ class VehicleDetails extends Component {
         this.props.loadingStart();
         axios.get(`policy-holder/motor/${policyHolder_id}`)
             .then(res => {
-                console.log(res);
-                 let motorInsurance = res.data.data.policyHolder ? res.data.data.policyHolder.motorinsurance : {};
-                 let previousPolicy = res.data.data.policyHolder ? res.data.data.policyHolder.previouspolicy : {};
-                 let vehicleDetails = res.data.data.policyHolder ? res.data.data.policyHolder.vehiclebrandmodel : {};
+                let motorInsurance = res.data.data.policyHolder ? res.data.data.policyHolder.motorinsurance : {}
                 this.setState({
-                    motorInsurance, previousPolicy, vehicleDetails
+                    motorInsurance
                 })
                 this.props.loadingStop();
             })
@@ -168,27 +154,11 @@ class VehicleDetails extends Component {
     componentDidMount() {
         this.getInsurerList();
         this.fetchData();
-        
     }
 
     render() {
         const {productId} = this.props.match.params  
-        const {insurerList, showClaim, previous_is_claim, motorInsurance, previousPolicy,vehicleDetails} = this.state
-
-        let newInitialValues = Object.assign(initialValue, {
-            registration_date: motorInsurance && motorInsurance.registration_date ? new Date(motorInsurance.registration_date) : "",
-            registration_city:  motorInsurance && motorInsurance.registration_city ? motorInsurance.registration_city : "",
-            previous_start_date: previousPolicy && previousPolicy.start_date ? new Date(previousPolicy.start_date) : "",
-            previous_end_date: previousPolicy && previousPolicy.end_date ? new Date(previousPolicy.end_date) : "",
-            // previous_policy_name: previousPolicy && previousPolicy.insurancecompany.ty ? previousPolicy.insurancecompany.ty : "",
-            // insurance_company_id: previousPolicy && previousPolicy.insurancecompany.id ? previousPolicy.insurancecompany.id : "",
-            previous_city: previousPolicy && previousPolicy.city ? previousPolicy.city : "",
-            previous_is_claim: previousPolicy && previousPolicy.is_claim ? previousPolicy.is_claim : "",
-            previous_claim_bonus: previousPolicy && previousPolicy.claim_bonus ? previousPolicy.claim_bonus : "",
-            previous_claim_for: previousPolicy && previousPolicy.claim_for ? previousPolicy.claim_for : "",
-
-        });
-console.log("newInitialValues", newInitialValues)
+        const {insurerList, showClaim, previous_is_claim} = this.state
         return (
             <>
                 <BaseComponent>
@@ -206,7 +176,7 @@ console.log("newInitialValues", newInitialValues)
                         </div>
                     </div>
                     <div className="brand-bg">
-                        <Formik initialValues={newInitialValues} onSubmit={this.handleSubmit} validationSchema={vehicleRegistrationValidation}>
+                        <Formik initialValues={initialValue} onSubmit={this.handleSubmit} validationSchema={vehicleRegistrationValidation}>
                             {({ values, errors, setFieldValue, setFieldTouched, isValid, isSubmitting, touched }) => {
 
                                 return (
@@ -242,7 +212,6 @@ console.log("newInitialValues", newInitialValues)
                                                                     setFieldTouched('registration_date');
                                                                     setFieldValue('registration_date', val);
                                                                 }}
-                                                                
                                                             />
                                                             {errors.registration_date && touched.registration_date ? (
                                                                 <span className="errorMsg">{errors.registration_date}</span>
@@ -269,8 +238,6 @@ console.log("newInitialValues", newInitialValues)
                                                                     autoComplete="off"
                                                                     onFocus={e => this.changePlaceHoldClassAdd(e)}
                                                                     onBlur={e => this.changePlaceHoldClassRemove(e)}
-                                                                    // value={values.registration_city}
-                                                                    
                                                                 />
                                                                 {errors.registration_city && touched.registration_city ? (
                                                                     <span className="errorMsg">{errors.registration_city}</span>
@@ -279,8 +246,6 @@ console.log("newInitialValues", newInitialValues)
                                                         </FormGroup>
                                                     </Col>
                                                 </Row>
-                                            {ageObj.whatIsMyAgeMonth(values.registration_date) > 0 ?
-                                                <Fragment>
                                                 <Row>
                                                     <Col sm={12}>
                                                         <FormGroup>
@@ -396,7 +361,6 @@ console.log("newInitialValues", newInitialValues)
                                                                     autoComplete="off"
                                                                     onFocus={e => this.changePlaceHoldClassAdd(e)}
                                                                     onBlur={e => this.changePlaceHoldClassRemove(e)}
-                                                                    
                                                                 />
                                                                 {errors.previous_city && touched.previous_city ? (
                                                                     <span className="errorMsg">{errors.previous_city}</span>
@@ -525,7 +489,7 @@ console.log("newInitialValues", newInitialValues)
                                                         </FormGroup>
                                                     </Col>
                                                 </Row>
-                                                </Fragment> : null }
+
                                                 <div className="d-flex justify-content-left resmb">
                                                 <Button className={`backBtn`} type="button"  disabled={isSubmitting ? true : false} onClick= {this.selectBrand.bind(this,productId)}>
                                                     {isSubmitting ? 'Wait..' : 'Back'}
@@ -541,8 +505,7 @@ console.log("newInitialValues", newInitialValues)
                                                 <div className="vehbox">
                                                     <Row className="m-b-25">
                                                         <Col sm={12} md={7}>
-                                                            <div className="txtRegistr">Registration No.<br />
-                                                            {motorInsurance && motorInsurance.registration_no}</div>
+                                                            <div className="txtRegistr">Registration No.</div>
                                                         </Col>
 
                                                         <Col sm={12} md={5} className="text-right">
@@ -553,7 +516,7 @@ console.log("newInitialValues", newInitialValues)
                                                     <Row className="m-b-25">
                                                         <Col sm={12} md={7}>
                                                             <div className="txtRegistr">Car Brand<br/>
-                                                                <strong>{vehicleDetails && vehicleDetails.vehiclebrand.name ? vehicleDetails.vehiclebrand.name : ""}</strong></div>
+                                                                <strong>BAJAJ AUTO</strong></div>
                                                         </Col>
 
                                                         <Col sm={12} md={5} className="text-right">
@@ -564,7 +527,7 @@ console.log("newInitialValues", newInitialValues)
                                                     <Row className="m-b-25">
                                                         <Col sm={12} md={7}>
                                                             <div className="txtRegistr">Car Model<br/>
-                                                                <strong>{vehicleDetails && vehicleDetails.vehiclemodel.description ? vehicleDetails.vehiclemodel.description+" "+vehicleDetails.varientmodel.varient : ""}</strong></div>
+                                                                <strong>4S CHAMPION</strong></div>
                                                         </Col>
 
                                                         <Col sm={12} md={5} className="text-right">
@@ -575,7 +538,7 @@ console.log("newInitialValues", newInitialValues)
                                                     <Row className="m-b-25">
                                                         <Col sm={12} md={7}>
                                                             <div className="txtRegistr">Fuel Type<br/>
-                                                                <strong>{vehicleDetails && fuel[vehicleDetails.varientmodel.fuel_type]} </strong></div>
+                                                                <strong>PETROL </strong></div>
                                                         </Col>
                                                     </Row>
                                                 </div>

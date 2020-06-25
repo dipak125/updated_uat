@@ -11,7 +11,6 @@ import * as Yup from 'yup';
 import swal from 'sweetalert';
 import Encryption from '../../shared/payload-encryption';
 import { Formik, Form, Field, ErrorMessage } from 'formik';
-import InputMask from "react-input-mask";
 
 
 const initialValues = {
@@ -19,8 +18,7 @@ const initialValues = {
 }
 
 const vehicleRegistrationValidation = Yup.object().shape({
-    regNumber: Yup.string().matches(/^[A-Z]{2}[ -][0-9]{1,2}(?: [A-Z])?(?: [A-Z]*)? [0-9]{4}$/, 'Invalid Registration number').required('Please enter valid registration number')
-
+    regNumber: Yup.string().required('Please enter valid registration number'),
    
    
 });
@@ -28,9 +26,7 @@ const vehicleRegistrationValidation = Yup.object().shape({
 
 class Registration extends Component {
     state = {
-        motorInsurance:'',
-        regno:'',
-        length:15
+        motorInsurance:''
     }
    
 
@@ -110,10 +106,6 @@ fetchData=()=>{
           this.props.loadingStop();
         });
     }
-    toInputUppercase = e => {
-        e.target.value = ("" + e.target.value).toUpperCase();
-      };
-      
 
 
 
@@ -142,58 +134,11 @@ fetchData=()=>{
                                         validationSchema={vehicleRegistrationValidation}>
                                         {({ values, errors, setFieldValue, setFieldTouched, isValid, isSubmitting, touched }) => {
                                             console.log("CCCCCCCC======>",values);
-                                            
-                                            this.state.regno = "";
-                                            
-                                            
-                                            if(values.regNumber.length>0){
-                                                console.log(values.regNumber);
-                                            if(values.regNumber.toLowerCase().substring(0, 2) == "dl")
-                                            {
-                                                
-                                                this.state.length = 15;
-                                                if(values.regNumber.length<11)
-                                            {
-                                               
-                                            this.state.regno=values.regNumber.replace(/[^A-Za-z0-9]+/g, '').replace(/(.{2})/g, '$1 ').trim();
-                                            
-                                            }
-                                            else{
-
-                                                
-                                                this.state.regno=values.regNumber;
-                                                
-                                            }
-                                               
-
-                                            }   
-                                            else{ 
-                                                
-                                                this.state.length = 13;
-                                            if(values.regNumber.length<10)
-                                            {
-                                               
-                                            this.state.regno=values.regNumber.replace(/[^A-Za-z0-9]+/g, '').replace(/(.{2})/g, '$1 ').trim();
-                                            
-                                            }
-                                            else{
-                                                
-                                                this.state.regno=values.regNumber;
-                                                
-                                            }
-                                        }
-                                        }
-                                       
-                                           
-                                           
-                                            console.log(this.state.regno.length);
-
                                         return (
                                         <Form>
                                         <div className="row formSection">
                                             <label className="col-md-4">Enter Vehicle Registration Number:</label>
                                             <div className="col-md-4">
-                                                
                                             <Field
                                                 name="regNumber"
                                                 type="text"
@@ -201,12 +146,7 @@ fetchData=()=>{
                                                 autoComplete="off"
                                                 onFocus={e => this.changePlaceHoldClassAdd(e)}
                                                 onBlur={e => this.changePlaceHoldClassRemove(e)}
-                                                value={this.state.regno}
-                                                maxLength={this.state.length}
-                                                onInput={e=>this.toInputUppercase(e)} 
-                                                
-                                                
-                                                
+                                                value={values.regNumber} 
                                             />
                                             {errors.regNumber && touched.regNumber ? (
                                                 <span className="errorMsg">{errors.regNumber}</span>

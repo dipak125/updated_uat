@@ -74,7 +74,7 @@ class HeaderTop extends Component {
                                 </div>
                             </Dropdown.Toggle>
                             <Dropdown.Menu>
-                                <Dropdown.Item  onClick={this.handleLogout}>Logout</Dropdown.Item>
+                                <Dropdown.Item >Logout</Dropdown.Item>
                             </Dropdown.Menu>
                         </Dropdown>                       
                     </div>

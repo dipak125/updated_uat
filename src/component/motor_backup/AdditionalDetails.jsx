@@ -1,4 +1,4 @@
-import React, { Component, Fragment } from 'react';
+import React, { Component } from 'react';
 import { Row, Col, Modal, Button, FormGroup, DropdownButton, Dropdown } from 'react-bootstrap';
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css"
@@ -218,7 +218,6 @@ class AdditionalDetails extends Component {
                                         </div>
                                     </Col>
                                     {showLoan || is_loan_account == 1 ?
-                                    <Fragment>
                                     <Col sm={12} md={4} lg={4}>
                                         <FormGroup>
                                             <div className="insurerName">
@@ -236,7 +235,7 @@ class AdditionalDetails extends Component {
                                             ) : null}
                                             </div>
                                         </FormGroup>
-                                    </Col> 
+                                    </Col> : ''}
                                     <Col sm={12} md={4} lg={4}>
                                         <FormGroup>
                                             <div className="insurerName">
@@ -255,10 +254,170 @@ class AdditionalDetails extends Component {
                                             </div>
                                         </FormGroup>
                                     </Col>
-                                    </Fragment>: ''}
                                 </Row>
+
                                 <Row>
-                                    <Col>&nbsp;</Col>
+                                    <Col sm={12}>
+                                        <FormGroup>
+                                            <div className="carloan">
+                                                <h4> Vehicle Details</h4>
+                                            </div>
+                                        </FormGroup>
+                                    </Col>
+                                </Row>    
+                                <Row>
+                                    <Col sm={12} md={6} lg={6}>
+                                        <FormGroup>
+                                            <div className="insurerName">
+                                                <Field
+                                                    name="engineNo"
+                                                    type="text"
+                                                    placeholder="Engine Number"
+                                                    autoComplete="off"
+                                                    onFocus={e => this.changePlaceHoldClassAdd(e)}
+                                                    onBlur={e => this.changePlaceHoldClassRemove(e)}
+                                                />
+                                                {errors.engineNo && touched.engineNo ? (
+                                                    <span className="errorMsg">{errors.engineNo}</span>
+                                                ) : null}
+                                            </div>
+                                        </FormGroup>
+                                    </Col>
+                                    <Col sm={12} md={6} lg={6}>
+                                        <FormGroup>
+                                            <div className="insurerName">
+                                                <Field
+                                                    name="chasisNo"
+                                                    type="text"
+                                                    placeholder="Chasis Number"
+                                                    autoComplete="off"
+                                                    onFocus={e => this.changePlaceHoldClassAdd(e)}
+                                                    onBlur={e => this.changePlaceHoldClassRemove(e)}
+                                                />
+                                                {errors.chasisNo && touched.chasisNo ? (
+                                                    <span className="errorMsg">{errors.chasisNo}</span>
+                                                ) : null}
+                                            </div>
+                                        </FormGroup>
+                                    </Col>
+                                </Row>
+
+                                <Row>
+                                    <Col sm={12}>
+                                        <FormGroup>
+                                            <div className="carloan">
+                                                <h4> Previous Policy Details</h4>
+                                            </div>
+                                        </FormGroup>
+                                    </Col>
+                                </Row>
+
+                                <Row>
+                                    <Col sm={12} md={4} lg={4}>
+                                        <FormGroup>
+                                            
+                                            <DatePicker
+                                                name="prevStartDate"
+                                                minDate={new Date('1/1/1900')}
+                                                maxDate={new Date()}
+                                                dateFormat="dd MMM yyyy"
+                                                placeholderText="Previous policy start date"
+                                                peekPreviousMonth
+                                                peekPreviousYear
+                                                showMonthDropdown
+                                                showYearDropdown
+                                                dropdownMode="select"
+                                                className="datePckr"
+                                                selected={values.prevStartDate}
+                                                onChange={(val) => {
+                                                    setFieldTouched('prevStartDate');
+                                                    setFieldValue('prevStartDate', val);
+                                                }}
+                                            />
+                                        </FormGroup>
+                                    </Col>
+
+                                    <Col sm={12} md={4} lg={4}>
+                                        <FormGroup>
+                                        <DatePicker
+                                                name="prevEndDate"
+                                                dateFormat="dd MMM yyyy"
+                                                placeholderText="Previous policy end date"
+                                                peekPreviousMonth
+                                                peekPreviousYear
+                                                showMonthDropdown
+                                                showYearDropdown
+                                                dropdownMode="select"
+                                                className="datePckr"
+                                                selected={values.prevEndDate}
+                                                onChange={(val) => {
+                                                    setFieldTouched('prevEndDate');
+                                                    setFieldValue('prevEndDate', val);
+                                                }}      
+                                            />
+                                        </FormGroup>
+                                    </Col>
+                                    <Col sm={12} md={4} lg={4}>
+                                        <FormGroup>
+                                            <div className="formSection">
+                                            <Field
+                                                name='policyType'
+                                                component="select"
+                                                autoComplete="off"                                                                        
+                                                className="formGrp"
+                                                value = {values.policyType}
+                                            >
+                                                <option value="">Select Policy Type</option>
+                                                <option value="male">Liability Policy</option>
+                                                <option value="female">Package Policy</option>
+                                            </Field>     
+                                            {errors.policyType && touched.policyType ? (
+                                            <span className="errorMsg">{errors.policyType}</span>
+                                            ) : null}            
+                                            </div>
+                                        </FormGroup>
+                                    </Col>
+                                </Row>
+
+                                <Row>
+                                    <Col sm={12} md={6} lg={6}>
+                                        <FormGroup>
+                                            <div className="formSection">
+                                            <Field
+                                                name='policyCompany'
+                                                component="select"
+                                                autoComplete="off"                                                                        
+                                                className="formGrp"
+                                            >
+                                                <option value="">Select Insurer Company</option>
+                                                {insurerList.map((insurer, qIndex) => ( 
+                                                    <option>{insurer.name}</option>
+                                                ))}
+                                            </Field>     
+                                            {errors.policyCompany && touched.policyCompany ? (
+                                            <span className="errorMsg">{errors.policyCompany}</span>
+                                            ) : null}          
+                                            </div>
+                                        </FormGroup>
+                                    </Col>
+
+                                    <Col sm={12} md={6} lg={6}>
+                                        <FormGroup>
+                                            <div className="insurerName">
+                                                <Field
+                                                    name="prevInsurerAddress"
+                                                    type="text"
+                                                    placeholder="Previous Insurer Address"
+                                                    autoComplete="off"
+                                                    onFocus={e => this.changePlaceHoldClassAdd(e)}
+                                                    onBlur={e => this.changePlaceHoldClassRemove(e)}
+                                                />
+                                                {errors.prevInsurerAddress && touched.prevInsurerAddress ? (
+                                                    <span className="errorMsg">{errors.prevInsurerAddress}</span>
+                                                ) : null}
+                                            </div>
+                                        </FormGroup>
+                                    </Col>
                                 </Row>
 
                                 <div className="d-flex justify-content-left carloan">

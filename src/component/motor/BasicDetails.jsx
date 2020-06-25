@@ -11,7 +11,6 @@ import * as Yup from 'yup';
 import swal from 'sweetalert';
 import Encryption from '../../shared/payload-encryption';
 import { Formik, Form, Field, ErrorMessage } from 'formik';
-import InputMask from "react-input-mask";
 
 
 const initialValues = {
@@ -19,18 +18,15 @@ const initialValues = {
 }
 
 const vehicleRegistrationValidation = Yup.object().shape({
-    regNumber: Yup.string().matches(/^[A-Z]{2}[ -][0-9]{1,2}(?: [A-Z])?(?: [A-Z]*)? [0-9]{4}$/, 'Invalid Registration number').required('Please enter valid registration number')
-
+    regNumber: Yup.string().required('Please enter valid registration number'),
    
    
 });
 
 
-class Registration extends Component {
+class BasicDetails extends Component {
     state = {
-        motorInsurance:'',
-        regno:'',
-        length:15
+        motorInsurance:''
     }
    
 
@@ -87,10 +83,7 @@ fetchData=()=>{
         const post_data = {
             'registration_no':values.regNumber,
             'menumaster_id':1,
-            'vehicle_type_id':productId,
-            'csc_id':localStorage.getItem('csc_id'),
-            'agent_name':localStorage.getItem('agent_name'),
-            'product_id':localStorage.getItem('product_id'),
+            'vehicle_type_id':productId
         } 
         formData.append('enc_data',encryption.encrypt(JSON.stringify(post_data)))
         this.props.loadingStart();
@@ -99,7 +92,6 @@ fetchData=()=>{
         .then(res => {
                 localStorage.setItem('policyHolder_id', res.data.data.policyHolder_id);
                 localStorage.setItem('policyHolder_refNo', res.data.data.policyHolder_refNo);
-                this.props.loadingStop();
                 this.props.history.push(`/select-brand/${productId}`);                        
         })
         .catch(err => {
@@ -110,10 +102,6 @@ fetchData=()=>{
           this.props.loadingStop();
         });
     }
-    toInputUppercase = e => {
-        e.target.value = ("" + e.target.value).toUpperCase();
-      };
-      
 
 
 
@@ -134,88 +122,74 @@ fetchData=()=>{
                             </div>
                             <div className="col-sm-12 col-md-12 col-lg-10 col-xl-10 infobox">
                                 <h4 className="text-center mt-3 mb-3">SBI General Insurance Company Limited</h4>
-                                <section className="brand">
+                                <section className="brand maxW">
                                     <div className="boxpd">
-                                        <h4 className="m-b-30">Help us with some information about yourself</h4>
+                                        <h4 className="m-b-30">We can reach you at</h4>
                                         <Formik initialValues={newInitialValues} 
                                         onSubmit={this.handleSubmit} 
                                         validationSchema={vehicleRegistrationValidation}>
                                         {({ values, errors, setFieldValue, setFieldTouched, isValid, isSubmitting, touched }) => {
                                             console.log("CCCCCCCC======>",values);
-                                            
-                                            this.state.regno = "";
-                                            
-                                            
-                                            if(values.regNumber.length>0){
-                                                console.log(values.regNumber);
-                                            if(values.regNumber.toLowerCase().substring(0, 2) == "dl")
-                                            {
-                                                
-                                                this.state.length = 15;
-                                                if(values.regNumber.length<11)
-                                            {
-                                               
-                                            this.state.regno=values.regNumber.replace(/[^A-Za-z0-9]+/g, '').replace(/(.{2})/g, '$1 ').trim();
-                                            
-                                            }
-                                            else{
-
-                                                
-                                                this.state.regno=values.regNumber;
-                                                
-                                            }
-                                               
-
-                                            }   
-                                            else{ 
-                                                
-                                                this.state.length = 13;
-                                            if(values.regNumber.length<10)
-                                            {
-                                               
-                                            this.state.regno=values.regNumber.replace(/[^A-Za-z0-9]+/g, '').replace(/(.{2})/g, '$1 ').trim();
-                                            
-                                            }
-                                            else{
-                                                
-                                                this.state.regno=values.regNumber;
-                                                
-                                            }
-                                        }
-                                        }
-                                       
-                                           
-                                           
-                                            console.log(this.state.regno.length);
-
                                         return (
                                         <Form>
                                         <div className="row formSection">
-                                            <label className="col-md-4">Enter Vehicle Registration Number:</label>
-                                            <div className="col-md-4">
-                                                
+                                            <label className="col-md-6">Mobile Number</label>
+                                            <div className="col-md-6">
                                             <Field
                                                 name="regNumber"
                                                 type="text"
-                                                placeholder="Registration Number"
+                                                placeholder="+91 enter 10 digit no."
                                                 autoComplete="off"
                                                 onFocus={e => this.changePlaceHoldClassAdd(e)}
                                                 onBlur={e => this.changePlaceHoldClassRemove(e)}
-                                                value={this.state.regno}
-                                                maxLength={this.state.length}
-                                                onInput={e=>this.toInputUppercase(e)} 
-                                                
-                                                
-                                                
+                                                value={values.regNumber} 
                                             />
                                             {errors.regNumber && touched.regNumber ? (
                                                 <span className="errorMsg">{errors.regNumber}</span>
                                             ) : null}    
                                             </div>
                                         </div>
+
+                                        <div className="row formSection">
+                                            <label className="col-md-6">email ID is</label>
+                                            <div className="col-md-6">
+                                            <FormGroup>
+                                            <div className="insurerName">
+                                            <Field
+                                                    name='bank_branch'
+                                                    type="text"
+                                                    placeholder="enter email address"
+                                                    autoComplete="off"
+                                                    onFocus={e => this.changePlaceHoldClassAdd(e)}
+                                                    onBlur={e => this.changePlaceHoldClassRemove(e)}
+                                                    value = {values.bank_branch}                                                                            
+                                            />
+                                                {errors.bank_branch && touched.bank_branch ? (
+                                            <span className="errorMsg">{errors.bank_branch}</span>
+                                            ) : null} 
+                                            </div>
+                                        </FormGroup>
+                                            
+                                            </div>
+                                        </div>
+                                        <div className="row">
+                                        <div className="col-sm-12">
+                                                    <label className="customCheckBox formGrp formGrp">I agree to the <span className="bluesmalltrm"><a href="#" target="blank">terms and conditions</a></span>
+                                                    <Field
+                                                        type="checkbox"
+                                                        name="looking_for_0"
+                                                        className="user-self"
+                                                       
+                                                    />
+                                                        <span className="checkmark mL-0"></span>
+                                                        <span className="error-message"> </span>
+                                                    </label>
+                                                </div>
+                                                </div>
+                                                <p class="footerInfo">*We will send an OTP for mobile number verification</p>
                                         <div className="cntrbtn">
                                         <Button className={`btnPrimary`} type="submit" >
-                                            Go
+                                            Continue
                                         </Button>
 
                                         
@@ -250,4 +224,4 @@ const mapStateToProps = state => {
     };
   };
 
-export default withRouter (connect( mapStateToProps, mapDispatchToProps)(Registration));
+export default withRouter (connect( mapStateToProps, mapDispatchToProps)(BasicDetails));

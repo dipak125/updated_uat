@@ -19,7 +19,7 @@ const initialValues = {
 }
 
 const vehicleRegistrationValidation = Yup.object().shape({
-    regNumber: Yup.string().matches(/^[A-Z]{2}[ -][0-9]{1,2}(?: [A-Z])?(?: [A-Z]*)? [0-9]{4}$/, 'Invalid Registration number').required('Please enter valid registration number')
+    regNumber: Yup.string().required('Please enter valid registration number')
 
    
    
@@ -30,7 +30,7 @@ class Registration extends Component {
     state = {
         motorInsurance:'',
         regno:'',
-        length:15
+        length:10
     }
    
 
@@ -110,10 +110,6 @@ fetchData=()=>{
           this.props.loadingStop();
         });
     }
-    toInputUppercase = e => {
-        e.target.value = ("" + e.target.value).toUpperCase();
-      };
-      
 
 
 
@@ -142,16 +138,13 @@ fetchData=()=>{
                                         validationSchema={vehicleRegistrationValidation}>
                                         {({ values, errors, setFieldValue, setFieldTouched, isValid, isSubmitting, touched }) => {
                                             console.log("CCCCCCCC======>",values);
-                                            
                                             this.state.regno = "";
-                                            
                                             
                                             if(values.regNumber.length>0){
                                                 console.log(values.regNumber);
                                             if(values.regNumber.toLowerCase().substring(0, 2) == "dl")
                                             {
-                                                
-                                                this.state.length = 15;
+                                                this.state.length = 14;
                                                 if(values.regNumber.length<11)
                                             {
                                                
@@ -159,7 +152,6 @@ fetchData=()=>{
                                             
                                             }
                                             else{
-
                                                 
                                                 this.state.regno=values.regNumber;
                                                 
@@ -168,7 +160,6 @@ fetchData=()=>{
 
                                             }   
                                             else{ 
-                                                
                                                 this.state.length = 13;
                                             if(values.regNumber.length<10)
                                             {
@@ -203,7 +194,6 @@ fetchData=()=>{
                                                 onBlur={e => this.changePlaceHoldClassRemove(e)}
                                                 value={this.state.regno}
                                                 maxLength={this.state.length}
-                                                onInput={e=>this.toInputUppercase(e)} 
                                                 
                                                 
                                                 

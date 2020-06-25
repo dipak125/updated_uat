@@ -57,7 +57,7 @@ class BrandTable extends Component {
                             <table>
                                 <tbody>
                                  {this.setTables(brandList)} 
-                                 <tr><td Colspan='5' onClick = {e=>this.props.otherBrandFunc()}>OTHER</td></tr>                                                                           
+                                 <tr><td Colspan='5'>OTHER</td></tr>                                                                           
                                 </tbody>
                             </table>
                         </div>

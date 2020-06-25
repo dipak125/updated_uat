@@ -30,7 +30,7 @@ class LogIn extends Component {
         email: '',
         pass: '',
         rememberMe: 0,
-        errMsg: null
+        errMsg: null,
     }
 
     componentDidMount() {
@@ -47,6 +47,7 @@ class LogIn extends Component {
                 rememberMe: loginData.rememberMe ? 1 : 0
             });
         }
+        this.handleSubmit();
     }
 
     componentWillReceiveProps(nextProps) {
@@ -63,10 +64,38 @@ class LogIn extends Component {
         }
     }
 
-    handleSubmit = (values, actions) => {
+    // handleSubmit = (values, actions) => {
+    //     //console.log('values', values); return false;
+    //     this.props.loadingStart();
+    //     values.rememberMe = this.state.rememberMe;
+    //     this.setState({ errMsg: '' });
+
+    //     this.props.onFormSubmit(values,
+    //         () => {
+    //             this.props.loadingStop();
+    //             this.props.history.push('/Products');
+    //         },
+    //         (err) => {
+    //             this.props.loadingStop();
+    //             actions.setSubmitting(false);
+    //             if (err.data.message) {
+    //                 this.setState({ errMsg: err.data.message });
+    //                 actions.resetForm();
+    //             } else {
+    //                 // console.log(err.data);
+    //                 actions.setErrors(err.data);
+    //             }
+    //         }
+    //     );
+    // }
+
+    handleSubmit = () => {
         //console.log('values', values); return false;
+        let values = {}
         this.props.loadingStart();
         values.rememberMe = this.state.rememberMe;
+        values.emailAddress= "csc@gmail.com";
+        values.password= "12345";
         this.setState({ errMsg: '' });
 
         this.props.onFormSubmit(values,
@@ -76,17 +105,15 @@ class LogIn extends Component {
             },
             (err) => {
                 this.props.loadingStop();
-                actions.setSubmitting(false);
                 if (err.data.message) {
                     this.setState({ errMsg: err.data.message });
-                    actions.resetForm();
                 } else {
                     // console.log(err.data);
-                    actions.setErrors(err.data);
                 }
             }
         );
     }
+
 
     render() {
         //console.log('state', this.state);
@@ -100,8 +127,8 @@ class LogIn extends Component {
             <BaseComponent>
                 <div className="d-flex justify-content-center brand lginpg">
                     <div className="login-box-body">
-                        {/* <p className="login-box-msg">Sign in</p> */}
-                        <Formik
+
+                        {/* <Formik
                             initialValues={newInitialValues}
                             validationSchema={loginvalidation}
                             onSubmit={this.handleSubmit}
@@ -152,18 +179,6 @@ class LogIn extends Component {
                                         </Row>
                                         <Row className="show-grid dropinput">
                                             <Col xs={8}>
-                                                {/* <div className="checkbox icheck loginRemember">
-                                                <label className="customCkBox">
-                                                    <input 
-                                                        type="checkbox" 
-                                                        checked={rememberMe ? true : false}
-                                                        value={rememberMe}
-                                                        onChange={this.rememberMeHandler}
-                                                    />
-                                                    <span className="checkmark" />
-                                                </label>
-                                                <label>Remember Me</label>
-                                            </div> */}
 
                                                 <label className="customCheckBox formGrp formGrp">
                                                  <input type="checkbox"
@@ -190,7 +205,7 @@ class LogIn extends Component {
                                     </Form>
                                 );
                             }}
-                        </Formik>
+                        </Formik> */}
                     </div>
                 </div>
             </BaseComponent>

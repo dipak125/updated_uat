@@ -39,7 +39,7 @@ export default class SideNav extends Component {
                         </li>
                     </ul>
 
-                    <button className="btn-lg" onClick={this.handleLogout}>
+                    <button className="btn-lg" >
 							<Link to="/#" activeClassName="active"><span className="leftIcon01"><img src={require('../../../assets/images/Logout.svg')} alt="" /></span>Logout</Link>
                         </button>
                 </nav>

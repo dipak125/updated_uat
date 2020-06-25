@@ -25,11 +25,6 @@ const initialValues = {
 
 };
 
-const fuel = {
-    1: 'Petrol',
-    2: 'Diesel'
-}
-
 
 const vehicleValidation = Yup.object().shape({
     selectedBrandId: Yup.string().required("Please enter the brand name"),
@@ -59,10 +54,7 @@ class SelectBrand extends Component {
             selectedVarientId: '',
             searchitem: [],
             search: "",
-            otherBrands: false,
-            brandName: '',
-            modelName: '',
-            fuelType: ''
+            otherBrands: false
         };
     }
 
@@ -91,12 +83,40 @@ class SelectBrand extends Component {
     }
 
 
+    // callFetchBrands = async () => {
+    //     const result = await this.getBrands();
+    // }
+
+    // getBrands = () => {
+    //     const { productId } = this.props.match.params
+    //     return new Promise(resolve => {
+    //         setTimeout(() => {
+    //             this.props.loadingStart();
+    //             axios.get(`vehicle/brand-with-image`)
+    //                 .then(res => {
+    //                     let brandList = res && res.data.data.list ? res.data.data.list : []
+    //                     this.setState({
+    //                         brandList
+    //                     })
+    //                     this.props.loadingStop();
+    //                 })
+    //                 .catch(err => {
+    //                     // handle error
+    //                     // console.log(error);
+    //                     this.props.loadingStop();
+    //                 })
+    //         }
+    //             , 2000)
+    //     })
+    // }
     change = (text) => {
+
 
         this.state.searchitem = [];
         this.state.brandModelList.map((item, index) => {
 
             var rgxp = new RegExp(text.toUpperCase(), "g");
+
             if (item.name.toUpperCase().match(rgxp) && item.name.toUpperCase().match(rgxp) != null) {
 
                 this.state.searchitem.push(item);
@@ -181,6 +201,7 @@ class SelectBrand extends Component {
     }
 
 
+
     setBrandName = (brand_id) => {
         this.props.loadingStart();
         axios.get(`vehicle/model-with-varient/${brand_id}`).then(res => {
@@ -191,8 +212,7 @@ class SelectBrand extends Component {
                 selectedBrandDetails,
                 brandModelList,
                 show: true,
-                selectedBrandId: brand_id,
-                brandName: selectedBrandDetails.name,
+                selectedBrandId: brand_id
             })
 
             this.props.loadingStop();
@@ -205,23 +225,18 @@ class SelectBrand extends Component {
 
     }
 
-    setVarient = (varient, model_Id, modelName, fuelType) => {
+    setVarient = (varient, model_Id) => {
         this.setState({
             selectedVarientId: varient,
             selectedModelId: model_Id,
-            modelName: modelName,
-            fuelType: fuelType
         })
     }
 
-    setOtherVarient = (varient, model_Id, brand_Id, brandName, modelName, fuelType) => {
+    setOtherVarient = (varient, model_Id, brand_Id) => {
         this.setState({
             selectedVarientId: varient,
             selectedModelId: model_Id,
-            selectedBrandId: brand_Id,
-            brandName: brandName,
-            modelName: modelName,
-            fuelType: fuelType
+            selectedBrandId: brand_Id
         })
     }
 
@@ -254,8 +269,7 @@ class SelectBrand extends Component {
 
 
     render() {
-        const { brandList, motorInsurance, selectedBrandDetails, brandModelList, selectedBrandId,
-             selectedModelId, selectedVarientId, otherBrands, brandName, modelName, fuelType } = this.state
+        const { brandList, motorInsurance, selectedBrandDetails, brandModelList, selectedBrandId, selectedModelId, selectedVarientId, otherBrands } = this.state
         const { productId } = this.props.match.params
         const newInitialValues = Object.assign(initialValues, {
             selectedBrandId: selectedBrandId ? selectedBrandId : '',
@@ -266,7 +280,7 @@ class SelectBrand extends Component {
 
         })
 
-console.log("selectedBrandDetails", selectedBrandDetails)
+
         return (
             <>
                 <BaseComponent>
@@ -327,22 +341,21 @@ console.log("selectedBrandDetails", selectedBrandDetails)
 
                                                                     <div className="d-flex justify-content-between flex-lg-row flex-md-column m-b-25">
                                                                         <div className="txtRegistr resmb-15">Car Brand
-                                                                            - {brandName}
-                                                                        </div>
+                                                           - {selectedBrandDetails && selectedBrandDetails.name}</div>
 
                                                                         <div> <button className="rgistrBtn">Edit</button></div>
                                                                     </div>
 
                                                                     <div className="d-flex justify-content-between flex-lg-row flex-md-column m-b-25">
                                                                         <div className="txtRegistr">Car Model<br />
-                                                                            <strong>{modelName}</strong></div>
+                                                                            <strong>4S CHAMPION</strong></div>
 
                                                                         <div> <button className="rgistrBtn">Edit</button></div>
                                                                     </div>
 
                                                                     <div className="d-flex justify-content-between flex-lg-row flex-md-column m-b-25">
                                                                         <div className="txtRegistr">Fuel Type<br />
-                                                                            <strong>{fuel[fuelType]} </strong></div>
+                                                                            <strong>PETROL </strong></div>
 
                                                                     </div>
                                                                 </div>
@@ -415,8 +428,7 @@ console.log("selectedBrandDetails", selectedBrandDetails)
                                                                     value={varient.id}
                                                                     aria-invalid="false"
                                                                     onClick={(e) =>
-                                                                        this.setVarient(e.target.value, brand.id, brand.name+" "+varient.varient, 
-                                                                            varient.fuel_type)
+                                                                        this.setVarient(e.target.value, brand.id)
                                                                     }
                                                                 />
                                                                 <span className="checkmark mL-0"></span>
@@ -428,7 +440,7 @@ console.log("selectedBrandDetails", selectedBrandDetails)
                                             )))
                                         ))
                                     :
-                                    (brandModelList.length > 0 && brandModelList.map((brand, brandIndex) => (
+                                    (this.state.brandModelList.length > 0 && this.state.brandModelList.map((brand, brandIndex) => (
                                         brand.varientmodel.length > 0 && brand.varientmodel.map((varient, varientIndex) => (
 
                                             <div className="brdrbottom">
@@ -445,8 +457,7 @@ console.log("selectedBrandDetails", selectedBrandDetails)
                                                                 value={varient.id}
                                                                 aria-invalid="false"
                                                                 onClick={(e) =>
-                                                                    this.setVarient(e.target.value, brand.id, brand.name+" "+varient.varient, 
-                                                                    varient.fuel_type)
+                                                                    this.setVarient(e.target.value, brand.id)
                                                                 }
                                                             />
                                                             <span className="checkmark mL-0"></span>
@@ -486,8 +497,7 @@ console.log("selectedBrandDetails", selectedBrandDetails)
                                                                 value={varient.id}
                                                                 aria-invalid="false"
                                                                 onClick={(e) =>
-                                                                    this.setOtherVarient(e.target.value, model.id, model.brand_id,
-                                                                        brand.name, model.name+" "+varient.varient, varient.fuel_type )
+                                                                    this.setOtherVarient(e.target.value, model.id, model.brand_id)
                                                                 }
                                                             />
                                                             <span className="checkmark mL-0"></span>
@@ -517,8 +527,7 @@ console.log("selectedBrandDetails", selectedBrandDetails)
                                                             value={varient.id}
                                                             aria-invalid="false"
                                                             onClick={(e) =>
-                                                                this.setOtherVarient(e.target.value, model.id, model.brand_id,
-                                                                    brand.name, model.name+" "+varient.varient, varient.fuel_type )
+                                                                this.setOtherVarient(e.target.value, model.id, model.brand_id)
                                                             }
                                                         />
                                                         <span className="checkmark mL-0"></span>
