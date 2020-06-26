@@ -88,9 +88,9 @@ fetchData=()=>{
             'registration_no':values.regNumber,
             'menumaster_id':1,
             'vehicle_type_id':productId,
-            'csc_id':localStorage.getItem('csc_id'),
-            'agent_name':localStorage.getItem('agent_name'),
-            'product_id':localStorage.getItem('product_id'),
+            'csc_id':sessionStorage.getItem('csc_id') ? sessionStorage.getItem('csc_id') : "500100100013",
+            'agent_name':sessionStorage.getItem('agent_name') ? sessionStorage.getItem('agent_name') : "Bipin Sing",
+            'product_id':sessionStorage.getItem('product_id') ? sessionStorage.getItem('product_id') : "900001786",
         } 
         formData.append('enc_data',encryption.encrypt(JSON.stringify(post_data)))
         this.props.loadingStart();

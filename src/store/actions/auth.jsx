@@ -70,14 +70,12 @@ export const authProcess = (data, onSuccess, onFailure) => {
         dispatch(authStart());
         // Auth Processing
         const formData = new FormData();
-        //formData.append('email', data.emailAddress);
-        //formData.append('password', data.password);
+
         const post_data_obj = {
             'email': data.emailAddress,
             'password':data.password
         }
         let encryption = new Encryption();
-        console.log("aaaa===========>",encryption.encrypt(JSON.stringify(post_data_obj)));
         
         formData.append('enc_data',encryption.encrypt(JSON.stringify(post_data_obj)))
 
@@ -95,6 +93,10 @@ export const authProcess = (data, onSuccess, onFailure) => {
                 // localStorage.setItem('users', JSON.stringify({ user: response.data.user, permission: response.data.permission, lastAction: Date.now() }));
                 localStorage.setItem('users', JSON.stringify({ user: response.data.user_data, permission: [], lastAction: Date.now() }));
                 localStorage.setItem('loginData', JSON.stringify( loginData ));
+                var cscData = JSON.parse(response.data.user_data.info);
+                localStorage.setItem('csc_id', cscData["csc_id"]);
+                localStorage.setItem('agent_name', cscData["fullname"]);
+                localStorage.setItem('product_id', cscData["productId"]);
                 onSuccess && onSuccess();
             })
             .catch(error => {

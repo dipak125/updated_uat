@@ -133,8 +133,7 @@ class Premium extends Component {
     payment = () => {
         const { refNumber } = this.state;
         // window.location = `http://14.140.119.44/sbig-csc/ConnectPG/payment.php?refrence_no=${refNumber}`
-        // window.location = `${process.env.REACT_APP_PAYMENT_URL}/sbig-csc/ConnectPG/payment_motor.php?refrence_no=${refNumber}`
-        window.location = `${process.env.REACT_APP_PAYMENT_URL}/sbig-csc/ConnectPG/payment_motor.php?refrence_no=d4e3fae155cb7e925e0fad4adeb1f6c1`
+        window.location = `${process.env.REACT_APP_PAYMENT_URL}/sbig-csc/ConnectPG/payment_motor.php?refrence_no=${refNumber}`
       }
     
 

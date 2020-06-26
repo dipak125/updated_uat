@@ -645,6 +645,9 @@ class InformationYourself extends Component {
        // formData.append(`gender[${i}]`, gender_val);
     } 
     post_data['gender'] = arr_date
+    post_data['csc_id'] = sessionStorage.getItem('csc_id') ? sessionStorage.getItem('csc_id') : "500100100013"
+    post_data['agent_name'] = sessionStorage.getItem('agent_name') ? sessionStorage.getItem('agent_name') : "Bipin Sing"
+    post_data['product_id'] = sessionStorage.getItem('product_id') ? sessionStorage.getItem('product_id') : "900001786"
     
 
     let encryption = new Encryption();

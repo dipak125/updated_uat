@@ -13,25 +13,82 @@ import { loaderStart, loaderStop } from "../../store/actions/loader";
 import { connect } from "react-redux";
 import axios from "../../shared/axios"
 import moment from "moment";
+import Encryption from '../../shared/payload-encryption';
 
 const initialValue = {
-    first_name:"Tanmoy",
-    last_name:"Ghosh",
-    gender:"m",
-    dob:new Date("1986-11-15"),
-    pancard:"6987589",
-    location:"barasat",
-    district:"north 24",
-    pincode:"700126",
+    first_name:"",
+    last_name:"test",
+    gender:"",
+    dob: "",
+    pancard:"",
+    location:"",
+    district:"test",
+    pincode:"",
     is_carloan:"",
-    bank_name:"SBI",
-    bank_branch:"Kolkata",
-    nominee_relation_with:"mother",
-    nominee_first_name:"Argha",
-    nominee_last_name:"Ghosh",
-    nominee_gender:"m",
-    nominee_dob:new Date("1986-11-15"),
+    bank_name:"",
+    bank_branch:"",
+    nominee_relation_with:"",
+    nominee_first_name:"",
+    nominee_last_name:"test",
+    nominee_gender:"",
+    nominee_dob: "",
+    phone: "",
+    email: "",
+    address: "",
+    eIA: "",
+    stateName: "",
+    pinDataArr: []
 }
+
+const ownerValidation = Yup.object().shape({
+    first_name: Yup.string().required('Name is required'),
+    // last_name:Yup.string().required('Last name is required'),
+    gender: Yup.string().required('Gender is required'),
+    dob:Yup.date().required('Date of birth is required'),
+    pancard: Yup.string().required('Pancard is required'),
+    location:Yup.string().required('Location is required'),
+    // district: Yup.string().required('District is required'),
+    pincode:Yup.string().required('Pincode is required'),
+    address:Yup.string().required('Address is required'),
+    phone: Yup.string().required('Phone No. is required'),
+    email:Yup.string().required('Email is required'),
+
+    is_carloan: Yup.mixed().required('This field is required'),
+    bank_name:Yup.string().notRequired('Bank Name is required')
+    .test(
+        "isLoanChecking",
+        function() {
+            return "Please enter bank name"
+        },
+        function (value) {
+            if (this.parent.is_carloan == 1 && !value) {   
+                return false;    
+            }
+            return true;
+        }
+    ),
+    bank_branch: Yup.string().notRequired('Bank branch is required')
+    .test(
+        "isLoanChecking",
+        function() {
+            return "Please enter bank branch"
+        },
+        function (value) {
+            if (this.parent.is_carloan == 1 && !value) {   
+                return false;    
+            }
+            return true;
+        }
+    ),
+
+    nominee_relation_with:Yup.string().required('Nominee relation is required'),
+    nominee_first_name: Yup.string().required('Nominee name is required'),
+    // nominee_last_name:Yup.string().required('Nominee last name is required'), 
+    nominee_gender: Yup.string().required('Nominee gender is required'),
+    nominee_dob:Yup.string().required('Nominee DOB is required'),
+   
+    eIA: Yup.string().required('This field is required'),
+})
 
 class AdditionalDetails extends Component {
 
@@ -41,7 +98,9 @@ class AdditionalDetails extends Component {
         is_eia_account: '',
         showLoan: false,
         is_loan_account: '',
-        insurerList: []
+        insurerList: [],
+        policyHolder: {},
+        nomineeDetails: {}
     };
     
 
@@ -89,40 +148,35 @@ class AdditionalDetails extends Component {
         this.props.history.push(`/OtherComprehensive/${productId}`);
     }
 
-    getInsurerList = () => {
-        this.props.loadingStart();
-        axios
-          .get(`/company`)
-          .then(res => {
-            this.setState({
-                insurerList: res.data.data
-            });
-            this.props.loadingStop();
-          })
-          .catch(err => {
-            this.setState({
-                insurerList: []
-            });
-            this.props.loadingStop();
-          });
-      }
 
     handleSubmit = (values, actions) => {
         const {productId} = this.props.match.params 
         const formData = new FormData(); 
-
-        for (const key in values) {
-            if (values.hasOwnProperty(key)) {
-              if(key == "dob" || key == "nominee_dob"){
-                formData.append(key, moment(values[key]).format("YYYY-MM-DD"));
-              }
-              else {
-                 formData.append(key, values[key]);
-              }          
-            }
-          }
-        formData.append('menumaster_id',1);
-        formData.append('policy_holder_id', localStorage.getItem('policyHolder_id'));
+        let encryption = new Encryption();
+        const post_data = {
+            'policy_holder_id':localStorage.getItem('policyHolder_id'),
+            'menumaster_id':1,
+            'first_name':values['first_name'],
+            'last_name':values['last_name'],
+            'gender':values['gender'],
+            'dob':moment(values['dob']).format("YYYY-MM-DD"),
+            'pancard':values['pancard'],
+            'location':values['location'],
+            'district':values['district'],
+            'pincode':values['pincode'].toString(),
+            'is_carloan':values['is_carloan'],
+            'bank_name':values['bank_name'],
+            'bank_branch':values['bank_branch'],
+            'nominee_relation_with':values['nominee_relation_with'],
+            'nominee_first_name':values['nominee_first_name'],
+            'nominee_last_name':values['nominee_last_name'],
+            'nominee_gender':values['nominee_gender'],
+            'nominee_dob':moment(values['nominee_dob']).format("YYYY-MM-DD"),
+            'phone': values['phone'],
+            'email': values['email'],
+        }
+console.log('post_data', post_data);
+        formData.append('enc_data',encryption.encrypt(JSON.stringify(post_data)))
         this.props.loadingStart();
         axios
         .post(`/owner-details`, formData)
@@ -130,23 +184,101 @@ class AdditionalDetails extends Component {
             // this.props.loadingStop();
             this.props.history.push(`/Premium/${productId}`);
         })
-        .catch(err => {
-    
+        .catch(err => { 
           this.props.loadingStop();
-          this.props.history.push(`/Premium/${productId}`);
+          actions.setSubmitting(false)
         });
 
     }
 
+    fetchData = () => {
+        const { productId } = this.props.match.params
+        let policyHolder_id = localStorage.getItem("policyHolder_id") ? localStorage.getItem("policyHolder_id") : 0;
+        this.props.loadingStart();
+        axios.get(`policy-holder/motor/${policyHolder_id}`)
+            .then(res => {
+                console.log(res);
+                 let motorInsurance = res.data.data.policyHolder ? res.data.data.policyHolder.motorinsurance : {};
+                 let previousPolicy = res.data.data.policyHolder ? res.data.data.policyHolder.previouspolicy : {};
+                 let vehicleDetails = res.data.data.policyHolder ? res.data.data.policyHolder.vehiclebrandmodel : {};
+                 let policyHolder = res.data.data.policyHolder ? res.data.data.policyHolder : {};
+                 let nomineeDetails = res.data.data.policyHolder ? res.data.data.policyHolder.request_data.nominee[0] : {}
+                 let is_loan_account = res.data.data.policyHolder ? res.data.data.policyHolder.is_carloan : 0
+                this.setState({
+                    motorInsurance, previousPolicy, vehicleDetails, policyHolder, nomineeDetails, is_loan_account
+                })
+                this.props.loadingStop();
+            })
+            .catch(err => {
+                // handle error
+                this.props.loadingStop();
+            })
+    }
+
+    fetchAreadetails=(e)=>{
+        let pinCode = e.target.value;      
+
+        if(pinCode.length==6){
+            const formData = new FormData();
+            this.props.loadingStart();
+            let encryption = new Encryption();
+            const post_data_obj = {
+                'pincode':pinCode
+            };
+           formData.append('enc_data',encryption.encrypt(JSON.stringify(post_data_obj)))
+           axios.post('generate-pincode-details',
+            formData
+            ).then(res=>{
+                let pinData = res.data.trim();               
+                let pinDataArr = JSON.parse(pinData.substring(0,pinData.length-10))   
+                let stateName=pinDataArr.map(resource=>
+                    resource.STATE_NM
+                )  
+                var unique = stateName.filter((v, i, a) => a.indexOf(v) === i);                                 
+                this.setState({
+                    pinDataArr,
+                    stateName:unique,
+                });
+                this.props.loadingStop();
+            }).
+            catch(err=>{
+                this.props.loadingStop();
+            })          
+        }       
+    }
+
     componentDidMount() {
-        this.getInsurerList();
+        this.fetchData();
     }
 
    
 
     render() {
-        const {showEIA, is_eia_account, showLoan, is_loan_account, insurerList} = this.state
+        const {showEIA, is_eia_account, showLoan, is_loan_account, nomineeDetails, policyHolder, stateName, pinDataArr} = this.state
         const {productId} = this.props.match.params 
+
+        let newInitialValues = Object.assign(initialValue, {
+            first_name: policyHolder && policyHolder.first_name ? policyHolder.first_name : "",
+            gender:  policyHolder && policyHolder.gender ? policyHolder.gender : "",
+            dob: policyHolder && policyHolder.dob ? new Date(policyHolder.dob) : "",
+            pancard: policyHolder && policyHolder.pancard ? policyHolder.pancard : "",
+            location: policyHolder && policyHolder.location ? policyHolder.location : "",
+            pincode: policyHolder && policyHolder.pincode ? policyHolder.pincode : "",
+            is_carloan:is_loan_account,
+            // bank_name: policyHolder && policyHolder.length > 0 ? policyHolder.location : "",
+            // bank_branch: policyHolder && policyHolder.length > 0 ? policyHolder.location : "",
+            nominee_relation_with: nomineeDetails && nomineeDetails.relation_with ? nomineeDetails.relation_with : "",
+            nominee_first_name: nomineeDetails && nomineeDetails.first_name ? nomineeDetails.first_name : "",
+            nominee_gender: nomineeDetails && nomineeDetails.gender ? nomineeDetails.gender : "",
+            nominee_dob: nomineeDetails && nomineeDetails.dob ? new Date(nomineeDetails.dob) : "",
+            
+            phone: policyHolder && policyHolder.mobile ? policyHolder.mobile : "",
+            email:  policyHolder && policyHolder.email_id ? policyHolder.email_id : "",
+            address: policyHolder && policyHolder.address ? policyHolder.address : "",
+            eIA:  policyHolder && (policyHolder.is_eia_account == 0 || policyHolder.is_eia_account == 1) ? policyHolder.is_eia_account : "",
+
+        });
+
         return (
             <>
                 <BaseComponent>
@@ -165,11 +297,10 @@ class AdditionalDetails extends Component {
                             </div>
                         </div>
 
-                        <Formik initialValues={initialValue} onSubmit={this.handleSubmit}
-                        // validationSchema={validateNominee}
+                        <Formik initialValues={newInitialValues} onSubmit={this.handleSubmit}
+                        validationSchema={ownerValidation}
                         >
                         {({ values, errors, setFieldValue, setFieldTouched, isValid, isSubmitting, touched }) => {
-
                         return (
                         <Form>
                         <Row>
@@ -214,6 +345,9 @@ class AdditionalDetails extends Component {
                                                     <span className="checkmark" />
                                                     <span className="fs-14">No</span>
                                                 </label>
+                                                {errors.is_carloan && touched.is_carloan ? (
+                                                <span className="errorMsg">{errors.is_carloan}</span>
+                                                ) : null}
                                             </div>
                                         </div>
                                     </Col>
@@ -272,7 +406,7 @@ class AdditionalDetails extends Component {
                                             <Field
                                                 name='first_name'
                                                 type="text"
-                                                placeholder="Full Name "
+                                                placeholder="Full Name"
                                                 autoComplete="off"
                                                 onFocus={e => this.changePlaceHoldClassAdd(e)}
                                                 onBlur={e => this.changePlaceHoldClassRemove(e)}
@@ -353,6 +487,46 @@ class AdditionalDetails extends Component {
                                         <FormGroup>
                                             <div className="insurerName">
                                             <Field
+                                                name='email'
+                                                type="email"
+                                                placeholder="Email "
+                                                autoComplete="off"
+                                                onFocus={e => this.changePlaceHoldClassAdd(e)}
+                                                onBlur={e => this.changePlaceHoldClassRemove(e)}
+                                                value = {values.email}                                                                            
+                                            />
+                                            {errors.email && touched.email ? (
+                                            <span className="errorMsg">{errors.email}</span>
+                                            ) : null}  
+                                            </div>
+                                        </FormGroup>
+                                    </Col>
+                                    <Col sm={12} md={4} lg={4}>
+                                        <FormGroup>
+                                            <div className="insurerName">
+                                            <Field
+                                                name='phone'
+                                                type="text"
+                                                placeholder="Phone No. "
+                                                autoComplete="off"
+                                                onFocus={e => this.changePlaceHoldClassAdd(e)}
+                                                onBlur={e => this.changePlaceHoldClassRemove(e)}
+                                                value = {values.phone}                                                                            
+                                            />
+                                            {errors.phone && touched.phone ? (
+                                            <span className="errorMsg">{errors.phone}</span>
+                                            ) : null}  
+                                            </div>
+                                        </FormGroup>
+                                    </Col>
+                                    
+                                </Row>
+
+                                <Row>  
+                                    <Col sm={12} md={4} lg={4}>
+                                        <FormGroup>
+                                            <div className="insurerName">
+                                            <Field
                                                 name='address'
                                                 type="text"
                                                 placeholder="Address "
@@ -368,41 +542,74 @@ class AdditionalDetails extends Component {
                                         </FormGroup>
                                     </Col>
                                     <Col sm={12} md={4} lg={4}>
-                                        <FormGroup>
-                                            <div className="insurerName">
+                                    <FormGroup>
+                                        <div className="insurerName">
                                             <Field
-                                                name='pincode'
-                                                type="text"
-                                                placeholder="Pincode "
+                                                name="pincode"
+                                                type="number"
+                                                placeholder="Pincode"
                                                 autoComplete="off"
+                                                maxlength = "6"
                                                 onFocus={e => this.changePlaceHoldClassAdd(e)}
                                                 onBlur={e => this.changePlaceHoldClassRemove(e)}
-                                                value = {values.pincode}                                                                            
+                                                onKeyUp={e=> this.fetchAreadetails(e)}
+                                                value={values.pincode}
+                                                onInput= {(e)=> {
+                                                    setFieldTouched("state");
+                                                    setFieldTouched("pincode");
+                                                    setFieldValue("pincode", e.target.value);
+                                                    setFieldValue("state", stateName ? stateName[0] : values.state);
+                                                }}
                                             />
                                             {errors.pincode && touched.pincode ? (
                                             <span className="errorMsg">{errors.pincode}</span>
-                                            ) : null}  
+                                            ) : null}                                                   
+                                        </div>
+                                    </FormGroup>
+                                    </Col>
+                                    <Col sm={12} md={4} lg={4}>
+                                        <FormGroup>
+                                            <div className="formSection">
+                                                <Field
+                                                    name="location"
+                                                    component="select"
+                                                    autoComplete="off"
+                                                    value={values.location}
+                                                    className="formGrp"
+                                                >
+                                                <option value="">Select Area</option>
+                                                {pinDataArr && pinDataArr.map((resource,rindex)=>
+                                                    <option value={resource.LCLTY_SUBRB_TALUK_TEHSL_NM}>{resource.LCLTY_SUBRB_TALUK_TEHSL_NM}</option>
+                                                )}
+                                                    
+                                                    {/*<option value="area2">Area 2</option>*/}
+                                                </Field>     
+                                                {errors.location && touched.location ? (
+                                                    <span className="errorMsg">{errors.location}</span>
+                                                ) : null}     
                                             </div>
                                         </FormGroup>
+                                        
                                     </Col>
                                 </Row>
-
                                 <Row>
                                     <Col sm={12} md={4} lg={4}>
                                         <FormGroup>
                                             <div className="insurerName">
-                                            <Field
-                                                name='location'
-                                                type="text"
-                                                placeholder="Location "
-                                                autoComplete="off"
-                                                onFocus={e => this.changePlaceHoldClassAdd(e)}
-                                                onBlur={e => this.changePlaceHoldClassRemove(e)}
-                                                value = {values.location}                                                                            
-                                            />
-                                            {errors.location && touched.location ? (
-                                            <span className="errorMsg">{errors.location}</span>
-                                            ) : null}  
+                                                <Field
+                                                    name="state"
+                                                    type="text"
+                                                    placeholder="State"
+                                                    autoComplete="off"
+                                                    onFocus={e => this.changePlaceHoldClassAdd(e)}
+                                                    onBlur={e => this.changePlaceHoldClassRemove(e)}
+                                                    value={stateName ? stateName[0] : values.state} 
+                                                    disabled = {true}
+                                                    
+                                                />
+                                                {errors.state && touched.state ? (
+                                                <span className="errorMsg">{errors.state}</span>
+                                                ) : null}           
                                             </div>
                                         </FormGroup>
                                     </Col>
@@ -419,7 +626,7 @@ class AdditionalDetails extends Component {
                                             <Field
                                                 name='nominee_first_name'
                                                 type="text"
-                                                placeholder="Name "
+                                                placeholder="Full Name "
                                                 autoComplete="off"
                                                 onFocus={e => this.changePlaceHoldClassAdd(e)}
                                                 onBlur={e => this.changePlaceHoldClassRemove(e)}

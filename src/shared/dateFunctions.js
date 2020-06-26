@@ -16,6 +16,11 @@ export class PersonAge {
         return this.calculateAgeMonth(this.parseDate(dateformat(mydob, 'mm/dd/yyyy')), new Date());
     }
 
+    whatIsCurrentMonth(mydob) {
+        //console.log('dob', dateformat(mydob, 'mm/dd/yyyy'));
+        return this.calculateCurrentMonth(this.parseDate(dateformat(mydob, 'mm/dd/yyyy')), new Date());
+    }
+
     //convert the date string in the format of dd/mm/yyyy into a JS date object
     parseDate(dateStr) {
         let dateParts = dateStr.split("/");
@@ -75,6 +80,33 @@ export class PersonAge {
                 }
             }
           
+        return ageMonth;
+    }
+
+    calculateCurrentMonth(dateOfBirth, dateToCalculate) {
+        var calculateYear = dateToCalculate.getFullYear();
+        var calculateMonth = dateToCalculate.getMonth();
+        var calculateDay = dateToCalculate.getDate();
+
+        var birthYear = dateOfBirth.getFullYear();
+        var birthMonth = dateOfBirth.getMonth();
+        var birthDay = dateOfBirth.getDate();
+        
+        var age = calculateYear - birthYear;
+        var ageMonth = calculateMonth - birthMonth;
+        var ageDay = calculateDay - birthDay;
+
+        if(age === 0 && ageMonth >= 0){
+            ageMonth = parseInt(ageMonth)
+        } 
+        else if(age === 0 && ageMonth < 0) {
+            ageMonth = parseInt(ageMonth) -1
+        }
+        else{
+            if(age > 0){ 
+                ageMonth = 3 
+            }
+        }
         return ageMonth;
     }
 

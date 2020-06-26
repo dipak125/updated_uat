@@ -30,6 +30,34 @@ const ComprehensiveValidation = Yup.object().shape({
    
 });
 
+const moreCoverage = [
+    {
+        "id": "C101069",
+        "name":"Basic Road Side Assistance",
+        "description":"The e-Insurance account or Electronic Insurance Account offers policyholders online space to hold all their insurance policies electronically under one e-insurance account number. This allows the policyholder to access all their policies with a few clicks and no risk of losing the physical insurance policy"
+    },
+    {
+        "id": "C101072",
+        "name":"Depreciation Reimbursement",
+        "description": "The e-Insurance account or Electronic Insurance Account offers policyholders online space to hold all their insurance policies electronically under one e-insurance account number. This allows the policyholder to access all their policies with a few clicks and no risk of losing the physical insurance policy"
+    },
+    {
+        "id": "C101067",
+        "name":"Return to Invoice",
+        "description": "The e-Insurance account or Electronic Insurance Account offers policyholders online space to hold all their insurance policies electronically under one e-insurance account number. This allows the policyholder to access all their policies with a few clicks and no risk of losing the physical insurance policy"
+    },
+    {
+        "id": "C101108",
+        "name":"Engine Guard",
+        "description": "The e-Insurance account or Electronic Insurance Account offers policyholders online space to hold all their insurance policies electronically under one e-insurance account number. This allows the policyholder to access all their policies with a few clicks and no risk of losing the physical insurance policy"
+    },
+    {
+        "id": "C101111",
+        "name":"Cover for consumables",
+        "description": "The e-Insurance account or Electronic Insurance Account offers policyholders online space to hold all their insurance policies electronically under one e-insurance account number. This allows the policyholder to access all their policies with a few clicks and no risk of losing the physical insurance policy"
+    }
+]
+
 class OtherComprehensive extends Component {
 
     constructor(props) {
@@ -47,7 +75,8 @@ class OtherComprehensive extends Component {
             PolicyArray: [],
             show: false,
             sliderVal: '',
-            motorInsurance: []
+            motorInsurance: [],
+            add_more_coverage: []
         };
     }
 
@@ -135,9 +164,15 @@ class OtherComprehensive extends Component {
       };
 
     fullQuote = (access_token) => {
+        const { PolicyArray, sliderVal, add_more_coverage } = this.state
+        let defaultSliderValue = PolicyArray.length > 0 ? Math.floor(PolicyArray[0].PolicyRiskList[0].IDV_Suggested) : 0
         const formData = new FormData();
         formData.append("access_token", access_token);
         formData.append("id", localStorage.getItem("policyHolder_id"));
+
+        formData.append("idv_value", sliderVal ? sliderVal : defaultSliderValue.toString());
+        formData.append("add_more_coverage", add_more_coverage);
+
         // const post_data = {
         //     'id':localStorage.getItem('policyHolder_id'),
         //     'access_token':access_token
@@ -173,21 +208,39 @@ class OtherComprehensive extends Component {
 
     handleSubmit = (values) => {
         const { productId } = this.props.match.params
-        const { motorInsurance } = this.state
+        const { motorInsurance, PolicyArray, sliderVal, add_more_coverage } = this.state
+        let defaultSliderValue = PolicyArray.length > 0 ? Math.floor(PolicyArray[0].PolicyRiskList[0].IDV_Suggested) : 0
         const formData = new FormData();
         let encryption = new Encryption();
-        const post_data = {
-            'policy_holder_id': localStorage.getItem('policyHolder_id'),
-            'menumaster_id': 1,
-            'registration_no': motorInsurance.registration_no,
-            'chasis_no': values.chasis_no,
-            'chasis_no_last_part': values.chasis_no_last_part,
-            'add_more_coverage': 0,
-            'cng_kit': values.cng_kit,
-            'cngKit_Cost': values.cngKit_Cost,
-            'engine_no': values.engine_no
-
+        let post_data = {}
+        if(add_more_coverage.length > 0){
+            post_data = {
+                'policy_holder_id': localStorage.getItem('policyHolder_id'),
+                'menumaster_id': 1,
+                'registration_no': motorInsurance.registration_no,
+                'chasis_no': values.chasis_no,
+                'chasis_no_last_part': values.chasis_no_last_part,
+                'cng_kit': values.cng_kit,
+                'cngKit_Cost': values.cngKit_Cost,
+                'engine_no': values.engine_no,
+                'idv_value': sliderVal ? sliderVal : defaultSliderValue.toString(),
+                'add_more_coverage': add_more_coverage
+            }
         }
+        else {
+            post_data = {
+                'policy_holder_id': localStorage.getItem('policyHolder_id'),
+                'menumaster_id': 1,
+                'registration_no': motorInsurance.registration_no,
+                'chasis_no': values.chasis_no,
+                'chasis_no_last_part': values.chasis_no_last_part,
+                'cng_kit': values.cng_kit,
+                'cngKit_Cost': values.cngKit_Cost,
+                'engine_no': values.engine_no,
+                'idv_value': sliderVal ? sliderVal : defaultSliderValue.toString(),
+            }
+        }
+        console.log('post_data',post_data)
         formData.append('enc_data', encryption.encrypt(JSON.stringify(post_data)))
         this.props.loadingStart();
         axios.post('update-insured-value', formData).then(res => {
@@ -203,13 +256,37 @@ class OtherComprehensive extends Component {
             })
     }
 
+    onRowSelect = (values,isSelect) =>{
+
+        const { add_more_coverage} = this.state;
+         var drv = [];
+         if(isSelect) {          
+            add_more_coverage.push(values);
+            this.setState({
+                add_more_coverage: add_more_coverage,
+                serverResponse: [],
+                error: []
+            });                               
+        }
+        else {                
+            const index = add_more_coverage.indexOf(values);    
+            if (index !== -1) {  
+                add_more_coverage.splice(index,1);
+                this.setState({
+                    serverResponse: [],
+                    error: []
+                });      
+                }                  
+        }
+    }
+
     componentDidMount() {
         this.fetchData()
     }
 
 
     render() {
-        const {showCNG, is_CNG_account, fulQuoteResp, PolicyArray, sliderVal, motorInsurance, serverResponse} = this.state
+        const {showCNG, is_CNG_account, fulQuoteResp, PolicyArray, sliderVal, motorInsurance, serverResponse, add_more_coverage} = this.state
         const {productId} = this.props.match.params 
         let defaultSliderValue = PolicyArray.length > 0 ? Math.floor(PolicyArray[0].PolicyRiskList[0].IDV_Suggested) : 0
         let sliderValue = sliderVal
@@ -226,7 +303,8 @@ class OtherComprehensive extends Component {
             engine_no: motorInsurance.engine_no ? motorInsurance.engine_no : "",
 
         });
-        console.log("IDV", sliderValue)
+        // console.log("IDV", sliderValue)
+        console.log('values',add_more_coverage)
         return (
             <>
                 <BaseComponent>
@@ -382,7 +460,7 @@ class OtherComprehensive extends Component {
                                                 className="premiumslid"
                                                 onFocus={e => this.changePlaceHoldClassAdd(e)}
                                                 onBlur={e => this.changePlaceHoldClassRemove(e)}
-                                                value={sliderValue ? sliderValue : defaultSliderValue}
+                                                value={sliderValue ? sliderValue : defaultSliderValue}  
                                             />
                                             {errors.IDV && touched.IDV ? (
                                                 <span className="errorMsg">{errors.IDV}</span>
@@ -491,90 +569,28 @@ class OtherComprehensive extends Component {
                                 </Row>
 
                                 <Row className="m-b-40">
-                                    <Col sm={12} md={6} lg={6}>
-                                        <label className="customCheckBox formGrp formGrp">Basic Roadside Assistance
-                                        <OverlayTrigger overlay={<Tooltip id="tooltip-disabled">The e-Insurance account or Electronic Insurance Account offers policyholders online space to hold all their insurance policies electronically under one e-insurance account number. This allows the policyholder to access all their policies with a few clicks and no risk of losing the physical insurance policy</Tooltip>}>
+                                {moreCoverage.map((coverage, qIndex) => ( 
+                                                                                         
+                                    <Col sm={12} md={6} lg={6}  key= {qIndex} > 
+                                        <label className="customCheckBox formGrp formGrp">{coverage.name}
+                                        <OverlayTrigger overlay={<Tooltip id="tooltip-disabled">{coverage.description}</Tooltip>}>
                                             <a href="#" className="infoIcon"><img src={require('../../assets/images/i.svg')} alt="" className="premtool"/></a>
                                             </OverlayTrigger>
                                             <Field
                                                 type="checkbox"
-                                                name='roadsideAssistance'                                            
-                                                value='1'
+                                                name={`moreCov_${qIndex}`}                                 
+                                                value={coverage.id}
                                                 className="user-self"
                                                 // checked={values.roadsideAssistance ? true : false}
+                                                onClick={(e) =>
+                                                    this.onRowSelect(e.target.value, e.target.checked )
+                                                }
                                             />
                                             <span className="checkmark mL-0"></span>
                                             <span className="error-message"></span>
                                         </label>
                                     </Col>
-
-                                    <Col sm={12} md={6} lg={6}>
-                                        <label className="customCheckBox formGrp formGrp">Cover for Consumables
-                                        <OverlayTrigger overlay={<Tooltip id="tooltip-disabled">The e-Insurance account or Electronic Insurance Account offers policyholders online space to hold all their insurance policies electronically under one e-insurance account number. This allows the policyholder to access all their policies with a few clicks and no risk of losing the physical insurance policy</Tooltip>}>
-                                                <a href="#" className="infoIcon"><img src={require('../../assets/images/i.svg')} alt="" className="premtool" /></a>
-                                                </OverlayTrigger>
-                                                <Field
-                                                    type="checkbox"
-                                                    name='consumables'                                            
-                                                    value='1'
-                                                    className="user-self"
-                                                    // checked={values.consumables ? true : false}
-                                                />
-                                                <span className="checkmark mL-0"></span>
-                                                <span className="error-message"></span>
-                                            </label>
-                                    </Col>
-
-                                    <Col sm={12} md={6} lg={6}>
-                                        <label className="customCheckBox formGrp formGrp">Depreciation Reimbursement
-                                        <OverlayTrigger overlay={<Tooltip id="tooltip-disabled">The e-Insurance account or Electronic Insurance Account offers policyholders online space to hold all their insurance policies electronically under one e-insurance account number. This allows the policyholder to access all their policies with a few clicks and no risk of losing the physical insurance policy</Tooltip>}>
-                                                <a href="#" className="infoIcon"><img src={require('../../assets/images/i.svg')} alt=""  className="premtool"/></a>
-                                                </OverlayTrigger>
-                                                <Field
-                                                    type="checkbox"
-                                                    name='depReimbursement'                                            
-                                                    value='1'
-                                                    className="user-self"
-                                                    // checked={values.consumables ? true : false}
-                                                />
-                                                <span className="checkmark mL-0"></span>
-                                                <span className="error-message"></span>
-                                            </label>
-                                    </Col>
-
-                                    <Col sm={12} md={6} lg={6}>
-                                        <label className="customCheckBox formGrp formGrp">Return To Invoice
-                                        <OverlayTrigger overlay={<Tooltip id="tooltip-disabled">The e-Insurance account or Electronic Insurance Account offers policyholders online space to hold all their insurance policies electronically under one e-insurance account number. This allows the policyholder to access all their policies with a few clicks and no risk of losing the physical insurance policy</Tooltip>}>
-                                                <a href="#" className="infoIcon"><img src={require('../../assets/images/i.svg')} alt="" className="premtool" /></a>
-                                                </OverlayTrigger>
-                                                <Field
-                                                    type="checkbox"
-                                                    name='invoice'                                            
-                                                    value='1'
-                                                    className="user-self"
-                                                    // checked={values.consumables ? true : false}
-                                                />
-                                                <span className="checkmark mL-0"></span>
-                                                <span className="error-message"></span>
-                                            </label>
-                                    </Col>
-
-                                    <Col sm={12} md={6} lg={6}>
-                                        <label className="customCheckBox formGrp formGrp">Engine Guard
-                                        <OverlayTrigger overlay={<Tooltip id="tooltip-disabled">The e-Insurance account or Electronic Insurance Account offers policyholders online space to hold all their insurance policies electronically under one e-insurance account number. This allows the policyholder to access all their policies with a few clicks and no risk of losing the physical insurance policy</Tooltip>}>
-                                                <a href="#" className="infoIcon"><img src={require('../../assets/images/i.svg')} alt="" className="premtool" /></a>
-                                                </OverlayTrigger>
-                                                <Field
-                                                    type="checkbox"
-                                                    name='engineGuard'                                            
-                                                    value='1'
-                                                    className="user-self"
-                                                    // checked={values.consumables ? true : false}
-                                                />
-                                                <span className="checkmark mL-0"></span>
-                                                <span className="error-message"></span>
-                                            </label>
-                                    </Col>
+                                ))}
                                     </Row>    
                                     <div className="d-flex justify-content-left resmb">
                                         <Button className={`backBtn`} type="button"  onClick= {this.vehicleDetails.bind(this,productId)}>
