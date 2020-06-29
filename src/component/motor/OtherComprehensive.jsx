@@ -20,8 +20,9 @@ import * as Yup from "yup";
 const initialValue = {}
 const ComprehensiveValidation = Yup.object().shape({
     // is_carloan: Yup.number().required('Please select one option')
+    chasis_no_last_part:Yup.string().required('This field is required'),
     engine_no:Yup.string().required('Engine no is required'),
-    chasis_no:Yup.string().required('Insurer Pan no is required'),
+    chasis_no:Yup.string().required('Chasis no is required'),
     cng_kit:Yup.number().required('please checked an option'),
     // IDV:Yup.number().required('Declared value is required'),
     
@@ -58,6 +59,17 @@ const moreCoverage = [
     }
 ]
 
+const Coverage = {
+        "C101064":"Own Damage",
+        "C101065":"3rd party liability",
+        "C101066":"Personal Accident cover",
+        "C101069":"Basic Road Side Assistance",
+        "C101072":"Depreciation Reimbursement",
+        "C101067":"Return to Invoice",
+        "C101108":"Engine Guard",
+        "C101111":"Cover for consumables"
+}
+
 class OtherComprehensive extends Component {
 
     constructor(props) {
@@ -76,7 +88,10 @@ class OtherComprehensive extends Component {
             show: false,
             sliderVal: '',
             motorInsurance: [],
-            add_more_coverage: []
+            add_more_coverage: [],
+            vahanDetails: [],
+            vahanVerify: false,
+            policyCoverage: []
         };
     }
 
@@ -133,8 +148,10 @@ class OtherComprehensive extends Component {
         axios.get(`policy-holder/motor/${policyHolder_id}`)
             .then(res => {
                 let motorInsurance = res.data.data.policyHolder ? res.data.data.policyHolder.motorinsurance : {}
+                
                 this.setState({
-                    motorInsurance
+                    motorInsurance,
+                    vahanVerify: motorInsurance.chasis_no && motorInsurance.engine_no ? true : false
                 })
                 this.props.loadingStop();
                 this.getAccessToken()
@@ -163,6 +180,29 @@ class OtherComprehensive extends Component {
           });
       };
 
+    getVahanDetails = (chasiNo, regnNo) => {
+        const formData = new FormData();
+        formData.append("chasiNo", chasiNo);
+        formData.append("regnNo", regnNo);
+
+        this.props.loadingStart();
+        axios
+          .post(`/getVahanDetails`,formData)
+          .then((res) => {
+            this.setState({
+              vahanDetails: res.data,
+              vahanVerify: res.data.length > 0 ? true : false
+            });
+            this.props.loadingStop();
+          })
+          .catch((err) => {
+            this.setState({
+                vahanDetails: [],
+            });
+            this.props.loadingStop();
+          });
+    };
+
     fullQuote = (access_token) => {
         const { PolicyArray, sliderVal, add_more_coverage } = this.state
         let defaultSliderValue = PolicyArray.length > 0 ? Math.floor(PolicyArray[0].PolicyRiskList[0].IDV_Suggested) : 0
@@ -171,6 +211,7 @@ class OtherComprehensive extends Component {
         formData.append("id", localStorage.getItem("policyHolder_id"));
 
         formData.append("idv_value", sliderVal ? sliderVal : defaultSliderValue.toString());
+        formData.append("policy_type", localStorage.getItem('policy_type'));
         formData.append("add_more_coverage", add_more_coverage);
 
         // const post_data = {
@@ -186,7 +227,8 @@ class OtherComprehensive extends Component {
                       fulQuoteResp: res.data.PolicyObject,
                       PolicyArray: res.data.PolicyObject.PolicyLobList,
                       error: [],
-                      serverResponse: res.data.PolicyObject
+                      serverResponse: res.data.PolicyObject,
+                      policyCoverage: res.data.PolicyObject.PolicyLobList ? res.data.PolicyObject.PolicyLobList[0].PolicyRiskList[0].PolicyCoverageList : [],
                     });
                   } else {
                     this.setState({
@@ -286,7 +328,7 @@ class OtherComprehensive extends Component {
 
 
     render() {
-        const {showCNG, is_CNG_account, fulQuoteResp, PolicyArray, sliderVal, motorInsurance, serverResponse, add_more_coverage} = this.state
+        const {showCNG, vahanDetails, policyCoverage, vahanVerify, is_CNG_account, fulQuoteResp, PolicyArray, sliderVal, motorInsurance, serverResponse, add_more_coverage} = this.state
         const {productId} = this.props.match.params 
         let defaultSliderValue = PolicyArray.length > 0 ? Math.floor(PolicyArray[0].PolicyRiskList[0].IDV_Suggested) : 0
         let sliderValue = sliderVal
@@ -303,8 +345,21 @@ class OtherComprehensive extends Component {
             engine_no: motorInsurance.engine_no ? motorInsurance.engine_no : "",
 
         });
-        // console.log("IDV", sliderValue)
-        console.log('values',add_more_coverage)
+        const policyCoverageList = policyCoverage && policyCoverage.length > 0 ?
+        policyCoverage.map((coverage, qIndex) => {
+            return(
+                <div>
+                    <Row>
+                        <Col sm={12} md={6}>
+                        <FormGroup>{Coverage[coverage.ProductElementCode]}</FormGroup>
+                        </Col>
+                        <Col sm={12} md={6}>
+                        <FormGroup>₹ {coverage.AnnualPremium}</FormGroup>
+                        </Col>
+                    </Row>
+                </div>
+            )
+        }) : null
         return (
             <>
                 <BaseComponent>
@@ -333,7 +388,7 @@ class OtherComprehensive extends Component {
                                 <div className="rghtsideTrigr W-90 m-b-30">
                                     <Collapsible trigger="Default Covered Coverages & Benefit" >
                                         <div className="listrghtsideTrigr">
-                                            Hello
+                                            {policyCoverageList}
                                         </div>
                                     </Collapsible>
                                 </div>
@@ -368,7 +423,7 @@ class OtherComprehensive extends Component {
 
                                     <Col sm={12} md={6} lg={5}>
                                     <Row>
-                            <Col sm={12} md={5} lg={6}>
+                                <Col sm={12} md={5} lg={6}>
                                         <FormGroup>
                                             <div className="insurerName">
                                             Please Enter Last 5 digits of Chassis no.
@@ -387,6 +442,9 @@ class OtherComprehensive extends Component {
                                                         value= {values.chasis_no_last_part}                                    
                                                         
                                                     />
+                                                     {errors.chasis_no_last_part && touched.chasis_no_last_part ? (
+                                                    <span className="errorMsg">{errors.chasis_no_last_part}</span>
+                                                ) : null}
                                             </div>
                                         </FormGroup>
                                     </Col>
@@ -396,12 +454,12 @@ class OtherComprehensive extends Component {
                                     <Col sm={12} md={2} lg={2}>
                                         <FormGroup>
                                             
-                                            <Button className="btn btn-primary vrifyBtn">Verify</Button>
+                                            <Button className="btn btn-primary vrifyBtn" onClick= {this.getVahanDetails.bind(this,values.chasis_no_last_part, values.registration_no)}>Verify</Button>
                                             
                                         </FormGroup>
                                     </Col>
                                     </Row>
-
+                                {vahanVerify ?
                                 <Row>
                                     <Col sm={12} md={6} lg={5}>
                                         <FormGroup>
@@ -440,6 +498,7 @@ class OtherComprehensive extends Component {
                                         </FormGroup>
                                     </Col>
                                 </Row>
+                                : null}
 
                                 <Row>
                                     <Col sm={12} md={4} lg={4}>
@@ -638,7 +697,8 @@ class OtherComprehensive extends Component {
                         </div>
                     </Modal.Header>
                     <Modal.Body>
-                    <h5> Total Premium Amount  ₹ {fulQuoteResp.DuePremium}</h5>
+                    <h5> Net Premium Amount  ₹ {fulQuoteResp.DuePremium}</h5>
+                    <h5> Gross Premium Amount  ₹ {fulQuoteResp.BeforeVatPremium}</h5>
                     <h5> Service Tax  ₹ {fulQuoteResp.TGST}</h5>
                     
                     </Modal.Body>

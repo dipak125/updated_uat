@@ -22,7 +22,8 @@ class Otp extends Component {
     state = {
         otp: "",
         errorMsg: "",
-        seconds: 20
+        seconds: 90,
+        disable:true
       };
 
     checkOtp = (values, actions) => {
@@ -31,7 +32,7 @@ class Otp extends Component {
        // formData.append('policy_holder_id', localStorage.getItem('policyHolder_id'));
        // formData.append("menumaster_id", '2');
        let post_data_obj = {
-         'policy_holder_id':localStorage.getItem('policyHolder_id'),
+         'policy_holder_id':localStorage.getItem("policyHolder_id"),
          'menumaster_id':'2'
        }
        let encryption = new Encryption();
@@ -79,6 +80,42 @@ class Otp extends Component {
         // this.props.otp(values.otp);
         // this.props.history.push(`/ThankYou_motor`);
     }
+    toUnicode= (elmnt,content)=>
+    {
+      //elmnt.target.form.elements[2].focus();
+      //console.log(document.forms[0].elements.length);
+      if (elmnt.key === "Delete" || elmnt.key === "Backspace") {
+ 
+       
+        //elmnt.target.form.elements[3].focus()
+        
+          const next=elmnt.target.tabIndex -2;
+          console.log(elmnt.target.tabIndex);
+          
+          //elmnt.target.form.elements[elmnt.target.tabIndex]="";
+           if (next>-1){
+           
+            elmnt.target.form.elements[next].focus()
+         }
+       
+       
+    }
+      else {
+        console.log("next");
+        if (content.length==elmnt.target.maxLength){
+         const next=elmnt.target.tabIndex;
+          if (next<5){
+            elmnt.target.form.elements[next].focus()
+        }
+      }
+    }
+  
+   
+    }
+    onKeyUp = (e) =>{
+     
+ 
+    }
 
     changePlaceHoldClassAdd(e) {
         let element = e.target.parentElement;
@@ -96,14 +133,14 @@ class Otp extends Component {
        // formData.append('policy_holder_id', localStorage.getItem('policyHolder_id'));
        // formData.append("menumaster_id", '2');
         let post_data_obj = {
-          'policy_holder_id':localStorage.getItem('policyHolder_id'),
+          'policy_holder_id':localStorage.getItem("policyHolder_id"),
           'menumaster_id':'2'
         }
         let encryption = new Encryption();
         formData.append('enc_data',encryption.encrypt(JSON.stringify(post_data_obj)))
 
         this.setState({
-            seconds: 20, errorMsg: ""
+            seconds: 90, errorMsg: ""
           });
         axios
           .post('/otp/generate', formData)
@@ -125,7 +162,7 @@ class Otp extends Component {
         //formData.append('policy_holder_id', localStorage.getItem('policyHolder_id'));
         //formData.append("menumaster_id", '2');
         let post_data_obj = {
-          'policy_holder_id':localStorage.getItem('policyHolder_id'),
+          'policy_holder_id':localStorage.getItem("policyHolder_id"),
           'menumaster_id':'2'
         }
         let encryption = new Encryption();
@@ -180,6 +217,12 @@ class Otp extends Component {
                     // validationSchema={validateNominee}
                     >
                     {({ values, errors, setFieldValue, setFieldTouched, isValid, isSubmitting, touched }) => {
+                      console.log(values);
+                      this.state.disable = true;
+                      if(values.otp1 !="" && values.otp2 !="" && values.otp3 !="" && values.otp4 !="" && values.otp5 !="")
+                      {
+                       this.state.disable = false;
+                      }
 
                     return (
                     <Form>
@@ -199,10 +242,13 @@ class Otp extends Component {
                                         value = {values.otp1}
                                         onFocus={e => this.changePlaceHoldClassAdd(e)}
                                         onBlur={e => this.changePlaceHoldClassRemove(e)}
-                                        maxLength="1"
+                                       
                                         onChange={(e) => {
                                                 setFieldValue('otp1', e.target.value);  
                                         }}
+                                        onKeyPress={this.keyPressed}
+                                        tabindex="1" maxlength="1" onKeyUp={e=>this.toUnicode(e,e.target.value)}
+                                        
                                     />
                                 </div>
                                 <div className="mr-1 ml-1">
@@ -214,10 +260,12 @@ class Otp extends Component {
                                         value = {values.otp2}
                                         onFocus={e => this.changePlaceHoldClassAdd(e)}
                                         onBlur={e => this.changePlaceHoldClassRemove(e)}
-                                        maxLength="1"
+                                      
                                         onChange={(e) => {
                                             setFieldValue('otp2', e.target.value);  
                                     }}
+                                    tabindex="2" maxlength="1" onKeyUp={e=>this.toUnicode(e,e.target.value)}
+                                    
                                     />
                                 </div>
                                 <div className="mr-1 ml-1">
@@ -229,10 +277,13 @@ class Otp extends Component {
                                         value = {values.otp3}
                                         onFocus={e => this.changePlaceHoldClassAdd(e)}
                                         onBlur={e => this.changePlaceHoldClassRemove(e)}
-                                        maxLength="1"
+                                       
                                         onChange={(e) => {
-                                            setFieldValue('otp3', e.target.value);  
+                                            setFieldValue('otp3', e.target.value); 
+                                             
                                     }}
+                                    tabindex="3" maxlength="1" onKeyUp={e=>this.toUnicode(e,e.target.value)}
+                                    
                                     />
                                 </div>
                                 <div className="mr-1 ml-1">
@@ -244,10 +295,12 @@ class Otp extends Component {
                                         value = {values.otp4}
                                         onFocus={e => this.changePlaceHoldClassAdd(e)}
                                         onBlur={e => this.changePlaceHoldClassRemove(e)}
-                                        maxLength="1"
+                                       
                                         onChange={(e) => {
                                             setFieldValue('otp4', e.target.value);  
                                     }}
+                                    tabindex="4" maxlength="1" onKeyUp={e=>this.toUnicode(e,e.target.value)}
+                                    
                                     />
                                 </div>
                                 <div className="mr-1 ml-1">
@@ -259,10 +312,12 @@ class Otp extends Component {
                                         value = {values.otp5}
                                         onFocus={e => this.changePlaceHoldClassAdd(e)}
                                         onBlur={e => this.changePlaceHoldClassRemove(e)}
-                                        maxLength="1"
+                                       
                                         onChange={(e) => {
                                             setFieldValue('otp5', e.target.value);  
                                     }}
+                                    tabindex="5" maxlength="1" onKeyUp={e=>this.toUnicode(e,e.target.value)}
+                                    
                                     />
                                 </div>
                             </div>
@@ -279,7 +334,7 @@ class Otp extends Component {
                             Resend OTP
                             </Button>
 
-                            <Button className={`proceedBtn`} type="submit" >
+                            <Button className={`proceedBtn`} type="submit" disabled = {this.state.disable?true:false}>
                                 {isSubmitting ? 'Wait..' : 'Continue'}                            
                             </Button> 
                             </div>

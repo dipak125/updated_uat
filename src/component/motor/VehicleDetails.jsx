@@ -15,12 +15,17 @@ import moment from "moment";
 import Encryption from '../../shared/payload-encryption';
 import {  PersonAge } from "../../shared/dateFunctions";
 import Autosuggest from 'react-autosuggest';
+import { addDays } from 'date-fns';
+import {
+    checkGreaterTimes,
+    checkGreaterStartEndTimes
+  } from "../../shared/validationFunctions";
 
 const ageObj = new PersonAge();
 
 const initialValue = {
     registration_date: "",
-    registration_city:"",
+    location_id:"",
     previous_is_claim:"",
     previous_city:"",
     insurance_company_id:"",
@@ -32,7 +37,7 @@ const initialValue = {
 }
 const vehicleRegistrationValidation = Yup.object().shape({
     registration_date: Yup.string().required('Registration date is required'),
-    registration_city:Yup.string().required('Registration city is required'),
+    location_id:Yup.string().required('Registration city is required'),
 
     previous_start_date:Yup.date()
     .notRequired('Previous Start date is required')
@@ -48,6 +53,24 @@ const vehicleRegistrationValidation = Yup.object().shape({
             }
             return true;
         }
+    ).test(
+        "checkGreaterTimes",
+        "Start date must be less than end date",
+        function (value) {
+            if (value) {
+                return checkGreaterStartEndTimes(value, this.parent.previous_end_date);
+            }
+            return true;
+        }
+    ).test(
+      "checkStartDate",
+      "Enter Start Date",
+      function (value) {       
+          if ( this.parent.previous_end_date != undefined && value == undefined) {
+              return false;
+          }
+          return true;
+      }
     ),
     previous_end_date:Yup.date()
     .notRequired('Previous end date is required')
@@ -63,6 +86,24 @@ const vehicleRegistrationValidation = Yup.object().shape({
             }
             return true;
         }
+    ).test( 
+        "checkGreaterTimes",
+        "End date must be greater than start date",
+        function (value) {
+            if (value) {
+                return checkGreaterTimes(value, this.parent.previous_start_date);
+            }
+            return true;
+        }
+        ).test(
+        "checkEndDate",
+        "Enter End Date",
+        function (value) {     
+            if ( this.parent.previous_start_date != undefined && value == undefined) {
+                return false;
+            }
+            return true;
+        }
     ),
     previous_policy_name:Yup.string()
     .notRequired('Policy name is required')
@@ -73,7 +114,7 @@ const vehicleRegistrationValidation = Yup.object().shape({
         },
         function (value) {
             const ageObj = new PersonAge();
-            if (ageObj.whatIsCurrentMonth(this.parent.registration_date) > 0 && !value) {   
+            if (ageObj.whatIsCurrentMonth(this.parent.registration_date) > 6 && !value) {   
                 return false;    
             }
             return true;
@@ -217,7 +258,7 @@ class VehicleDetails extends Component {
     }  
     const regex = new RegExp('^' + escapedValue, 'i');
     if(this.state.customerDetails) {
-      return this.state.customerDetails.filter(language => regex.test(language.CITY_NM));
+      return this.state.customerDetails.filter(language => regex.test(language.RTO_LOCATION));
     }
     else return 0;
     
@@ -233,18 +274,20 @@ class VehicleDetails extends Component {
     this.setState({
       selectedCustomerRecords: suggestion
     });
-    return suggestion.CITY_NM;
+    return suggestion.RTO_LOCATION;
   }
   
    renderCustomerIDSuggestion(suggestion) {
     return (
-      <span>{suggestion.CITY_NM}</span>
+      <span>{suggestion.RTO_LOCATION}</span>
     );
   }
   //--------------------------------------------------------
 
     handleSubmit = (values, actions) => {
         const {productId} = this.props.match.params 
+        values.previous_policy_name ? localStorage.setItem('policy_type', values.previous_policy_name) 
+        : localStorage.setItem('policy_type', 6)
         const formData = new FormData(); 
         let encryption = new Encryption();
         let post_data = {}
@@ -253,10 +296,10 @@ class VehicleDetails extends Component {
                 'policy_holder_id':localStorage.getItem('policyHolder_id'),
                 'menumaster_id':1,
                 'registration_date':moment(values.registration_date).format("YYYY-MM-DD"),
-                'registration_city':values.registration_city,
+                'location_id':values.location_id,
                 'previous_start_date':moment(values.previous_start_date).format("YYYY-MM-DD"),
                 'previous_end_date':moment(values.previous_end_date).format("YYYY-MM-DD"),
-                'previous_policy_name':values.previous_policy_name,
+                'previous_policy_name':localStorage.getItem('policy_type'),
                 'insurance_company_id':values.insurance_company_id,
                 'previous_city':'11',
                 'previous_is_claim':values.previous_is_claim,
@@ -270,7 +313,7 @@ class VehicleDetails extends Component {
                 'policy_holder_id':localStorage.getItem('policyHolder_id'),
                 'menumaster_id':1,
                 'registration_date':moment(values.registration_date).format("YYYY-MM-DD"),
-                'registration_city':values.registration_city,    
+                'location_id':values.location_id,    
                 'previous_is_claim':'0', 
             } 
         }
@@ -314,7 +357,7 @@ class VehicleDetails extends Component {
     }
 
     getAllAddress() {
-        axios.get('city-list')
+        axios.get('location-list ')
           .then(res => {
             this.setState({
               customerDetails: res.data.data
@@ -347,6 +390,16 @@ class VehicleDetails extends Component {
             })
     }
 
+    handleChange =(value) => {
+        let endDate = moment(value).add(1, 'years').format("YYYY-MM-DD")
+        this.setState({
+            EndDate: endDate,
+            endDateFlag: true,
+            serverResponse: [],
+            error: []
+        }) 
+    }
+
     componentDidMount() {
         this.getInsurerList();
         this.fetchData();
@@ -360,7 +413,7 @@ class VehicleDetails extends Component {
 
         let newInitialValues = Object.assign(initialValue, {
             registration_date: motorInsurance && motorInsurance.registration_date ? new Date(motorInsurance.registration_date) : "",
-            registration_city:  motorInsurance && motorInsurance.registration_city ? motorInsurance.registration_city : "",
+            location_id:  motorInsurance && motorInsurance.location_id ? motorInsurance.location_id : "",
             previous_start_date: previousPolicy && previousPolicy.start_date ? new Date(previousPolicy.start_date) : "",
             previous_end_date: previousPolicy && previousPolicy.end_date ? new Date(previousPolicy.end_date) : "",
             // previous_policy_name: previousPolicy && previousPolicy.insurancecompany.ty ? previousPolicy.insurancecompany.ty : "",
@@ -430,8 +483,8 @@ console.log("newInitialValues", newInitialValues)
                                                                 className="datePckr inputfs12"
                                                                 selected={values.registration_date}
                                                                 onChange={(val) => {
-                                                                    setFieldTouched('registration_date');
-                                                                    setFieldValue('registration_date', val);
+                                                                    setFieldTouched('previous_policy_name');
+                                                                    setFieldValue('registration_date', val); 
                                                                 }}
                                                                 
                                                             />
@@ -462,22 +515,12 @@ console.log("newInitialValues", newInitialValues)
                                                                 renderSuggestion={this.renderCustomerIDSuggestion}
                                                                 inputProps={inputCustomerID} 
                                                                 onSuggestionSelected={(e, {suggestion,suggestionValue}) => {
-                                                                        setFieldValue("registration_city", suggestion.id)
-                                                                        setFieldTouched('registration_city')
+                                                                        setFieldValue("location_id", suggestion.id)
+                                                                        setFieldTouched('location_id')
                                                                     }}
                                                                 />
-                                                                {/* <Field
-                                                                    name="registration_city"
-                                                                    type="text"
-                                                                    placeholder="Registration City"
-                                                                    autoComplete="off"
-                                                                    onFocus={e => this.changePlaceHoldClassAdd(e)}
-                                                                    onBlur={e => this.changePlaceHoldClassRemove(e)}
-                                                                    value={values.registration_city}
-                                                                    
-                                                                /> */}
-                                                                {errors.registration_city && touched.registration_city ? (
-                                                                    <span className="errorMsg">{errors.registration_city}</span>
+                                                                {errors.location_id && touched.location_id ? (
+                                                                    <span className="errorMsg">{errors.location_id}</span>
                                                                 ) : null}
                                                             </div>
                                                         </FormGroup>
@@ -501,7 +544,7 @@ console.log("newInitialValues", newInitialValues)
 
                                                             <DatePicker
                                                                 name="previous_start_date"
-                                                                minDate={new Date('1/1/1900')}
+                                                                minDate={new Date('2019-01-01')}
                                                                 maxDate={new Date()}
                                                                 dateFormat="dd MMM yyyy"
                                                                 placeholderText="Previous policy start date"
@@ -513,8 +556,8 @@ console.log("newInitialValues", newInitialValues)
                                                                 className="datePckr inputfs12"
                                                                 selected={values.previous_start_date}
                                                                 onChange={(val) => {
-                                                                    setFieldTouched('previous_start_date');
                                                                     setFieldValue('previous_start_date', val);
+                                                                    setFieldValue("previous_end_date", addDays(new Date(val), 365));
                                                                 }}
                                                             />
                                                             {errors.previous_start_date && touched.previous_start_date ? (
@@ -529,10 +572,7 @@ console.log("newInitialValues", newInitialValues)
                                                                 name="previous_end_date"
                                                                 dateFormat="dd MMM yyyy"
                                                                 placeholderText="Previous policy end date"
-                                                                peekPreviousMonth
-                                                                peekPreviousYear
-                                                                showMonthDropdown
-                                                                showYearDropdown
+                                                                disabled = {true}
                                                                 dropdownMode="select"
                                                                 className="datePckr inputfs12"
                                                                 selected={values.previous_end_date}
@@ -554,11 +594,13 @@ console.log("newInitialValues", newInitialValues)
                                                                     component="select"
                                                                     autoComplete="off"
                                                                     className="formGrp inputfs12"
-                                                                    value={values.previous_policy_name}
+                                                                    value={ageObj.whatIsCurrentMonth(values.registration_date) < 7 ? 6 : values.previous_policy_name}
+                                                                    disabled = {ageObj.whatIsCurrentMonth(values.registration_date) < 7 ? true : false}
                                                                 >
                                                                     <option value="">Select Policy Type</option>
-                                                                    <option value="2">Liability Policy</option>
-                                                                    <option value="1">Package Policy</option>
+                                                                    <option value="1">Package</option>
+                                                                    <option value="2">Liability Only</option>  
+                                                                    <option value="6" > Bundled Product</option>
                                                                 </Field>
                                                                 {errors.previous_policy_name && touched.previous_policy_name ? (
                                                                     <span className="errorMsg">{errors.previous_policy_name}</span>

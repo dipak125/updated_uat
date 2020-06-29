@@ -104,7 +104,7 @@ export class PersonAge {
         }
         else{
             if(age > 0){ 
-                ageMonth = 3 
+                ageMonth = 11 
             }
         }
         return ageMonth;
