@@ -22,6 +22,8 @@ import {
   } from "../../shared/validationFunctions";
 
 const ageObj = new PersonAge();
+const minDate = moment(moment().subtract(1, 'years').calendar()).add(1, 'day').calendar();
+const minRegnDate = moment().subtract(18, 'years').calendar();
 
 const initialValue = {
     registration_date: "",
@@ -471,7 +473,7 @@ console.log("newInitialValues", newInitialValues)
                                                         <FormGroup>
                                                             <DatePicker
                                                                 name="registration_date"
-                                                                minDate={new Date('1/1/1900')}
+                                                                minDate={new Date(minRegnDate)}
                                                                 maxDate={new Date()}
                                                                 dateFormat="dd MMM yyyy"
                                                                 placeholderText="Registration Date"
@@ -515,8 +517,8 @@ console.log("newInitialValues", newInitialValues)
                                                                 renderSuggestion={this.renderCustomerIDSuggestion}
                                                                 inputProps={inputCustomerID} 
                                                                 onSuggestionSelected={(e, {suggestion,suggestionValue}) => {
-                                                                        setFieldValue("location_id", suggestion.id)
-                                                                        setFieldTouched('location_id')
+                                                                    setFieldTouched('location_id')
+                                                                    setFieldValue("location_id", suggestion.id)    
                                                                     }}
                                                                 />
                                                                 {errors.location_id && touched.location_id ? (
@@ -544,7 +546,7 @@ console.log("newInitialValues", newInitialValues)
 
                                                             <DatePicker
                                                                 name="previous_start_date"
-                                                                minDate={new Date('2019-01-01')}
+                                                                minDate={new Date(minDate)}
                                                                 maxDate={new Date()}
                                                                 dateFormat="dd MMM yyyy"
                                                                 placeholderText="Previous policy start date"

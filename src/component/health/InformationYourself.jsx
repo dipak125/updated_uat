@@ -200,6 +200,45 @@ const validateFamilyMembers  = Yup.object().shape({
                     return true;
                 }   
             }
+        ).test(
+            "greaterAgeDiffChecking",
+            function() {
+                return "Child age should be less than self"
+            },
+            function (value) {
+                if(typeof this.parent.dob_0 != 'undefined'){
+                    var ageDiff = Math.floor(moment(value).diff(this.parent.dob_0, 'years', true));
+                    if (ageDiff < 0 ) {   
+                        return false;    
+                    }
+                    else{
+                        return true;
+                    }                    
+                }
+                else{
+                    return true;
+                }
+            }
+        )
+        .test(
+            "greaterAgeDiffChecking",
+            function() {
+                return "Child age should be less than spouse"
+            },
+            function (value) {
+                if(typeof this.parent.dob_1 != 'undefined'){
+                    var ageDiff = Math.floor(moment(value).diff(this.parent.dob_1, 'years', true));
+                    if (ageDiff < 0 ) {   
+                        return false;    
+                    }
+                    else{
+                        return true;
+                    }                    
+                }
+                else{
+                    return true;
+                }
+            }
         ),
         
         othewise: Yup.string()
@@ -260,6 +299,45 @@ const validateFamilyMembers  = Yup.object().shape({
                     return true;
                 }   
             }
+        ).test(
+            "greaterAgeDiffChecking",
+            function() {
+                return "Child age should be less than self"
+            },
+            function (value) {
+                if(typeof this.parent.dob_0 != 'undefined'){
+                    var ageDiff = Math.floor(moment(value).diff(this.parent.dob_0, 'years', true));
+                    if (ageDiff < 0 ) {   
+                        return false;    
+                    }
+                    else{
+                        return true;
+                    }                    
+                }
+                else{
+                    return true;
+                }
+            }
+        )
+        .test(
+            "greaterAgeDiffChecking",
+            function() {
+                return "Child age should be less than spouse"
+            },
+            function (value) {
+                if(typeof this.parent.dob_1 != 'undefined'){
+                    var ageDiff = Math.floor(moment(value).diff(this.parent.dob_1, 'years', true));
+                    if (ageDiff < 0 ) {   
+                        return false;    
+                    }
+                    else{
+                        return true;
+                    }                    
+                }
+                else{
+                    return true;
+                }
+            }
         ),
         othewise: Yup.string()
     }),
@@ -319,6 +397,45 @@ const validateFamilyMembers  = Yup.object().shape({
                     return true;
                 }   
             }
+        ).test(
+            "greaterAgeDiffChecking",
+            function() {
+                return "Child age should be less than self"
+            },
+            function (value) {
+                if(typeof this.parent.dob_0 != 'undefined'){
+                    var ageDiff = Math.floor(moment(value).diff(this.parent.dob_0, 'years', true));
+                    if (ageDiff < 0 ) {   
+                        return false;    
+                    }
+                    else{
+                        return true;
+                    }                    
+                }
+                else{
+                    return true;
+                }
+            }
+        )
+        .test(
+            "greaterAgeDiffChecking",
+            function() {
+                return "Child age should be less than spouse"
+            },
+            function (value) {
+                if(typeof this.parent.dob_1 != 'undefined'){
+                    var ageDiff = Math.floor(moment(value).diff(this.parent.dob_1, 'years', true));
+                    if (ageDiff < 0 ) {   
+                        return false;    
+                    }
+                    else{
+                        return true;
+                    }                    
+                }
+                else{
+                    return true;
+                }
+            }
         ),
         othewise: Yup.string()
     }),
@@ -367,6 +484,45 @@ const validateFamilyMembers  = Yup.object().shape({
                 }
                 return true;
             }
+        ).test(
+            "greaterAgeDiffChecking",
+            function() {
+                return "Father age should be greater than self"
+            },
+            function (value) {
+                if(typeof this.parent.dob_0 != 'undefined'){
+                    var ageDiff = Math.floor(moment(value).diff(this.parent.dob_0, 'years', true));
+                    if (ageDiff > 0 ) {   
+                        return false;    
+                    }
+                    else{
+                        return true;
+                    }                    
+                }
+                else{
+                    return true;
+                }
+            }
+        )
+        .test(
+            "greaterAgeDiffChecking",
+            function() {
+                return "Father age should be greater than spouse"
+            },
+            function (value) {
+                if(typeof this.parent.dob_1 != 'undefined'){
+                    var ageDiff = Math.floor(moment(value).diff(this.parent.dob_1, 'years', true));
+                    if (ageDiff > 0 ) {   
+                        return false;    
+                    }
+                    else{
+                        return true;
+                    }                    
+                }
+                else{
+                    return true;
+                }
+            }
         ),
         othewise: Yup.string()
     }),
@@ -409,6 +565,45 @@ const validateFamilyMembers  = Yup.object().shape({
                     return false;    
                 }
                 return true;
+            }
+        ).test(
+            "greaterAgeDiffChecking",
+            function() {
+                return "Mother age should be greater than self"
+            },
+            function (value) {
+                if(typeof this.parent.dob_0 != 'undefined'){
+                    var ageDiff = Math.floor(moment(value).diff(this.parent.dob_0, 'years', true));
+                    if (ageDiff > 0 ) {   
+                        return false;    
+                    }
+                    else{
+                        return true;
+                    }                    
+                }
+                else{
+                    return true;
+                }
+            }
+        )
+        .test(
+            "greaterAgeDiffChecking",
+            function() {
+                return "Mother age should be greater than spouse"
+            },
+            function (value) {
+                if(typeof this.parent.dob_1 != 'undefined'){
+                    var ageDiff = Math.floor(moment(value).diff(this.parent.dob_1, 'years', true));
+                    if (ageDiff > 0 ) {   
+                        return false;    
+                    }
+                    else{
+                        return true;
+                    }                    
+                }
+                else{
+                    return true;
+                }
             }
         ),
         othewise: Yup.string()
@@ -453,6 +648,45 @@ const validateFamilyMembers  = Yup.object().shape({
                 }
                 return true;
             }
+        ).test(
+            "greaterAgeDiffChecking",
+            function() {
+                return "Father-in-law age should be greater than self"
+            },
+            function (value) {
+                if(typeof this.parent.dob_0 != 'undefined'){
+                    var ageDiff = Math.floor(moment(value).diff(this.parent.dob_0, 'years', true));
+                    if (ageDiff > 0 ) {   
+                        return false;    
+                    }
+                    else{
+                        return true;
+                    }                    
+                }
+                else{
+                    return true;
+                }
+            }
+        )
+        .test(
+            "greaterAgeDiffChecking",
+            function() {
+                return "Father-in-law age should be greater than spouse"
+            },
+            function (value) {
+                if(typeof this.parent.dob_1 != 'undefined'){
+                    var ageDiff = Math.floor(moment(value).diff(this.parent.dob_1, 'years', true));
+                    if (ageDiff > 0 ) {   
+                        return false;    
+                    }
+                    else{
+                        return true;
+                    }                    
+                }
+                else{
+                    return true;
+                }
+            }
         ),
         othewise: Yup.string()
     }),
@@ -494,6 +728,45 @@ const validateFamilyMembers  = Yup.object().shape({
                     return false;    
                 }
                 return true;
+            }
+        ).test(
+            "greaterAgeDiffChecking",
+            function() {
+                return "Mother-in-law age should be greater than self"
+            },
+            function (value) {
+                if(typeof this.parent.dob_0 != 'undefined'){
+                    var ageDiff = Math.floor(moment(value).diff(this.parent.dob_0, 'years', true));
+                    if (ageDiff > 0 ) {   
+                        return false;    
+                    }
+                    else{
+                        return true;
+                    }                    
+                }
+                else{
+                    return true;
+                }
+            }
+        )
+        .test(
+            "greaterAgeDiffChecking",
+            function() {
+                return "Mother-in-law age should be greater than spouse"
+            },
+            function (value) {
+                if(typeof this.parent.dob_1 != 'undefined'){
+                    var ageDiff = Math.floor(moment(value).diff(this.parent.dob_1, 'years', true));
+                    if (ageDiff > 0 ) {   
+                        return false;    
+                    }
+                    else{
+                        return true;
+                    }                    
+                }
+                else{
+                    return true;
+                }
             }
         ),
         othewise: Yup.string()

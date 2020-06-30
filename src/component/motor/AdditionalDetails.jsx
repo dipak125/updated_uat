@@ -13,7 +13,14 @@ import { loaderStart, loaderStop } from "../../store/actions/loader";
 import { connect } from "react-redux";
 import axios from "../../shared/axios"
 import moment from "moment";
+import {  PersonAge } from "../../shared/dateFunctions";
 import Encryption from '../../shared/payload-encryption';
+
+
+const minDobAdult = moment(moment().subtract(111, 'years').calendar()).add(1, 'day').calendar()
+const maxDobAdult = moment().subtract(18, 'years').calendar();
+const minDobNominee = moment(moment().subtract(111, 'years').calendar()).add(1, 'day').calendar()
+const maxDobNominee = moment().subtract(3, 'months').calendar();
 
 const initialValue = {
     first_name:"",
@@ -41,11 +48,41 @@ const initialValue = {
 }
 
 const ownerValidation = Yup.object().shape({
-    first_name: Yup.string().required('Name is required'),
+    first_name: Yup.string().required('Name is required')
+        .min(3, function() {
+            return "Name must be minimum 3 chracters"
+        })
+        .max(40, function() {
+            return "Name must be maximum 40 chracters"
+        })
+        .matches(/^[A-Za-z][A-Za-z\s]*$/, function() {
+            return "Please enter valid name"
+        }),
     // last_name:Yup.string().required('Last name is required'),
-    gender: Yup.string().required('Gender is required'),
-    dob:Yup.date().required('Date of birth is required'),
-    pancard: Yup.string().required('Pancard is required'),
+    gender: Yup.string().required('Gender is required')
+    .matches(/^[MmFf]$/, function() {
+        return "Please select valid gender"
+    }),
+    dob:Yup.date().required('Date of birth is required')
+    .test(
+        "18YearsChecking",
+        function() {
+            return "Age should me minium 18 years"
+        },
+        function (value) {
+            if (value) {
+                const ageObj = new PersonAge();
+                return ageObj.whatIsMyAge(value) < 111 && ageObj.whatIsMyAge(value) >= 18;
+            }
+            return true;
+        }
+    ),
+    pancard: Yup.string()
+    .required(function() {
+        return "Enter PAN number"
+    }).matches(/^[A-Z]{3}[CPHFATBLJG]{1}[A-Z]{1}[0-9]{4}[A-Z]{1}$/, function() {
+        return "Please enter valid Pan Number"
+    }),
     location:Yup.string().required('Location is required'),
     // district: Yup.string().required('District is required'),
     pincode:Yup.string().required('Pincode is required'),
@@ -82,10 +119,35 @@ const ownerValidation = Yup.object().shape({
     ),
 
     nominee_relation_with:Yup.string().required('Nominee relation is required'),
-    nominee_first_name: Yup.string().required('Nominee name is required'),
+    nominee_first_name: Yup.string().required('Nominee name is required')
+        .min(3, function() {
+            return "Name must be minimum 3 chracters"
+        })
+        .max(40, function() {
+            return "Name must be maximum 40 chracters"
+        })
+        .matches(/^[A-Za-z][A-Za-z\s]*$/, function() {
+            return "Please enter valid name"
+        }),
     // nominee_last_name:Yup.string().required('Nominee last name is required'), 
-    nominee_gender: Yup.string().required('Nominee gender is required'),
-    nominee_dob:Yup.string().required('Nominee DOB is required'),
+    nominee_gender: Yup.string().required('Nominee gender is required')
+        .matches(/^[MmFf]$/, function() {
+            return "Please select valid gender"
+    }),
+    nominee_dob:Yup.date().required('Nominee DOB is required')
+        .test(
+        "3monthsChecking",
+        function() {
+            return "Age should be minium 3 months"
+        },
+        function (value) {
+            if (value) {
+                const ageObj = new PersonAge();
+                return ageObj.whatIsMyAge(value) < 111 && ageObj.whatIsMyAgeMonth(value) >=3;
+            }
+            return true;
+        }
+    ),
    
     eIA: Yup.string().required('This field is required'),
 })
@@ -100,7 +162,8 @@ class AdditionalDetails extends Component {
         is_loan_account: '',
         insurerList: [],
         policyHolder: {},
-        nomineeDetails: {}
+        nomineeDetails: {},
+        quoteId: ""
     };
     
 
@@ -204,8 +267,9 @@ console.log('post_data', post_data);
                  let policyHolder = res.data.data.policyHolder ? res.data.data.policyHolder : {};
                  let nomineeDetails = res.data.data.policyHolder ? res.data.data.policyHolder.request_data.nominee[0] : {}
                  let is_loan_account = res.data.data.policyHolder ? res.data.data.policyHolder.is_carloan : 0
+                 let quoteId = res.data.data.policyHolder ? res.data.data.policyHolder.request_data.quote_id : ""
                 this.setState({
-                    motorInsurance, previousPolicy, vehicleDetails, policyHolder, nomineeDetails, is_loan_account
+                    quoteId, motorInsurance, previousPolicy, vehicleDetails, policyHolder, nomineeDetails, is_loan_account
                 })
                 this.props.loadingStop();
             })
@@ -254,7 +318,7 @@ console.log('post_data', post_data);
    
 
     render() {
-        const {showEIA, is_eia_account, showLoan, is_loan_account, nomineeDetails, policyHolder, stateName, pinDataArr} = this.state
+        const {showEIA, is_eia_account, showLoan, is_loan_account, nomineeDetails, policyHolder, stateName, pinDataArr, quoteId} = this.state
         const {productId} = this.props.match.params 
 
         let newInitialValues = Object.assign(initialValue, {
@@ -279,6 +343,11 @@ console.log('post_data', post_data);
 
         });
 
+        const quoteNumber =
+        quoteId ? (
+            <h4>You are just one steps away in getting your policy ready and your Quotation Number: {quoteId}. Please share a few more details. </h4>
+        ) : null;
+
         return (
             <>
                 <BaseComponent>
@@ -293,7 +362,7 @@ console.log('post_data', post_data);
                     <div className="brand-bg">
                         <div className="d-flex justify-content-left">
                             <div className="brandhead m-b-10">
-                                <h4>You are just few steps away in getting your policy ready. Please share a few more details. </h4>
+                                {quoteNumber}
                             </div>
                         </div>
 
@@ -448,8 +517,8 @@ console.log('post_data', post_data);
                                             showMonthDropdown
                                             showYearDropdown
                                             dropdownMode="select"
-                                            maxDate={new Date()}
-                                            minDate={new Date(1/1/1900)}
+                                            maxDate={new Date(maxDobAdult)}
+                                            minDate={new Date(minDobAdult)}
                                             className="datePckr"
                                             selected={values.dob}
                                             onChange={(val) => {
@@ -668,8 +737,8 @@ console.log('post_data', post_data);
                                             showMonthDropdown
                                             showYearDropdown
                                             dropdownMode="select"
-                                            maxDate={new Date()}
-                                            minDate={new Date(1/1/1900)}
+                                            maxDate={new Date(maxDobNominee)}
+                                            minDate={new Date(minDobNominee)}
                                             className="datePckr"
                                             selected={values.nominee_dob}
                                             onChange={(val) => {

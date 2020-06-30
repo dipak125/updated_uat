@@ -15,19 +15,62 @@ import { connect } from "react-redux";
 import axios from "../../shared/axios"
 import Encryption from '../../shared/payload-encryption';
 import * as Yup from "yup";
+import swal from 'sweetalert';
 
 
 const initialValue = {}
 const ComprehensiveValidation = Yup.object().shape({
     // is_carloan: Yup.number().required('Please select one option')
-    chasis_no_last_part:Yup.string().required('This field is required'),
-    engine_no:Yup.string().required('Engine no is required'),
-    chasis_no:Yup.string().required('Chasis no is required'),
-    cng_kit:Yup.number().required('please checked an option'),
+
+    chasis_no_last_part:Yup.string().required('This field is required')
+    .matches(/^([0-9]*)$/, function() {
+        return "Invalid number"
+    })
+    .min(5, function() {
+        return "Chasis no. should be last 5 digit"
+    })
+    .max(5, function() {
+        return "Chasis no. should be last 5 digit"
+    }),
+
+    engine_no:Yup.string().required('Engine no is required')
+    .matches(/^([A-z]{2}[A-z0-9]{5,16})$/, function() {
+        return "Invalid engine number"
+    })
+    .min(7, function() {
+        return "Engine no. should be minimum 7 characters"
+    })
+    .max(18, function() {
+        return "Engine no. should be maximum 18 characters"
+    }),
+
+    chasis_no:Yup.string().required('Chasis no is required')
+    .matches(/^([A-z]{2}[A-z0-9]{5,16})$/, function() {
+        return "Invalid chasis number"
+    })
+    .min(7, function() {
+        return "Chasis no. should be minimum 7 characters"
+    })
+    .max(18, function() {
+        return "Chasis no. should be maximum 18 characters"
+    }),
+    cng_kit:Yup.number().required('Please select an option'),
     // IDV:Yup.number().required('Declared value is required'),
     
    
-    // eIA:Yup.number().required('Please select one option')
+    vahanVerify:Yup.boolean().notRequired('Please verify chasis number')
+    .test(
+        "vahanVerifyChecking",
+        function() {
+            return "Please verify chasis number"
+        },
+        function (value) {
+            if (value == false && this.parent.chasis_no_last_part && this.parent.chasis_no_last_part.length == 5) {  
+                return false;
+            }
+            return true;
+        }
+    )
    
 });
 
@@ -61,8 +104,8 @@ const moreCoverage = [
 
 const Coverage = {
         "C101064":"Own Damage",
-        "C101065":"3rd party liability",
-        "C101066":"Personal Accident cover",
+        "C101065":"Legal Liability to Third Party",
+        "C101066":"PA Cover",
         "C101069":"Basic Road Side Assistance",
         "C101072":"Depreciation Reimbursement",
         "C101067":"Return to Invoice",
@@ -113,17 +156,26 @@ class OtherComprehensive extends Component {
         this.setState({ show: true });
     }
 
+    handleChange = () => {
+        console.log('handleChange')
+        this.setState({serverResponse: [], error: [] });
+    }
+
     showCNGText = (value) =>{
         if(value == 1){
             this.setState({
                 showCNG:true,
-                is_CNG_account:1
+                is_CNG_account:1,
+                serverResponse: [],
+                error: []
             })
         }
         else{
             this.setState({
                 showCNG:false,
-                is_CNG_account:0
+                is_CNG_account:0,
+                serverResponse: [],
+                error: []
             })
         }
     }
@@ -148,13 +200,14 @@ class OtherComprehensive extends Component {
         axios.get(`policy-holder/motor/${policyHolder_id}`)
             .then(res => {
                 let motorInsurance = res.data.data.policyHolder ? res.data.data.policyHolder.motorinsurance : {}
-                
+                let values = []
                 this.setState({
                     motorInsurance,
+                    showCNG: motorInsurance.cng_kit ? true : false,
                     vahanVerify: motorInsurance.chasis_no && motorInsurance.engine_no ? true : false
                 })
                 this.props.loadingStop();
-                this.getAccessToken()
+                this.getAccessToken(values)
             })
             .catch(err => {
                 // handle error
@@ -162,7 +215,7 @@ class OtherComprehensive extends Component {
             })
     }
 
-    getAccessToken = () => {
+    getAccessToken = (values) => {
         this.props.loadingStart();
         axios
           .post(`/callTokenService`)
@@ -170,7 +223,7 @@ class OtherComprehensive extends Component {
             this.setState({
               accessToken: res.data.access_token,
             });
-            this.fullQuote(res.data.access_token)
+            this.fullQuote(res.data.access_token, values)
           })
           .catch((err) => {
             this.setState({
@@ -180,7 +233,8 @@ class OtherComprehensive extends Component {
           });
       };
 
-    getVahanDetails = (chasiNo, regnNo) => {
+    getVahanDetails = (chasiNo, regnNo, setFieldTouched, setFieldValue) => {
+       
         const formData = new FormData();
         formData.append("chasiNo", chasiNo);
         formData.append("regnNo", regnNo);
@@ -193,6 +247,12 @@ class OtherComprehensive extends Component {
               vahanDetails: res.data,
               vahanVerify: res.data.length > 0 ? true : false
             });
+
+            setFieldTouched('vahanVerify')
+            res.data.length > 0 ?
+            setFieldValue('vahanVerify', true) 
+            : setFieldValue('vahanVerify', false)
+
             this.props.loadingStop();
           })
           .catch((err) => {
@@ -203,8 +263,14 @@ class OtherComprehensive extends Component {
           });
     };
 
-    fullQuote = (access_token) => {
+    fullQuote = (access_token, values) => {
         const { PolicyArray, sliderVal, add_more_coverage } = this.state
+        let cng_kit_flag = 0;
+        let cngKit_Cost = 0;
+        if(values.toString()) {            
+            cng_kit_flag = values.cng_kit
+            cngKit_Cost = values.cngKit_Cost
+        }
         let defaultSliderValue = PolicyArray.length > 0 ? Math.floor(PolicyArray[0].PolicyRiskList[0].IDV_Suggested) : 0
         const formData = new FormData();
         formData.append("access_token", access_token);
@@ -213,6 +279,8 @@ class OtherComprehensive extends Component {
         formData.append("idv_value", sliderVal ? sliderVal : defaultSliderValue.toString());
         formData.append("policy_type", localStorage.getItem('policy_type'));
         formData.append("add_more_coverage", add_more_coverage);
+        formData.append("cng_kit", cng_kit_flag);
+        formData.append("cngKit_Cost", cngKit_Cost);
 
         // const post_data = {
         //     'id':localStorage.getItem('policyHolder_id'),
@@ -252,6 +320,7 @@ class OtherComprehensive extends Component {
         const { productId } = this.props.match.params
         const { motorInsurance, PolicyArray, sliderVal, add_more_coverage } = this.state
         let defaultSliderValue = PolicyArray.length > 0 ? Math.floor(PolicyArray[0].PolicyRiskList[0].IDV_Suggested) : 0
+
         const formData = new FormData();
         let encryption = new Encryption();
         let post_data = {}
@@ -263,7 +332,7 @@ class OtherComprehensive extends Component {
                 'chasis_no': values.chasis_no,
                 'chasis_no_last_part': values.chasis_no_last_part,
                 'cng_kit': values.cng_kit,
-                'cngKit_Cost': values.cngKit_Cost,
+                'cngkit_cost': values.cngKit_Cost,
                 'engine_no': values.engine_no,
                 'idv_value': sliderVal ? sliderVal : defaultSliderValue.toString(),
                 'add_more_coverage': add_more_coverage
@@ -277,7 +346,7 @@ class OtherComprehensive extends Component {
                 'chasis_no': values.chasis_no,
                 'chasis_no_last_part': values.chasis_no_last_part,
                 'cng_kit': values.cng_kit,
-                'cngKit_Cost': values.cngKit_Cost,
+                'cngkit_cost': values.cngKit_Cost,
                 'engine_no': values.engine_no,
                 'idv_value': sliderVal ? sliderVal : defaultSliderValue.toString(),
             }
@@ -322,13 +391,14 @@ class OtherComprehensive extends Component {
         }
     }
 
+
     componentDidMount() {
         this.fetchData()
     }
 
 
     render() {
-        const {showCNG, vahanDetails, policyCoverage, vahanVerify, is_CNG_account, fulQuoteResp, PolicyArray, sliderVal, motorInsurance, serverResponse, add_more_coverage} = this.state
+        const {showCNG, vahanDetails,error, policyCoverage, vahanVerify, is_CNG_account, fulQuoteResp, PolicyArray, sliderVal, motorInsurance, serverResponse, add_more_coverage} = this.state
         const {productId} = this.props.match.params 
         let defaultSliderValue = PolicyArray.length > 0 ? Math.floor(PolicyArray[0].PolicyRiskList[0].IDV_Suggested) : 0
         let sliderValue = sliderVal
@@ -340,11 +410,13 @@ class OtherComprehensive extends Component {
             chasis_no: motorInsurance.chasis_no ? motorInsurance.chasis_no : "",
             chasis_no_last_part: motorInsurance.chasis_no_last_part ? motorInsurance.chasis_no_last_part : "",
             add_more_coverage: motorInsurance.add_more_coverage ? motorInsurance.add_more_coverage : "",
-            cng_kit: motorInsurance.cng_kit ? motorInsurance.cng_kit : 0,
-            cngKit_Cost: motorInsurance.cngkit_cost ? motorInsurance.cngkit_cost : "",
+            cng_kit: motorInsurance.cng_kit == 0 || motorInsurance.cng_kit == 1 ? motorInsurance.cng_kit : is_CNG_account,
+            cngKit_Cost: motorInsurance.cngkit_cost ? motorInsurance.cngkit_cost : 0,
             engine_no: motorInsurance.engine_no ? motorInsurance.engine_no : "",
+            vahanVerify: vahanVerify
 
         });
+
         const policyCoverageList = policyCoverage && policyCoverage.length > 0 ?
         policyCoverage.map((coverage, qIndex) => {
             return(
@@ -360,6 +432,20 @@ class OtherComprehensive extends Component {
                 </div>
             )
         }) : null
+
+        const errMsg =
+            error && error.message ? (
+                <span className="errorMsg">
+                <h6>
+                    <strong>
+                    Thank you for showing your interest for buying product.Due to some
+                    reasons, we are not able to issue the policy online.Please call
+                    180 22 1111
+                    </strong>
+                </h6>
+                </span>
+            ) : null;
+
         return (
             <>
                 <BaseComponent>
@@ -374,6 +460,7 @@ class OtherComprehensive extends Component {
                     <div className="d-flex justify-content-left">
                         <div className="brandhead m-b-10">
                             <h4 className="m-b-30">Covers your Car + Damage to Others (Comprehensive)</h4>
+                            <h5>{errMsg}</h5>
                         </div>
                     </div>
                     <Formik initialValues={newInitialValues} 
@@ -439,7 +526,12 @@ class OtherComprehensive extends Component {
                                                         name='chasis_no_last_part' 
                                                         autoComplete="off"
                                                         className="premiumslid"       
-                                                        value= {values.chasis_no_last_part}                                    
+                                                        value= {values.chasis_no_last_part}       
+                                                        onChange = {(e) => {
+                                                            setFieldValue('vahanVerify', false)
+                                                            setFieldTouched('chasis_no_last_part')
+                                                            setFieldValue('chasis_no_last_part', e.target.value)                        
+                                                        }}                           
                                                         
                                                     />
                                                      {errors.chasis_no_last_part && touched.chasis_no_last_part ? (
@@ -453,13 +545,15 @@ class OtherComprehensive extends Component {
 
                                     <Col sm={12} md={2} lg={2}>
                                         <FormGroup>
-                                            
-                                            <Button className="btn btn-primary vrifyBtn" onClick= {this.getVahanDetails.bind(this,values.chasis_no_last_part, values.registration_no)}>Verify</Button>
-                                            
+                                        
+                                            <Button className="btn btn-primary vrifyBtn" onClick= {!errors.chasis_no_last_part ? this.getVahanDetails.bind(this,values.chasis_no_last_part, values.registration_no, setFieldTouched, setFieldValue) : null}>Verify</Button>
+                                            {errors.vahanVerify ? (
+                                                    <span className="errorMsg">{errors.vahanVerify}</span>
+                                                ) : null}
                                         </FormGroup>
                                     </Col>
                                     </Row>
-                                {vahanVerify ?
+                                {values.vahanVerify && !errors.chasis_no_last_part ?
                                 <Row>
                                     <Col sm={12} md={6} lg={5}>
                                         <FormGroup>
@@ -591,8 +685,11 @@ class OtherComprehensive extends Component {
                                                         checked={values.cng_kit == '0' ? true : false}
                                                     />
                                                         <span className="checkmark" />
-                                                        <span className="fs-14">No</span>
+                                                        <span className="fs-14">No</span>      
                                                     </label>
+                                                    {errors.cng_kit && touched.cng_kit ? (
+                                                    <span className="errorMsg">{errors.cng_kit}</span>
+                                                    ) : null}
                                                 </div>
                                             </div>
                                         </FormGroup>
@@ -610,6 +707,12 @@ class OtherComprehensive extends Component {
                                                 value = {values.cngKit_Cost}
                                                 onFocus={e => this.changePlaceHoldClassAdd(e)}
                                                 onBlur={e => this.changePlaceHoldClassRemove(e)}
+                                                onChange={e => {
+                                                    setFieldTouched('cngKit_Cost');
+                                                    setFieldValue('cngKit_Cost', e.target.value);
+                                                    this.handleChange()
+
+                                                }}
                                             />
                                             {errors.cngKit_Cost && touched.cngKit_Cost ? (
                                             <span className="errorMsg">{errors.cngKit_Cost}</span>
@@ -691,7 +794,7 @@ class OtherComprehensive extends Component {
                 <Modal className="customModal" bsSize="md"
                     show={this.state.show}
                     onHide={this.handleClose}>
-                    <Modal.Header closeButton className="custmModlHead">
+                    <Modal.Header closeButton className="custmModlHead modalhd">
                         <div className="cntrbody">
                             <h3>Premium breakup </h3>                           
                         </div>

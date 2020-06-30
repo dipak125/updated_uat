@@ -65,12 +65,12 @@ class HeaderTop extends Component {
                                         <a href="#" className="notiBell">
                                         </a>
                                     </div>
-                                    <div className="align-self-center userNameImg">
+                                    {/* <div className="align-self-center userNameImg">
                                         <img src={require('../../../../assets/images/user.svg')} alt="" />
                                     </div>
                                     <div className="align-self-center d-none d-sm-block">
                                     <img src={require('../../../../assets/images/shapes-and-symbols.svg')} alt="" />
-                                    </div>
+                                    </div> */}
                                 </div>
                             </Dropdown.Toggle>
                             <Dropdown.Menu>

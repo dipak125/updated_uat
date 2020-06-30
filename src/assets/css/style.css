@@ -17,6 +17,7 @@ h4{font-size: 18px; line-height: 22px; font-weight: 600;}
 .m-t-10 {margin-top: 10px;}
 .m-t-15{ margin-top: 15px;} 
 .m-t--20 {margin-top: -20px;}
+.m-b-0 {margin-bottom: 0 !important;}
 .m-b-15{ margin-bottom: 15px!important;}
 .m-t-20{ margin-top: 20px;} 
 .m-b-20{ margin-bottom: 20px!important;}
@@ -312,6 +313,9 @@ ul.navPan li a span{ margin-bottom:8px; display: block; }
 .premamnt {text-align: center; font-size: 18px; font-weight: 600; color: #FFFFFF; line-height: 23px;}
 .rupee {text-align: center; font-size: 36px; color: #FFFFFF; font-weight: 600; margin-bottom: 25px;}
 .brkbtn {border: 1px solid #AFDFF2; border-radius: 15px; background-color: #2770b3; color: #ffffff !important; padding: 3px 15px; font-size: 12px;}
+.modalhd {margin-bottom: 0 !important;}
+.modalhd .close {padding: 5px 15px !important;}
+.customModal h5 {font-size: 14px;}
 
 .colpd { padding: 25px 15px 25px 15px;}
 .W-90 {width: 90% !important;}
@@ -547,6 +551,11 @@ Note: Beware of modifying this element as it can break the animations - you shou
 /*---- Policy Details close------*/
 /*---------Insurance close-------*/
 
+/*---- Error Page Start------*/
+.error404 {box-sizing: border-box; text-align: center; margin: 18% auto 0;}
+.error404 h3 {color:#1482AB; font-size: 50px; font-weight: 900; line-height: 55px;}
+.error404 h4 {font-size: 40px; line-height: 45px; font-weight: 500;}
+/*---- Error Page close------*/
 
 /*********** Extra large devices (large desktops, 1200px and up)***************/
 @media (min-width: 1200px) and (max-width: 1399.98px) {

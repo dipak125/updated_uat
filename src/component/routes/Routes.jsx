@@ -27,6 +27,8 @@ import OtherComprehensive from '../motor/OtherComprehensive';
 import Premium from '../motor/Premium';
 import ThankYou_motor from '../motor/ThankYou';
 
+import ErrorPage from '../ErrorPage';
+
 import UnderMaintenance from '../UnderMaintenance';
 
 const componentLoader = () => {
@@ -112,7 +114,8 @@ class Routes extends Component {
                         <PrivateRoute exact path="/Additional_details/:productId" component={AdditionalDetails} />
                         <PrivateRoute exact path="/Premium/:productId" component={Premium} />
                         <PrivateRoute exact path="/ThankYou_motor/:policyId" component={ThankYou_motor} />
-
+                        
+                        <PrivateRoute exact path="/error-page" component={ErrorPage} />
                         <PrivateRoute exact path="/UnderMaintenance" component={UnderMaintenance} />
                         <Redirect from="/" to="/Products" />
                     </Switch>
