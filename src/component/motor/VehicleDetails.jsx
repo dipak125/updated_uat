@@ -108,15 +108,27 @@ const vehicleRegistrationValidation = Yup.object().shape({
         }
     ),
     previous_policy_name:Yup.string()
-    .notRequired('Policy name is required')
+    .notRequired('Please select Policy Type')
     .test(
         "currentMonthChecking",
         function() {
-            return "Please enter previous policy type"
+            return "Please select Policy Type"
         },
         function (value) {
             const ageObj = new PersonAge();
-            if (ageObj.whatIsCurrentMonth(this.parent.registration_date) > 6 && !value) {   
+            if (ageObj.whatIsCurrentMonth(this.parent.registration_date) > 0 && !value) {   
+                return false;    
+            }
+            return true;
+        }
+    )
+    .test(
+        "currentMonthChecking",
+        function() {
+            return "Since previous policy is a liability policy, issuance of a package policy will be subjet to successful inspection of your vehicle. Our Customer care executive will call you to assit on same, shortly"
+        },
+        function (value) {
+            if (value == '2' ) {   
                 return false;    
             }
             return true;
@@ -317,6 +329,7 @@ class VehicleDetails extends Component {
                 'registration_date':moment(values.registration_date).format("YYYY-MM-DD"),
                 'location_id':values.location_id,    
                 'previous_is_claim':'0', 
+                'previous_policy_name':localStorage.getItem('policy_type'),
             } 
         }
         console.log('post_data', post_data)
@@ -485,7 +498,7 @@ console.log("newInitialValues", newInitialValues)
                                                                 className="datePckr inputfs12"
                                                                 selected={values.registration_date}
                                                                 onChange={(val) => {
-                                                                    setFieldTouched('previous_policy_name');
+                                                                    setFieldTouched('registration_date');
                                                                     setFieldValue('registration_date', val); 
                                                                 }}
                                                                 
@@ -596,13 +609,13 @@ console.log("newInitialValues", newInitialValues)
                                                                     component="select"
                                                                     autoComplete="off"
                                                                     className="formGrp inputfs12"
-                                                                    value={ageObj.whatIsCurrentMonth(values.registration_date) < 7 ? 6 : values.previous_policy_name}
-                                                                    disabled = {ageObj.whatIsCurrentMonth(values.registration_date) < 7 ? true : false}
+                                                                    value = {values.previous_policy_name}
+                                                                    // value={ageObj.whatIsCurrentMonth(values.registration_date) < 7 ? 6 : values.previous_policy_name}
                                                                 >
                                                                     <option value="">Select Policy Type</option>
                                                                     <option value="1">Package</option>
                                                                     <option value="2">Liability Only</option>  
-                                                                    <option value="6" > Bundled Product</option>
+                                                        
                                                                 </Field>
                                                                 {errors.previous_policy_name && touched.previous_policy_name ? (
                                                                     <span className="errorMsg">{errors.previous_policy_name}</span>

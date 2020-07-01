@@ -358,7 +358,7 @@ console.log('post_data', post_data);
                     </div>
                 <div className="col-sm-12 col-md-12 col-lg-10 col-xl-10 infobox">
                 <h4 className="text-center mt-3 mb-3">SBI General Insurance Company Limited</h4>
-                <section className="brand m-t-11 m-b-25">
+                <section className="brand m-b-25">
                     <div className="brand-bg">
                         <div className="d-flex justify-content-left">
                             <div className="brandhead m-b-10">
@@ -374,6 +374,9 @@ console.log('post_data', post_data);
                         <Form>
                         <Row>
                             <Col sm={12} md={9} lg={9}>
+                            <div className="d-flex justify-content-left brandhead">
+                            <h4>You are just one steps away in getting your policy ready and your Quotation Number: QPMCAR001000000021884. Please share a few more details.</h4>
+                            </div>
                                 <div className="d-flex justify-content-left carloan">
                                     <h4> Taken Car Loan</h4>
                                 </div>

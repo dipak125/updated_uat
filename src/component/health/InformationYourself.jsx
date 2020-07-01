@@ -15,7 +15,6 @@ import * as Yup from 'yup';
 import swal from 'sweetalert';
 
 import { Formik, Form, Field, ErrorMessage } from 'formik';
-import dateformat from "dateformat";
 import { changeFormat, get18YearsBeforeDate, PersonAge } from "../../shared/dateFunctions";
 import Encryption from '../../shared/payload-encryption';
 
@@ -56,6 +55,20 @@ const vehicleInspectionValidation = Yup.object().shape({
 
 const validateFamilyMembers  = Yup.object().shape({
     //check_input : Yup.string().required('Please select an options'),
+    confirm: Yup.string().when(['looking_for_2'], {
+        is: looking_for_2 => looking_for_2 == 'child1',       
+        then: Yup.string().required('Please agree to the terms'),
+        othewise: Yup.string()
+    }).when(['looking_for_3'], {
+        is: looking_for_3 => looking_for_3 == 'child2',       
+        then: Yup.string().required('Please agree to the terms'),
+        othewise: Yup.string()
+    }).when(['looking_for_4'], {
+        is: looking_for_4 => looking_for_4 == 'child3',       
+        then: Yup.string().required('Please agree to the terms'),
+        othewise: Yup.string()
+    }),
+    
     looking_for_1 : Yup.string(),
     looking_for_5 : Yup.string(),
     looking_for_0: Yup.string().when(['looking_for_2'], {
@@ -778,10 +791,7 @@ const validateFamilyMembers  = Yup.object().shape({
 function checkSelfData(str)
 {
     let error;
-
     let looking_for = document.getelementsbyname("looking_for_1").value
-
-    console.log("Looking for===-==============>",looking_for)
     return 'sssss'
    
 }
@@ -809,7 +819,8 @@ class InformationYourself extends Component {
             display_looking_for:[],
             relationList:[],
             display_gender:[],
-            gender_for:[]
+            gender_for:[],
+            confirm: ""
         };
     }
 
@@ -858,9 +869,6 @@ class InformationYourself extends Component {
                     gender_for.push(display_gender_new[i])
                 }
             }
-
-            console.log("GENDER FOR =====>", display_looking_for)
-
             localStorage.setItem('display_gender',JSON.stringify(display_gender_new))
 
             this.setState({
@@ -883,27 +891,17 @@ class InformationYourself extends Component {
     handleFormSubmit = (values) => {
         const {productId} = this.props.match.params
         const formData = new FormData();
-       // let gender = values.gender
-    // console.log("gender=========>",gender);
-   // formData.append(`gender`, gender);
     let lookingFor = this.state.lookingFor ;
-    console.log("lookingFor=========>",lookingFor);
     let dob = this.state.dob ;
-    console.log("dob=========>",dob);
     let familyMembers = this.state.familyMembers;
     let post_data = []
     let menumaster_id = 2;
-    console.log("menumaster_id=========>",menumaster_id);
     post_data['menumaster_id'] = menumaster_id
-    //formData.append(`menumaster_id`, menumaster_id);  
     post_data['proposer_gender'] = values.gender    
-    //formData.append(`proposer_gender`, values.gender);  
     
     let arr_date=[]
     for(let i=0;i<dob.length;i++){        
         let date_of_birth= dob[i] ? dob[i] : familyMembers[i].dob;    
-       // formData.append(`dob[${i}]`, date_of_birth);
-      // post_data[`dob[${i}]`] = date_of_birth  
       arr_date.push(date_of_birth)
       
     }  
@@ -914,28 +912,22 @@ class InformationYourself extends Component {
             
             let looking_for = lookingFor[i] ? lookingFor[i] : familyMembers[i].relation_with; 
             is_self_select =  looking_for == 'self' ? true:false   
-            arr_date.push(looking_for)
-             //= arr_date[i]
-          //  post_data[`looking_for[${i}]`] = looking_for  
-           // formData.append(`looking_for[${i}]`, looking_for);                
+            arr_date.push(looking_for)          
     }  
     post_data['looking_for'] = arr_date
     let policyHolder_id = localStorage.getItem('policyHolder_id') ? localStorage.getItem('policyHolder_id') :0
     
     let gender_for = this.state.gender_for
 
-    console.log("WWWWW+======>>>>>>",gender_for)
     arr_date=[]
     for(let i=0;i<gender_for.length;i++){
         let gender_val;
         gender_val = gender_for[i] ? gender_for[i] : familyMembers[i].gender; 
         arr_date.push(gender_val); 
-        
-       // post_data[`gender[${i}]`] = gender_val         
-       // post_data[`gender[${i}]`] = gender_val                
-       // formData.append(`gender[${i}]`, gender_val);
     } 
     post_data['gender'] = arr_date
+    post_data['confirm'] = this.state.confirm
+    
     post_data['csc_id'] = sessionStorage.getItem('csc_id') ? sessionStorage.getItem('csc_id') : "500100100013"
     post_data['agent_name'] = sessionStorage.getItem('agent_name') ? sessionStorage.getItem('agent_name') : "Bipin Sing"
     post_data['product_id'] = sessionStorage.getItem('product_id') ? sessionStorage.getItem('product_id') : "900001786"
@@ -951,7 +943,6 @@ class InformationYourself extends Component {
     if(policyHolder_id > 0){
         post_data['policy_holder_id'] = policyHolder_id
         Object.assign(post_data_obj, post_data); // {0:"a", 1:"b", 2:"c"}
-        console.log("POST DATA=============>>",post_data_obj)
         formData.append('enc_data',encryption.encrypt(JSON.stringify(post_data_obj)))
         //let vvv = encryption.encrypt(JSON.stringify(target))        
         this.props.loadingStart();
@@ -965,7 +956,6 @@ class InformationYourself extends Component {
             this.props.history.push(`/MedicalDetails/${productId}`);
         })
         .catch(err => {
-        console.log('Errors==============>',err.data);
         if(err && err.data){
             swal('Family Member fields are required...');
         }
@@ -974,7 +964,6 @@ class InformationYourself extends Component {
     }
     else{
         Object.assign(post_data_obj, post_data); // {0:"a", 1:"b", 2:"c"}
-        console.log("POST DATA=============>>",post_data_obj)
         formData.append('enc_data',encryption.encrypt(JSON.stringify(post_data_obj)))
 
         this.props.loadingStart();
@@ -988,7 +977,6 @@ class InformationYourself extends Component {
             this.props.history.push(`/MedicalDetails/${productId}`);
         })
         .catch(err => {
-        console.log('Errors==============>',err.data);
         if(err && err.data){
             swal('Family Member fields are required...');
         }
@@ -1005,10 +993,7 @@ class InformationYourself extends Component {
         var display_looking_for = [];
         var display_dob = [];
         let display_gender = [];
-        console.log("VALUES --------->",values);
 
-        
-       
             display_gender[0] = this.state.gender ? this.state.gender:null
             display_gender[1] = this.state.gender ? (this.state.gender == 'm') ?'f':'m' :null
             display_gender[2] = values.child1Gender ? values.child1Gender :null
@@ -1019,10 +1004,6 @@ class InformationYourself extends Component {
             display_gender[7] = this.state.gender ? 'm' : null
             display_gender[8] = this.state.gender ? 'f' : null
         
-        
-
-
-        //var check_input = values.check_input
         if(this.state.validateCheck == 1){
             for (const key in values) {
                 if (values.hasOwnProperty(key)) {
@@ -1052,12 +1033,11 @@ class InformationYourself extends Component {
                 if (values.hasOwnProperty(key)) {
                     if ( key.match(/looking_for/gi)){                  
                         i = key.substr(12, 1);                                             
-                        console.log("ASSSS1111======>", values[key]);
                         display_looking_for[i] = values[key] ? values[key] : '';                       
                         if(values[key]){
                             looking_for.push(values[key]);
                             gender_for.push(display_gender[i])    
-                        }                           // formData.append(`looking_for[${i}]`, values[key]);
+                        }   
                     }
 
                    
@@ -1068,7 +1048,6 @@ class InformationYourself extends Component {
                         if(values[key]) {
                             dob.push(moment(values[key]).format("YYYY-MM-DD"))
                         }
-                        //formData.append(`dob[${i}]`, moment(values[key]).format("YYYY-MM-DD"));
                     }
                 } 
             }
@@ -1118,9 +1097,7 @@ fetchData=()=>{
     this.props.loadingStart();
     axios.get(`policy-holder/${policyHolder_id}`)
         .then(res=>{
-            //console.log("aaaaaabbbbbir========>",response.data.data.policyHolder.request_data.family_members)
             let family_members =  res.data.data.policyHolder && res.data.data.policyHolder.request_data && res.data.data.policyHolder.request_data.family_members ? res.data.data.policyHolder.request_data.family_members : []
-            console.log("Family Members =======>",family_members)
             let addressDetails = JSON.parse(res.data.data.policyHolder.address)
             let is_eia_account = res.data.data.policyHolder.is_eia_account
             let gender = res.data.data.policyHolder.gender
@@ -1136,7 +1113,7 @@ fetchData=()=>{
         })
         .catch(function (error) {
             // handle error
-            console.log(error);
+
         })
         this.props.loadingStop();
 }
@@ -1144,8 +1121,6 @@ fetchData=()=>{
 fetchRelations = () => {
     axios.get(`relations`)
     .then(res=>{
-       // console.log("AAAAAAAAAAAA=====>",res.data.data)
-        //let relationsData = res.data. 
         const relationList = res.data && res.data.data ? res.data.data : []
         this.setState({
             relationList            
@@ -1153,14 +1128,12 @@ fetchRelations = () => {
     })
     .catch(function (error) {
         // handle error
-        console.log(error);
     })
 }
 
 
 setValueData = () => {
     var checkBoxAll = document.getElementsByClassName('user-self');
-   // console.log('OP===>',checkBoxAll)
     for(const a in checkBoxAll){
         if(checkBoxAll[a].checked){            
             return true
@@ -1196,7 +1169,6 @@ setStateForPreviousData=(family_members)=>{
 }
 
     getInsuredList=(family_members)=>{
-        ///console.log("FAMILY======>",family_members);
         if (family_members.length > 0) {
 			return family_members.map(resource => resource.relation_with);
 		} else {
@@ -1204,16 +1176,11 @@ setStateForPreviousData=(family_members)=>{
 		}
     }
     render() {
-        const {memberInfo, insureList,validateCheck,gender,familyMembers,lookingFor,dob,display_looking_for,display_dob,display_gender} = this.state
-        console.log("FAMILY11111==ddddddddddddddd=sssssss====>",gender);
-        console.log("FAMILY22222======>",display_dob);
+        const {memberInfo, insureList,validateCheck,gender,familyMembers,lookingFor,dob,display_looking_for,display_dob,display_gender, confirm} = this.state
         const insureListPrev = this.getInsuredList(familyMembers);
-        console.log("insureList =====",familyMembers);
         let display_looking_for_arr = display_looking_for  && display_looking_for.length >0 ? display_looking_for : (sessionStorage.getItem('display_looking_for') ? JSON.parse(sessionStorage.getItem('display_looking_for')) : []);
         let display_dob_arr = display_dob && display_dob.length >0 ? display_dob : (sessionStorage.getItem('display_dob') ? JSON.parse(sessionStorage.getItem('display_dob')) : []);
         let display_gender_arr = display_gender && display_gender.length > 0 ? display_gender : (localStorage.getItem('display_gender') ? JSON.parse(localStorage.getItem('display_gender')) : []);
-        
-        console.log("insureList Gender=====",display_gender_arr);
 
         const newInitialValues = Object.assign(initialValues, {
             check_input: validateCheck ? validateCheck :0,
@@ -2036,8 +2003,47 @@ setStateForPreviousData=(family_members)=>{
                                                         }
                                                         </label>
                                                     </FormGroup>
-                                                </div>
+                                                </div>              
                                             </div>
+                            {values.looking_for_2 || values.looking_for_3 || values.looking_for_4 ?
+                                            <div className="row dropinput m-b-45">
+                                                <div className="col-md-15">
+                                                    <label className="customCheckBox formGrp formGrp">
+                                                    I confirm that the child is/ children are financially dependent on me
+                                                    <Field
+                                                        type="checkbox"
+                                                        name="confirm"
+                                                        value="1"
+                                                        className="user-self"
+                                                        onChange={(e) => {
+                                                            if (e.target.checked === true) {
+                                                                setFieldValue('confirm', e.target.value);
+                                                                
+                                                            } else {
+                                                                setFieldValue('confirm', '');                                                            
+                                                            }
+                                                            if(this.setValueData()){
+                                                                this.setState({
+                                                                    confirm:1
+                                                                })
+                                                            }
+                                                            else{
+                                                                this.setState({
+                                                                    confirm:0
+                                                                })
+                                                            }
+                                                        }}
+                                                        checked={values.confirm == '1' ? true : false}
+                                                    />
+                                                        <span className="checkmark mL-0"></span>
+                                                    </label>
+                                                    {errors.confirm && (touched.looking_for_2 || touched.looking_for_3 || touched.looking_for_4) ? 
+                                                            <span className="error-message">{errors.confirm}</span> : ""
+                                                        }
+                                                </div>
+                                            </div> 
+                                            : null }
+                                            
                                             <div className="cntrbtn">
                                             <Button className={`btnPrimary m-r-15`} type="submit" >
                                             {this.setValueData() || this.state.validateCheck == '1' ? 'Submit':'Select' }
