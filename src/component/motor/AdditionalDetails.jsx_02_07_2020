@@ -17,9 +17,9 @@ import {  PersonAge } from "../../shared/dateFunctions";
 import Encryption from '../../shared/payload-encryption';
 
 
-const minDobAdult = moment(moment().subtract(64, 'years').calendar()).add(1, 'day').calendar()
+const minDobAdult = moment(moment().subtract(111, 'years').calendar()).add(1, 'day').calendar()
 const maxDobAdult = moment().subtract(18, 'years').calendar();
-const minDobNominee = moment(moment().subtract(100, 'years').calendar()).add(1, 'day').calendar()
+const minDobNominee = moment(moment().subtract(111, 'years').calendar()).add(1, 'day').calendar()
 const maxDobNominee = moment().subtract(3, 'months').calendar();
 
 const initialValue = {
@@ -86,16 +86,9 @@ const ownerValidation = Yup.object().shape({
     location:Yup.string().required('Location is required'),
     // district: Yup.string().required('District is required'),
     pincode:Yup.string().required('Pincode is required'),
-    address:Yup.string().required('Address is required').matches(/^(?![0-9._])(?!.*[0-9._]$)(?!.*\d_)(?!.*_\d)[a-zA-Z0-9_.,-\\]+$/, function() {
-        return "Please enter valid address"
-    }),
-    phone: Yup.string().matches(/^[7-9][0-9]{9}$/,'Invalid Mobile number').required('Phone No. is required'),
-    email:Yup.string().email().required('Email is required').min(9, function() {
-        return "Email must be minimum 9 chracters"
-    })
-    .max(75, function() {
-        return "Email must be maximum 75 chracters"
-    }),
+    address:Yup.string().required('Address is required'),
+    phone: Yup.string().required('Phone No. is required'),
+    email:Yup.string().required('Email is required'),
 
     is_carloan: Yup.mixed().required('This field is required'),
     bank_name:Yup.string().notRequired('Bank Name is required')
@@ -157,24 +150,6 @@ const ownerValidation = Yup.object().shape({
     ),
    
     eIA: Yup.string().required('This field is required'),
-    eia_account_no: Yup.string().min(13, function() {
-        return "EIA no must be minimum 13 chracters"
-    })
-    .max(13, function() {
-        return "EIA no must be maximum 13 chracters"
-    }).matches(/^[1-5][0-9]{0,13}$/,'Please enter valid EIA no').notRequired('EIA no is required')
-    .test(
-        "isEIAchecking",
-        function() {
-            return "Please enter EIA no"
-        },
-        function (value) {
-            if (this.parent.eIA == 1 && !value) {   
-                return false;    
-            }
-            return true;
-        }
-    ),
 })
 
 class AdditionalDetails extends Component {
@@ -262,9 +237,6 @@ class AdditionalDetails extends Component {
             'nominee_dob':moment(values['nominee_dob']).format("YYYY-MM-DD"),
             'phone': values['phone'],
             'email': values['email'],
-            'eIA': values['eIA'],
-            'eia_account_no': values['eia_account_no'],
-            'address': values['address']
         }
 console.log('post_data', post_data);
         formData.append('enc_data',encryption.encrypt(JSON.stringify(post_data)))
@@ -356,10 +328,9 @@ console.log('post_data', post_data);
             pancard: policyHolder && policyHolder.pancard ? policyHolder.pancard : "",
             location: policyHolder && policyHolder.location ? policyHolder.location : "",
             pincode: policyHolder && policyHolder.pincode ? policyHolder.pincode : "",
-            address: policyHolder && policyHolder.address ? policyHolder.address : "",
             is_carloan:is_loan_account,
-            bank_name: policyHolder && policyHolder.length > 0 ? policyHolder.location : "",
-            bank_branch: policyHolder && policyHolder.length > 0 ? policyHolder.location : "",
+            // bank_name: policyHolder && policyHolder.length > 0 ? policyHolder.location : "",
+            // bank_branch: policyHolder && policyHolder.length > 0 ? policyHolder.location : "",
             nominee_relation_with: nomineeDetails && nomineeDetails.relation_with ? nomineeDetails.relation_with : "",
             nominee_first_name: nomineeDetails && nomineeDetails.first_name ? nomineeDetails.first_name : "",
             nominee_gender: nomineeDetails && nomineeDetails.gender ? nomineeDetails.gender : "",
@@ -389,22 +360,22 @@ console.log('post_data', post_data);
                 <h4 className="text-center mt-3 mb-3">SBI General Insurance Company Limited</h4>
                 <section className="brand m-b-25">
                     <div className="brand-bg">
+                        <div className="d-flex justify-content-left">
+                            <div className="brandhead m-b-10">
+                                {quoteNumber}
+                            </div>
+                        </div>
 
                         <Formik initialValues={newInitialValues} onSubmit={this.handleSubmit}
                         validationSchema={ownerValidation}
                         >
                         {({ values, errors, setFieldValue, setFieldTouched, isValid, isSubmitting, touched }) => {
-                             let value = values.nominee_first_name;
-
-                            //  value = value.replace(/[^A-Za-z]/ig, '')
-                            //  values.nominee_first_name = value;
-                            
                         return (
                         <Form>
                         <Row>
                             <Col sm={12} md={9} lg={9}>
                             <div className="d-flex justify-content-left brandhead">
-                            {quoteNumber}
+                            <h4>You are just one steps away in getting your policy ready and your Quotation Number: QPMCAR001000000021884. Please share a few more details.</h4>
                             </div>
                                 <div className="d-flex justify-content-left carloan">
                                     <h4> Taken Car Loan</h4>
@@ -576,10 +547,7 @@ console.log('post_data', post_data);
                                                 autoComplete="off"
                                                 onFocus={e => this.changePlaceHoldClassAdd(e)}
                                                 onBlur={e => this.changePlaceHoldClassRemove(e)}
-                                                value = {values.pancard.toUpperCase()} 
-                                                onChange= {(e)=> 
-                                                    setFieldValue('pancard', e.target.value.toUpperCase())
-                                                    }                                                                           
+                                                value = {values.pancard}                                                                            
                                             />
                                             {errors.pancard && touched.pancard ? (
                                             <span className="errorMsg">{errors.pancard}</span>
@@ -607,8 +575,7 @@ console.log('post_data', post_data);
                                     </Col>
                                     <Col sm={12} md={4} lg={4}>
                                         <FormGroup>
-                                            <div className="insurerName nmbract">
-                                                <span>+91</span>
+                                            <div className="insurerName">
                                             <Field
                                                 name='phone'
                                                 type="text"
@@ -616,8 +583,7 @@ console.log('post_data', post_data);
                                                 autoComplete="off"
                                                 onFocus={e => this.changePlaceHoldClassAdd(e)}
                                                 onBlur={e => this.changePlaceHoldClassRemove(e)}
-                                                value = {values.phone}
-                                                className="phoneinput pd-l-25"                                                                          
+                                                value = {values.phone}                                                                            
                                             />
                                             {errors.phone && touched.phone ? (
                                             <span className="errorMsg">{errors.phone}</span>
@@ -660,7 +626,6 @@ console.log('post_data', post_data);
                                                 onBlur={e => this.changePlaceHoldClassRemove(e)}
                                                 onKeyUp={e=> this.fetchAreadetails(e)}
                                                 value={values.pincode}
-                                                maxlength="6"
                                                 onInput= {(e)=> {
                                                     setFieldTouched("state");
                                                     setFieldTouched("pincode");
@@ -806,17 +771,6 @@ console.log('post_data', post_data);
                                             <option value="father">father</option>
                                             <option value="mother">Mother</option>
                                             <option value="spouse">Spouse</option>
-                                            <option value="aunty">Aunty</option>
-                                            <option value="cousin">Cousin</option>
-                                            <option value="daughter">Daughter</option>
-                                            <option value="employed_driver">Employed Driver</option>
-                                            <option value="employee">Employee</option>
-                                            <option value="father_in_law">Father In Law</option>
-                                            <option value="friend">Friend</option>
-                                            <option value="mother_in_law">Mother In Law</option>
-                                            <option value="sister">Sister</option>
-                                            <option value="son">Son</option>
-                                            <option value="uncle">Uncle</option>
                                             </Field>     
                                             {errors.nominee_relation_with && touched.nominee_relation_with ? (
                                                 <span className="errorMsg">{errors.nominee_relation_with}</span>

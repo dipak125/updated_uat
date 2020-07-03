@@ -88,7 +88,7 @@ class Premium extends Component {
                     console.log(this.state.memberdetails.length);
                     //this.props.loadingStop();
 
-                    this.getAccessToken(motorInsurance)
+                    this.getAccessToken()
                
             })
             .catch(err => {
@@ -97,14 +97,14 @@ class Premium extends Component {
             })
     }
 
-    getAccessToken = (motorInsurance) => {
+    getAccessToken = () => {
         axios
             .post(`/callTokenService`)
             .then((res) => {
                 this.setState({
                     accessToken: res.data.access_token,
                 });
-                this.fullQuote(res.data.access_token, motorInsurance)
+                this.fullQuote(res.data.access_token)
             })
             .catch((err) => {
                 this.setState({
@@ -114,17 +114,10 @@ class Premium extends Component {
             });
     };
 
-    fullQuote = (access_token, motorInsurance) => {
+    fullQuote = (access_token) => {
         const formData = new FormData();
         formData.append("access_token", access_token);
         formData.append("id", localStorage.getItem("policyHolder_id"));
-
-        formData.append("idv_value", motorInsurance.idv_value);
-        formData.append("policy_type", localStorage.getItem('policy_type'));
-        formData.append("add_more_coverage", motorInsurance.add_more_coverage);
-        formData.append("cng_kit", motorInsurance.cng_kit);
-        formData.append("cngKit_Cost", Math.floor(motorInsurance.cngkit_cost));
-
         axios.post('fullQuotePMCAR', formData)
             .then(res => {
                 if (res.data.PolicyObject) {
@@ -300,22 +293,6 @@ class Premium extends Component {
                                                                                                     <FormGroup>{memberdetails.dob}</FormGroup>
                                                                                                 </Col>
                                                                                             </Row>
-                                                                                            <Row>
-                                                                                                <Col sm={12} md={6}>
-                                                                                                    <FormGroup>Mobile No</FormGroup>
-                                                                                                </Col>
-                                                                                                <Col sm={12} md={6}>
-                                                                                                    <FormGroup>{memberdetails.mobile}</FormGroup>
-                                                                                                </Col>
-                                                                                            </Row>
-                                                                                            <Row>
-                                                                                                <Col sm={12} md={6}>
-                                                                                                    <FormGroup>Email Id</FormGroup>
-                                                                                                </Col>
-                                                                                                <Col sm={12} md={6}>
-                                                                                                    <FormGroup>{memberdetails.email_id}</FormGroup>
-                                                                                                </Col>
-                                                                                            </Row>
 
                                                                                             <Row>
                                                                                                 <Col sm={12} md={6}>
@@ -335,7 +312,6 @@ class Premium extends Component {
                                                                                                     <FormGroup>{memberdetails.gender == "m" ? "Male" : "Female"}</FormGroup>
                                                                                                 </Col>
                                                                                             </Row>
-
                                                                                         </Col>
                                                                                     </Row>
                                                                                     <Row>

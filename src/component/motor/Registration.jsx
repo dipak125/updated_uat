@@ -15,12 +15,30 @@ import InputMask from "react-input-mask";
 
 
 const initialValues = {
-    regNumber:''
+    regNumber:'',
+    confirm: 0
 }
 
 const vehicleRegistrationValidation = Yup.object().shape({
-    regNumber: Yup.string().matches(/^[A-Z]{2}[ -][0-9]{1,2}(?: [A-Z])?(?: [A-Z]*)? [0-9]{4}$/, 'Invalid Registration number').required('Please enter valid registration number')
 
+    confirm: Yup.string().notRequired(),
+
+    // regNumber: Yup.string().matches(/^[A-Z]{2}[ -][0-9]{1,2}(?: [A-Z])?(?: [A-Z]*)? [0-9]{4}$/, 'Invalid Registration number').required('Please enter valid registration number')
+    regNumber: Yup.string().matches(/^[A-Z]{2}[ -][0-9]{1,2}(?: [A-Z])?(?: [A-Z]*)? [0-9]{4}$/, 'Invalid Registration number')
+    .test(
+        "registrationNumberCheck",
+        function() {
+            return "Please Provide Vehicle Registration Number"
+        },
+        function (value) {
+            // console.log('YUP', value)
+            if ((value == "" || value == undefined) && this.parent.confirm == 0 ) {  
+                return false;
+            }
+            return true;
+        }
+    ),
+   
    
    
 });
@@ -68,58 +86,94 @@ fetchData=()=>{
         })
         .catch(function (error) {
             // handle error
-            console.log(error);
         })
 }
 
     handleSubmit=(values)=>{
-       // console.log("Vehicle Type ID ----->",this.props.match.params)
-        const {productId} = this.props.match.params;
 
+        const {productId} = this.props.match.params;
 
         const formData = new FormData();
         let encryption = new Encryption();
 
-        /*formData.append('registration_no',values.regNumber);
-        formData.append('menumaster_id',1);
-        formData.append('vehicle_type_id',productId);*/
+        let policyHolder_id = localStorage.getItem('policyHolder_id') ? localStorage.getItem('policyHolder_id') :0
 
-        const post_data = {
-            'registration_no':values.regNumber,
-            'menumaster_id':1,
-            'vehicle_type_id':productId,
-            'csc_id':sessionStorage.getItem('csc_id') ? sessionStorage.getItem('csc_id') : "500100100013",
-            'agent_name':sessionStorage.getItem('agent_name') ? sessionStorage.getItem('agent_name') : "Bipin Sing",
-            'product_id':sessionStorage.getItem('product_id') ? sessionStorage.getItem('product_id') : "900001786",
-        } 
-        formData.append('enc_data',encryption.encrypt(JSON.stringify(post_data)))
-        this.props.loadingStart();
-        axios
-        .post(`/registration`, formData)
-        .then(res => {
-                localStorage.setItem('policyHolder_id', res.data.data.policyHolder_id);
-                localStorage.setItem('policyHolder_refNo', res.data.data.policyHolder_refNo);
-                this.props.loadingStop();
-                this.props.history.push(`/select-brand/${productId}`);                        
-        })
-        .catch(err => {
-          console.log('Errors==============>',err.data);
-          if(err && err.data){
-             swal('Please check..something went wrong!!');
-          }
-          this.props.loadingStop();
-        });
+        if(policyHolder_id > 0){
+            const post_data = {
+                'policy_holder_id': policyHolder_id,
+                'registration_no':values.regNumber,
+                'confirm': values.confirm,
+                'menumaster_id':1,
+                'vehicle_type_id':productId,
+                'csc_id':sessionStorage.getItem('csc_id') ? sessionStorage.getItem('csc_id') : "500100100013",
+                'agent_name':sessionStorage.getItem('agent_name') ? sessionStorage.getItem('agent_name') : "Bipin Sing",
+                'product_id':sessionStorage.getItem('product_id') ? sessionStorage.getItem('product_id') : "900001786",
+            } 
+            console.log('post_data', post_data)
+            formData.append('enc_data',encryption.encrypt(JSON.stringify(post_data)))
+      
+            this.props.loadingStart();
+            axios
+            .post(`/update-registration`, formData)
+            .then(res => {
+                    // localStorage.setItem('policyHolder_id', res.data.data.policyHolder_id);
+                    // localStorage.setItem('policyHolder_refNo', res.data.data.policyHolder_refNo);
+                    this.props.loadingStop();
+                    this.props.history.push(`/select-brand/${productId}`);
+            })
+            .catch(err => {
+            if(err && err.data){
+                swal('Registratioon number required...');
+            }
+            this.props.loadingStop();
+            });
+        }
+        else{
+            const post_data = {
+                'registration_no':values.regNumber,
+                'confirm': values.confirm,
+                'menumaster_id':1,
+                'vehicle_type_id':productId,
+                'csc_id':sessionStorage.getItem('csc_id') ? sessionStorage.getItem('csc_id') : "500100100013",
+                'agent_name':sessionStorage.getItem('agent_name') ? sessionStorage.getItem('agent_name') : "Bipin Sing",
+                'product_id':sessionStorage.getItem('product_id') ? sessionStorage.getItem('product_id') : "900001786",
+            } 
+            console.log('post_data', post_data)
+            formData.append('enc_data',encryption.encrypt(JSON.stringify(post_data)))
+            this.props.loadingStart();
+            axios
+            .post(`/registration`, formData)
+            .then(res => {
+                    localStorage.setItem('policyHolder_id', res.data.data.policyHolder_id);
+                    localStorage.setItem('policyHolder_refNo', res.data.data.policyHolder_refNo);
+                    this.props.loadingStop();
+                    this.props.history.push(`/select-brand/${productId}`);                        
+            })
+            .catch(err => {
+            if(err && err.data){
+                swal('Please check..something went wrong!!');
+            }
+            this.props.loadingStop();
+            });
+        }
     }
     toInputUppercase = e => {
         e.target.value = ("" + e.target.value).toUpperCase();
       };
       
-
+    setValueData = () => {
+        var checkBoxAll = document.getElementsByClassName('user-self');
+        for(const a in checkBoxAll){
+            if(checkBoxAll[a].checked){            
+                return true
+            }
+        }
+        return false
+    }
 
 
     render() {
         const {motorInsurance} = this.state
-        console.log("VVVVV======>",motorInsurance);
         const newInitialValues = Object.assign(initialValues,{
             regNumber: motorInsurance ? motorInsurance.registration_no:'' 
         })
@@ -141,13 +195,10 @@ fetchData=()=>{
                                         onSubmit={this.handleSubmit} 
                                         validationSchema={vehicleRegistrationValidation}>
                                         {({ values, errors, setFieldValue, setFieldTouched, isValid, isSubmitting, touched }) => {
-                                            console.log("CCCCCCCC======>",values);
-                                            
+                                            // console.log('values',values)
                                             this.state.regno = "";
-                                            
-                                            
+                                          
                                             if(values.regNumber.length>0){
-                                                console.log(values.regNumber);
                                             if(values.regNumber.toLowerCase().substring(0, 2) == "dl")
                                             {
                                                 
@@ -159,12 +210,9 @@ fetchData=()=>{
                                             
                                             }
                                             else{
-
-                                                
-                                                this.state.regno=values.regNumber;
-                                                
-                                            }
-                                               
+    
+                                                this.state.regno=values.regNumber;                                                
+                                            }                                        
 
                                             }   
                                             else{ 
@@ -183,10 +231,6 @@ fetchData=()=>{
                                             }
                                         }
                                         }
-                                       
-                                           
-                                           
-                                            console.log(this.state.regno.length);
 
                                         return (
                                         <Form>
@@ -203,16 +247,56 @@ fetchData=()=>{
                                                 onBlur={e => this.changePlaceHoldClassRemove(e)}
                                                 value={this.state.regno}
                                                 maxLength={this.state.length}
-                                                onInput={e=>this.toInputUppercase(e)} 
-                                                
-                                                
-                                                
+                                                onInput={e=>{
+                                                    this.toInputUppercase(e)
+                                                    setFieldTouched('confirm')
+                                                    setFieldValue('confirm', '0');
+                                                }} 
+    
                                             />
                                             {errors.regNumber && touched.regNumber ? (
                                                 <span className="errorMsg">{errors.regNumber}</span>
                                             ) : null}    
                                             </div>
                                         </div>
+                                        <div className="row formSection">
+                                                <label className="customCheckBox formGrp formGrp">
+                                                Continue Without Vehicle Registration Number
+                                                <Field
+                                                    type="checkbox"
+                                                    name="confirm"
+                                                    value="1"
+                                                    className="user-self"
+                                                    onChange={(e) => {
+                                                        if (e.target.checked === true) {
+                                                            setFieldTouched('regNumber')
+                                                            setFieldValue('regNumber', '');
+                                                            setFieldTouched('confirm')
+                                                            setFieldValue('confirm', e.target.value);
+    
+                                                        } else {
+                                                            setFieldValue('confirm', '0');                                                            
+                                                        }
+                                                        if(this.setValueData()){
+                                                            this.setState({
+                                                                confirm:1
+                                                            })
+                                                        }
+                                                        else{
+                                                            this.setState({
+                                                                confirm:0
+                                                            })
+                                                        }
+                                                    }}
+                                                    checked={values.confirm == '1' ? true : false}
+                                                />
+                                                    <span className="checkmark mL-0"></span>
+                                                </label>
+                                                {errors.confirm && (touched.looking_for_2 || touched.looking_for_3 || touched.looking_for_4) ? 
+                                                        <span className="error-message">{errors.confirm}</span> : ""
+                                                    }
+                                                
+                                            </div> 
                                         <div className="cntrbtn">
                                         <Button className={`btnPrimary`} type="submit" >
                                             Go

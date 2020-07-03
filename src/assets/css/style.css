@@ -45,6 +45,7 @@ h4{font-size: 18px; line-height: 22px; font-weight: 600;}
 .m-l-15 {margin-left: 15px !important;}
 .p-d-25 {padding: 25px;}
 .pd-l-0 {padding-left: 0;}
+.pd-l-25 {padding-left: 25px;}
 .pd-30 {padding: 30px;}
 .p-r-25 {padding-right: 25px;}
 
@@ -324,6 +325,9 @@ ul.navPan li a span{ margin-bottom:8px; display: block; }
 /*---------Other Comprehensive close-------*/
 
 /*---------Additional Deatils section start-------*/
+.nmbract {position: relative;}
+.nmbract span {position: absolute; top: 0; left: 0; font-size: 14px;}
+.insurerName textarea, .insurerName input.active .nmbract span {display: block;}
 .hdtop {background: url(../images/hd-additional-bg.svg) no-repeat center center; max-width: 1060px; padding: 10px 0 20px; z-index: 2; border-radius: 25px 25px 0 0; margin: 0 auto; color: #ffffff; font-size: 15px;}
 
 .motrcar {text-align: center; margin-top: 50px;}

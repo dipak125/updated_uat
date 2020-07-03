@@ -18,16 +18,7 @@ import * as Yup from "yup";
 import swal from 'sweetalert';
 
 
-const initialValue = {
-    registration_no: "",
-    chasis_no: "",
-    chasis_no_last_part: "",
-    add_more_coverage: "",
-    cng_kit: "",
-    cngKit_Cost: 0,
-    engine_no: "",
-    vahanVerify: false
-}
+const initialValue = {}
 const ComprehensiveValidation = Yup.object().shape({
     // is_carloan: Yup.number().required('Please select one option')
 
@@ -43,7 +34,7 @@ const ComprehensiveValidation = Yup.object().shape({
     }),
 
     engine_no:Yup.string().required('Engine no is required')
-    .matches(/^[A-Z0-9]*$/, function() {
+    .matches(/^([A-z]{2}[A-z0-9]{5,16})$/, function() {
         return "Invalid engine number"
     })
     .min(7, function() {
@@ -53,27 +44,19 @@ const ComprehensiveValidation = Yup.object().shape({
         return "Engine no. should be maximum 18 characters"
     }),
 
-    chasis_no:Yup.string().required('Engine no is required')
-    .matches(/^[A-Z0-9]*$/, function() {
+    chasis_no:Yup.string().required('Chasis no is required')
+    .matches(/^([A-z]{2}[A-z0-9]{5,16})$/, function() {
         return "Invalid chasis number"
     })
     .min(7, function() {
-        return "Engine no. should be minimum 7 characters"
+        return "Chasis no. should be minimum 7 characters"
     })
     .max(18, function() {
-        return "Engine no. should be maximum 18 characters"
+        return "Chasis no. should be maximum 18 characters"
     }),
-
-    cng_kit:Yup.string().required("Please select an option"),
+    cng_kit:Yup.number().required('Please select an option'),
     // IDV:Yup.number().required('Declared value is required'),
     
-    cngKit_Cost: Yup.string().when(['cng_kit'], {
-        is: cng_kit => cng_kit == '1',       
-        then: Yup.string().required('Please provide CNG kit cost'),
-        othewise: Yup.string()
-    }).matches(/^([0-9]*)$/, function() {
-        return "Invalid number"
-    }),
    
     vahanVerify:Yup.boolean().notRequired('Please verify chasis number')
     .test(
@@ -220,7 +203,7 @@ class OtherComprehensive extends Component {
                 let values = []
                 this.setState({
                     motorInsurance,
-                    showCNG: motorInsurance.cng_kit == 1 ? true : false,
+                    showCNG: motorInsurance.cng_kit ? true : false,
                     vahanVerify: motorInsurance.chasis_no && motorInsurance.engine_no ? true : false
                 })
                 this.props.loadingStop();
@@ -317,7 +300,7 @@ class OtherComprehensive extends Component {
                     });
                   } else {
                     this.setState({
-                      fulQuoteResp: [],add_more_coverage,
+                      fulQuoteResp: [],
                       error: res.data,
                       serverResponse: []
                     });
@@ -427,9 +410,8 @@ class OtherComprehensive extends Component {
             chasis_no: motorInsurance.chasis_no ? motorInsurance.chasis_no : "",
             chasis_no_last_part: motorInsurance.chasis_no_last_part ? motorInsurance.chasis_no_last_part : "",
             add_more_coverage: motorInsurance.add_more_coverage ? motorInsurance.add_more_coverage : "",
-            // cng_kit: motorInsurance.cng_kit ? motorInsurance.cng_kit : "",
             cng_kit: motorInsurance.cng_kit == 0 || motorInsurance.cng_kit == 1 ? motorInsurance.cng_kit : is_CNG_account,
-            cngKit_Cost: motorInsurance.cngkit_cost ? Math.floor(motorInsurance.cngkit_cost) : 0,
+            cngKit_Cost: motorInsurance.cngkit_cost ? motorInsurance.cngkit_cost : 0,
             engine_no: motorInsurance.engine_no ? motorInsurance.engine_no : "",
             vahanVerify: vahanVerify
 
@@ -485,7 +467,7 @@ class OtherComprehensive extends Component {
                     onSubmit={ serverResponse && serverResponse != "" ? (serverResponse.message ? this.getAccessToken : this.handleSubmit ) : this.getAccessToken} 
                     validationSchema={ComprehensiveValidation}>
                     {({ values, errors, setFieldValue, setFieldTouched, isValid, isSubmitting, touched }) => {
-                            
+
                     return (
                         <Form>
                         <Row>
@@ -544,8 +526,7 @@ class OtherComprehensive extends Component {
                                                         name='chasis_no_last_part' 
                                                         autoComplete="off"
                                                         className="premiumslid"       
-                                                        value= {values.chasis_no_last_part}
-                                                        maxLength="5"       
+                                                        value= {values.chasis_no_last_part}       
                                                         onChange = {(e) => {
                                                             setFieldValue('vahanVerify', false)
                                                             setFieldTouched('chasis_no_last_part')
@@ -584,7 +565,7 @@ class OtherComprehensive extends Component {
                                                     autoComplete="off"
                                                     onFocus={e => this.changePlaceHoldClassAdd(e)}
                                                     onBlur={e => this.changePlaceHoldClassRemove(e)}
-                                                    value= {values.engine_no.toUpperCase()}
+                                                    value= {values.engine_no}
                                                 />
                                                 {errors.engine_no && touched.engine_no ? (
                                                     <span className="errorMsg">{errors.engine_no}</span>
@@ -602,9 +583,7 @@ class OtherComprehensive extends Component {
                                                     autoComplete="off"
                                                     onFocus={e => this.changePlaceHoldClassAdd(e)}
                                                     onBlur={e => this.changePlaceHoldClassRemove(e)}
-                                                    value= {values.chasis_no.toUpperCase()}
-                                                    maxLength="18"
-                                                    minLength="7"
+                                                    value= {values.chasis_no}
                                                 />
                                                 {errors.chasis_no && touched.chasis_no ? (
                                                     <span className="errorMsg">{errors.chasis_no}</span>
