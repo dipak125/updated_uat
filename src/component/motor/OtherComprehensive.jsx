@@ -31,6 +31,10 @@ const initialValue = {
 const ComprehensiveValidation = Yup.object().shape({
     // is_carloan: Yup.number().required('Please select one option')
 
+    registration_no: Yup.string().required('Please enter valid registration number')
+    .matches(/^[A-Z]{2}[ -][0-9]{1,2}(?: [A-Z])?(?: [A-Z]*)? [0-9]{4}$/, 'Invalid Registration number'),
+
+
     chasis_no_last_part:Yup.string().required('This field is required')
     .matches(/^([0-9]*)$/, function() {
         return "Invalid number"
@@ -43,25 +47,25 @@ const ComprehensiveValidation = Yup.object().shape({
     }),
 
     engine_no:Yup.string().required('Engine no is required')
-    .matches(/^[A-Z0-9]*$/, function() {
+    .matches(/^[A-Z0-9]+$/, function() {
         return "Invalid engine number"
     })
-    .min(7, function() {
-        return "Engine no. should be minimum 7 characters"
+    .min(5, function() {
+        return "Engine no. should be minimum 5 characters"
     })
-    .max(18, function() {
-        return "Engine no. should be maximum 18 characters"
+    .max(12, function() {
+        return "Engine no. should be maximum 12 characters"
     }),
 
-    chasis_no:Yup.string().required('Engine no is required')
-    .matches(/^[A-Z0-9]*$/, function() {
+    chasis_no:Yup.string().required('Chasis no is required')
+    .matches(/^[A-Z0-9]+$/, function() {
         return "Invalid chasis number"
     })
-    .min(7, function() {
-        return "Engine no. should be minimum 7 characters"
+    .min(5, function() {
+        return "Chasis no. should be minimum 5 characters"
     })
-    .max(18, function() {
-        return "Engine no. should be maximum 18 characters"
+    .max(12, function() {
+        return "Chasis no. should be maximum 12 characters"
     }),
 
     cng_kit:Yup.string().required("Please select an option"),
@@ -91,33 +95,33 @@ const ComprehensiveValidation = Yup.object().shape({
    
 });
 
-const moreCoverage = [
-    {
-        "id": "C101069",
-        "name":"Basic Road Side Assistance",
-        "description":"The e-Insurance account or Electronic Insurance Account offers policyholders online space to hold all their insurance policies electronically under one e-insurance account number. This allows the policyholder to access all their policies with a few clicks and no risk of losing the physical insurance policy"
-    },
-    {
-        "id": "C101072",
-        "name":"Depreciation Reimbursement",
-        "description": "The e-Insurance account or Electronic Insurance Account offers policyholders online space to hold all their insurance policies electronically under one e-insurance account number. This allows the policyholder to access all their policies with a few clicks and no risk of losing the physical insurance policy"
-    },
-    {
-        "id": "C101067",
-        "name":"Return to Invoice",
-        "description": "The e-Insurance account or Electronic Insurance Account offers policyholders online space to hold all their insurance policies electronically under one e-insurance account number. This allows the policyholder to access all their policies with a few clicks and no risk of losing the physical insurance policy"
-    },
-    {
-        "id": "C101108",
-        "name":"Engine Guard",
-        "description": "The e-Insurance account or Electronic Insurance Account offers policyholders online space to hold all their insurance policies electronically under one e-insurance account number. This allows the policyholder to access all their policies with a few clicks and no risk of losing the physical insurance policy"
-    },
-    {
-        "id": "C101111",
-        "name":"Cover for consumables",
-        "description": "The e-Insurance account or Electronic Insurance Account offers policyholders online space to hold all their insurance policies electronically under one e-insurance account number. This allows the policyholder to access all their policies with a few clicks and no risk of losing the physical insurance policy"
-    }
-]
+// const moreCoverage = [
+//     {
+//         "id": "C101069",
+//         "name":"Basic Road Side Assistance",
+//         "description":"The e-Insurance account or Electronic Insurance Account offers policyholders online space to hold all their insurance policies electronically under one e-insurance account number. This allows the policyholder to access all their policies with a few clicks and no risk of losing the physical insurance policy"
+//     },
+//     {
+//         "id": "C101072",
+//         "name":"Depreciation Reimbursement",
+//         "description": "The e-Insurance account or Electronic Insurance Account offers policyholders online space to hold all their insurance policies electronically under one e-insurance account number. This allows the policyholder to access all their policies with a few clicks and no risk of losing the physical insurance policy"
+//     },
+//     {
+//         "id": "C101067",
+//         "name":"Return to Invoice",
+//         "description": "The e-Insurance account or Electronic Insurance Account offers policyholders online space to hold all their insurance policies electronically under one e-insurance account number. This allows the policyholder to access all their policies with a few clicks and no risk of losing the physical insurance policy"
+//     },
+//     {
+//         "id": "C101108",
+//         "name":"Engine Guard",
+//         "description": "The e-Insurance account or Electronic Insurance Account offers policyholders online space to hold all their insurance policies electronically under one e-insurance account number. This allows the policyholder to access all their policies with a few clicks and no risk of losing the physical insurance policy"
+//     },
+//     {
+//         "id": "C101111",
+//         "name":"Cover for consumables",
+//         "description": "The e-Insurance account or Electronic Insurance Account offers policyholders online space to hold all their insurance policies electronically under one e-insurance account number. This allows the policyholder to access all their policies with a few clicks and no risk of losing the physical insurance policy"
+//     }
+// ]
 
 const Coverage = {
         "C101064":"Own Damage",
@@ -151,7 +155,10 @@ class OtherComprehensive extends Component {
             add_more_coverage: [],
             vahanDetails: [],
             vahanVerify: false,
-            policyCoverage: []
+            policyCoverage: [],
+            regno:'',
+            length:15,
+            moreCoverage: []
         };
     }
 
@@ -174,7 +181,6 @@ class OtherComprehensive extends Component {
     }
 
     handleChange = () => {
-        console.log('handleChange')
         this.setState({serverResponse: [], error: [] });
     }
 
@@ -250,34 +256,57 @@ class OtherComprehensive extends Component {
           });
       };
 
-    getVahanDetails = (chasiNo, regnNo, setFieldTouched, setFieldValue) => {
-       
-        const formData = new FormData();
-        formData.append("chasiNo", chasiNo);
-        formData.append("regnNo", regnNo);
-
+    getMoreCoverage = () => {
         this.props.loadingStart();
         axios
-          .post(`/getVahanDetails`,formData)
+          .get(`/coverage-list`)
           .then((res) => {
             this.setState({
-              vahanDetails: res.data,
-              vahanVerify: res.data.length > 0 ? true : false
+            moreCoverage: res.data.data,
             });
-
-            setFieldTouched('vahanVerify')
-            res.data.length > 0 ?
-            setFieldValue('vahanVerify', true) 
-            : setFieldValue('vahanVerify', false)
-
             this.props.loadingStop();
           })
           .catch((err) => {
             this.setState({
-                vahanDetails: [],
+                moreCoverage: [],
             });
             this.props.loadingStop();
           });
+      };
+
+    getVahanDetails = (chasiNo, regnNo, setFieldTouched, setFieldValue, errors) => {
+       
+        const formData = new FormData();
+        formData.append("chasiNo", chasiNo);
+        formData.append("regnNo", regnNo);
+        if(errors.registration_no || errors.chasis_no_last_part) {
+            swal("Please provide correct Registration number and Chasis number")
+        }
+        else {
+            this.props.loadingStart()
+            axios
+            .post(`/getVahanDetails`,formData)
+            .then((res) => {
+                this.setState({
+                vahanDetails: res.data,
+                vahanVerify: res.data.length > 0 ? true : false
+                });
+
+                setFieldTouched('vahanVerify')
+                res.data.length > 0 ?
+                setFieldValue('vahanVerify', true) 
+                : setFieldValue('vahanVerify', false)
+
+                this.props.loadingStop();
+            })
+            .catch((err) => {
+                this.setState({
+                    vahanDetails: [],
+                });
+                swal("Please provide correct Registration number and Chasis number")
+                this.props.loadingStop();
+            });
+        }
     };
 
     fullQuote = (access_token, values) => {
@@ -299,12 +328,12 @@ class OtherComprehensive extends Component {
         formData.append("cng_kit", cng_kit_flag);
         formData.append("cngKit_Cost", cngKit_Cost);
 
-        // const post_data = {
-        //     'id':localStorage.getItem('policyHolder_id'),
-        //     'access_token':access_token
-        // }
-        // let encryption = new Encryption();
-            // formData.append('enc_data',encryption.encrypt(JSON.stringify(post_data)))
+        const post_data = {
+            'id':localStorage.getItem('policyHolder_id'),
+            'access_token':access_token
+        }
+        let encryption = new Encryption();
+            formData.append('enc_data',encryption.encrypt(JSON.stringify(post_data)))
         axios.post('fullQuotePMCAR',formData)
             .then(res => {
                 if (res.data.PolicyObject) {
@@ -345,7 +374,7 @@ class OtherComprehensive extends Component {
             post_data = {
                 'policy_holder_id': localStorage.getItem('policyHolder_id'),
                 'menumaster_id': 1,
-                'registration_no': motorInsurance.registration_no,
+                'registration_no': motorInsurance.registration_no ? motorInsurance.registration_no : values.registration_no,
                 'chasis_no': values.chasis_no,
                 'chasis_no_last_part': values.chasis_no_last_part,
                 'cng_kit': values.cng_kit,
@@ -359,7 +388,7 @@ class OtherComprehensive extends Component {
             post_data = {
                 'policy_holder_id': localStorage.getItem('policyHolder_id'),
                 'menumaster_id': 1,
-                'registration_no': motorInsurance.registration_no,
+                'registration_no':motorInsurance.registration_no ? motorInsurance.registration_no : values.registration_no,
                 'chasis_no': values.chasis_no,
                 'chasis_no_last_part': values.chasis_no_last_part,
                 'cng_kit': values.cng_kit,
@@ -408,14 +437,20 @@ class OtherComprehensive extends Component {
         }
     }
 
+    toInputUppercase = e => {
+        e.target.value = ("" + e.target.value).toUpperCase();
+      };
+
 
     componentDidMount() {
         this.fetchData()
+        this.getMoreCoverage()
     }
 
 
     render() {
-        const {showCNG, vahanDetails,error, policyCoverage, vahanVerify, is_CNG_account, fulQuoteResp, PolicyArray, sliderVal, motorInsurance, serverResponse, add_more_coverage} = this.state
+        const {showCNG, vahanDetails,error, policyCoverage, vahanVerify, is_CNG_account, fulQuoteResp, PolicyArray, 
+            moreCoverage, sliderVal, motorInsurance, serverResponse} = this.state
         const {productId} = this.props.match.params 
         let defaultSliderValue = PolicyArray.length > 0 ? Math.floor(PolicyArray[0].PolicyRiskList[0].IDV_Suggested) : 0
         let sliderValue = sliderVal
@@ -434,7 +469,7 @@ class OtherComprehensive extends Component {
             vahanVerify: vahanVerify
 
         });
-
+        console.log("add_more_coverage", this.state.add_more_coverage)
         const policyCoverageList = policyCoverage && policyCoverage.length > 0 ?
         policyCoverage.map((coverage, qIndex) => {
             return(
@@ -485,7 +520,41 @@ class OtherComprehensive extends Component {
                     onSubmit={ serverResponse && serverResponse != "" ? (serverResponse.message ? this.getAccessToken : this.handleSubmit ) : this.getAccessToken} 
                     validationSchema={ComprehensiveValidation}>
                     {({ values, errors, setFieldValue, setFieldTouched, isValid, isSubmitting, touched }) => {
+                            this.state.regno = "";
+                                          
+                            if(values.registration_no.length>0){
+                            if(values.registration_no.toLowerCase().substring(0, 2) == "dl")
+                            {
+                                
+                                this.state.length = 15;
+                                if(values.registration_no.length<11)
+                            {
+                               
+                            this.state.regno=values.registration_no.replace(/[^A-Za-z0-9]+/g, '').replace(/(.{2})/g, '$1 ').trim();
                             
+                            }
+                            else{
+
+                                this.state.regno=values.registration_no;                                                
+                            }                                        
+
+                            }   
+                            else{ 
+                                
+                                this.state.length = 13;
+                            if(values.registration_no.length<10)
+                            {
+                               
+                            this.state.regno=values.registration_no.replace(/[^A-Za-z0-9]+/g, '').replace(/(.{2})/g, '$1 ').trim();
+                            
+                            }
+                            else{
+                                
+                                this.state.regno=values.registration_no;
+                                
+                            }
+                        }
+                        }
                     return (
                         <Form>
                         <Row>
@@ -517,9 +586,16 @@ class OtherComprehensive extends Component {
                                                         name='registration_no' 
                                                         autoComplete="off"
                                                         className="premiumslid"   
-                                                        value= {values.registration_no}                                        
-                                                        
+                                                        // value= {values.registration_no}    
+                                                        value={this.state.regno}
+                                                        maxLength={this.state.length}
+                                                        onInput={e=>{
+                                                            this.toInputUppercase(e)
+                                                        }}                                                 
                                                     />
+                                                {errors.registration_no ? (
+                                                    <span className="errorMsg">{errors.registration_no}</span>
+                                                ) : null}
                                             </div>
                                         </FormGroup>
                                     </Col>
@@ -565,7 +641,7 @@ class OtherComprehensive extends Component {
                                     <Col sm={12} md={2} lg={2}>
                                         <FormGroup>
                                         
-                                            <Button className="btn btn-primary vrifyBtn" onClick= {!errors.chasis_no_last_part ? this.getVahanDetails.bind(this,values.chasis_no_last_part, values.registration_no, setFieldTouched, setFieldValue) : null}>Verify</Button>
+                                            <Button className="btn btn-primary vrifyBtn" onClick= {!errors.chasis_no_last_part ? this.getVahanDetails.bind(this,values.chasis_no_last_part, values.registration_no, setFieldTouched, setFieldValue, errors) : null}>Verify</Button>
                                             {errors.vahanVerify ? (
                                                     <span className="errorMsg">{errors.vahanVerify}</span>
                                                 ) : null}
@@ -585,6 +661,7 @@ class OtherComprehensive extends Component {
                                                     onFocus={e => this.changePlaceHoldClassAdd(e)}
                                                     onBlur={e => this.changePlaceHoldClassRemove(e)}
                                                     value= {values.engine_no.toUpperCase()}
+                                                    maxLength="12"
                                                 />
                                                 {errors.engine_no && touched.engine_no ? (
                                                     <span className="errorMsg">{errors.engine_no}</span>
@@ -603,8 +680,7 @@ class OtherComprehensive extends Component {
                                                     onFocus={e => this.changePlaceHoldClassAdd(e)}
                                                     onBlur={e => this.changePlaceHoldClassRemove(e)}
                                                     value= {values.chasis_no.toUpperCase()}
-                                                    maxLength="18"
-                                                    minLength="7"
+                                                    maxLength="12"
                                                 />
                                                 {errors.chasis_no && touched.chasis_no ? (
                                                     <span className="errorMsg">{errors.chasis_no}</span>
@@ -752,8 +828,8 @@ class OtherComprehensive extends Component {
                                 </Row>
 
                                 <Row className="m-b-40">
-                                {moreCoverage.map((coverage, qIndex) => ( 
-                                                                                         
+                                {moreCoverage && moreCoverage.length > 0 ? moreCoverage.map((coverage, qIndex) => ( 
+                             
                                     <Col sm={12} md={6} lg={6}  key= {qIndex} > 
                                         <label className="customCheckBox formGrp formGrp">{coverage.name}
                                         <OverlayTrigger overlay={<Tooltip id="tooltip-disabled">{coverage.description}</Tooltip>}>
@@ -761,19 +837,19 @@ class OtherComprehensive extends Component {
                                             </OverlayTrigger>
                                             <Field
                                                 type="checkbox"
-                                                name={`moreCov_${qIndex}`}                                 
-                                                value={coverage.id}
+                                                name={`moreCov_${coverage.id}`}                                 
+                                                value={coverage.code}
                                                 className="user-self"
                                                 // checked={values.roadsideAssistance ? true : false}
-                                                onClick={(e) =>
+                                                onClick={(e) =>{
                                                     this.onRowSelect(e.target.value, e.target.checked )
-                                                }
+                                                }}
                                             />
                                             <span className="checkmark mL-0"></span>
                                             <span className="error-message"></span>
                                         </label>
                                     </Col>
-                                ))}
+                                )) : null}
                                     </Row>    
                                     <div className="d-flex justify-content-left resmb">
                                         <Button className={`backBtn`} type="button"  onClick= {this.vehicleDetails.bind(this,productId)}>
@@ -823,7 +899,7 @@ class OtherComprehensive extends Component {
                     <Modal.Body>
                     <h5> Net Premium Amount  ₹ {fulQuoteResp.DuePremium}</h5>
                     <h5> Gross Premium Amount  ₹ {fulQuoteResp.BeforeVatPremium}</h5>
-                    <h5> Service Tax  ₹ {fulQuoteResp.TGST}</h5>
+                    <h5> Applicable Taxs  ₹ {fulQuoteResp.TGST}</h5>
                     
                     </Modal.Body>
                 </Modal>

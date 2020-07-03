@@ -42,7 +42,8 @@ const initialValue = {
     phone: "",
     email: "",
     address: "",
-    eIA: "",
+    is_eia_account: "",
+    eia_no: "",
     stateName: "",
     pinDataArr: []
 }
@@ -156,8 +157,8 @@ const ownerValidation = Yup.object().shape({
         }
     ),
    
-    eIA: Yup.string().required('This field is required'),
-    eia_account_no: Yup.string().min(13, function() {
+    is_eia_account: Yup.string().required('This field is required'),
+    eia_no: Yup.string().min(13, function() {
         return "EIA no must be minimum 13 chracters"
     })
     .max(13, function() {
@@ -188,7 +189,8 @@ class AdditionalDetails extends Component {
         insurerList: [],
         policyHolder: {},
         nomineeDetails: {},
-        quoteId: ""
+        quoteId: "",
+        bankDetails: {}
     };
     
 
@@ -262,8 +264,8 @@ class AdditionalDetails extends Component {
             'nominee_dob':moment(values['nominee_dob']).format("YYYY-MM-DD"),
             'phone': values['phone'],
             'email': values['email'],
-            'eIA': values['eIA'],
-            'eia_account_no': values['eia_account_no'],
+            'is_eia_account': values['is_eia_account'],
+            'eia_no': values['eia_no'],
             'address': values['address']
         }
 console.log('post_data', post_data);
@@ -296,8 +298,10 @@ console.log('post_data', post_data);
                  let nomineeDetails = res.data.data.policyHolder ? res.data.data.policyHolder.request_data.nominee[0] : {}
                  let is_loan_account = res.data.data.policyHolder ? res.data.data.policyHolder.is_carloan : 0
                  let quoteId = res.data.data.policyHolder ? res.data.data.policyHolder.request_data.quote_id : ""
+                 let is_eia_account=  policyHolder && (policyHolder.is_eia_account == 0 || policyHolder.is_eia_account == 1) ? policyHolder.is_eia_account : ""
+                 let bankDetails = res.data.data.policyHolder && res.data.data.policyHolder.bankdetail ? res.data.data.policyHolder.bankdetail[0] : {};
                 this.setState({
-                    quoteId, motorInsurance, previousPolicy, vehicleDetails, policyHolder, nomineeDetails, is_loan_account
+                    quoteId, motorInsurance, previousPolicy, vehicleDetails, policyHolder, nomineeDetails, is_loan_account, is_eia_account, bankDetails
                 })
                 this.props.loadingStop();
             })
@@ -346,8 +350,10 @@ console.log('post_data', post_data);
    
 
     render() {
-        const {showEIA, is_eia_account, showLoan, is_loan_account, nomineeDetails, policyHolder, stateName, pinDataArr, quoteId} = this.state
+        const {showEIA, is_eia_account, showLoan, is_loan_account, nomineeDetails, 
+            bankDetails,policyHolder, stateName, pinDataArr, quoteId} = this.state
         const {productId} = this.props.match.params 
+        
 
         let newInitialValues = Object.assign(initialValue, {
             first_name: policyHolder && policyHolder.first_name ? policyHolder.first_name : "",
@@ -358,8 +364,8 @@ console.log('post_data', post_data);
             pincode: policyHolder && policyHolder.pincode ? policyHolder.pincode : "",
             address: policyHolder && policyHolder.address ? policyHolder.address : "",
             is_carloan:is_loan_account,
-            bank_name: policyHolder && policyHolder.length > 0 ? policyHolder.location : "",
-            bank_branch: policyHolder && policyHolder.length > 0 ? policyHolder.location : "",
+            bank_name: bankDetails ? bankDetails.bank_name : "",
+            bank_branch: bankDetails ? bankDetails.bank_branch : "",
             nominee_relation_with: nomineeDetails && nomineeDetails.relation_with ? nomineeDetails.relation_with : "",
             nominee_first_name: nomineeDetails && nomineeDetails.first_name ? nomineeDetails.first_name : "",
             nominee_gender: nomineeDetails && nomineeDetails.gender ? nomineeDetails.gender : "",
@@ -368,7 +374,8 @@ console.log('post_data', post_data);
             phone: policyHolder && policyHolder.mobile ? policyHolder.mobile : "",
             email:  policyHolder && policyHolder.email_id ? policyHolder.email_id : "",
             address: policyHolder && policyHolder.address ? policyHolder.address : "",
-            eIA:  policyHolder && (policyHolder.is_eia_account == 0 || policyHolder.is_eia_account == 1) ? policyHolder.is_eia_account : "",
+            is_eia_account:  is_eia_account,
+            eia_no: policyHolder && policyHolder.eia_no ? policyHolder.eia_no : "",
 
         });
 
@@ -606,7 +613,7 @@ console.log('post_data', post_data);
                                         </FormGroup>
                                     </Col>
                                     <Col sm={12} md={4} lg={4}>
-                                        <FormGroup>
+                                        <FormGroup className="m-b-25">
                                             <div className="insurerName nmbract">
                                                 <span>+91</span>
                                             <Field
@@ -620,7 +627,7 @@ console.log('post_data', post_data);
                                                 className="phoneinput pd-l-25"                                                                          
                                             />
                                             {errors.phone && touched.phone ? (
-                                            <span className="errorMsg">{errors.phone}</span>
+                                            <span className="errorMsg msgpositn">{errors.phone}</span>
                                             ) : null}  
                                             </div>
                                         </FormGroup>
@@ -841,14 +848,14 @@ console.log('post_data', post_data);
                                                     <label className="customRadio3">
                                                     <Field
                                                         type="radio"
-                                                        name='eIA'                                            
+                                                        name='is_eia_account'                                            
                                                         value='1'
                                                         key='1'  
                                                         onChange={(e) => {
-                                                            setFieldValue(`eIA`, e.target.value);
+                                                            setFieldValue(`is_eia_account`, e.target.value);
                                                             this.showEIAText(1);
                                                         }}
-                                                        checked={values.eIA == '1' ? true : false}
+                                                        checked={values.is_eia_account == '1' ? true : false}
                                                     />
                                                         <span className="checkmark " /><span className="fs-14"> Yes</span>
                                                     </label>
@@ -858,40 +865,40 @@ console.log('post_data', post_data);
                                                     <label className="customRadio3">
                                                         <Field
                                                         type="radio"
-                                                        name='eIA'                                            
+                                                        name='is_eia_account'                                            
                                                         value='0'
                                                         key='1'  
                                                         onChange={(e) => {
-                                                            setFieldValue(`eIA`, e.target.value);
+                                                            setFieldValue(`is_eia_account`, e.target.value);
                                                             this.showEIAText(0);
                                                         }}
-                                                        checked={values.eIA == '0' ? true : false}
+                                                        checked={values.is_eia_account == '0' ? true : false}
                                                     />
                                                         <span className="checkmark" />
                                                         <span className="fs-14">No</span>
-                                                        {errors.eIA && touched.eIA ? (
-                                                        <span className="errorMsg">{errors.eIA}</span>
+                                                        {errors.is_eia_account && touched.is_eia_account ? (
+                                                        <span className="errorMsg">{errors.is_eia_account}</span>
                                                     ) : null}
                                                     </label>
                                                 </div>
                                             </div>
                                         </FormGroup>
                                     </Col>
-                                    {showEIA || is_eia_account == 1 ?
+                                    {showEIA || is_eia_account == '1' ?
                                     <Col sm={12} md={4} lg={4}>
                                         <FormGroup>
                                         <div className="insurerName">   
                                             <Field
-                                                name="eia_account_no"
+                                                name="eia_no"
                                                 type="text"
                                                 placeholder="EIA Number"
                                                 autoComplete="off"
-                                                value = {values.eia_account_no}
+                                                value = {values.eia_no}
                                                 onFocus={e => this.changePlaceHoldClassAdd(e)}
                                                 onBlur={e => this.changePlaceHoldClassRemove(e)}
                                             />
-                                            {errors.eia_account_no && touched.eia_account_no ? (
-                                            <span className="errorMsg">{errors.eia_account_no}</span>
+                                            {errors.eia_no && touched.eia_no ? (
+                                            <span className="errorMsg">{errors.eia_no}</span>
                                             ) : null}                                             
                                             </div>
                                         </FormGroup>

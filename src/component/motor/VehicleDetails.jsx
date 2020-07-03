@@ -21,10 +21,12 @@ import {
     checkGreaterStartEndTimes
   } from "../../shared/validationFunctions";
 
+const year = new Date('Y')
 const ageObj = new PersonAge();
 const minDate = moment(moment().subtract(1, 'years').calendar()).add(1, 'day').calendar();
 const maxDate = moment(minDate).add(30, 'day').calendar();
 const minRegnDate = moment().subtract(18, 'years').calendar();
+const maxRegnDate = moment().endOf('year').format('YYYY-MM-DD hh:mm');
 
 const initialValue = {
     registration_date: "",
@@ -191,8 +193,19 @@ const vehicleRegistrationValidation = Yup.object().shape({
             return "Please enter previous claim bonus"
         },
         function (value) {
-            const ageObj = new PersonAge();
-            if (ageObj.whatIsCurrentMonth(this.parent.registration_date) > 0 && !value) {   
+            if (this.parent.previous_is_claim == '0' && !value) {   
+                return false;    
+            }
+            return true;
+        }
+    )
+    .test(
+        "previousClaimChecking",
+        function() {
+            return "Please enter previous claim bonus"
+        },
+        function (value) {
+            if (this.parent.previous_is_claim == '1' && !value && this.parent.previous_claim_for == '2') {   
                 return false;    
             }
             return true;
@@ -212,7 +225,12 @@ const vehicleRegistrationValidation = Yup.object().shape({
             }
             return true;
         }
-    )
+    ),
+    previous_claim_for:Yup.string().when(['previous_is_claim'], {
+        is: previous_is_claim => previous_is_claim == '1',       
+        then: Yup.string().required('Please provide previous clain for'),
+        othewise: Yup.string()
+    }),
    
 });
 
@@ -235,7 +253,8 @@ class VehicleDetails extends Component {
         customerDetails: [],
         selectedCustomerRecords: [],
         CustIdkeyword: "",
-        RTO_location: ""
+        RTO_location: "",
+        previous_is_claim: ""
     };
 
     changePlaceHoldClassAdd(e) {
@@ -330,6 +349,7 @@ class VehicleDetails extends Component {
         const {productId} = this.props.match.params 
         ageObj.whatIsCurrentMonth(values.registration_date) < 7 ? localStorage.setItem('policy_type', 6) : 
         localStorage.setItem('policy_type', 1)
+        let vehicleAge = ageObj.whatIsMyVehicleAge(values.registration_date)
         const formData = new FormData(); 
         let encryption = new Encryption();
         let post_data = {}
@@ -345,19 +365,20 @@ class VehicleDetails extends Component {
                 'insurance_company_id':values.insurance_company_id,
                 'previous_city':values.previous_city,
                 'previous_is_claim':values.previous_is_claim,
-                'previous_claim_bonus': values.previous_claim_bonus,
-                'previous_claim_for': values.previous_claim_for,             
+                'previous_claim_bonus': values.previous_claim_bonus ? values.previous_claim_bonus : 0,
+                'previous_claim_for': values.previous_claim_for,        
+                'vehicleAge': vehicleAge     
                 
             } 
         }
-        else if(ageObj.whatIsCurrentMonth(values.registration_date) == 0)  {
+        else if(ageObj.whatIsCurrentMonth(values.registration_date) <= 0)  {
             post_data = {
                 'policy_holder_id':localStorage.getItem('policyHolder_id'),
                 'menumaster_id':1,
                 'registration_date':moment(values.registration_date).format("YYYY-MM-DD"),
                 'location_id':values.location_id,    
                 'previous_is_claim':'0', 
-                // 'previous_policy_name':localStorage.getItem('policy_type'),
+                'vehicleAge': vehicleAge ,
             } 
         }
         console.log('post_data', post_data)
@@ -424,8 +445,9 @@ class VehicleDetails extends Component {
                  let previousPolicy = res.data.data.policyHolder ? res.data.data.policyHolder.previouspolicy : {};
                  let vehicleDetails = res.data.data.policyHolder ? res.data.data.policyHolder.vehiclebrandmodel : {};
                  let RTO_location = motorInsurance && motorInsurance.location && motorInsurance.location.RTO_LOCATION ? motorInsurance.location.RTO_LOCATION : ""
+                 let previous_is_claim= previousPolicy && (previousPolicy.is_claim == 0 || previousPolicy.is_claim == 1) ? previousPolicy.is_claim : ""
                 this.setState({
-                    motorInsurance, previousPolicy, vehicleDetails,RTO_location
+                    motorInsurance, previousPolicy, vehicleDetails,RTO_location, previous_is_claim
                 })
                 this.props.loadingStop();
             })
@@ -467,7 +489,7 @@ class VehicleDetails extends Component {
             previous_policy_name: previousPolicy && previousPolicy.name ? previousPolicy.name : "",
             insurance_company_id: previousPolicy && previousPolicy.insurancecompany && previousPolicy.insurancecompany.id ? previousPolicy.insurancecompany.id : "",
             previous_city: previousPolicy && previousPolicy.city ? previousPolicy.city : "",
-            previous_is_claim: previousPolicy && (previousPolicy.is_claim == 0 || previousPolicy.is_claim == 1) ? previousPolicy.is_claim : "",
+            previous_is_claim: previous_is_claim,
             previous_claim_bonus: previousPolicy && previousPolicy.claim_bonus ? Math.floor(previousPolicy.claim_bonus) : "",
             previous_claim_for: previousPolicy && previousPolicy.claim_for ? previousPolicy.claim_for : "",
 
@@ -502,7 +524,6 @@ class VehicleDetails extends Component {
                     <div className="brand-bg">
                         <Formik initialValues={newInitialValues} onSubmit={this.handleSubmit} validationSchema={vehicleRegistrationValidation}>
                             {({ values, errors, setFieldValue, setFieldTouched, isValid, isSubmitting, touched }) => {
-                                console.log(values);
 
                                 return (
                                     <Form>
@@ -523,7 +544,7 @@ class VehicleDetails extends Component {
                                                             <DatePicker
                                                                 name="registration_date"
                                                                 minDate={new Date(minRegnDate)}
-                                                                maxDate={new Date()}
+                                                                maxDate={new Date(maxRegnDate)}
                                                                 dateFormat="dd MMM yyyy"
                                                                 placeholderText="Registration Date"
                                                                 peekPreviousMonth
@@ -536,6 +557,10 @@ class VehicleDetails extends Component {
                                                                 onChange={(val) => {
                                                                     setFieldTouched('registration_date');
                                                                     setFieldValue('registration_date', val); 
+
+                                                                    setFieldValue('previous_end_date', ""); 
+                                                                    setFieldValue('previous_start_date', ""); 
+                                                                    
                                                                 }}
                                                                 
                                                             />
@@ -608,8 +633,9 @@ class VehicleDetails extends Component {
                                                                 className="datePckr inputfs12"
                                                                 selected={values.previous_start_date}
                                                                 onChange={(val) => {
-                                                                    setFieldValue('previous_start_date', val);
+                                                                    setFieldTouched('previous_start_date')
                                                                     setFieldValue("previous_end_date", addDays(new Date(val), 365));
+                                                                    setFieldValue('previous_start_date', val);
                                                                 }}
                                                             />
                                                             {errors.previous_start_date && touched.previous_start_date ? (
@@ -792,6 +818,7 @@ class VehicleDetails extends Component {
                                                     </Col>
                                                 </Row>
                                             : null }
+                                            { values.previous_claim_for == "2" || previous_is_claim == "0" ?
                                                 <Row className="m-b-30">
                                                     <Col sm={12} md={5} lg={5}>
                                                         <FormGroup>
@@ -826,6 +853,7 @@ class VehicleDetails extends Component {
                                                         </FormGroup>
                                                     </Col>
                                                 </Row>
+                                            : null} 
                                                 </Fragment> : null }
                                                 <div className="d-flex justify-content-left resmb">
                                                 <Button className={`backBtn`} type="button"  disabled={isSubmitting ? true : false} onClick= {this.selectBrand.bind(this,productId)}>

@@ -327,7 +327,7 @@ ul.navPan li a span{ margin-bottom:8px; display: block; }
 /*---------Additional Deatils section start-------*/
 .nmbract {position: relative;}
 .nmbract span {position: absolute; top: 0; left: 0; font-size: 14px;}
-.insurerName textarea, .insurerName input.active .nmbract span {display: block;}
+.msgpositn {position: absolute !important; top: 23px !important; left: 0 !important;}
 .hdtop {background: url(../images/hd-additional-bg.svg) no-repeat center center; max-width: 1060px; padding: 10px 0 20px; z-index: 2; border-radius: 25px 25px 0 0; margin: 0 auto; color: #ffffff; font-size: 15px;}
 
 .motrcar {text-align: center; margin-top: 50px;}
@@ -631,4 +631,4 @@ Note: Beware of modifying this element as it can break the animations - you shou
     position: absolute;
     top: 0;
 }
-.errorMsg{ color: #ff0000; font-size: 12px; line-height: 14px; display: block; padding-top: 4px;}
+.errorMsg{ color: #ff0000; font-size: 12px !important; line-height: 14px; display: block; padding-top: 4px;}
