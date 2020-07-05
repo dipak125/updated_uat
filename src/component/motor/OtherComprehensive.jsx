@@ -26,14 +26,20 @@ const initialValue = {
     cng_kit: "",
     cngKit_Cost: 0,
     engine_no: "",
-    vahanVerify: false
+    vahanVerify: false,
+    newRegistrationNo: ""
 }
 const ComprehensiveValidation = Yup.object().shape({
     // is_carloan: Yup.number().required('Please select one option')
 
-    registration_no: Yup.string().required('Please enter valid registration number')
-    .matches(/^[A-Z]{2}[ -][0-9]{1,2}(?: [A-Z])?(?: [A-Z]*)? [0-9]{4}$/, 'Invalid Registration number'),
+    // registration_no: Yup.string().required('Please enter valid registration number')
+    // .matches(/^[A-Z]{2}[ -][0-9]{1,2}(?: [A-Z])?(?: [A-Z]*)? [0-9]{4}$/, 'Invalid Registration number'),
 
+    registration_no: Yup.string().when("newRegistrationNo", {
+        is: "NEW",       
+        then: Yup.string(),
+        otherwise: Yup.string().required('Please provide registration number').matches(/^[A-Z]{2}[ -][0-9]{1,2}(?: [A-Z])?(?: [A-Z]*)? [0-9]{4}$/, 'Invalid Registration number'),
+    }),
 
     chasis_no_last_part:Yup.string().required('This field is required')
     .matches(/^([0-9]*)$/, function() {
@@ -259,7 +265,7 @@ class OtherComprehensive extends Component {
     getMoreCoverage = () => {
         this.props.loadingStart();
         axios
-          .get(`/coverage-list`)
+          .get(`/coverage-list/${localStorage.getItem('policyHolder_id')}`)
           .then((res) => {
             this.setState({
             moreCoverage: res.data.data,
@@ -274,11 +280,20 @@ class OtherComprehensive extends Component {
           });
       };
 
-    getVahanDetails = (chasiNo, regnNo, setFieldTouched, setFieldValue, errors) => {
-       
+    getVahanDetails = (values, setFieldTouched, setFieldValue, errors) => {
+
         const formData = new FormData();
-        formData.append("chasiNo", chasiNo);
-        formData.append("regnNo", regnNo);
+        if(values.newRegistrationNo == "NEW") {
+            formData.append("regnNo", values.newRegistrationNo);
+            setFieldTouched('registration_no');
+            setFieldValue('registration_no', values.newRegistrationNo);
+        }
+        else {
+            formData.append("regnNo", values.registration_no);
+        }
+
+        formData.append("chasiNo", values.chasis_no_last_part);
+        
         if(errors.registration_no || errors.chasis_no_last_part) {
             swal("Please provide correct Registration number and Chasis number")
         }
@@ -466,10 +481,11 @@ class OtherComprehensive extends Component {
             cng_kit: motorInsurance.cng_kit == 0 || motorInsurance.cng_kit == 1 ? motorInsurance.cng_kit : is_CNG_account,
             cngKit_Cost: motorInsurance.cngkit_cost ? Math.floor(motorInsurance.cngkit_cost) : 0,
             engine_no: motorInsurance.engine_no ? motorInsurance.engine_no : "",
-            vahanVerify: vahanVerify
+            vahanVerify: vahanVerify,
+            newRegistrationNo: localStorage.getItem('registration_number') == "NEW" ? localStorage.getItem('registration_number') : ""
 
         });
-        console.log("add_more_coverage", this.state.add_more_coverage)
+
         const policyCoverageList = policyCoverage && policyCoverage.length > 0 ?
         policyCoverage.map((coverage, qIndex) => {
             return(
@@ -522,7 +538,7 @@ class OtherComprehensive extends Component {
                     {({ values, errors, setFieldValue, setFieldTouched, isValid, isSubmitting, touched }) => {
                             this.state.regno = "";
                                           
-                            if(values.registration_no.length>0){
+                            if(values.registration_no.length>0 && values.newRegistrationNo != "NEW"){
                             if(values.registration_no.toLowerCase().substring(0, 2) == "dl")
                             {
                                 
@@ -581,6 +597,7 @@ class OtherComprehensive extends Component {
                                 <Col sm={12} md={5} lg={6}>
                                         <FormGroup>
                                             <div className="insurerName">
+                                            {values.newRegistrationNo != "NEW" ?
                                                     <Field
                                                         type="text"
                                                         name='registration_no' 
@@ -592,7 +609,17 @@ class OtherComprehensive extends Component {
                                                         onInput={e=>{
                                                             this.toInputUppercase(e)
                                                         }}                                                 
+                                                    /> :
+                                                    <Field
+                                                        type="text"
+                                                        name='registration_no' 
+                                                        autoComplete="off"
+                                                        className="premiumslid"   
+                                                        value= {values.newRegistrationNo}    
+                                                        disabled = {true}                                                 
                                                     />
+
+                                                }
                                                 {errors.registration_no ? (
                                                     <span className="errorMsg">{errors.registration_no}</span>
                                                 ) : null}
@@ -624,8 +651,9 @@ class OtherComprehensive extends Component {
                                                         maxLength="5"       
                                                         onChange = {(e) => {
                                                             setFieldValue('vahanVerify', false)
+
                                                             setFieldTouched('chasis_no_last_part')
-                                                            setFieldValue('chasis_no_last_part', e.target.value)                        
+                                                            setFieldValue('chasis_no_last_part', e.target.value)                       
                                                         }}                           
                                                         
                                                     />
@@ -641,7 +669,7 @@ class OtherComprehensive extends Component {
                                     <Col sm={12} md={2} lg={2}>
                                         <FormGroup>
                                         
-                                            <Button className="btn btn-primary vrifyBtn" onClick= {!errors.chasis_no_last_part ? this.getVahanDetails.bind(this,values.chasis_no_last_part, values.registration_no, setFieldTouched, setFieldValue, errors) : null}>Verify</Button>
+                                            <Button className="btn btn-primary vrifyBtn" onClick= {!errors.chasis_no_last_part ? this.getVahanDetails.bind(this,values, setFieldTouched, setFieldValue, errors) : null}>Verify</Button>
                                             {errors.vahanVerify ? (
                                                     <span className="errorMsg">{errors.vahanVerify}</span>
                                                 ) : null}

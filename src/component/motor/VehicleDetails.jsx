@@ -350,6 +350,7 @@ class VehicleDetails extends Component {
         ageObj.whatIsCurrentMonth(values.registration_date) < 7 ? localStorage.setItem('policy_type', 6) : 
         localStorage.setItem('policy_type', 1)
         let vehicleAge = ageObj.whatIsMyVehicleAge(values.registration_date)
+        let ageDiff = Math.floor(moment().diff(values.registration_date, 'days', true));
         const formData = new FormData(); 
         let encryption = new Encryption();
         let post_data = {}
@@ -381,7 +382,15 @@ class VehicleDetails extends Component {
                 'vehicleAge': vehicleAge ,
             } 
         }
-        console.log('post_data', post_data)
+
+        if(ageDiff < 0) {
+            localStorage.setItem('registration_number', "NEW");
+        }
+        else if(ageDiff > 0) {
+            localStorage.removeItem('registration_number');
+        }
+
+        console.log('ageDiff', ageDiff)
         formData.append('enc_data',encryption.encrypt(JSON.stringify(post_data)))
         this.props.loadingStart();
         axios
