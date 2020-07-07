@@ -97,6 +97,7 @@ class ThankYouPage extends Component {
           this.props.loadingStop();
           localStorage.removeItem("policyHolder_id");
           localStorage.removeItem("policyHolder_refNo");
+          localStorage.removeItem("policy_type");
           sessionStorage.removeItem('pan_data');
           sessionStorage.removeItem('email_data');
           sessionStorage.removeItem('proposed_insured');
@@ -118,6 +119,7 @@ class ThankYouPage extends Component {
 
   downloadDoc = (file_path) => {
     console.log(file_path);
+    const { policyId } = this.props.match.params
     // const url = file_path;
     // const fileName = "b7b98d12c9da4f44b7f5e372945fbf7f.pdf"
     // const pom = document.createElement('a');
@@ -139,7 +141,8 @@ class ThankYouPage extends Component {
         a.style.display = 'none';
         a.href = url;
         // the filename you want
-        a.download = 'b7b98d12c9da4f44b7f5e372945fbf7f.pdf';
+        // a.download = 'b7b98d12c9da4f44b7f5e372945fbf7f.pdf';
+        a.download = policyId+'.pdf';
         document.body.appendChild(a);
         a.click();
         window.URL.revokeObjectURL(url);
