@@ -124,24 +124,6 @@ class PolicyDetails extends Component {
       });
   };
 
-  // getAccessTokenForInception = (e) => {
-  //   this.handleClose()
-  //   this.props.loadingStart();
-  //   axios
-  //     .post(`/callTokenService`)
-  //     .then((res) => {
-  //       this.setState({
-  //         accessToken: res.data.access_token,
-  //       });
-  //       this.policyInception(res.data.access_token);
-  //     })
-  //     .catch((err) => {
-  //       this.setState({
-  //         accessToken: [],
-  //       });
-  //       this.props.loadingStop();
-  //     });
-  // };
 
   fullQuote = (access_token, policyHolderDetails) => {
     let id = localStorage.getItem("policyHolder_id");
@@ -186,50 +168,6 @@ class PolicyDetails extends Component {
       });
   };
 
-  // policyInception = (access_token) => {
-  //   const { fulQuoteResp, error } = this.state;
-  //   const formData = new FormData();
-  //  // formData.append("quotationNo", fulQuoteResp.QuotationNo);
-  //   //formData.append("amount", fulQuoteResp.DuePremium);
-  //   //formData.append("access_token", access_token);
-
-  //   let encryption = new Encryption();
-
-  //   //formData.append("id", id);
-  //   //formData.append("insureValue", insureValue);
-  //   //formData.append("access_token", access_token);
-  //   const post_data = {
-  //     "quotationNo":fulQuoteResp.QuotationNo,
-  //     "amount":fulQuoteResp.DuePremium,
-  //     "access_token":access_token
-  //   }
-  //   formData.append('enc_data',encryption.encrypt(JSON.stringify(post_data)))    
-
-  //   axios
-  //     .post(`/callIssueQuoteMod`, formData)
-  //     .then((res) => {
-  //       if (res.data.PolicyNo) {
-  //         this.setState({
-  //           purchaseData: res.data,
-  //           error1: [],
-  //         });
-  //         this.policySummery(res.data.PolicyNo);
-  //       } else {
-  //         this.setState({
-  //           purchaseData: [],
-  //           error1: res.data,
-  //         });
-  //         swal("Thank you for showing your interest for buying product.Due to some reasons, we are not able to issue the policy online.Please call 180 22 1111");
-  //       }
-  //       this.props.loadingStop();
-  //     })
-  //     .catch((err) => {
-  //       this.setState({
-  //         serverResponse: [],
-  //       });
-  //       this.props.loadingStop();
-  //     });
-  // };
 
   payment = () => {
     const { refNumber } = this.state;
@@ -474,7 +412,7 @@ class PolicyDetails extends Component {
                         {fulQuoteResp.QuotationNo ? 
                           <button
                             className="proceedBtn"
-                            onClick= {this.handleShow }
+                            onClick= {this.payment }
                           >
                             Make Payment
                           </button> : null

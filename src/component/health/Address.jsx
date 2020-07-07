@@ -366,29 +366,23 @@ class Address extends Component {
             if(addressDetails){
                 let pincode = addressDetails.pincode;
                 const formData = new FormData();
-                let encryption = new Encryption();
+                // let encryption = new Encryption();
 
-               const post_data_obj = {
-                    'pincode':pincode.toString()
-                };
+            //    const post_data_obj = {
+            //         'pincode':pincode.toString()
+            //     };
                // let encryption = new Encryption();
-               formData.append('enc_data',encryption.encrypt(JSON.stringify(post_data_obj)))
+            //    formData.append('enc_data',encryption.encrypt(JSON.stringify(post_data_obj)))
 
+                formData.append('pincode', pincode)
                 this.props.loadingStart();
-                axios.post('generate-pincode-details',
+                axios.post('pincode-details',
                 formData
                 ).then(res=>{
-                    let pinData = res.data.trim();               
-                    let pinDataArr = JSON.parse(pinData.substring(0,pinData.length-10))   
-                    let stateName=pinDataArr.map(resource=>
-                        resource.STATE_NM
-                    )  
-                    var unique = stateName.filter((v, i, a) => a.indexOf(v) === i); 
-                    
-                        
+                    let stateName = res.data.data && res.data.data[0] && res.data.data[0].pinstate.STATE_NM ? res.data.data[0].pinstate.STATE_NM : ""                        
                     this.setState({
-                        pinDataArr,
-                        stateName:unique,
+                        pinDataArr: res.data.data,
+                        stateName,
                     });
                     this.props.loadingStop();
                 }).
@@ -400,47 +394,30 @@ class Address extends Component {
     }
 
     fetchAreadetails=(e)=>{
-        //let pinCode=obj.value;
-        let pinCode = e.target.value;
-       
+        let pinCode = e.target.value;      
+
         if(pinCode.length==6){
-
             const formData = new FormData();
-            ///formData.append('pincode',pinCode);
             this.props.loadingStart();
-
             let encryption = new Encryption();
-
-           // formData.append('pincode',pinCode);
             const post_data_obj = {
                 'pincode':pinCode
             };
-           // let encryption = new Encryption();
-           formData.append('enc_data',encryption.encrypt(JSON.stringify(post_data_obj)))
-           axios.post('generate-pincode-details',
-            formData
-            ).then(res=>{
-                let pinData = res.data.trim();               
-                let pinDataArr = JSON.parse(pinData.substring(0,pinData.length-10))   
-                let stateName=pinDataArr.map(resource=>
-                    resource.STATE_NM
-                )  
-                var unique = stateName.filter((v, i, a) => a.indexOf(v) === i); 
-                
-                    
+        //    formData.append('enc_data',encryption.encrypt(JSON.stringify(post_data_obj)))
+           formData.append('pincode',pinCode)
+           axios.post('pincode-details', formData)
+           .then(res=>{       
+                let stateName = res.data.data && res.data.data[0] && res.data.data[0].pinstate.STATE_NM ? res.data.data[0].pinstate.STATE_NM : ""                        
                 this.setState({
-                    pinDataArr,
-                    stateName:unique,
+                    pinDataArr: res.data.data,
+                    stateName,
                 });
                 this.props.loadingStop();
             }).
             catch(err=>{
                 this.props.loadingStop();
-            })
-           
-
-        }
-        
+            })          
+        }       
     }
 
     changePlaceHoldClassRemove(e) {
@@ -1100,7 +1077,7 @@ class Address extends Component {
                                                                     autoComplete="off"
                                                                     onFocus={e => this.changePlaceHoldClassAdd(e)}
                                                                     onBlur={e => this.changePlaceHoldClassRemove(e)}
-                                                                    value={stateName ? stateName[0] : values.state} 
+                                                                    value={stateName ? stateName : values.state} 
                                                                     disabled = {true}
                                                                     
                                                                 />
@@ -1112,9 +1089,9 @@ class Address extends Component {
                                                     </Col>
                                                 </Row>
 
-                                                <div className="d-flex justify-content-left align-items-center m-b-40">
+                                                <div className="d-flex flex-column flex-sm-column flex-md-column flex-lg-row justify-content-left m-b-40">
                                                 
-                                            <div className="proposr m-r-60"><p>Do you have an eIA number? 
+                                            <div className="proposr prsres m-r-60"><p>Do you have an eIA number? 
                                             <OverlayTrigger overlay={<Tooltip id="tooltip-disabled">The e-Insurance account or Electronic Insurance Account offers policyholders online space to hold all their insurance policies electronically under one e-insurance account number. This allows the policyholder to access all their policies with a few clicks and no risk of losing the physical insurance policy</Tooltip>}>
                                             <a href="#" className="infoIcon"><img src={require('../../assets/images/i.svg')} alt="" /></a>
                                             </OverlayTrigger></p>

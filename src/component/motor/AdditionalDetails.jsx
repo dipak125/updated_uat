@@ -334,19 +334,15 @@ console.log('post_data', post_data);
             const post_data_obj = {
                 'pincode':pinCode
             };
-           formData.append('enc_data',encryption.encrypt(JSON.stringify(post_data_obj)))
-           axios.post('generate-pincode-details',
+        //    formData.append('enc_data',encryption.encrypt(JSON.stringify(post_data_obj)))
+           formData.append('pincode',pinCode)
+           axios.post('pincode-details',
             formData
-            ).then(res=>{
-                let pinData = res.data.trim();               
-                let pinDataArr = JSON.parse(pinData.substring(0,pinData.length-10))   
-                let stateName=pinDataArr.map(resource=>
-                    resource.STATE_NM
-                )  
-                var unique = stateName.filter((v, i, a) => a.indexOf(v) === i);                                 
+            ).then(res=>{       
+                let stateName = res.data.data && res.data.data[0] && res.data.data[0].pinstate.STATE_NM ? res.data.data[0].pinstate.STATE_NM : ""                        
                 this.setState({
-                    pinDataArr,
-                    stateName:unique,
+                    pinDataArr: res.data.data,
+                    stateName,
                 });
                 this.props.loadingStop();
             }).
@@ -397,6 +393,7 @@ console.log('post_data', post_data);
             <h4>You are just one steps away in getting your policy ready and your Quotation Number: {quoteId}. Please share a few more details. </h4>
         ) : null;
 
+        console.log("stateName", stateName)
         return (
             <>
                 <BaseComponent>
@@ -706,7 +703,7 @@ console.log('post_data', post_data);
                                                     className="formGrp"
                                                 >
                                                 <option value="">Select Area</option>
-                                                {pinDataArr && pinDataArr.map((resource,rindex)=>
+                                                {pinDataArr && pinDataArr.length > 0 && pinDataArr.map((resource,rindex)=>
                                                     <option value={resource.LCLTY_SUBRB_TALUK_TEHSL_NM}>{resource.LCLTY_SUBRB_TALUK_TEHSL_NM}</option>
                                                 )}
                                                     
@@ -731,7 +728,7 @@ console.log('post_data', post_data);
                                                     autoComplete="off"
                                                     onFocus={e => this.changePlaceHoldClassAdd(e)}
                                                     onBlur={e => this.changePlaceHoldClassRemove(e)}
-                                                    value={stateName ? stateName[0] : values.state} 
+                                                    value={stateName ? stateName : values.state} 
                                                     disabled = {true}
                                                     
                                                 />
