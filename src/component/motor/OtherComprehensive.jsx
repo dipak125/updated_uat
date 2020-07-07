@@ -924,18 +924,15 @@ class OtherComprehensive extends Component {
                     </div>
                     </div>
                 </BaseComponent>
-                <Modal className="customModal" bsSize="md"
+                <Modal className="customModal maxwother" bsSize="md"
                     show={this.state.show}
                     onHide={this.handleClose}>
                     <Modal.Header closeButton className="custmModlHead modalhd">
-                        <div className="cntrbody">
+                        
                             <h3>Premium breakup </h3>                           
-                        </div>
+                        
                     </Modal.Header>
                     <Modal.Body>
-                    {/* <h5> Net Premium Amount  ₹ {fulQuoteResp.DuePremium}</h5>
-                    <h5> Gross Premium Amount  ₹ {fulQuoteResp.BeforeVatPremium}</h5>
-                    <h5> Applicable Taxs  ₹ {fulQuoteResp.TGST}</h5> */}
                     <table class="table table-bordered">
                             <thead>
                                 <tr>

@@ -838,6 +838,7 @@ console.log('post_data', post_data);
                                             <option value="sister">Sister</option>
                                             <option value="son">Son</option>
                                             <option value="uncle">Uncle</option>
+                                            <option value="sister_in_law">Sister In Law</option>
                                             </Field>     
                                             {errors.nominee_relation_with && touched.nominee_relation_with ? (
                                                 <span className="errorMsg">{errors.nominee_relation_with}</span>

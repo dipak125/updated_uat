@@ -180,7 +180,7 @@ ul.navPan li a span{ margin-bottom:8px; display: block; }
 .modal-header.custmModlHead  {justify-content: center; border-bottom: none; padding: 15px 15px 5px; margin-bottom: 50px;}
 .modal-header.custmModlHead .close {font-size: 32px; outline: none;}
 .cntrbody {position: absolute; text-align: center;}
-.modal-content {border-radius: 15px !important; position: absolute !important; top: 95px; border: 1px solid #1167B1 !important; max-width: 403px;}
+.modal-content {border-radius: 15px !important; position: absolute !important; top: 95px; border: 1px solid #1167B1 !important; max-width: initial;}
 .customModal .modal-body{ text-align: center; padding: 20px 15px;}
 .customModal h3{ font-size:16px; font-weight:700; margin-top: 0; margin-bottom: 15px;}
 
@@ -314,7 +314,8 @@ ul.navPan li a span{ margin-bottom:8px; display: block; }
 .premamnt {text-align: center; font-size: 18px; font-weight: 600; color: #FFFFFF; line-height: 23px;}
 .rupee {text-align: center; font-size: 36px; color: #FFFFFF; font-weight: 600; margin-bottom: 25px;}
 .brkbtn {border: 1px solid #AFDFF2; border-radius: 15px; background-color: #2770b3; color: #ffffff !important; padding: 3px 15px; font-size: 12px;}
-.modalhd {margin-bottom: 0 !important;}
+.modalhd {margin-bottom: 0 !important; border-bottom: 1px solid #dee2e6 !important;}
+.table-bordered {text-align: left !important;}
 .modalhd .close {padding: 5px 15px !important;}
 .customModal h5 {font-size: 14px;}
 
