@@ -25,8 +25,9 @@ const year = new Date('Y')
 const ageObj = new PersonAge();
 const minDate = moment(moment().subtract(1, 'years').calendar()).add(1, 'day').calendar();
 const maxDate = moment(minDate).add(30, 'day').calendar();
-const minRegnDate = moment().subtract(18, 'years').calendar();
-const maxRegnDate = moment().endOf('year').format('YYYY-MM-DD hh:mm');
+const startRegnDate = moment().subtract(12, 'years').calendar();
+const minRegnDate = moment(startRegnDate).startOf('year').format('YYYY-MM-DD hh:mm');
+const maxRegnDate = new Date();
 
 const initialValue = {
     registration_date: "",
@@ -38,7 +39,8 @@ const initialValue = {
     previous_end_date: "",
     previous_start_date: "",
     previous_claim_bonus: "",
-    previous_claim_for: ""
+    previous_claim_for: "",
+    previous_policy_no: ""
 }
 const vehicleRegistrationValidation = Yup.object().shape({
     registration_date: Yup.string().notRequired('Registration date is required')
@@ -184,7 +186,32 @@ const vehicleRegistrationValidation = Yup.object().shape({
             }
             return true;
         }
-    ),
+    )
+    .matches(/^[a-zA-Z0-9\s,/.]*$/, 
+        function() {
+            return "Please enter valid address"
+        }),
+
+    previous_policy_no:Yup.string()
+    .notRequired('Previous policy number is required')
+    .test(
+        "currentMonthChecking",
+        function() {
+            return "Please enter previous policy number"
+        },
+        function (value) {
+            const ageObj = new PersonAge();
+            if (ageObj.whatIsCurrentMonth(this.parent.registration_date) > 0 && !value) {   
+                return false;    
+            }
+            return true;
+        }
+    )
+    .matches(/^[a-zA-Z0-9]*$/, 
+        function() {
+            return "Please enter valid policy number"
+        }),
+
     previous_claim_bonus:Yup.mixed()
     .notRequired('No Claim bonus is required')
     .test(
@@ -317,8 +344,10 @@ class VehicleDetails extends Component {
     if (escapedValue === '') {
       return [];
     }  
-    const regex = new RegExp('^' + escapedValue, 'i');
-    if(this.state.customerDetails) {
+    // const regex = new RegExp('^' + escapedValue, 'i');
+    const regex = new RegExp( escapedValue, 'i');
+    console.log('newValue', regex)
+    if(this.state.customerDetails && escapedValue.length >1) {
       return this.state.customerDetails.filter(language => regex.test(language.RTO_LOCATION));
     }
     else return 0;
@@ -347,10 +376,12 @@ class VehicleDetails extends Component {
 
     handleSubmit = (values, actions) => {
         const {productId} = this.props.match.params 
+        const {motorInsurance} = this.state
         ageObj.whatIsCurrentMonth(values.registration_date) < 7 ? localStorage.setItem('policy_type', 6) : 
         localStorage.setItem('policy_type', 1)
         let vehicleAge = ageObj.whatIsMyVehicleAge(values.registration_date)
-        let ageDiff = Math.floor(moment().diff(values.registration_date, 'days', true));
+        // let ageDiff = Math.floor(moment().diff(values.registration_date, 'days', true));
+        let ageDiff = ageObj.whatIsCurrentMonth(values.registration_date);
         const formData = new FormData(); 
         let encryption = new Encryption();
         let post_data = {}
@@ -365,6 +396,7 @@ class VehicleDetails extends Component {
                 'previous_policy_name':values.previous_policy_name,
                 'insurance_company_id':values.insurance_company_id,
                 'previous_city':values.previous_city,
+                'previous_policy_no': values.previous_policy_no,
                 'previous_is_claim':values.previous_is_claim,
                 'previous_claim_bonus': values.previous_claim_bonus ? values.previous_claim_bonus : 0,
                 'previous_claim_for': values.previous_claim_for,        
@@ -383,14 +415,13 @@ class VehicleDetails extends Component {
             } 
         }
 
-        if(ageDiff < 0) {
+        if(ageDiff < 1 && motorInsurance && motorInsurance.registration_no == "") {
             localStorage.setItem('registration_number', "NEW");
         }
-        else if(ageDiff > 0) {
+        else {
             localStorage.removeItem('registration_number');
         }
 
-        console.log('ageDiff', ageDiff)
         formData.append('enc_data',encryption.encrypt(JSON.stringify(post_data)))
         this.props.loadingStart();
         axios
@@ -449,7 +480,6 @@ class VehicleDetails extends Component {
         this.props.loadingStart();
         axios.get(`policy-holder/motor/${policyHolder_id}`)
             .then(res => {
-                console.log(res);
                  let motorInsurance = res.data.data.policyHolder ? res.data.data.policyHolder.motorinsurance : {};
                  let previousPolicy = res.data.data.policyHolder ? res.data.data.policyHolder.previouspolicy : {};
                  let vehicleDetails = res.data.data.policyHolder ? res.data.data.policyHolder.vehiclebrandmodel : {};
@@ -498,14 +528,12 @@ class VehicleDetails extends Component {
             previous_policy_name: previousPolicy && previousPolicy.name ? previousPolicy.name : "",
             insurance_company_id: previousPolicy && previousPolicy.insurancecompany && previousPolicy.insurancecompany.id ? previousPolicy.insurancecompany.id : "",
             previous_city: previousPolicy && previousPolicy.city ? previousPolicy.city : "",
+            previous_policy_no: previousPolicy && previousPolicy.policy_no ? previousPolicy.policy_no : "",
             previous_is_claim: previous_is_claim,
             previous_claim_bonus: previousPolicy && previousPolicy.claim_bonus ? Math.floor(previousPolicy.claim_bonus) : "",
             previous_claim_for: previousPolicy && previousPolicy.claim_for ? previousPolicy.claim_for : "",
 
         });
-
-
-        console.log("CustomerID", CustomerID)
 
         const inputCustomerID = {
             placeholder: "Search City",
@@ -738,6 +766,26 @@ class VehicleDetails extends Component {
                                                         </FormGroup>
                                                     </Col>
                                                 </Row>
+                                                <Row>
+                                                <Col sm={12} md={5} lg={5}>
+                                                        <FormGroup>
+                                                            <div className="insurerName">
+                                                                <Field
+                                                                    name="previous_policy_no"
+                                                                    type="text"
+                                                                    placeholder="Previous Policy Number"
+                                                                    autoComplete="off"
+                                                                    onFocus={e => this.changePlaceHoldClassAdd(e)}
+                                                                    onBlur={e => this.changePlaceHoldClassRemove(e)}
+                                                                    
+                                                                />
+                                                                {errors.previous_policy_no && touched.previous_policy_no ? (
+                                                                    <span className="errorMsg">{errors.previous_policy_no}</span>
+                                                                ) : null}
+                                                            </div>
+                                                        </FormGroup>
+                                                    </Col>
+                                                </Row>
 
                                                 <Row>
                                                     <Col sm={12}>
@@ -902,7 +950,7 @@ class VehicleDetails extends Component {
                                                     <Row className="m-b-25">
                                                         <Col sm={12} md={7}>
                                                             <div className="txtRegistr">Car Model<br/>
-                                                                <strong>{vehicleDetails && vehicleDetails.vehiclemodel.description ? vehicleDetails.vehiclemodel.description+" "+vehicleDetails.varientmodel.varient : ""}</strong></div>
+                                                                <strong>{vehicleDetails && vehicleDetails.vehiclemodel && vehicleDetails.vehiclemodel.description ? vehicleDetails.vehiclemodel.description+" "+vehicleDetails.varientmodel.varient : ""}</strong></div>
                                                         </Col>
 
                                                         <Col sm={12} md={5} className="text-right">
@@ -913,7 +961,7 @@ class VehicleDetails extends Component {
                                                     <Row className="m-b-25">
                                                         <Col sm={12} md={7}>
                                                             <div className="txtRegistr">Fuel Type<br/>
-                                                                <strong>{vehicleDetails && fuel[vehicleDetails.varientmodel.fuel_type]} </strong></div>
+                                                                <strong>{vehicleDetails && vehicleDetails.varientmodel && vehicleDetails.varientmodel.fuel_type ? fuel[vehicleDetails.varientmodel.fuel_type] : null} </strong></div>
                                                         </Col>
                                                     </Row>
                                                 </div>

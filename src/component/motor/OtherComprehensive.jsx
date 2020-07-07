@@ -53,7 +53,7 @@ const ComprehensiveValidation = Yup.object().shape({
     }),
 
     engine_no:Yup.string().required('Engine no is required')
-    .matches(/^[A-Z0-9]+$/, function() {
+    .matches(/^[a-zA-Z0-9]*$/, function() {
         return "Invalid engine number"
     })
     .min(5, function() {
@@ -64,7 +64,7 @@ const ComprehensiveValidation = Yup.object().shape({
     }),
 
     chasis_no:Yup.string().required('Chasis no is required')
-    .matches(/^[A-Z0-9]+$/, function() {
+    .matches(/^[a-zA-Z0-9]*$/, function() {
         return "Invalid chasis number"
     })
     .min(5, function() {
@@ -690,6 +690,10 @@ class OtherComprehensive extends Component {
                                                     onBlur={e => this.changePlaceHoldClassRemove(e)}
                                                     value= {values.engine_no.toUpperCase()}
                                                     maxLength="12"
+                                                    onChange = {(e) => {
+                                                        setFieldTouched('engine_no')
+                                                        setFieldValue('engine_no', e.target.value)                       
+                                                    }}  
                                                 />
                                                 {errors.engine_no && touched.engine_no ? (
                                                     <span className="errorMsg">{errors.engine_no}</span>
@@ -709,6 +713,10 @@ class OtherComprehensive extends Component {
                                                     onBlur={e => this.changePlaceHoldClassRemove(e)}
                                                     value= {values.chasis_no.toUpperCase()}
                                                     maxLength="12"
+                                                    onChange = {(e) => {
+                                                        setFieldTouched('chasis_no')
+                                                        setFieldValue('chasis_no', e.target.value)                       
+                                                    }} 
                                                 />
                                                 {errors.chasis_no && touched.chasis_no ? (
                                                     <span className="errorMsg">{errors.chasis_no}</span>
@@ -925,9 +933,28 @@ class OtherComprehensive extends Component {
                         </div>
                     </Modal.Header>
                     <Modal.Body>
-                    <h5> Net Premium Amount  ₹ {fulQuoteResp.DuePremium}</h5>
+                    {/* <h5> Net Premium Amount  ₹ {fulQuoteResp.DuePremium}</h5>
                     <h5> Gross Premium Amount  ₹ {fulQuoteResp.BeforeVatPremium}</h5>
-                    <h5> Applicable Taxs  ₹ {fulQuoteResp.TGST}</h5>
+                    <h5> Applicable Taxs  ₹ {fulQuoteResp.TGST}</h5> */}
+                    <table class="table table-bordered">
+                            <thead>
+                                <tr>
+                                    <th>Premium:</th>
+                                    <th>₹ {fulQuoteResp.DuePremium}</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>Gross Premium:</td>
+                                    <td>₹ {fulQuoteResp.BeforeVatPremium}</td>
+                                </tr>
+                                <tr>
+                                    <td>Applicable Taxes:</td>
+                                    <td>₹ {fulQuoteResp.TGST}</td>
+                                </tr>
+
+                            </tbody>
+                        </table>
                     
                     </Modal.Body>
                 </Modal>

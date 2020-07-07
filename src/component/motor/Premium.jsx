@@ -10,8 +10,16 @@ import axios from "../../shared/axios";
 import { withRouter, Link, Route } from "react-router-dom";
 import { loaderStart, loaderStop } from "../../store/actions/loader";
 import { connect } from "react-redux";
+import * as Yup from "yup";
 
 const initialValue = {}
+
+const validatePremium = Yup.object().shape({
+    refNo: Yup.string().notRequired('Reference number is required')
+    .matches(/^[0-9]*$/, function() {
+        return "Please enter valid reference number"
+    }),
+    })
 
 class Premium extends Component {
 
@@ -201,7 +209,7 @@ class Premium extends Component {
                             <div className="col-sm-12 col-md-12 col-lg-10 col-xl-10 infobox">
                                 <h4 className="text-center mt-3 mb-3">SBI General Insurance Company Limited</h4>
                                 <Formik initialValues={initialValue} onSubmit={this.handleSubmit}
-                                // validationSchema={validateNominee}
+                                validationSchema={validatePremium}
                                 >
                                     {({ values, errors, setFieldValue, setFieldTouched, isValid, isSubmitting, touched }) => {
 
@@ -426,7 +434,7 @@ class Premium extends Component {
                                                                             <FormGroup>
                                                                                 <div className="refno">
                                                                                     My reference no is
-                                    </div>
+                                                                                </div>
                                                                             </FormGroup>
                                                                         </Col>
                                                                         <Col sm={6}>
@@ -462,7 +470,7 @@ class Premium extends Component {
                                                             <Row>
                                                                 <Col sm={12}>
                                                                     <label className="customCheckBox formGrp formGrp fscheck">I want to receive my Quote & Policy Details on Whatsapp
-                                    <Field
+                                                                        <Field
                                                                             type="checkbox"
                                                                             name='whatsapp'
                                                                             value='1'
@@ -481,8 +489,8 @@ class Premium extends Component {
                                                                         className="proceedBtn"
                                                                     >
                                                                         Make Payment
-                                </Button> : null
-                                                                }
+                                                                </Button> 
+                                                            : null}
                                                             </div>
                                                         </Col>
 

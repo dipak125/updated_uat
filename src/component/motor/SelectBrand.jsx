@@ -134,16 +134,18 @@ class SelectBrand extends Component {
     }
 
     getOtherBrands = () => {
+        let policyHolder_id = localStorage.getItem("policyHolder_id") ? localStorage.getItem("policyHolder_id") : 0;
         this.props.loadingStart();
-        axios.get(`vehicle/brand-without-image`).then(res => {
+        axios.get(`vehicle/brand-without-image/${policyHolder_id}`).then(res => {
             let selectedBrandDetails = res.data && res.data.data ? res.data.data : {};
             let brandModelList = res.data && res.data.data ? res.data.data.list : [];
-            console.log("brandModelList", brandModelList)
+
             this.setState({
                 selectedBrandDetails,
                 brandModelList,
                 show: true,
-                otherBrands: true
+                otherBrands: true,
+                searchitem: []
                 // selectedBrandId: brand_id
             })
 
@@ -182,8 +184,10 @@ class SelectBrand extends Component {
 
 
     setBrandName = (brand_id) => {
+        let policyHolder_id = localStorage.getItem("policyHolder_id") ? localStorage.getItem("policyHolder_id") : 0;
+        const formData = new FormData();
         this.props.loadingStart();
-        axios.get(`vehicle/model-with-varient/${brand_id}`).then(res => {
+        axios.get(`vehicle/model-with-varient/${brand_id}/${policyHolder_id}`).then(res => {
             let selectedBrandDetails = res.data && res.data.data ? res.data.data : {};
             let brandModelList = res.data && res.data.data.brand_models ? res.data.data.brand_models : [];
 
@@ -191,8 +195,10 @@ class SelectBrand extends Component {
                 selectedBrandDetails,
                 brandModelList,
                 show: true,
+                otherBrands: false,
                 selectedBrandId: brand_id,
                 brandName: selectedBrandDetails.name,
+                searchitem: []
             })
 
             this.props.loadingStop();
@@ -266,7 +272,6 @@ class SelectBrand extends Component {
 
         })
 
-console.log("selectedBrandDetails", selectedBrandDetails)
         return (
             <>
                 <BaseComponent>
@@ -399,8 +404,8 @@ console.log("selectedBrandDetails", selectedBrandDetails)
                                 {this.state.searchitem && this.state.searchitem.length > 0 ?
 
                                     (
-                                        this.state.searchitem.length > 0 && this.state.searchitem.map((brand, brandIndex) => (
-                                            brand.varientmodel.length > 0 && brand.varientmodel.map((varient, varientIndex) => (
+                                        this.state.searchitem && this.state.searchitem.length > 0 && this.state.searchitem.map((brand, brandIndex) => (
+                                            brand.varientmodel && brand.varientmodel.length > 0 && brand.varientmodel.map((varient, varientIndex) => (
                                                 <div className="brdrbottom">
                                                     <div className="d-flex justify-content-between">
                                                         <div className="modalboxInfo">{brand.name}
@@ -427,10 +432,10 @@ console.log("selectedBrandDetails", selectedBrandDetails)
                                                 </div>
                                             )))
                                         ))
-                                    :
-                                    (brandModelList.length > 0 && brandModelList.map((brand, brandIndex) => (
-                                        brand.varientmodel.length > 0 && brand.varientmodel.map((varient, varientIndex) => (
-
+                                    : 
+                                    (brandModelList && brandModelList.length > 0 && brandModelList.map((brand, brandIndex) => (
+                                        brand.varientmodel && brand.varientmodel.length > 0 && brand.varientmodel.map((varient, varientIndex) => (
+                                            
                                             <div className="brdrbottom">
                                                 <div className="d-flex justify-content-between">
                                                     <div className="modalboxInfo">{brand.name}
@@ -457,7 +462,8 @@ console.log("selectedBrandDetails", selectedBrandDetails)
                                             </div>
                                         ))
                                     ))
-                                    )}
+                                    )
+                                }
 
                             </ScrollArea> : 
                             <ScrollArea
@@ -469,13 +475,13 @@ console.log("selectedBrandDetails", selectedBrandDetails)
                             {this.state.searchitem && this.state.searchitem.length > 0 ?
 
                                 (
-                                    this.state.searchitem.length > 0 && this.state.searchitem.map((brand, brandIndex) => (
-                                        brand.brand_models.length > 0 && brand.brand_models.map((model, modelIndex) => (
-                                            model.varientmodel.length > 0 && model.varientmodel.map((varient, varientIndex) => (
+                                    this.state.searchitem && this.state.searchitem.length > 0 && this.state.searchitem.map((brand, brandIndex) => (
+                                        brand.brand_models && brand.brand_models.length > 0 && brand.brand_models.map((model, modelIndex) => (
+                                            model.varientmodel && model.varientmodel.length > 0 && model.varientmodel.map((varient, varientIndex) => (
                                             <div className="brdrbottom">
                                                 <div className="d-flex justify-content-between">
                                                     <div className="modalboxInfo">{brand.name}
-                                                        <span className="grey ml-5">{model.name+" "+varient.varient}</span>
+                                                        <span className="grey ml-5">{model.name+" "+varient.varient+ " "+varient.cc+"cc" }</span>
                                                     </div>
                                                     <div>
                                                         <label className="customCheckBox formGrp formGrp">
@@ -499,14 +505,14 @@ console.log("selectedBrandDetails", selectedBrandDetails)
                                         )))
                                     ))))
                                 :
-                                (this.state.brandModelList.length > 0 && this.state.brandModelList.map((brand, brandIndex) => (
-                                    brand.brand_models.length > 0 && brand.brand_models.map((model, modelIndex) => (
-                                        model.varientmodel.length > 0 && model.varientmodel.map((varient, varientIndex) => (
+                                (this.state.brandModelList && this.state.brandModelList.length > 0 && this.state.brandModelList.map((brand, brandIndex) => (
+                                    brand.brand_models && brand.brand_models.length > 0 && brand.brand_models.map((model, modelIndex) => (
+                                        model.varientmodel && model.varientmodel.length > 0 && model.varientmodel.map((varient, varientIndex) => (
 
                                         <div className="brdrbottom">
                                             <div className="d-flex justify-content-between">
                                                 <div className="modalboxInfo">{brand.name}
-                                                    <span className="grey ml-5">{model.name+" "+varient.varient}</span>
+                                                    <span className="grey ml-5">{model.name+" "+varient.varient+ " "+varient.cc+"cc"}</span>
                                                 </div>
                                                 <div>
                                                     <label className="customCheckBox formGrp formGrp">

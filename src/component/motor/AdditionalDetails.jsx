@@ -17,10 +17,10 @@ import {  PersonAge } from "../../shared/dateFunctions";
 import Encryption from '../../shared/payload-encryption';
 
 
-const minDobAdult = moment(moment().subtract(64, 'years').calendar()).add(1, 'day').calendar()
+const minDobAdult = moment(moment().subtract(64, 'years').calendar())
 const maxDobAdult = moment().subtract(18, 'years').calendar();
-const minDobNominee = moment(moment().subtract(100, 'years').calendar()).add(1, 'day').calendar()
-const maxDobNominee = moment().subtract(3, 'months').calendar();
+const minDobNominee = moment(moment().subtract(100, 'years').calendar())
+const maxDobNominee = moment().subtract(18, 'years').calendar();
 
 const initialValue = {
     first_name:"",
@@ -51,12 +51,12 @@ const initialValue = {
 const ownerValidation = Yup.object().shape({
     first_name: Yup.string().required('Name is required')
         .min(3, function() {
-            return "Name must be minimum 3 chracters"
+            return "First name must be 3 chracters & last name 1 characters long"
         })
         .max(40, function() {
-            return "Name must be maximum 40 chracters"
+            return "Full name must be maximum 40 chracters"
         })
-        .matches(/^[A-Za-z][A-Za-z\s]*$/, function() {
+        .matches(/^[A-Za-z]{3,20}[\s][A-Za-z]{1,20}$/, function() {
             return "Please enter valid name"
         }),
     // last_name:Yup.string().required('Last name is required'),
@@ -68,12 +68,12 @@ const ownerValidation = Yup.object().shape({
     .test(
         "18YearsChecking",
         function() {
-            return "Age should me minium 18 years"
+            return "Age should me minium 18 years and maximum 64 years"
         },
         function (value) {
             if (value) {
                 const ageObj = new PersonAge();
-                return ageObj.whatIsMyAge(value) < 111 && ageObj.whatIsMyAge(value) >= 18;
+                return ageObj.whatIsMyAge(value) <= 64 && ageObj.whatIsMyAge(value) >= 18;
             }
             return true;
         }
@@ -85,12 +85,20 @@ const ownerValidation = Yup.object().shape({
         return "Please enter valid Pan Number"
     }),
     location:Yup.string().required('Location is required'),
-    // district: Yup.string().required('District is required'),
-    pincode:Yup.string().required('Pincode is required'),
-    address:Yup.string().required('Address is required').matches(/^(?![0-9._])(?!.*[0-9._]$)(?!.*\d_)(?!.*_\d)[a-zA-Z0-9_.,-\\]+$/, function() {
+
+    pincode:Yup.string().required('Pincode is required')
+    .matches(/^[0-9]{6}$/, function() {
+        return "Please enter valid pin code"
+    }),
+
+    address:Yup.string().required('Address is required')
+    // .matches(/^(?![0-9._])(?!.*[0-9._]$)(?!.*\d_)(?!.*_\d)[a-zA-Z0-9_.,-\\]+$/, 
+    .matches(/^[a-zA-Z0-9\s,/.]*$/, 
+    function() {
         return "Please enter valid address"
     }),
-    phone: Yup.string().matches(/^[7-9][0-9]{9}$/,'Invalid Mobile number').required('Phone No. is required'),
+    phone: Yup.string()
+    .matches(/^[6-9][0-9]{9}$/,'Invalid Mobile number').required('Phone No. is required'),
     email:Yup.string().email().required('Email is required').min(9, function() {
         return "Email must be minimum 9 chracters"
     })
@@ -111,7 +119,9 @@ const ownerValidation = Yup.object().shape({
             }
             return true;
         }
-    ),
+    ).matches(/^[A-Za-z][A-Za-z\s]*$/, function() {
+        return "Please enter bank name"
+    }),
     bank_branch: Yup.string().notRequired('Bank branch is required')
     .test(
         "isLoanChecking",
@@ -124,7 +134,9 @@ const ownerValidation = Yup.object().shape({
             }
             return true;
         }
-    ),
+    ).matches(/^[A-Za-z][A-Za-z\s]*$/, function() {
+        return "Please enter bank branch"
+    }),
 
     nominee_relation_with:Yup.string().required('Nominee relation is required'),
     nominee_first_name: Yup.string().required('Nominee name is required')
@@ -134,7 +146,7 @@ const ownerValidation = Yup.object().shape({
         .max(40, function() {
             return "Name must be maximum 40 chracters"
         })
-        .matches(/^[A-Za-z][A-Za-z\s]*$/, function() {
+        .matches(/^[A-Za-z]{3,20}[\s][A-Za-z]{1,20}$/, function() {
             return "Please enter valid name"
         }),
     // nominee_last_name:Yup.string().required('Nominee last name is required'), 
@@ -151,31 +163,32 @@ const ownerValidation = Yup.object().shape({
         function (value) {
             if (value) {
                 const ageObj = new PersonAge();
-                return ageObj.whatIsMyAge(value) < 111 && ageObj.whatIsMyAgeMonth(value) >=3;
+                return ageObj.whatIsMyAge(value) <= 100 && ageObj.whatIsMyAge(value) >= 18;
             }
             return true;
         }
     ),
    
     is_eia_account: Yup.string().required('This field is required'),
-    eia_no: Yup.string().min(13, function() {
-        return "EIA no must be minimum 13 chracters"
-    })
-    .max(13, function() {
-        return "EIA no must be maximum 13 chracters"
-    }).matches(/^[1-5][0-9]{0,13}$/,'Please enter valid EIA no').notRequired('EIA no is required')
+    eia_no: Yup.string()
     .test(
         "isEIAchecking",
         function() {
             return "Please enter EIA no"
         },
         function (value) {
-            if (this.parent.eIA == 1 && !value) {   
+            if (this.parent.is_eia_account == 1 && !value) {   
                 return false;    
             }
             return true;
         }
-    ),
+    )
+    .min(13, function() {
+        return "EIA no must be minimum 13 chracters"
+    })
+    .max(13, function() {
+        return "EIA no must be maximum 13 chracters"
+    }).matches(/^[1245][0-9]{0,13}$/,'Please enter valid EIA no').notRequired('EIA no is required'),
 })
 
 class AdditionalDetails extends Component {
@@ -624,6 +637,7 @@ console.log('post_data', post_data);
                                                 onFocus={e => this.changePlaceHoldClassAdd(e)}
                                                 onBlur={e => this.changePlaceHoldClassRemove(e)}
                                                 value = {values.phone}
+                                                maxLength="10" 
                                                 className="phoneinput pd-l-25"                                                                          
                                             />
                                             {errors.phone && touched.phone ? (
@@ -659,7 +673,7 @@ console.log('post_data', post_data);
                                         <div className="insurerName">
                                             <Field
                                                 name="pincode"
-                                                type="number"
+                                                type="test"
                                                 placeholder="Pincode"
                                                 autoComplete="off"
                                                 maxlength = "6"
@@ -667,7 +681,7 @@ console.log('post_data', post_data);
                                                 onBlur={e => this.changePlaceHoldClassRemove(e)}
                                                 onKeyUp={e=> this.fetchAreadetails(e)}
                                                 value={values.pincode}
-                                                maxlength="6"
+                                                maxLength="6"
                                                 onInput= {(e)=> {
                                                     setFieldTouched("state");
                                                     setFieldTouched("pincode");
@@ -894,6 +908,7 @@ console.log('post_data', post_data);
                                                 placeholder="EIA Number"
                                                 autoComplete="off"
                                                 value = {values.eia_no}
+                                                maxLength="13"
                                                 onFocus={e => this.changePlaceHoldClassAdd(e)}
                                                 onBlur={e => this.changePlaceHoldClassRemove(e)}
                                             />

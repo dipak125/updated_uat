@@ -22,13 +22,13 @@ export default class SideNav extends Component {
             <>
                 <nav className="flex-fill leftNav">
                     <ul className="navPan">
-                        <li>
+                        {/* <li>
 							<Link to="/UnderMaintenance" activeClassName="active"><span className="leftIcon01"><img src={require('../../../assets/images/leftIcon01.svg')} alt="" /></span>Dashboard</Link>
-                        </li>
+                        </li> */}
                         <li>
 							<Link to="/Products" activeClassName="active"><span className="leftIcon01"><img src={require('../../../assets/images/leftIcon02Hover.svg')} alt="" /></span>Products</Link>
                         </li>
-                        <li>
+                        {/* <li>
 							<Link to="/UnderMaintenance" activeClassName="active"><span className="leftIcon01"><img src={require('../../../assets/images/leftIcon03.svg')} alt="" /></span>Policy Issuance </Link>
                         </li>
                         <li>
@@ -36,12 +36,12 @@ export default class SideNav extends Component {
                         </li>
                         <li>
 							<Link to="/UnderMaintenance" activeClassName="active"><span className="leftIcon01"><img src={require('../../../assets/images/leftIcon05.svg')} alt="" /></span>Support</Link>
-                        </li>
+                        </li> */}
                     </ul>
 
-                    <button className="btn-lg" >
+                    {/* <button className="btn-lg" >
 							<Link to="/#" activeClassName="active"><span className="leftIcon01"><img src={require('../../../assets/images/Logout.svg')} alt="" /></span>Logout</Link>
-                        </button>
+                    </button> */}
                 </nav>
             </>
         )
