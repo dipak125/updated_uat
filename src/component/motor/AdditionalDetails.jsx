@@ -28,8 +28,6 @@ const initialValue = {
     gender:"",
     dob: "",
     pancard:"",
-    location:"",
-    district:"test",
     pincode:"",
     is_carloan:"",
     bank_name:"",
@@ -45,7 +43,8 @@ const initialValue = {
     is_eia_account: "",
     eia_no: "",
     stateName: "",
-    pinDataArr: []
+    pinDataArr: [],
+    pincode_id: ""
 }
 
 const ownerValidation = Yup.object().shape({
@@ -84,7 +83,7 @@ const ownerValidation = Yup.object().shape({
     }).matches(/^[A-Z]{3}[CPHFATBLJG]{1}[A-Z]{1}[0-9]{4}[A-Z]{1}$/, function() {
         return "Please enter valid Pan Number"
     }),
-    location:Yup.string().required('Location is required'),
+    pincode_id:Yup.string().required('Location is required'),
 
     pincode:Yup.string().required('Pincode is required')
     .matches(/^[0-9]{6}$/, function() {
@@ -203,7 +202,8 @@ class AdditionalDetails extends Component {
         policyHolder: {},
         nomineeDetails: {},
         quoteId: "",
-        bankDetails: {}
+        bankDetails: {},
+        addressDetails: []
     };
     
 
@@ -264,7 +264,7 @@ class AdditionalDetails extends Component {
             'gender':values['gender'],
             'dob':moment(values['dob']).format("YYYY-MM-DD"),
             'pancard':values['pancard'],
-            'location':values['location'],
+            'pincode_id':values['pincode_id'],
             'district':values['district'],
             'pincode':values['pincode'].toString(),
             'is_carloan':values['is_carloan'],
@@ -313,10 +313,12 @@ console.log('post_data', post_data);
                  let quoteId = res.data.data.policyHolder ? res.data.data.policyHolder.request_data.quote_id : ""
                  let is_eia_account=  policyHolder && (policyHolder.is_eia_account == 0 || policyHolder.is_eia_account == 1) ? policyHolder.is_eia_account : ""
                  let bankDetails = res.data.data.policyHolder && res.data.data.policyHolder.bankdetail ? res.data.data.policyHolder.bankdetail[0] : {};
-                this.setState({
-                    quoteId, motorInsurance, previousPolicy, vehicleDetails, policyHolder, nomineeDetails, is_loan_account, is_eia_account, bankDetails
+                 let addressDetails = JSON.parse(res.data.data.policyHolder.pincode_response)
+                 this.setState({
+                    quoteId, motorInsurance, previousPolicy, vehicleDetails, policyHolder, nomineeDetails, is_loan_account, is_eia_account, bankDetails, addressDetails
                 })
                 this.props.loadingStop();
+                this.fetchPrevAreaDetails(addressDetails)
             })
             .catch(err => {
                 // handle error
@@ -352,6 +354,38 @@ console.log('post_data', post_data);
         }       
     }
 
+    
+    fetchPrevAreaDetails=(addressDetails)=>{
+        if(addressDetails){
+            let pincode = addressDetails.PIN_CD;
+            const formData = new FormData();
+            // let encryption = new Encryption();
+
+        //    const post_data_obj = {
+        //         'pincode':pincode.toString()
+        //     };
+           // let encryption = new Encryption();
+        //    formData.append('enc_data',encryption.encrypt(JSON.stringify(post_data_obj)))
+
+            formData.append('pincode', pincode)
+            this.props.loadingStart();
+            axios.post('pincode-details',
+            formData
+            ).then(res=>{
+                let stateName = res.data.data && res.data.data[0] && res.data.data[0].pinstate.STATE_NM ? res.data.data[0].pinstate.STATE_NM : ""                        
+                this.setState({
+                    pinDataArr: res.data.data,
+                    stateName,
+                });
+                this.props.loadingStop();
+            }).
+            catch(err=>{
+                this.props.loadingStop();
+            })
+        }
+        
+    }
+
     componentDidMount() {
         this.fetchData();
     }
@@ -360,7 +394,7 @@ console.log('post_data', post_data);
 
     render() {
         const {showEIA, is_eia_account, showLoan, is_loan_account, nomineeDetails, 
-            bankDetails,policyHolder, stateName, pinDataArr, quoteId} = this.state
+            bankDetails,policyHolder, stateName, pinDataArr, quoteId, addressDetails} = this.state
         const {productId} = this.props.match.params 
         
 
@@ -369,7 +403,7 @@ console.log('post_data', post_data);
             gender:  policyHolder && policyHolder.gender ? policyHolder.gender : "",
             dob: policyHolder && policyHolder.dob ? new Date(policyHolder.dob) : "",
             pancard: policyHolder && policyHolder.pancard ? policyHolder.pancard : "",
-            location: policyHolder && policyHolder.location ? policyHolder.location : "",
+            pincode_id: addressDetails && addressDetails.id ? addressDetails.id : "",
             pincode: policyHolder && policyHolder.pincode ? policyHolder.pincode : "",
             address: policyHolder && policyHolder.address ? policyHolder.address : "",
             is_carloan:is_loan_account,
@@ -684,6 +718,7 @@ console.log('post_data', post_data);
                                                     setFieldTouched("pincode");
                                                     setFieldValue("pincode", e.target.value);
                                                     setFieldValue("state", stateName ? stateName[0] : values.state);
+                                                    setFieldValue("pincode_id", "");
                                                 }}
                                             />
                                             {errors.pincode && touched.pincode ? (
@@ -696,21 +731,21 @@ console.log('post_data', post_data);
                                         <FormGroup>
                                             <div className="formSection">
                                                 <Field
-                                                    name="location"
+                                                    name="pincode_id"
                                                     component="select"
                                                     autoComplete="off"
-                                                    value={values.location}
+                                                    value={values.pincode_id}
                                                     className="formGrp"
                                                 >
                                                 <option value="">Select Area</option>
                                                 {pinDataArr && pinDataArr.length > 0 && pinDataArr.map((resource,rindex)=>
-                                                    <option value={resource.LCLTY_SUBRB_TALUK_TEHSL_NM}>{resource.LCLTY_SUBRB_TALUK_TEHSL_NM}</option>
+                                                    <option value={resource.id}>{resource.LCLTY_SUBRB_TALUK_TEHSL_NM}</option>
                                                 )}
                                                     
                                                     {/*<option value="area2">Area 2</option>*/}
                                                 </Field>     
-                                                {errors.location && touched.location ? (
-                                                    <span className="errorMsg">{errors.location}</span>
+                                                {errors.pincode_id && touched.pincode_id ? (
+                                                    <span className="errorMsg">{errors.pincode_id}</span>
                                                 ) : null}     
                                             </div>
                                         </FormGroup>

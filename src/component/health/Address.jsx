@@ -333,7 +333,7 @@ class Address extends Component {
             .then(res=>{
                 let policy_holder =  res.data.data.policyHolder;
                 let family_members = res.data.data.policyHolder.request_data.family_members
-                let addressDetails = JSON.parse(res.data.data.policyHolder.address)
+                let addressDetails = res.data.data.policyHolder
                 let is_eia_account = res.data.data.policyHolder.is_eia_account == 2 ? "" : res.data.data.policyHolder.is_eia_account
                 let selfFlag = false;
                 for(let i=0;i<family_members.length;i++){

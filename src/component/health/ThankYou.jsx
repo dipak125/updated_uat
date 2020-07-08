@@ -14,7 +14,8 @@ class ThankYouPage extends Component {
   state = {
     accessToken: "",
     response_text: [],
-    policy_holder_id: localStorage.getItem("policyHolder_id")
+    policy_holder_id: localStorage.getItem("policyHolder_id"),
+    refNumber: ""
   };
 
 
@@ -98,6 +99,7 @@ class ThankYouPage extends Component {
           localStorage.removeItem("policyHolder_id");
           localStorage.removeItem("policyHolder_refNo");
           localStorage.removeItem("policy_type");
+          localStorage.removeItem("brandEdit");
           sessionStorage.removeItem('pan_data');
           sessionStorage.removeItem('email_data');
           sessionStorage.removeItem('proposed_insured');
@@ -117,47 +119,68 @@ class ThankYouPage extends Component {
 
   }
 
-  downloadDoc = (file_path) => {
+  downloadDoc = () => {
+    let file_path = `${process.env.REACT_APP_PAYMENT_URL}/sbig-csc/ConnectPG/policy_pdf_download.php?refrence_no=${this.state.refNumber}`
     console.log(file_path);
     const { policyId } = this.props.match.params
-    // const url = file_path;
-    // const fileName = "b7b98d12c9da4f44b7f5e372945fbf7f.pdf"
-    // const pom = document.createElement('a');
-    // pom.setAttribute('href', url);
-    // pom.setAttribute('target', '_blank');
-    // // pom.setAttribute('download', fileName);
-    // document.body.appendChild(pom);
-    // pom.click();
-    // // document.body.removeChild(pom);  
-    // window.URL.revokeObjectURL(url);
+    const url = file_path;
+    const pom = document.createElement('a');
 
-    fetch(file_path,{
-      mode: 'no-cors' // 'cors' by default
-    })
-      .then(resp => resp.blob())
-      .then(blob => {
-        const url = window.URL.createObjectURL(blob);
-        const a = document.createElement('a');
-        a.style.display = 'none';
-        a.href = url;
-        // the filename you want
-        // a.download = 'b7b98d12c9da4f44b7f5e372945fbf7f.pdf';
-        a.download = policyId+'.pdf';
-        document.body.appendChild(a);
-        a.click();
-        window.URL.revokeObjectURL(url);
-        this.props.loadingStop();
-        //alert('your file has downloaded!'); // or you know, something with better UX...
-      })
+    pom.style.display = 'none';
+    pom.href = url;
+
+    document.body.appendChild(pom);
+    pom.click(); 
+    window.URL.revokeObjectURL(url);
+
+    // fetch(file_path,{
+    //   mode: 'no-cors' // 'cors' by default
+    // })
+    //   .then(resp => resp.blob())
+    //   .then(blob => {
+    //     const url = window.URL.createObjectURL(blob);
+    //     const a = document.createElement('a');
+    //     a.style.display = 'none';
+    //     a.href = url;
+    //     // the filename you want
+    //     // a.download = 'b7b98d12c9da4f44b7f5e372945fbf7f.pdf';
+    //     a.download = policyId+'.pdf';
+    //     document.body.appendChild(a);
+    //     a.click();
+    //     window.URL.revokeObjectURL(url);
+    //     this.props.loadingStop();
+    //     //alert('your file has downloaded!'); // or you know, something with better UX...
+    //   })
      
-      .catch(() => {
-       this.props.loadingStop();
-      
-    
+      // .catch(() => {
+      //  this.props.loadingStop();
 
-      });
+      // });
       
   }
+
+  getPolicyHolderDetails = () => {
+    this.props.loadingStart();
+    axios
+      .get(`/policy-holder/${localStorage.getItem("policyHolder_id")}`)
+      .then((res) => {
+        this.setState({
+          refNumber: res.data.data.policyHolder.reference_no,
+        });
+        this.props.loadingStop();
+      })
+      .catch((err) => {
+        if(err.status == 401) {
+          swal("Session out. Please login")
+        }
+        else swal("Something wrong happened. Please try after some")
+
+        this.setState({
+          policyHolderDetails: [],
+        });
+        this.props.loadingStop();
+      });
+  };
 
   componentDidMount() {
     // this.getAccessToken();       
@@ -175,6 +198,8 @@ class ThankYouPage extends Component {
     window.onpopstate = function () {
       window.history.go(1);
     };
+
+    this.getPolicyHolderDetails();
   }
   render() {
     const { policyId } = this.props.match.params

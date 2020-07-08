@@ -332,21 +332,27 @@ class OtherComprehensive extends Component {
             cng_kit_flag = values.cng_kit
             cngKit_Cost = values.cngKit_Cost
         }
-        let defaultSliderValue = PolicyArray.length > 0 ? Math.floor(PolicyArray[0].PolicyRiskList[0].IDV_Suggested) : 0
+        let defaultSliderValue = PolicyArray.length > 0 ? Math.round(PolicyArray[0].PolicyRiskList[0].IDV_Suggested) : 0
         const formData = new FormData();
-        formData.append("access_token", access_token);
-        formData.append("id", localStorage.getItem("policyHolder_id"));
+        // formData.append("access_token", access_token);
+        // formData.append("id", localStorage.getItem("policyHolder_id"));
 
-        formData.append("idv_value", sliderVal ? sliderVal : defaultSliderValue.toString());
-        formData.append("policy_type", localStorage.getItem('policy_type'));
-        formData.append("add_more_coverage", add_more_coverage);
-        formData.append("cng_kit", cng_kit_flag);
-        formData.append("cngKit_Cost", cngKit_Cost);
+        // formData.append("idv_value", sliderVal ? sliderVal : defaultSliderValue.toString());
+        // formData.append("policy_type", localStorage.getItem('policy_type'));
+        // formData.append("add_more_coverage", add_more_coverage);
+        // formData.append("cng_kit", cng_kit_flag);
+        // formData.append("cngKit_Cost", cngKit_Cost);
 
         const post_data = {
             'id':localStorage.getItem('policyHolder_id'),
-            'access_token':access_token
+            'access_token':access_token,
+            'idv_value': sliderVal ? sliderVal : defaultSliderValue.toString(),
+            'policy_type': localStorage.getItem('policy_type'),
+            'add_more_coverage': add_more_coverage,
+            'cng_kit': cng_kit_flag,
+            'cngKit_Cost': cngKit_Cost
         }
+        console.log('fullQuote_post_data', post_data)
         let encryption = new Encryption();
             formData.append('enc_data',encryption.encrypt(JSON.stringify(post_data)))
         axios.post('fullQuotePMCAR',formData)
@@ -380,7 +386,7 @@ class OtherComprehensive extends Component {
     handleSubmit = (values) => {
         const { productId } = this.props.match.params
         const { motorInsurance, PolicyArray, sliderVal, add_more_coverage } = this.state
-        let defaultSliderValue = PolicyArray.length > 0 ? Math.floor(PolicyArray[0].PolicyRiskList[0].IDV_Suggested) : 0
+        let defaultSliderValue = PolicyArray.length > 0 ? Math.round(PolicyArray[0].PolicyRiskList[0].IDV_Suggested) : 0
 
         const formData = new FormData();
         let encryption = new Encryption();
@@ -467,10 +473,10 @@ class OtherComprehensive extends Component {
         const {showCNG, vahanDetails,error, policyCoverage, vahanVerify, is_CNG_account, fulQuoteResp, PolicyArray, 
             moreCoverage, sliderVal, motorInsurance, serverResponse} = this.state
         const {productId} = this.props.match.params 
-        let defaultSliderValue = PolicyArray.length > 0 ? Math.floor(PolicyArray[0].PolicyRiskList[0].IDV_Suggested) : 0
+        let defaultSliderValue = PolicyArray.length > 0 ? Math.round(PolicyArray[0].PolicyRiskList[0].IDV_Suggested) : 0
         let sliderValue = sliderVal
-        let minIDV = PolicyArray.length > 0 ? Math.floor(PolicyArray[0].PolicyRiskList[0].MinIDV_Suggested) : null
-        let maxIDV = PolicyArray.length > 0 ? Math.floor(PolicyArray[0].PolicyRiskList[0].MaxIDV_Suggested) : null
+        let minIDV = PolicyArray.length > 0 ? Math.round(PolicyArray[0].PolicyRiskList[0].MinIDV_Suggested) : null
+        let maxIDV = PolicyArray.length > 0 ? Math.round(PolicyArray[0].PolicyRiskList[0].MaxIDV_Suggested) : null
         
         let newInitialValues = Object.assign(initialValue, {
             registration_no: motorInsurance.registration_no ? motorInsurance.registration_no : "",
@@ -479,7 +485,7 @@ class OtherComprehensive extends Component {
             add_more_coverage: motorInsurance.add_more_coverage ? motorInsurance.add_more_coverage : "",
             // cng_kit: motorInsurance.cng_kit ? motorInsurance.cng_kit : "",
             cng_kit: motorInsurance.cng_kit == 0 || motorInsurance.cng_kit == 1 ? motorInsurance.cng_kit : is_CNG_account,
-            cngKit_Cost: motorInsurance.cngkit_cost ? Math.floor(motorInsurance.cngkit_cost) : 0,
+            cngKit_Cost: motorInsurance.cngkit_cost ? Math.round(motorInsurance.cngkit_cost) : 0,
             engine_no: motorInsurance.engine_no ? motorInsurance.engine_no : "",
             vahanVerify: vahanVerify,
             newRegistrationNo: localStorage.getItem('registration_number') == "NEW" ? localStorage.getItem('registration_number') : ""
