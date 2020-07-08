@@ -15,7 +15,7 @@ class ThankYouPage extends Component {
     accessToken: "",
     response_text: [],
     policy_holder_id: localStorage.getItem("policyHolder_id"),
-    refNumber: ""
+    refNumber: localStorage.getItem("policyHolder_refNo") ? localStorage.getItem("policyHolder_refNo") : 0
   };
 
 
@@ -159,28 +159,28 @@ class ThankYouPage extends Component {
       
   }
 
-  getPolicyHolderDetails = () => {
-    this.props.loadingStart();
-    axios
-      .get(`/policy-holder/${localStorage.getItem("policyHolder_id")}`)
-      .then((res) => {
-        this.setState({
-          refNumber: res.data.data.policyHolder.reference_no,
-        });
-        this.props.loadingStop();
-      })
-      .catch((err) => {
-        if(err.status == 401) {
-          swal("Session out. Please login")
-        }
-        else swal("Something wrong happened. Please try after some")
+  // getPolicyHolderDetails = () => {
+  //   this.props.loadingStart();
+  //   axios
+  //     .get(`/policy-holder/${localStorage.getItem("policyHolder_refNo")}`)
+  //     .then((res) => {
+  //       this.setState({
+  //         refNumber: res.data.data.policyHolder.reference_no,
+  //       });
+  //       this.props.loadingStop();
+  //     })
+  //     .catch((err) => {
+  //       if(err.status == 401) {
+  //         swal("Session out. Please login")
+  //       }
+  //       else swal("Something wrong happened. Please try after some")
 
-        this.setState({
-          policyHolderDetails: [],
-        });
-        this.props.loadingStop();
-      });
-  };
+  //       this.setState({
+  //         policyHolderDetails: [],
+  //       });
+  //       this.props.loadingStop();
+  //     });
+  // };
 
   componentDidMount() {
     // this.getAccessToken();       
@@ -199,7 +199,7 @@ class ThankYouPage extends Component {
       window.history.go(1);
     };
 
-    this.getPolicyHolderDetails();
+    // this.getPolicyHolderDetails();
   }
   render() {
     const { policyId } = this.props.match.params
