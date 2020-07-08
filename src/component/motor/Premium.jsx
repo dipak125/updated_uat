@@ -16,7 +16,7 @@ const initialValue = {}
 
 const validatePremium = Yup.object().shape({
     refNo: Yup.string().notRequired('Reference number is required')
-    .matches(/^[0-9]*$/, function() {
+    .matches(/^[a-zA-Z0-9]*$/, function() {
         return "Please enter valid reference number"
     }),
     })
@@ -166,7 +166,6 @@ class Premium extends Component {
 
     componentDidMount() {
         this.fetchData()
-        console.log(this.state);
     }
 
     render() {
@@ -322,16 +321,6 @@ class Premium extends Component {
                                                                                                 </Col>
                                                                                                 <Col sm={12} md={6}>
                                                                                                     <FormGroup>{memberdetails.email_id}</FormGroup>
-                                                                                                </Col>
-                                                                                            </Row>
-
-                                                                                            <Row>
-                                                                                                <Col sm={12} md={6}>
-                                                                                                    <FormGroup>Relation With Proposer:</FormGroup>
-                                                                                                </Col>
-                                                                                                <Col sm={12} md={6}>
-                                                                                                    <FormGroup>Self
-                                                                                                   </FormGroup>
                                                                                                 </Col>
                                                                                             </Row>
 

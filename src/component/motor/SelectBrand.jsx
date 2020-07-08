@@ -62,7 +62,8 @@ class SelectBrand extends Component {
             otherBrands: false,
             brandName: '',
             modelName: '',
-            fuelType: ''
+            fuelType: '',
+            vehicleDetails: []
         };
     }
 
@@ -87,7 +88,6 @@ class SelectBrand extends Component {
     componentDidMount() {
         // this.callFetchBrands();
         this.fetchData();
-
     }
 
 
@@ -114,6 +114,8 @@ class SelectBrand extends Component {
 
     getBrands = () => {
         const { productId } = this.props.match.params
+        const {vehicleDetails} = this.state
+        let brandId = vehicleDetails && vehicleDetails.vehiclebrand_id ? vehicleDetails.vehiclebrand_id : ""
         return new Promise(resolve => {
             axios.get(`vehicle/brand-with-image`)
                 .then(res => {
@@ -123,6 +125,12 @@ class SelectBrand extends Component {
                         otherBrands: false
                     })
                     this.props.loadingStop();
+                    if(localStorage.getItem('brandEdit') == '3') {
+                        this.setBrandName(brandId)
+                    }
+                    else if(localStorage.getItem('brandEdit') == '4') {
+                        this.getOtherBrands()
+                    }
                 })
                 .catch(err => {
                     // handle error
@@ -145,7 +153,13 @@ class SelectBrand extends Component {
                 brandModelList,
                 show: true,
                 otherBrands: true,
-                searchitem: []
+                searchitem: [],
+                modelName: [],
+                vehicleDetails: [],
+                selectedBrandId: "",
+                selectedModelId: [], 
+                selectedVarientId: [],
+                brandName: ""
                 // selectedBrandId: brand_id
             })
 
@@ -166,8 +180,9 @@ class SelectBrand extends Component {
         axios.get(`policy-holder/motor/${policyHolder_id}`)
             .then(res => {
                 let motorInsurance = res.data.data.policyHolder ? res.data.data.policyHolder.motorinsurance : {}
+                let vehicleDetails = res.data.data.policyHolder ? res.data.data.policyHolder.vehiclebrandmodel : {};
                 this.setState({
-                    motorInsurance
+                    motorInsurance, vehicleDetails
                 })
                 this.getBrands();
             })
@@ -180,6 +195,30 @@ class SelectBrand extends Component {
 
     registration = (productId) => {
         this.props.history.push(`/Registration/${productId}`);
+    }
+
+    selectBrand = (productId) => {
+        const {selectedBrandId , vehicleDetails, otherBrands} = this.state
+        let brandId= selectedBrandId ? selectedBrandId : (vehicleDetails && vehicleDetails.vehiclebrand_id ? vehicleDetails.vehiclebrand_id : "")
+        if(localStorage.getItem('brandEdit') == '1') {
+            this.setBrandName(brandId)
+        }
+        else if(localStorage.getItem('brandEdit') == '2') {
+            this.getOtherBrands()
+        }
+        
+        // if(otherBrands) {
+        //     this.getOtherBrands()
+        // }
+        // else {
+        //     this.setBrandName(brandId)
+        // }
+        
+        // this.props.history.push(`/Select-brand/${productId}`);
+    }
+
+    selectVehicle = (productId) => {
+        this.props.history.push(`/Select-brand/${productId}`);
     }
 
 
@@ -198,7 +237,9 @@ class SelectBrand extends Component {
                 otherBrands: false,
                 selectedBrandId: brand_id,
                 brandName: selectedBrandDetails.name,
-                searchitem: []
+                searchitem: [],
+                modelName: "",
+                vehicleDetails: []
             })
 
             this.props.loadingStop();
@@ -211,7 +252,7 @@ class SelectBrand extends Component {
 
     }
 
-    setVarient = (varient, model_Id, modelName, fuelType) => {
+    setVarient = (varient, model_Id, modelName, fuelType) => {        
         this.setState({
             selectedVarientId: varient,
             selectedModelId: model_Id,
@@ -221,6 +262,7 @@ class SelectBrand extends Component {
     }
 
     setOtherVarient = (varient, model_Id, brand_Id, brandName, modelName, fuelType) => {
+        // brandEdit = 1 for model, 2 for other Varient
         this.setState({
             selectedVarientId: varient,
             selectedModelId: model_Id,
@@ -239,21 +281,30 @@ class SelectBrand extends Component {
         const post_data = {
             'policy_holder_id': localStorage.getItem('policyHolder_id'),
             'menumaster_id': 1,
-            'brand_id': selectedBrandId,
-            'brand_model_id': selectedModelId,
-            'model_varient_id': selectedVarientId,
+            'brand_id': values.selectedBrandId,
+            'brand_model_id': values.selectedModelId,
+            'model_varient_id': values.selectedVarientId,
         }
         formData.append('enc_data', encryption.encrypt(JSON.stringify(post_data)))
         this.props.loadingStart();
         axios.post('insert-brand-model-varient', formData).then(res => {
             this.props.loadingStop();
             if (res.data.error == false) {
+                if(this.state.otherBrands) {
+                    localStorage.setItem('brandEdit', 2)
+                }
+                else {
+                    localStorage.setItem('brandEdit', 1)
+                }
                 this.props.history.push(`/VehicleDetails/${productId}`);
             }
 
         })
             .catch(err => {
                 // handle error
+                if(err.status == '422') {
+                    swal("Please select vehicle model")
+                }
                 this.props.loadingStop();
             })
     }
@@ -261,16 +312,18 @@ class SelectBrand extends Component {
 
     render() {
         const { brandList, motorInsurance, selectedBrandDetails, brandModelList, selectedBrandId,
-             selectedModelId, selectedVarientId, otherBrands, brandName, modelName, fuelType } = this.state
+             selectedModelId, selectedVarientId, otherBrands, brandName, modelName, fuelType, vehicleDetails } = this.state
         const { productId } = this.props.match.params
         const newInitialValues = Object.assign(initialValues, {
-            selectedBrandId: selectedBrandId ? selectedBrandId : '',
-            selectedModelId: selectedModelId ? selectedModelId : '',
+            selectedBrandId: selectedBrandId ? selectedBrandId : (vehicleDetails && vehicleDetails.vehiclebrand_id ? vehicleDetails.vehiclebrand_id : ""),
+            selectedModelId:  selectedModelId ? selectedModelId : (selectedBrandId ? "" : vehicleDetails && vehicleDetails.vehiclemodel_id ? vehicleDetails.vehiclemodel_id : ""),
             selectedBrandName: '',
             selectedModelName: '',
-            selectedVarientId: selectedVarientId ? selectedVarientId : '',
+            selectedVarientId: selectedVarientId ? selectedVarientId : (selectedBrandId ? "" :  vehicleDetails && vehicleDetails.varientmodel_id ? vehicleDetails.varientmodel_id : ""),
 
         })
+
+        console.log("vehicleDetails", newInitialValues)
 
         return (
             <>
@@ -325,29 +378,29 @@ class SelectBrand extends Component {
                                                                         <div className="txtRegistr resmb-15">Registration No.<br />
                                                                             {motorInsurance && motorInsurance.registration_no}</div>
 
-                                                                        <div> <button className="rgistrBtn" onClick={this.registration.bind(this, productId)}>Edit</button></div>
+                                                                        <div> <button type="button" className="rgistrBtn" onClick={this.registration.bind(this, productId)}>Edit</button></div>
                                                                     </div>
 
 
 
                                                                     <div className="d-flex justify-content-between flex-lg-row flex-md-column m-b-25">
                                                                         <div className="txtRegistr resmb-15">Car Brand
-                                                                            - {brandName}
+                                                                            - <strong>{brandName ? brandName : (vehicleDetails && vehicleDetails.vehiclebrand && vehicleDetails.vehiclebrand.name ? vehicleDetails.vehiclebrand.name : "")}</strong>
                                                                         </div>
 
-                                                                        <div> <button className="rgistrBtn">Edit</button></div>
+                                                                        <div> <button type="button" className="rgistrBtn" onClick={this.selectVehicle.bind(this, productId)}>Edit</button></div>
                                                                     </div>
 
                                                                     <div className="d-flex justify-content-between flex-lg-row flex-md-column m-b-25">
                                                                         <div className="txtRegistr">Car Model<br />
-                                                                            <strong>{modelName}</strong></div>
+                                                                            <strong>{modelName ? modelName : (selectedBrandId ? "" : vehicleDetails && vehicleDetails.vehiclemodel && vehicleDetails.vehiclemodel.description ? vehicleDetails.vehiclemodel.description+" "+vehicleDetails.varientmodel.varient : "")}</strong></div>
 
-                                                                        <div> <button className="rgistrBtn">Edit</button></div>
+                                                                        <div> <button type="button" className="rgistrBtn" onClick={this.selectBrand.bind(this, productId)}>Edit</button></div>
                                                                     </div>
 
                                                                     <div className="d-flex justify-content-between flex-lg-row flex-md-column m-b-25">
                                                                         <div className="txtRegistr">Fuel Type<br />
-                                                                            <strong>{fuel[fuelType]} </strong></div>
+                                                                            <strong>{fuel[fuelType] ? fuel[fuelType] : (vehicleDetails && vehicleDetails.varientmodel && vehicleDetails.varientmodel.fuel_type ? fuel[vehicleDetails.varientmodel.fuel_type] : null)} </strong></div>
 
                                                                     </div>
                                                                 </div>

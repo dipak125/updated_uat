@@ -93,7 +93,7 @@ const ownerValidation = Yup.object().shape({
 
     address:Yup.string().required('Address is required')
     // .matches(/^(?![0-9._])(?!.*[0-9._]$)(?!.*\d_)(?!.*_\d)[a-zA-Z0-9_.,-\\]+$/, 
-    .matches(/^[a-zA-Z0-9\s,/.]*$/, 
+    .matches(/^[a-zA-Z0-9\s,/.-]*$/, 
     function() {
         return "Please enter valid address"
     }),
@@ -828,6 +828,7 @@ console.log('post_data', post_data);
                                             <option value="cousin">Cousin</option>
                                             <option value="daughter">Daughter</option>
                                             <option value="employed_driver">Employed Driver</option>
+                                            <option value="employed_driver_close_relation">Employed driver other closed relations</option>
                                             <option value="employee">Employee</option>
                                             <option value="father_in_law">Father In Law</option>
                                             <option value="friend">Friend</option>

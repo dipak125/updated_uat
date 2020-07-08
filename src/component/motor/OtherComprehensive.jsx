@@ -754,6 +754,8 @@ class OtherComprehensive extends Component {
                                             </div>
                                         </FormGroup>
                                     </Col>
+                                    {defaultSliderValue ? 
+
                                     <Col sm={12} md={12} lg={6}>
                                         <FormGroup>
                                         <input type="range" className="W-90" 
@@ -772,6 +774,7 @@ class OtherComprehensive extends Component {
                                             {/* <img src={require('../../assets/images/slide.svg')} alt="" className="W-90" /> */}
                                         </FormGroup>
                                     </Col>
+                                    : null}
                                 </Row>
 
                                                                
@@ -924,15 +927,18 @@ class OtherComprehensive extends Component {
                     </div>
                     </div>
                 </BaseComponent>
-                <Modal className="customModal maxwother" bsSize="md"
+                <Modal className="customModal" bsSize="md"
                     show={this.state.show}
                     onHide={this.handleClose}>
                     <Modal.Header closeButton className="custmModlHead modalhd">
-                        
+                        <div className="cntrbody">
                             <h3>Premium breakup </h3>                           
-                        
+                        </div>
                     </Modal.Header>
                     <Modal.Body>
+                    {/* <h5> Net Premium Amount  ₹ {fulQuoteResp.DuePremium}</h5>
+                    <h5> Gross Premium Amount  ₹ {fulQuoteResp.BeforeVatPremium}</h5>
+                    <h5> Applicable Taxs  ₹ {fulQuoteResp.TGST}</h5> */}
                     <table class="table table-bordered">
                             <thead>
                                 <tr>

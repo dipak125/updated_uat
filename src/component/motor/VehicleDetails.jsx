@@ -298,6 +298,16 @@ class VehicleDetails extends Component {
     }
 
     selectBrand = (productId) => {
+        if(localStorage.getItem('brandEdit') == '1') {
+            localStorage.setItem('brandEdit', 3)
+        }
+        else if(localStorage.getItem('brandEdit') == '2') {
+            localStorage.setItem('brandEdit', 4)
+        }
+        this.props.history.push(`/Select-brand/${productId}`);
+    }
+
+    selectVehicle = (productId) => {
         this.props.history.push(`/Select-brand/${productId}`);
     }
 
@@ -379,7 +389,8 @@ class VehicleDetails extends Component {
         const {motorInsurance} = this.state
         ageObj.whatIsCurrentMonth(values.registration_date) < 7 ? localStorage.setItem('policy_type', 6) : 
         localStorage.setItem('policy_type', 1)
-        let vehicleAge = ageObj.whatIsMyVehicleAge(values.registration_date)
+        // let vehicleAge = ageObj.whatIsMyVehicleAge(values.registration_date)
+        let vehicleAge = Math.floor(moment().diff(values.registration_date, 'years', true))
         // let ageDiff = Math.floor(moment().diff(values.registration_date, 'days', true));
         let ageDiff = ageObj.whatIsCurrentMonth(values.registration_date);
         const formData = new FormData(); 
@@ -421,7 +432,7 @@ class VehicleDetails extends Component {
         else {
             localStorage.removeItem('registration_number');
         }
-
+        console.log("post_data", post_data)
         formData.append('enc_data',encryption.encrypt(JSON.stringify(post_data)))
         this.props.loadingStart();
         axios
@@ -943,7 +954,7 @@ class VehicleDetails extends Component {
                                                         </Col>
 
                                                         <Col sm={12} md={5} className="text-right">
-                                                            <button className="rgistrBtn" onClick= {this.selectBrand.bind(this,productId)}>Edit</button>
+                                                            <button className="rgistrBtn" onClick= {this.selectVehicle.bind(this,productId)}>Edit</button>
                                                         </Col>
                                                     </Row>
 
