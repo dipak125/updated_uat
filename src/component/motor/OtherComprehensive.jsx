@@ -348,13 +348,13 @@ class OtherComprehensive extends Component {
             'access_token':access_token,
             'idv_value': sliderVal ? sliderVal : defaultSliderValue.toString(),
             'policy_type': localStorage.getItem('policy_type'),
-            'add_more_coverage': add_more_coverage,
+            'add_more_coverage': add_more_coverage.toString(),
             'cng_kit': cng_kit_flag,
             'cngKit_Cost': cngKit_Cost
         }
         console.log('fullQuote_post_data', post_data)
         let encryption = new Encryption();
-            formData.append('enc_data',encryption.encrypt(JSON.stringify(post_data)))
+        formData.append('enc_data',encryption.encrypt(JSON.stringify(post_data)))
         axios.post('fullQuotePMCAR',formData)
             .then(res => {
                 if (res.data.PolicyObject) {

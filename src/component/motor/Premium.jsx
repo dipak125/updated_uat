@@ -11,6 +11,7 @@ import { withRouter, Link, Route } from "react-router-dom";
 import { loaderStart, loaderStop } from "../../store/actions/loader";
 import { connect } from "react-redux";
 import * as Yup from "yup";
+import Encryption from '../../shared/payload-encryption';
 
 const initialValue = {}
 
@@ -124,14 +125,27 @@ class Premium extends Component {
 
     fullQuote = (access_token, motorInsurance) => {
         const formData = new FormData();
-        formData.append("access_token", access_token);
-        formData.append("id", localStorage.getItem("policyHolder_id"));
+        let encryption = new Encryption();
+        // formData.append("access_token", access_token);
+        // formData.append("id", localStorage.getItem("policyHolder_id"));
 
-        formData.append("idv_value", motorInsurance.idv_value);
-        formData.append("policy_type", localStorage.getItem('policy_type'));
-        formData.append("add_more_coverage", motorInsurance.add_more_coverage);
-        formData.append("cng_kit", motorInsurance.cng_kit);
-        formData.append("cngKit_Cost", Math.floor(motorInsurance.cngkit_cost));
+        // formData.append("idv_value", motorInsurance.idv_value);
+        // formData.append("policy_type", localStorage.getItem('policy_type'));
+        // formData.append("add_more_coverage", motorInsurance.add_more_coverage);
+        // formData.append("cng_kit", motorInsurance.cng_kit);
+        // formData.append("cngKit_Cost", Math.floor(motorInsurance.cngkit_cost));
+
+        const post_data = {
+            'id':localStorage.getItem('policyHolder_id'),
+            'access_token':access_token,
+            'idv_value': motorInsurance.idv_value,
+            'policy_type': localStorage.getItem('policy_type'),
+            'add_more_coverage': motorInsurance.add_more_coverage,
+            'cng_kit': motorInsurance.cng_kit,
+            'cngKit_Cost': Math.floor(motorInsurance.cngkit_cost)
+        }
+
+        formData.append('enc_data',encryption.encrypt(JSON.stringify(post_data)))
 
         axios.post('fullQuotePMCAR', formData)
             .then(res => {
