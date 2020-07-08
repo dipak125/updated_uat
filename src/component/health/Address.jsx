@@ -44,7 +44,7 @@ const initialValues = {
     address2: "",
     address3: "",
     pincode: "",
-    area: "",
+    // area: "",
     state: "",
     eIA: "",
     eia_account_no:"",
@@ -113,7 +113,7 @@ const validateAddress =  Yup.object().shape({
         }).min(6, 'Must be exactly 6 digits')
         .max(6, 'Must be exactly 6 digits'),
 
-    area: Yup.string()
+    pincode_id: Yup.string()
         .required(function() {
             return "Select area"
         }),
@@ -309,7 +309,8 @@ class Address extends Component {
             selfFlag:false,
             pinDataArr:[],
             stateName:[],
-            showEIA:false
+            showEIA:false,
+            pincode_Details: []
 		}
 	}
 
@@ -333,9 +334,10 @@ class Address extends Component {
             .then(res=>{
                 let policy_holder =  res.data.data.policyHolder;
                 let family_members = res.data.data.policyHolder.request_data.family_members
-                let addressDetails = res.data.data.policyHolder
+                let addressDetails = JSON.parse(res.data.data.policyHolder.address)
                 let is_eia_account = res.data.data.policyHolder.is_eia_account == 2 ? "" : res.data.data.policyHolder.is_eia_account
                 let selfFlag = false;
+                let pincode_Details = JSON.parse(res.data.data.policyHolder.pincode_response)
                 for(let i=0;i<family_members.length;i++){
                     if(family_members[i].relation_with=='self'){
                         selfFlag = true
@@ -349,10 +351,11 @@ class Address extends Component {
                     policy_holder,
                     familyMembers:family_members,
                     addressDetails,
-                    is_eia_account
+                    is_eia_account,
+                    pincode_Details
                 })
                 this.props.loadingStop();
-                this.fetchPrevAreaDetails(addressDetails)
+                this.fetchPrevAreaDetails(pincode_Details)
                 
             })
             .catch(function (error) {
@@ -362,9 +365,9 @@ class Address extends Component {
             this.props.loadingStop();
     }
 
-    fetchPrevAreaDetails=(addressDetails)=>{
-            if(addressDetails){
-                let pincode = addressDetails.pincode;
+    fetchPrevAreaDetails=(pincode_Details)=>{
+            if(pincode_Details){
+                let pincode = pincode_Details.PIN_CD;
                 const formData = new FormData();
                 // let encryption = new Encryption();
 
@@ -436,7 +439,6 @@ class Address extends Component {
 
         let formArr = []
         
-      //  formData.append('policy_holder_id',policyHolder_id);
         formArr['policy_holder_id'] = policyHolder_id;
         const family_members = values.family_members;
         let proposerAsInsured = values.proposerAsInsured;
@@ -451,21 +453,13 @@ class Address extends Component {
         let pancard_no = []
 
         for(let i=0;i<family_members.length;i++){
-           // formData.append(`looking_for[${i}]`, family_members[i].looking_for);
              looking_for.push(family_members[i].looking_for)
-          //  formData.append(`family_member_id[${i}]`, family_members[i].family_member_id);
             family_member_id.push(family_members[i].family_member_id)
-          //  formData.append(`gender[${i}]`, family_members[i].gender);
             gender.push(family_members[i].gender)
-           // formData.append(`first_name[${i}]`, family_members[i].fname);
             first_name.push(family_members[i].fname)
-            //formData.append(`last_name[${i}]`, family_members[i].lname);
             last_name.push(family_members[i].lname)
-           // formData.append(`dob[${i}]`, moment(family_members[i].dob).format("YYYY-MM-DD"));
            dob.push(moment(family_members[i].dob).format("YYYY-MM-DD"))
            pancard_no.push(values.panNo)
-          //  formData.append(`pancard_no[${i}]`, values.panNo);
-         //   formData.append(`pancard_no[${i}]`, values.panNo);
         }  
 
         formArr['looking_for'] = looking_for
@@ -480,14 +474,10 @@ class Address extends Component {
 
 
         let email = values.email;
-     // formData.append('panNo',values.panNo);
-       // formData.append('phoneNo',values.phoneNo);
         formArr['phoneNo'] = values.phoneNo;
-        //formData.append('email_id',values.email);
         formArr['email_id'] = values.email;
         sessionStorage.setItem('email_data',email);
-        formArr['is_eia_account'] = values.eIA;
-        //formData.append('is_eia_account',values.eIA);        
+        formArr['is_eia_account'] = values.eIA;      
         sessionStorage.setItem('pan_data',values.panNo);
         sessionStorage.setItem('email_data',values.email);
 
@@ -496,29 +486,22 @@ class Address extends Component {
             address1:values.address1,
             address2:values.address2,
             address3:values.address3,
-            area:values.area,
+            pincode_id:values.pincode_id,
             phoneNo:values.phoneNo,
             pincode:values.pincode,
             state:values.state,
-        })
-        //formData.append('communication_address',JSON.stringify(address_object));   
+        }) 
         formArr['communication_address'] = JSON.stringify(address_object);   
-       // formData.append('panNo',values.panNo);
         formArr['panNo'] = values.panNo;
-        //formData.append('phoneNo',values.phoneNo);
         formArr['phoneNo'] = values.phoneNo;
-        //formData.append('email',values.email); 
         formArr['email'] = values.email;
-       // formData.append('proposerName',values.proposerName);
         formArr['proposerName'] = values.proposerName;
-       // formData.append('proposerLname',values.proposerLname);
-        formArr['proposerLname'] = values.proposerLname;
-        //formData.append('proposerDob',moment(values.proposerDob).format("YYYY-MM-DD") ); 
+        formArr['proposerLname'] = values.proposerLname; 
         formArr['proposerDob'] = moment(values.proposerDob).format("YYYY-MM-DD");
-        //formData.append('proposerGender',values.proposerGender); 
         formArr['proposerGender'] = values.proposerGender;
+        formArr['pincode_id'] = values.pincode_id;
+        
         if(values.eIA == 1){
-            //formData.append('eia_account_no',values.eia_account_no)
             formArr['eia_account_no'] = values.eia_account_no;
         }       
 
@@ -579,8 +562,8 @@ class Address extends Component {
     
     
     render() {
-        const {policy_holder,familyMembers,addressDetails,is_eia_account,selfFlag,pinDataArr,stateName,showEIA} = this.state    
-        console.log("aaaa======> ", is_eia_account)
+        const {policy_holder,familyMembers,addressDetails,is_eia_account,selfFlag,pinDataArr,stateName,showEIA, pincode_Details} = this.state    
+
         let newInitialValues = Object.assign(initialValues, {
             proposerAsInsured: sessionStorage.getItem('proposed_insured') ? sessionStorage.getItem('proposed_insured') : (selfFlag ? 1:0),
             family_members:this.initFamilyDetailsList(
@@ -593,7 +576,7 @@ class Address extends Component {
             address2: addressDetails && addressDetails.address2 ? addressDetails.address2:  "",
             address3: addressDetails && addressDetails.address3 ? addressDetails.address3: "",
             pincode: addressDetails && addressDetails.pincode ? addressDetails.pincode: "",
-            area: addressDetails && addressDetails.area ? addressDetails.area: "",
+            pincode_id: pincode_Details && pincode_Details.id ? pincode_Details.id : "",
             state: addressDetails && addressDetails.state ? addressDetails.state:"",
             eIA: is_eia_account,
             eia_account_no : policy_holder && policy_holder.eia_no ?  policy_holder.eia_no : '',
@@ -1036,6 +1019,7 @@ class Address extends Component {
                                                                         setFieldTouched("pincode");
                                                                         setFieldValue("pincode", e.target.value);
                                                                         setFieldValue("state", stateName ? stateName[0] : values.state);
+                                                                        setFieldValue("pincode_id", "");
                                                                     }}
                                                                 />
                                                                 {errors.pincode && touched.pincode ? (
@@ -1048,21 +1032,21 @@ class Address extends Component {
                                                         <FormGroup>
                                                         <div className="formSection">
                                                                 <Field
-                                                                    name="area"
+                                                                    name="pincode_id"
                                                                     component="select"
                                                                     autoComplete="off"
-                                                                    value={values.area}
+                                                                    value={values.pincode_id}
                                                                     className="formGrp"
                                                                 >
                                                                 <option value="">Select Area</option>
                                                                 {pinDataArr && pinDataArr.map((resource,rindex)=>
-                                                                    <option value={resource.LCLTY_SUBRB_TALUK_TEHSL_NM}>{resource.LCLTY_SUBRB_TALUK_TEHSL_NM}</option>
+                                                                    <option value={resource.id}>{resource.LCLTY_SUBRB_TALUK_TEHSL_NM}</option>
                                                                 )}
                                                                     
                                                                     {/*<option value="area2">Area 2</option>*/}
                                                                 </Field>     
-                                                                {errors.area && touched.area ? (
-                                                                    <span className="errorMsg">{errors.area}</span>
+                                                                {errors.pincode_id && touched.pincode_id ? (
+                                                                    <span className="errorMsg">{errors.pincode_id}</span>
                                                                 ) : null}     
                                                                 </div>
                                                         </FormGroup>

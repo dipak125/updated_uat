@@ -27,7 +27,8 @@ const initialValues = {
 
 const fuel = {
     1: 'Petrol',
-    2: 'Diesel'
+    2: 'Diesel',
+    3: 'CNG'
 }
 
 
@@ -125,10 +126,10 @@ class SelectBrand extends Component {
                         otherBrands: false
                     })
                     this.props.loadingStop();
-                    if(localStorage.getItem('brandEdit') == '3') {
+                    if(localStorage.getItem('newBrandEdit') == '1') {
                         this.setBrandName(brandId)
                     }
-                    else if(localStorage.getItem('brandEdit') == '4') {
+                    else if(localStorage.getItem('newBrandEdit') == '2') {
                         this.getOtherBrands()
                     }
                 })
@@ -175,7 +176,7 @@ class SelectBrand extends Component {
 
     fetchData = () => {
         const { productId } = this.props.match.params
-        let policyHolder_id = localStorage.getItem("policyHolder_id") ? localStorage.getItem("policyHolder_id") : 0;
+        let policyHolder_id = localStorage.getItem("policyHolder_refNo") ? localStorage.getItem("policyHolder_refNo") : 0;
         this.props.loadingStart();
         axios.get(`policy-holder/motor/${policyHolder_id}`)
             .then(res => {
@@ -292,9 +293,11 @@ class SelectBrand extends Component {
             if (res.data.error == false) {
                 if(this.state.otherBrands) {
                     localStorage.setItem('brandEdit', 2)
+                    localStorage.removeItem('newBrandEdit')
                 }
                 else {
                     localStorage.setItem('brandEdit', 1)
+                    localStorage.removeItem('newBrandEdit')
                 }
                 this.props.history.push(`/VehicleDetails/${productId}`);
             }

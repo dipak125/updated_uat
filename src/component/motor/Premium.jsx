@@ -78,7 +78,7 @@ class Premium extends Component {
 
     fetchData = () => {
         const { productId } = this.props.match.params
-        let policyHolder_id = localStorage.getItem("policyHolder_id") ? localStorage.getItem("policyHolder_id") : 0;
+        let policyHolder_id = localStorage.getItem("policyHolder_refNo") ? localStorage.getItem("policyHolder_refNo") : 0;
         this.props.loadingStart();
         axios.get(`policy-holder/motor/${policyHolder_id}`)
             .then(res => {
@@ -470,7 +470,7 @@ class Premium extends Component {
                                                                 </Col>
                                                             </Row>
 
-                                                            <Row>
+                                                            {/* <Row>
                                                                 <Col sm={12}>
                                                                     <label className="customCheckBox formGrp formGrp fscheck">I want to receive my Quote & Policy Details on Whatsapp
                                                                         <Field
@@ -484,7 +484,7 @@ class Premium extends Component {
                                                                         <span className="error-message"></span>
                                                                     </label>
                                                                 </Col>
-                                                            </Row>
+                                                            </Row> */}
                                                             <div className="d-flex justify-content-left resmb">
                                                                 <Button className="backBtn" type="button" onClick={this.additionalDetails.bind(this, productId)}>Back</Button>
                                                                 {fulQuoteResp.QuotationNo ?

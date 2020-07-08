@@ -16,12 +16,12 @@ import InputMask from "react-input-mask";
 
 const initialValues = {
     regNumber:'',
-    confirm: 0
+    check_registration: 2
 }
 
 const vehicleRegistrationValidation = Yup.object().shape({
 
-    confirm: Yup.string().notRequired(),
+    check_registration: Yup.string().notRequired(),
 
     // regNumber: Yup.string().matches(/^[A-Z]{2}[ -][0-9]{1,2}(?: [A-Z])?(?: [A-Z]*)? [0-9]{4}$/, 'Invalid Registration number').required('Please enter valid registration number')
     regNumber: Yup.string().matches(/^[A-Z]{2}[ -][0-9]{1,2}(?: [A-Z])?(?: [A-Z]*)? [0-9]{4}$/, 'Invalid Registration number')
@@ -32,7 +32,7 @@ const vehicleRegistrationValidation = Yup.object().shape({
         },
         function (value) {
             // console.log('YUP', value)
-            if ((value == "" || value == undefined) && this.parent.confirm == 0 ) {  
+            if ((value == "" || value == undefined) && this.parent.check_registration == 2 ) {  
                 return false;
             }
             return true;
@@ -102,7 +102,7 @@ fetchData=()=>{
             const post_data = {
                 'policy_holder_id': policyHolder_id,
                 'registration_no':values.regNumber,
-                'confirm': values.confirm,
+                'check_registration': values.check_registration,
                 'menumaster_id':1,
                 'vehicle_type_id':productId,
                 'csc_id':sessionStorage.getItem('csc_id') ? sessionStorage.getItem('csc_id') : "500100100013",
@@ -116,10 +116,16 @@ fetchData=()=>{
             axios
             .post(`/update-registration`, formData)
             .then(res => {
+                if(res.data.error == false) {
+                    this.props.history.push(`/select-brand/${productId}`);
                     // localStorage.setItem('policyHolder_id', res.data.data.policyHolder_id);
                     // localStorage.setItem('policyHolder_refNo', res.data.data.policyHolder_refNo);
-                    this.props.loadingStop();
-                    this.props.history.push(`/select-brand/${productId}`);
+                }
+                else{
+                    swal(res.data.msg)
+                }   
+                this.props.loadingStop();
+                    
             })
             .catch(err => {
             if(err && err.data){
@@ -131,12 +137,14 @@ fetchData=()=>{
         else{
             const post_data = {
                 'registration_no':values.regNumber,
-                'confirm': values.confirm,
+                'check_registration': values.check_registration,
                 'menumaster_id':1,
                 'vehicle_type_id':productId,
                 'csc_id':sessionStorage.getItem('csc_id') ? sessionStorage.getItem('csc_id') : "500100100013",
                 'agent_name':sessionStorage.getItem('agent_name') ? sessionStorage.getItem('agent_name') : "Bipin Sing",
                 'product_id':sessionStorage.getItem('product_id') ? sessionStorage.getItem('product_id') : "900001786",
+                // post_data['agent_name'] = sessionStorage.getItem('fullname') ? sessionStorage.getItem('fullname') : "Bipin Sing"
+                // post_data['product_id'] = sessionStorage.getItem('productId') ? sessionStorage.getItem('productId') : "900001786"
             } 
             console.log('post_data', post_data)
             formData.append('enc_data',encryption.encrypt(JSON.stringify(post_data)))
@@ -144,10 +152,15 @@ fetchData=()=>{
             axios
             .post(`/registration`, formData)
             .then(res => {
+                if(res.data.error == false) {
                     localStorage.setItem('policyHolder_id', res.data.data.policyHolder_id);
                     localStorage.setItem('policyHolder_refNo', res.data.data.policyHolder_refNo);
-                    this.props.loadingStop();
-                    this.props.history.push(`/select-brand/${productId}`);                        
+                    this.props.history.push(`/select-brand/${productId}`); 
+                }   
+                else{
+                    swal(res.data.msg)
+                }
+                this.props.loadingStop();                    
             })
             .catch(err => {
             if(err && err.data){
@@ -249,8 +262,8 @@ fetchData=()=>{
                                                 maxLength={this.state.length}
                                                 onInput={e=>{
                                                     this.toInputUppercase(e)
-                                                    setFieldTouched('confirm')
-                                                    setFieldValue('confirm', '0');
+                                                    setFieldTouched('check_registration')
+                                                    setFieldValue('check_registration', '2');
                                                 }} 
     
                                             />
@@ -264,36 +277,36 @@ fetchData=()=>{
                                                 Continue Without Vehicle Registration Number
                                                 <Field
                                                     type="checkbox"
-                                                    name="confirm"
+                                                    name="check_registration"
                                                     value="1"
                                                     className="user-self"
                                                     onChange={(e) => {
                                                         if (e.target.checked === true) {
                                                             setFieldTouched('regNumber')
                                                             setFieldValue('regNumber', '');
-                                                            setFieldTouched('confirm')
-                                                            setFieldValue('confirm', e.target.value);
+                                                            setFieldTouched('check_registration')
+                                                            setFieldValue('check_registration', e.target.value);
     
                                                         } else {
-                                                            setFieldValue('confirm', '0');                                                            
+                                                            setFieldValue('check_registration', '2');                                                            
                                                         }
                                                         if(this.setValueData()){
                                                             this.setState({
-                                                                confirm:1
+                                                                check_registration:1
                                                             })
                                                         }
                                                         else{
                                                             this.setState({
-                                                                confirm:0
+                                                                check_registration:2
                                                             })
                                                         }
                                                     }}
-                                                    checked={values.confirm == '1' ? true : false}
+                                                    checked={values.check_registration == '1' ? true : false}
                                                 />
                                                     <span className="checkmark mL-0"></span>
                                                 </label>
-                                                {errors.confirm && (touched.looking_for_2 || touched.looking_for_3 || touched.looking_for_4) ? 
-                                                        <span className="error-message">{errors.confirm}</span> : ""
+                                                {errors.check_registration && (touched.looking_for_2 || touched.looking_for_3 || touched.looking_for_4) ? 
+                                                        <span className="error-message">{errors.check_registration}</span> : ""
                                                     }
                                                 
                                             </div> 

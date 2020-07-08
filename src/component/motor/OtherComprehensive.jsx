@@ -224,7 +224,7 @@ class OtherComprehensive extends Component {
 
     fetchData = () => {
         const { productId } = this.props.match.params
-        let policyHolder_id = localStorage.getItem("policyHolder_id") ? localStorage.getItem("policyHolder_id") : 0;
+        let policyHolder_id = localStorage.getItem("policyHolder_refNo") ? localStorage.getItem("policyHolder_refNo") : 0;
         this.props.loadingStart();
         axios.get(`policy-holder/motor/${policyHolder_id}`)
             .then(res => {
@@ -475,9 +475,10 @@ class OtherComprehensive extends Component {
         const {productId} = this.props.match.params 
         let defaultSliderValue = PolicyArray.length > 0 ? Math.round(PolicyArray[0].PolicyRiskList[0].IDV_Suggested) : 0
         let sliderValue = sliderVal
-        let minIDV = PolicyArray.length > 0 ? Math.round(PolicyArray[0].PolicyRiskList[0].MinIDV_Suggested) : null
-        let maxIDV = PolicyArray.length > 0 ? Math.round(PolicyArray[0].PolicyRiskList[0].MaxIDV_Suggested) : null
-        
+        let minIDV = PolicyArray.length > 0 ? Math.floor(PolicyArray[0].PolicyRiskList[0].MinIDV_Suggested) : null
+        let maxIDV = PolicyArray.length > 0 ? Math.floor(PolicyArray[0].PolicyRiskList[0].MaxIDV_Suggested) : null
+        minIDV = minIDV + 1;
+        maxIDV = maxIDV - 1;
         let newInitialValues = Object.assign(initialValue, {
             registration_no: motorInsurance.registration_no ? motorInsurance.registration_no : "",
             chasis_no: motorInsurance.chasis_no ? motorInsurance.chasis_no : "",

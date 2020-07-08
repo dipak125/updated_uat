@@ -263,7 +263,8 @@ const vehicleRegistrationValidation = Yup.object().shape({
 
 const fuel = {
     1: 'Petrol',
-    2: 'Diesel'
+    2: 'Diesel',
+    3: 'CNG'
 }
 
 
@@ -297,19 +298,20 @@ class VehicleDetails extends Component {
         e.target.value.length === 0 && element.classList.remove('active');
     }
 
-    selectBrand = (productId) => {
+    selectVehicleBrand = (productId) => {
         if(localStorage.getItem('brandEdit') == '1') {
-            localStorage.setItem('brandEdit', 3)
+            localStorage.setItem('newBrandEdit', 1)
         }
         else if(localStorage.getItem('brandEdit') == '2') {
-            localStorage.setItem('brandEdit', 4)
+            localStorage.setItem('newBrandEdit', '2')
         }
         this.props.history.push(`/Select-brand/${productId}`);
     }
 
-    selectVehicle = (productId) => {
+    selectBrand = (productId) => {
         this.props.history.push(`/Select-brand/${productId}`);
     }
+
 
     showClaimText = (value) =>{
         if(value == 1){
@@ -487,7 +489,7 @@ class VehicleDetails extends Component {
 
     fetchData = () => {
         const { productId } = this.props.match.params
-        let policyHolder_id = localStorage.getItem("policyHolder_id") ? localStorage.getItem("policyHolder_id") : 0;
+        let policyHolder_id = localStorage.getItem("policyHolder_refNo") ? localStorage.getItem("policyHolder_refNo") : 0;
         this.props.loadingStart();
         axios.get(`policy-holder/motor/${policyHolder_id}`)
             .then(res => {
@@ -651,7 +653,7 @@ class VehicleDetails extends Component {
                                                         </FormGroup>
                                                     </Col>
                                                 </Row>
-                                            {ageObj.whatIsCurrentMonth(values.registration_date) > 0 ?
+                                            {ageObj.whatIsCurrentMonth(values.registration_date) > 0 || values.registration_date == "" ?
                                                 <Fragment>
                                                 <Row>
                                                     <Col sm={12}>
@@ -954,7 +956,7 @@ class VehicleDetails extends Component {
                                                         </Col>
 
                                                         <Col sm={12} md={5} className="text-right">
-                                                            <button className="rgistrBtn" onClick= {this.selectVehicle.bind(this,productId)}>Edit</button>
+                                                            <button className="rgistrBtn" onClick= {this.selectBrand.bind(this,productId)}>Edit</button>
                                                         </Col>
                                                     </Row>
 
@@ -965,7 +967,7 @@ class VehicleDetails extends Component {
                                                         </Col>
 
                                                         <Col sm={12} md={5} className="text-right">
-                                                            <button className="rgistrBtn" onClick= {this.selectBrand.bind(this,productId)}>Edit</button>
+                                                            <button className="rgistrBtn" onClick= {this.selectVehicleBrand.bind(this,productId)}>Edit</button>
                                                         </Col>
                                                     </Row>
 

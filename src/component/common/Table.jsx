@@ -42,6 +42,8 @@ class Table extends Component {
             sessionStorage.removeItem('proposed_insured');
             sessionStorage.removeItem('display_looking_for');
             sessionStorage.removeItem('display_dob');
+            localStorage.removeItem('newBrandEdit');
+            localStorage.removeItem('brandEdit');
             this.props.loadingStop();
           })
           .catch(err => {
