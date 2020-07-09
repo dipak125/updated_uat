@@ -490,12 +490,15 @@ class VehicleDetails extends Component {
     fetchData = () => {
         const { productId } = this.props.match.params
         let policyHolder_id = localStorage.getItem("policyHolder_refNo") ? localStorage.getItem("policyHolder_refNo") : 0;
+        let encryption = new Encryption();
         this.props.loadingStart();
         axios.get(`policy-holder/motor/${policyHolder_id}`)
             .then(res => {
-                 let motorInsurance = res.data.data.policyHolder ? res.data.data.policyHolder.motorinsurance : {};
-                 let previousPolicy = res.data.data.policyHolder ? res.data.data.policyHolder.previouspolicy : {};
-                 let vehicleDetails = res.data.data.policyHolder ? res.data.data.policyHolder.vehiclebrandmodel : {};
+                 let decryptResp = JSON.parse(encryption.decrypt(res.data))
+                 console.log("decrypt", decryptResp)
+                 let motorInsurance = decryptResp.data.policyHolder ? decryptResp.data.policyHolder.motorinsurance : {};
+                 let previousPolicy = decryptResp.data.policyHolder ? decryptResp.data.policyHolder.previouspolicy : {};
+                 let vehicleDetails = decryptResp.data.policyHolder ? decryptResp.data.policyHolder.vehiclebrandmodel : {};
                  let RTO_location = motorInsurance && motorInsurance.location && motorInsurance.location.RTO_LOCATION ? motorInsurance.location.RTO_LOCATION : ""
                  let previous_is_claim= previousPolicy && (previousPolicy.is_claim == 0 || previousPolicy.is_claim == 1) ? previousPolicy.is_claim : ""
                 this.setState({

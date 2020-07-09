@@ -301,20 +301,22 @@ console.log('post_data', post_data);
     fetchData = () => {
         const { productId } = this.props.match.params
         let policyHolder_id = localStorage.getItem("policyHolder_refNo") ? localStorage.getItem("policyHolder_refNo") : 0;
+        let encryption = new Encryption();
         this.props.loadingStart();
         axios.get(`policy-holder/motor/${policyHolder_id}`)
             .then(res => {
-                console.log(res);
-                 let motorInsurance = res.data.data.policyHolder ? res.data.data.policyHolder.motorinsurance : {};
-                 let previousPolicy = res.data.data.policyHolder ? res.data.data.policyHolder.previouspolicy : {};
-                 let vehicleDetails = res.data.data.policyHolder ? res.data.data.policyHolder.vehiclebrandmodel : {};
-                 let policyHolder = res.data.data.policyHolder ? res.data.data.policyHolder : {};
-                 let nomineeDetails = res.data.data.policyHolder ? res.data.data.policyHolder.request_data.nominee[0] : {}
-                 let is_loan_account = res.data.data.policyHolder ? res.data.data.policyHolder.is_carloan : 0
-                 let quoteId = res.data.data.policyHolder ? res.data.data.policyHolder.request_data.quote_id : ""
+                 let decryptResp = JSON.parse(encryption.decrypt(res.data))
+                 console.log("decrypt", decryptResp)
+                 let motorInsurance = decryptResp.data.policyHolder ? decryptResp.data.policyHolder.motorinsurance : {};
+                 let previousPolicy = decryptResp.data.policyHolder ? decryptResp.data.policyHolder.previouspolicy : {};
+                 let vehicleDetails = decryptResp.data.policyHolder ? decryptResp.data.policyHolder.vehiclebrandmodel : {};
+                 let policyHolder = decryptResp.data.policyHolder ? decryptResp.data.policyHolder : {};
+                 let nomineeDetails = decryptResp.data.policyHolder ? decryptResp.data.policyHolder.request_data.nominee : {}
+                 let is_loan_account = decryptResp.data.policyHolder ? decryptResp.data.policyHolder.is_carloan : 0
+                 let quoteId = decryptResp.data.policyHolder ? decryptResp.data.policyHolder.request_data.quote_id : ""
                  let is_eia_account=  policyHolder && (policyHolder.is_eia_account == 0 || policyHolder.is_eia_account == 1) ? policyHolder.is_eia_account : ""
-                 let bankDetails = res.data.data.policyHolder && res.data.data.policyHolder.bankdetail ? res.data.data.policyHolder.bankdetail[0] : {};
-                 let addressDetails = JSON.parse(res.data.data.policyHolder.pincode_response)
+                 let bankDetails = decryptResp.data.policyHolder && decryptResp.data.policyHolder.bankdetail ? decryptResp.data.policyHolder.bankdetail[0] : {};
+                 let addressDetails = JSON.parse(decryptResp.data.policyHolder.pincode_response)
                  this.setState({
                     quoteId, motorInsurance, previousPolicy, vehicleDetails, policyHolder, nomineeDetails, is_loan_account, is_eia_account, bankDetails, addressDetails
                 })
@@ -431,7 +433,7 @@ console.log('post_data', post_data);
             is_carloan:is_loan_account,
             bank_name: bankDetails ? bankDetails.bank_name : "",
             bank_branch: bankDetails ? bankDetails.bank_branch : "",
-            nominee_relation_with: nomineeDetails && nomineeDetails.relation_with ? nomineeDetails.relation_with : "",
+            nominee_relation_with: nomineeDetails && nomineeDetails.relation_with ? nomineeDetails.relation_with.toString() : "",
             nominee_first_name: nomineeDetails && nomineeDetails.first_name ? nomineeDetails.first_name : "",
             nominee_gender: nomineeDetails && nomineeDetails.gender ? nomineeDetails.gender : "",
             nominee_dob: nomineeDetails && nomineeDetails.dob ? new Date(nomineeDetails.dob) : "",
@@ -449,7 +451,7 @@ console.log('post_data', post_data);
             <h4>You are just one steps away in getting your policy ready and your Quotation Number: {quoteId}. Please share a few more details. </h4>
         ) : null;
 
-        console.log("stateName", stateName)
+        // console.log("newInitialValues", newInitialValues)
         return (
             <>
                 <BaseComponent>

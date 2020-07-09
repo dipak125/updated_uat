@@ -177,11 +177,14 @@ class SelectBrand extends Component {
     fetchData = () => {
         const { productId } = this.props.match.params
         let policyHolder_id = localStorage.getItem("policyHolder_refNo") ? localStorage.getItem("policyHolder_refNo") : 0;
+        let encryption = new Encryption();
         this.props.loadingStart();
         axios.get(`policy-holder/motor/${policyHolder_id}`)
             .then(res => {
-                let motorInsurance = res.data.data.policyHolder ? res.data.data.policyHolder.motorinsurance : {}
-                let vehicleDetails = res.data.data.policyHolder ? res.data.data.policyHolder.vehiclebrandmodel : {};
+                let decryptResp = JSON.parse(encryption.decrypt(res.data));
+                console.log("decrypt", decryptResp)
+                let motorInsurance = decryptResp.data.policyHolder ? decryptResp.data.policyHolder.motorinsurance : {}
+                let vehicleDetails = decryptResp.data.policyHolder ? decryptResp.data.policyHolder.vehiclebrandmodel : {};
                 this.setState({
                     motorInsurance, vehicleDetails
                 })
@@ -326,7 +329,7 @@ class SelectBrand extends Component {
 
         })
 
-        console.log("vehicleDetails", newInitialValues)
+        // console.log("vehicleDetails", newInitialValues)
 
         return (
             <>

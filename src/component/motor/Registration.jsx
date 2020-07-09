@@ -73,19 +73,23 @@ componentDidMount(){
 
 fetchData=()=>{
     const {productId } = this.props.match.params
-    let policyHolder_id = localStorage.getItem("policyHolder_id") ? localStorage.getItem("policyHolder_id"):0;
+    let policyHolder_id = localStorage.getItem("policyHolder_refNo") ? localStorage.getItem("policyHolder_refNo"):0;
+    let encryption = new Encryption();
+    this.props.loadingStart();
     axios.get(`policy-holder/motor/${policyHolder_id}`)
         .then(res=>{
-            //console.log("aaaaaabbbbbir========>",response.data.data.policyHolder.request_data.family_members)
-            let motorInsurance = res.data.data.policyHolder.motorinsurance
-           
+            let decryptResp = JSON.parse(encryption.decrypt(res.data))
+            console.log("decrypt", decryptResp)
+
+            let motorInsurance = decryptResp.data.policyHolder.motorinsurance           
             this.setState({ 
                 motorInsurance
             })
-           
+            this.props.loadingStop();
         })
-        .catch(function (error) {
+        .catch(err => {
             // handle error
+            this.props.loadingStop();
         })
 }
 

@@ -198,10 +198,13 @@ class OtherComprehensive extends Component {
     fetchData = () => {
         const { productId } = this.props.match.params
         let policyHolder_id = localStorage.getItem("policyHolder_refNo") ? localStorage.getItem("policyHolder_refNo") : 0;
+        let encryption = new Encryption();
         this.props.loadingStart();
         axios.get(`policy-holder/motor/${policyHolder_id}`)
             .then(res => {
-                let motorInsurance = res.data.data.policyHolder ? res.data.data.policyHolder.motorinsurance : {}
+                let decryptResp = JSON.parse(encryption.decrypt(res.data))
+                console.log("decrypt", decryptResp)
+                let motorInsurance = decryptResp.data.policyHolder ? decryptResp.data.policyHolder.motorinsurance : {}
                 let values = []
                 this.setState({
                     motorInsurance,
