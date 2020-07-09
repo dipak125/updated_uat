@@ -187,7 +187,7 @@ const vehicleRegistrationValidation = Yup.object().shape({
             return true;
         }
     )
-    .matches(/^[a-zA-Z0-9-/.]*$/, 
+    .matches(/^[a-zA-Z0-9][a-zA-Z0-9-/.,\s]*$/, 
         function() {
             return "Please enter valid address"
         }),

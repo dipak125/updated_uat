@@ -24,7 +24,7 @@ const maxDobNominee = moment().subtract(18, 'years').calendar();
 
 const initialValue = {
     first_name:"",
-    last_name:"test",
+    last_name:"",
     gender:"",
     dob: "",
     pancard:"",
@@ -78,7 +78,7 @@ const ownerValidation = Yup.object().shape({
         }
     ),
     pancard: Yup.string()
-    .required(function() {
+    .notRequired(function() {
         return "Enter PAN number"
     }).matches(/^[A-Z]{3}[CPHFATBLJG]{1}[A-Z]{1}[0-9]{4}[A-Z]{1}$/, function() {
         return "Please enter valid Pan Number"
@@ -203,7 +203,8 @@ class AdditionalDetails extends Component {
         nomineeDetails: {},
         quoteId: "",
         bankDetails: {},
-        addressDetails: []
+        addressDetails: [],
+        relation: []
     };
     
 
@@ -386,15 +387,36 @@ console.log('post_data', post_data);
         
     }
 
+    fetchRelationships=()=>{
+
+            this.props.loadingStart();
+            axios.get('relations')
+            .then(res=>{
+                let relation = res.data.data ? res.data.data : []                        
+                this.setState({
+                    relation
+                });
+                this.props.loadingStop();
+            }).
+            catch(err=>{
+                this.props.loadingStop();
+                this.setState({
+                    relation: []
+                });
+            })
+        
+    }
+
     componentDidMount() {
         this.fetchData();
+        this.fetchRelationships();
     }
 
    
 
     render() {
         const {showEIA, is_eia_account, showLoan, is_loan_account, nomineeDetails, 
-            bankDetails,policyHolder, stateName, pinDataArr, quoteId, addressDetails} = this.state
+            bankDetails,policyHolder, stateName, pinDataArr, quoteId, addressDetails, relation} = this.state
         const {productId} = this.props.match.params 
         
 
@@ -856,22 +878,9 @@ console.log('post_data', post_data);
                                                 className="formGrp"
                                             >
                                             <option value="">Relation with Primary Insured</option>
-                                            <option value="father">father</option>
-                                            <option value="mother">Mother</option>
-                                            <option value="spouse">Spouse</option>
-                                            <option value="aunty">Aunty</option>
-                                            <option value="cousin">Cousin</option>
-                                            <option value="daughter">Daughter</option>
-                                            <option value="employed_driver">Employed Driver</option>
-                                            <option value="employed_driver_close_relation">Employed driver other closed relations</option>
-                                            <option value="employee">Employee</option>
-                                            <option value="father_in_law">Father In Law</option>
-                                            <option value="friend">Friend</option>
-                                            <option value="mother_in_law">Mother In Law</option>
-                                            <option value="sister">Sister</option>
-                                            <option value="son">Son</option>
-                                            <option value="uncle">Uncle</option>
-                                            <option value="sister_in_law">Sister In Law</option>
+                                           { relation.map((relations, qIndex) => 
+                                            <option value={relations.id}>{relations.name}</option>                                        
+                                           )}
                                             </Field>     
                                             {errors.nominee_relation_with && touched.nominee_relation_with ? (
                                                 <span className="errorMsg">{errors.nominee_relation_with}</span>

@@ -43,7 +43,8 @@ class Premium extends Component {
             accessToken: "",
             PolicyArray: [],
             memberdetails: [],
-            nomineedetails:[]
+            nomineedetails:[],
+            relation: []
         };
     }
 
@@ -126,14 +127,6 @@ class Premium extends Component {
     fullQuote = (access_token, motorInsurance) => {
         const formData = new FormData();
         let encryption = new Encryption();
-        // formData.append("access_token", access_token);
-        // formData.append("id", localStorage.getItem("policyHolder_id"));
-
-        // formData.append("idv_value", motorInsurance.idv_value);
-        // formData.append("policy_type", localStorage.getItem('policy_type'));
-        // formData.append("add_more_coverage", motorInsurance.add_more_coverage);
-        // formData.append("cng_kit", motorInsurance.cng_kit);
-        // formData.append("cngKit_Cost", Math.floor(motorInsurance.cngkit_cost));
 
         const post_data = {
             'id':localStorage.getItem('policyHolder_id'),
@@ -177,13 +170,34 @@ class Premium extends Component {
         window.location = `${process.env.REACT_APP_PAYMENT_URL}/sbig-csc/ConnectPG/payment_motor.php?refrence_no=${refNumber}`
     }
 
+    fetchRelationships=()=>{
+
+        this.props.loadingStart();
+        axios.get('relations')
+        .then(res=>{
+            let relation = res.data.data ? res.data.data : []                        
+            this.setState({
+                relation
+            });
+            this.props.loadingStop();
+        }).
+        catch(err=>{
+            this.props.loadingStop();
+            this.setState({
+                relation: []
+            });
+        })
+    
+}
+
 
     componentDidMount() {
         this.fetchData()
+        this.fetchRelationships()
     }
 
     render() {
-        const { refNo, whatsapp, show, fulQuoteResp, motorInsurance, error, error1, refNumber, paymentStatus, PolicyArray, memberdetails,nomineedetails } = this.state
+        const { refNo, whatsapp, show, fulQuoteResp, motorInsurance, error, error1, refNumber, paymentStatus, relation, memberdetails,nomineedetails } = this.state
         const { productId } = this.props.match.params
 
         const errMsg =
@@ -309,7 +323,7 @@ class Premium extends Component {
                                                                                                     <FormGroup>Name:</FormGroup>
                                                                                                 </Col>
                                                                                                 <Col sm={12} md={6}>
-                                                                                                    <FormGroup>{memberdetails.first_name + " " + memberdetails.last_name}</FormGroup>
+                                                                                                    <FormGroup>{memberdetails.first_name }</FormGroup>
                                                                                                 </Col>
                                                                                             </Row>
 
@@ -391,8 +405,10 @@ class Premium extends Component {
                                                                                             <FormGroup>Relation With Proposer:</FormGroup>
                                                                                         </Col>
                                                                                         <Col sm={12} md={6}>
-                                                                                            <FormGroup>{nominee.relation_with}
-                                                                                        </FormGroup>
+                                                                                        { relation.map((relations, qIndex) => 
+                                                                                        relations.id == nominee.relation_with ?
+                                                                                            <FormGroup>{relations.name}</FormGroup> : null
+                                                                                        )}
                                                                                         </Col>
                                                                                     </Row>
 

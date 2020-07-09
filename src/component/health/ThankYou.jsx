@@ -100,6 +100,7 @@ class ThankYouPage extends Component {
           localStorage.removeItem("policyHolder_refNo");
           localStorage.removeItem("policy_type");
           localStorage.removeItem("brandEdit");
+          localStorage.removeItem("newBrandEdit");
           sessionStorage.removeItem('pan_data');
           sessionStorage.removeItem('email_data');
           sessionStorage.removeItem('proposed_insured');

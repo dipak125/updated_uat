@@ -101,33 +101,6 @@ const ComprehensiveValidation = Yup.object().shape({
    
 });
 
-// const moreCoverage = [
-//     {
-//         "id": "C101069",
-//         "name":"Basic Road Side Assistance",
-//         "description":"The e-Insurance account or Electronic Insurance Account offers policyholders online space to hold all their insurance policies electronically under one e-insurance account number. This allows the policyholder to access all their policies with a few clicks and no risk of losing the physical insurance policy"
-//     },
-//     {
-//         "id": "C101072",
-//         "name":"Depreciation Reimbursement",
-//         "description": "The e-Insurance account or Electronic Insurance Account offers policyholders online space to hold all their insurance policies electronically under one e-insurance account number. This allows the policyholder to access all their policies with a few clicks and no risk of losing the physical insurance policy"
-//     },
-//     {
-//         "id": "C101067",
-//         "name":"Return to Invoice",
-//         "description": "The e-Insurance account or Electronic Insurance Account offers policyholders online space to hold all their insurance policies electronically under one e-insurance account number. This allows the policyholder to access all their policies with a few clicks and no risk of losing the physical insurance policy"
-//     },
-//     {
-//         "id": "C101108",
-//         "name":"Engine Guard",
-//         "description": "The e-Insurance account or Electronic Insurance Account offers policyholders online space to hold all their insurance policies electronically under one e-insurance account number. This allows the policyholder to access all their policies with a few clicks and no risk of losing the physical insurance policy"
-//     },
-//     {
-//         "id": "C101111",
-//         "name":"Cover for consumables",
-//         "description": "The e-Insurance account or Electronic Insurance Account offers policyholders online space to hold all their insurance policies electronically under one e-insurance account number. This allows the policyholder to access all their policies with a few clicks and no risk of losing the physical insurance policy"
-//     }
-// ]
 
 const Coverage = {
         "C101064":"Own Damage",
@@ -334,14 +307,6 @@ class OtherComprehensive extends Component {
         }
         let defaultSliderValue = PolicyArray.length > 0 ? Math.round(PolicyArray[0].PolicyRiskList[0].IDV_Suggested) : 0
         const formData = new FormData();
-        // formData.append("access_token", access_token);
-        // formData.append("id", localStorage.getItem("policyHolder_id"));
-
-        // formData.append("idv_value", sliderVal ? sliderVal : defaultSliderValue.toString());
-        // formData.append("policy_type", localStorage.getItem('policy_type'));
-        // formData.append("add_more_coverage", add_more_coverage);
-        // formData.append("cng_kit", cng_kit_flag);
-        // formData.append("cngKit_Cost", cngKit_Cost);
 
         const post_data = {
             'id':localStorage.getItem('policyHolder_id'),
@@ -903,11 +868,11 @@ class OtherComprehensive extends Component {
                                         </Button> 
                                         { serverResponse && serverResponse != "" ? (serverResponse.message ? 
                                         <Button className={`proceedBtn`} type="submit"  >
-                                            Quote
+                                            Recalculate
                                         </Button> : <Button className={`proceedBtn`} type="submit"  >
                                             Continue
                                         </Button> ) : <Button className={`proceedBtn`} type="submit"  >
-                                            Quote
+                                            Recalculate
                                         </Button>}
                                         </div>
                                     </Col>
