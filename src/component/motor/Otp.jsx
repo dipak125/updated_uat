@@ -22,7 +22,7 @@ class Otp extends Component {
     state = {
         otp: "",
         errorMsg: "",
-        seconds: 90,
+        seconds: 180,
         disable:true
       };
 
@@ -140,7 +140,7 @@ class Otp extends Component {
         formData.append('enc_data',encryption.encrypt(JSON.stringify(post_data_obj)))
 
         this.setState({
-            seconds: 90, errorMsg: ""
+            seconds: 180, errorMsg: ""
           });
         axios
           .post('/otp/generate', formData)

@@ -16,6 +16,7 @@ import axios from "../../shared/axios"
 import Encryption from '../../shared/payload-encryption';
 import * as Yup from "yup";
 import swal from 'sweetalert';
+import moment from "moment";
 
 
 const initialValue = {
@@ -23,8 +24,8 @@ const initialValue = {
     chasis_no: "",
     chasis_no_last_part: "",
     add_more_coverage: "",
-    cng_kit: "",
-    cngKit_Cost: 0,
+    cng_kit: 0,
+    // cngKit_Cost: 0,
     engine_no: "",
     vahanVerify: false,
     newRegistrationNo: ""
@@ -74,16 +75,16 @@ const ComprehensiveValidation = Yup.object().shape({
         return "Chasis no. should be maximum 12 characters"
     }),
 
-    cng_kit:Yup.string().required("Please select an option"),
-    // IDV:Yup.number().required('Declared value is required'),
+    // cng_kit:Yup.string().required("Please select an option"),
+    // // IDV:Yup.number().required('Declared value is required'),
     
-    cngKit_Cost: Yup.string().when(['cng_kit'], {
-        is: cng_kit => cng_kit == '1',       
-        then: Yup.string().required('Please provide CNG kit cost'),
-        othewise: Yup.string()
-    }).matches(/^([0-9]*)$/, function() {
-        return "Invalid number"
-    }),
+    // cngKit_Cost: Yup.string().when(['cng_kit'], {
+    //     is: cng_kit => cng_kit == '1',       
+    //     then: Yup.string().required('Please provide CNG kit cost'),
+    //     othewise: Yup.string()
+    // }).matches(/^([0-9]*)$/, function() {
+    //     return "Invalid number"
+    // }),
    
     vahanVerify:Yup.boolean().notRequired('Please verify chasis number')
     .test(
@@ -246,7 +247,7 @@ class OtherComprehensive extends Component {
             this.setState({
             moreCoverage: res.data.data,
             });
-            this.props.loadingStop();
+            this.fetchData()
           })
           .catch((err) => {
             this.setState({
@@ -302,12 +303,12 @@ class OtherComprehensive extends Component {
 
     fullQuote = (access_token, values) => {
         const { PolicyArray, sliderVal, add_more_coverage } = this.state
-        let cng_kit_flag = 0;
-        let cngKit_Cost = 0;
-        if(values.toString()) {            
-            cng_kit_flag = values.cng_kit
-            cngKit_Cost = values.cngKit_Cost
-        }
+        // let cng_kit_flag = 0;
+        // let cngKit_Cost = 0;
+        // if(values.toString()) {            
+        //     cng_kit_flag = values.cng_kit
+        //     cngKit_Cost = values.cngKit_Cost
+        // }
         let defaultSliderValue = PolicyArray.length > 0 ? Math.round(PolicyArray[0].PolicyRiskList[0].IDV_Suggested) : 0
         const formData = new FormData();
 
@@ -317,8 +318,8 @@ class OtherComprehensive extends Component {
             'idv_value': sliderVal ? sliderVal : defaultSliderValue.toString(),
             'policy_type': localStorage.getItem('policy_type'),
             'add_more_coverage': add_more_coverage.toString(),
-            'cng_kit': cng_kit_flag,
-            'cngKit_Cost': cngKit_Cost
+            // 'cng_kit': cng_kit_flag,
+            // 'cngKit_Cost': cngKit_Cost
         }
         console.log('fullQuote_post_data', post_data)
         let encryption = new Encryption();
@@ -367,7 +368,7 @@ class OtherComprehensive extends Component {
                 'chasis_no': values.chasis_no,
                 'chasis_no_last_part': values.chasis_no_last_part,
                 'cng_kit': values.cng_kit,
-                'cngkit_cost': values.cngKit_Cost,
+                // 'cngkit_cost': values.cngKit_Cost,
                 'engine_no': values.engine_no,
                 'idv_value': sliderVal ? sliderVal : defaultSliderValue.toString(),
                 'add_more_coverage': add_more_coverage
@@ -381,7 +382,7 @@ class OtherComprehensive extends Component {
                 'chasis_no': values.chasis_no,
                 'chasis_no_last_part': values.chasis_no_last_part,
                 'cng_kit': values.cng_kit,
-                'cngkit_cost': values.cngKit_Cost,
+                // 'cngkit_cost': values.cngKit_Cost,
                 'engine_no': values.engine_no,
                 'idv_value': sliderVal ? sliderVal : defaultSliderValue.toString(),
             }
@@ -432,7 +433,6 @@ class OtherComprehensive extends Component {
 
 
     componentDidMount() {
-        this.fetchData()
         this.getMoreCoverage()
     }
 
@@ -453,16 +453,19 @@ class OtherComprehensive extends Component {
             chasis_no_last_part: motorInsurance.chasis_no_last_part ? motorInsurance.chasis_no_last_part : "",
             add_more_coverage: motorInsurance.add_more_coverage ? motorInsurance.add_more_coverage : "",
             // cng_kit: motorInsurance.cng_kit ? motorInsurance.cng_kit : "",
-            cng_kit: motorInsurance.cng_kit == 0 || motorInsurance.cng_kit == 1 ? motorInsurance.cng_kit : is_CNG_account,
-            cngKit_Cost: motorInsurance.cngkit_cost ? Math.round(motorInsurance.cngkit_cost) : 0,
+            // cng_kit: motorInsurance.cng_kit == 0 || motorInsurance.cng_kit == 1 ? motorInsurance.cng_kit : is_CNG_account,
+            // cngKit_Cost: motorInsurance.cngkit_cost ? Math.round(motorInsurance.cngkit_cost) : 0,
             engine_no: motorInsurance.engine_no ? motorInsurance.engine_no : "",
             vahanVerify: vahanVerify,
             newRegistrationNo: localStorage.getItem('registration_number') == "NEW" ? localStorage.getItem('registration_number') : ""
 
         });
 
+        let OD_TP_premium = serverResponse.PolicyLobList ? serverResponse.PolicyLobList[0].PolicyRiskList[0] : []
+
         const policyCoverageList = policyCoverage && policyCoverage.length > 0 ?
         policyCoverage.map((coverage, qIndex) => {
+            // let coverSpan = Math.floor(moment(coverage.ExpiryDate).diff(coverage.EffectiveDate, 'years', true)) + 1;
             return(
                 <div>
                     <Row>
@@ -470,7 +473,7 @@ class OtherComprehensive extends Component {
                         <FormGroup>{Coverage[coverage.ProductElementCode]}</FormGroup>
                         </Col>
                         <Col sm={12} md={6}>
-                        <FormGroup>₹ {coverage.AnnualPremium}</FormGroup>
+                        <FormGroup>₹ {coverage.BeforeVatPremium}  </FormGroup>                      
                         </Col>
                     </Row>
                 </div>
@@ -754,7 +757,7 @@ class OtherComprehensive extends Component {
 
                                                                
 
-                                <Row>
+                                {/* <Row>
                                     <Col sm={12} md={5} lg={5}>
                                         <FormGroup>
                                             <div className="insurerName">
@@ -832,6 +835,7 @@ class OtherComprehensive extends Component {
                                         </FormGroup>
                                     </Col> : ''}
                                 </Row>
+                                 */}
 
                                 <Row>
                                     <Col sm={12} md={12} lg={12}>

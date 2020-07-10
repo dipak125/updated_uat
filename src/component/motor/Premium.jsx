@@ -93,7 +93,7 @@ class Premium extends Component {
                     refNumber: decryptResp.data.policyHolder.reference_no,
                     paymentStatus: decryptResp.data.policyHolder.payment ? decryptResp.data.policyHolder.payment[0] : [],
                     memberdetails : decryptResp.data.policyHolder ? decryptResp.data.policyHolder : [],
-                    nomineedetails: decryptResp.data.policyHolder ? decryptResp.data.policyHolder.request_data.nominee:[]
+                    nomineedetails: decryptResp.data.policyHolder ? decryptResp.data.policyHolder.request_data.nominee[0]:[]
                     
                 })
 
@@ -198,7 +198,7 @@ class Premium extends Component {
     render() {
         const { refNo, whatsapp, show, fulQuoteResp, motorInsurance, error, error1, refNumber, paymentStatus, relation, memberdetails,nomineedetails } = this.state
         const { productId } = this.props.match.params
-
+console.log('nomineedetails', nomineedetails)
         const errMsg =
             error && error.message ? (
                 <span className="errorMsg">
@@ -310,10 +310,8 @@ class Premium extends Component {
                                                                     <div className="listrghtsideTrigr">
                                                                         {memberdetails ?
 
-
-                                                                            
                                                                                 <div>
-                                                                                    Owner Details :
+                                                                                    <strong>Owner Details :</strong>
                                                                                     <br/>
                                                                                        <Row>
                                                                                         <Col sm={12} md={6}>
@@ -367,17 +365,9 @@ class Premium extends Component {
                                                                                     </Row>
                                                                                 </div>
                                                                             : (<p></p>)}
-
-
-                                                                        {nomineedetails ?
-
-                                                                        (
-                                                                            nomineedetails.length  > 0 && nomineedetails.map((nominee, nomineeIndex) => (
-
-
-                                                                                                                                                    
+                                                                                   
                                                                         <div>
-                                                                            Nominee Details :
+                                                                        <strong>Nominee Details :</strong>
                                                                             <br/>
                                                                             <Row>
                                                                                 <Col sm={12} md={6}>
@@ -386,7 +376,7 @@ class Premium extends Component {
                                                                                             <FormGroup>Name:</FormGroup>
                                                                                         </Col>
                                                                                         <Col sm={12} md={6}>
-                                                                                            <FormGroup>{nominee.first_name}</FormGroup>
+                                                                                            <FormGroup>{nomineedetails.first_name}</FormGroup>
                                                                                         </Col>
                                                                                     </Row>
 
@@ -395,7 +385,7 @@ class Premium extends Component {
                                                                                             <FormGroup>Date Of Birth:</FormGroup>
                                                                                         </Col>
                                                                                         <Col sm={12} md={6}>
-                                                                                            <FormGroup>{nominee.dob}</FormGroup>
+                                                                                            <FormGroup>{nomineedetails.dob}</FormGroup>
                                                                                         </Col>
                                                                                     </Row>
 
@@ -405,7 +395,7 @@ class Premium extends Component {
                                                                                         </Col>
                                                                                         <Col sm={12} md={6}>
                                                                                         { relation.map((relations, qIndex) => 
-                                                                                        relations.id == nominee.relation_with ?
+                                                                                        relations.id == nomineedetails.relation_with ?
                                                                                             <FormGroup>{relations.name}</FormGroup> : null
                                                                                         )}
                                                                                         </Col>
@@ -416,7 +406,7 @@ class Premium extends Component {
                                                                                             <FormGroup>Gender</FormGroup>
                                                                                         </Col>
                                                                                         <Col sm={12} md={6}>
-                                                                                            <FormGroup>{nominee.gender == "m" ? "Male" : "Female"}</FormGroup>
+                                                                                            <FormGroup>{nomineedetails.gender == "m" ? "Male" : "Female"}</FormGroup>
                                                                                         </Col>
                                                                                     </Row>
                                                                                 </Col>
@@ -425,7 +415,6 @@ class Premium extends Component {
                                                                                 <p></p>
                                                                             </Row>
                                                                         </div>
-                                                                             ))) : (<p></p>)}
                                                                     </div>
 
                                                                 </Collapsible>

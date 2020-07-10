@@ -38,7 +38,7 @@ const initialValue = {
     previous_policy_name:"",
     previous_end_date: "",
     previous_start_date: "",
-    previous_claim_bonus: "",
+    previous_claim_bonus: 1,
     previous_claim_for: "",
     previous_policy_no: ""
 }
@@ -411,9 +411,11 @@ class VehicleDetails extends Component {
                 'previous_city':values.previous_city,
                 'previous_policy_no': values.previous_policy_no,
                 'previous_is_claim':values.previous_is_claim,
-                'previous_claim_bonus': values.previous_claim_bonus ? values.previous_claim_bonus : 0,
+                'previous_claim_bonus': values.previous_claim_bonus ? values.previous_claim_bonus : 1,
                 'previous_claim_for': values.previous_claim_for,        
-                'vehicleAge': vehicleAge     
+                'vehicleAge': vehicleAge,
+                'policy_type': localStorage.getItem('policy_type'),
+                'prev_policy_flag': 1,
                 
             } 
         }
@@ -424,7 +426,10 @@ class VehicleDetails extends Component {
                 'registration_date':moment(values.registration_date).format("YYYY-MM-DD"),
                 'location_id':values.location_id,    
                 'previous_is_claim':'0', 
+                'previous_claim_bonus': 1,
                 'vehicleAge': vehicleAge ,
+                'policy_type': localStorage.getItem('policy_type'),
+                'prev_policy_flag': 0,
             } 
         }
 
