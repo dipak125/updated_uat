@@ -392,7 +392,7 @@ class VehicleDetails extends Component {
         ageObj.whatIsCurrentMonth(values.registration_date) < 7 ? localStorage.setItem('policy_type', 6) : 
         localStorage.setItem('policy_type', 1)
         // let vehicleAge = ageObj.whatIsMyVehicleAge(values.registration_date)
-        let vehicleAge = Math.floor(moment().diff(values.registration_date, 'years', true))
+        let vehicleAge = Math.floor(moment().diff(values.registration_date, 'months', true))
         // let ageDiff = Math.floor(moment().diff(values.registration_date, 'days', true));
         let ageDiff = ageObj.whatIsCurrentMonth(values.registration_date);
         const formData = new FormData(); 
