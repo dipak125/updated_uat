@@ -832,6 +832,7 @@ class VehicleDetails extends Component {
                                                                         onChange={(e) => {
                                                                             setFieldTouched('previous_is_claim')
                                                                             setFieldValue(`previous_is_claim`, e.target.value);
+                                                                            setFieldValue('previous_claim_for', "")
                                                                             this.showClaimText(0);
                                                                         }}
                                                                         checked={values.previous_is_claim == '0' ? true : false}
@@ -850,6 +851,7 @@ class VehicleDetails extends Component {
                                                                         onChange={(e) => {
                                                                             setFieldTouched('previous_is_claim')
                                                                             setFieldValue(`previous_is_claim`, e.target.value);
+                                                                            setFieldValue('previous_claim_for', "")
                                                                             this.showClaimText(1);
                                                                         }}
                                                                         checked={values.previous_is_claim == '1' ? true : false}
@@ -883,6 +885,15 @@ class VehicleDetails extends Component {
                                                                     autoComplete="off"                                                                        
                                                                     className="formGrp"
                                                                     value = {values.previous_claim_for}
+                                                                    onChange = {(e) => {
+                                                                        setFieldTouched('previous_claim_for')
+                                                                        setFieldValue('previous_claim_for', e.target.value)
+                                                                        if(e.target.value == '1') {
+                                                                            setFieldValue('previous_claim_bonus', '1')
+                                                                        }
+                                                                        
+                                                                    } 
+                                                                    }
                                                                 >
                                                                     <option value="">--Select--</option>
                                                                     <option value="1">Own Damage</option>
