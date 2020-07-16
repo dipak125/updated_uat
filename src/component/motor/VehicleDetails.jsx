@@ -463,7 +463,7 @@ class VehicleDetails extends Component {
     getInsurerList = () => {
         this.props.loadingStart();
         axios
-          .get(`/company`)
+          .get(`/company/1`)
           .then(res => {
             this.setState({
                 insurerList: res.data.data
@@ -758,7 +758,7 @@ class VehicleDetails extends Component {
                                                         >
                                                             <option value="">Select Insurer Company</option>
                                                             {insurerList.map((insurer, qIndex) => ( 
-                                                                <option value= {insurer.id}>{insurer.name}</option>
+                                                                <option value= {insurer.Id}>{insurer.name}</option>
                                                             ))}
                                                         </Field>     
                                                         {errors.insurance_company_id && touched.insurance_company_id ? (
