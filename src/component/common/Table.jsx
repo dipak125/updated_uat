@@ -37,6 +37,7 @@ class Table extends Component {
             });
             localStorage.removeItem('policyHolder_id');
             localStorage.removeItem('policyHolder_refNo');
+            localStorage.removeItem('display_gender');
             sessionStorage.removeItem('pan_data');
             sessionStorage.removeItem('email_data');
             sessionStorage.removeItem('proposed_insured');

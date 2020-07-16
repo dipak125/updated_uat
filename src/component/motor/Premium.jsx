@@ -74,7 +74,8 @@ class Premium extends Component {
     }
 
     handleSubmit = (values) => {
-        this.setState({ show: true, refNo: values.refNo, whatsapp: values.whatsapp });
+        // this.setState({ show: true, refNo: values.refNo, whatsapp: values.whatsapp });
+        this.payment()
     }
 
     fetchData = () => {
@@ -283,20 +284,20 @@ console.log('nomineedetails', nomineedetails)
 
                                                                             <Col sm={12} md={3}>
                                                                                 <div className="premamount">
-                                                                                    ₹ {fulQuoteResp.BeforeVatPremium}
+                                                                                    ₹ {Math.round(fulQuoteResp.BeforeVatPremium)}
                                                                                 </div>
                                                                             </Col>
 
                                                                             <Col sm={12} md={3}>
                                                                                 <div className="motopremium">
-                                                                                    Service Tax:
+                                                                                    GST:
                                                                     </div>
                                                                             </Col>
 
 
                                                                             <Col sm={12} md={3}>
                                                                                 <div className="premamount">
-                                                                                    ₹ {fulQuoteResp.TGST}
+                                                                                    ₹ {Math.round(fulQuoteResp.TGST)}
                                                                                 </div>
                                                                             </Col>
                                                                         </Row>

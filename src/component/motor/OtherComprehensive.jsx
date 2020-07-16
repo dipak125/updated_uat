@@ -473,7 +473,7 @@ class OtherComprehensive extends Component {
                         <FormGroup>{Coverage[coverage.ProductElementCode]}</FormGroup>
                         </Col>
                         <Col sm={12} md={6}>
-                        <FormGroup>₹ {coverage.BeforeVatPremium}  </FormGroup>                      
+                        <FormGroup>₹ {Math.round(coverage.BeforeVatPremium)}  </FormGroup>                      
                         </Col>
                     </Row>
                 </div>
@@ -928,11 +928,11 @@ class OtherComprehensive extends Component {
                             <tbody>
                                 <tr>
                                     <td>Gross Premium:</td>
-                                    <td>₹ {fulQuoteResp.BeforeVatPremium}</td>
+                                    <td>₹ {Math.round(fulQuoteResp.BeforeVatPremium)}</td>
                                 </tr>
                                 <tr>
-                                    <td>Applicable Taxes:</td>
-                                    <td>₹ {fulQuoteResp.TGST}</td>
+                                    <td>GST:</td>
+                                    <td>₹ {Math.round(fulQuoteResp.TGST)}</td>
                                 </tr>
 
                             </tbody>
