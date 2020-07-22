@@ -309,7 +309,7 @@ class TwoWheelerAdditionalDetails extends Component {
         let policyHolder_id = localStorage.getItem("policyHolder_refNo") ? localStorage.getItem("policyHolder_refNo") : 0;
         let encryption = new Encryption();
         this.props.loadingStart();
-        axios.get(`policy-holder/motor/${policyHolder_id}`)
+        axios.get(`two-wh/details/${policyHolder_id}`)
             .then(res => {
                  let decryptResp = JSON.parse(encryption.decrypt(res.data))
                  console.log("decrypt", decryptResp)

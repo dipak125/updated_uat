@@ -16,10 +16,6 @@ import Encryption from '../../shared/payload-encryption';
 import {  PersonAge } from "../../shared/dateFunctions";
 import Autosuggest from 'react-autosuggest';
 import { addDays } from 'date-fns';
-import {
-    checkGreaterTimes,
-    checkGreaterStartEndTimes
-  } from "../../shared/validationFunctions";
 
 const ageObj = new PersonAge();
 let encryption = new Encryption();
@@ -40,18 +36,7 @@ const initialValue = {
     previous_claim_bonus: "",
 }
 const vehicleRegistrationValidation = Yup.object().shape({
-    registration_date: Yup.string().notRequired('Registration date is required')
-    .test(
-        "checkGreaterTimes",
-        "Registration date must be less than Previous policy start date",
-        function (value) {
-            if (value) {
-                return checkGreaterStartEndTimes(value, this.parent.previous_start_date);
-            }
-            return true;
-        }
-    ),
-    // location_id:Yup.string().matches(/^[A-Za-z0-9 ]+$/,'No special Character allowed').required('Registration city is required'),
+    registration_date: Yup.string().required('Registration date is required'), 
 
     location_id: Yup.string()
     .required(function() {
@@ -61,159 +46,17 @@ const vehicleRegistrationValidation = Yup.object().shape({
         return "No special Character allowed"
     }),
 
-    previous_start_date:Yup.date()
-    .notRequired('Previous Start date is required')
-    .test(
-        "currentMonthChecking",
-        function() {
-            return "Please enter Start date"
-        },
-        function (value) {
-            const ageObj = new PersonAge();
-            if (ageObj.whatIsCurrentMonth(this.parent.registration_date) > 0 && !value) {   
-                return false;    
-            }
-            return true;
-        }
-    ).test(
-        "checkGreaterTimes",
-        "Start date must be less than end date",
-        function (value) {
-            if (value) {
-                return checkGreaterStartEndTimes(value, this.parent.previous_end_date);
-            }
-            return true;
-        }
-    ).test(
-      "checkStartDate",
-      "Enter Start Date",
-      function (value) {       
-          if ( this.parent.previous_end_date != undefined && value == undefined) {
-              return false;
-          }
-          return true;
-      }
-    ),
-    previous_end_date:Yup.date()
-    .notRequired('Previous end date is required')
-    .test(
-        "currentMonthChecking",
-        function() {
-            return "Please enter end date"
-        },
-        function (value) {
-            const ageObj = new PersonAge();
-            if (ageObj.whatIsCurrentMonth(this.parent.registration_date) > 0 && !value) {   
-                return false;    
-            }
-            return true;
-        }
-    ).test( 
-        "checkGreaterTimes",
-        "End date must be greater than start date",
-        function (value) {
-            if (value) {
-                return checkGreaterTimes(value, this.parent.previous_start_date);
-            }
-            return true;
-        }
-        ).test(
-        "checkEndDate",
-        "Enter End Date",
-        function (value) {     
-            if ( this.parent.previous_start_date != undefined && value == undefined) {
-                return false;
-            }
-            return true;
-        }
-    ),
-    previous_policy_name:Yup.string()
-    .notRequired('Please select Policy Type')
-    .test(
-        "currentMonthChecking",
-        function() {
-            return "Please select Policy Type"
-        },
-        function (value) {
-            const ageObj = new PersonAge();
-            if (ageObj.whatIsCurrentMonth(this.parent.registration_date) > 0 && !value) {   
-                return false;    
-            }
-            return true;
-        }
-    )
-    .test(
-        "currentMonthChecking",
-        function() {
-            return "Since previous policy is a liability policy, issuance of a package policy will be subjet to successful inspection of your vehicle. Our Customer care executive will call you to assit on same, shortly"
-        },
-        function (value) {
-            if (value == '2' ) {   
-                return false;    
-            }
-            return true;
-        }
-    ),
-    insurance_company_id:Yup.number()
-    .notRequired('Insurance company is required')
-    .test(
-        "currentMonthChecking",
-        function() {
-            return "Please enter previous insurance company"
-        },
-        function (value) {
-            const ageObj = new PersonAge();
-            if (ageObj.whatIsCurrentMonth(this.parent.registration_date) > 0 && !value) {   
-                return false;    
-            }
-            return true;
-        }
-    ),
-    previous_city:Yup.string()
-    .notRequired('Previous city is required')
-    .test(
-        "currentMonthChecking",
-        function() {
-            return "Please enter previous insurance company city"
-        },
-        function (value) {
-            const ageObj = new PersonAge();
-            if (ageObj.whatIsCurrentMonth(this.parent.registration_date) > 0 && !value) {   
-                return false;    
-            }
-            return true;
-        }
-    ),
-    previous_claim_bonus:Yup.mixed()
-    .notRequired('No Claim bonus is required')
-    .test(
-        "currentMonthChecking",
-        function() {
-            return "Please enter previous claim bonus"
-        },
-        function (value) {
-            const ageObj = new PersonAge();
-            if (ageObj.whatIsCurrentMonth(this.parent.registration_date) > 0 && !value) {   
-                return false;    
-            }
-            return true;
-        }
-    ),
-    previous_is_claim:Yup.string()
-    .notRequired('Please select one option')
-    .test(
-        "currentMonthChecking",
-        function() {
-            return "Please select if you have previous claim"
-        },
-        function (value) {
-            const ageObj = new PersonAge();
-            if (ageObj.whatIsCurrentMonth(this.parent.registration_date) > 0 && !value) {   
-                return false;    
-            }
-            return true;
-        }
-    )
+    previous_is_claim: Yup.string().when("policy_type_Id", {
+        is: 1,       
+        then: Yup.string(),
+        otherwise: Yup.string().required("Please select if you have previous claim")
+    }),
+
+    previous_claim_bonus:Yup.string().when("previous_is_claim", {
+        is: "0" ,       
+        then: Yup.string().required('Please provide previous NCB'),
+        othewise: Yup.string()
+    }),
    
 });
 
@@ -359,7 +202,7 @@ class TwoWheelerVehicleDetails extends Component {
                 'registration_date':moment(values.registration_date).format("YYYY-MM-DD"),
                 'location_id':values.location_id,
                 'previous_is_claim':values.previous_is_claim,
-                'previous_claim_bonus': values.previous_claim_bonus,      
+                'previous_claim_bonus': values.previous_claim_bonus == "" ? "2" : values.previous_claim_bonus,      
                 'prev_policy_flag': 1,
                 'vehicleAge': vehicleAge,
                 'pol_start_date': moment(newPolStartDate).format('YYYY-MM-DD'),
@@ -427,7 +270,7 @@ class TwoWheelerVehicleDetails extends Component {
     fetchData = () => {
         const { productId } = this.props.match.params
         this.props.loadingStart();
-        axios.get(`policy-holder/motor/${localStorage.getItem("policyHolder_refNo")}`)
+        axios.get(`two-wh/details/${localStorage.getItem("policyHolder_refNo")}`)
             .then(res => {
                  let decryptResp = JSON.parse(encryption.decrypt(res.data));
                 console.log('decryptResp_fetchData', decryptResp)
@@ -461,9 +304,7 @@ class TwoWheelerVehicleDetails extends Component {
         this.fetchData();
         
     }
-    registration = (productId) => {
-        this.props.history.push(`/Registration/${productId}`);
-    }
+
 
     render() {
         const {productId} = this.props.match.params  
@@ -479,8 +320,8 @@ class TwoWheelerVehicleDetails extends Component {
             // insurance_company_id: previousPolicy && previousPolicy.insurancecompany && previousPolicy.insurancecompany.id ? previousPolicy.insurancecompany.id : "",
             previous_city: previousPolicy && previousPolicy.city ? previousPolicy.city : "",
             previous_is_claim: previousPolicy && (previousPolicy.is_claim == 0 || previousPolicy.is_claim == 1) ? previousPolicy.is_claim : "",
-            previous_claim_bonus: previousPolicy && previousPolicy.claim_bonus ? Math.floor(previousPolicy.claim_bonus) : "2",
-
+            previous_claim_bonus: previousPolicy && previousPolicy.claim_bonus && previousPolicy.claim_bonus != 2 ? Math.floor(previousPolicy.claim_bonus) : "",
+            policy_type_Id : motorInsurance && motorInsurance.policytype_id ? motorInsurance.policytype_id : "0"
         });
 
         const inputCustomerID = {
@@ -508,10 +349,10 @@ class TwoWheelerVehicleDetails extends Component {
                     </div>
                     <div className="brand-bg">
                         <Formik initialValues={newInitialValues} onSubmit={this.handleSubmit} 
-                        // validationSchema={vehicleRegistrationValidation}
+                        validationSchema={vehicleRegistrationValidation}
                         >
                             {({ values, errors, setFieldValue, setFieldTouched, isValid, isSubmitting, touched }) => {
-
+console.log("errors------", errors)
                                 return (
                                     <Form>
                                         <Row>

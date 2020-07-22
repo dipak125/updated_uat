@@ -22,7 +22,7 @@ import 'react-datepicker/dist/react-datepicker-cssmodules.min.css'
 import Encryption from '../../shared/payload-encryption';
 
 const maxDob = dateformat(new Date(), 'mm/dd/yyyy');
-const minDobAdult = moment(moment().subtract(46, 'years').calendar()).add(1, 'day').calendar()
+const minDobAdult = moment(moment().subtract(56, 'years').calendar()).add(1, 'day').calendar()
 const maxDobAdult = moment().subtract(18, 'years').calendar();
 
 const initialFamilyDetails = {

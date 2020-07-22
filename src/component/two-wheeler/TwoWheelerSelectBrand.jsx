@@ -34,9 +34,28 @@ const fuel = {
 
 
 const vehicleValidation = Yup.object().shape({
-    selectedBrandId: Yup.string().required("Please enter the brand name"),
-    selectedModelId: Yup.string().required("Please enter the model name"),
-    // selectedVarientId : Yup.string().required("Please enter the varient name"),
+    policy_type: Yup.string().required("Please enter policy type"),
+    check_registration: Yup.string().notRequired(),
+
+    // regNumber: Yup.string().matches(/^[A-Z]{2}[ -][0-9]{1,2}(?: [A-Z])?(?: [A-Z]*)? [0-9]{4}$/, 'Invalid Registration number')
+    // .test(
+    //     "registrationNumberCheck",
+    //     function() {
+    //         return "Please Provide Vehicle Registration Number"
+    //     },
+    //     function (value) {
+    //         // console.log('YUP', value)
+    //         if ((value == "" || value == undefined) && this.parent.check_registration == 2 ) {  
+    //             return false;
+    //         }
+    //         return true;
+    //     }
+    // ),   
+    regNumber: Yup.string().when("check_registration", {
+        is: "1",       
+        then: Yup.string(),
+        otherwise: Yup.string().required('Please provide registration number').matches(/^[A-Z]{2}[ -][0-9]{1,2}[ -][A-Z]{1,3}[ -][0-9]{4}$/, 'Invalid Registration number'),
+    }),
 })
 
 
@@ -65,7 +84,9 @@ class TwoWheelerSelectBrand extends Component {
             brandName: '',
             modelName: '',
             fuelType: '',
-            vehicleDetails: []
+            vehicleDetails: [],
+            error_msg: [],
+            length:14
         };
     }
 
@@ -186,7 +207,7 @@ class TwoWheelerSelectBrand extends Component {
         let policyHolder_id = localStorage.getItem("policyHolder_refNo") ? localStorage.getItem("policyHolder_refNo") : 0;
         let encryption = new Encryption();
         this.props.loadingStart();
-        axios.get(`policy-holder/motor/${policyHolder_id}`)
+        axios.get(`two-wh/details/${policyHolder_id}`)
             .then(res => {
                 let decryptResp = JSON.parse(encryption.decrypt(res.data));
                 console.log('decryptResp', decryptResp)
@@ -333,9 +354,10 @@ class TwoWheelerSelectBrand extends Component {
     
             })
                 .catch(err => {
-                    let decryptResp = JSON.parse(encryption.decrypt(err.data));
-                    console.log('decryptResp--err---', decryptResp)
+                    let decryptErr = JSON.parse(encryption.decrypt(err.data));
+                    console.log('decryptResp--err---', decryptErr)
                     // handle error
+                    this.setState({error_msg: decryptErr})
                     this.props.loadingStop();
                 })
         }
@@ -356,10 +378,45 @@ class TwoWheelerSelectBrand extends Component {
         e.target.value = ("" + e.target.value).toUpperCase();
       };
 
+    // regnoFormat = (e, setFieldTouched, setFieldValue) => {
+        
+    // let regno = e.target.value
+    // let formatVal = ''
+    // let regnoLength = regno.length
+
+    // if (regnoLength == 9) {
+
+    //     formatVal = regno.substring(0, 2) +" "+ regno.substring(2, 4) +" "+ regno.substring(4, 5)
+    //     +" "+ regno.substring(5, 9);
+
+    //     setFieldTouched('regNumber')
+    //     setFieldValue('regNumber', formatVal);
+    //     e.target.value = formatVal;
+        
+    // }
+    // else if (regnoLength == 10) {
+    //     formatVal = regno.substring(0, 2) +" "+ regno.substring(2, 4) +" "+ regno.substring(4, 6)
+    //     +" "+ regno.substring(6, 10);
+
+    //     setFieldTouched('regNumber')
+    //     setFieldValue('regNumber', formatVal);
+    //     e.target.value = formatVal;
+
+    // }
+    // else if (regnoLength == 11) {
+    //     formatVal = regno.substring(0, 2) +" "+ regno.substring(2, 4) +" "+ regno.substring(4, 7)
+    //     +" "+ regno.substring(7, 11);
+
+    //     setFieldTouched('regNumber')
+    //     setFieldValue('regNumber', formatVal);
+    //     e.target.value = formatVal;
+    // }
+    // }
+
 
     render() {
         const { brandList, motorInsurance, selectedBrandDetails, brandModelList, selectedBrandId,
-            selectedModelId, selectedVarientId, otherBrands, vehicleDetails, modelName, fuelType } = this.state
+            selectedModelId, selectedVarientId, otherBrands, vehicleDetails, error_msg, fuelType } = this.state
         const { productId } = this.props.match.params
         const newInitialValues = Object.assign(initialValues, {
             selectedBrandId: selectedBrandId ? selectedBrandId : (vehicleDetails && vehicleDetails.vehiclebrand_id ? vehicleDetails.vehiclebrand_id : ""),
@@ -384,13 +441,14 @@ class TwoWheelerSelectBrand extends Component {
 
                                 <Formik initialValues={newInitialValues} 
                                     onSubmit={ this.handleSubmit} 
-                                    // validationSchema={ComprehensiveValidation}
+                                    validationSchema={vehicleValidation}
                                     >
                                     {({ values, errors, setFieldValue, setFieldTouched, isValid, isSubmitting, touched }) => {
-                                        // console.log("aaaaaa=GHHH====>", values)
+                                        console.log("errors=GHHH====>", values.regNumber.length)
                                         this.state.regno = "";
                                           
-                                        if(values.regNumber.length>0 && values.regNumber != "NEW"){
+                                        if(values.regNumber.length>0 && values.regNumber != "NEW"){   
+                                            
                                         if(values.regNumber.toLowerCase().substring(0, 2) == "dl")
                                         {
                                             
@@ -500,7 +558,9 @@ class TwoWheelerSelectBrand extends Component {
                                                                                 setFieldTouched('check_registration')
                                                                                 setFieldValue('check_registration', '2');
                                                                             }} 
-                                
+                                                                            // onBlur= {e=>{
+                                                                            //     this.regnoFormat(e, setFieldTouched, setFieldValue)
+                                                                            // }}                                
                                                                         /> : 
                                                                         <Field
                                                                             type="text"
@@ -518,6 +578,7 @@ class TwoWheelerSelectBrand extends Component {
                                                                 </div>                                                           
                                                             </Col>
                                                         </Row>
+                                                    {values.policy_type == '1' ?
                                                         <div className="row formSection">
                                                             <label className="customCheckBox formGrp formGrp">
                                                             Continue Without Vehicle Registration Number
@@ -553,12 +614,17 @@ class TwoWheelerSelectBrand extends Component {
                                                                 <span className="checkmark mL-0"></span>
                                                             </label>
                                                             {errors.check_registration && (touched.looking_for_2 || touched.looking_for_3 || touched.looking_for_4) ? 
-                                                                    <span className="error-message">{errors.check_registration}</span> : ""
+                                                                    <span className="errorMsg">{errors.check_registration}</span> : ""
                                                                 }
                                                             
-                                                        </div>
+                                                        </div> : null }
+
+
                                                         <div className="brandhead">
                                                             <h4>Please select your Vehicle brand</h4>
+                                                            {error_msg.brand_id || error_msg.brand_model_id || error_msg.model_varient_id ? 
+                                                                <span className="errorMsg">Please select brand and varient</span> : ""
+                                                            }
                                                         </div>
 
                                                         <Row>
@@ -583,7 +649,6 @@ class TwoWheelerSelectBrand extends Component {
                                                         </Row>
                                                     </div>
                                                 </section>
-
 
                                             </Form>
                                         );

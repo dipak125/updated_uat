@@ -178,7 +178,7 @@ class TwoWheelerOtherComprehensive extends Component {
         const { productId } = this.props.match.params
         let policyHolder_id = localStorage.getItem("policyHolder_refNo") ? localStorage.getItem("policyHolder_refNo") : 0;
         this.props.loadingStart();
-        axios.get(`policy-holder/motor/${policyHolder_id}`)
+        axios.get(`two-wh/details/${policyHolder_id}`)
             .then(res => {
                 let decryptResp = JSON.parse(encryption.decrypt(res.data));
                 let motorInsurance = decryptResp.data.policyHolder ? decryptResp.data.policyHolder.motorinsurance : {}

@@ -19,6 +19,10 @@ import swal from 'sweetalert';
 import moment from "moment";
 import {  PersonAge } from "../../shared/dateFunctions";
 import { addDays } from 'date-fns';
+import {
+    checkGreaterTimes,
+    checkGreaterStartEndTimes
+  } from "../../shared/validationFunctions";
 
 let encryption = new Encryption();
 
@@ -40,7 +44,8 @@ const initialValue = {
     previous_end_date: "",
     previous_policy_no: "",
     previous_policy_name: "",
-    insurance_company_id: 0
+    insurance_company_id: 0,
+    policy_type_id: ""
 }
 const ComprehensiveValidation = Yup.object().shape({
 
@@ -68,8 +73,8 @@ const ComprehensiveValidation = Yup.object().shape({
     .min(5, function() {
         return "Engine no. should be minimum 5 characters"
     })
-    .max(12, function() {
-        return "Engine no. should be maximum 12 characters"
+    .max(17, function() {
+        return "Engine no. should be maximum 17 characters"
     }),
 
     chasis_no:Yup.string().required('Chasis no is required')
@@ -79,8 +84,8 @@ const ComprehensiveValidation = Yup.object().shape({
     .min(5, function() {
         return "Chasis no. should be minimum 5 characters"
     })
-    .max(12, function() {
-        return "Chasis no. should be maximum 12 characters"
+    .max(17, function() {
+        return "Chasis no. should be maximum 17 characters"
     }),
 
     vahanVerify:Yup.boolean().notRequired('Please verify chasis number')
@@ -95,7 +100,149 @@ const ComprehensiveValidation = Yup.object().shape({
             }
             return true;
         }
+    ),
+
+    previous_start_date:Yup.date()
+    .notRequired('Previous Start date is required')
+    .test(
+        "currentMonthChecking",
+        function() {
+            return "Please enter Start date"
+        },
+        function (value) {
+            if (this.parent.policy_type_id > 1 && !value) {   
+                return false;    
+            }
+            return true;
+        }
+    ).test(
+        "checkGreaterTimes",
+        "Start date must be less than end date",
+        function (value) {
+            if (value) {
+                return checkGreaterStartEndTimes(value, this.parent.previous_end_date);
+            }
+            return true;
+        }
+    ).test(
+      "checkStartDate",
+      "Enter Start Date",
+      function (value) {       
+          if ( this.parent.previous_end_date != undefined && value == undefined) {
+              return false;
+          }
+          return true;
+      }
+    ),
+    previous_end_date:Yup.date()
+    .notRequired('Previous end date is required')
+    .test(
+        "currentMonthChecking",
+        function() {
+            return "Please enter end date"
+        },
+        function (value) {
+            if (this.parent.policy_type_id > 1 && !value) {   
+                return false;    
+            }
+            return true;
+        }
+    ).test( 
+        "checkGreaterTimes",
+        "End date must be greater than start date",
+        function (value) {
+            if (value) {
+                return checkGreaterTimes(value, this.parent.previous_start_date);
+            }
+            return true;
+        }
+        ).test(
+        "checkEndDate",
+        "Enter End Date",
+        function (value) {     
+            if ( this.parent.previous_start_date != undefined && value == undefined) {
+                return false;
+            }
+            return true;
+        }
+    ),
+    previous_policy_name:Yup.string()
+    .notRequired('Please select Policy Type')
+    .test(
+        "currentMonthChecking",
+        function() {
+            return "Please select Policy Type"
+        },
+        function (value) {
+            if (this.parent.policy_type_id > 1 && !value) {   
+                return false;    
+            }
+            return true;
+        }
+    ).test(
+        "currentMonthChecking",
+        function() {
+            return "Since previous policy is a liability policy, issuance of a package policy will be subjet to successful inspection of your vehicle. Our Customer care executive will call you to assit on same, shortly"
+        },
+        function (value) {
+            if (value == '2' ) {   
+                return false;    
+            }
+            return true;
+        }
+    ),
+    insurance_company_id:Yup.number()
+    .notRequired('Insurance company is required')
+    .test(
+        "currentMonthChecking",
+        function() {
+            return "Please enter previous insurance company"
+        },
+        function (value) {
+            if (this.parent.policy_type_id > 1 && !value) {   
+                return false;    
+            }
+            return true;
+        }
+    ),
+    previous_city:Yup.string()
+    .notRequired('Previous city is required')
+    .test(
+        "currentMonthChecking",
+        function() {
+            return "Please enter previous insurance company city"
+        },
+        function (value) {
+            if (this.parent.policy_type_id > 1 && !value) {   
+                return false;    
+            }
+            return true;
+        }
     )
+    .matches(/^[a-zA-Z0-9][a-zA-Z0-9-/.,\s]*$/, 
+        function() {
+            return "Please enter valid address"
+        }),
+
+    previous_policy_no:Yup.string()
+    .notRequired('Previous policy number is required')
+    .test(
+        "currentMonthChecking",
+        function() {
+            return "Please enter previous policy number"
+        },
+        function (value) {
+            if (this.parent.policy_type_id > 1 && !value) {   
+                return false;    
+            }
+            return true;
+        }
+    )
+    .matches(/^[a-zA-Z0-9]*$/, 
+        function() {
+            return "Please enter valid policy number"
+        }),
+
    
 });
 
@@ -171,7 +318,7 @@ class TwoWheelerVerify extends Component {
         const { productId } = this.props.match.params
         let policyHolder_id = localStorage.getItem("policyHolder_refNo") ? localStorage.getItem("policyHolder_refNo") : 0;
         this.props.loadingStart();
-        axios.get(`policy-holder/motor/${policyHolder_id}`)
+        axios.get(`two-wh/details/${policyHolder_id}`)
             .then(res => {
                 let decryptResp = JSON.parse(encryption.decrypt(res.data))
                 console.log("decryptResp====", decryptResp)
@@ -335,10 +482,12 @@ class TwoWheelerVerify extends Component {
             previous_start_date: previousPolicy && previousPolicy.start_date ? new Date(previousPolicy.start_date) : "",
             previous_end_date: previousPolicy && previousPolicy.end_date ? new Date(previousPolicy.end_date) : "",
             previous_policy_name: previousPolicy && previousPolicy.name ? previousPolicy.name : "",
-            insurance_company_id: previousPolicy && previousPolicy.insurancecompany && previousPolicy.insurancecompany.Id ? previousPolicy.insurancecompany.Id : "",
+            // insurance_company_id: previousPolicy && previousPolicy.insurancecompany && previousPolicy.insurancecompany.Id ? previousPolicy.insurancecompany.Id : "",
+            insurance_company_id: previousPolicy && previousPolicy.insurancecompany_id ? previousPolicy.insurancecompany_id : "",
             previous_city: previousPolicy && previousPolicy.city ? previousPolicy.city : "",
             previous_policy_no: previousPolicy && previousPolicy.policy_no ? previousPolicy.policy_no : "",
-            // newRegistrationNo: localStorage.getItem('registration_number') == "NEW" ? localStorage.getItem('registration_number') : ""
+            newRegistrationNo:  motorInsurance.registration_no &&  motorInsurance.registration_no == "NEW" ? motorInsurance.registration_no : "",
+            policy_type_id: motorInsurance && motorInsurance.policytype_id ? motorInsurance.policytype_id : ""
 
         });
 
@@ -374,7 +523,7 @@ class TwoWheelerVerify extends Component {
                     </div>
                     <Formik initialValues={newInitialValues} 
                     onSubmit={ this.handleSubmit} 
-                    // validationSchema={ComprehensiveValidation}
+                    validationSchema={ComprehensiveValidation}
                     >
                     {({ values, errors, setFieldValue, setFieldTouched, isValid, isSubmitting, touched }) => {
                             this.state.regno = "";
@@ -529,7 +678,7 @@ class TwoWheelerVerify extends Component {
                                                     onFocus={e => this.changePlaceHoldClassAdd(e)}
                                                     onBlur={e => this.changePlaceHoldClassRemove(e)}
                                                     value= {values.engine_no.toUpperCase()}
-                                                    maxLength="12"
+                                                    maxLength="17"
                                                     onChange = {(e) => {
                                                         setFieldTouched('engine_no')
                                                         setFieldValue('engine_no', e.target.value)                       
@@ -552,7 +701,7 @@ class TwoWheelerVerify extends Component {
                                                     onFocus={e => this.changePlaceHoldClassAdd(e)}
                                                     onBlur={e => this.changePlaceHoldClassRemove(e)}
                                                     value= {values.chasis_no.toUpperCase()}
-                                                    maxLength="12"
+                                                    maxLength="17"
                                                     onChange = {(e) => {
                                                         setFieldTouched('chasis_no')
                                                         setFieldValue('chasis_no', e.target.value)                       
@@ -575,7 +724,7 @@ class TwoWheelerVerify extends Component {
                                         </FormGroup>
                                     </Col>
                                 </Row>
-                                {localStorage.getItem('registration_number') != "NEW" ? 
+                                {values.policy_type_id != '1' ? 
                                 <Fragment>
                                 <Row>
                                     <Col sm={12}>
