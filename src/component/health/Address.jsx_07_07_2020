@@ -44,7 +44,7 @@ const initialValues = {
     address2: "",
     address3: "",
     pincode: "",
-    // area: "",
+    area: "",
     state: "",
     eIA: "",
     eia_account_no:"",
@@ -100,7 +100,7 @@ const validateAddress =  Yup.object().shape({
         }),
    
     panNo: Yup.string()
-        .notRequired(function() {
+        .required(function() {
             return "Enter PAN number"
         }).matches(/^[A-Z]{3}[CPHFATBLJG]{1}[A-Z]{1}[0-9]{4}[A-Z]{1}$/, function() {
             return "Please enter valid Pan Number"
@@ -113,7 +113,7 @@ const validateAddress =  Yup.object().shape({
         }).min(6, 'Must be exactly 6 digits')
         .max(6, 'Must be exactly 6 digits'),
 
-    pincode_id: Yup.string()
+    area: Yup.string()
         .required(function() {
             return "Select area"
         }),
@@ -165,12 +165,12 @@ const validateAddress =  Yup.object().shape({
                         .test(
                             "18YearsChecking",
                             function() {
-                                return "Age should me minium 18 years and maximum 55 years"
+                                return "Age should me minium 18 years"
                             },
                             function (value) {
                                 if (value) {
                                     const ageObj = new PersonAge();
-                                    return ageObj.whatIsMyAge(value) < 56 && ageObj.whatIsMyAge(value) >= 18;
+                                    return ageObj.whatIsMyAge(value) < 46 && ageObj.whatIsMyAge(value) >= 18;
                                 }
                                 return true;
                             }
@@ -260,13 +260,13 @@ const validateAddress =  Yup.object().shape({
     }).test(
         "18YearsChecking",
         function() {
-            return "Proposer age should be between 18 to 55 years"
+            return "Proposer age should be between 18 to 45 years"
         },
         function (value) {
             const ageObj = new PersonAge();
             if (value) {
                 const age_Obj = new PersonAge();
-                return ageObj.whatIsMyAge(value) < 56 && ageObj.whatIsMyAge(value) >= 18;
+                return ageObj.whatIsMyAge(value) < 46 && ageObj.whatIsMyAge(value) >= 18;
             }
             return true;
     }),
@@ -309,8 +309,7 @@ class Address extends Component {
             selfFlag:false,
             pinDataArr:[],
             stateName:[],
-            showEIA:false,
-            pincode_Details: []
+            showEIA:false
 		}
 	}
 
@@ -337,7 +336,6 @@ class Address extends Component {
                 let addressDetails = JSON.parse(res.data.data.policyHolder.address)
                 let is_eia_account = res.data.data.policyHolder.is_eia_account == 2 ? "" : res.data.data.policyHolder.is_eia_account
                 let selfFlag = false;
-                let pincode_Details = JSON.parse(res.data.data.policyHolder.pincode_response)
                 for(let i=0;i<family_members.length;i++){
                     if(family_members[i].relation_with=='self'){
                         selfFlag = true
@@ -351,11 +349,10 @@ class Address extends Component {
                     policy_holder,
                     familyMembers:family_members,
                     addressDetails,
-                    is_eia_account,
-                    pincode_Details
+                    is_eia_account
                 })
                 this.props.loadingStop();
-                this.fetchPrevAreaDetails(pincode_Details)
+                this.fetchPrevAreaDetails(addressDetails)
                 
             })
             .catch(function (error) {
@@ -365,27 +362,33 @@ class Address extends Component {
             this.props.loadingStop();
     }
 
-    fetchPrevAreaDetails=(pincode_Details)=>{
-            if(pincode_Details){
-                let pincode = pincode_Details.PIN_CD;
+    fetchPrevAreaDetails=(addressDetails)=>{
+            if(addressDetails){
+                let pincode = addressDetails.pincode;
                 const formData = new FormData();
-                // let encryption = new Encryption();
+                let encryption = new Encryption();
 
-            //    const post_data_obj = {
-            //         'pincode':pincode.toString()
-            //     };
+               const post_data_obj = {
+                    'pincode':pincode.toString()
+                };
                // let encryption = new Encryption();
-            //    formData.append('enc_data',encryption.encrypt(JSON.stringify(post_data_obj)))
+               formData.append('enc_data',encryption.encrypt(JSON.stringify(post_data_obj)))
 
-                formData.append('pincode', pincode)
                 this.props.loadingStart();
-                axios.post('pincode-details',
+                axios.post('generate-pincode-details',
                 formData
                 ).then(res=>{
-                    let stateName = res.data.data && res.data.data[0] && res.data.data[0].pinstate.STATE_NM ? res.data.data[0].pinstate.STATE_NM : ""                        
+                    let pinData = res.data.trim();               
+                    let pinDataArr = JSON.parse(pinData.substring(0,pinData.length-10))   
+                    let stateName=pinDataArr.map(resource=>
+                        resource.STATE_NM
+                    )  
+                    var unique = stateName.filter((v, i, a) => a.indexOf(v) === i); 
+                    
+                        
                     this.setState({
-                        pinDataArr: res.data.data,
-                        stateName,
+                        pinDataArr,
+                        stateName:unique,
                     });
                     this.props.loadingStop();
                 }).
@@ -397,30 +400,47 @@ class Address extends Component {
     }
 
     fetchAreadetails=(e)=>{
-        let pinCode = e.target.value;      
-
+        //let pinCode=obj.value;
+        let pinCode = e.target.value;
+       
         if(pinCode.length==6){
+
             const formData = new FormData();
+            ///formData.append('pincode',pinCode);
             this.props.loadingStart();
+
             let encryption = new Encryption();
+
+           // formData.append('pincode',pinCode);
             const post_data_obj = {
                 'pincode':pinCode
             };
-        //    formData.append('enc_data',encryption.encrypt(JSON.stringify(post_data_obj)))
-           formData.append('pincode',pinCode)
-           axios.post('pincode-details', formData)
-           .then(res=>{       
-                let stateName = res.data.data && res.data.data[0] && res.data.data[0].pinstate.STATE_NM ? res.data.data[0].pinstate.STATE_NM : ""                        
+           // let encryption = new Encryption();
+           formData.append('enc_data',encryption.encrypt(JSON.stringify(post_data_obj)))
+           axios.post('generate-pincode-details',
+            formData
+            ).then(res=>{
+                let pinData = res.data.trim();               
+                let pinDataArr = JSON.parse(pinData.substring(0,pinData.length-10))   
+                let stateName=pinDataArr.map(resource=>
+                    resource.STATE_NM
+                )  
+                var unique = stateName.filter((v, i, a) => a.indexOf(v) === i); 
+                
+                    
                 this.setState({
-                    pinDataArr: res.data.data,
-                    stateName,
+                    pinDataArr,
+                    stateName:unique,
                 });
                 this.props.loadingStop();
             }).
             catch(err=>{
                 this.props.loadingStop();
-            })          
-        }       
+            })
+           
+
+        }
+        
     }
 
     changePlaceHoldClassRemove(e) {
@@ -439,6 +459,7 @@ class Address extends Component {
 
         let formArr = []
         
+      //  formData.append('policy_holder_id',policyHolder_id);
         formArr['policy_holder_id'] = policyHolder_id;
         const family_members = values.family_members;
         let proposerAsInsured = values.proposerAsInsured;
@@ -453,13 +474,21 @@ class Address extends Component {
         let pancard_no = []
 
         for(let i=0;i<family_members.length;i++){
+           // formData.append(`looking_for[${i}]`, family_members[i].looking_for);
              looking_for.push(family_members[i].looking_for)
+          //  formData.append(`family_member_id[${i}]`, family_members[i].family_member_id);
             family_member_id.push(family_members[i].family_member_id)
+          //  formData.append(`gender[${i}]`, family_members[i].gender);
             gender.push(family_members[i].gender)
+           // formData.append(`first_name[${i}]`, family_members[i].fname);
             first_name.push(family_members[i].fname)
+            //formData.append(`last_name[${i}]`, family_members[i].lname);
             last_name.push(family_members[i].lname)
+           // formData.append(`dob[${i}]`, moment(family_members[i].dob).format("YYYY-MM-DD"));
            dob.push(moment(family_members[i].dob).format("YYYY-MM-DD"))
            pancard_no.push(values.panNo)
+          //  formData.append(`pancard_no[${i}]`, values.panNo);
+         //   formData.append(`pancard_no[${i}]`, values.panNo);
         }  
 
         formArr['looking_for'] = looking_for
@@ -474,10 +503,14 @@ class Address extends Component {
 
 
         let email = values.email;
+     // formData.append('panNo',values.panNo);
+       // formData.append('phoneNo',values.phoneNo);
         formArr['phoneNo'] = values.phoneNo;
+        //formData.append('email_id',values.email);
         formArr['email_id'] = values.email;
         sessionStorage.setItem('email_data',email);
-        formArr['is_eia_account'] = values.eIA;      
+        formArr['is_eia_account'] = values.eIA;
+        //formData.append('is_eia_account',values.eIA);        
         sessionStorage.setItem('pan_data',values.panNo);
         sessionStorage.setItem('email_data',values.email);
 
@@ -486,22 +519,29 @@ class Address extends Component {
             address1:values.address1,
             address2:values.address2,
             address3:values.address3,
-            pincode_id:values.pincode_id,
+            area:values.area,
             phoneNo:values.phoneNo,
             pincode:values.pincode,
             state:values.state,
-        }) 
+        })
+        //formData.append('communication_address',JSON.stringify(address_object));   
         formArr['communication_address'] = JSON.stringify(address_object);   
+       // formData.append('panNo',values.panNo);
         formArr['panNo'] = values.panNo;
+        //formData.append('phoneNo',values.phoneNo);
         formArr['phoneNo'] = values.phoneNo;
+        //formData.append('email',values.email); 
         formArr['email'] = values.email;
+       // formData.append('proposerName',values.proposerName);
         formArr['proposerName'] = values.proposerName;
-        formArr['proposerLname'] = values.proposerLname; 
+       // formData.append('proposerLname',values.proposerLname);
+        formArr['proposerLname'] = values.proposerLname;
+        //formData.append('proposerDob',moment(values.proposerDob).format("YYYY-MM-DD") ); 
         formArr['proposerDob'] = moment(values.proposerDob).format("YYYY-MM-DD");
+        //formData.append('proposerGender',values.proposerGender); 
         formArr['proposerGender'] = values.proposerGender;
-        formArr['pincode_id'] = values.pincode_id;
-        
         if(values.eIA == 1){
+            //formData.append('eia_account_no',values.eia_account_no)
             formArr['eia_account_no'] = values.eia_account_no;
         }       
 
@@ -562,8 +602,8 @@ class Address extends Component {
     
     
     render() {
-        const {policy_holder,familyMembers,addressDetails,is_eia_account,selfFlag,pinDataArr,stateName,showEIA, pincode_Details} = this.state    
-
+        const {policy_holder,familyMembers,addressDetails,is_eia_account,selfFlag,pinDataArr,stateName,showEIA} = this.state    
+        console.log("aaaa======> ", is_eia_account)
         let newInitialValues = Object.assign(initialValues, {
             proposerAsInsured: sessionStorage.getItem('proposed_insured') ? sessionStorage.getItem('proposed_insured') : (selfFlag ? 1:0),
             family_members:this.initFamilyDetailsList(
@@ -576,7 +616,7 @@ class Address extends Component {
             address2: addressDetails && addressDetails.address2 ? addressDetails.address2:  "",
             address3: addressDetails && addressDetails.address3 ? addressDetails.address3: "",
             pincode: addressDetails && addressDetails.pincode ? addressDetails.pincode: "",
-            pincode_id: pincode_Details && pincode_Details.id ? pincode_Details.id : "",
+            area: addressDetails && addressDetails.area ? addressDetails.area: "",
             state: addressDetails && addressDetails.state ? addressDetails.state:"",
             eIA: is_eia_account,
             eia_account_no : policy_holder && policy_holder.eia_no ?  policy_holder.eia_no : '',
@@ -604,7 +644,8 @@ class Address extends Component {
                                     <Formik initialValues={newInitialValues} onSubmit={this.handleSubmit} 
                                     validationSchema={validateAddress}
                                     >
-                                    {({ values, errors, setFieldValue, setFieldTouched, isValid, isSubmitting, touched }) => {                                    
+                                    {({ values, errors, setFieldValue, setFieldTouched, isValid, isSubmitting, touched }) => {
+                                        
                                     return (
                                     <Form>
                                         <div className="d-flex flex-column flex-sm-column flex-md-column flex-lg-row justify-content-left m-b-15">
@@ -784,7 +825,7 @@ class Address extends Component {
                                                                 type="hidden"
                                                                 value={values.family_members[index].looking_for}
                                                             />
-                                                        </div> &nbsp;&nbsp;
+                                                        </div>
                                                         <Row>
                                                         <Col sm={12} md={3} lg={3}>
                                                             <FormGroup>
@@ -1018,7 +1059,6 @@ class Address extends Component {
                                                                         setFieldTouched("pincode");
                                                                         setFieldValue("pincode", e.target.value);
                                                                         setFieldValue("state", stateName ? stateName[0] : values.state);
-                                                                        setFieldValue("pincode_id", "");
                                                                     }}
                                                                 />
                                                                 {errors.pincode && touched.pincode ? (
@@ -1031,21 +1071,21 @@ class Address extends Component {
                                                         <FormGroup>
                                                         <div className="formSection">
                                                                 <Field
-                                                                    name="pincode_id"
+                                                                    name="area"
                                                                     component="select"
                                                                     autoComplete="off"
-                                                                    value={values.pincode_id}
+                                                                    value={values.area}
                                                                     className="formGrp"
                                                                 >
                                                                 <option value="">Select Area</option>
                                                                 {pinDataArr && pinDataArr.map((resource,rindex)=>
-                                                                    <option value={resource.id}>{resource.LCLTY_SUBRB_TALUK_TEHSL_NM}</option>
+                                                                    <option value={resource.LCLTY_SUBRB_TALUK_TEHSL_NM}>{resource.LCLTY_SUBRB_TALUK_TEHSL_NM}</option>
                                                                 )}
                                                                     
                                                                     {/*<option value="area2">Area 2</option>*/}
                                                                 </Field>     
-                                                                {errors.pincode_id && touched.pincode_id ? (
-                                                                    <span className="errorMsg">{errors.pincode_id}</span>
+                                                                {errors.area && touched.area ? (
+                                                                    <span className="errorMsg">{errors.area}</span>
                                                                 ) : null}     
                                                                 </div>
                                                         </FormGroup>
@@ -1060,7 +1100,7 @@ class Address extends Component {
                                                                     autoComplete="off"
                                                                     onFocus={e => this.changePlaceHoldClassAdd(e)}
                                                                     onBlur={e => this.changePlaceHoldClassRemove(e)}
-                                                                    value={stateName ? stateName : values.state} 
+                                                                    value={stateName ? stateName[0] : values.state} 
                                                                     disabled = {true}
                                                                     
                                                                 />
@@ -1072,9 +1112,9 @@ class Address extends Component {
                                                     </Col>
                                                 </Row>
 
-                                                <div className="d-flex flex-column flex-sm-column flex-md-column flex-lg-row justify-content-left m-b-40">
+                                                <div className="d-flex justify-content-left align-items-center m-b-40">
                                                 
-                                            <div className="proposr prsres m-r-60"><p>Do you have an eIA number? 
+                                            <div className="proposr m-r-60"><p>Do you have an eIA number? 
                                             <OverlayTrigger overlay={<Tooltip id="tooltip-disabled">The e-Insurance account or Electronic Insurance Account offers policyholders online space to hold all their insurance policies electronically under one e-insurance account number. This allows the policyholder to access all their policies with a few clicks and no risk of losing the physical insurance policy</Tooltip>}>
                                             <a href="#" className="infoIcon"><img src={require('../../assets/images/i.svg')} alt="" /></a>
                                             </OverlayTrigger></p>

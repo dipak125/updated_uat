@@ -60,8 +60,8 @@ const ComprehensiveValidation = Yup.object().shape({
     .min(5, function() {
         return "Engine no. should be minimum 5 characters"
     })
-    .max(17, function() {
-        return "Engine no. should be maximum 17 characters"
+    .max(12, function() {
+        return "Engine no. should be maximum 12 characters"
     }),
 
     chasis_no:Yup.string().required('Chasis no is required')
@@ -71,8 +71,8 @@ const ComprehensiveValidation = Yup.object().shape({
     .min(5, function() {
         return "Chasis no. should be minimum 5 characters"
     })
-    .max(17, function() {
-        return "Chasis no. should be maximum 17 characters"
+    .max(12, function() {
+        return "Chasis no. should be maximum 12 characters"
     }),
 
     // cng_kit:Yup.string().required("Please select an option"),
@@ -698,7 +698,7 @@ class OtherComprehensive extends Component {
                                                     onFocus={e => this.changePlaceHoldClassAdd(e)}
                                                     onBlur={e => this.changePlaceHoldClassRemove(e)}
                                                     value= {values.engine_no.toUpperCase()}
-                                                    maxLength="17"
+                                                    maxLength="12"
                                                     onChange = {(e) => {
                                                         setFieldTouched('engine_no')
                                                         setFieldValue('engine_no', e.target.value)                       
@@ -721,7 +721,7 @@ class OtherComprehensive extends Component {
                                                     onFocus={e => this.changePlaceHoldClassAdd(e)}
                                                     onBlur={e => this.changePlaceHoldClassRemove(e)}
                                                     value= {values.chasis_no.toUpperCase()}
-                                                    maxLength="17"
+                                                    maxLength="12"
                                                     onChange = {(e) => {
                                                         setFieldTouched('chasis_no')
                                                         setFieldValue('chasis_no', e.target.value)                       
@@ -946,6 +946,9 @@ class OtherComprehensive extends Component {
                         </div>
                     </Modal.Header>
                     <Modal.Body>
+                    {/* <h5> Net Premium Amount  ₹ {fulQuoteResp.DuePremium}</h5>
+                    <h5> Gross Premium Amount  ₹ {fulQuoteResp.BeforeVatPremium}</h5>
+                    <h5> Applicable Taxs  ₹ {fulQuoteResp.TGST}</h5> */}
                     <table class="table table-bordered">
                             <thead>
                                 <tr>

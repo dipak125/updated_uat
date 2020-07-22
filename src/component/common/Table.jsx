@@ -22,9 +22,13 @@ class Table extends Component {
       };
 
     buy_policy = (productId) => {
-        if(productId < 6){
+        if(productId == '2'){
             this.props.history.push(`/Registration/${productId}`);
-        }else
+        }
+        else if(productId == '4') {
+            this.props.history.push(`/two_wheeler_Select-brand/${productId}`)
+        }
+        else if(productId == '6')
         this.props.history.push(`/Health/${productId}`);
     }   
 
@@ -45,6 +49,9 @@ class Table extends Component {
             sessionStorage.removeItem('display_dob');
             localStorage.removeItem('newBrandEdit');
             localStorage.removeItem('brandEdit');
+            localStorage.removeItem('registration_number');
+            localStorage.removeItem('policy_type');
+            
             this.props.loadingStop();
           })
           .catch(err => {

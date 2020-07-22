@@ -18,7 +18,7 @@ import { Formik, Form, Field, ErrorMessage } from 'formik';
 import { changeFormat, get18YearsBeforeDate, PersonAge } from "../../shared/dateFunctions";
 import Encryption from '../../shared/payload-encryption';
 
-const minDobAdult = moment(moment().subtract(46, 'years').calendar()).add(1, 'day').calendar()
+const minDobAdult = moment(moment().subtract(56, 'years').calendar()).add(1, 'day').calendar()
 const maxDobAdult = moment().subtract(18, 'years').calendar();
 
 const minDobChild = moment(moment().subtract(26, 'years').calendar()).add(1, 'day').calendar()
@@ -136,7 +136,7 @@ const validateFamilyMembers  = Yup.object().shape({
         function (value) {
             if (value) {
                 const ageObj = new PersonAge();
-                return ageObj.whatIsMyAge(value) < 46 && ageObj.whatIsMyAge(value) >= 18 ;
+                return ageObj.whatIsMyAge(value) < 56 && ageObj.whatIsMyAge(value) >= 18 ;
             }
             return true;
         }
@@ -154,7 +154,7 @@ const validateFamilyMembers  = Yup.object().shape({
             function (value) {
                 if (value) {
                     const ageObj = new PersonAge();
-                    return ageObj.whatIsMyAge(value) < 46 && ageObj.whatIsMyAge(value) >= 18;
+                    return ageObj.whatIsMyAge(value) < 56 && ageObj.whatIsMyAge(value) >= 18;
                 }
                 return true;
             }
@@ -469,7 +469,7 @@ const validateFamilyMembers  = Yup.object().shape({
             function (value) {
                 if (value) {
                     const ageObj = new PersonAge();
-                    return ageObj.whatIsMyAge(value) < 46 && ageObj.whatIsMyAge(value) >= 18;
+                    return ageObj.whatIsMyAge(value) < 56 && ageObj.whatIsMyAge(value) >= 18;
                 }
                 return true;
             }
@@ -551,7 +551,7 @@ const validateFamilyMembers  = Yup.object().shape({
             function (value) {
                 if (value) {
                     const ageObj = new PersonAge();
-                    return ageObj.whatIsMyAge(value) < 46 && ageObj.whatIsMyAge(value) >= 18;
+                    return ageObj.whatIsMyAge(value) < 56 && ageObj.whatIsMyAge(value) >= 18;
                 }
                 return true;
             }
@@ -633,7 +633,7 @@ const validateFamilyMembers  = Yup.object().shape({
             function (value) {
                 if (value) {
                     const ageObj = new PersonAge();
-                    return ageObj.whatIsMyAge(value) < 46 && ageObj.whatIsMyAge(value) >= 18;
+                    return ageObj.whatIsMyAge(value) < 56 && ageObj.whatIsMyAge(value) >= 18;
                 }
                 return true;
             }
@@ -714,7 +714,7 @@ const validateFamilyMembers  = Yup.object().shape({
             function (value) {
                 if (value) {
                     const ageObj = new PersonAge();
-                    return ageObj.whatIsMyAge(value) < 46 && ageObj.whatIsMyAge(value) >= 18;
+                    return ageObj.whatIsMyAge(value) < 56 && ageObj.whatIsMyAge(value) >= 18;
                 }
                 return true;
             }

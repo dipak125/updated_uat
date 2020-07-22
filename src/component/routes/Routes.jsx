@@ -9,15 +9,6 @@ import { PrivateRoute } from "../../shared/private-route";
 import Loader from "react-loader-spinner";
 
 import LogIn from "../common/login/LogIn";
-// import Motor from '../motor/Motor';
-// import SelectDuration from '../health/SelectDuration';
-// import Health from '../health/InformationYourself';
-// import MedicalDetails from '../health/MedicalDetails';
-// import Address from '../health/Address';
-// import NomineeDetails from '../health/NomineeDetails';
-// import PolicyDetails from '../health/PolicyDetails';
-// import PolicySummery from '../health/PolicySummery';
-// import ThankYou from '../health/ThankYou';
 
 import Registration from '../motor/Registration';
 // import SelectBrand from '../motor/SelectBrand';
@@ -27,7 +18,22 @@ import OtherComprehensive from '../motor/OtherComprehensive';
 import Premium from '../motor/Premium';
 import ThankYou_motor from '../motor/ThankYou';
 
-import ErrorPage from '../ErrorPage';
+// import TwoWheelerRegistration from '../two-wheeler/TwoWheelerRegistration';
+import TwoWheelerSelectBrand from '../two-wheeler/TwoWheelerSelectBrand';
+import TwoWheelerVehicleDetails from '../two-wheeler/TwoWheelerVehicleDetails';
+import TwoWheelerPolicyPremiumDetails from '../two-wheeler/TwoWheelerPolicyPremiumDetails';
+import TwoWheelerOtherComprehensive from '../two-wheeler/TwoWheelerOtherComprehensive';
+import TwoWheelerVerify from '../two-wheeler/TwoWheelerVerify';
+import TwoWheelerAdditionalDetails from '../two-wheeler/TwoWheelerAdditionalDetails';
+import TwoWheelerThankYou_motor from '../two-wheeler/TwoWheelerThankYou';
+
+// import TwoWheelerSelectBrandTP from '../two-wheeler-tp/TwoWheelerSelectBrand';
+// import TwoWheelerVehicleDetailsTP from '../two-wheeler-tp/TwoWheelerVehicleDetails';
+// import TwoWheelerPolicyPremiumDetailsTP from '../two-wheeler-tp/TwoWheelerPolicyPremiumDetails';
+// import TwoWheelerOtherComprehensiveTP from '../two-wheeler-tp/TwoWheelerOtherComprehensive';
+// import TwoWheelerVerifyTP from '../two-wheeler-tp/TwoWheelerVerify';
+// import TwoWheelerAdditionalDetailsTP from '../two-wheeler-tp/TwoWheelerAdditionalDetails';
+// import TwoWheelerThankYou_motorTP from '../two-wheeler-tp/TwoWheelerThankYou';
 
 import UnderMaintenance from '../UnderMaintenance';
 
@@ -114,8 +120,26 @@ class Routes extends Component {
                         <PrivateRoute exact path="/Additional_details/:productId" component={AdditionalDetails} />
                         <PrivateRoute exact path="/Premium/:productId" component={Premium} />
                         <PrivateRoute exact path="/ThankYou_motor/:policyId" component={ThankYou_motor} />
+
+                        {/************ TwoWheeler ******************/}
+                        {/* <PrivateRoute exact path="/two_wheeler_Registration/:productId" component={TwoWheelerRegistration} />                     */}
+                        <PrivateRoute exact path="/two_wheeler_Select-brand/:productId" component={TwoWheelerSelectBrand} />
+                        <PrivateRoute exact path="/two_wheeler_Vehicle_details/:productId" component={TwoWheelerVehicleDetails} />
+                        <PrivateRoute exact path="/two_wheeler_OtherComprehensive/:productId" component={TwoWheelerOtherComprehensive} />
+                        <PrivateRoute exact path="/two_wheeler_verify/:productId" component={TwoWheelerVerify} />
+                        <PrivateRoute exact path="/two_wheeler_additional_details/:productId" component={TwoWheelerAdditionalDetails} />  
+                        <PrivateRoute exact path="/two_wheeler_policy_premium_details/:productId" component={TwoWheelerPolicyPremiumDetails} />
+                        <PrivateRoute exact path="/two_wheeler_ThankYou_motor/:policyId" component={TwoWheelerThankYou_motor} />
+
+                        {/************ TwoWheelerTP ******************/}
+                        {/* <PrivateRoute exact path="/two_wheeler_Select-brandTP/:productId" component={TwoWheelerSelectBrandTP} />
+                        <PrivateRoute exact path="/two_wheeler_Vehicle_detailsTP/:productId" component={TwoWheelerVehicleDetailsTP} />
+                        <PrivateRoute exact path="/two_wheeler_OtherComprehensiveTP/:productId" component={TwoWheelerOtherComprehensiveTP} />
+                        <PrivateRoute exact path="/two_wheeler_verifyTP/:productId" component={TwoWheelerVerifyTP} />
+                        <PrivateRoute exact path="/two_wheeler_additional_detailsTP/:productId" component={TwoWheelerAdditionalDetailsTP} />  
+                        <PrivateRoute exact path="/two_wheeler_policy_premium_detailsTP/:productId" component={TwoWheelerPolicyPremiumDetailsTP} />
+                        <PrivateRoute exact path="/two_wheeler_ThankYou_motorTP/:policyId" component={TwoWheelerThankYou_motorTP} /> */}
                         
-                        <PrivateRoute exact path="/error-page" component={ErrorPage} />
                         <PrivateRoute exact path="/UnderMaintenance" component={UnderMaintenance} />
                         <Redirect from="/" to="/Products" />
                     </Switch>
