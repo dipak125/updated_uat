@@ -67,7 +67,7 @@ hr{border-top:1px solid rgba(220,220,220,1); margin-top:0; margin-bottom:25px;}
 /****************Header*************/
 
 .headerTop{ background-color:#ffffff; color:#353535; height: 70px; position: fixed; top: 0; left: 0; right: 0; z-index: 999;}
-.headerTop img {cursor: pointer; width: 165px;}
+.headerTop img {cursor: pointer;}
 .userTopRtSec .dropdown-toggle.btn{ padding: 0;}
 .userTopRtSec .dropdown-toggle::after{ display: none;}
 .userTopRtSec .dropdown-toggle.btn.btn-success{ background: none; border: none; box-shadow:none;}
@@ -82,7 +82,7 @@ hr{border-top:1px solid rgba(220,220,220,1); margin-top:0; margin-bottom:25px;}
 /*-------------- Tab Section--------------*/
 .messageDeskSec .nav-pills .nav-link { font-size:16px; line-height: 18px; color:#8F8F8F; letter-spacing:.36px; padding: 25px 40px 20px; outline: none;}
 .messageDeskSec .nav-pills .nav-link.active, .messageDeskSec .nav-pills .show>.nav-link{ position: relative; background:none; color:#353535; font-weight:800; }
-.messageDeskSec .nav-pills .nav-link.active::after{content:""; position: absolute; bottom:0; left:0; right:0; margin:0 auto; width:50px; height:3px; background:#65106b;}
+.messageDeskSec .nav-pills .nav-link.active::after{content:""; position: absolute; bottom:0; left:0; right:0; margin:0 auto; width:50px; height:3px; background:#0286CE;}
 .messageDeskSec .nav-pills .messageDeskTab { border-bottom: 1px solid rgba(0,0,0,.16); margin-bottom: 25px;}
 
 .bg-light{ background-color:#eaeef1!important; color: #8F8F8F;}
@@ -103,8 +103,8 @@ hr{border-top:1px solid rgba(220,220,220,1); margin-top:0; margin-bottom:25px;}
 
 ul.navPan{ margin:0; padding:0; list-style: none;}
 ul.navPan li a{ color:#fff; font-size:13px; padding:10px 40px 20px 35px; box-sizing: border-box; display: block; text-align: left; }
-ul.navPan li a:hover{ text-decoration:none; background-color:#440449 ; color: #fff;}
-ul.navPan li a.active { background-color: #fff; color: #440449; display: inline-block;}
+ul.navPan li a:hover{ text-decoration:none; background-color:#053f77 ; color: #fff;}
+ul.navPan li a.active { background-color: #fff; color: #0085CF; display: inline-block;}
 ul.navPan li a p{ margin-bottom:0;}
 ul.navPan li a span{ margin-bottom:8px; display: block; }
 
@@ -134,11 +134,11 @@ ul.navPan li a span{ margin-bottom:8px; display: block; }
 .tablecontent {background-color: #ffffff; border-radius: 15px; box-shadow: 0 2px 10px rgba(0, 0, 0, .08); overflow: hidden; margin-bottom: 200px;}
 .tablecontent td {color: #575757; font-size: 20px; padding: 20px 30px;}
 .buy {border: 1px solid #ff8000; border-radius: 16.5px; padding: 6px 20px; color:#ff8000; font-size: 14px; text-align: center; background-color: #ffffff !important; outline: none !important;}
-.renew {border: 1px solid #65106b; border-radius: 16.5px; padding: 6px 20px; color:#65106b; font-size: 14px; text-align: center; background-color: #ffffff !important; outline: none !important;}
+.renew {border: 1px solid #2B75B7; border-radius: 16.5px; padding: 6px 20px; color:#2B75B7; font-size: 14px; text-align: center; background-color: #ffffff !important; outline: none !important;}
 .tablecontent tr:hover .buy {border: 1px solid #ff8000 !important; background-color: #ff8000 !important; color: #ffffff !important;}
-.tablecontent tr:hover .renew {border: 1px solid #65106b !important; background-color: #65106b !important; color: #ffffff !important;}
+.tablecontent tr:hover .renew {border: 1px solid #2B75B7 !important; background-color: #2B75B7 !important; color: #ffffff !important;}
 .buy.active:focus {color:#ff8000 !important;}
-.renew.active:focus {color:#65106b !important;}
+.renew.active:focus {color:#2B75B7 !important;}
  .tablecontent table {width: 100%;}
  .tablecontent tr:hover {background-color: #efefef;}
 
@@ -173,7 +173,7 @@ ul.navPan li a span{ margin-bottom:8px; display: block; }
 .formSection select { display: block;width: 100%;  outline: none;  border: none;  border-bottom: 1px solid #1167b1; 
   -webkit-appearance: none; -moz-appearance: none;  appearance: none;  background: url(../images/arrow-down-sign-to-navigate.svg) no-repeat right center #f6faff;  color: #000;} 
 
-.btnPrimary {  background-color: #65106b; color: #fff; width: 140px; height: 47px;  padding: 0 10px;  text-align: center;  vertical-align: middle;  font-size: 16px;  border: 1px solid #65106b;  -webkit-box-shadow: -1px 6px 12px -7px rgba(0, 0, 0, 0.24);
+.btnPrimary {  background-color: #0095da; color: #fff; width: 140px; height: 47px;  padding: 0 10px;  text-align: center;  vertical-align: middle;  font-size: 16px;  border: 1px solid #0095da;  -webkit-box-shadow: -1px 6px 12px -7px rgba(0, 0, 0, 0.24);
   -moz-box-shadow: -1px 6px 12px -7px rgba(0, 0, 0, 0.24);  box-shadow: -1px 6px 12px -7px rgba(0, 0, 0, 0.24);  border-radius: 47px;}
 
 /*---------Modal-------*/
@@ -357,7 +357,7 @@ ul.navPan li a span{ margin-bottom:8px; display: block; }
 .thankuinfo {padding: 45px 30px;}
 .custtxt p {font-size: 18px; color: #231F20; font-weight: 300; line-height: 23px;}
 .lghtBlue {font-size: 18px; color: #1673C2; margin-left: 35px;}
-.proposal {background-color: #65106b; color: #ffffff; font-size: 16px; padding: 10px 60px 10px 15px; border-radius: 25px; background-image: url(../images/download.svg); background-repeat: no-repeat; background-position: right 22px top 14px; outline: none !important; border: none !important; box-shadow: none !important;}
+.proposal {background-color: #2B75B7; color: #ffffff; font-size: 16px; padding: 10px 60px 10px 15px; border-radius: 25px; background-image: url(../images/download.svg); background-repeat: no-repeat; background-position: right 22px top 14px; outline: none !important; border: none !important; box-shadow: none !important;}
 .policy {background-color: #24AAEB; color: #ffffff; font-size: 16px; padding: 10px 40px 10px 15px; border-radius: 25px; background-image: url(../images/download.svg); background-repeat: no-repeat; background-position: right 15px top 14px; outline: none !important; border: none !important; box-shadow: none !important;}
 .dashbrd {margin: 0 auto; text-align: center; font-size: 14px; color: #575757;}
 .dashbrd a:hover {text-decoration: none; color:#24AAEB ;}
@@ -439,7 +439,7 @@ Note: Beware of modifying this element as it can break the animations - you shou
 
 .dropinput label input[type=text] { display: block; width: 100% !important; outline: none; border: none; border-bottom: 1px solid #1167b1; color: #1e7ea4; background-color: #f6faff; margin-bottom: 15px;}
 
-.btnPrimary {background-color: #65106b; color: #fff; width: 140px; height: 47px; padding: 0 10px; text-align: center; vertical-align: middle; font-size: 16px; border: 1px solid #65106b; -webkit-box-shadow: -1px 6px 12px -7px rgba(0, 0, 0, 0.24); -moz-box-shadow: -1px 6px 12px -7px rgba(0, 0, 0, 0.24); box-shadow: -1px 6px 12px -7px rgba(0, 0, 0, 0.24); border-radius: 47px;}
+.btnPrimary {background-color: #0095da; color: #fff; width: 140px; height: 47px; padding: 0 10px; text-align: center; vertical-align: middle; font-size: 16px; border: 1px solid #0095da; -webkit-box-shadow: -1px 6px 12px -7px rgba(0, 0, 0, 0.24); -moz-box-shadow: -1px 6px 12px -7px rgba(0, 0, 0, 0.24); box-shadow: -1px 6px 12px -7px rgba(0, 0, 0, 0.24); border-radius: 47px;}
 .cntrbtn {text-align: center; margin: 0 auto;}
 
 .modal-content .customModalfamlyForm {min-width: 638px !important; border-radius: 15px; color: #7d7d7d; font-size: 15px; padding: 20px 50px; background-color: #f6faff !important;}
@@ -633,8 +633,3 @@ Note: Beware of modifying this element as it can break the animations - you shou
     top: 0;
 }
 .errorMsg{ color: #ff0000; font-size: 12px !important; line-height: 14px; display: block; padding-top: 4px;}
-/* two_wheeler_Select-brand */
-.brand-table img{max-height: 60px;}
-.customCheckBox.formGrp{margin-left: 15px;}
-.brandModal .cntrbody img{ max-height: 72px;}
-.brandModal .brdrbottom{height: 30px;}

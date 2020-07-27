@@ -207,7 +207,7 @@ const vehicleRegistrationValidation = Yup.object().shape({
             return true;
         }
     )
-    .matches(/^[a-zA-Z0-9][a-zA-Z0-9\s-/]*$/, 
+    .matches(/^[a-zA-Z0-9]*$/, 
         function() {
             return "Please enter valid policy number"
         }),
@@ -547,7 +547,7 @@ class VehicleDetails extends Component {
             previous_start_date: previousPolicy && previousPolicy.start_date ? new Date(previousPolicy.start_date) : "",
             previous_end_date: previousPolicy && previousPolicy.end_date ? new Date(previousPolicy.end_date) : "",
             previous_policy_name: previousPolicy && previousPolicy.name ? previousPolicy.name : "",
-            insurance_company_id: previousPolicy && previousPolicy.insurancecompany && previousPolicy.insurancecompany.Id ? previousPolicy.insurancecompany.Id : "",
+            insurance_company_id: previousPolicy && previousPolicy.insurancecompany && previousPolicy.insurancecompany.id ? previousPolicy.insurancecompany.id : "",
             previous_city: previousPolicy && previousPolicy.city ? previousPolicy.city : "",
             previous_policy_no: previousPolicy && previousPolicy.policy_no ? previousPolicy.policy_no : "",
             previous_is_claim: previous_is_claim,

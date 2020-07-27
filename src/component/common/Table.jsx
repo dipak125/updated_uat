@@ -51,6 +51,8 @@ class Table extends Component {
             localStorage.removeItem('brandEdit');
             localStorage.removeItem('registration_number');
             localStorage.removeItem('policy_type');
+            localStorage.removeItem('check_registration');
+
             
             this.props.loadingStop();
           })
@@ -81,7 +83,7 @@ class Table extends Component {
                                         <td className="W-10"><img src={require(`../../assets/images/${part.logo}`)} alt="" /></td>
                                         <td className="W-70">{part.name}</td>
                                         <td className="W-10 text-right"> <button className="buy" onClick= {this.buy_policy.bind(this, part.id )}>Buy</button></td>
-                                        <td className="W-10 text-right"> <button className="renew">Renew</button></td>
+                                        {/* <td className="W-10 text-right"> <button className="renew">Renew</button></td> */}
                                     </tr>
                                     ))
                                     }

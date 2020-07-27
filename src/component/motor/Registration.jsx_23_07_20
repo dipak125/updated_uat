@@ -24,7 +24,7 @@ const vehicleRegistrationValidation = Yup.object().shape({
     check_registration: Yup.string().notRequired(),
 
     // regNumber: Yup.string().matches(/^[A-Z]{2}[ -][0-9]{1,2}(?: [A-Z])?(?: [A-Z]*)? [0-9]{4}$/, 'Invalid Registration number').required('Please enter valid registration number')
-    regNumber: Yup.string().matches(/^[A-Z]{2}[ -][0-9]{1,2}[ -][A-Z]{1,3}[ -][0-9]{4}$/, 'Invalid Registration number')
+    regNumber: Yup.string().matches(/^[A-Z]{2}[ -][0-9]{1,2}(?: [A-Z])?(?: [A-Z]*)? [0-9]{4}$/, 'Invalid Registration number')
     .test(
         "registrationNumberCheck",
         function() {
@@ -48,7 +48,7 @@ class Registration extends Component {
     state = {
         motorInsurance:'',
         regno:'',
-        length:14
+        length:15
     }
    
 
@@ -174,6 +174,9 @@ fetchData=()=>{
             });
         }
     }
+    toInputUppercase = e => {
+        e.target.value = ("" + e.target.value).toUpperCase();
+      };
       
     setValueData = () => {
         var checkBoxAll = document.getElementsByClassName('user-self');
@@ -183,35 +186,6 @@ fetchData=()=>{
             }
         }
         return false
-    }
-
-    regnoFormat = (e, setFieldTouched, setFieldValue) => {
-        
-        let regno = e.target.value
-        let formatVal = ""
-        let regnoLength = regno.length
-        var letter = /^[a-zA-Z]+$/;
-        var number = /^[0-9]+$/;
-        let subString = regno.substring(regnoLength-1, regnoLength)
-        let preSubString = regno.substring(regnoLength-2, regnoLength-1)
-    
-        if(subString.match(letter) && preSubString.match(letter)) {
-            formatVal = regno
-        }
-        else if(subString.match(number) && preSubString.match(number)) {
-            formatVal = regno
-        } 
-        else if(subString.match(number) && preSubString.match(letter)) {        
-            formatVal = regno.substring(0, regnoLength-1) + " " +subString      
-        } 
-        else if(subString.match(letter) && preSubString.match(number)) {
-            formatVal = regno.substring(0, regnoLength-1) + " " +subString   
-        } 
-    
-        else formatVal = regno.toUpperCase()
-        
-        e.target.value = formatVal.toUpperCase()
-    
     }
 
 
@@ -239,7 +213,42 @@ fetchData=()=>{
                                         validationSchema={vehicleRegistrationValidation}>
                                         {({ values, errors, setFieldValue, setFieldTouched, isValid, isSubmitting, touched }) => {
                                             // console.log('values',values)
+                                            this.state.regno = "";
+                                          
+                                            if(values.regNumber.length>0){
+                                            if(values.regNumber.toLowerCase().substring(0, 2) == "dl")
+                                            {
+                                                
+                                                this.state.length = 15;
+                                                if(values.regNumber.length<11)
+                                            {
+                                               
+                                            this.state.regno=values.regNumber.replace(/[^A-Za-z0-9]+/g, '').replace(/(.{2})/g, '$1 ').trim();
                                             
+                                            }
+                                            else{
+    
+                                                this.state.regno=values.regNumber;                                                
+                                            }                                        
+
+                                            }   
+                                            else{ 
+                                                
+                                                this.state.length = 13;
+                                            if(values.regNumber.length<10)
+                                            {
+                                               
+                                            this.state.regno=values.regNumber.replace(/[^A-Za-z0-9]+/g, '').replace(/(.{2})/g, '$1 ').trim();
+                                            
+                                            }
+                                            else{
+                                                
+                                                this.state.regno=values.regNumber;
+                                                
+                                            }
+                                        }
+                                        }
+
                                         return (
                                         <Form>
                                         <div className="row formSection">
@@ -253,13 +262,13 @@ fetchData=()=>{
                                                 autoComplete="off"
                                                 onFocus={e => this.changePlaceHoldClassAdd(e)}
                                                 onBlur={e => this.changePlaceHoldClassRemove(e)}
-                                                value= {values.regNumber}   
+                                                value={this.state.regno}
                                                 maxLength={this.state.length}
                                                 onInput={e=>{
-                                                    this.regnoFormat(e, setFieldTouched, setFieldValue)
+                                                    this.toInputUppercase(e)
                                                     setFieldTouched('check_registration')
                                                     setFieldValue('check_registration', '2');
-                                                }}        
+                                                }} 
     
                                             />
                                             {errors.regNumber && touched.regNumber ? (

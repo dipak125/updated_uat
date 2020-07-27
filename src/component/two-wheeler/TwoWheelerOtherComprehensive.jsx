@@ -21,7 +21,8 @@ let encryption = new Encryption()
 
 const initialValue = {
     add_more_coverage: "",
-    cng_kit: '0'
+    cng_kit: '0',
+    moreCov_0: "B00015"
 
 }
 const ComprehensiveValidation = Yup.object().shape({
@@ -90,12 +91,12 @@ const ComprehensiveValidation = Yup.object().shape({
 
 const moreCoverage = [
     {
-        "id": "C101070",
+        "id": "B00015",
         "name": "PA for Owner Driver",
         "description": "The e-Insurance account or Electronic Insurance Account offers policyholders online space to hold all their insurance policies electronically under one e-insurance account number. This allows the policyholder to access all their policies with a few clicks and no risk of losing the physical insurance policy"
     },
     {
-        "id": "C101069",
+        "id": "B00075",
         "name": "PA For Unnamed Passenger",
         "description": "The e-Insurance account or Electronic Insurance Account offers policyholders online space to hold all their insurance policies electronically under one e-insurance account number. This allows the policyholder to access all their policies with a few clicks and no risk of losing the physical insurance policy"
     }
@@ -103,14 +104,11 @@ const moreCoverage = [
 ]
 
 const Coverage = {
-    "C101064": "Own Damage",
-    "C101065": "Legal Liability to Third Party",
-    "C101066": "PA Cover",
-    "C101069": "Basic Road Side Assistance",
-    "C101072": "Depreciation Reimbursement",
-    "C101067": "Return to Invoice",
-    "C101108": "Engine Guard",
-    "C101111": "Cover for consumables"
+    "B00002": "Own Damage Basic",
+    "B00008": "Third Party Bodily Injury",
+    "B00013": "Legal Liability to Paid Drivers",
+    "B00015": "PA -  Owner Driver",
+    "B00075": "PA for Unnamed Passenger"
 }
 
 class TwoWheelerOtherComprehensive extends Component {
@@ -131,7 +129,7 @@ class TwoWheelerOtherComprehensive extends Component {
             show: false,
             sliderVal: '',
             motorInsurance: [],
-            add_more_coverage: ["C101070"],
+            add_more_coverage: ["B00015"],
             vahanDetails: [],
             vahanVerify: false,
             policyCoverage: []
@@ -244,7 +242,7 @@ class TwoWheelerOtherComprehensive extends Component {
     };
 
     fullQuote = (access_token, values) => {
-        const { PolicyArray, sliderVal, add_more_coverage } = this.state
+        const { PolicyArray, sliderVal, add_more_coverage, motorInsurance } = this.state
         let cng_kit_flag = 0;
         let cngKit_Cost = 0;
         if (values.toString()) {
@@ -255,15 +253,24 @@ class TwoWheelerOtherComprehensive extends Component {
         const formData = new FormData();
 
         const post_data = {
-            'id':localStorage.getItem('policyHolder_id'),
+            'id':localStorage.getItem('policyHolder_refNo'),
             'access_token':access_token,
             'idv_value': sliderVal ? sliderVal : defaultSliderValue.toString(),
             'policy_type': localStorage.getItem('policy_type'),
             'add_more_coverage': add_more_coverage.toString(),
+            'policy_type': motorInsurance ? motorInsurance.policy_type : "",
+            'policytype_id': motorInsurance ? motorInsurance.policytype_id : ""
         }
         console.log('fullQuote_post_data', post_data)
-        let encryption = new Encryption();
-        formData.append('enc_data',encryption.encrypt(JSON.stringify(post_data)))
+        // let encryption = new Encryption();
+        // formData.append('enc_data',encryption.encrypt(JSON.stringify(post_data)))
+        formData.append('id',localStorage.getItem('policyHolder_refNo'))
+        formData.append('access_token',access_token)
+        formData.append('idv_value',sliderVal ? sliderVal : defaultSliderValue.toString())
+        formData.append('policy_type',motorInsurance ? motorInsurance.policy_type : "")
+        formData.append('add_more_coverage',JSON.stringify(add_more_coverage))
+        formData.append('policytype_id',motorInsurance ? motorInsurance.policytype_id : "")
+
         axios.post('fullQuotePM2W', formData)
             .then(res => {
                 if (res.data.PolicyObject) {
@@ -372,31 +379,42 @@ class TwoWheelerOtherComprehensive extends Component {
     render() {
         const { showCNG, vahanDetails, error, policyCoverage, vahanVerify, is_CNG_account, fulQuoteResp, PolicyArray, sliderVal, motorInsurance, serverResponse, add_more_coverage } = this.state
         const { productId } = this.props.match.params
-        let defaultSliderValue = PolicyArray.length > 0 ? Math.floor(PolicyArray[0].PolicyRiskList[0].IDV_Suggested) : 0
+        let defaultSliderValue = PolicyArray.length > 0 ? Math.round(PolicyArray[0].PolicyRiskList[0].IDV_Suggested) : 0
         let sliderValue = sliderVal
-        let minIDV = PolicyArray.length > 0 ? Math.floor(PolicyArray[0].PolicyRiskList[0].MinIDV_Suggested) : 0
-        let maxIDV = PolicyArray.length > 0 ? Math.floor(PolicyArray[0].PolicyRiskList[0].MaxIDV_Suggested) : 0
+        let minIDV = PolicyArray.length > 0 ? Math.floor(PolicyArray[0].PolicyRiskList[0].MinIDV_Suggested) : null
+        let maxIDV = PolicyArray.length > 0 ? Math.floor(PolicyArray[0].PolicyRiskList[0].MaxIDV_Suggested) : null
+        minIDV = minIDV + 1;
+        maxIDV = maxIDV - 1;
 
         let newInitialValues = Object.assign(initialValue, {
             add_more_coverage: motorInsurance.add_more_coverage ? motorInsurance.add_more_coverage : "",
-            moreCov_0: "C101070"
         });
 
-        const policyCoverageList = policyCoverage && policyCoverage.length > 0 ?
-            policyCoverage.map((coverage, qIndex) => {
-                return (
+        const policyCoverageList =  policyCoverage && policyCoverage.length > 0 ?
+            policyCoverage.map((coverage, qIndex) => (
+                coverage.PolicyBenefitList && coverage.PolicyBenefitList.map((benefit, bIndex) => (
                     <div>
                         <Row>
                             <Col sm={12} md={6}>
-                                <FormGroup>{Coverage[coverage.ProductElementCode]}</FormGroup>
+                                <FormGroup>{Coverage[benefit.ProductElementCode]}</FormGroup>
                             </Col>
                             <Col sm={12} md={6}>
-                                <FormGroup>₹ {coverage.AnnualPremium}</FormGroup>
+                                <FormGroup>₹ {Math.round(benefit.BeforeVatPremium)}</FormGroup>
                             </Col>
                         </Row>
-                    </div>
-                )
-            }) : null
+                    </div>     
+            ))
+        )) : null 
+
+        const premiumBreakup = policyCoverage && policyCoverage.length > 0 ?
+            policyCoverage.map((coverage, qIndex) => (
+                coverage.PolicyBenefitList && coverage.PolicyBenefitList.map((benefit, bIndex) => (
+                        <tr>
+                            <td>{Coverage[benefit.ProductElementCode]}:</td>
+                            <td>₹ {Math.round(benefit.BeforeVatPremium)}</td>
+                        </tr>  
+                ))
+            )) : null
 
         const errMsg =
             error && error.message ? (
@@ -413,6 +431,7 @@ class TwoWheelerOtherComprehensive extends Component {
 
         return (
             <>
+            {console.log("policyCoverageList=====", policyCoverageList)}
                 <BaseComponent>
                     <div className="container-fluid">
                         <div className="row">
@@ -441,26 +460,7 @@ class TwoWheelerOtherComprehensive extends Component {
                                                             <div className="rghtsideTrigr W-90 m-b-30">
                                                                 <Collapsible trigger="Default Covered Coverages & Benefit" >
                                                                     <div className="listrghtsideTrigr">
-                                                                        {policyCoverageList}
-                                                                        <div className="d-flex justify-content-between benefitcovr">
-                                                                            <p>Third Party Bodily Injury</p>
-                                                                            <p>752</p>
-                                                                        </div>
-
-                                                                        <div className="d-flex justify-content-between benefitcovr">
-                                                                            <p>Legal Liability to Paid Drivers	</p>
-                                                                            <p>50</p>
-                                                                        </div>
-
-                                                                        <div className="d-flex justify-content-between benefitcovr">
-                                                                            <p>PA for Owner Driver	</p>
-                                                                            <p>375</p>
-                                                                        </div>
-
-                                                                        <div className="d-flex justify-content-between benefitcovr">
-                                                                            <p>Own Damage	</p>
-                                                                            <p>401</p>
-                                                                        </div>
+                                                                    {policyCoverageList}
                                                                     </div>
                                                                 </Collapsible>
                                                             </div>
@@ -492,6 +492,7 @@ class TwoWheelerOtherComprehensive extends Component {
                                                                         </div>
                                                                     </FormGroup>
                                                                 </Col>
+                                                                {defaultSliderValue ? 
                                                                 <Col sm={12} md={12} lg={6}>
                                                                     <FormGroup>
                                                                         <input type="range" className="W-90"
@@ -509,7 +510,7 @@ class TwoWheelerOtherComprehensive extends Component {
                                                                         />
                                                                         
                                                                     </FormGroup>
-                                                                </Col>
+                                                                </Col> : null }
                                                             </Row>
 
                                                             <Row>
@@ -536,7 +537,7 @@ class TwoWheelerOtherComprehensive extends Component {
                                                                                 className="user-self"
                                                                                 // checked={values.roadsideAssistance ? true : false}
                                                                                 onClick={(e) =>{
-                                                                                    if( e.target.checked == false && values[`moreCov_${qIndex}`] == 'C101070') {
+                                                                                    if( e.target.checked == false && values[`moreCov_${qIndex}`] == 'B00015') {
                                                                                         swal("loremipsum loremipsum")
                                                                                     }
                                                                                     this.onRowSelect(e.target.value, e.target.checked)     
@@ -604,6 +605,7 @@ class TwoWheelerOtherComprehensive extends Component {
                                 </tr>
                             </thead>
                             <tbody>
+                                {premiumBreakup}
                                 <tr>
                                     <td>Gross Premium:</td>
                                     <td>₹ {Math.round(fulQuoteResp.BeforeVatPremium)}</td>
@@ -612,6 +614,7 @@ class TwoWheelerOtherComprehensive extends Component {
                                     <td>GST:</td>
                                     <td>₹ {Math.round(fulQuoteResp.TGST)}</td>
                                 </tr>
+                                
 
                             </tbody>
                         </table>

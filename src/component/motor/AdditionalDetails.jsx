@@ -98,12 +98,12 @@ const ownerValidation = Yup.object().shape({
     }),
     phone: Yup.string()
     .matches(/^[6-9][0-9]{9}$/,'Invalid Mobile number').required('Phone No. is required'),
-    email:Yup.string().email().required('Email is required').min(9, function() {
-        return "Email must be minimum 9 chracters"
+    email:Yup.string().email().required('Email is required').min(8, function() {
+        return "Email must be minimum 8 chracters"
     })
     .max(75, function() {
         return "Email must be maximum 75 chracters"
-    }),
+    }).matches(/^[a-zA-Z0-9]+([._\-]?[a-zA-Z0-9]+)*@\w+([-]?\w+)*(\.\w{2,3})+$/,'Invalid Email Id'),
 
     is_carloan: Yup.mixed().required('This field is required'),
     bank_name:Yup.string().notRequired('Bank Name is required')

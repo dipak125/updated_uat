@@ -426,7 +426,7 @@ class SelectBrand extends Component {
                     </div>
                 </BaseComponent>
 
-                <Modal className="customModal" bsSize="md"
+                <Modal className="customModal brandModal" bsSize="md"
                     show={this.state.show}
                     onHide={this.handleClose}>
                     <Modal.Header closeButton className="custmModlHead">
@@ -465,13 +465,12 @@ class SelectBrand extends Component {
                                     (
                                         this.state.searchitem && this.state.searchitem.length > 0 && this.state.searchitem.map((brand, brandIndex) => (
                                             brand.varientmodel && brand.varientmodel.length > 0 && brand.varientmodel.map((varient, varientIndex) => (
-                                                <div className="brdrbottom">
-                                                    <div className="d-flex justify-content-between">
+                                                <div key= {varientIndex} className="brdrbottom">
+                                                    <label className="d-flex justify-content-between">
                                                         <div className="modalboxInfo">{brand.name}
                                                             <span className="grey ml-5">{varient.varient + " " + varient.cc + "cc"}</span>
                                                         </div>
-                                                        <div>
-                                                            <label className="customCheckBox formGrp formGrp">
+                                                            <div className="customCheckBox formGrp formGrp">
                                                                 <input type="radio"
                                                                     name="varient"
                                                                     className="user-self"
@@ -485,9 +484,8 @@ class SelectBrand extends Component {
                                                                 />
                                                                 <span className="checkmark mL-0"></span>
                                                                 <span className="error-message"></span>
-                                                            </label>
-                                                        </div>
-                                                    </div>
+                                                            </div>                                                       
+                                                    </label>
                                                 </div>
                                             )))
                                         ))
@@ -495,13 +493,12 @@ class SelectBrand extends Component {
                                     (brandModelList && brandModelList.length > 0 && brandModelList.map((brand, brandIndex) => (
                                         brand.varientmodel && brand.varientmodel.length > 0 && brand.varientmodel.map((varient, varientIndex) => (
                                             
-                                            <div className="brdrbottom">
-                                                <div className="d-flex justify-content-between">
+                                            <div key= {varientIndex} className="brdrbottom">
+                                                <label className="d-flex justify-content-between">
                                                     <div className="modalboxInfo">{brand.name}
                                                         <span className="grey ml-5">{varient.varient + " " + varient.cc + "cc"}</span>
-                                                    </div>
-                                                    <div>
-                                                        <label className="customCheckBox formGrp formGrp">
+                                                    </div>   
+                                                        <div className="customCheckBox formGrp formGrp">
                                                             <input type="radio"
                                                                 name="varient"
                                                                 className="user-self"
@@ -515,9 +512,8 @@ class SelectBrand extends Component {
                                                             />
                                                             <span className="checkmark mL-0"></span>
                                                             <span className="error-message"></span>
-                                                        </label>
-                                                    </div>
-                                                </div>
+                                                        </div>    
+                                                </label>
                                             </div>
                                         ))
                                     ))
@@ -537,13 +533,12 @@ class SelectBrand extends Component {
                                     this.state.searchitem && this.state.searchitem.length > 0 && this.state.searchitem.map((brand, brandIndex) => (
                                         brand.brand_models && brand.brand_models.length > 0 && brand.brand_models.map((model, modelIndex) => (
                                             model.varientmodel && model.varientmodel.length > 0 && model.varientmodel.map((varient, varientIndex) => (
-                                            <div className="brdrbottom">
-                                                <div className="d-flex justify-content-between">
+                                            <div key= {varientIndex} className="brdrbottom">
+                                                <label className="d-flex justify-content-between">
                                                     <div className="modalboxInfo">{brand.name}
                                                         <span className="grey ml-5">{model.name+" "+varient.varient+ " "+varient.cc+"cc" }</span>
-                                                    </div>
-                                                    <div>
-                                                        <label className="customCheckBox formGrp formGrp">
+                                                    </div>        
+                                                        <div className="customCheckBox formGrp formGrp">
                                                             <input type="radio"
                                                                 name="varient"
                                                                 className="user-self"
@@ -557,9 +552,8 @@ class SelectBrand extends Component {
                                                             />
                                                             <span className="checkmark mL-0"></span>
                                                             <span className="error-message"></span>
-                                                        </label>
-                                                    </div>
-                                                </div>
+                                                        </div>        
+                                                </label>
                                             </div>
                                         )))
                                     ))))
@@ -568,13 +562,12 @@ class SelectBrand extends Component {
                                     brand.brand_models && brand.brand_models.length > 0 && brand.brand_models.map((model, modelIndex) => (
                                         model.varientmodel && model.varientmodel.length > 0 && model.varientmodel.map((varient, varientIndex) => (
 
-                                        <div className="brdrbottom">
-                                            <div className="d-flex justify-content-between">
+                                        <div key= {varientIndex} className="brdrbottom">
+                                            <label className="d-flex justify-content-between">
                                                 <div className="modalboxInfo">{brand.name}
                                                     <span className="grey ml-5">{model.name+" "+varient.varient+ " "+varient.cc+"cc"}</span>
                                                 </div>
-                                                <div>
-                                                    <label className="customCheckBox formGrp formGrp">
+                                                    <div className="customCheckBox formGrp formGrp">
                                                         <input type="radio"
                                                             name="varient"
                                                             className="user-self"
@@ -588,9 +581,8 @@ class SelectBrand extends Component {
                                                         />
                                                         <span className="checkmark mL-0"></span>
                                                         <span className="error-message"></span>
-                                                    </label>
-                                                </div>
-                                            </div>
+                                                    </div>                                 
+                                            </label>
                                         </div>
                                     ))))
                                 ))

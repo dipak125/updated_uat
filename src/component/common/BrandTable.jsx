@@ -21,19 +21,36 @@ class BrandTable extends Component {
       //  const products = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
 		let rowContents = [];
         const contents = brandList && brandList.reduce((acc, p, i) => {
-            rowContents.push(<td key={i} onClick = {e=>this.setModelName(p.id)}> 
+            if(p.name != "Others"){
+                rowContents.push(<td key={i} onClick = {e=>this.setModelName(p.id)}> 
                     {p.image ?
                     <img src={'http://14.140.119.44/sbig-csc/core/public/image/car_brand_image/'+p.image} alt={p.name} />:
                     <img src={require('../../assets/images/car.svg')} alt="" />                                                
                     } 
                 </td>);
                 if (i % 5 === 4) {
-                    acc.push(<tr>{rowContents}</tr>);
+                    acc.push(<tr key={i}>{rowContents}</tr>);
                     rowContents = [];
                 }
                 
                
                 return acc;
+            }
+            else {
+                rowContents.push(<td key={i} onClick = {e=>this.props.otherBrandFunc()}>
+                {p.image ?
+                    <img src={'http://14.140.119.44/sbig-csc/core/public/image/car_brand_image/'+p.image} alt={p.name} />:
+                    <img src={require('../../assets/images/car.svg')} alt="" />                                                
+                    } 
+                </td> )
+                if (i % 5 === 4) {
+                    acc.push(<tr key={i}>{rowContents}</tr>);
+                    rowContents = [];
+                }
+                              
+                return acc;
+            }
+            
             },[])
         contents.push(<tr className="text-center">{rowContents}</tr>);
             
@@ -47,7 +64,6 @@ class BrandTable extends Component {
     render() {
         let stat = false;
         const {brandList,selectBrandFunc} = this.props;
-        console.log("Brand Listing========>",brandList)
         return (
             
             <>
@@ -57,7 +73,7 @@ class BrandTable extends Component {
                             <table>
                                 <tbody>
                                  {this.setTables(brandList)} 
-                                 <tr><td Colspan='5' onClick = {e=>this.props.otherBrandFunc()}>OTHER</td></tr>                                                                           
+                                 {/* <tr><td Colspan='5' onClick = {e=>this.props.otherBrandFunc()}>OTHER</td></tr>                                                                            */}
                                 </tbody>
                             </table>
                         </div>

@@ -19,8 +19,7 @@ import { addDays } from 'date-fns';
 
 const ageObj = new PersonAge();
 let encryption = new Encryption();
-const minDate = moment(moment().subtract(1, 'years').calendar()).add(1, 'day').calendar();
-const maxDate = moment(minDate).add(30, 'day').calendar();
+const maxRegnDate = moment(moment().subtract(1, 'years').calendar()).add(1, 'day').calendar();
 const minRegnDate = moment().subtract(18, 'years').calendar();
 
 
@@ -93,6 +92,16 @@ class TwoWheelerVehicleDetails extends Component {
     changePlaceHoldClassRemove(e) {
         let element = e.target.parentElement;
         e.target.value.length === 0 && element.classList.remove('active');
+    }
+
+    selectVehicleBrand = (productId) => {
+        if(localStorage.getItem('brandEdit') == '1') {
+            localStorage.setItem('newBrandEdit', 1)
+        }
+        else if(localStorage.getItem('brandEdit') == '2') {
+            localStorage.setItem('newBrandEdit', '2')
+        }
+        this.props.history.push(`/two_wheeler_Select-brand/${productId}`);
     }
 
     selectBrand = (productId) => {
@@ -352,7 +361,7 @@ class TwoWheelerVehicleDetails extends Component {
                         validationSchema={vehicleRegistrationValidation}
                         >
                             {({ values, errors, setFieldValue, setFieldTouched, isValid, isSubmitting, touched }) => {
-console.log("errors------", errors)
+            console.log("errors------", errors)
                                 return (
                                     <Form>
                                         <Row>
@@ -372,7 +381,7 @@ console.log("errors------", errors)
                                                             <DatePicker
                                                                 name="registration_date"
                                                                 minDate={new Date(minRegnDate)}
-                                                                maxDate={new Date()}
+                                                                maxDate={new Date(maxRegnDate)}
                                                                 dateFormat="dd MMM yyyy"
                                                                 placeholderText="Registration Date"
                                                                 peekPreviousMonth
@@ -532,11 +541,11 @@ console.log("errors------", errors)
                                                                     <Field
                                                                         type="radio"
                                                                         name='previous_claim_bonus'                                            
-                                                                        value='30'
+                                                                        value='35'
                                                                         key='1'  
-                                                                        checked = {values.previous_claim_bonus == '30' ? true : false}
+                                                                        checked = {values.previous_claim_bonus == '35' ? true : false}
                                                                     />
-                                                                        <span className="checkmark " /><span className="fs-14"> 30</span>
+                                                                        <span className="checkmark " /><span className="fs-14"> 35</span>
                                                                     </label>
                                                                 </div>
                                                                 <div className="p-r-25">
@@ -544,11 +553,11 @@ console.log("errors------", errors)
                                                                     <Field
                                                                         type="radio"
                                                                         name='previous_claim_bonus'                                            
-                                                                        value='35'
+                                                                        value='45'
                                                                         key='1'  
-                                                                        checked = {values.previous_claim_bonus == '35' ? true : false}
+                                                                        checked = {values.previous_claim_bonus == '45' ? true : false}
                                                                     />
-                                                                        <span className="checkmark " /><span className="fs-14"> 35</span>
+                                                                        <span className="checkmark " /><span className="fs-14"> 45</span>
                                                                     </label>
                                                                 </div>
 
@@ -557,12 +566,12 @@ console.log("errors------", errors)
                                                                     <Field
                                                                         type="radio"
                                                                         name='previous_claim_bonus'                                            
-                                                                        value='40'
+                                                                        value='50'
                                                                         key='1'  
-                                                                        checked = {values.previous_claim_bonus == '40' ? true : false}
+                                                                        checked = {values.previous_claim_bonus == '50' ? true : false}
                                                                     />
                                                                         <span className="checkmark" />
-                                                                        <span className="fs-14">40</span>
+                                                                        <span className="fs-14">50</span>
                                                                     </label>
                                                                     {errors.previous_claim_bonus && touched.previous_claim_bonus ? (
                                                                     <span className="errorMsg">{errors.previous_claim_bonus}</span>
@@ -617,7 +626,7 @@ console.log("errors------", errors)
                                                         </Col>
 
                                                         <Col sm={12} md={5} className="text-right">
-                                                            <button className="rgistrBtn" type="button" onClick= {this.selectBrand.bind(this,productId)}>Edit</button>
+                                                            <button className="rgistrBtn" type="button" onClick= {this.selectVehicleBrand.bind(this,productId)}>Edit</button>
                                                         </Col>
                                                     </Row>
 

@@ -11,7 +11,27 @@ import Footer from '../common/footer/Footer';
 
 
 class Products extends Component {
+
+    state = {
+        product_id: ''
+    };
+
+    componentDidMount() {
+        let product_id = sessionStorage.getItem("product_id")
+        this.setState({
+            product_id: product_id
+        })
+
+        // this.setState({
+        //     product_id: '5221643668'
+        // })
+
+
+    }
+    
     render() {
+        const {product_id} = this.state
+        console.log('product_id', product_id)
         return (
             <>
             <BaseComponent>
@@ -24,26 +44,39 @@ class Products extends Component {
                                 </div>
                                 <div className="col-sm-12 col-md-12 col-lg-10 col-xl-10 infobox">
                                     <div className="messageDeskSec">
-                                        <Tab.Container id="left-tabs-example" defaultActiveKey="first">
+                                        {(product_id == '5221671739') ?
+                                        <Tab.Container id="left-tabs-example" defaultActiveKey="first"> 
+                                        <Row>
+                                            <Col sm={12}>
+                                                <Nav variant="pills" className="flex-column">
+                                                    <div className="d-flex justify-content-left messageDeskTab">
+                                                    <div><Nav.Item><Nav.Link eventKey="first">Motor</Nav.Link></Nav.Item></div>
+                                                    <div><Nav.Item><Nav.Link eventKey="second">Health</Nav.Link></Nav.Item></div>                                
+                                                    </div>
+                                                </Nav>
+                                            </Col>
+                                            <Col sm={12}>
+                                                <Tab.Content>
+                                                    <Tab.Pane eventKey="first">
+                                                        <Table tabId='1'/>
+                                                        <Footer />
+                                                    </Tab.Pane>
+                                                    <Tab.Pane eventKey="second">
+                                                            <Table tabId='2'/>
+                                                            <Footer />
+                                                    </Tab.Pane>
+                                                </Tab.Content>
+                                            </Col>
+                                        </Row>
+                                        </Tab.Container>:
+                                        (product_id == '5221643668') ? 
+                                        <Tab.Container id="left-tabs-example" defaultActiveKey= "second"> 
                                             <Row>
                                                 <Col sm={12}>
                                                     <Nav variant="pills" className="flex-column">
                                                         <div className="d-flex justify-content-left messageDeskTab">
-                                                            <div>
-                                                                <Nav.Item>
-                                                                    <Nav.Link eventKey="first">Motor</Nav.Link>
-                                                                </Nav.Item>
-                                                            </div>
-                                                            <div>
-                                                                <Nav.Item>
-                                                                    <Nav.Link eventKey="second">Health</Nav.Link>
-                                                                </Nav.Item>
-                                                            </div>
-                                                            <div>
-                                                                <Nav.Item>
-                                                                    <Nav.Link eventKey="third">Personal Accident</Nav.Link>
-                                                                </Nav.Item>
-                                                            </div>
+                                                        <div><Nav.Item><Nav.Link eventKey="first">Motor</Nav.Link></Nav.Item></div>
+                                                        <div><Nav.Item><Nav.Link eventKey="second">Health</Nav.Link></Nav.Item></div>
                                                         </div>
                                                     </Nav>
                                                 </Col>
@@ -57,13 +90,33 @@ class Products extends Component {
                                                             <Table tabId='2'/>
                                                             <Footer />
                                                         </Tab.Pane>
-                                                        <Tab.Pane eventKey="third">
-                                                            Personal Accident
+                                                    </Tab.Content>
+                                                </Col>
+                                            </Row>
+                                        </Tab.Container> : <Tab.Container id="left-tabs-example" defaultActiveKey= "second"> 
+                                            <Row>
+                                                <Col sm={12}>
+                                                    <Nav variant="pills" className="flex-column">
+                                                        <div className="d-flex justify-content-left messageDeskTab">
+                                                        <div><Nav.Item><Nav.Link eventKey="first">Motor</Nav.Link></Nav.Item></div>
+                                                        <div><Nav.Item><Nav.Link eventKey="second">Health</Nav.Link></Nav.Item></div>
+                                                        </div>
+                                                    </Nav>
+                                                </Col>
+                                                <Col sm={12}>
+                                                    <Tab.Content>
+                                                        <Tab.Pane eventKey="first">
+                                                            <Table tabId='1'/>
+                                                            <Footer />
+                                                        </Tab.Pane>
+                                                        <Tab.Pane eventKey="second">
+                                                            <Table tabId='2'/>
+                                                            <Footer />
                                                         </Tab.Pane>
                                                     </Tab.Content>
                                                 </Col>
                                             </Row>
-                                        </Tab.Container>
+                                        </Tab.Container>} 
                                     </div>
 
                                 </div>

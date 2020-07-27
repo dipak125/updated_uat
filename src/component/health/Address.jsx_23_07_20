@@ -77,15 +77,27 @@ const validateAddress =  Yup.object().shape({
         }).matches(/^([A-Za-z\s]*)$/, function() {
             return "Invalid street name"
         }),
-    email:Yup.string().email().required('Email is required').min(8, function() {
-            return "Email must be minimum 8 chracters"
+    email: Yup.string()
+        .required( function() {
+            return "Please enter email"
         })
-        .max(75, function() {
-            return "Email must be maximum 75 chracters"
-        }).matches(/^[a-zA-Z0-9]+([._\-]?[a-zA-Z0-9]+)*@\w+([-]?\w+)*(\.\w{2,3})+$/,'Invalid Email Id'),
+        .email( function() {
+            return "Please enter valid email"
+        }),
     
     phoneNo: Yup.string()
-    .matches(/^[6-9][0-9]{9}$/,'Invalid Mobile number').required('Phone No. is required'),
+        .required(function() {
+            return "Please enter phone number"
+        })
+        .matches(/^([0-9]*)$/, function() {
+            return "Invalid number"
+        })
+        .min(10, function() {
+            return "Phone number should be minimum 10 digits"
+        })
+        .max(10, function() {
+            return "Phone number should be maximum 10 digits"
+        }),
    
     panNo: Yup.string()
         .notRequired(function() {
