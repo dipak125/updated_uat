@@ -634,7 +634,8 @@ Note: Beware of modifying this element as it can break the animations - you shou
 }
 .errorMsg{ color: #ff0000; font-size: 12px !important; line-height: 14px; display: block; padding-top: 4px;}
 /* two_wheeler_Select-brand */
-.brand-table img{max-height: 60px;}
+.two-wheeler .brand-table img{max-height: 60px; min-width: 107px;}
+/*.two-wheeler .brand-table img:last-child{ min-width: inherit;}*/
 .customCheckBox.formGrp{margin-left: 15px;}
 .brandModal .cntrbody img{ max-height: 72px;}
 .brandModal .brdrbottom{height: 30px;}

@@ -656,7 +656,7 @@ class TwoWheelerSelectBrand extends Component {
                                                         </div>
 
                                                         <Row>
-                                                            <Col sm={12} md={9} className="two-wheeler">
+                                                            <Col sm={12} md={12}>
                                                                 <TwoWheelerBrandTable brandList={brandList && brandList.length > 0 ? brandList : []} selectBrandFunc={this.setBrandName} otherBrandFunc={this.getOtherBrands} />
 
 

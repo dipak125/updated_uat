@@ -238,9 +238,14 @@ const ComprehensiveValidation = Yup.object().shape({
             return true;
         }
     )
-    .matches(/^[a-zA-Z0-9]*$/, 
+    .matches(/^[a-zA-Z0-9][a-zA-Z0-9\s-/]*$/, 
         function() {
             return "Please enter valid policy number"
+        }).min(6, function() {
+            return "Policy No. must be minimum 6 chracters"
+        })
+        .max(18, function() {
+            return "Policy No. must be maximum 18 chracters"
         }),
 
    
@@ -459,9 +464,35 @@ class TwoWheelerVerify extends Component {
     }
 
 
-    toInputUppercase = e => {
-        e.target.value = ("" + e.target.value).toUpperCase();
-      };
+    regnoFormat = (e, setFieldTouched, setFieldValue) => {
+        
+        let regno = e.target.value
+        let formatVal = e.target.value
+        let regnoLength = regno.length
+        var letter = /^[a-zA-Z]+$/;
+        var number = /^[0-9]+$/;
+        let subString = regno.substring(regnoLength-1, regnoLength)
+        let preSubString = regno.substring(regnoLength-2, regnoLength-1)
+    
+    
+        if(subString.match(letter) && preSubString.match(letter)) {
+            formatVal = regno
+        }
+        else if(subString.match(number) && preSubString.match(number)) {
+            formatVal = regno
+        } 
+        if(subString.match(number) && preSubString.match(letter)) {
+            formatVal = regno.replace(regno.substring(regnoLength-1, regnoLength), " ")
+            formatVal = formatVal+subString
+        } 
+        else if(subString.match(letter) && preSubString.match(number)) {
+            formatVal = regno.replace(regno.substring(regnoLength-1, regnoLength), " ")
+            formatVal = formatVal+subString
+        } 
+    
+        e.target.value = formatVal.toUpperCase()
+    
+    }
 
 
     componentDidMount() {
@@ -526,41 +557,7 @@ class TwoWheelerVerify extends Component {
                     validationSchema={ComprehensiveValidation}
                     >
                     {({ values, errors, setFieldValue, setFieldTouched, isValid, isSubmitting, touched }) => {
-                            this.state.regno = "";
-                                          
-                            if(values.registration_no.length>0 && values.newRegistrationNo != "NEW"){
-                            if(values.registration_no.toLowerCase().substring(0, 2) == "dl")
-                            {
-                                
-                                this.state.length = 15;
-                                if(values.registration_no.length<11)
-                            {
-                               
-                            this.state.regno=values.registration_no.replace(/[^A-Za-z0-9]+/g, '').replace(/(.{2})/g, '$1 ').trim();
                             
-                            }
-                            else{
-
-                                this.state.regno=values.registration_no;                                                
-                            }                                        
-
-                            }   
-                            else{ 
-                                
-                                this.state.length = 13;
-                            if(values.registration_no.length<10)
-                            {
-                               
-                            this.state.regno=values.registration_no.replace(/[^A-Za-z0-9]+/g, '').replace(/(.{2})/g, '$1 ').trim();
-                            
-                            }
-                            else{
-                                
-                                this.state.regno=values.registration_no;
-                                
-                            }
-                        }
-                        }
                     return (
                         <Form>
                         <FormGroup>
@@ -592,10 +589,10 @@ class TwoWheelerVerify extends Component {
                                                         autoComplete="off"
                                                         className="premiumslid"   
                                                         // value= {values.registration_no}    
-                                                        value={this.state.regno}
+                                                        value= {values.regNumber}
                                                         maxLength={this.state.length}
                                                         onInput={e=>{
-                                                            this.toInputUppercase(e)
+                                                            this.regnoFormat(e, setFieldTouched, setFieldValue)
                                                         }}                                                 
                                                     /> :
                                                     <Field

@@ -210,6 +210,11 @@ const vehicleRegistrationValidation = Yup.object().shape({
     .matches(/^[a-zA-Z0-9][a-zA-Z0-9\s-/]*$/, 
         function() {
             return "Please enter valid policy number"
+        }).min(6, function() {
+            return "Policy No. must be minimum 6 chracters"
+        })
+        .max(18, function() {
+            return "Policy No. must be maximum 18 chracters"
         }),
 
     previous_claim_bonus:Yup.mixed()
