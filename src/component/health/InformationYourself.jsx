@@ -889,13 +889,20 @@ class InformationYourself extends Component {
     }
 
     handleFormSubmit = (values) => {
-        const {productId} = this.props.match.params
-        const formData = new FormData();
+    const {productId} = this.props.match.params
+    const formData = new FormData();
+    let encryption = new Encryption();
     let lookingFor = this.state.lookingFor ;
     let dob = this.state.dob ;
     let familyMembers = this.state.familyMembers;
     let post_data = []
     let menumaster_id = 2;
+
+    let bc_data = sessionStorage.getItem('bcLoginData') ? sessionStorage.getItem('bcLoginData') : "";
+    if(bc_data) {
+        bc_data = JSON.parse(encryption.decrypt(bc_data));
+    }
+
     post_data['menumaster_id'] = menumaster_id
     post_data['proposer_gender'] = values.gender    
     
@@ -928,18 +935,17 @@ class InformationYourself extends Component {
     post_data['gender'] = arr_date
     post_data['confirm'] = this.state.confirm
     
-    post_data['csc_id'] = sessionStorage.getItem('csc_id') ? sessionStorage.getItem('csc_id') : "500100100013"
-    post_data['agent_name'] = sessionStorage.getItem('agent_name') ? sessionStorage.getItem('agent_name') : "Bipin Sing"
-    post_data['product_id'] = sessionStorage.getItem('product_id') ? sessionStorage.getItem('product_id') : "900001786"
+    post_data['csc_id'] = sessionStorage.getItem('csc_id') ? sessionStorage.getItem('csc_id') : ""
+    post_data['agent_name'] = sessionStorage.getItem('agent_name') ? sessionStorage.getItem('agent_name') : ""
+    post_data['product_id'] = sessionStorage.getItem('product_id') ? sessionStorage.getItem('product_id') : ""
     
+    post_data['bcmaster_id'] = bc_data ? bc_data.agent_id : ""
+    post_data['bc_token'] = bc_data ? bc_data.token : ""
 
-    let encryption = new Encryption();
     let post_data_obj = {}
 
-
-
-
-
+    console.log("postData========", post_data)
+    
     if(policyHolder_id > 0){
         post_data['policy_holder_id'] = policyHolder_id
         Object.assign(post_data_obj, post_data); // {0:"a", 1:"b", 2:"c"}

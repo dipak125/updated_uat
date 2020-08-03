@@ -44,7 +44,9 @@ class Premium extends Component {
             PolicyArray: [],
             memberdetails: [],
             nomineedetails:[],
-            relation: []
+            relation: [],
+            step_completed: "0",
+            vehicleDetails: []
         };
     }
 
@@ -70,7 +72,7 @@ class Premium extends Component {
     }
 
     additionalDetails = (productId) => {
-        this.props.history.push(`/Additional_details/${productId}`);
+        this.props.history.push(`/two_wheeler_additional_detailsTP/${productId}`);
     }
 
     handleSubmit = (values) => {
@@ -83,14 +85,16 @@ class Premium extends Component {
         let policyHolder_id = localStorage.getItem("policyHolder_refNo") ? localStorage.getItem("policyHolder_refNo") : 0;
         let encryption = new Encryption();
     
-        axios.get(`policy-holder/motor/${policyHolder_id}`)
+        axios.get(`two-wh/details/${policyHolder_id}`)
             .then(res => {
                 let decryptResp = JSON.parse(encryption.decrypt(res.data))
                 console.log("decrypt", decryptResp)
                 let motorInsurance = decryptResp.data.policyHolder ? decryptResp.data.policyHolder.motorinsurance : {}
-                    
+                let vehicleDetails = decryptResp.data.policyHolder ? decryptResp.data.policyHolder.vehiclebrandmodel : {};
+                let step_completed = decryptResp.data.policyHolder ? decryptResp.data.policyHolder.step_no : "";
+
                 this.setState({
-                    motorInsurance,
+                    motorInsurance,vehicleDetails,step_completed,
                     refNumber: decryptResp.data.policyHolder.reference_no,
                     paymentStatus: decryptResp.data.policyHolder.payment ? decryptResp.data.policyHolder.payment[0] : [],
                     memberdetails : decryptResp.data.policyHolder ? decryptResp.data.policyHolder : [],
@@ -134,13 +138,19 @@ class Premium extends Component {
             'idv_value': motorInsurance.idv_value,
             'policy_type': localStorage.getItem('policy_type'),
             'add_more_coverage': motorInsurance.add_more_coverage,
-            'cng_kit': motorInsurance.cng_kit,
-            'cngKit_Cost': Math.floor(motorInsurance.cngkit_cost)
+            // 'cng_kit': motorInsurance.cng_kit,
+            // 'cngKit_Cost': Math.floor(motorInsurance.cngkit_cost)
         }
+        formData.append('id',localStorage.getItem('policyHolder_refNo'))
+        formData.append('access_token',access_token)
+        formData.append('idv_value',motorInsurance.idv_value)
+        formData.append('policy_type',motorInsurance ? motorInsurance.policy_type : "")
+        formData.append('add_more_coverage',JSON.stringify(motorInsurance.add_more_coverage))
+        formData.append('policytype_id',motorInsurance ? motorInsurance.policytype_id : "")
 
-        formData.append('enc_data',encryption.encrypt(JSON.stringify(post_data)))
+        // formData.append('enc_data',encryption.encrypt(JSON.stringify(post_data)))
 
-        axios.post('fullQuotePMCAR', formData)
+        axios.post('fullQuotePM2WTP', formData)
             .then(res => {
                 if (res.data.PolicyObject) {
                     this.setState({
@@ -197,7 +207,8 @@ class Premium extends Component {
     }
 
     render() {
-        const { refNo, whatsapp, show, fulQuoteResp, motorInsurance, error, error1, refNumber, paymentStatus, relation, memberdetails,nomineedetails } = this.state
+        const { refNo, whatsapp, show, fulQuoteResp, motorInsurance, error, error1, refNumber, 
+            paymentStatus, relation, memberdetails,nomineedetails,vehicleDetails,step_completed } = this.state
         const { productId } = this.props.match.params
 console.log('nomineedetails', nomineedetails)
         const errMsg =
@@ -226,6 +237,8 @@ console.log('nomineedetails', nomineedetails)
 
         return (
             <>
+            { step_completed >= '4' && vehicleDetails.vehicletype_id == '3' ?
+            <div>
                 <BaseComponent>
                     <div className="container-fluid">
                         <div className="row">
@@ -252,7 +265,7 @@ console.log('nomineedetails', nomineedetails)
                                                         <h5>{errMsg}</h5>
                                                         <h5>{paymentErrMsg}</h5>
                                                         <h4>
-                                                            Policy Reference Number {fulQuoteResp.QuotationNo ? fulQuoteResp.QuotationNo : 'POASAN00100001146'}
+                                                            Policy Reference Number {fulQuoteResp.QuotationNo ? fulQuoteResp.QuotationNo : ''}
                                                         </h4>
                                                     </div>
 
@@ -377,7 +390,7 @@ console.log('nomineedetails', nomineedetails)
                                                                                             <FormGroup>Name:</FormGroup>
                                                                                         </Col>
                                                                                         <Col sm={12} md={6}>
-                                                                                            <FormGroup>{nomineedetails.first_name}</FormGroup>
+                                                                                            <FormGroup>{nomineedetails ? nomineedetails.first_name : null}</FormGroup>
                                                                                         </Col>
                                                                                     </Row>
 
@@ -386,7 +399,7 @@ console.log('nomineedetails', nomineedetails)
                                                                                             <FormGroup>Date Of Birth:</FormGroup>
                                                                                         </Col>
                                                                                         <Col sm={12} md={6}>
-                                                                                            <FormGroup>{nomineedetails.dob}</FormGroup>
+                                                                                            <FormGroup>{nomineedetails ? nomineedetails.dob : null}</FormGroup>
                                                                                         </Col>
                                                                                     </Row>
 
@@ -395,7 +408,7 @@ console.log('nomineedetails', nomineedetails)
                                                                                             <FormGroup>Relation With Proposer:</FormGroup>
                                                                                         </Col>
                                                                                         <Col sm={12} md={6}>
-                                                                                        { relation.map((relations, qIndex) => 
+                                                                                        {nomineedetails && relation.map((relations, qIndex) => 
                                                                                         relations.id == nomineedetails.relation_with ?
                                                                                             <FormGroup>{relations.name}</FormGroup> : null
                                                                                         )}
@@ -407,7 +420,7 @@ console.log('nomineedetails', nomineedetails)
                                                                                             <FormGroup>Gender</FormGroup>
                                                                                         </Col>
                                                                                         <Col sm={12} md={6}>
-                                                                                            <FormGroup>{nomineedetails.gender == "m" ? "Male" : "Female"}</FormGroup>
+                                                                                            <FormGroup>{nomineedetails && nomineedetails.gender == "m" ? "Male" : "Female"}</FormGroup>
                                                                                         </Col>
                                                                                     </Row>
                                                                                 </Col>
@@ -422,74 +435,21 @@ console.log('nomineedetails', nomineedetails)
                                                             </div>
 
                                                             <Row>
-                                                                <Col sm={12} md={6}>
-                                                                    <div className="carloan">
-                                                                        <h4>Make Payment</h4>
-                                                                    </div>
-                                                                </Col>
-                                                                <Col sm={12} md={6}>
-                                                                    <div className="carloan">
-                                                                        <h4>Select Payment Gateway</h4>
-                                                                    </div>
-                                                                </Col>
-                                                            </Row>
-
-
-                                                            <Row>
-                                                                <Col sm={12} md={6}>
-                                                                    <Row>
-                                                                        <Col sm={6}>
-                                                                            <FormGroup>
-                                                                                <div className="refno">
-                                                                                    My reference no is
-                                                                                </div>
-                                                                            </FormGroup>
-                                                                        </Col>
-                                                                        <Col sm={6}>
-                                                                            <FormGroup>
-                                                                                <div className="insurerName">
-                                                                                    <Field
-                                                                                        name="refNo"
-                                                                                        type="text"
-                                                                                        placeholder="Type No"
-                                                                                        autoComplete="off"
-                                                                                        className="hght30"
-                                                                                        value={values.refNo}
-                                                                                        onFocus={e => this.changePlaceHoldClassAdd(e)}
-                                                                                        onBlur={e => this.changePlaceHoldClassRemove(e)}
-                                                                                    />
-                                                                                    {errors.refNo && touched.refNo ? (
-                                                                                        <span className="errorMsg">{errors.refNo}</span>
-                                                                                    ) : null}
-                                                                                </div>
-                                                                            </FormGroup>
-                                                                        </Col>
-                                                                    </Row>
-
-                                                                </Col>
+                                                            <Col sm={12} md={6}>
+                                                            </Col>
                                                                 <Col sm={12} md={6}>
                                                                     <FormGroup>
+                                                                    <div className="paymntgatway">
+                                                                        Select Payment Gateway
+                                                                        <div>
                                                                         <img src={require('../../assets/images/green-check.svg')} alt="" className="m-r-10" />
                                                                         <img src={require('../../assets/images/CSC.svg')} alt="" />
+                                                                        </div>
+                                                                    </div>
                                                                     </FormGroup>
                                                                 </Col>
                                                             </Row>
 
-                                                            {/* <Row>
-                                                                <Col sm={12}>
-                                                                    <label className="customCheckBox formGrp formGrp fscheck">I want to receive my Quote & Policy Details on Whatsapp
-                                                                        <Field
-                                                                            type="checkbox"
-                                                                            name='whatsapp'
-                                                                            value='1'
-                                                                            className="user-self"
-                                                                        // checked={values.consumables ? true : false}
-                                                                        />
-                                                                        <span className="checkmark mL-0"></span>
-                                                                        <span className="error-message"></span>
-                                                                    </label>
-                                                                </Col>
-                                                            </Row> */}
                                                             <div className="d-flex justify-content-left resmb">
                                                                 <Button className="backBtn" type="button" onClick={this.additionalDetails.bind(this, productId)}>Back</Button>
                                                                 {fulQuoteResp.QuotationNo ?
@@ -504,7 +464,7 @@ console.log('nomineedetails', nomineedetails)
 
 
                                                         <Col sm={12} md={3} lg={3}>
-                                                            <div className="motrcar"><img src={require('../../assets/images/motor-car.svg')} alt="" /></div>
+                                                            <div className="motrcar"><img src={require('../../assets/images/two-wheeler-addl.svg')} alt="" /></div>
                                                         </Col>
                                                     </Row>
                                                 </section>
@@ -533,6 +493,7 @@ console.log('nomineedetails', nomineedetails)
                         </div>
                     </div>
                 </BaseComponent>
+                </div> : step_completed == "" ? "Forbidden" : null }
             </>
         );
     }

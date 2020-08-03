@@ -102,6 +102,11 @@ fetchData=()=>{
 
         let policyHolder_id = localStorage.getItem('policyHolder_id') ? localStorage.getItem('policyHolder_id') :0
 
+        let bc_data = sessionStorage.getItem('bcLoginData') ? sessionStorage.getItem('bcLoginData') : "";
+        if(bc_data) {
+            bc_data = JSON.parse(encryption.decrypt(bc_data));
+        }
+
         if(policyHolder_id > 0){
             const post_data = {
                 'policy_holder_id': policyHolder_id,
@@ -109,9 +114,11 @@ fetchData=()=>{
                 'check_registration': values.check_registration,
                 'menumaster_id':1,
                 'vehicle_type_id':productId,
-                'csc_id':sessionStorage.getItem('csc_id') ? sessionStorage.getItem('csc_id') : "500100100013",
-                'agent_name':sessionStorage.getItem('agent_name') ? sessionStorage.getItem('agent_name') : "Bipin Sing",
-                'product_id':sessionStorage.getItem('product_id') ? sessionStorage.getItem('product_id') : "900001786",
+                'csc_id':sessionStorage.getItem('csc_id') ? sessionStorage.getItem('csc_id') : "",
+                'agent_name':sessionStorage.getItem('agent_name') ? sessionStorage.getItem('agent_name') : "",
+                'product_id':sessionStorage.getItem('product_id') ? sessionStorage.getItem('product_id') : "",
+                'bcmaster_id': bc_data ? bc_data.agent_id : "",
+                'bc_token': bc_data ? bc_data.token : "",
             } 
             console.log('post_data', post_data)
             formData.append('enc_data',encryption.encrypt(JSON.stringify(post_data)))
@@ -144,11 +151,11 @@ fetchData=()=>{
                 'check_registration': values.check_registration,
                 'menumaster_id':1,
                 'vehicle_type_id':productId,
-                'csc_id':sessionStorage.getItem('csc_id') ? sessionStorage.getItem('csc_id') : "500100100013",
-                'agent_name':sessionStorage.getItem('agent_name') ? sessionStorage.getItem('agent_name') : "Bipin Sing",
-                'product_id':sessionStorage.getItem('product_id') ? sessionStorage.getItem('product_id') : "900001786",
-                // post_data['agent_name'] = sessionStorage.getItem('fullname') ? sessionStorage.getItem('fullname') : "Bipin Sing"
-                // post_data['product_id'] = sessionStorage.getItem('productId') ? sessionStorage.getItem('productId') : "900001786"
+                'csc_id':sessionStorage.getItem('csc_id') ? sessionStorage.getItem('csc_id') : "",
+                'agent_name':sessionStorage.getItem('agent_name') ? sessionStorage.getItem('agent_name') : "",
+                'product_id':sessionStorage.getItem('product_id') ? sessionStorage.getItem('product_id') : "",
+                'bcmaster_id': bc_data ? bc_data.agent_id : "",
+                'bc_token': bc_data ? bc_data.token : "",
             } 
             console.log('post_data', post_data)
             formData.append('enc_data',encryption.encrypt(JSON.stringify(post_data)))

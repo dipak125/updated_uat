@@ -588,8 +588,7 @@ class TwoWheelerVerify extends Component {
                                                         name='registration_no' 
                                                         autoComplete="off"
                                                         className="premiumslid"   
-                                                        // value= {values.registration_no}    
-                                                        value= {values.regNumber}
+                                                        value= {values.registration_no}    
                                                         maxLength={this.state.length}
                                                         onInput={e=>{
                                                             this.regnoFormat(e, setFieldTouched, setFieldValue)

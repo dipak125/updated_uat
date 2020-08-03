@@ -93,10 +93,10 @@ export const authProcess = (data, onSuccess, onFailure) => {
                 // localStorage.setItem('users', JSON.stringify({ user: response.data.user, permission: response.data.permission, lastAction: Date.now() }));
                 localStorage.setItem('users', JSON.stringify({ user: response.data.user_data, permission: [], lastAction: Date.now() }));
                 localStorage.setItem('loginData', JSON.stringify( loginData ));
-                // var cscData = JSON.parse(response.data.user_data.info);
-                // localStorage.setItem('csc_id', cscData["csc_id"]);
-                // localStorage.setItem('agent_name', cscData["fullname"]);
-                // localStorage.setItem('product_id', cscData["productId"]);
+                var cscData = JSON.parse(response.data.user_data.info);
+                localStorage.setItem('csc_id', cscData["csc_id"]);
+                localStorage.setItem('agent_name', cscData["fullname"]);
+                localStorage.setItem('product_id', cscData["productId"]);
                 onSuccess && onSuccess();
             })
             .catch(error => {

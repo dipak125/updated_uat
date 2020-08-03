@@ -97,9 +97,10 @@ const ownerValidation = Yup.object().shape({
         return "Please enter valid address"
     }),
     phone: Yup.string()
-    .matches(/^[6-9][0-9]{9}$/,'Invalid Mobile number').required('Phone No. is required'),
-    email:Yup.string().email().required('Email is required').min(9, function() {
-        return "Email must be minimum 9 chracters"
+        .matches(/^[6-9][0-9]{9}$/,'Invalid Mobile number').required('Phone No. is required'),
+        
+    email:Yup.string().email().required('Email is required').min(8, function() {
+        return "Email must be minimum 8 chracters"
     })
     .max(75, function() {
         return "Email must be maximum 75 chracters"
@@ -452,6 +453,11 @@ class TwoWheelerAdditionalDetails extends Component {
 
         });
 
+        const quoteNumber =
+        quoteId ? (
+            <h4>You are just one steps away in getting your policy ready and your Quotation Number: {quoteId}. Please share a few more details. </h4>
+        ) : null;
+
         // console.log("newInitialValues", newInitialValues)
         return (
             <>
@@ -479,6 +485,9 @@ class TwoWheelerAdditionalDetails extends Component {
                         <Form>
                         <Row>
                             <Col sm={12} md={9} lg={9}>
+                                <div className="d-flex justify-content-left brandhead">
+                                    {quoteNumber}
+                                </div>
                             
                                 <div className="d-flex justify-content-left carloan">
                                     <h4> Taken Two-wheeler Loan</h4>
@@ -961,7 +970,7 @@ class TwoWheelerAdditionalDetails extends Component {
                             </Col>
 
                             <Col sm={12} md={3} lg={3}>
-                                <div className="motrcar"><img src={require('../../assets/images/motor-car.svg')} alt="" /></div>
+                                <div className="motrcar"><img src={require('../../assets/images/two-wheeler-addl.svg')} alt="" /></div>
                             </Col>
                         </Row>
                         </Form>

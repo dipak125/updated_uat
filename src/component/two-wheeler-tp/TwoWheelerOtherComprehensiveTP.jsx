@@ -82,7 +82,9 @@ class TwoWheelerOtherComprehensive extends Component {
             add_more_coverage: ["B00015"],
             vahanDetails: [],
             vahanVerify: false,
-            policyCoverage: []
+            policyCoverage: [],
+            step_completed: "0",
+            vehicleDetails: []
         };
     }
 
@@ -118,7 +120,7 @@ class TwoWheelerOtherComprehensive extends Component {
     }
 
     vehicleDetails = (productId) => {
-        this.props.history.push(`/two_wheeler_Vehicle_details/${productId}`);
+        this.props.history.push(`/two_wheeler_Vehicle_detailsTP/${productId}`);
     }
 
 
@@ -131,8 +133,10 @@ class TwoWheelerOtherComprehensive extends Component {
                 let decryptResp = JSON.parse(encryption.decrypt(res.data));
                 let motorInsurance = decryptResp.data.policyHolder ? decryptResp.data.policyHolder.motorinsurance : {}
                 let values = []
+                let vehicleDetails = decryptResp.data.policyHolder ? decryptResp.data.policyHolder.vehiclebrandmodel : {};
+                let step_completed = decryptResp.data.policyHolder ? decryptResp.data.policyHolder.step_no : "";
                 this.setState({
-                    motorInsurance
+                    motorInsurance,vehicleDetails,step_completed
                 })
                 this.props.loadingStop();
                 this.getAccessToken(values)
@@ -223,7 +227,7 @@ class TwoWheelerOtherComprehensive extends Component {
         formData.append('policytype_id',motorInsurance ? motorInsurance.policytype_id : "")
         formData.append('PA_Cover',values.PA_flag ? values.PA_Cover : "0")
 
-        axios.post('fullQuotePM2W', formData)
+        axios.post('fullQuotePM2WTP', formData)
             .then(res => {
                 if (res.data.PolicyObject) {
                     this.setState({
@@ -287,7 +291,7 @@ class TwoWheelerOtherComprehensive extends Component {
             let decryptResp = JSON.parse(encryption.decrypt(res.data));
             console.log('decryptResp---', decryptResp)
             if (decryptResp.error == false) {
-                this.props.history.push(`/two_wheeler_verify/${productId}`);
+                this.props.history.push(`/two_wheeler_verifyTP/${productId}`);
             }
 
         })
@@ -341,14 +345,10 @@ class TwoWheelerOtherComprehensive extends Component {
 
 
     render() {
-        const { showCNG, vahanDetails, error, policyCoverage, vahanVerify, is_CNG_account, fulQuoteResp, PolicyArray, sliderVal, motorInsurance, serverResponse, add_more_coverage } = this.state
+        const { vahanDetails, error, policyCoverage, vahanVerify, fulQuoteResp, PolicyArray, motorInsurance, serverResponse, add_more_coverage,
+            step_completed, vehicleDetails} = this.state
         const { productId } = this.props.match.params
-        let defaultSliderValue = PolicyArray.length > 0 ? Math.round(PolicyArray[0].PolicyRiskList[0].IDV_Suggested) : 0
-        let sliderValue = sliderVal
-        let minIDV = PolicyArray.length > 0 ? Math.floor(PolicyArray[0].PolicyRiskList[0].MinIDV_Suggested) : null
-        let maxIDV = PolicyArray.length > 0 ? Math.floor(PolicyArray[0].PolicyRiskList[0].MaxIDV_Suggested) : null
-        minIDV = minIDV + 1;
-        maxIDV = maxIDV - 1;
+
 
         let newInitialValues = Object.assign(initialValue, {
             add_more_coverage: motorInsurance.add_more_coverage ? motorInsurance.add_more_coverage : "",
@@ -394,8 +394,10 @@ class TwoWheelerOtherComprehensive extends Component {
             ) : null;
 
         return (
-            <>
             
+            <>
+            { step_completed >= '2' && vehicleDetails.vehicletype_id == '3' ?
+            <div>
                 <BaseComponent>
                     <div className="container-fluid">
                         <div className="row">
@@ -407,7 +409,7 @@ class TwoWheelerOtherComprehensive extends Component {
                                 <section className="brand colpd m-b-25">
                                     <div className="d-flex justify-content-left">
                                         <div className="brandhead m-b-10">
-                                            <h4 className="m-b-30">Cover your Vehicle + Damage to Others (Comprehensive)</h4>
+                                            <h4 className="m-b-30">Third Party Liability Coverage</h4>
                                             <h5>{errMsg}</h5>
                                         </div>
                                     </div>
@@ -430,54 +432,6 @@ class TwoWheelerOtherComprehensive extends Component {
                                                             </div>
 
                                                             <Row>
-                                                                <Col sm={12} md={4} lg={4}>
-                                                                    <FormGroup>
-                                                                        <div className="insurerName">
-                                                                            <span className="fs-16">Insured Declared Value</span>
-                                                                        </div>
-                                                                    </FormGroup>
-                                                                </Col>
-                                                                <Col sm={12} md={3} lg={2}>
-                                                                    <FormGroup>
-                                                                        <div className="insurerName">
-                                                                            <Field
-                                                                                name="IDV"
-                                                                                type="text"
-                                                                                placeholder=""
-                                                                                autoComplete="off"
-                                                                                className="premiumslid"
-                                                                                onFocus={e => this.changePlaceHoldClassAdd(e)}
-                                                                                onBlur={e => this.changePlaceHoldClassRemove(e)}
-                                                                                value={sliderValue ? sliderValue : defaultSliderValue}
-                                                                            />
-                                                                            {errors.IDV && touched.IDV ? (
-                                                                                <span className="errorMsg">{errors.IDV}</span>
-                                                                            ) : null}
-                                                                        </div>
-                                                                    </FormGroup>
-                                                                </Col>
-                                                                {defaultSliderValue ? 
-                                                                <Col sm={12} md={12} lg={6}>
-                                                                    <FormGroup>
-                                                                        <input type="range" className="W-90"
-                                                                            name='slider'
-                                                                            defaultValue={defaultSliderValue}
-                                                                            min={minIDV}
-                                                                            max={maxIDV}
-                                                                            step='1'
-                                                                            value={values.slider}
-                                                                            onChange={(e) => {
-                                                                                setFieldTouched("slider");
-                                                                                setFieldValue("slider", values.slider);
-                                                                                this.sliderValue(e.target.value)
-                                                                            }}
-                                                                        />
-                                                                        
-                                                                    </FormGroup>
-                                                                </Col> : null }
-                                                            </Row>
-
-                                                            <Row>
                                                                 <Col sm={12} md={12} lg={12}>
                                                                     <FormGroup>
                                                                         <span className="fs-18"> Add  more coverage to your plan.</span>
@@ -486,8 +440,8 @@ class TwoWheelerOtherComprehensive extends Component {
                                                             </Row>
 
                                                             {moreCoverage.map((coverage, qIndex) => (
-                                                            <Row key={qIndex}>
-                                                                <Col sm={12} md={11} lg={6}>
+                                                            <Row key={qIndex}>   
+                                                                <Col sm={12} md={11} lg={6}  >
                                                                     <label className="customCheckBox formGrp formGrp">{coverage.name}
                                                                         <OverlayTrigger overlay={<Tooltip id="tooltip-disabled">{coverage.description}</Tooltip>}>
                                                                             <a href="#" className="infoIcon"><img src={require('../../assets/images/i.svg')} alt="" className="premtool" /></a>
@@ -499,18 +453,17 @@ class TwoWheelerOtherComprehensive extends Component {
                                                                             className="user-self"
                                                                             // checked={values.roadsideAssistance ? true : false}
                                                                             onClick={(e) =>{
-
                                                                                 if( e.target.checked == false && values[`moreCov_${qIndex}`] == 'B00015') {
                                                                                     swal("This cover is mandated by IRDAI, it is compulsory for Owner-Driver to possess a PA cover of minimum Rs 15 Lacs, except in certain conditions. By not choosing this cover, you confirm that you hold an existing PA cover or you do not possess a valid driving license.")
                                                                                 }
-                                                                                this.onRowSelect(e.target.value, e.target.checked, setFieldTouched, setFieldValue)     
+                                                                                this.onRowSelect(e.target.value, e.target.checked, setFieldTouched, setFieldValue)         
                                                                             }
                                                                             }
                                                                             checked = {values[`moreCov_${qIndex}`] == coverage.id ? true : false}
                                                                         />
                                                                         <span className="checkmark mL-0"></span>
                                                                         <span className="error-message"></span>
-                                                                    </label> 
+                                                                    </label>
                                                                 </Col>
                                                                 {values.PA_flag == '1' && values[`moreCov_${qIndex}`] == 'B00075' ?
                                                                     <Col sm={12} md={11} lg={3}>
@@ -539,11 +492,9 @@ class TwoWheelerOtherComprehensive extends Component {
                                                                             </div>
                                                                         </FormGroup>
                                                                     </Col> : null
-                                                            }
+                                                                }
                                                             </Row>
                                                             ))}
-
-                                                            
                                                             
                                                             <div className="d-flex justify-content-left resmb">
                                                                 <Button className={`backBtn`} type="button" onClick={this.vehicleDetails.bind(this, productId)}>
@@ -582,6 +533,7 @@ class TwoWheelerOtherComprehensive extends Component {
                         </div>
                     </div>
                 </BaseComponent>
+        
                 <Modal className="customModal" bsSize="md"
                     show={this.state.show}
                     onHide={this.handleClose}>
@@ -614,8 +566,9 @@ class TwoWheelerOtherComprehensive extends Component {
 
                     </Modal.Body>
                 </Modal>
-
+                </div> : step_completed == "" ? "Forbidden" : null }
             </>
+            
         );
     }
 }

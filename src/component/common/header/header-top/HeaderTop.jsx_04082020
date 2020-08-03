@@ -5,8 +5,6 @@ import { connect } from "react-redux";
 import { authLogout } from "../../../../store/actions/auth";
 import axios from "../../../../shared/axios"
 
-let logo = ""
-
 class HeaderTop extends Component {
 
     handleLogout = () => {
@@ -24,9 +22,8 @@ class HeaderTop extends Component {
 
     };
 
-
     componentWillUpdate(nextProps, nextState) {
-        logo = sessionStorage.getItem('logo') && sessionStorage.getItem('logo') != "undefined" ? sessionStorage.getItem('logo') : "search.svg"
+
       }
       
     render() {
@@ -65,9 +62,8 @@ class HeaderTop extends Component {
                             <Dropdown.Toggle variant="" id="dropdown-basic">
                                 <div className="d-flex topUserBtn">
                                     <div className="align-self-center">
-                                    {logo ? 
-                                    <img src={require(`../../../../assets/images/${logo}`)} alt="" className="notiBell"/>
-                                    : null}
+                                        <a href="#" className="notiBell">
+                                        </a>
                                     </div>
                                     {/* <div className="align-self-center userNameImg">
                                         <img src={require('../../../../assets/images/user.svg')} alt="" />

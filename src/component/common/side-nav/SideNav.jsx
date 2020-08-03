@@ -28,13 +28,13 @@ export default class SideNav extends Component {
                         <li>
 							<Link to="/Products" activeClassName="active"><span className="leftIcon01"><img src={require('../../../assets/images/leftIcon02Hover.svg')} alt="" /></span>Products</Link>
                         </li>
-                        {/* <li>
-							<Link to="/UnderMaintenance" activeClassName="active"><span className="leftIcon01"><img src={require('../../../assets/images/leftIcon03.svg')} alt="" /></span>Policy Issuance </Link>
+                         {/* <li>
+							<a href={`${process.env.REACT_APP_PAYMENT_URL}/sbig-csc/core/public/pdf_files/SBIG Sales Manager.pdf`} target="_blank" activeClassName="active"><span className="leftIcon01"><img src={require('../../../assets/images/leftIcon03.svg')} alt="" /></span>Sales Manager </a>
                         </li>
                         <li>
-							<Link to="/UnderMaintenance" activeClassName="active"><span className="leftIcon01"><img src={require('../../../assets/images/leftIcon04.svg')} alt="" /></span>Services</Link>
-                        </li>
-                        <li>
+                        <a href={`${process.env.REACT_APP_PAYMENT_URL}/sbig-csc/core/public/pdf_files/Arogya Sanjeevani.pdf`} target="_blank" activeClassName="active"><span className="leftIcon01"><img src={require('../../../assets/images/leftIcon05.svg')} alt="" /></span>Arogya Sanjeevani Brochure </a>
+                        </li> */}
+                       {/* <li>
 							<Link to="/UnderMaintenance" activeClassName="active"><span className="leftIcon01"><img src={require('../../../assets/images/leftIcon05.svg')} alt="" /></span>Support</Link>
                         </li> */}
                     </ul>

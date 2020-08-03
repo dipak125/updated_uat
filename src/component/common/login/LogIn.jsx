@@ -12,18 +12,23 @@ import * as Yup from "yup";
 import "./LogIn.css";
 import { authProcess } from "../../../store/actions/auth";
 import BaseComponent from '../../BaseComponent';
+import axiosBCintegration from "../../../shared/axiosBCintegration"
+import Encryption from '../../../shared/payload-encryption';
+import queryString from 'query-string';
+import swal from 'sweetalert';
 
 const initialValues = {
-    emailAddress: "",
+    userId: "",
     password: ""
 };
 
 const loginvalidation = Yup.object().shape({
-    emailAddress: Yup.string()
-        .email("Please enter a valid email")
-        .required("Please enter email id"),
-    password: Yup.string().required("Please enter password")
+    userId: Yup.string().required("Please enter email id"),
+    password: Yup.string().required("Please enter password"),
+    broker_id: Yup.string().required("Please select broker"),
 });
+
+
 
 class LogIn extends Component {
     state = {
@@ -31,9 +36,12 @@ class LogIn extends Component {
         pass: '',
         rememberMe: 0,
         errMsg: null,
+        respArray: []
     }
 
+
     componentDidMount() {
+        localStorage.clear()
         let bodyClass = [];
         bodyClass.length && document.body.classList.remove(...bodyClass);
         document.body.classList.add("loginBody");
@@ -47,13 +55,51 @@ class LogIn extends Component {
                 rememberMe: loginData.rememberMe ? 1 : 0
             });
         }
-        this.handleSubmit();
+        
+        if(queryString.parse(this.props.location.search).authentication_token) {
+            this.fetchTokenDetails(queryString.parse(this.props.location.search).authentication_token )
+        }
+        else if(sessionStorage.getItem('csc_id')) {
+            sessionStorage.setItem('logo', "CSC.svg") 
+            this.callLogin();          
+        }
+        else{
+            this.fetchCustDetail()
+        }
+        
+    }
+
+    fetchCustDetail=()=>{
+
+        this.props.loadingStart();
+        axiosBCintegration.get('all-customer')
+        .then(res=>{
+            if(res.data.error == false) {
+                let respArray = res.data.data ? res.data.data : []                        
+                this.setState({
+                    respArray
+                });
+            }
+            else {
+                this.setState({
+                    respArray: []
+                });
+            }           
+            this.props.loadingStop();
+        }).
+        catch(err=>{
+            this.props.loadingStop();
+            this.setState({
+                respArray: []
+            });
+        })
+    
     }
 
     componentWillReceiveProps(nextProps) {
-        if (nextProps.match.path === '/login' && !nextProps.loading) {
-            this.props.history.push('/user-list');
-        }
+        // if (nextProps.match.path === '/login' && !nextProps.loading) {
+        //     this.props.history.push('/Products');
+        // }
     }
 
     rememberMeHandler = (e) => {
@@ -64,76 +110,125 @@ class LogIn extends Component {
         }
     }
 
-    // handleSubmit = (values, actions) => {
-    //     //console.log('values', values); return false;
-    //     this.props.loadingStart();
-    //     values.rememberMe = this.state.rememberMe;
-    //     this.setState({ errMsg: '' });
-
-    //     this.props.onFormSubmit(values,
-    //         () => {
-    //             this.props.loadingStop();
-    //             this.props.history.push('/Products');
-    //         },
-    //         (err) => {
-    //             this.props.loadingStop();
-    //             actions.setSubmitting(false);
-    //             if (err.data.message) {
-    //                 this.setState({ errMsg: err.data.message });
-    //                 actions.resetForm();
-    //             } else {
-    //                 // console.log(err.data);
-    //                 actions.setErrors(err.data);
-    //             }
-    //         }
-    //     );
-    // }
-
-    handleSubmit = () => {
-        //console.log('values', values); return false;
-        let values = {}
+    handleSubmit = (values, actions) => {
+        // sessionStorage.removeItem('logo') 
+        sessionStorage.removeItem('bcLoginData')
+        const formData = new FormData();
+        let encryption = new Encryption();
         this.props.loadingStart();
-        values.rememberMe = this.state.rememberMe;
-        values.emailAddress= "csc@gmail.com";
-        values.password= "12345";
-        this.setState({ errMsg: '' });
+        formData.append('username',values.userId)
+        formData.append('password',values.password)
+        formData.append('bcmaster_id',values.broker_id)
 
-        this.props.onFormSubmit(values,
-            () => {
-                this.props.loadingStop();
-                this.props.history.push('/Products');
-            },
-            (err) => {
-                this.props.loadingStop();
-                if (err.data.message) {
-                    this.setState({ errMsg: err.data.message });
-                } else {
-                    // console.log(err.data);
-                }
+        axiosBCintegration.post('bc-login', formData)
+        .then(res=>{
+            
+            if(res.data.error == false) {
+                let bcLoginData = res.data.data ? res.data.data : [] 
+                bcLoginData.agent_id = values.broker_id        
+                sessionStorage.setItem('bcLoginData', encryption.encrypt(JSON.stringify(bcLoginData)));
+                this.fetchTokenDetails(bcLoginData.token)
             }
-        );
+            else {
+                sessionStorage.removeItem('bcLoginData');
+                actions.setSubmitting(false)
+                this.props.loadingStop();
+            }
+            
+            
+        }).
+        catch(err=>{
+            this.props.loadingStop();
+            actions.setSubmitting(false)
+            sessionStorage.removeItem('bcLoginData');
+        })
+
+
+    }
+
+    fetchTokenDetails= (token) => {
+
+        const formData = new FormData();
+        this.props.loadingStart();
+        formData.append('token',token)
+
+        axiosBCintegration.post('view-token', formData)
+        .then(res=>{
+            
+            if(res.data.error == false) {
+                let bcLoginData = res.data.data ? res.data.data : [] 
+                sessionStorage.setItem('logo', bcLoginData.logo) 
+                this.callLogin()
+            }
+            else {
+                sessionStorage.removeItem('bcLoginData');
+                swal(res.data.msg)
+            }
+            
+            this.props.loadingStop();
+        }).
+        catch(err=>{
+            this.props.loadingStop();
+            sessionStorage.removeItem('bcLoginData');
+        })
+    }
+
+    callLogin = async () => {
+        const result = await this.handle_AutoSubmit();
+    }
+
+    handle_AutoSubmit = () => {
+        //console.log('values', values); return false;
+        return new Promise(resolve => {
+            setTimeout(() => {
+                let values = {}
+                this.props.loadingStart();
+                values.rememberMe = this.state.rememberMe;
+                values.emailAddress= "csc@gmail.com";
+                values.password= "12345";
+                // this.setState({ errMsg: '' });
+
+                this.props.onFormSubmit(values,
+                    () => {
+                        this.props.loadingStop();
+                        this.props.history.push('/Products');
+                    },
+                    (err) => {
+                        this.props.loadingStop();
+                        if (err.data.message) {
+                            this.setState({ errMsg: err.data.message });
+                        } else {
+                            // console.log(err.data);
+                        }
+                    }
+                );
+            }
+            , 20)
+        })
     }
 
 
     render() {
         //console.log('state', this.state);
-        const { email, pass, rememberMe } = this.state;
+        const { email, pass, rememberMe, respArray } = this.state;
 
         const newInitialValues = Object.assign(initialValues, {
-            emailAddress: email ? email : '',
+            userId: email ? email : '',
             password: pass ? pass : ''
         });
+
+        console.log("queryString.parse(this.props.location.search)---", )
         return (
             <BaseComponent>
                 <div className="d-flex justify-content-center brand lginpg">
                     <div className="login-box-body">
-
-                        {/* <Formik
+                    {sessionStorage.getItem('csc_id')|| queryString.parse(this.props.location.search).authentication_token ? null :
+                        <Formik
                             initialValues={newInitialValues}
                             validationSchema={loginvalidation}
                             onSubmit={this.handleSubmit}
                         >
-                            {({ values, errors, isValid, touched, isSubmitting }) => {
+                            {({ values, errors, isValid, touched, isSubmitting,setFieldValue, setFieldTouched, }) => {
                                 return (
                                     <Form>
                                         {this.state.errMsg ? (
@@ -143,20 +238,21 @@ class LogIn extends Component {
                                                 </Col>
                                             </Row>
                                         ) : null}
+
                                         <Row className="show-grid">
                                             <Col md={12}>
                                                 <div className="form-group">
-                                                    <label>Email ID</label>
+                                                    <label>User ID</label>
                                                     <Field
-                                                        name="emailAddress"
+                                                        name="userId"
                                                         type="text"
                                                         className={`form-control`}
-                                                        placeholder="Email"
+                                                        placeholder="User Id"
                                                         autoComplete="off"
-                                                        value={values.emailAddress}
+                                                        value={values.userId}
                                                     />
-                                                    {errors.emailAddress && touched.emailAddress ? (
-                                                        <span className="errorMsg">{errors.emailAddress}</span>
+                                                    {errors.userId && touched.userId ? (
+                                                        <span className="errorMsg">{errors.userId}</span>
                                                     ) : null}
                                                 </div>
                                             </Col>
@@ -177,6 +273,35 @@ class LogIn extends Component {
                                                 </div>
                                             </Col>
                                         </Row>
+
+                                        <Row className="show-grid">
+                                            <Col sm={12} md={12} lg={12}>
+                                                <div className="formSection">
+                                                    <Field
+                                                        name="broker_id"
+                                                        component="select"
+                                                        autoComplete="off"
+                                                        value={values.broker_id}
+                                                        className="formGrp"
+                                                    >
+                                                    <option value="">Select Broker Company</option>
+                                                    { respArray.map((relations, qIndex) => 
+                                                        <option value={relations.id}>{relations.vendor_name}</option>                                        
+                                                    )}
+                                                    </Field>     
+                                                    {errors.broker_id && touched.broker_id ? (
+                                                        <span className="errorMsg">{errors.broker_id}</span>
+                                                    ) : null}
+                                                </div>
+                                            </Col>
+                                        </Row>
+                                        <Row>
+                                           <Col>&nbsp;</Col>
+                                        </Row>
+                                        <Row>
+                                           <Col>&nbsp;</Col>
+                                        </Row>
+
                                         <Row className="show-grid dropinput">
                                             <Col xs={8}>
 
@@ -205,7 +330,8 @@ class LogIn extends Component {
                                     </Form>
                                 );
                             }}
-                        </Formik> */}
+                        </Formik> }
+
                     </div>
                 </div>
             </BaseComponent>

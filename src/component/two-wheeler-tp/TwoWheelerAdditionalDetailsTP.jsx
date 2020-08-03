@@ -97,44 +97,13 @@ const ownerValidation = Yup.object().shape({
         return "Please enter valid address"
     }),
     phone: Yup.string()
-    .matches(/^[6-9][0-9]{9}$/,'Invalid Mobile number').required('Phone No. is required'),
-    email:Yup.string().email().required('Email is required').min(9, function() {
-        return "Email must be minimum 9 chracters"
+        .matches(/^[6-9][0-9]{9}$/,'Invalid Mobile number').required('Phone No. is required'),
+        
+    email:Yup.string().email().required('Email is required').min(8, function() {
+        return "Email must be minimum 8 chracters"
     })
     .max(75, function() {
         return "Email must be maximum 75 chracters"
-    }),
-
-    is_carloan: Yup.mixed().required('This field is required'),
-    bank_name:Yup.string().notRequired('Bank Name is required')
-    .test(
-        "isLoanChecking",
-        function() {
-            return "Please enter bank name"
-        },
-        function (value) {
-            if (this.parent.is_carloan == 1 && !value) {   
-                return false;    
-            }
-            return true;
-        }
-    ).matches(/^[A-Za-z][A-Za-z\s]*$/, function() {
-        return "Please enter bank name"
-    }),
-    bank_branch: Yup.string().notRequired('Bank branch is required')
-    .test(
-        "isLoanChecking",
-        function() {
-            return "Please enter bank branch"
-        },
-        function (value) {
-            if (this.parent.is_carloan == 1 && !value) {   
-                return false;    
-            }
-            return true;
-        }
-    ).matches(/^[A-Za-z][A-Za-z\s]*$/, function() {
-        return "Please enter bank branch"
     }),
 
     nominee_relation_with:Yup.string().required('Nominee relation is required'),
@@ -204,7 +173,8 @@ class TwoWheelerAdditionalDetails extends Component {
         quoteId: "",
         bankDetails: {},
         addressDetails: [],
-        relation: []
+        relation: [],
+        step_completed: "0"
     };
     
 
@@ -249,7 +219,7 @@ class TwoWheelerAdditionalDetails extends Component {
     }
 
     otherComprehensive = (productId) => {
-        this.props.history.push(`/OtherComprehensive/${productId}`);
+        this.props.history.push(`/two_wheeler_verifyTP/${productId}`);
     }
 
 
@@ -282,18 +252,24 @@ class TwoWheelerAdditionalDetails extends Component {
             'eia_no': values['eia_no'],
             'address': values['address']
         }
-console.log('post_data', post_data);
+        console.log('post_data', post_data);
         formData.append('enc_data',encryption.encrypt(JSON.stringify(post_data)))
         this.props.loadingStart();
         axios
-        .post(`/owner-details`, formData)
+        .post(`/two-wh/owner-details`, formData)
         .then(res => { 
-            // this.props.loadingStop();
-            this.props.history.push(`/Premium/${productId}`);
+            let decryptResp = JSON.parse(encryption.decrypt(res.data));
+            console.log('decryptResp-----', decryptResp)
+            this.props.loadingStop();
+            if (decryptResp.error == false) {
+            this.props.history.push(`/two_wheeler_policy_premium_detailsTP/${productId}`);
+            }
         })
         .catch(err => { 
           this.props.loadingStop();
           actions.setSubmitting(false)
+          let decryptErr = JSON.parse(encryption.decrypt(err.data));
+            console.log('decryptErr-----', decryptErr)
         });
 
     }
@@ -303,10 +279,10 @@ console.log('post_data', post_data);
         let policyHolder_id = localStorage.getItem("policyHolder_refNo") ? localStorage.getItem("policyHolder_refNo") : 0;
         let encryption = new Encryption();
         this.props.loadingStart();
-        axios.get(`policy-holder/motor/${policyHolder_id}`)
+        axios.get(`two-wh/details/${policyHolder_id}`)
             .then(res => {
                  let decryptResp = JSON.parse(encryption.decrypt(res.data))
-                 console.log("decrypt", decryptResp)
+                 console.log("decrypt---", decryptResp)
                  let motorInsurance = decryptResp.data.policyHolder ? decryptResp.data.policyHolder.motorinsurance : {};
                  let previousPolicy = decryptResp.data.policyHolder ? decryptResp.data.policyHolder.previouspolicy : {};
                  let vehicleDetails = decryptResp.data.policyHolder ? decryptResp.data.policyHolder.vehiclebrandmodel : {};
@@ -317,8 +293,10 @@ console.log('post_data', post_data);
                  let is_eia_account=  policyHolder && (policyHolder.is_eia_account == 0 || policyHolder.is_eia_account == 1) ? policyHolder.is_eia_account : ""
                  let bankDetails = decryptResp.data.policyHolder && decryptResp.data.policyHolder.bankdetail ? decryptResp.data.policyHolder.bankdetail[0] : {};
                  let addressDetails = JSON.parse(decryptResp.data.policyHolder.pincode_response)
+                 let step_completed = decryptResp.data.policyHolder ? decryptResp.data.policyHolder.step_no : "";
                  this.setState({
-                    quoteId, motorInsurance, previousPolicy, vehicleDetails, policyHolder, nomineeDetails, is_loan_account, is_eia_account, bankDetails, addressDetails
+                    quoteId, motorInsurance, previousPolicy, vehicleDetails, policyHolder, nomineeDetails, is_loan_account, 
+                    is_eia_account, bankDetails, addressDetails, step_completed: step_completed
                 })
                 this.props.loadingStop();
                 this.fetchPrevAreaDetails(addressDetails)
@@ -418,9 +396,9 @@ console.log('post_data', post_data);
 
     render() {
         const {showEIA, is_eia_account, showLoan, is_loan_account, nomineeDetails, 
-            bankDetails,policyHolder, stateName, pinDataArr, quoteId, addressDetails, relation} = this.state
+            bankDetails,policyHolder, stateName, pinDataArr, quoteId, addressDetails, relation,step_completed,vehicleDetails} = this.state
         const {productId} = this.props.match.params 
-        
+        console.log("step_completed---", step_completed)
 
         let newInitialValues = Object.assign(initialValue, {
             first_name: policyHolder && policyHolder.first_name ? policyHolder.first_name : "",
@@ -446,9 +424,16 @@ console.log('post_data', post_data);
 
         });
 
+        const quoteNumber =
+        quoteId ? (
+            <h4>You are just one steps away in getting your policy ready and your Quotation Number: {quoteId}. Please share a few more details. </h4>
+        ) : null;
+
         // console.log("newInitialValues", newInitialValues)
         return (
             <>
+            { step_completed >= '4' && vehicleDetails.vehicletype_id == '3' ?
+            <div>
                 <BaseComponent>
                 <div className="container-fluid">
                 <div className="row">
@@ -461,106 +446,18 @@ console.log('post_data', post_data);
                     <div className="brand-bg">
 
                         <Formik initialValues={newInitialValues} onSubmit={this.handleSubmit}
-                        // validationSchema={ownerValidation}
+                        validationSchema={ownerValidation}
                         >
                         {({ values, errors, setFieldValue, setFieldTouched, isValid, isSubmitting, touched }) => {
                              let value = values.nominee_first_name;
-
-                            //  value = value.replace(/[^A-Za-z]/ig, '')
-                            //  values.nominee_first_name = value;
                             
                         return (
                         <Form>
                         <Row>
                             <Col sm={12} md={9} lg={9}>
-                            
-                                {/* <div className="d-flex justify-content-left carloan">
-                                    <h4> Taken Two-wheeler Loan</h4>
-                                </div> */}
-
-                                {/* <Row>
-                                    <Col sm={12} md={4} lg={4}>
-                                        <div className="d-inline-flex m-b-35">
-                                            <div className="p-r-25">
-                                                <label className="customRadio3">
-                                                <Field
-                                                    type="radio"
-                                                    name='is_carloan'                                            
-                                                    value='1'
-                                                    key='1'  
-                                                    onChange={(e) => {
-                                                        setFieldValue(`is_carloan`, e.target.value);
-                                                        this.showLoanText(1);
-                                                    }}
-                                                    checked={values.is_carloan == '1' ? true : false}
-                                                />
-                                                    <span className="checkmark " /><span className="fs-14"> Yes</span>
-                                                </label>
-                                            </div>
-
-                                            <div className="">
-                                                <label className="customRadio3">
-                                                <Field
-                                                    type="radio"
-                                                    name='is_carloan'                                            
-                                                    value='0'
-                                                    key='1'  
-                                                    onChange={(e) => {
-                                                        setFieldValue(`is_carloan`, e.target.value); 
-                                                        this.showLoanText(0);  
-                                                    }}
-                                                    checked={values.is_carloan == '0' ? true : false}
-                                                />
-                                                    <span className="checkmark" />
-                                                    <span className="fs-14">No</span>
-                                                </label>
-                                                {errors.is_carloan && touched.is_carloan ? (
-                                                <span className="errorMsg">{errors.is_carloan}</span>
-                                                ) : null}
-                                            </div>
-                                        </div>
-                                    </Col>
-                                    {showLoan || is_loan_account == 1 ?
-                                    <Fragment>
-                                    <Col sm={12} md={4} lg={4}>
-                                        <FormGroup>
-                                            <div className="insurerName">
-                                            <Field
-                                                    name='bank_name'
-                                                    type="text"
-                                                    placeholder="Bank Name"
-                                                    autoComplete="off"
-                                                    onFocus={e => this.changePlaceHoldClassAdd(e)}
-                                                    onBlur={e => this.changePlaceHoldClassRemove(e)}
-                                                    value = {values.bank_name}                                                                            
-                                            />
-                                                {errors.bank_name && touched.bank_name ? (
-                                            <span className="errorMsg">{errors.bank_name}</span>
-                                            ) : null}
-                                            </div>
-                                        </FormGroup>
-                                    </Col> 
-                                    <Col sm={12} md={4} lg={4}>
-                                        <FormGroup>
-                                            <div className="insurerName">
-                                            <Field
-                                                    name='bank_branch'
-                                                    type="text"
-                                                    placeholder="Bank Branch"
-                                                    autoComplete="off"
-                                                    onFocus={e => this.changePlaceHoldClassAdd(e)}
-                                                    onBlur={e => this.changePlaceHoldClassRemove(e)}
-                                                    value = {values.bank_branch}                                                                            
-                                            />
-                                                {errors.bank_branch && touched.bank_branch ? (
-                                            <span className="errorMsg">{errors.bank_branch}</span>
-                                            ) : null} 
-                                            </div>
-                                        </FormGroup>
-                                    </Col>
-                                    </Fragment>: ''}
-                                </Row>
-                                 */}
+                                <div className="d-flex justify-content-left brandhead">
+                                {quoteNumber}
+                                </div>
 
                                 <div className="d-flex justify-content-left carloan">
                                     <h4> Owners Details</h4>
@@ -953,7 +850,7 @@ console.log('post_data', post_data);
                             </Col>
 
                             <Col sm={12} md={3} lg={3}>
-                                <div className="motrcar"><img src={require('../../assets/images/motor-car.svg')} alt="" /></div>
+                                <div className="motrcar"><img src={require('../../assets/images/two-wheeler-addl.svg')} alt="" /></div>
                             </Col>
                         </Row>
                         </Form>
@@ -967,6 +864,7 @@ console.log('post_data', post_data);
                 </div>
                 </div>
                 </BaseComponent>
+                </div> : step_completed == "" ? "Forbidden" : null }
             </>
         );
     }

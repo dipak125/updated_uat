@@ -421,7 +421,7 @@ console.log('nomineedetails', nomineedetails)
                                                                 </Collapsible>
                                                             </div>
 
-                                                            <Row>
+                                                            {/* <Row>
                                                                 <Col sm={12} md={6}>
                                                                     <div className="carloan">
                                                                         <h4>Make Payment</h4>
@@ -432,12 +432,12 @@ console.log('nomineedetails', nomineedetails)
                                                                         <h4>Select Payment Gateway</h4>
                                                                     </div>
                                                                 </Col>
-                                                            </Row>
+                                                            </Row> */}
 
 
                                                             <Row>
                                                                 <Col sm={12} md={6}>
-                                                                    <Row>
+                                                                    {/* <Row>
                                                                         <Col sm={6}>
                                                                             <FormGroup>
                                                                                 <div className="refno">
@@ -464,13 +464,18 @@ console.log('nomineedetails', nomineedetails)
                                                                                 </div>
                                                                             </FormGroup>
                                                                         </Col>
-                                                                    </Row>
+                                                                    </Row> */}
 
                                                                 </Col>
                                                                 <Col sm={12} md={6}>
                                                                     <FormGroup>
-                                                                        <img src={require('../../assets/images/green-check.svg')} alt="" className="m-r-10" />
-                                                                        <img src={require('../../assets/images/CSC.svg')} alt="" />
+                                                                    <div className="paymntgatway">
+                                                                        Select Payment Gateway
+                                                                        <div>
+                                                                            <img src={require('../../assets/images/green-check.svg')} alt="" className="m-r-10" />
+                                                                            <img src={require('../../assets/images/CSC.svg')} alt="" />
+                                                                        </div>
+                                                                    </div>
                                                                     </FormGroup>
                                                                 </Col>
                                                             </Row>

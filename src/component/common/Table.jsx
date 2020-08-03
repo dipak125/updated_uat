@@ -25,6 +25,9 @@ class Table extends Component {
         if(productId == '2'){
             this.props.history.push(`/Registration/${productId}`);
         }
+        else if(productId == '3') {
+            this.props.history.push(`/two_wheeler_Select-brandTP/${productId}`)
+        }
         else if(productId == '4') {
             this.props.history.push(`/two_wheeler_Select-brand/${productId}`)
         }

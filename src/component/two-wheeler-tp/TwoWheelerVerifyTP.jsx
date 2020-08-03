@@ -19,22 +19,38 @@ import swal from 'sweetalert';
 import moment from "moment";
 import {  PersonAge } from "../../shared/dateFunctions";
 import { addDays } from 'date-fns';
+import {
+    checkGreaterTimes,
+    checkGreaterStartEndTimes
+  } from "../../shared/validationFunctions";
+
+let encryption = new Encryption();
 
 const ageObj = new PersonAge();
 const minDate = moment(moment().subtract(1, 'years').calendar()).add(1, 'day').calendar();
 const maxDate = moment(minDate).add(30, 'day').calendar();
 const minRegnDate = moment().subtract(18, 'years').calendar();
 
+const fuel = {
+    1: 'Petrol',
+    2: 'Diesel'
+}
+
 const initialValue = {
     registration_no: "",
     chasis_no: "",
     chasis_no_last_part: "",
-    add_more_coverage: "",
     cng_kit: 0,
     // cngKit_Cost: 0,
     engine_no: "",
     vahanVerify: false,
-    newRegistrationNo: ""
+    newRegistrationNo: "",
+    previous_start_date: "",
+    previous_end_date: "",
+    previous_policy_no: "",
+    previous_policy_name: "",
+    insurance_company_id: 0,
+    policy_type_id: ""
 }
 const ComprehensiveValidation = Yup.object().shape({
 
@@ -62,8 +78,8 @@ const ComprehensiveValidation = Yup.object().shape({
     .min(5, function() {
         return "Engine no. should be minimum 5 characters"
     })
-    .max(12, function() {
-        return "Engine no. should be maximum 12 characters"
+    .max(17, function() {
+        return "Engine no. should be maximum 17 characters"
     }),
 
     chasis_no:Yup.string().required('Chasis no is required')
@@ -73,8 +89,8 @@ const ComprehensiveValidation = Yup.object().shape({
     .min(5, function() {
         return "Chasis no. should be minimum 5 characters"
     })
-    .max(12, function() {
-        return "Chasis no. should be maximum 12 characters"
+    .max(17, function() {
+        return "Chasis no. should be maximum 17 characters"
     }),
 
     vahanVerify:Yup.boolean().notRequired('Please verify chasis number')
@@ -89,49 +105,162 @@ const ComprehensiveValidation = Yup.object().shape({
             }
             return true;
         }
+    ),
+
+    previous_start_date:Yup.date()
+    .notRequired('Previous Start date is required')
+    .test(
+        "currentMonthChecking",
+        function() {
+            return "Please enter Start date"
+        },
+        function (value) {
+            if (this.parent.policy_type_id == 2 && !value) {   
+                return false;    
+            }
+            return true;
+        }
+    ).test(
+        "checkGreaterTimes",
+        "Start date must be less than end date",
+        function (value) {
+            if (value) {
+                return checkGreaterStartEndTimes(value, this.parent.previous_end_date);
+            }
+            return true;
+        }
+    ).test(
+      "checkStartDate",
+      "Enter Start Date",
+      function (value) {       
+          if ( this.parent.previous_end_date != undefined && value == undefined) {
+              return false;
+          }
+          return true;
+      }
+    ),
+    previous_end_date:Yup.date()
+    .notRequired('Previous end date is required')
+    .test(
+        "currentMonthChecking",
+        function() {
+            return "Please enter end date"
+        },
+        function (value) {
+            if (this.parent.policy_type_id == 2 && !value) {   
+                return false;    
+            }
+            return true;
+        }
+    ).test( 
+        "checkGreaterTimes",
+        "End date must be greater than start date",
+        function (value) {
+            if (value) {
+                return checkGreaterTimes(value, this.parent.previous_start_date);
+            }
+            return true;
+        }
+        ).test(
+        "checkEndDate",
+        "Enter End Date",
+        function (value) {     
+            if ( this.parent.previous_start_date != undefined && value == undefined) {
+                return false;
+            }
+            return true;
+        }
+    ),
+    previous_policy_name:Yup.string()
+    .notRequired('Please select Policy Type')
+    .test(
+        "currentMonthChecking",
+        function() {
+            return "Please select Policy Type"
+        },
+        function (value) {
+            if (this.parent.policy_type_id == 2 && !value) {   
+                return false;    
+            }
+            return true;
+        }
+    ),
+    insurance_company_id:Yup.number()
+    .notRequired('Insurance company is required')
+    .test(
+        "currentMonthChecking",
+        function() {
+            return "Please enter previous insurance company"
+        },
+        function (value) {
+            if (this.parent.policy_type_id == 2 && !value) {   
+                return false;    
+            }
+            return true;
+        }
+    ),
+    previous_city:Yup.string()
+    .notRequired('Previous city is required')
+    .test(
+        "currentMonthChecking",
+        function() {
+            return "Please enter previous insurance company city"
+        },
+        function (value) {
+            if (this.parent.policy_type_id == 2 && !value) {   
+                return false;    
+            }
+            return true;
+        }
     )
+    .matches(/^[a-zA-Z0-9][a-zA-Z0-9-/.,\s]*$/, 
+        function() {
+            return "Please enter valid address"
+        }),
+
+    previous_policy_no:Yup.string()
+    .notRequired('Previous policy number is required')
+    .test(
+        "currentMonthChecking",
+        function() {
+            return "Please enter previous policy number"
+        },
+        function (value) {
+            if (this.parent.policy_type_id == 2 && !value) {   
+                return false;    
+            }
+            return true;
+        }
+    )
+    .matches(/^[a-zA-Z0-9][a-zA-Z0-9\s-/]*$/, 
+        function() {
+            return "Please enter valid policy number"
+        }).min(6, function() {
+            return "Policy No. must be minimum 6 chracters"
+        })
+        .max(18, function() {
+            return "Policy No. must be maximum 18 chracters"
+        }),
+
    
 });
 
 
-const Coverage = {
-        "C101064":"Own Damage",
-        "C101065":"Legal Liability to Third Party",
-        "C101066":"PA Cover",
-        "C101069":"Basic Road Side Assistance",
-        "C101072":"Depreciation Reimbursement",
-        "C101067":"Return to Invoice",
-        "C101108":"Engine Guard",
-        "C101111":"Cover for consumables"
-}
 
 class TwoWheelerVerify extends Component {
 
-    constructor(props) {
-        super(props);
-
-        this.handleShow = this.handleShow.bind(this);
-        this.handleClose = this.handleClose.bind(this);
-
-        this.state = {
-            showCNG: false,
-            is_CNG_account: '',
-            accessToken: '',
-            serverResponse: [],
-            fulQuoteResp: [],
-            PolicyArray: [],
-            show: false,
-            sliderVal: '',
+        state = {
+            previousPolicy: [],
             motorInsurance: [],
-            add_more_coverage: [],
             vahanDetails: [],
             vahanVerify: false,
             policyCoverage: [],
             regno:'',
             length:15,
             insurerList: [],
+            vehicleDetails: [],
+            step_completed: "0"
         };
-    }
 
     changePlaceHoldClassAdd(e) {
         let element = e.target.parentElement;
@@ -143,68 +272,43 @@ class TwoWheelerVerify extends Component {
         e.target.value.length === 0 && element.classList.remove('active');
     }
 
-    handleClose() {
-        this.setState({ show: false });
-    }
-
-    handleShow() {
-        this.setState({ show: true });
-    }
-
-    handleChange = () => {
-        this.setState({serverResponse: [], error: [] });
-    }
-
-    showCNGText = (value) =>{
-        if(value == 1){
-            this.setState({
-                showCNG:true,
-                is_CNG_account:1,
-                serverResponse: [],
-                error: []
-            })
+    selectVehicleBrand = (productId) => {
+        if(localStorage.getItem('brandEdit') == '1') {
+            localStorage.setItem('newBrandEdit', 1)
         }
-        else{
-            this.setState({
-                showCNG:false,
-                is_CNG_account:0,
-                serverResponse: [],
-                error: []
-            })
+        else if(localStorage.getItem('brandEdit') == '2') {
+            localStorage.setItem('newBrandEdit', '2')
         }
+        this.props.history.push(`/two_wheeler_Select-brandTP/${productId}`);
     }
 
-    sliderValue = (value) => {
-        this.setState({
-            sliderVal: value,
-            serverResponse: [],
-            error: []
-        })
+    selectBrand = (productId) => {
+        this.props.history.push(`/two_wheeler_Select-brandTP/${productId}`);
     }
 
-    vehicleDetails = (productId) => {      
-        this.props.history.push(`/VehicleDetails/${productId}`);
+    otherComprehensive = (productId) => {      
+        this.props.history.push(`/two_wheeler_OtherComprehensiveTP/${productId}`);
     }
 
 
     fetchData = () => {
         const { productId } = this.props.match.params
         let policyHolder_id = localStorage.getItem("policyHolder_refNo") ? localStorage.getItem("policyHolder_refNo") : 0;
-        let encryption = new Encryption();
         this.props.loadingStart();
-        axios.get(`policy-holder/motor/${policyHolder_id}`)
+        axios.get(`two-wh/details/${policyHolder_id}`)
             .then(res => {
                 let decryptResp = JSON.parse(encryption.decrypt(res.data))
-                console.log("decrypt", decryptResp)
+                console.log("decryptResp====", decryptResp)
                 let motorInsurance = decryptResp.data.policyHolder ? decryptResp.data.policyHolder.motorinsurance : {}
-                let values = []
+                let previousPolicy = decryptResp.data.policyHolder ? decryptResp.data.policyHolder.previouspolicy : {};
+                let vehicleDetails = decryptResp.data.policyHolder ? decryptResp.data.policyHolder.vehiclebrandmodel : {};
+                let step_completed = decryptResp.data.policyHolder ? decryptResp.data.policyHolder.step_no : "";
+                this.getInsurerList()
                 this.setState({
-                    motorInsurance,
-                    showCNG: motorInsurance.cng_kit == 1 ? true : false,
+                    motorInsurance, previousPolicy,vehicleDetails,step_completed,
                     vahanVerify: motorInsurance.chasis_no && motorInsurance.engine_no ? true : false
                 })
                 this.props.loadingStop();
-                this.getAccessToken(values)
             })
             .catch(err => {
                 // handle error
@@ -212,23 +316,6 @@ class TwoWheelerVerify extends Component {
             })
     }
 
-    getAccessToken = (values) => {
-        this.props.loadingStart();
-        axios
-          .post(`/callTokenService`)
-          .then((res) => {
-            this.setState({
-              accessToken: res.data.access_token,
-            });
-            this.fullQuote(res.data.access_token, values)
-          })
-          .catch((err) => {
-            this.setState({
-              accessToken: '',
-            });
-            this.props.loadingStop();
-          });
-      };
 
 
     getVahanDetails = (values, setFieldTouched, setFieldValue, errors) => {
@@ -248,140 +335,176 @@ class TwoWheelerVerify extends Component {
         if(errors.registration_no || errors.chasis_no_last_part) {
             swal("Please provide correct Registration number and Chasis number")
         }
+        // else {
+        //     this.props.loadingStart()
+        //     axios
+        //     .post(`/getVahanDetails`,formData)
+        //     .then((res) => {
+        //         this.setState({
+        //         vahanDetails: res.data,
+        //         vahanVerify: res.data.length > 0 ? true : false
+        //         });
+
+        //         setFieldTouched('vahanVerify')
+        //         res.data.length > 0 ?
+        //         setFieldValue('vahanVerify', true) 
+        //         : setFieldValue('vahanVerify', false)
+
+        //         this.props.loadingStop();
+        //     })
+        //     .catch((err) => {
+        //         this.setState({
+        //             vahanDetails: [],
+        //         });
+        //         swal("Please provide correct Registration number and Chasis number")
+        //         this.props.loadingStop();
+        //     });
+        // }
         else {
             this.props.loadingStart()
-            axios
-            .post(`/getVahanDetails`,formData)
-            .then((res) => {
                 this.setState({
-                vahanDetails: res.data,
-                vahanVerify: res.data.length > 0 ? true : false
+                vahanDetails: [],
+                vahanVerify:  true 
                 });
 
                 setFieldTouched('vahanVerify')
-                res.data.length > 0 ?
                 setFieldValue('vahanVerify', true) 
-                : setFieldValue('vahanVerify', false)
 
                 this.props.loadingStop();
-            })
-            .catch((err) => {
-                this.setState({
-                    vahanDetails: [],
-                });
-                swal("Please provide correct Registration number and Chasis number")
-                this.props.loadingStop();
-            });
         }
     };
+
+    getInsurerList = () => {
+        axios
+          .get(`/company/1`)
+          .then(res => {
+            this.setState({
+                insurerList: res.data.data
+            });
+          })
+          .catch(err => {
+            this.setState({
+                insurerList: []
+            });
+            this.props.loadingStop();
+          });
+    }
 
 
     handleSubmit = (values) => {
         const { productId } = this.props.match.params
-        const { motorInsurance, PolicyArray, sliderVal, add_more_coverage } = this.state
-        let defaultSliderValue = PolicyArray.length > 0 ? Math.round(PolicyArray[0].PolicyRiskList[0].IDV_Suggested) : 0
-
+        const { motorInsurance } = this.state
+        
         const formData = new FormData();
         let encryption = new Encryption();
         let post_data = {}
-        if(add_more_coverage.length > 0){
+        if(motorInsurance.policytype_id == '3'){
             post_data = {
                 'policy_holder_id': localStorage.getItem('policyHolder_id'),
-                'menumaster_id': 1,
+                'menumaster_id': 3,
                 'registration_no': motorInsurance.registration_no ? motorInsurance.registration_no : values.registration_no,
                 'chasis_no': values.chasis_no,
                 'chasis_no_last_part': values.chasis_no_last_part,
-                'cng_kit': values.cng_kit,
-                // 'cngkit_cost': values.cngKit_Cost,
                 'engine_no': values.engine_no,
-                'idv_value': sliderVal ? sliderVal : defaultSliderValue.toString(),
-                'add_more_coverage': add_more_coverage
+                'prev_policy_flag': 0,
+                'cng_kit': 0
             }
         }
         else {
             post_data = {
                 'policy_holder_id': localStorage.getItem('policyHolder_id'),
-                'menumaster_id': 1,
+                'menumaster_id': 3,
                 'registration_no':motorInsurance.registration_no ? motorInsurance.registration_no : values.registration_no,
                 'chasis_no': values.chasis_no,
                 'chasis_no_last_part': values.chasis_no_last_part,
-                'cng_kit': values.cng_kit,
-                // 'cngkit_cost': values.cngKit_Cost,
                 'engine_no': values.engine_no,
-                'idv_value': sliderVal ? sliderVal : defaultSliderValue.toString(),
+                'prev_policy_flag': 1,
+                'previous_start_date':moment(values.previous_start_date).format("YYYY-MM-DD"),
+                'previous_end_date':moment(values.previous_end_date).format("YYYY-MM-DD"),
+                'previous_policy_no': values.previous_policy_no,
+                'previous_policy_name':values.previous_policy_name,
+                'insurance_company_id':values.insurance_company_id,
+                'cng_kit': 0,
+                'previous_city':values.previous_city,
+                        
             }
         }
         console.log('post_data',post_data)
         formData.append('enc_data', encryption.encrypt(JSON.stringify(post_data)))
         this.props.loadingStart();
-        axios.post('update-insured-value', formData).then(res => {
+        axios.post('two-wh/previous-vehicle-details', formData).then(res => {
             this.props.loadingStop();
-            if (res.data.error == false) {
-                this.props.history.push(`/Additional_details/${productId}`);
+            let decryptResp = JSON.parse(encryption.decrypt(res.data));
+            console.log('decryptResp-----', decryptResp)
+            if (decryptResp.error == false) {
+                this.props.history.push(`/two_wheeler_additional_detailsTP/${productId}`);
             }
 
         })
-            .catch(err => {
-                // handle error
-                this.props.loadingStop();
-            })
+        .catch(err => {
+            // handle error
+            this.props.loadingStop();
+            let decryptErr = JSON.parse(encryption.decrypt(err.data));
+            console.log('decryptErr-----', decryptErr)
+        })
     }
 
-    onRowSelect = (values,isSelect) =>{
 
-        const { add_more_coverage} = this.state;
-         var drv = [];
-         if(isSelect) {          
-            add_more_coverage.push(values);
-            this.setState({
-                add_more_coverage: add_more_coverage,
-                serverResponse: [],
-                error: []
-            });                               
+    regnoFormat = (e, setFieldTouched, setFieldValue) => {
+        
+        let regno = e.target.value
+        let formatVal = e.target.value
+        let regnoLength = regno.length
+        var letter = /^[a-zA-Z]+$/;
+        var number = /^[0-9]+$/;
+        let subString = regno.substring(regnoLength-1, regnoLength)
+        let preSubString = regno.substring(regnoLength-2, regnoLength-1)
+    
+    
+        if(subString.match(letter) && preSubString.match(letter)) {
+            formatVal = regno
         }
-        else {                
-            const index = add_more_coverage.indexOf(values);    
-            if (index !== -1) {  
-                add_more_coverage.splice(index,1);
-                this.setState({
-                    serverResponse: [],
-                    error: []
-                });      
-                }                  
-        }
+        else if(subString.match(number) && preSubString.match(number)) {
+            formatVal = regno
+        } 
+        if(subString.match(number) && preSubString.match(letter)) {
+            formatVal = regno.replace(regno.substring(regnoLength-1, regnoLength), " ")
+            formatVal = formatVal+subString
+        } 
+        else if(subString.match(letter) && preSubString.match(number)) {
+            formatVal = regno.replace(regno.substring(regnoLength-1, regnoLength), " ")
+            formatVal = formatVal+subString
+        } 
+    
+        e.target.value = formatVal.toUpperCase()
+    
     }
-
-    toInputUppercase = e => {
-        e.target.value = ("" + e.target.value).toUpperCase();
-      };
 
 
     componentDidMount() {
-
+        this.fetchData()
     }
 
 
     render() {
-        const {insurerList, vahanDetails, error, policyCoverage, vahanVerify, fulQuoteResp, PolicyArray, 
-            sliderVal, motorInsurance, serverResponse} = this.state
+        const {insurerList, vahanDetails, error, vehicleDetails, vahanVerify, previousPolicy, motorInsurance, step_completed} = this.state
         const {productId} = this.props.match.params 
-        let defaultSliderValue = PolicyArray.length > 0 ? Math.round(PolicyArray[0].PolicyRiskList[0].IDV_Suggested) : 0
-        let sliderValue = sliderVal
-        let minIDV = PolicyArray.length > 0 ? Math.floor(PolicyArray[0].PolicyRiskList[0].MinIDV_Suggested) : null
-        let maxIDV = PolicyArray.length > 0 ? Math.floor(PolicyArray[0].PolicyRiskList[0].MaxIDV_Suggested) : null
-        minIDV = minIDV + 1;
-        maxIDV = maxIDV - 1;
+
         let newInitialValues = Object.assign(initialValue, {
             registration_no: motorInsurance.registration_no ? motorInsurance.registration_no : "",
             chasis_no: motorInsurance.chasis_no ? motorInsurance.chasis_no : "",
             chasis_no_last_part: motorInsurance.chasis_no_last_part ? motorInsurance.chasis_no_last_part : "",
-            add_more_coverage: motorInsurance.add_more_coverage ? motorInsurance.add_more_coverage : "",
-            // cng_kit: motorInsurance.cng_kit ? motorInsurance.cng_kit : "",
-            // cng_kit: motorInsurance.cng_kit == 0 || motorInsurance.cng_kit == 1 ? motorInsurance.cng_kit : is_CNG_account,
-            // cngKit_Cost: motorInsurance.cngkit_cost ? Math.round(motorInsurance.cngkit_cost) : 0,
             engine_no: motorInsurance.engine_no ? motorInsurance.engine_no : "",
             vahanVerify: vahanVerify,
-            // newRegistrationNo: localStorage.getItem('registration_number') == "NEW" ? localStorage.getItem('registration_number') : ""
+            previous_start_date: previousPolicy && previousPolicy.start_date ? new Date(previousPolicy.start_date) : "",
+            previous_end_date: previousPolicy && previousPolicy.end_date ? new Date(previousPolicy.end_date) : "",
+            previous_policy_name: previousPolicy && previousPolicy.name ? previousPolicy.name : "",
+            // insurance_company_id: previousPolicy && previousPolicy.insurancecompany && previousPolicy.insurancecompany.Id ? previousPolicy.insurancecompany.Id : "",
+            insurance_company_id: previousPolicy && previousPolicy.insurancecompany_id ? previousPolicy.insurancecompany_id : "",
+            previous_city: previousPolicy && previousPolicy.city ? previousPolicy.city : "",
+            previous_policy_no: previousPolicy && previousPolicy.policy_no ? previousPolicy.policy_no : "",
+            newRegistrationNo:  motorInsurance.registration_no &&  motorInsurance.registration_no == "NEW" ? motorInsurance.registration_no : "",
+            policy_type_id: motorInsurance && motorInsurance.policytype_id ? motorInsurance.policytype_id : ""
 
         });
 
@@ -400,6 +523,8 @@ class TwoWheelerVerify extends Component {
 
         return (
             <>
+            { step_completed >= '3' && vehicleDetails.vehicletype_id == '3' ?
+            <div>
                 <BaseComponent>
                 <div className="container-fluid">
                 <div className="row">
@@ -417,44 +542,10 @@ class TwoWheelerVerify extends Component {
                     </div>
                     <Formik initialValues={newInitialValues} 
                     onSubmit={ this.handleSubmit} 
-                    // validationSchema={ComprehensiveValidation}
+                    validationSchema={ComprehensiveValidation}
                     >
                     {({ values, errors, setFieldValue, setFieldTouched, isValid, isSubmitting, touched }) => {
-                            this.state.regno = "";
-                                          
-                            if(values.registration_no.length>0 && values.newRegistrationNo != "NEW"){
-                            if(values.registration_no.toLowerCase().substring(0, 2) == "dl")
-                            {
-                                
-                                this.state.length = 15;
-                                if(values.registration_no.length<11)
-                            {
-                               
-                            this.state.regno=values.registration_no.replace(/[^A-Za-z0-9]+/g, '').replace(/(.{2})/g, '$1 ').trim();
                             
-                            }
-                            else{
-
-                                this.state.regno=values.registration_no;                                                
-                            }                                        
-
-                            }   
-                            else{ 
-                                
-                                this.state.length = 13;
-                            if(values.registration_no.length<10)
-                            {
-                               
-                            this.state.regno=values.registration_no.replace(/[^A-Za-z0-9]+/g, '').replace(/(.{2})/g, '$1 ').trim();
-                            
-                            }
-                            else{
-                                
-                                this.state.regno=values.registration_no;
-                                
-                            }
-                        }
-                        }
                     return (
                         <Form>
                         <FormGroup>
@@ -479,29 +570,17 @@ class TwoWheelerVerify extends Component {
                                     <Col sm={12} md={5} lg={6}>
                                         <FormGroup>
                                             <div className="insurerName">
-                                            {values.newRegistrationNo != "NEW" ?
                                                     <Field
                                                         type="text"
                                                         name='registration_no' 
                                                         autoComplete="off"
-                                                        className="premiumslid"   
-                                                        // value= {values.registration_no}    
-                                                        value={this.state.regno}
+                                                        className="premiumslid"    
+                                                        value= {values.registration_no}
                                                         maxLength={this.state.length}
                                                         onInput={e=>{
-                                                            this.toInputUppercase(e)
+                                                            this.regnoFormat(e, setFieldTouched, setFieldValue)
                                                         }}                                                 
-                                                    /> :
-                                                    <Field
-                                                        type="text"
-                                                        name='registration_no' 
-                                                        autoComplete="off"
-                                                        className="premiumslid"   
-                                                        value= {values.newRegistrationNo}    
-                                                        disabled = {true}                                                 
-                                                    />
-
-                                                }
+                                                    /> 
                                                 {errors.registration_no ? (
                                                     <span className="errorMsg">{errors.registration_no}</span>
                                                 ) : null}
@@ -572,7 +651,7 @@ class TwoWheelerVerify extends Component {
                                                     onFocus={e => this.changePlaceHoldClassAdd(e)}
                                                     onBlur={e => this.changePlaceHoldClassRemove(e)}
                                                     value= {values.engine_no.toUpperCase()}
-                                                    maxLength="12"
+                                                    maxLength="17"
                                                     onChange = {(e) => {
                                                         setFieldTouched('engine_no')
                                                         setFieldValue('engine_no', e.target.value)                       
@@ -595,7 +674,7 @@ class TwoWheelerVerify extends Component {
                                                     onFocus={e => this.changePlaceHoldClassAdd(e)}
                                                     onBlur={e => this.changePlaceHoldClassRemove(e)}
                                                     value= {values.chasis_no.toUpperCase()}
-                                                    maxLength="12"
+                                                    maxLength="17"
                                                     onChange = {(e) => {
                                                         setFieldTouched('chasis_no')
                                                         setFieldValue('chasis_no', e.target.value)                       
@@ -618,7 +697,7 @@ class TwoWheelerVerify extends Component {
                                         </FormGroup>
                                     </Col>
                                 </Row>
-                                {/* {localStorage.getItem('registration_number') != "NEW" ?  */}
+                                {values.policy_type_id == '2' ? 
                                 <Fragment>
                                 <Row>
                                     <Col sm={12}>
@@ -714,7 +793,7 @@ class TwoWheelerVerify extends Component {
                                         >
                                             <option value="">Select Insurer Company</option>
                                             {insurerList.map((insurer, qIndex) => ( 
-                                                <option value= {insurer.id}>{insurer.name}</option>
+                                                <option value= {insurer.Id}>{insurer.name}</option>
                                             ))}
                                         </Field>     
                                         {errors.insurance_company_id && touched.insurance_company_id ? (
@@ -748,7 +827,7 @@ class TwoWheelerVerify extends Component {
                                         <FormGroup>
                                             <div className="insurerName">
                                                 <Field
-                                                    name="previous_pol_nmbr"
+                                                    name="previous_policy_no"
                                                     type="text"
                                                     placeholder="Previous Policy Number"
                                                     autoComplete="off"
@@ -756,8 +835,8 @@ class TwoWheelerVerify extends Component {
                                                     onBlur={e => this.changePlaceHoldClassRemove(e)}
                                                     
                                                 />
-                                                {errors.previous_pol_nmbr && touched.previous_pol_nmbr ? (
-                                                    <span className="errorMsg">{errors.previous_pol_nmbr}</span>
+                                                {errors.previous_policy_no && touched.previous_policy_no ? (
+                                                    <span className="errorMsg">{errors.previous_policy_no}</span>
                                                 ) : null}
                                             </div>
                                         </FormGroup>
@@ -773,15 +852,58 @@ class TwoWheelerVerify extends Component {
                                     </Col>
                                 </Row>
                                 </Fragment> 
-                                {/* : null} */}
+                              : null}
 
                                     <div className="d-flex justify-content-left resmb">
-                                        <Button className={`backBtn`} type="button"  onClick= {this.vehicleDetails.bind(this,productId)}>
+                                        <Button className={`backBtn`} type="button"  onClick= {this.otherComprehensive.bind(this,productId)}>
                                             Back
                                         </Button> 
                                         <Button className={`proceedBtn`} type="submit"  >
                                             Continue
                                         </Button>
+                                        </div>
+                                    </Col>
+                                    <Col sm={12} md={3}>
+                                        <div className="vehbox">
+                                            <Row className="m-b-25">
+                                                <Col sm={12} md={7}>
+                                                    <div className="txtRegistr">Registration No.<br />
+                                                    {motorInsurance && motorInsurance.registration_no}</div>
+                                                </Col>
+
+                                                <Col sm={12} md={5} className="text-right">
+                                                    <button className="rgistrBtn" type="button" onClick={this.selectBrand.bind(this, productId)}>Edit</button>
+                                                </Col>
+                                            </Row>
+
+                                            <Row className="m-b-25">
+                                                <Col sm={12} md={7}>
+                                                    <div className="txtRegistr">Two-wheeler Brand<br/>
+                                                        <strong>{vehicleDetails && vehicleDetails.vehiclebrand && vehicleDetails.vehiclebrand.name ? vehicleDetails.vehiclebrand.name : ""}</strong></div>
+                                                </Col>
+
+                                                <Col sm={12} md={5} className="text-right">
+                                                    <button className="rgistrBtn" type="button" onClick= {this.selectBrand.bind(this,productId)}>Edit</button>
+                                                </Col>
+                                            </Row>
+
+                                            <Row className="m-b-25">
+                                                <Col sm={12} md={7}>
+                                                    <div className="txtRegistr">Two-wheeler Model<br/>
+                                                        <strong>{vehicleDetails && vehicleDetails.vehiclemodel && vehicleDetails.vehiclemodel.description ? vehicleDetails.vehiclemodel.description+" "+vehicleDetails.varientmodel.varient : ""}</strong></div>
+                                                </Col>
+
+                                                <Col sm={12} md={5} className="text-right">
+                                                    <button className="rgistrBtn" type="button" onClick= {this.selectVehicleBrand.bind(this,productId)}>Edit</button>
+                                                </Col>
+                                            </Row>
+
+                                            <Row className="m-b-25">
+                                                <Col sm={12} md={7}>
+                                                    <div className="txtRegistr">Fuel Type<br/>
+                                                        <strong>{vehicleDetails && vehicleDetails.varientmodel && fuel[Math.floor(vehicleDetails.varientmodel.fuel_type)]} </strong></div>
+                                                </Col>
+                                            </Row>
                                         </div>
                                     </Col>
                                 </Row>
@@ -795,7 +917,7 @@ class TwoWheelerVerify extends Component {
                     </div>
                     </div>
                 </BaseComponent>
-
+                </div> : step_completed == "" ? "Forbidden" : null }
             </>
         );
     }
