@@ -308,6 +308,7 @@ class TwoWheelerSelectBrand extends Component {
     handleSubmit = (values) => {
         const { productId } = this.props.match.params
         const { selectedVarientId, selectedModelId, selectedBrandId } = this.state
+        let post_data = {}
         const formData = new FormData();
         let encryption = new Encryption();
         let policyHolder_id = localStorage.getItem('policyHolder_id') ? localStorage.getItem('policyHolder_id') :0
@@ -320,21 +321,37 @@ class TwoWheelerSelectBrand extends Component {
         
 
         if(policyHolder_id > 0) {
-            const post_data = {
-                'menumaster_id': 3,
-                'brand_id': values.selectedBrandId,
-                'brand_model_id': values.selectedModelId,
-                'model_varient_id': values.selectedVarientId,
-                'vehicle_type_id':4,
-                'registration_no':values.regNumber,
-                'policy_type_id':values.policy_type,
-                'policy_holder_id': policyHolder_id,
-                'check_registration': values.check_registration,
-                'csc_id':sessionStorage.getItem('csc_id') ? sessionStorage.getItem('csc_id') : "",
-                'agent_name':sessionStorage.getItem('agent_name') ? sessionStorage.getItem('agent_name') : "",
-                'product_id':sessionStorage.getItem('product_id') ? sessionStorage.getItem('product_id') : "",
-                'bcmaster_id': bc_data ? bc_data.agent_id : "",
-                'bc_token': bc_data ? bc_data.token : "",
+            if(sessionStorage.getItem('csc_id')) {
+                post_data = {
+                    'menumaster_id': 3,
+                    'brand_id': values.selectedBrandId,
+                    'brand_model_id': values.selectedModelId,
+                    'model_varient_id': values.selectedVarientId,
+                    'vehicle_type_id':4,
+                    'registration_no':values.regNumber,
+                    'policy_type_id':values.policy_type,
+                    'policy_holder_id': policyHolder_id,
+                    'check_registration': values.check_registration,
+                    'csc_id':sessionStorage.getItem('csc_id') ? sessionStorage.getItem('csc_id') : "",
+                    'agent_name':sessionStorage.getItem('agent_name') ? sessionStorage.getItem('agent_name') : "",
+                    'product_id':sessionStorage.getItem('product_id') ? sessionStorage.getItem('product_id') : "",
+                    'bcmaster_id': "0"
+                }
+            }
+            else {
+                post_data = {
+                    'menumaster_id': 3,
+                    'brand_id': values.selectedBrandId,
+                    'brand_model_id': values.selectedModelId,
+                    'model_varient_id': values.selectedVarientId,
+                    'vehicle_type_id':4,
+                    'registration_no':values.regNumber,
+                    'policy_type_id':values.policy_type,
+                    'policy_holder_id': policyHolder_id,
+                    'check_registration': values.check_registration,
+                    'bcmaster_id': bc_data ? bc_data.agent_id : "",
+                    'bc_token': bc_data ? bc_data.token : "",
+                }
             }
             console.log('post_data-----', post_data)
             formData.append('enc_data', encryption.encrypt(JSON.stringify(post_data)))
@@ -369,20 +386,35 @@ class TwoWheelerSelectBrand extends Component {
                 })
         }
         else {
-            const post_data = {
-                'menumaster_id': 3,
-                'brand_id': selectedBrandId,
-                'brand_model_id': selectedModelId,
-                'model_varient_id': selectedVarientId,
-                'vehicle_type_id':4,
-                'registration_no':values.regNumber,
-                'policy_type_id':values.policy_type,
-                'check_registration': values.check_registration,
-                'csc_id':sessionStorage.getItem('csc_id') ? sessionStorage.getItem('csc_id') : "",
-                'agent_name':sessionStorage.getItem('agent_name') ? sessionStorage.getItem('agent_name') : "",
-                'product_id':sessionStorage.getItem('product_id') ? sessionStorage.getItem('product_id') : "",
-                'bcmaster_id': bc_data ? bc_data.agent_id : "",
-                'bc_token': bc_data ? bc_data.token : "",
+            if(sessionStorage.getItem('csc_id')) {
+                post_data = {
+                    'menumaster_id': 3,
+                    'brand_id': selectedBrandId,
+                    'brand_model_id': selectedModelId,
+                    'model_varient_id': selectedVarientId,
+                    'vehicle_type_id':4,
+                    'registration_no':values.regNumber,
+                    'policy_type_id':values.policy_type,
+                    'check_registration': values.check_registration,
+                    'csc_id':sessionStorage.getItem('csc_id') ? sessionStorage.getItem('csc_id') : "",
+                    'agent_name':sessionStorage.getItem('agent_name') ? sessionStorage.getItem('agent_name') : "",
+                    'product_id':sessionStorage.getItem('product_id') ? sessionStorage.getItem('product_id') : "",
+                    'bcmaster_id': "0"
+                }
+            }
+            else{
+                post_data = {
+                    'menumaster_id': 3,
+                    'brand_id': selectedBrandId,
+                    'brand_model_id': selectedModelId,
+                    'model_varient_id': selectedVarientId,
+                    'vehicle_type_id':4,
+                    'registration_no':values.regNumber,
+                    'policy_type_id':values.policy_type,
+                    'check_registration': values.check_registration,
+                    'bcmaster_id': bc_data ? bc_data.agent_id : "",
+                    'bc_token': bc_data ? bc_data.token : "",
+                }
             }
             console.log('post_data-----', post_data)
 

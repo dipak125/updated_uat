@@ -12,7 +12,6 @@ import { loaderStart, loaderStop } from "../../store/actions/loader";
 import { connect } from "react-redux";
 import * as Yup from "yup";
 import Encryption from '../../shared/payload-encryption';
-// import Razorpay from "./Razorpay.jsx"
 
 const initialValue = {}
 
@@ -32,7 +31,6 @@ class Premium extends Component {
 
         this.state = {
             show: false,
-            show1: true,
             refNo: "",
             whatsapp: "",
             fulQuoteResp: [],
@@ -48,14 +46,19 @@ class Premium extends Component {
             nomineedetails:[],
             relation: [],
             step_completed: "0",
-            vehicleDetails: [],
-            policyHolder: []
+            vehicleDetails: []
         };
     }
 
 
     handleClose(e) {
         this.setState({ show: false, });
+    }
+
+    handleOtp(e) {
+        console.log("otp", e)
+        this.setState({ show: false, });
+        this.props.history.push(`/ThankYou_motor`)
     }
 
     changePlaceHoldClassAdd(e) {
@@ -74,8 +77,7 @@ class Premium extends Component {
 
     handleSubmit = (values) => {
         // this.setState({ show: true, refNo: values.refNo, whatsapp: values.whatsapp });
-        const {policyHolder} = this.state
-        policyHolder && policyHolder.csc_id ? this.payment() : this.Razor_payment()
+        this.payment()
     }
 
     fetchData = () => {
@@ -90,10 +92,9 @@ class Premium extends Component {
                 let motorInsurance = decryptResp.data.policyHolder ? decryptResp.data.policyHolder.motorinsurance : {}
                 let vehicleDetails = decryptResp.data.policyHolder ? decryptResp.data.policyHolder.vehiclebrandmodel : {};
                 let step_completed = decryptResp.data.policyHolder ? decryptResp.data.policyHolder.step_no : "";
-                let policyHolder = decryptResp.data.policyHolder ? decryptResp.data.policyHolder : [];
 
                 this.setState({
-                    motorInsurance,vehicleDetails,step_completed,policyHolder,
+                    motorInsurance,vehicleDetails,step_completed,
                     refNumber: decryptResp.data.policyHolder.reference_no,
                     paymentStatus: decryptResp.data.policyHolder.payment ? decryptResp.data.policyHolder.payment[0] : [],
                     memberdetails : decryptResp.data.policyHolder ? decryptResp.data.policyHolder : [],
@@ -179,11 +180,6 @@ class Premium extends Component {
         window.location = `${process.env.REACT_APP_PAYMENT_URL}/sbig-csc/ConnectPG/payment_motor.php?refrence_no=${refNumber}`
     }
 
-    Razor_payment = () => {
-        const { refNumber } = this.state;
-        window.location = `${process.env.REACT_APP_PAYMENT_URL}/sbig-csc/razorpay/pay.php?refrence_no=${refNumber}`
-    }
-
     fetchRelationships=()=>{
 
         this.props.loadingStart();
@@ -211,10 +207,10 @@ class Premium extends Component {
     }
 
     render() {
-        const { policyHolder, show, fulQuoteResp, motorInsurance, error, error1, refNumber, 
+        const { refNo, whatsapp, show, fulQuoteResp, motorInsurance, error, error1, refNumber, 
             paymentStatus, relation, memberdetails,nomineedetails,vehicleDetails,step_completed } = this.state
         const { productId } = this.props.match.params
-
+console.log('nomineedetails', nomineedetails)
         const errMsg =
             error && error.message ? (
                 <span className="errorMsg">
@@ -447,9 +443,7 @@ class Premium extends Component {
                                                                         Select Payment Gateway
                                                                         <div>
                                                                         <img src={require('../../assets/images/green-check.svg')} alt="" className="m-r-10" />
-                                                                        {policyHolder && policyHolder.csc_id ? <img src={require('../../assets/images/CSC.svg')} alt="" /> :
-                                                                        <img src={require('../../assets/images/razorpay.svg')} alt="" />
-                                                                        }
+                                                                        <img src={require('../../assets/images/CSC.svg')} alt="" />
                                                                         </div>
                                                                     </div>
                                                                     </FormGroup>
@@ -478,7 +472,7 @@ class Premium extends Component {
                                         );
                                     }}
                                 </Formik>
-                                {/* <Modal className="" bsSize="md"
+                                <Modal className="" bsSize="md"
                                     show={show}
                                     onHide={this.handleClose}>
                                     <div className="otpmodal">
@@ -492,9 +486,7 @@ class Premium extends Component {
                                             />
                                         </Modal.Body>
                                     </div>
-                                </Modal> */}
-
-
+                                </Modal>
 
                             </div>
                             <Footer />

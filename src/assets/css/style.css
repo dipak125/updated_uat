@@ -77,7 +77,7 @@ hr{border-top:1px solid rgba(220,220,220,1); margin-top:0; margin-bottom:25px;}
 .topUserBtn p.userName{ color:#353535; font-weight: 600;}
 .userTopRtSec .btn-success:not(:disabled):not(.disabled).active:focus, .userTopRtSec .btn-success:not(:disabled):not(.disabled):active:focus, .userTopRtSec .show>.btn-success.dropdown-toggle:focus{ box-shadow:none;} /*Added Parent Class ".userTopRtSec"*/
 .userTopRtSec .btn-success.focus, .userTopRtSec .btn-success:focus{ box-shadow:none;}
-.userTopRtSec .notiBell{ background: no-repeat 50% 100%; width:85px; height:40px; position:relative; margin-right:27px; display:block;}
+.userTopRtSec .notiBell{ background: no-repeat 50% 100%; width:150px; height:40px; position:relative; margin-right:27px; display:block;}
 
 /*-------------- Tab Section--------------*/
 .messageDeskSec .nav-pills .nav-link { font-size:16px; line-height: 18px; color:#8F8F8F; letter-spacing:.36px; padding: 25px 40px 20px; outline: none;}

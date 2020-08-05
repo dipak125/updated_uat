@@ -4,11 +4,8 @@ import Loader from "react-loader-spinner";
 import { connect } from "react-redux";
 import { authLogout } from "../../../../store/actions/auth";
 import axios from "../../../../shared/axios"
-import Encryption from '../../../../shared/payload-encryption';
 
 let logo = sessionStorage.getItem('logo') && sessionStorage.getItem('logo') != "undefined" ? sessionStorage.getItem('logo') : "search.svg"
-
-let bc_data = {}
 
 class HeaderTop extends Component {
 
@@ -29,17 +26,11 @@ class HeaderTop extends Component {
 
 
     componentWillUpdate(nextProps, nextState) {
-        logo = sessionStorage.getItem('logo') && sessionStorage.getItem('logo') != "undefined" ? sessionStorage.getItem('logo') : ""
-        bc_data = sessionStorage.getItem('bcLoginData') ? sessionStorage.getItem('bcLoginData') : "";
-        if(bc_data) {
-            let encryption = new Encryption();
-            bc_data = JSON.parse(encryption.decrypt(bc_data));
-        }
-    }
+        logo = sessionStorage.getItem('logo') && sessionStorage.getItem('logo') != "undefined" ? sessionStorage.getItem('logo') : "search.svg"
+      }
 
       
     render() {
-        // console.log("BC_data---", bc_data.user_info )
         return (
             <>
                 <section className="container-fluid headerTop d-flex justify-content-between">
@@ -68,33 +59,30 @@ class HeaderTop extends Component {
                     </div> 
                      : null } 
 
-                    
+                    {localStorage.getItem("auth_token") ?
                     <div className="align-self-center userTopRtSec">
                         <Dropdown alignRight>
                             <Dropdown.Toggle variant="" id="dropdown-basic">
                                 <div className="d-flex topUserBtn">
-                                {localStorage.getItem("auth_token") && bc_data.user_info ?
-                                    <div className="align-self-center userNameImg">
-                                        Welcome {bc_data.user_info.data.user.name}
-                                    </div>
-                                    : null }
                                     <div className="align-self-center">
                                     {logo ? 
                                     <img src={require(`../../../../assets/images/${logo}`)} alt="" className="notiBell"/>
-                                    : <img src={require(`../../../../assets/images/vedavaag.png`)} alt="" className="notiBell"/>}
+                                    : null}
                                     </div>
-                                    
-                                    {/* <div className="align-self-center d-none d-sm-block">
+                                    {/* <div className="align-self-center userNameImg">
+                                        <img src={require('../../../../assets/images/user.svg')} alt="" />
+                                    </div>
+                                    <div className="align-self-center d-none d-sm-block">
                                     <img src={require('../../../../assets/images/shapes-and-symbols.svg')} alt="" />
                                     </div> */}
                                 </div>
                             </Dropdown.Toggle>
                             <Dropdown.Menu>
-                                {/* <Dropdown.Item >Logout</Dropdown.Item> */}
+                                <Dropdown.Item >Logout</Dropdown.Item>
                             </Dropdown.Menu>
                         </Dropdown>                       
                     </div>
-                    
+                    : null }
                     
                     {this.props.loading ? (
                         <div className="loading">

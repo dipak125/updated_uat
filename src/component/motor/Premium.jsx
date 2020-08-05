@@ -44,7 +44,8 @@ class Premium extends Component {
             PolicyArray: [],
             memberdetails: [],
             nomineedetails:[],
-            relation: []
+            relation: [],
+            policyHolder: []
         };
     }
 
@@ -75,7 +76,8 @@ class Premium extends Component {
 
     handleSubmit = (values) => {
         // this.setState({ show: true, refNo: values.refNo, whatsapp: values.whatsapp });
-        this.payment()
+        const {policyHolder} = this.state
+        policyHolder && policyHolder.csc_id ? this.payment() : this.Razor_payment()
     }
 
     fetchData = () => {
@@ -88,9 +90,9 @@ class Premium extends Component {
                 let decryptResp = JSON.parse(encryption.decrypt(res.data))
                 console.log("decrypt", decryptResp)
                 let motorInsurance = decryptResp.data.policyHolder ? decryptResp.data.policyHolder.motorinsurance : {}
-                    
+                let policyHolder = decryptResp.data.policyHolder ? decryptResp.data.policyHolder : [];
                 this.setState({
-                    motorInsurance,
+                    motorInsurance,policyHolder,
                     refNumber: decryptResp.data.policyHolder.reference_no,
                     paymentStatus: decryptResp.data.policyHolder.payment ? decryptResp.data.policyHolder.payment[0] : [],
                     memberdetails : decryptResp.data.policyHolder ? decryptResp.data.policyHolder : [],
@@ -170,6 +172,11 @@ class Premium extends Component {
         window.location = `${process.env.REACT_APP_PAYMENT_URL}/sbig-csc/ConnectPG/payment_motor.php?refrence_no=${refNumber}`
     }
 
+    Razor_payment = () => {
+        const { refNumber } = this.state;
+        window.location = `${process.env.REACT_APP_PAYMENT_URL}/sbig-csc/razorpay/pay.php?refrence_no=${refNumber}`
+    }
+
     fetchRelationships=()=>{
 
         this.props.loadingStart();
@@ -197,7 +204,7 @@ class Premium extends Component {
     }
 
     render() {
-        const { refNo, whatsapp, show, fulQuoteResp, motorInsurance, error, error1, refNumber, paymentStatus, relation, memberdetails,nomineedetails } = this.state
+        const { policyHolder, show, fulQuoteResp, motorInsurance, error, error1, refNumber, paymentStatus, relation, memberdetails,nomineedetails } = this.state
         const { productId } = this.props.match.params
 console.log('nomineedetails', nomineedetails)
         const errMsg =
@@ -421,59 +428,18 @@ console.log('nomineedetails', nomineedetails)
                                                                 </Collapsible>
                                                             </div>
 
-                                                            {/* <Row>
-                                                                <Col sm={12} md={6}>
-                                                                    <div className="carloan">
-                                                                        <h4>Make Payment</h4>
-                                                                    </div>
-                                                                </Col>
-                                                                <Col sm={12} md={6}>
-                                                                    <div className="carloan">
-                                                                        <h4>Select Payment Gateway</h4>
-                                                                    </div>
-                                                                </Col>
-                                                            </Row> */}
-
-
                                                             <Row>
-                                                                <Col sm={12} md={6}>
-                                                                    {/* <Row>
-                                                                        <Col sm={6}>
-                                                                            <FormGroup>
-                                                                                <div className="refno">
-                                                                                    My reference no is
-                                                                                </div>
-                                                                            </FormGroup>
-                                                                        </Col>
-                                                                        <Col sm={6}>
-                                                                            <FormGroup>
-                                                                                <div className="insurerName">
-                                                                                    <Field
-                                                                                        name="refNo"
-                                                                                        type="text"
-                                                                                        placeholder="Type No"
-                                                                                        autoComplete="off"
-                                                                                        className="hght30"
-                                                                                        value={values.refNo}
-                                                                                        onFocus={e => this.changePlaceHoldClassAdd(e)}
-                                                                                        onBlur={e => this.changePlaceHoldClassRemove(e)}
-                                                                                    />
-                                                                                    {errors.refNo && touched.refNo ? (
-                                                                                        <span className="errorMsg">{errors.refNo}</span>
-                                                                                    ) : null}
-                                                                                </div>
-                                                                            </FormGroup>
-                                                                        </Col>
-                                                                    </Row> */}
-
-                                                                </Col>
+                                                            <Col sm={12} md={6}>
+                                                            </Col>
                                                                 <Col sm={12} md={6}>
                                                                     <FormGroup>
                                                                     <div className="paymntgatway">
                                                                         Select Payment Gateway
                                                                         <div>
-                                                                            <img src={require('../../assets/images/green-check.svg')} alt="" className="m-r-10" />
-                                                                            <img src={require('../../assets/images/CSC.svg')} alt="" />
+                                                                        <img src={require('../../assets/images/green-check.svg')} alt="" className="m-r-10" />
+                                                                        {policyHolder && policyHolder.csc_id ? <img src={require('../../assets/images/CSC.svg')} alt="" /> :
+                                                                        <img src={require('../../assets/images/razorpay.svg')} alt="" />
+                                                                        }
                                                                         </div>
                                                                     </div>
                                                                     </FormGroup>
@@ -517,7 +483,7 @@ console.log('nomineedetails', nomineedetails)
                                         );
                                     }}
                                 </Formik>
-                                <Modal className="" bsSize="md"
+                                {/* <Modal className="" bsSize="md"
                                     show={show}
                                     onHide={this.handleClose}>
                                     <div className="otpmodal">
@@ -531,7 +497,7 @@ console.log('nomineedetails', nomineedetails)
                                             />
                                         </Modal.Body>
                                     </div>
-                                </Modal>
+                                </Modal> */}
 
                             </div>
                             <Footer />

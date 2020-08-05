@@ -22,6 +22,14 @@ let encryption = new Encryption();
 const maxRegnDate = moment(moment().subtract(1, 'years').calendar()).add(1, 'day').calendar();
 const minRegnDate = moment().subtract(18, 'years').calendar();
 
+const ncbArr = {
+    0:"0",
+    20:"20",
+    25:"25",
+    35:"35",
+    45:"45",
+    50:"50"
+}
 
 const initialValue = {
     registration_date: "",
@@ -329,7 +337,7 @@ class TwoWheelerVehicleDetails extends Component {
             // insurance_company_id: previousPolicy && previousPolicy.insurancecompany && previousPolicy.insurancecompany.id ? previousPolicy.insurancecompany.id : "",
             previous_city: previousPolicy && previousPolicy.city ? previousPolicy.city : "",
             previous_is_claim: previousPolicy && (previousPolicy.is_claim == 0 || previousPolicy.is_claim == 1) ? previousPolicy.is_claim : "",
-            previous_claim_bonus: previousPolicy && previousPolicy.claim_bonus && previousPolicy.claim_bonus != 2 ? Math.floor(previousPolicy.claim_bonus) : "",
+            previous_claim_bonus: previousPolicy && ncbArr[previousPolicy.claim_bonus]  && previousPolicy.claim_bonus != 2 ? Math.floor(previousPolicy.claim_bonus) : "",
             policy_type_Id : motorInsurance && motorInsurance.policytype_id ? motorInsurance.policytype_id : "0"
         });
 
@@ -444,7 +452,7 @@ class TwoWheelerVehicleDetails extends Component {
                                                     <Col sm={12}>
                                                         <FormGroup>
                                                             <div className="carloan">
-                                                                <h4>Have you made a claim in your existing Policy</h4>
+                                                                <h4>Have you made a claim in your last Policy</h4>
                                                             </div>
                                                         </FormGroup>
                                                     </Col>
@@ -505,7 +513,7 @@ class TwoWheelerVehicleDetails extends Component {
                                                     <Col sm={12}>
                                                         <FormGroup>
                                                             <div className="carloan">
-                                                            Current No Claim Bonus
+                                                            Select NCB mentioned on last policy
                                                             </div>
                                                         </FormGroup>
                                                     </Col>
@@ -514,6 +522,18 @@ class TwoWheelerVehicleDetails extends Component {
                                                     <Col sm={12} md={6} lg={6}>
                                                     <FormGroup>
                                                             <div className="d-inline-flex m-b-35">
+                                                                <div className="p-r-25">
+                                                                    <label className="customRadio3">
+                                                                    <Field
+                                                                        type="radio"
+                                                                        name='previous_claim_bonus'                                            
+                                                                        value='0'
+                                                                        key='1'  
+                                                                        checked = {values.previous_claim_bonus == '0' ? true : false}
+                                                                    />
+                                                                        <span className="checkmark " /><span className="fs-14"> 0</span>
+                                                                    </label>
+                                                                </div>
                                                                 <div className="p-r-25">
                                                                     <label className="customRadio3">
                                                                     <Field

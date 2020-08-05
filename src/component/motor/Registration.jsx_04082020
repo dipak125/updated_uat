@@ -11,6 +11,7 @@ import * as Yup from 'yup';
 import swal from 'sweetalert';
 import Encryption from '../../shared/payload-encryption';
 import { Formik, Form, Field, ErrorMessage } from 'formik';
+import InputMask from "react-input-mask";
 
 
 const initialValues = {
@@ -37,6 +38,8 @@ const vehicleRegistrationValidation = Yup.object().shape({
             return true;
         }
     ),
+   
+   
    
 });
 
@@ -96,7 +99,7 @@ fetchData=()=>{
 
         const formData = new FormData();
         let encryption = new Encryption();
-        let post_data = {}
+
         let policyHolder_id = localStorage.getItem('policyHolder_id') ? localStorage.getItem('policyHolder_id') :0
 
         let bc_data = sessionStorage.getItem('bcLoginData') ? sessionStorage.getItem('bcLoginData') : "";
@@ -105,31 +108,18 @@ fetchData=()=>{
         }
 
         if(policyHolder_id > 0){
-            if(sessionStorage.getItem('csc_id')) {
-                post_data = {
-                    'policy_holder_id': policyHolder_id,
-                    'registration_no':values.regNumber,
-                    'check_registration': values.check_registration,
-                    'menumaster_id':1,
-                    'vehicle_type_id':productId,
-                    'csc_id':sessionStorage.getItem('csc_id') ? sessionStorage.getItem('csc_id') : "",
-                    'agent_name':sessionStorage.getItem('agent_name') ? sessionStorage.getItem('agent_name') : "",
-                    'product_id':sessionStorage.getItem('product_id') ? sessionStorage.getItem('product_id') : "",
-                    'bc_token': "0",
-                } 
-            }
-            else {
-                post_data = {
-                    'policy_holder_id': policyHolder_id,
-                    'registration_no':values.regNumber,
-                    'check_registration': values.check_registration,
-                    'menumaster_id':1,
-                    'vehicle_type_id':productId,
-                    'bcmaster_id': bc_data ? bc_data.agent_id : "",
-                    'bc_token': bc_data ? bc_data.token : "",
-                } 
-            }
-
+            const post_data = {
+                'policy_holder_id': policyHolder_id,
+                'registration_no':values.regNumber,
+                'check_registration': values.check_registration,
+                'menumaster_id':1,
+                'vehicle_type_id':productId,
+                'csc_id':sessionStorage.getItem('csc_id') ? sessionStorage.getItem('csc_id') : "",
+                'agent_name':sessionStorage.getItem('agent_name') ? sessionStorage.getItem('agent_name') : "",
+                'product_id':sessionStorage.getItem('product_id') ? sessionStorage.getItem('product_id') : "",
+                'bcmaster_id': bc_data ? bc_data.agent_id : "",
+                'bc_token': bc_data ? bc_data.token : "",
+            } 
             console.log('post_data', post_data)
             formData.append('enc_data',encryption.encrypt(JSON.stringify(post_data)))
       
@@ -139,6 +129,8 @@ fetchData=()=>{
             .then(res => {
                 if(res.data.error == false) {
                     this.props.history.push(`/select-brand/${productId}`);
+                    // localStorage.setItem('policyHolder_id', res.data.data.policyHolder_id);
+                    // localStorage.setItem('policyHolder_refNo', res.data.data.policyHolder_refNo);
                 }
                 else{
                     swal(res.data.msg)
@@ -154,28 +146,17 @@ fetchData=()=>{
             });
         }
         else{
-            if(sessionStorage.getItem('csc_id')) {
-                post_data = {
-                    'registration_no':values.regNumber,
-                    'check_registration': values.check_registration,
-                    'menumaster_id':1,
-                    'vehicle_type_id':productId,
-                    'csc_id':sessionStorage.getItem('csc_id') ? sessionStorage.getItem('csc_id') : "",
-                    'agent_name':sessionStorage.getItem('agent_name') ? sessionStorage.getItem('agent_name') : "",
-                    'product_id':sessionStorage.getItem('product_id') ? sessionStorage.getItem('product_id') : "",
-                    'bcmaster_id': "0"
-                } 
-            }
-            else {
-                post_data = {
-                    'registration_no':values.regNumber,
-                    'check_registration': values.check_registration,
-                    'menumaster_id':1,
-                    'vehicle_type_id':productId,
-                    'bcmaster_id': bc_data ? bc_data.agent_id : "",
-                    'bc_token': bc_data ? bc_data.token : "",
-                } 
-            }
+            const post_data = {
+                'registration_no':values.regNumber,
+                'check_registration': values.check_registration,
+                'menumaster_id':1,
+                'vehicle_type_id':productId,
+                'csc_id':sessionStorage.getItem('csc_id') ? sessionStorage.getItem('csc_id') : "",
+                'agent_name':sessionStorage.getItem('agent_name') ? sessionStorage.getItem('agent_name') : "",
+                'product_id':sessionStorage.getItem('product_id') ? sessionStorage.getItem('product_id') : "",
+                'bcmaster_id': bc_data ? bc_data.agent_id : "",
+                'bc_token': bc_data ? bc_data.token : "",
+            } 
             console.log('post_data', post_data)
             formData.append('enc_data',encryption.encrypt(JSON.stringify(post_data)))
             this.props.loadingStart();

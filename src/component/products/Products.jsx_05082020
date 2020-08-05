@@ -104,7 +104,7 @@ class Products extends Component {
                                                     </Tab.Content>
                                                 </Col>
                                             </Row>
-                                        </Tab.Container> : <Tab.Container id="left-tabs-example" defaultActiveKey= "first"> 
+                                        </Tab.Container> : <Tab.Container id="left-tabs-example" defaultActiveKey= "second"> 
                                             <Row>
                                                 <Col sm={12}>
                                                     <Nav variant="pills" className="flex-column">
