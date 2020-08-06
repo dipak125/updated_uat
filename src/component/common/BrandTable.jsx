@@ -24,7 +24,7 @@ class BrandTable extends Component {
             if(p.name != "Others"){
                 rowContents.push(<td key={i} onClick = {e=>this.setModelName(p.id)}> 
                     {p.image ?
-                    <img src={'http://14.140.119.44/sbig-csc/core/public/image/car_brand_image/'+p.image} alt={p.name} />:
+                    <img src={`${process.env.REACT_APP_PAYMENT_URL}/core/public/image/car_brand_image/`+p.image} alt={p.name} />:
                     <img src={require('../../assets/images/car.svg')} alt="" />                                                
                     } 
                 </td>);
@@ -39,7 +39,7 @@ class BrandTable extends Component {
             else {
                 rowContents.push(<td key={i} onClick = {e=>this.props.otherBrandFunc()}>
                 {p.image ?
-                    <img src={'http://14.140.119.44/sbig-csc/core/public/image/car_brand_image/'+p.image} alt={p.name} />:
+                    <img src={`${process.env.REACT_APP_PAYMENT_URL}/core/public/image/car_brand_image/`+p.image} alt={p.name} />:
                     <img src={require('../../assets/images/car.svg')} alt="" />                                                
                     } 
                 </td> )

@@ -26,7 +26,7 @@ class DocumentTable extends Component {
       };
 
     dload_doc = (productId) => {
-        let filePath = `${process.env.REACT_APP_PAYMENT_URL}/sbig-csc/core/public/pdf_files/`
+        let filePath = `${process.env.REACT_APP_PAYMENT_URL}/core/public/pdf_files/`
         let fileName = ""
         if(productId == '1'){            
             fileName = "Arogya_Sanjeevani.pdf"

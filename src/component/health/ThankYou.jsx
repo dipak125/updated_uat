@@ -121,7 +121,7 @@ class ThankYouPage extends Component {
   }
 
   downloadDoc = () => {
-    let file_path = `${process.env.REACT_APP_PAYMENT_URL}/sbig-csc/ConnectPG/policy_pdf_download.php?refrence_no=${this.state.refNumber}`
+    let file_path = `${process.env.REACT_APP_PAYMENT_URL}/ConnectPG/policy_pdf_download.php?refrence_no=${this.state.refNumber}`
     console.log(file_path);
     const { policyId } = this.props.match.params
     const url = file_path;
