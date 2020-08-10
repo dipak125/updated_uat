@@ -27,10 +27,17 @@ import TwoWheelerVerify from '../two-wheeler/TwoWheelerVerify';
 import TwoWheelerAdditionalDetails from '../two-wheeler/TwoWheelerAdditionalDetails';
 // import TwoWheelerThankYou_motor from '../two-wheeler/TwoWheelerThankYou';
 
-
+import TwoWheelerSelectBrandTP from '../two-wheeler-tp/TwoWheelerSelectBrandTP';
+import TwoWheelerVehicleDetailsTP from '../two-wheeler-tp/TwoWheelerVehicleDetailsTP';
+import TwoWheelerPolicyPremiumDetailsTP from '../two-wheeler-tp/TwoWheelerPolicyPremiumDetailsTP';
+import TwoWheelerOtherComprehensiveTP from '../two-wheeler-tp/TwoWheelerOtherComprehensiveTP';
+import TwoWheelerVerifyTP from '../two-wheeler-tp/TwoWheelerVerifyTP';
+import TwoWheelerAdditionalDetailsTP from '../two-wheeler-tp/TwoWheelerAdditionalDetailsTP';
+// import TwoWheelerThankYou_motorTP from '../two-wheeler-tp/TwoWheelerThankYouTP';
 
 import UnderMaintenance from '../UnderMaintenance';
 
+// import CreateTicket from '../Support/CreateTicket';
 
 const componentLoader = () => {
     return (
@@ -45,21 +52,6 @@ const loadingContent = componentLoader();
 
 const Products = Loadable({
     loader: () => import(/*webpackChunkName: "Products" */"../products/Products.jsx"),
-    loading: () => loadingContent
-});
-
-const Documents = Loadable({
-    loader: () => import(/*webpackChunkName: "Documents" */"../products/Documents.jsx"),
-    loading: () => loadingContent
-});
-
-const Supports = Loadable({
-    loader: () => import(/*webpackChunkName: "Supports" */"../support/Supports.jsx"),
-    loading: () => loadingContent
-});
-
-const TicketCount = Loadable({
-    loader: () => import(/*webpackChunkName: "TicketCount" */"../support/TicketCount.jsx"),
     loading: () => loadingContent
 });
 
@@ -91,37 +83,17 @@ const ThankYou = Loadable({
     loader: () => import(/*webpackChunkName: "Products" */"../health/ThankYou.jsx"),
     loading: () => loadingContent
 });
+// const PolicySummery = Loadable({
+//     loader: () => import(/*webpackChunkName: "Products" */"../health/PolicySummery.jsx"),
+//     loading: () => loadingContent
+// });
+
+
+
 const SelectBrand = Loadable({
     loader: () => import(/*webpackChunkName: "Products" */"../motor/SelectBrand.jsx"),
     loading: () => loadingContent
 });
-
-
-const TwoWheelerSelectBrandTP = Loadable({
-    loader: () => import(/*webpackChunkName: "Products" */"../two-wheeler-tp/TwoWheelerSelectBrandTP.jsx"),
-    loading: () => loadingContent
-});
-const TwoWheelerVehicleDetailsTP = Loadable({
-    loader: () => import(/*webpackChunkName: "Products" */"../two-wheeler-tp/TwoWheelerVehicleDetailsTP.jsx"),
-    loading: () => loadingContent
-});
-const TwoWheelerPolicyPremiumDetailsTP = Loadable({
-    loader: () => import(/*webpackChunkName: "Products" */"../two-wheeler-tp/TwoWheelerPolicyPremiumDetailsTP.jsx"),
-    loading: () => loadingContent
-});
-const TwoWheelerOtherComprehensiveTP = Loadable({
-    loader: () => import(/*webpackChunkName: "Products" */"../two-wheeler-tp/TwoWheelerOtherComprehensiveTP.jsx"),
-    loading: () => loadingContent
-});
-const TwoWheelerVerifyTP = Loadable({
-    loader: () => import(/*webpackChunkName: "Products" */"../two-wheeler-tp/TwoWheelerVerifyTP.jsx"),
-    loading: () => loadingContent
-});
-const TwoWheelerAdditionalDetailsTP = Loadable({
-    loader: () => import(/*webpackChunkName: "Products" */"../two-wheeler-tp/TwoWheelerAdditionalDetailsTP.jsx"),
-    loading: () => loadingContent
-});
-
 
 
 class Routes extends Component {
@@ -171,9 +143,7 @@ class Routes extends Component {
                         {/* <PrivateRoute exact path="/two_wheeler_ThankYou_motorTP/:policyId" component={TwoWheelerThankYou_motorTP} /> */}
 
                         {/************ Support ******************/}
-                        <PrivateRoute exact path="/Documents" component={Documents} />
-                        <PrivateRoute exact path="/Supports" component={Supports} />
-                        <PrivateRoute exact path="/TicketCount" component={TicketCount} />
+                        {/* <PrivateRoute exact path="/create-ticket" component={CreateTicket} /> */}
                         
                         <PrivateRoute exact path="/UnderMaintenance" component={UnderMaintenance} />
                         <Redirect from="/" to="/Products" />

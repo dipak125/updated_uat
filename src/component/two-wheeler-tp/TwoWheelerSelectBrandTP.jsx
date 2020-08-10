@@ -23,7 +23,9 @@ const initialValues = {
     selectedModelName: '',
     selectedVarientId: '',
     regNumber:'',
-    check_registration: 2
+    check_registration: 2,
+    policy_for: ""
+
 
 };
 
@@ -35,7 +37,8 @@ const fuel = {
 
 const vehicleValidation = Yup.object().shape({
     policy_type: Yup.string().required("Please enter policy type"),
-   
+    policy_for: Yup.string().required("Please select policy for indivudal or corporate"),
+
     regNumber: Yup.string().when("check_registration", {
         is: "1",       
         then: Yup.string(),
@@ -311,7 +314,8 @@ class TwoWheelerSelectBrand extends Component {
                     'csc_id':sessionStorage.getItem('csc_id') ? sessionStorage.getItem('csc_id') : "",
                     'agent_name':sessionStorage.getItem('agent_name') ? sessionStorage.getItem('agent_name') : "",
                     'product_id':sessionStorage.getItem('product_id') ? sessionStorage.getItem('product_id') : "",
-                    'bcmaster_id': "0"
+                    'bcmaster_id': "0",
+                    'policy_for': values.policy_for
                 }
             }
             else {
@@ -327,6 +331,7 @@ class TwoWheelerSelectBrand extends Component {
                     'check_registration': values.check_registration,
                     'bcmaster_id': bc_data ? bc_data.agent_id : "",
                     'bc_token': bc_data ? bc_data.token : "",
+                    'policy_for': values.policy_for
                 }
             }
             
@@ -376,7 +381,8 @@ class TwoWheelerSelectBrand extends Component {
                     'csc_id':sessionStorage.getItem('csc_id') ? sessionStorage.getItem('csc_id') : "",
                     'agent_name':sessionStorage.getItem('agent_name') ? sessionStorage.getItem('agent_name') : "",
                     'product_id':sessionStorage.getItem('product_id') ? sessionStorage.getItem('product_id') : "",
-                    'bcmaster_id': "0"
+                    'bcmaster_id': "0",
+                    'policy_for': values.policy_for
                 }
             }
             else {
@@ -391,6 +397,7 @@ class TwoWheelerSelectBrand extends Component {
                     'check_registration': values.check_registration,
                     'bcmaster_id': bc_data ? bc_data.agent_id : "",
                     'bc_token': bc_data ? bc_data.token : "",
+                    'policy_for': values.policy_for
                 }
             }
             console.log('post_data-----', post_data)
@@ -489,7 +496,8 @@ class TwoWheelerSelectBrand extends Component {
             selectedVarientId: selectedVarientId ? selectedVarientId : (selectedBrandId ? "" :  vehicleDetails && vehicleDetails.varientmodel_id ? vehicleDetails.varientmodel_id : ""),
             policy_type: motorInsurance && motorInsurance.policytype_id ? motorInsurance.policytype_id : "",
             regNumber: motorInsurance && motorInsurance.registration_no ? motorInsurance.registration_no : "",
-            check_registration: localStorage.getItem('check_registration') ? localStorage.getItem('check_registration') : "2"
+            check_registration: localStorage.getItem('check_registration') ? localStorage.getItem('check_registration') : "2",
+            policy_for: motorInsurance && motorInsurance.policy_for ? motorInsurance.policy_for : "",
         })
 
         return (
@@ -513,6 +521,53 @@ class TwoWheelerSelectBrand extends Component {
                                             <Form>
                                                 <section className="brand">
                                                     <div className="brand-bg">
+                                                        <div className="d-flex justify-content-left">
+                                                            <div className="brandhead"> 
+                                                            <p>Taking 2-Wheeler policy for</p>
+                                                                <div className="d-inline-flex m-b-15">
+                                                                    <div className="p-r-25">
+                                                                        <label className="customRadio3">
+                                                                            <Field
+                                                                                type="radio"
+                                                                                name='policy_for'
+                                                                                value='1'
+                                                                                key='1'
+                                                                                checked = {values.policy_for == '1' ? true : false}
+                                                                                onChange = {() =>{
+                                                                                    setFieldTouched('policy_for')
+                                                                                    setFieldValue('policy_for', '1');
+                                                                                    this.handleChange(values,setFieldTouched, setFieldValue)
+                                                                                }  
+                                                                                }
+                                                                            />
+                                                                            <span className="checkmark " /><span className="fs-14"> Individual</span>
+                                                                        </label>
+                                                                    </div>
+                                                                    <div className="p-r-25">
+                                                                        <label className="customRadio3">
+                                                                            <Field
+                                                                                type="radio"
+                                                                                name='policy_for'
+                                                                                value='2'
+                                                                                key='1'
+                                                                                checked = {values.policy_for == '2' ? true : false}
+                                                                                onChange = {() =>{
+                                                                                    setFieldTouched('policy_for')
+                                                                                    setFieldValue('policy_for', '2');
+                                                                                    this.handleChange(values,setFieldTouched, setFieldValue)
+                                                                                }  
+                                                                                }
+                                                                            />
+                                                                            <span className="checkmark " /><span className="fs-14"> Corporate</span>
+                                                                        </label>
+                                                                        {errors.policy_for && touched.policy_for ? (
+                                                                            <span className="errorMsg">{errors.policy_for}</span>
+                                                                        ) : null}
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+
                                                         <div className="d-flex justify-content-left">
                                                             <div className="brandhead"> 
                                                                 <p>Tell us about your policy details</p>

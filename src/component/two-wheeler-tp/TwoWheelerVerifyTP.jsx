@@ -523,8 +523,6 @@ class TwoWheelerVerify extends Component {
 
         return (
             <>
-            { step_completed >= '3' && vehicleDetails.vehicletype_id == '3' ?
-            <div>
                 <BaseComponent>
                 <div className="container-fluid">
                 <div className="row">
@@ -533,6 +531,7 @@ class TwoWheelerVerify extends Component {
                     </div>
                 <div className="col-sm-12 col-md-12 col-lg-10 col-xl-10 infobox">
                 <h4 className="text-center mt-3 mb-3">SBI General Insurance Company Limited</h4>
+                { step_completed >= '3' && vehicleDetails.vehicletype_id == '3' ?
                 <section className="brand m-b-25">
                     <div className="d-flex justify-content-left">
                         <div className="brandhead">
@@ -911,13 +910,12 @@ class TwoWheelerVerify extends Component {
                                 );
                             }}
                         </Formik>
-                    </section>
+                    </section> : step_completed == "" ? "Forbidden" : null }
                     <Footer />
                     </div>
                     </div>
                     </div>
                 </BaseComponent>
-                </div> : step_completed == "" ? "Forbidden" : null }
             </>
         );
     }

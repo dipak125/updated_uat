@@ -8,15 +8,10 @@ import { loaderStart, loaderStop } from "../../store/actions/loader";
 const initialValues = {};
   
 
-class DocumentTable extends Component {
+class ContactDetails extends Component {
 
     state = {
         doc_list: [
-            {
-              "id": "1",
-              "product": "Arogya Sanjeevani brochure",
-              "image" : "Miscellaneous-car.svg"
-            },
             {
                 "id": "2",
                 "product": "Contact details of Sales Manager",
@@ -110,4 +105,4 @@ const mapStateToProps = state => {
   };
 
 
-export default withRouter (connect( mapStateToProps, mapDispatchToProps)(DocumentTable));
+export default withRouter (connect( mapStateToProps, mapDispatchToProps)(ContactDetails));

@@ -16,11 +16,12 @@ import Encryption from '../../shared/payload-encryption';
 import {  PersonAge } from "../../shared/dateFunctions";
 import Autosuggest from 'react-autosuggest';
 import { addDays } from 'date-fns';
+import swal from 'sweetalert';
 
 const ageObj = new PersonAge();
 let encryption = new Encryption();
 const maxRegnDate = moment(moment().subtract(1, 'years').calendar()).add(1, 'day').calendar();
-const minRegnDate = moment().subtract(18, 'years').calendar();
+const minRegnDate = moment().subtract(20, 'years').calendar();
 
 
 const initialValue = {
@@ -140,8 +141,8 @@ class TwoWheelerVehicleDetails extends Component {
     if (escapedValue === '') {
       return [];
     }  
-    const regex = new RegExp('^' + escapedValue, 'i');
-    if(this.state.customerDetails) {
+    const regex = new RegExp( escapedValue, 'i');
+    if(this.state.customerDetails && escapedValue.length >1) {
       return this.state.customerDetails.filter(language => regex.test(language.RTO_LOCATION));
     }
     else return 0;
@@ -208,6 +209,7 @@ class TwoWheelerVehicleDetails extends Component {
             }
             else{
                 actions.setSubmitting(false)
+                swal(decryptResp.msg)
             }
             
         })
@@ -308,8 +310,7 @@ class TwoWheelerVehicleDetails extends Component {
           
 
         return (
-            <>
-            { step_completed >= '1' && vehicleDetails.vehicletype_id == '3' ?
+            <>        
                 <BaseComponent>
                 <div className="container-fluid">
                 <div className="row">
@@ -318,6 +319,7 @@ class TwoWheelerVehicleDetails extends Component {
                     </div>
                 <div className="col-sm-12 col-md-12 col-lg-10 col-xl-10 infobox">
                 <h4 className="text-center mt-3 mb-3">SBI General Insurance Company Limited</h4>
+                { step_completed >= '1' && vehicleDetails.vehicletype_id == '3' ?
                 <section className="brand m-b-25">
                     <div className="d-flex justify-content-left">
                         <div className="brandhead">
@@ -465,13 +467,14 @@ class TwoWheelerVehicleDetails extends Component {
                             }}
                         </Formik>
                     </div>
-                </section>
+                </section> : step_completed == "" ? "Forbidden" : null
+            }
+
                 <Footer />
                 </div>
                 </div>
                 </div>
-            </BaseComponent> : step_completed == "" ? "Forbidden" : null
-            }
+            </BaseComponent>
             </>
         );
     }

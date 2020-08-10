@@ -135,8 +135,10 @@ class TwoWheelerOtherComprehensive extends Component {
                 let values = []
                 let vehicleDetails = decryptResp.data.policyHolder ? decryptResp.data.policyHolder.vehiclebrandmodel : {};
                 let step_completed = decryptResp.data.policyHolder ? decryptResp.data.policyHolder.step_no : "";
+                
                 this.setState({
-                    motorInsurance,vehicleDetails,step_completed
+                    motorInsurance,vehicleDetails,step_completed,
+                    add_more_coverage: motorInsurance && motorInsurance.policy_for == '2' ? [] : ["B00015"]
                 })
                 this.props.loadingStop();
                 this.getAccessToken(values)
@@ -214,7 +216,8 @@ class TwoWheelerOtherComprehensive extends Component {
             'add_more_coverage': add_more_coverage.toString(),
             'policy_type': motorInsurance ? motorInsurance.policy_type : "",
             'policytype_id': motorInsurance ? motorInsurance.policytype_id : "",
-            'PA_Cover': values.PA_flag ? values.PA_Cover : "0"
+            'PA_Cover': values.PA_flag ? values.PA_Cover : "0",
+            'policy_for': motorInsurance ? motorInsurance.policy_for : ""
         }
         console.log('fullQuote_post_data', post_data)
         // let encryption = new Encryption();
@@ -226,6 +229,7 @@ class TwoWheelerOtherComprehensive extends Component {
         formData.append('add_more_coverage',JSON.stringify(add_more_coverage))
         formData.append('policytype_id',motorInsurance ? motorInsurance.policytype_id : "")
         formData.append('PA_Cover',values.PA_flag ? values.PA_Cover : "0")
+        formData.append('policy_for',motorInsurance ? motorInsurance.policy_for : "")
 
         axios.post('fullQuotePM2WTP', formData)
             .then(res => {
@@ -396,8 +400,6 @@ class TwoWheelerOtherComprehensive extends Component {
         return (
             
             <>
-            { step_completed >= '2' && vehicleDetails.vehicletype_id == '3' ?
-            <div>
                 <BaseComponent>
                     <div className="container-fluid">
                         <div className="row">
@@ -406,6 +408,7 @@ class TwoWheelerOtherComprehensive extends Component {
                             </div>
                             <div className="col-sm-12 col-md-12 col-lg-10 col-xl-10 infobox">
                                 <h4 className="text-center mt-3 mb-3">SBI General Insurance Company Limited</h4>
+                                { step_completed >= '2' && vehicleDetails.vehicletype_id == '3' ?
                                 <section className="brand colpd m-b-25">
                                     <div className="d-flex justify-content-left">
                                         <div className="brandhead m-b-10">
@@ -430,16 +433,16 @@ class TwoWheelerOtherComprehensive extends Component {
                                                                     </div>
                                                                 </Collapsible>
                                                             </div>
-
+                                                            {motorInsurance && motorInsurance.policy_for == '1' ?
                                                             <Row>
                                                                 <Col sm={12} md={12} lg={12}>
                                                                     <FormGroup>
                                                                         <span className="fs-18"> Add  more coverage to your plan.</span>
                                                                     </FormGroup>
                                                                 </Col>
-                                                            </Row>
+                                                            </Row> : null }
 
-                                                            {moreCoverage.map((coverage, qIndex) => (
+                                                            {motorInsurance && motorInsurance.policy_for == '1' && moreCoverage.map((coverage, qIndex) => (
                                                             <Row key={qIndex}>   
                                                                 <Col sm={12} md={11} lg={6}  >
                                                                     <label className="customCheckBox formGrp formGrp">{coverage.name}
@@ -527,7 +530,8 @@ class TwoWheelerOtherComprehensive extends Component {
                                             );
                                         }}
                                     </Formik>
-                                </section>
+                                </section> : step_completed == "" ? "Forbidden" : null }
+
                                 <Footer />
                             </div>
                         </div>
@@ -566,7 +570,6 @@ class TwoWheelerOtherComprehensive extends Component {
 
                     </Modal.Body>
                 </Modal>
-                </div> : step_completed == "" ? "Forbidden" : null }
             </>
             
         );

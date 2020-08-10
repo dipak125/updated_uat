@@ -127,7 +127,7 @@ const validateAddress =  Yup.object().shape({
                     .max(40, function() {
                         return "Name must be maximum 40 chracters"
                     })
-                    .matches(/^[A-Za-z]*$/, function() {
+                    .matches(/^[a-zA-Z]+([\s]?[a-zA-Z]+)$/, function() {
                         return "Please enter valid name"
                 }),
                 lname: Yup.string(function() {
@@ -195,7 +195,7 @@ const validateAddress =  Yup.object().shape({
         .max(40, function() {
             return "Name must be maximum 40 chracters"
         })
-        .matches(/^[A-Za-z]*$/, function() {
+        .matches(/^[a-zA-Z]+([\s]?[a-zA-Z]+)$/, function() {
             return "Please enter valid name"
         }).test(
         "proposerAsInsured",

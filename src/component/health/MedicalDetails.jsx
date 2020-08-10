@@ -700,7 +700,7 @@ console.log("FORM ARRAY----------=====>",famArr)
 
                             <Col sm={12} md={3}>
                                 <div className="regisBox medpd">
-                                    <h3 className="medihead">No Medical Test upto the Age of 45 for People with No Medical History </h3>
+                                    <h3 className="medihead">No Medical Test upto the Age of 55 for People with No Medical History </h3>
                                 </div>
                             </Col>
                         </Row>

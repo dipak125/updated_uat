@@ -17,7 +17,7 @@ import {  PersonAge } from "../../shared/dateFunctions";
 import Encryption from '../../shared/payload-encryption';
 
 
-const minDobAdult = moment(moment().subtract(64, 'years').calendar())
+const minDobAdult = moment(moment().subtract(100, 'years').calendar())
 const maxDobAdult = moment().subtract(18, 'years').calendar();
 const minDobNominee = moment(moment().subtract(100, 'years').calendar())
 const maxDobNominee = moment().subtract(18, 'years').calendar();
@@ -55,7 +55,7 @@ const ownerValidation = Yup.object().shape({
         .max(40, function() {
             return "Full name must be maximum 40 chracters"
         })
-        .matches(/^[A-Za-z]{3,20}[\s][A-Za-z]{1,20}$/, function() {
+        .matches(/^[a-zA-Z]+([\s]?[a-zA-Z]+)([\s]?[a-zA-Z]+)$/, function() {
             return "Please enter valid name"
         }),
     // last_name:Yup.string().required('Last name is required'),
@@ -67,12 +67,12 @@ const ownerValidation = Yup.object().shape({
     .test(
         "18YearsChecking",
         function() {
-            return "Age should me minium 18 years and maximum 64 years"
+            return "Age should me minium 18 years and maximum 100 years"
         },
         function (value) {
             if (value) {
                 const ageObj = new PersonAge();
-                return ageObj.whatIsMyAge(value) <= 64 && ageObj.whatIsMyAge(value) >= 18;
+                return ageObj.whatIsMyAge(value) <= 100 && ageObj.whatIsMyAge(value) >= 18;
             }
             return true;
         }
@@ -98,6 +98,7 @@ const ownerValidation = Yup.object().shape({
     }),
     phone: Yup.string()
     .matches(/^[6-9][0-9]{9}$/,'Invalid Mobile number').required('Phone No. is required'),
+    
     email:Yup.string().email().required('Email is required').min(8, function() {
         return "Email must be minimum 8 chracters"
     })
@@ -687,7 +688,7 @@ console.log('post_data', post_data);
                                             <Field
                                                 name='phone'
                                                 type="text"
-                                                placeholder="Phone No. "
+                                                placeholder="Mobile No. "
                                                 autoComplete="off"
                                                 onFocus={e => this.changePlaceHoldClassAdd(e)}
                                                 onBlur={e => this.changePlaceHoldClassRemove(e)}

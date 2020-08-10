@@ -137,6 +137,7 @@ class Premium extends Component {
             'idv_value': motorInsurance.idv_value,
             'policy_type': localStorage.getItem('policy_type'),
             'add_more_coverage': motorInsurance.add_more_coverage,
+            'policy_for': motorInsurance ? motorInsurance.policy_for : ""
             // 'cng_kit': motorInsurance.cng_kit,
             // 'cngKit_Cost': Math.floor(motorInsurance.cngkit_cost)
         }
@@ -146,6 +147,7 @@ class Premium extends Component {
         formData.append('policy_type',motorInsurance ? motorInsurance.policy_type : "")
         formData.append('add_more_coverage',JSON.stringify(motorInsurance.add_more_coverage))
         formData.append('policytype_id',motorInsurance ? motorInsurance.policytype_id : "")
+        formData.append('policy_for',motorInsurance ? motorInsurance.policy_for : "")
 
         // formData.append('enc_data',encryption.encrypt(JSON.stringify(post_data)))
 

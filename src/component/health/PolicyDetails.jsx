@@ -329,11 +329,11 @@ class PolicyDetails extends Component {
                                 <Col sm={12} md={3}>
                                   <FormGroup>
                                     <strong>Rs:</strong>{" "}
-                                    {fulQuoteResp.GrossPremium+fulQuoteResp.AlcoholLoadingAmount+fulQuoteResp.SmokerLoadingAmount+fulQuoteResp.TobaccoLoadingAmount}
+                                    {Math.round(fulQuoteResp.GrossPremium+fulQuoteResp.AlcoholLoadingAmount+fulQuoteResp.SmokerLoadingAmount+fulQuoteResp.TobaccoLoadingAmount)}
                                   </FormGroup>
                                 </Col>
                                 <Col sm={12} md={3}>
-                                  <FormGroup>Net Premium;</FormGroup>
+                                  <FormGroup>Net Premium:</FormGroup>
                                 </Col>
                                 <Col sm={12} md={3}>
                                   <FormGroup>
