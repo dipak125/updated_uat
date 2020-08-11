@@ -275,7 +275,7 @@ class TwoWheelerOtherComprehensive extends Component {
                 'registration_no': motorInsurance.registration_no,
                 'idv_value': sliderVal ? sliderVal : defaultSliderValue.toString(),
                 'add_more_coverage': add_more_coverage,
-                'PA_Cover': values.PA_flag ? values.PA_Cover : "0"
+                'pa_cover': values.PA_flag ? values.PA_Cover : "0"
             }
         }
         else {

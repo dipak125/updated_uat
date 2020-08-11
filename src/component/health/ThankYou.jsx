@@ -9,6 +9,8 @@ import { connect } from "react-redux";
 import swal from 'sweetalert';
 import Encryption from '../../shared/payload-encryption';
 
+const refNumber = localStorage.getItem("policyHolder_id")
+
 class ThankYouPage extends Component {
 
   state = {
@@ -63,7 +65,7 @@ class ThankYouPage extends Component {
             response_text: res.data,
             res_error: false
           })
-          this.generate_pdf(res.data, localStorage.getItem("policyHolder_id"))
+          this.generate_pdf(res.data, refNumber)
         }
 
       })
@@ -77,6 +79,8 @@ class ThankYouPage extends Component {
 
   generate_pdf = (response_text, policy_holder_id) => {
     // const {response_text, policy_holder_id, res_error} = this.state
+    console.log('policy_holder_id', policy_holder_id)
+    console.log("response_text", response_text)
     const { policyId } = this.props.match.params
     if (response_text && policy_holder_id) {
       const formData = new FormData();

@@ -148,6 +148,7 @@ class Premium extends Component {
         formData.append('add_more_coverage',JSON.stringify(motorInsurance.add_more_coverage))
         formData.append('policytype_id',motorInsurance ? motorInsurance.policytype_id : "")
         formData.append('policy_for',motorInsurance ? motorInsurance.policy_for : "")
+        formData.append('PA_Cover',motorInsurance ? motorInsurance.pa_cover : "0")
 
         // formData.append('enc_data',encryption.encrypt(JSON.stringify(post_data)))
 
