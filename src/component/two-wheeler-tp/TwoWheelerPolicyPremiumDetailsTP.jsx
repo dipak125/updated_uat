@@ -242,7 +242,7 @@ class Premium extends Component {
 
         return (
             <>
-            { step_completed >= '4' && vehicleDetails.vehicletype_id == '3' ?
+            
             <div>
                 <BaseComponent>
                     <div className="container-fluid">
@@ -250,7 +250,7 @@ class Premium extends Component {
                             <div className="col-sm-12 col-md-12 col-lg-2 col-xl-2 pd-l-0">
                                 <SideNav />
                             </div>
-
+                            { step_completed >= '4' && vehicleDetails.vehicletype_id == '3' ?
                             <div className="col-sm-12 col-md-12 col-lg-10 col-xl-10 infobox">
                                 <h4 className="text-center mt-3 mb-3">SBI General Insurance Company Limited</h4>
                                 <Formik initialValues={initialValue} onSubmit={this.handleSubmit}
@@ -336,24 +336,24 @@ class Premium extends Component {
                                                                                         <Col sm={12} md={6}>
                                                                                             <Row>
                                                                                                 <Col sm={12} md={6}>
-                                                                                                    <FormGroup>Name:</FormGroup>
+                                                                                                {motorInsurance.policy_for == '1' ?  <FormGroup>Name:</FormGroup> : <FormGroup>Company Name:</FormGroup> }
                                                                                                 </Col>
                                                                                                 <Col sm={12} md={6}>
                                                                                                     <FormGroup>{memberdetails.first_name }</FormGroup>
                                                                                                 </Col>
                                                                                             </Row>
-
+                                                                                            {motorInsurance.policy_for == '1' ?     
+                                                                                                <Row>
+                                                                                                    <Col sm={12} md={6}>
+                                                                                                        <FormGroup>Date Of Birth:</FormGroup>
+                                                                                                    </Col>
+                                                                                                    <Col sm={12} md={6}>
+                                                                                                        <FormGroup>{memberdetails.dob}</FormGroup>
+                                                                                                    </Col>
+                                                                                                </Row> : null}
                                                                                             <Row>
                                                                                                 <Col sm={12} md={6}>
-                                                                                                    <FormGroup>Date Of Birth:</FormGroup>
-                                                                                                </Col>
-                                                                                                <Col sm={12} md={6}>
-                                                                                                    <FormGroup>{memberdetails.dob}</FormGroup>
-                                                                                                </Col>
-                                                                                            </Row>
-                                                                                            <Row>
-                                                                                                <Col sm={12} md={6}>
-                                                                                                    <FormGroup>Mobile No</FormGroup>
+                                                                                                    <FormGroup>Mobile No:</FormGroup>
                                                                                                 </Col>
                                                                                                 <Col sm={12} md={6}>
                                                                                                     <FormGroup>{memberdetails.mobile}</FormGroup>
@@ -361,21 +361,29 @@ class Premium extends Component {
                                                                                             </Row>
                                                                                             <Row>
                                                                                                 <Col sm={12} md={6}>
-                                                                                                    <FormGroup>Email Id</FormGroup>
+                                                                                                    <FormGroup>Email Id:</FormGroup>
                                                                                                 </Col>
                                                                                                 <Col sm={12} md={6}>
                                                                                                     <FormGroup>{memberdetails.email_id}</FormGroup>
                                                                                                 </Col>
                                                                                             </Row>
-
-                                                                                            <Row>
-                                                                                                <Col sm={12} md={6}>
-                                                                                                    <FormGroup>Gender</FormGroup>
-                                                                                                </Col>
-                                                                                                <Col sm={12} md={6}>
-                                                                                                    <FormGroup>{memberdetails.gender == "m" ? "Male" : "Female"}</FormGroup>
-                                                                                                </Col>
-                                                                                            </Row>
+                                                                                            {motorInsurance.policy_for == '1' ?
+                                                                                                <Row>
+                                                                                                    <Col sm={12} md={6}>
+                                                                                                        <FormGroup>Gender</FormGroup>
+                                                                                                    </Col>
+                                                                                                    <Col sm={12} md={6}>
+                                                                                                        <FormGroup>{memberdetails.gender == "m" ? "Male" : "Female"}</FormGroup>
+                                                                                                    </Col>
+                                                                                                </Row> :
+                                                                                                <Row>
+                                                                                                    <Col sm={12} md={6}>
+                                                                                                        <FormGroup>GSTIN:</FormGroup>
+                                                                                                    </Col>
+                                                                                                    <Col sm={12} md={6}>
+                                                                                                        <FormGroup>{memberdetails.gstn_no}</FormGroup>
+                                                                                                    </Col>
+                                                                                                </Row> }
 
                                                                                         </Col>
                                                                                     </Row>
@@ -384,56 +392,56 @@ class Premium extends Component {
                                                                                     </Row>
                                                                                 </div>
                                                                             : (<p></p>)}
-                                                                                   
-                                                                        <div>
-                                                                        <strong>Nominee Details :</strong>
-                                                                            <br/>
-                                                                            <Row>
-                                                                                <Col sm={12} md={6}>
-                                                                                    <Row>
-                                                                                        <Col sm={12} md={6}>
-                                                                                            <FormGroup>Name:</FormGroup>
-                                                                                        </Col>
-                                                                                        <Col sm={12} md={6}>
-                                                                                            <FormGroup>{nomineedetails ? nomineedetails.first_name : null}</FormGroup>
-                                                                                        </Col>
-                                                                                    </Row>
+                                                                        {motorInsurance.policy_for == '1' ?      
+                                                                            <div>
+                                                                            <strong>Nominee Details :</strong>
+                                                                                <br/>
+                                                                                <Row>
+                                                                                    <Col sm={12} md={6}>
+                                                                                        <Row>
+                                                                                            <Col sm={12} md={6}>
+                                                                                                <FormGroup>Name:</FormGroup>
+                                                                                            </Col>
+                                                                                            <Col sm={12} md={6}>
+                                                                                                <FormGroup>{nomineedetails ? nomineedetails.first_name : null}</FormGroup>
+                                                                                            </Col>
+                                                                                        </Row>
 
-                                                                                    <Row>
-                                                                                        <Col sm={12} md={6}>
-                                                                                            <FormGroup>Date Of Birth:</FormGroup>
-                                                                                        </Col>
-                                                                                        <Col sm={12} md={6}>
-                                                                                            <FormGroup>{nomineedetails ? nomineedetails.dob : null}</FormGroup>
-                                                                                        </Col>
-                                                                                    </Row>
+                                                                                        <Row>
+                                                                                            <Col sm={12} md={6}>
+                                                                                                <FormGroup>Date Of Birth:</FormGroup>
+                                                                                            </Col>
+                                                                                            <Col sm={12} md={6}>
+                                                                                                <FormGroup>{nomineedetails ? nomineedetails.dob : null}</FormGroup>
+                                                                                            </Col>
+                                                                                        </Row>
 
-                                                                                    <Row>
-                                                                                        <Col sm={12} md={6}>
-                                                                                            <FormGroup>Relation With Proposer:</FormGroup>
-                                                                                        </Col>
-                                                                                        <Col sm={12} md={6}>
-                                                                                        {nomineedetails && relation.map((relations, qIndex) => 
-                                                                                        relations.id == nomineedetails.relation_with ?
-                                                                                            <FormGroup>{relations.name}</FormGroup> : null
-                                                                                        )}
-                                                                                        </Col>
-                                                                                    </Row>
+                                                                                        <Row>
+                                                                                            <Col sm={12} md={6}>
+                                                                                                <FormGroup>Relation With Proposer:</FormGroup>
+                                                                                            </Col>
+                                                                                            <Col sm={12} md={6}>
+                                                                                            {nomineedetails && relation.map((relations, qIndex) => 
+                                                                                            relations.id == nomineedetails.relation_with ?
+                                                                                                <FormGroup>{relations.name}</FormGroup> : null
+                                                                                            )}
+                                                                                            </Col>
+                                                                                        </Row>
 
-                                                                                    <Row>
-                                                                                        <Col sm={12} md={6}>
-                                                                                            <FormGroup>Gender</FormGroup>
-                                                                                        </Col>
-                                                                                        <Col sm={12} md={6}>
-                                                                                            <FormGroup>{nomineedetails && nomineedetails.gender == "m" ? "Male" : "Female"}</FormGroup>
-                                                                                        </Col>
-                                                                                    </Row>
-                                                                                </Col>
-                                                                            </Row>
-                                                                            <Row>
-                                                                                <p></p>
-                                                                            </Row>
-                                                                        </div>
+                                                                                        <Row>
+                                                                                            <Col sm={12} md={6}>
+                                                                                                <FormGroup>Gender</FormGroup>
+                                                                                            </Col>
+                                                                                            <Col sm={12} md={6}>
+                                                                                                <FormGroup>{nomineedetails && nomineedetails.gender == "m" ? "Male" : "Female"}</FormGroup>
+                                                                                            </Col>
+                                                                                        </Row>
+                                                                                    </Col>
+                                                                                </Row>
+                                                                                <Row>
+                                                                                    <p></p>
+                                                                                </Row>
+                                                                            </div> : null }
                                                                     </div>
 
                                                                 </Collapsible>
@@ -497,12 +505,12 @@ class Premium extends Component {
 
 
 
-                            </div>
+                            </div> : step_completed == "" ? "Forbidden" : null }
                             <Footer />
                         </div>
                     </div>
                 </BaseComponent>
-                </div> : step_completed == "" ? "Forbidden" : null }
+                </div> 
             </>
         );
     }

@@ -37,27 +37,27 @@ const initialValues = {
 const validateNominee = Yup.object().shape({
     last_name: Yup.string().required(function() {
         return "Please enter a last name"
-    }).matches(/^[A-Za-z]*$/, function() {
-        return "Please enter valid last name"
-    }).min(1, function() {
-        return "Name must be minimum 1 chracters"
-    })
-    .max(40, function() {
-        return "Name must be maximum 40 chracters"
+        }).matches(/^[A-Za-z]*$/, function() {
+            return "Please enter valid last name"
+        }).min(1, function() {
+            return "Name must be minimum 1 chracters"
+        })
+        .max(40, function() {
+            return "Name must be maximum 40 chracters"
     }),
     first_name: Yup.string(function() {
         return "Please enter name"
-    }).required(function() {
-        return "Please enter name"
-    }).matches(/^[A-Za-z]*$/, function() {
-            return "Please enter valid name"
-    }).min(3, function() {
-        return "Name must be minimum 3 chracters"
-    })
-    .max(40, function() {
-        return "Name must be maximum 40 chracters"
+        }).required(function() {
+            return "Please enter name"
+        }).matches(/^[a-zA-Z]+([\s]?[a-zA-Z]+)$/, function() {
+                return "Please enter valid name"
+        }).min(3, function() {
+            return "Name must be minimum 3 chracters"
+        })
+        .max(40, function() {
+            return "Name must be maximum 40 chracters"
     }),
-        gender: Yup.string().required(function() {
+    gender: Yup.string().required(function() {
                 return "Please select gender"
         }).matches(/^[MmFf]$/, function() {
             return "Please select valid gender"
@@ -115,7 +115,7 @@ const validateNominee = Yup.object().shape({
         }).notRequired(function() {
             return "Please enter appointee name"
         })        
-        .matches(/^[A-Za-z][A-Za-z\s\-']*$/, function() {
+        .matches(/^[a-zA-Z]+([\s]?[a-zA-Z]+)$/, function() {
             return "Please enter valid name"
     }).test(
         "18YearsChecking",
@@ -297,7 +297,7 @@ class NomineeDetails extends Component {
         
         // console.log("newInitialValues", moment(NomineeDetails.dob, moment.defaultFormat).toDate())
         // console.log("newInitialValues", moment(NomineeDetails.dob).utc())
-        console.log("newInitialValues", newInitialValues)
+        // console.log("newInitialValues", newInitialValues)
 
         return (
             <>

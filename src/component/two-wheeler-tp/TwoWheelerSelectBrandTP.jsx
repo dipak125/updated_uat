@@ -744,8 +744,7 @@ class TwoWheelerSelectBrand extends Component {
                         <div className="cntrbody">
                             <h3>Select Model </h3>
                             {selectedBrandDetails.image ?
-                                <img src={`${process.env.REACT_APP_PAYMENT_URL}/core/public/image/car_brand_image/` + selectedBrandDetails.image} alt={selectedBrandDetails.name} /> :
-                                <img src={require('../../assets/images/car.svg')} alt="" />
+                                <img src={`${process.env.REACT_APP_PAYMENT_URL}/core/public/image/car_brand_image/` + selectedBrandDetails.image} alt={selectedBrandDetails.name} /> : null     
                             }
                         </div>
                     </Modal.Header>

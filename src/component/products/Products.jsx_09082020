@@ -6,8 +6,8 @@ import { Button, Navbar, Nav, Form, FormControl, NavDropdown, NavItem, Row, Col,
 import { connect } from "react-redux";
 import { loaderStart, loaderStop } from "../../store/actions/loader";
 
-import Motor from '../common/Motor';
-import Health from '../common/Health';
+import Table from '../common/Table';
+import DocTable from '../common/DocumentTable';
 import Footer from '../common/footer/Footer';
 
 
@@ -59,11 +59,11 @@ class Products extends Component {
                                             <Col sm={12}>
                                                 <Tab.Content>
                                                     <Tab.Pane eventKey="first">
-                                                        <Motor tabId='1'/>
+                                                        <Table tabId='1'/>
                                                         <Footer />
                                                     </Tab.Pane>
                                                     <Tab.Pane eventKey="second">
-                                                            <Health tabId='2'/>
+                                                            <Table tabId='2'/>
                                                             <Footer />
                                                     </Tab.Pane>
                                                     
@@ -86,11 +86,11 @@ class Products extends Component {
                                                 <Col sm={12}>
                                                     <Tab.Content>
                                                         <Tab.Pane eventKey="first">
-                                                            <Motor tabId='1'/>
+                                                            <Table tabId='1'/>
                                                             <Footer />
                                                         </Tab.Pane>
                                                         <Tab.Pane eventKey="second">
-                                                            <Health tabId='2'/>
+                                                            <Table tabId='2'/>
                                                             <Footer />
                                                         </Tab.Pane>
                                                         
@@ -111,11 +111,11 @@ class Products extends Component {
                                                 <Col sm={12}>
                                                     <Tab.Content>
                                                         <Tab.Pane eventKey="first">
-                                                            <Motor tabId='1'/>
+                                                            <Table tabId='1'/>
                                                             <Footer />
                                                         </Tab.Pane>
                                                         <Tab.Pane eventKey="second">
-                                                            <Health tabId='2'/>
+                                                            <Table tabId='2'/>
                                                             <Footer />
                                                         </Tab.Pane>
                                                         

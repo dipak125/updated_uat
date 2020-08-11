@@ -44,7 +44,7 @@ class HeaderTop extends Component {
             <>
                 <section className="container-fluid headerTop d-flex justify-content-between">
                     <div className="align-self-center"><img src={require('../../../../assets/images/logo.svg')} alt="" /></div>
-                    {localStorage.getItem("auth_token") ? 
+                    {/* {localStorage.getItem("auth_token") ? 
                     <div className="align-self-right">
                         <select
                             name="langauage"
@@ -66,7 +66,7 @@ class HeaderTop extends Component {
                             <option value="hi">Hindi</option>
                         </select>
                     </div> 
-                     : null } 
+                     : null }  */}
 
                     
                     <div className="align-self-center userTopRtSec">

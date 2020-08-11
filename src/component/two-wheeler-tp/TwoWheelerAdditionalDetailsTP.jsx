@@ -32,7 +32,7 @@ const initialValue = {
     is_carloan:"",
     bank_name:"",
     bank_branch:"",
-    nominee_relation_with:"",
+    nominee_relation_with:"0",
     nominee_first_name:"",
     nominee_last_name:"test",
     nominee_gender:"",
@@ -61,10 +61,10 @@ const ownerValidation = Yup.object().shape({
     // last_name:Yup.string().required('Last name is required'),
     gender: Yup.string().when(['policy_for'], {
         is: policy_for => policy_for == '1',  
-        then: Yup.string().required('Gender is required')
-            .matches(/^[MmFf]$/, function() {
-                return "Please select valid gender"
-            }),
+        then: Yup.string().required('Gender is required'),
+            // .matches(/^[MmFf]$/, function() {
+            //     return "Please select valid gender"
+            // }),
         otherwise: Yup.string()
     }),
 
@@ -116,9 +116,9 @@ const ownerValidation = Yup.object().shape({
         }).matches(/^[a-zA-Z0-9]+([._\-]?[a-zA-Z0-9]+)*@\w+([-]?\w+)*(\.\w{2,3})+$/,'Invalid Email Id'),
 
     
-    // GSTIN: Yup.string().when(['policy_for'], {
+    // gstn_no: Yup.string().when(['policy_for'], {
     //     is: policy_for => policy_for == '2',       
-    //     then: Yup.string().required('GSTIN is required'),
+    //     then: Yup.string().required('gstn_no is required'),
     //     otherwise: Yup.string()
     // }),
 
@@ -137,13 +137,13 @@ const ownerValidation = Yup.object().shape({
             .max(40, function() {
                 return "Name must be maximum 40 chracters"
             })
-            .matches(/^[A-Za-z]{3,20}[\s][A-Za-z]{1,20}$/, function() {
+            .matches(/^[a-zA-Z]+([\s]?[a-zA-Z]+)([\s]?[a-zA-Z]+)$/, function() {
                 return "Please enter valid name"
             }),
         otherwise: Yup.string()
     }),
 
-    // nominee_last_name:Yup.string().required('Nominee last name is required'), 
+        // nominee_last_name:Yup.string().required('Nominee last name is required'), 
 
     nominee_gender: Yup.string().when(['policy_for'], {
         is: policy_for => policy_for == '1',       
@@ -172,27 +172,68 @@ const ownerValidation = Yup.object().shape({
             ),
         otherwise: Yup.date()
     }),
-   
+    
     is_eia_account: Yup.string().required('This field is required'),
     eia_no: Yup.string()
-    .test(
-        "isEIAchecking",
-        function() {
-            return "Please enter EIA no"
-        },
-        function (value) {
-            if (this.parent.is_eia_account == 1 && !value) {   
-                return false;    
+        .test(
+            "isEIAchecking",
+            function() {
+                return "Please enter EIA no"
+            },
+            function (value) {
+                if (this.parent.is_eia_account == 1 && !value) {   
+                    return false;    
+                }
+                return true;
             }
-            return true;
-        }
-    )
-    .min(13, function() {
-        return "EIA no must be minimum 13 chracters"
-    })
-    .max(13, function() {
-        return "EIA no must be maximum 13 chracters"
-    }).matches(/^[1245][0-9]{0,13}$/,'Please enter valid EIA no').notRequired('EIA no is required'),
+        )
+        .min(13, function() {
+            return "EIA no must be minimum 13 chracters"
+        })
+        .max(13, function() {
+            return "EIA no must be maximum 13 chracters"
+        }).matches(/^[1245][0-9]{0,13}$/,'Please enter valid EIA no').notRequired('EIA no is required'),
+
+    // appointee_name:Yup.string(function() {
+    //         return "Please enter appointee name"
+    //     }).notRequired(function() {
+    //         return "Please enter appointee name"
+    //     })        
+    //     .matches(/^[A-Za-z][A-Za-z\s\-']*$/, function() {
+    //         return "Please enter valid name"
+    //     }).test(
+    //         "18YearsChecking",
+    //         function() {
+    //             return "Please enter appointee name"
+    //         },
+    //         function (value) {
+    //             const ageObj = new PersonAge();
+    //             if (ageObj.whatIsMyAge(this.parent.dob) < 18 && !value) {   
+    //                 return false;    
+    //             }
+    //             return true;
+    //         }
+    //     ).min(3, function() {
+    //         return "Name must be minimum 3 chracters"
+    //     })
+    //     .max(40, function() {
+    //         return "Name must be maximum 40 chracters"
+    //     }),
+    // appointee_relation_with: Yup.string().notRequired(function() {
+    //     return "Please select relation"
+    //     }).test(
+    //         "18YearsChecking",
+    //         function() {
+    //             return "Please enter Appointee relation"
+    //         },
+    //         function (value) {
+    //             const ageObj = new PersonAge();
+    //             if (ageObj.whatIsMyAge(this.parent.dob) < 18 && !value) {   
+    //                 return false;    
+    //             }
+    //             return true;
+    //         }
+    //     )
 })
 
 class TwoWheelerAdditionalDetails extends Component {
@@ -279,15 +320,14 @@ class TwoWheelerAdditionalDetails extends Component {
 
     handleSubmit = (values, actions) => {
         const {productId} = this.props.match.params 
+        const {motorInsurance} = this.state
         const formData = new FormData(); 
         let encryption = new Encryption();
-        const post_data = {
+        let post_data = {
             'policy_holder_id':localStorage.getItem('policyHolder_id'),
             'menumaster_id':1,
             'first_name':values['first_name'],
             'last_name':values['last_name'],
-            'gender':values['gender'] ? values['gender'] : "M",
-            'dob':values['dob'] ? moment(values['dob']).format("YYYY-MM-DD") : moment().format("YYYY-MM-DD"),
             'pancard':values['pancard'],
             'pincode_id':values['pincode_id'],
             'district':values['district'],
@@ -295,21 +335,29 @@ class TwoWheelerAdditionalDetails extends Component {
             'is_carloan':values['is_carloan'],
             'bank_name':values['bank_name'],
             'bank_branch':values['bank_branch'],
-            'nominee_relation_with':values['nominee_relation_with'],
-            'nominee_first_name':values['nominee_first_name'],
-            'nominee_last_name':values['nominee_last_name'],
-            'nominee_gender':values['nominee_gender'],
-            'nominee_dob':moment(values['nominee_dob']).format("YYYY-MM-DD"),
             'phone': values['phone'],
             'email': values['email'],
             'is_eia_account': values['is_eia_account'],
             'eia_no': values['eia_no'],
-            'address': values['address'],
-            'is_appointee': this.state.is_appointee,
-            'appointee_name': values['appointee_name'],
-            'appointee_relation_with': values['appointee_relation_with'],
-            'GSTIN': values['GSTIN']
+            'address': values['address'],          
+            'gstn_no': values['gstn_no']
         }
+        if(motorInsurance.policy_for == '1'){
+            post_data['dob'] = moment(values['dob']).format("YYYY-MM-DD")
+            post_data['nominee_relation_with'] = values['nominee_relation_with']
+            post_data['nominee_first_name'] = values['nominee_first_name']
+            post_data['nominee_last_name']= values['nominee_last_name']
+            post_data['nominee_gender'] = values['nominee_gender']
+            post_data['nominee_dob'] = moment(values['nominee_dob']).format("YYYY-MM-DD")
+            post_data['appointee_name'] = values['appointee_name']
+            post_data['appointee_relation_with'] = values['appointee_relation_with']
+            post_data['is_appointee'] = this.state.is_appointee
+            post_data['gender']= values['gender']
+        }
+        else {
+            post_data['gender']= "cc"
+        }
+            
         console.log('post_data', post_data);
         formData.append('enc_data',encryption.encrypt(JSON.stringify(post_data)))
         this.props.loadingStart();
@@ -473,11 +521,11 @@ class TwoWheelerAdditionalDetails extends Component {
             is_carloan:is_loan_account,
             bank_name: bankDetails ? bankDetails.bank_name : "",
             bank_branch: bankDetails ? bankDetails.bank_branch : "",
-            nominee_relation_with: nomineeDetails && nomineeDetails.relation_with ? nomineeDetails.relation_with.toString() : "",
+            nominee_relation_with: nomineeDetails && nomineeDetails.relation_with ? nomineeDetails.relation_with.toString() : "0",
             nominee_first_name: nomineeDetails && nomineeDetails.first_name ? nomineeDetails.first_name : "",
-            nominee_gender: nomineeDetails && nomineeDetails.gender ? nomineeDetails.gender : "",
+            nominee_gender: nomineeDetails && nomineeDetails.gender ? nomineeDetails.gender : "cc",
             nominee_dob: nomineeDetails && nomineeDetails.dob ? new Date(nomineeDetails.dob) : "",
-            
+            gstn_no: policyHolder ? policyHolder.gstn_no : "",
             phone: policyHolder && policyHolder.mobile ? policyHolder.mobile : "",
             email:  policyHolder && policyHolder.email_id ? policyHolder.email_id : "",
             address: policyHolder && policyHolder.address ? policyHolder.address : "",
@@ -494,7 +542,7 @@ class TwoWheelerAdditionalDetails extends Component {
             <h4>You are just one steps away in getting your policy ready and your Quotation Number: {quoteId}. Please share a few more details. </h4>
         ) : null;
 
-        console.log("step_completed", step_completed)
+        
         return (
             <>
                 <BaseComponent>
@@ -514,7 +562,7 @@ class TwoWheelerAdditionalDetails extends Component {
                         >
                         {({ values, errors, setFieldValue, setFieldTouched, isValid, isSubmitting, touched }) => {
                              let value = values.nominee_first_name;
-                            
+                             console.log("errors", errors)
                         return (
                         <Form>
                         <Row>
@@ -551,16 +599,16 @@ class TwoWheelerAdditionalDetails extends Component {
                                             <FormGroup>
                                                 <div className="insurerName">
                                                 <Field
-                                                    name='GSTIN'
+                                                    name='gstn_no'
                                                     type="text"
                                                     placeholder= "GSTIN"
                                                     autoComplete="off"
                                                     onFocus={e => this.changePlaceHoldClassAdd(e)}
                                                     onBlur={e => this.changePlaceHoldClassRemove(e)}
-                                                    value = {values.GSTIN}                                                                            
+                                                    value = {values.gstn_no}                                                                            
                                                 />
-                                                    {errors.GSTIN && touched.GSTIN ? (
-                                                <span className="errorMsg">{errors.GSTIN}</span>
+                                                    {errors.gstn_no && touched.gstn_no ? (
+                                                <span className="errorMsg">{errors.gstn_no}</span>
                                                 ) : null} 
                                                 </div>
                                             </FormGroup>
@@ -886,14 +934,9 @@ class TwoWheelerAdditionalDetails extends Component {
                                                             className="formGrp"
                                                         >
                                                         <option value="">Relation with Nominee</option>
-                                                        <option value="1">Self</option>
-                                                        <option value="2">Spouse</option>
-                                                        <option value="3">Son</option>
-                                                        <option value="4">Daughter</option>
-                                                        <option value="5">Father</option>
-                                                        <option value="6">Mother</option>
-                                                        <option value="7">Father In Law</option>
-                                                        <option value="8">Mother In Law</option>
+                                                        { relation.map((relations, qIndex) => 
+                                                            <option value={relations.id}>{relations.name}</option>                                        
+                                                        )}
                                                         </Field>     
                                                         {errors.appointee_relation_with && touched.appointee_relation_with ? (
                                                             <span className="errorMsg">{errors.appointee_relation_with}</span>
