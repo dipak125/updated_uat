@@ -335,7 +335,7 @@ class TwoWheelerSelectBrand extends Component {
                     'csc_id':sessionStorage.getItem('csc_id') ? sessionStorage.getItem('csc_id') : "",
                     'agent_name':sessionStorage.getItem('agent_name') ? sessionStorage.getItem('agent_name') : "",
                     'product_id':sessionStorage.getItem('product_id') ? sessionStorage.getItem('product_id') : "",
-                    'bcmaster_id': "0"
+                    'bcmaster_id': "5"
                 }
             }
             else {
@@ -399,7 +399,7 @@ class TwoWheelerSelectBrand extends Component {
                     'csc_id':sessionStorage.getItem('csc_id') ? sessionStorage.getItem('csc_id') : "",
                     'agent_name':sessionStorage.getItem('agent_name') ? sessionStorage.getItem('agent_name') : "",
                     'product_id':sessionStorage.getItem('product_id') ? sessionStorage.getItem('product_id') : "",
-                    'bcmaster_id': "0"
+                    'bcmaster_id': "5"
                 }
             }
             else{
