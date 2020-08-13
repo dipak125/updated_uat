@@ -3,8 +3,9 @@ import BaseComponent from '.././BaseComponent';
 import { Row, Col, FormGroup } from 'react-bootstrap';
 import moment from "moment";
 
-import SideNav from '../common/side-nav/SideNav';
-import Footer from '../common/footer/Footer';
+// import SideNav from '../common/side-nav/SideNav';
+// import Footer from '../common/footer/Footer';
+import TicketStatus from '../support/TicketStatus'
 import LinkWithTooltip from "../../shared/LinkWithTooltip";
 import { BootstrapTable, TableHeaderColumn, ExportCSVButton } from "react-bootstrap-table";
 
@@ -12,7 +13,9 @@ const actionFormatter = (refObj) => (cell, row, enumObject) => {
     return (
         <LinkWithTooltip
             tooltip="Show Ticket"
-            href={'#'}
+            href="#"
+            clicked={() => refObj.ticketDetails(row.ticket)
+            }
             id="tooltip-1"
         >
             {row.ticket}
@@ -44,11 +47,17 @@ class TicketCount extends Component {
                 status: "closed",
                 subject: "System Issue",
             }
-        ]
+        ],
+        ticketId: "",
+        viewTicket: false
+    }
+
+    ticketDetails = (ticketId) => {
+        this.setState({ ticketId: ticketId, viewTicket: true })
     }
 
     render() {
-        const { ticketCount } = this.state
+        const { ticketCount, ticketId, viewTicket } = this.state
         const options = {
             // afterColumnFilter: this.afterColumnFilter,
             // onExportToCSV: this.onExportToCSV,
@@ -79,20 +88,28 @@ class TicketCount extends Component {
         return (
             <>
 
-                <div className="contBox m-b-45">
-                    <BootstrapTable ref="table"
-                        data={ticketCount}
-                        pagination={true}
-                        options={options}
-                    // exportCSV = {true}
-                    >
+                <div className="contBox m-b-45 tickedTable">
 
-                        <TableHeaderColumn width='100px' dataField='ticket' isKey={true} dataFormat={actionFormatter(this)} >Tickets</TableHeaderColumn>
-                        <TableHeaderColumn width='120px' dataField="status" tdStyle={{ whiteSpace: 'normal' }} >Status</TableHeaderColumn>
-                        <TableHeaderColumn width='150px' dataField="subject" tdStyle={{ whiteSpace: 'normal' }}>Subject</TableHeaderColumn>
+                    {viewTicket == true ?
+                        <TicketStatus ticketId={ticketId} />
+                        :
+                        <BootstrapTable ref="table"
+                            data={ticketCount}
+                            pagination={true}
+                            headerStyle={{ background: '#85c0ff' }}
+                            striped
+                            hover
+                            condensed
+                            wrapperClasses="table-responsive"
+                        >
+
+                            <TableHeaderColumn width='100px' dataField='ticket' isKey={true} dataFormat={actionFormatter(this)} >Tickets</TableHeaderColumn>
+                            <TableHeaderColumn width='120px' dataField="status" tdStyle={{ whiteSpace: 'normal' }} >Status</TableHeaderColumn>
+                            <TableHeaderColumn width='150px' dataField="subject" tdStyle={{ whiteSpace: 'normal' }}>Subject</TableHeaderColumn>
 
 
-                    </BootstrapTable>
+                        </BootstrapTable>
+                    }
                 </div>
             </>
         );

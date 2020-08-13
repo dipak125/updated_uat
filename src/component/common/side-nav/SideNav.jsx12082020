@@ -32,10 +32,7 @@ export default class SideNav extends Component {
 							<Link to="/Documents" activeClassName="active"><span className="leftIcon01"><img src={require('../../../assets/images/document.png')} alt="" /></span>Documents</Link>
                         </li>
                         <li>
-							<Link to="/Supports" activeClassName="active"><span className="leftIcon01"><img src={require('../../../assets/images/support.png')} alt="" /></span>Support</Link>
-                        </li>
-                        <li>
-							<Link to="/Break_in" activeClassName="active"><span className="leftIcon01"><img src={require('../../../assets/images/leftIcon01.svg')} alt="" /></span>Break In</Link>
+							<Link to="/Supports" activeClassName="active"><span className="leftIcon01"><img src={require('../../../assets/images/support.png')} alt="" /></span>Supports</Link>
                         </li>
                        {/* <li>
 							<Link to="/UnderMaintenance" activeClassName="active"><span className="leftIcon01"><img src={require('../../../assets/images/leftIcon05.svg')} alt="" /></span>Support</Link>

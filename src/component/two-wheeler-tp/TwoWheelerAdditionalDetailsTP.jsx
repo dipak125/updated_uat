@@ -21,6 +21,8 @@ const minDobAdult = moment(moment().subtract(100, 'years').calendar())
 const maxDobAdult = moment().subtract(18, 'years').calendar();
 const minDobNominee = moment(moment().subtract(100, 'years').calendar())
 const maxDobNominee = moment().subtract(3, 'months').calendar();
+const maxDoi = new Date()
+const minDoi = moment(moment().subtract(100, 'years').calendar())
 
 const initialValue = {
     first_name:"",
@@ -32,7 +34,7 @@ const initialValue = {
     is_carloan:"",
     bank_name:"",
     bank_branch:"",
-    nominee_relation_with:"0",
+    nominee_relation_with:"",
     nominee_first_name:"",
     nominee_last_name:"test",
     nominee_gender:"",
@@ -50,7 +52,7 @@ const initialValue = {
 const ownerValidation = Yup.object().shape({
     first_name: Yup.string().required('Name is required')
         .min(3, function() {
-            return "First name must be 3 chracters & last name 1 characters long"
+            return "First name must be 3 chracters"
         })
         .max(40, function() {
             return "Full name must be maximum 40 chracters"
@@ -65,7 +67,7 @@ const ownerValidation = Yup.object().shape({
             // .matches(/^[MmFf]$/, function() {
             //     return "Please select valid gender"
             // }),
-        otherwise: Yup.string()
+        otherwise: Yup.string().nullable()
     }),
 
     dob: Yup.date().when(['policy_for'], {
@@ -83,7 +85,7 @@ const ownerValidation = Yup.object().shape({
                     }
                     return true;
             }),
-        otherwise: Yup.date()
+        otherwise: Yup.date().nullable()
     }),
 
     pancard: Yup.string()
@@ -101,7 +103,7 @@ const ownerValidation = Yup.object().shape({
 
     address:Yup.string().required('Address is required')
     // .matches(/^(?![0-9._])(?!.*[0-9._]$)(?!.*\d_)(?!.*_\d)[a-zA-Z0-9_.,-\\]+$/, 
-    .matches(/^[a-zA-Z0-9\s,/.-]*$/, 
+    .matches(/^[a-zA-Z0-9][a-zA-Z0-9\s,/.-]*$/, 
     function() {
         return "Please enter valid address"
     }),
@@ -115,17 +117,10 @@ const ownerValidation = Yup.object().shape({
             return "Email must be maximum 75 chracters"
         }).matches(/^[a-zA-Z0-9]+([._\-]?[a-zA-Z0-9]+)*@\w+([-]?\w+)*(\.\w{2,3})+$/,'Invalid Email Id'),
 
-    
-    // gstn_no: Yup.string().when(['policy_for'], {
-    //     is: policy_for => policy_for == '2',       
-    //     then: Yup.string().required('gstn_no is required'),
-    //     otherwise: Yup.string()
-    // }),
-
     nominee_relation_with: Yup.string().when(['policy_for'], {
         is: policy_for => policy_for == '1',       
         then: Yup.string().required('Nominee relation is required'),
-        otherwise: Yup.string()
+        otherwise: Yup.string().nullable()
     }),
 
     nominee_first_name: Yup.string().when(['policy_for'], {
@@ -140,7 +135,7 @@ const ownerValidation = Yup.object().shape({
             .matches(/^[a-zA-Z]+([\s]?[a-zA-Z]+)([\s]?[a-zA-Z]+)$/, function() {
                 return "Please enter valid name"
             }),
-        otherwise: Yup.string()
+        otherwise: Yup.string().nullable()
     }),
 
         // nominee_last_name:Yup.string().required('Nominee last name is required'), 
@@ -194,46 +189,73 @@ const ownerValidation = Yup.object().shape({
             return "EIA no must be maximum 13 chracters"
         }).matches(/^[1245][0-9]{0,13}$/,'Please enter valid EIA no').notRequired('EIA no is required'),
 
-    // appointee_name:Yup.string(function() {
-    //         return "Please enter appointee name"
-    //     }).notRequired(function() {
-    //         return "Please enter appointee name"
-    //     })        
-    //     .matches(/^[A-Za-z][A-Za-z\s\-']*$/, function() {
-    //         return "Please enter valid name"
-    //     }).test(
-    //         "18YearsChecking",
-    //         function() {
-    //             return "Please enter appointee name"
-    //         },
-    //         function (value) {
-    //             const ageObj = new PersonAge();
-    //             if (ageObj.whatIsMyAge(this.parent.dob) < 18 && !value) {   
-    //                 return false;    
-    //             }
-    //             return true;
-    //         }
-    //     ).min(3, function() {
-    //         return "Name must be minimum 3 chracters"
-    //     })
-    //     .max(40, function() {
-    //         return "Name must be maximum 40 chracters"
-    //     }),
-    // appointee_relation_with: Yup.string().notRequired(function() {
-    //     return "Please select relation"
-    //     }).test(
-    //         "18YearsChecking",
-    //         function() {
-    //             return "Please enter Appointee relation"
-    //         },
-    //         function (value) {
-    //             const ageObj = new PersonAge();
-    //             if (ageObj.whatIsMyAge(this.parent.dob) < 18 && !value) {   
-    //                 return false;    
-    //             }
-    //             return true;
-    //         }
-    //     )
+    appointee_name: Yup.string().when(['policy_for'], {
+        is: policy_for => policy_for == '1', 
+        then:  Yup.string().notRequired(function() {
+                return "Please enter appointee name"
+                })
+                .min(3, function() {
+                    return "Name must be minimum 3 chracters"
+                })
+                .max(40, function() {
+                    return "Name must be maximum 40 chracters"
+                })        
+                .matches(/^[a-zA-Z]+([\s]?[a-zA-Z]+)([\s]?[a-zA-Z]+)$/, function() {
+                    return "Please enter valid name"
+                }).test(
+                    "18YearsChecking",
+                    function() {
+                        return "Please enter appointee name"
+                    },
+                    function (value) {
+                        const ageObj = new PersonAge();
+                        if (ageObj.whatIsMyAge(this.parent.nominee_dob) < 18 && !value) {   
+                            return false  
+                        }
+                        return true;
+                    }
+                ),
+        otherwise: Yup.string().nullable()
+    }),
+
+    appointee_relation_with: Yup.string().when(['policy_for'], {
+        is: policy_for => policy_for == '1', 
+        then: Yup.string().notRequired(function() {
+                return "Please select relation"
+                }).test(
+                    "18YearsChecking",
+                    function() {
+                        return 'Apppointee relation is required'
+                    },
+                    function (value) {
+                        const ageObj = new PersonAge();
+                        if (ageObj.whatIsMyAge(this.parent.nominee_dob) < 18 && !value) {   
+                            return false;    
+                        }
+                        return true;
+                    }
+                ),
+        otherwise: Yup.string().nullable()
+    }),
+
+    date_of_incorporation: Yup.date().when(['policy_for'], {
+        is: policy_for => policy_for == '2', 
+        then: Yup.date().required('Date of incorporation is required'),
+        otherwise: Yup.date().nullable()
+    }),
+
+    org_level: Yup.string().when(['policy_for'], {
+        is: policy_for => policy_for == '2', 
+        then: Yup.string().required('Organization level is required'),
+        otherwise: Yup.string().nullable()
+    }), 
+
+    gstn_no: Yup.string().when(['policy_for'], {
+        is: policy_for => policy_for == '2',       
+        then: Yup.string().required('GSTIN is required')
+            .matches(/^[0-9]{2}[A-Z]{3}[CPHFATBLJG]{1}[A-Z]{1}[0-9]{4}[A-Z]{1}[0-9]{1}[A-Z]{1}[0-9]{1}$/,'Invalid GSTIN'),
+        otherwise: Yup.string().nullable()
+    }),
 })
 
 class TwoWheelerAdditionalDetails extends Component {
@@ -356,6 +378,8 @@ class TwoWheelerAdditionalDetails extends Component {
         }
         else {
             post_data['gender']= "cc"
+            post_data['date_of_incorporation'] = moment(values['date_of_incorporation']).format("YYYY-MM-DD")
+            post_data['org_level'] = values['org_level']
         }
             
         console.log('post_data', post_data);
@@ -521,11 +545,11 @@ class TwoWheelerAdditionalDetails extends Component {
             is_carloan:is_loan_account,
             bank_name: bankDetails ? bankDetails.bank_name : "",
             bank_branch: bankDetails ? bankDetails.bank_branch : "",
-            nominee_relation_with: nomineeDetails && nomineeDetails.relation_with ? nomineeDetails.relation_with.toString() : "0",
+            nominee_relation_with: nomineeDetails && nomineeDetails.relation_with ? nomineeDetails.relation_with.toString() : "",
             nominee_first_name: nomineeDetails && nomineeDetails.first_name ? nomineeDetails.first_name : "",
             nominee_gender: nomineeDetails && nomineeDetails.gender ? nomineeDetails.gender : "cc",
             nominee_dob: nomineeDetails && nomineeDetails.dob ? new Date(nomineeDetails.dob) : "",
-            gstn_no: policyHolder ? policyHolder.gstn_no : "",
+            gstn_no: policyHolder && policyHolder.gstn_no ? policyHolder.gstn_no : "",
             phone: policyHolder && policyHolder.mobile ? policyHolder.mobile : "",
             email:  policyHolder && policyHolder.email_id ? policyHolder.email_id : "",
             address: policyHolder && policyHolder.address ? policyHolder.address : "",
@@ -534,7 +558,8 @@ class TwoWheelerAdditionalDetails extends Component {
             policy_for : motorInsurance ? motorInsurance.policy_for : "",
             appointee_relation_with: nomineeDetails && nomineeDetails.appointee_relation_with ? nomineeDetails.appointee_relation_with : "",
             appointee_name: nomineeDetails && nomineeDetails.appointee_name ? nomineeDetails.appointee_name : "",
-
+            date_of_incorporation: policyHolder && policyHolder.date_of_incorporation ? new Date(policyHolder.date_of_incorporation) : "",
+            org_level: policyHolder ? policyHolder.org_level : "",
         });
 
         const quoteNumber =
@@ -605,12 +630,38 @@ class TwoWheelerAdditionalDetails extends Component {
                                                     autoComplete="off"
                                                     onFocus={e => this.changePlaceHoldClassAdd(e)}
                                                     onBlur={e => this.changePlaceHoldClassRemove(e)}
-                                                    value = {values.gstn_no}                                                                            
+                                                    value = {values.gstn_no.toUpperCase()}                                                                            
                                                 />
                                                     {errors.gstn_no && touched.gstn_no ? (
                                                 <span className="errorMsg">{errors.gstn_no}</span>
                                                 ) : null} 
                                                 </div>
+                                            </FormGroup>
+                                        </Col> : null }
+                                        {motorInsurance && motorInsurance.policy_for == '2' ?
+                                        <Col sm={12} md={4} lg={4}>
+                                            <FormGroup>
+                                            <DatePicker
+                                                name="date_of_incorporation"
+                                                dateFormat="dd MMM yyyy"
+                                                placeholderText="Incorporation Date"
+                                                peekPreviousMonth
+                                                peekPreviousYear
+                                                showMonthDropdown
+                                                showYearDropdown
+                                                dropdownMode="select"
+                                                maxDate={new Date(maxDoi)}
+                                                minDate={new Date(minDoi)}
+                                                className="datePckr"
+                                                selected={values.date_of_incorporation}
+                                                onChange={(val) => {
+                                                    setFieldTouched('date_of_incorporation');
+                                                    setFieldValue('date_of_incorporation', val);
+                                                    }}
+                                            />
+                                            {errors.date_of_incorporation && touched.date_of_incorporation ? (
+                                                <span className="errorMsg">{errors.date_of_incorporation}</span>
+                                            ) : null}  
                                             </FormGroup>
                                         </Col> : null }
                                     {motorInsurance && motorInsurance.policy_for == '1' ?
@@ -796,6 +847,39 @@ class TwoWheelerAdditionalDetails extends Component {
                                         </FormGroup>
                                     </Col>
                                 </Row>
+                                {motorInsurance && motorInsurance.policy_for == '2' ?
+                                <Row>
+                                    <Col sm={12} md={4} lg={4}>
+                                        <FormGroup>
+                                            <div className="formSection">
+                                            <Field
+                                                name="org_level"
+                                                component="select"
+                                                autoComplete="off"
+                                                value={values.org_level}
+                                                className="formGrp"
+                                            >
+                                            <option value="">Select Organization Level</option>
+                                            <option value="1">Corporate Public</option> 
+                                            <option value="2">Corporate (PSU)</option>        
+                                            <option value="3">Corporate (Private)</option>        
+                                            <option value="4">Firm</option>        
+                                            <option value="5">HUF</option>        
+                                            <option value="6">Society</option>  
+                                            <option value="7">NGO</option>       
+                                            <option value="8">Trust</option>   
+                                            <option value="9">BOA</option>        
+                                            <option value="10">Government</option>        
+                                            <option value="11">SME</option>                                              
+                                           
+                                            </Field>     
+                                            {errors.org_level && touched.org_level ? (
+                                                <span className="errorMsg">{errors.org_level}</span>
+                                            ) : null}        
+                                            </div>
+                                        </FormGroup>
+                                    </Col>
+                                </Row> : null }
 
                                 <div className="d-flex justify-content-left carloan">
                                     <h4> </h4>

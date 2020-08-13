@@ -18,6 +18,7 @@ import OtherComprehensive from '../motor/OtherComprehensive';
 import Premium from '../motor/Premium';
 // import ThankYou_motor from '../motor/ThankYou';
 
+
 // import TwoWheelerRegistration from '../two-wheeler/TwoWheelerRegistration';
 import TwoWheelerSelectBrand from '../two-wheeler/TwoWheelerSelectBrand';
 import TwoWheelerVehicleDetails from '../two-wheeler/TwoWheelerVehicleDetails';
@@ -26,7 +27,6 @@ import TwoWheelerOtherComprehensive from '../two-wheeler/TwoWheelerOtherComprehe
 import TwoWheelerVerify from '../two-wheeler/TwoWheelerVerify';
 import TwoWheelerAdditionalDetails from '../two-wheeler/TwoWheelerAdditionalDetails';
 // import TwoWheelerThankYou_motor from '../two-wheeler/TwoWheelerThankYou';
-
 
 
 import UnderMaintenance from '../UnderMaintenance';
@@ -42,6 +42,18 @@ const componentLoader = () => {
     )
 }
 const loadingContent = componentLoader();
+
+const Break_in = Loadable({
+    loader: () => import(/*webpackChunkName: "Products" */"../support/StatusTable.jsx"),
+    loading: () => loadingContent
+});
+
+const Break_form = Loadable({
+    loader: () => import(/*webpackChunkName: "Products" */"../support/RequestForm.jsx"),
+    loading: () => loadingContent
+});
+
+
 
 const Products = Loadable({
     loader: () => import(/*webpackChunkName: "Products" */"../products/Products.jsx"),
@@ -124,6 +136,8 @@ const TwoWheelerAdditionalDetailsTP = Loadable({
 
 
 
+
+
 class Routes extends Component {
     render() {
         this.props.onAuthPersist();
@@ -173,8 +187,12 @@ class Routes extends Component {
                         {/************ Support ******************/}
                         <PrivateRoute exact path="/Documents" component={Documents} />
                         <PrivateRoute exact path="/Supports" component={Supports} />
-                        <PrivateRoute exact path="/TicketCount" component={TicketCount} />
-                        
+                        <PrivateRoute exact path="/TicketCount" component={TicketCount} /> 
+
+                        {/************ BREAK IN ******************/}
+                        <PrivateRoute exact path="/Break_in" component={Break_in} />
+                        <PrivateRoute exact path="/Break_form" component={Break_form} />
+
                         <PrivateRoute exact path="/UnderMaintenance" component={UnderMaintenance} />
                         <Redirect from="/" to="/Products" />
                     </Switch>

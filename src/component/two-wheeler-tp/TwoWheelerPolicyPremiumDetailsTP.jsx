@@ -443,6 +443,39 @@ class Premium extends Component {
                                                                                     <p></p>
                                                                                 </Row>
                                                                             </div> : null }
+
+                                                                            {motorInsurance.policy_for == '1' && nomineedetails && nomineedetails.is_appointee == '1'?      
+                                                                            <div>
+                                                                            <strong>Appointee Details :</strong>
+                                                                                <br/>
+                                                                                <Row>
+                                                                                    <Col sm={12} md={6}>
+                                                                                        <Row>
+                                                                                            <Col sm={12} md={6}>
+                                                                                                <FormGroup>Name:</FormGroup>
+                                                                                            </Col>
+                                                                                            <Col sm={12} md={6}>
+                                                                                                <FormGroup>{nomineedetails && nomineedetails.appointee_name ? nomineedetails.appointee_name : null}</FormGroup>
+                                                                                            </Col>
+                                                                                        </Row>
+
+                                                                                        <Row>
+                                                                                            <Col sm={12} md={6}>
+                                                                                                <FormGroup>Relation With Nominee:</FormGroup>
+                                                                                            </Col>
+                                                                                            <Col sm={12} md={6}>
+                                                                                            {nomineedetails && nomineedetails.appointee_relation_with && relation.map((relations, qIndex) => 
+                                                                                            relations.id == nomineedetails.appointee_relation_with ?
+                                                                                                <FormGroup>{relations.name}</FormGroup> : null
+                                                                                            )}
+                                                                                            </Col>
+                                                                                        </Row>
+                                                                                    </Col>
+                                                                                </Row>
+                                                                                <Row>
+                                                                                    <p></p>
+                                                                                </Row>
+                                                                            </div> : null }
                                                                     </div>
 
                                                                 </Collapsible>

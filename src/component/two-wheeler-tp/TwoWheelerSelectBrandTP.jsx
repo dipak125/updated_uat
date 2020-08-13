@@ -42,7 +42,21 @@ const vehicleValidation = Yup.object().shape({
     regNumber: Yup.string().when("check_registration", {
         is: "1",       
         then: Yup.string(),
-        otherwise: Yup.string().required('Please provide registration number').matches(/^[A-Z]{2}[ -][0-9]{1,2}[ -][A-Z]{1,3}[ -][0-9]{4}$/, 'Invalid Registration number'),
+        otherwise: Yup.string().required('Please provide registration number').matches(/^[A-Z]{2}[ -][0-9]{1,2}[ -][A-Z]{1,3}[ -][0-9]{4}$/, 'Invalid Registration number')
+            .test(
+                "validRegistrationChecking",
+                function() {
+                    return "Enter valid registration number"
+                },
+                function (value) {
+                    if (value) {
+                        let reg = value.split(" ")
+                        if(reg && reg[3]) {
+                            return parseInt(reg[3])
+                        }
+                    }
+                    return true;
+            })
     }),
 })
 

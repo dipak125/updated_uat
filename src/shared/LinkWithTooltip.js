@@ -13,7 +13,7 @@ const LinkWithTooltip = ({ id, children, href, tooltip, clicked }) => {
            placement="top"
            delayShow={300}
            delayHide={150}
-           trigger={['hover']}
+           trigger={['hover','focus']}
        >
            <Link to={href} onClick={clicked}>
            {children}

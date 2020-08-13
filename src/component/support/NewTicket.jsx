@@ -95,10 +95,12 @@ class NewTicket extends Component {
 
                     <div className="opntckt">
                         <Row>
-                            <Col sm={12} md={6}>Email:	</Col>
-                            <Col sm={12} md={6}>test@gmail.com</Col>
-                            <Col sm={12} md={6}>Client:</Col>
-                            <Col sm={12} md={6}>XXXXXX</Col>
+                            <Col sm={12} md={1}>Email:	</Col>
+                            <Col sm={12} md={1}>test@gmail.com</Col>
+                        </Row>
+                        <Row>
+                            <Col sm={12} md={1}>Client:</Col>
+                            <Col sm={12} md={11}>XXXXXX</Col>
                         </Row>
                     </div>
 
@@ -135,38 +137,37 @@ class NewTicket extends Component {
                                         </Col>
 
                                     </div>
-                                    <div class="form-group">
-                                            <label for="usr">Issue Summery:</label>
-                                            <FormGroup>
+                                    <div class="form-group issue-area">
+                                        <label for="usr">Issue Summary:</label>
+                                        <FormGroup>
                                             <Field
                                                 name="issueSummery"
                                                 as="textarea"
                                                 className={'form-control' + (errors.issueSummery && touched.issueSummery ? ' is-invalid' : '')}
                                                 component={props =>
                                                     <CKEditor
-                                                        editor={ ClassicEditor }
-                                                        data="<p>Write your details here
-                                                        </p>"
-                                                        onInit={ editor => {
+                                                        config={{placeholder: "Write your details here"}} 
+                                                        editor={ClassicEditor}
+                                                        onInit={editor => {
                                                             // You can store the "editor" and use when it is needed.
-                                                            console.log( 'Editor is ready to use!', editor );
-                                                        } }
-                                                        onChange={ ( event, editor ) => {
+                                                            console.log('Editor is ready to use!', editor);
+                                                        }}
+                                                        onChange={(event, editor) => {
                                                             const data = editor.getData();
-                                                            console.log( { event, editor, data } );
-                                                        } }
-                                                        onBlur={ ( event, editor ) => {
-                                                            console.log( 'Blur.', editor );
-                                                        } }
-                                                        onFocus={ ( event, editor ) => {
-                                                            console.log( 'Focus.', editor );
-                                                        } }
+                                                            console.log({ event, editor, data });
+                                                        }}
+                                                        onBlur={(event, editor) => {
+                                                            console.log('Blur.', editor);
+                                                        }}
+                                                        onFocus={(event, editor) => {
+                                                            console.log('Focus.', editor);
+                                                        }}
                                                     />
-                                                    }
-                                                />
-                                                <ErrorMessage name="issueSummery" component="div" className="invalid-feedback" />
-                                                </FormGroup>
-                                        </div>
+                                                }
+                                            />
+                                            <ErrorMessage name="issueSummery" component="div" className="invalid-feedback" />
+                                        </FormGroup>
+                                    </div>
                                     <div class="form-group">
                                         <input type="file" key='1' name="attachment"
                                             accept=".png, .jpeg, .jpg, .doc, .docx, .xls, .xlsx, .pdf"
