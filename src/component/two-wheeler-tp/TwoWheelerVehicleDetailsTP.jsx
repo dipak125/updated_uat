@@ -68,7 +68,8 @@ class TwoWheelerVehicleDetails extends Component {
         selectedCustomerRecords: [],
         CustIdkeyword: "",
         RTO_location: "",
-        step_completed: "0"
+        step_completed: "0",
+        location_reset_flag: 0
     };
 
     changePlaceHoldClassAdd(e) {
@@ -128,9 +129,11 @@ class TwoWheelerVehicleDetails extends Component {
     onChangeCustomerID = (event, { newValue, method }) => {
         //const input = newValue;
            // if (/^[a-zA-Z]+$/.test(input) || input === "") {
+            let location_reset_flag = this.state.motorInsurance && this.state.motorInsurance.location_id ? 1 : 0
                 this.setState({
                     CustomerID: newValue,
-                    RTO_location: ""
+                    RTO_location: "",
+                    location_reset_flag
                     });
             //}
         
@@ -294,11 +297,11 @@ class TwoWheelerVehicleDetails extends Component {
 
     render() {
         const {productId} = this.props.match.params  
-        const { motorInsurance, CustomerID,suggestions, vehicleDetails, RTO_location, step_completed} = this.state
+        const { motorInsurance, CustomerID,suggestions, vehicleDetails, RTO_location, step_completed, location_reset_flag} = this.state
 
         let newInitialValues = Object.assign(initialValue, {
             registration_date: motorInsurance && motorInsurance.registration_date ? new Date(motorInsurance.registration_date) : "",
-            location_id:  motorInsurance && motorInsurance.location_id ? motorInsurance.location_id : "",
+            location_id:  motorInsurance && motorInsurance.location_id && location_reset_flag == 0 ? motorInsurance.location_id : "",
             policy_type_Id : motorInsurance && motorInsurance.policytype_id ? motorInsurance.policytype_id : "0"
         });
 

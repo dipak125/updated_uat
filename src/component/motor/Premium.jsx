@@ -213,7 +213,7 @@ console.log('nomineedetails', nomineedetails)
                         <strong>
                             Thank you for showing your interest for buying product.Due to some
                             reasons, we are not able to issue the policy online.Please call
-                            180 22 1111
+                            1800 22 1111
                     </strong>
                     </h6>
                 </span>

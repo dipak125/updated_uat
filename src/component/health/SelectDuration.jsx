@@ -351,7 +351,7 @@ class SelectDuration extends Component {
         //     )                                                
         // }) : null
         const errMsg =  error && error.message ? (            
-            <span className="errorMsg"><h6><strong>Thank you for showing your interest for buying product.Due to some reasons, we are not able to issue the policy online.Please call 180 22 1111</strong></h6></span>                                
+            <span className="errorMsg"><h6><strong>Thank you for showing your interest for buying product.Due to some reasons, we are not able to issue the policy online.Please call 1800 22 1111</strong></h6></span>                                
         ) : null 
                                                         
        
