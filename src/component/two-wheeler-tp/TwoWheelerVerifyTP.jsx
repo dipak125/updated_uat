@@ -555,7 +555,7 @@ class TwoWheelerVerify extends Component {
                         <Row>
                             <Col sm={12} md={9} lg={9}>
                                 <Row>
-                                <Col sm={12} md={6} lg={4}>
+                                <Col sm={12} md={6} lg={5}>
                                 <Row>
                                     
                                 <Col sm={12} md={5} lg={6}>
@@ -589,8 +589,8 @@ class TwoWheelerVerify extends Component {
                                 </Row>
                                 </Col>
 
-                                <Col sm={12} md={6} lg={5}>
-                                <Row>
+                                <Col sm={12} md={6} lg={4}>
+                                <Row sm={12} md={6} lg={4}>
                                 <Col sm={12} md={5} lg={6}>
                                     <FormGroup>
                                         <div className="insurerName">
@@ -626,7 +626,7 @@ class TwoWheelerVerify extends Component {
                                 </Row>
                                 </Col>
 
-                                <Col sm={12} md={2} lg={2}>
+                                <Col sm={12} md={6} lg={2}>
                                     <FormGroup>
                                     
                                         <Button className="btn btn-primary vrifyBtn" onClick= {!errors.chasis_no_last_part ? this.getVahanDetails.bind(this,values, setFieldTouched, setFieldValue, errors) : null}>Verify</Button>

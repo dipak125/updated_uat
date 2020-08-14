@@ -880,6 +880,30 @@ class TwoWheelerAdditionalDetails extends Component {
                                         </FormGroup>
                                     </Col>
                                 </Row> : null }
+                                {motorInsurance && motorInsurance.policy_for == '1' ?
+                                <Row>
+                                    <Col sm={12} md={4} lg={4}>
+                                        <FormGroup>
+                                            <div className="insurerName">
+                                            <Field
+                                                name='pancard'
+                                                type="text"
+                                                placeholder="PAN Card No. "
+                                                autoComplete="off"
+                                                onFocus={e => this.changePlaceHoldClassAdd(e)}
+                                                onBlur={e => this.changePlaceHoldClassRemove(e)}
+                                                value = {values.pancard.toUpperCase()} 
+                                                onChange= {(e)=> 
+                                                    setFieldValue('pancard', e.target.value.toUpperCase())
+                                                    }                                                                           
+                                            />
+                                            {errors.pancard && touched.pancard ? (
+                                            <span className="errorMsg">{errors.pancard}</span>
+                                            ) : null} 
+                                            </div>
+                                        </FormGroup>
+                                    </Col>
+                                </Row> : null }
 
                                 <div className="d-flex justify-content-left carloan">
                                     <h4> </h4>
