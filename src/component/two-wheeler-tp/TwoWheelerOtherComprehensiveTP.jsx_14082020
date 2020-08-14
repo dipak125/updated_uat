@@ -19,13 +19,12 @@ import swal from 'sweetalert';
 
 let encryption = new Encryption()
 
-
- let initialValue = {
-    // add_more_coverage: "",
-    // cng_kit: '0',
-    // B00015: "B00015",
-    // PA_flag: '0',
-    // PA_Cover: ""
+const initialValue = {
+    add_more_coverage: "",
+    cng_kit: '0',
+    moreCov_0: "B00015",
+    PA_flag: '0',
+    PA_Cover: ""
 
 }
 const ComprehensiveValidation = Yup.object().shape({
@@ -80,13 +79,12 @@ class TwoWheelerOtherComprehensive extends Component {
             show: false,
             sliderVal: '',
             motorInsurance: [],
-            add_more_coverage: ['B00015'],
+            add_more_coverage: ["B00015"],
             vahanDetails: [],
             vahanVerify: false,
             policyCoverage: [],
             step_completed: "0",
-            vehicleDetails: [],
-            selectFlag: ''
+            vehicleDetails: []
         };
     }
 
@@ -109,6 +107,7 @@ class TwoWheelerOtherComprehensive extends Component {
     }
 
     handleChange = () => {
+        console.log('handleChange')
         this.setState({ serverResponse: [], error: [] });
     }
 
@@ -132,23 +131,14 @@ class TwoWheelerOtherComprehensive extends Component {
         axios.get(`two-wh/details/${policyHolder_id}`)
             .then(res => {
                 let decryptResp = JSON.parse(encryption.decrypt(res.data));
-                console.log("decryptResp----", decryptResp)
-                let values = []
                 let motorInsurance = decryptResp.data.policyHolder ? decryptResp.data.policyHolder.motorinsurance : {}
+                let values = []
                 let vehicleDetails = decryptResp.data.policyHolder ? decryptResp.data.policyHolder.vehiclebrandmodel : {};
                 let step_completed = decryptResp.data.policyHolder ? decryptResp.data.policyHolder.step_no : "";
-
-                let add_more_coverage = motorInsurance && motorInsurance.policy_for == '2' ? [] : (motorInsurance.add_more_coverage != null ? motorInsurance.add_more_coverage.split(",") : ['B00015']) 
-                add_more_coverage = add_more_coverage.flat()
-
-                 values.PA_flag = motorInsurance && motorInsurance.pa_cover != "" ? '1' : '0'
-                 values.PA_Cover = motorInsurance && motorInsurance.pa_cover != "" ? motorInsurance.pa_cover : '0'
                 
                 this.setState({
                     motorInsurance,vehicleDetails,step_completed,
-                    add_more_coverage: add_more_coverage, 
-                    selectFlag: motorInsurance && motorInsurance.policy_for == '2' ? [] : (motorInsurance.add_more_coverage != null ? '0' : '1') 
-                    
+                    add_more_coverage: motorInsurance && motorInsurance.policy_for == '2' ? [] : ["B00015"]
                 })
                 this.props.loadingStop();
                 this.getAccessToken(values)
@@ -209,7 +199,12 @@ class TwoWheelerOtherComprehensive extends Component {
 
     fullQuote = (access_token, values) => {
         const { PolicyArray, sliderVal, add_more_coverage, motorInsurance } = this.state
-
+        let cng_kit_flag = 0;
+        let cngKit_Cost = 0;
+        if (values.toString()) {
+            cng_kit_flag = values.cng_kit
+            cngKit_Cost = values.cngKit_Cost
+        }
         let defaultSliderValue = PolicyArray.length > 0 ? Math.floor(PolicyArray[0].PolicyRiskList[0].IDV_Suggested) : 0
         const formData = new FormData();
 
@@ -224,7 +219,7 @@ class TwoWheelerOtherComprehensive extends Component {
             'PA_Cover': values.PA_flag ? values.PA_Cover : "0",
             'policy_for': motorInsurance ? motorInsurance.policy_for : ""
         }
-
+        console.log('fullQuote_post_data', post_data)
         // let encryption = new Encryption();
         // formData.append('enc_data',encryption.encrypt(JSON.stringify(post_data)))
         formData.append('id',localStorage.getItem('policyHolder_refNo'))
@@ -316,8 +311,6 @@ class TwoWheelerOtherComprehensive extends Component {
 
         const { add_more_coverage } = this.state;
         var drv = [];
-
-
         if (isSelect) {
             add_more_coverage.push(values);
             this.setState({
@@ -339,7 +332,6 @@ class TwoWheelerOtherComprehensive extends Component {
                     error: []
                 });
             }
-
             if(values == "B00075") {
                 setFieldTouched("PA_flag");
                 setFieldValue("PA_flag", '0');
@@ -358,44 +350,13 @@ class TwoWheelerOtherComprehensive extends Component {
 
     render() {
         const { vahanDetails, error, policyCoverage, vahanVerify, fulQuoteResp, PolicyArray, motorInsurance, serverResponse, add_more_coverage,
-            step_completed, vehicleDetails, selectFlag} = this.state
+            step_completed, vehicleDetails} = this.state
         const { productId } = this.props.match.params
-        let covList = motorInsurance && motorInsurance.add_more_coverage ? motorInsurance.add_more_coverage.split(",") : ""
-        let newInnitialArray = {}
-        let PA_flag = motorInsurance && motorInsurance.pa_cover != null ? '1' : '0'
-        let PA_Cover = motorInsurance &&  motorInsurance.pa_cover != null ? motorInsurance.pa_cover : '0'
 
-        if(selectFlag == '1') {
-            initialValue = {
-                add_more_coverage: "",
-                cng_kit: '0',
-                B00015: "B00015",
-                PA_flag: '0',
-                PA_Cover: ""
-            
-            }
-           
-        }else {
-            initialValue = {
-                add_more_coverage: "",
-                cng_kit: '0',
-                // B00015: "B00015",
-                PA_flag: '0',
-                PA_Cover: ""
-            
-            }
-        }
-            
-        for (var i = 0 ; i < covList.length; i++) {
-            newInnitialArray[covList[i]] = covList[i];
-        }    
 
-        newInnitialArray.PA_flag = PA_flag   
-        newInnitialArray.PA_Cover = PA_Cover
-        let newInitialValues = Object.assign(initialValue, newInnitialArray );
-
-        console.log("InitialValues---", newInnitialArray)
-        console.log("add_more_coverage---", add_more_coverage)
+        let newInitialValues = Object.assign(initialValue, {
+            // add_more_coverage: motorInsurance.add_more_coverage ? motorInsurance.add_more_coverage : "",
+        });
 
         const policyCoverageList =  policyCoverage && policyCoverage.length > 0 ?
             policyCoverage.map((coverage, qIndex) => (
@@ -483,33 +444,32 @@ class TwoWheelerOtherComprehensive extends Component {
 
                                                             {motorInsurance && motorInsurance.policy_for == '1' && moreCoverage.map((coverage, qIndex) => (
                                                             <Row key={qIndex}>   
-                                                                <Col sm={12} md={11} lg={6} key={qIndex+"a"} >
+                                                                <Col sm={12} md={11} lg={6}  >
                                                                     <label className="customCheckBox formGrp formGrp">{coverage.name}
                                                                         <OverlayTrigger overlay={<Tooltip id="tooltip-disabled">{coverage.description}</Tooltip>}>
                                                                             <a href="#" className="infoIcon"><img src={require('../../assets/images/i.svg')} alt="" className="premtool" /></a>
                                                                         </OverlayTrigger>
                                                                         <Field
                                                                             type="checkbox"
-                                                                            // name={`moreCov_${qIndex}`}
-                                                                            name={coverage.id}
+                                                                            name={`moreCov_${qIndex}`}
                                                                             value={coverage.id}
                                                                             className="user-self"
                                                                             // checked={values.roadsideAssistance ? true : false}
                                                                             onClick={(e) =>{
-                                                                                if( e.target.checked == false && values[coverage.id] == 'B00015') {
+                                                                                if( e.target.checked == false && values[`moreCov_${qIndex}`] == 'B00015') {
                                                                                     swal("This cover is mandated by IRDAI, it is compulsory for Owner-Driver to possess a PA cover of minimum Rs 15 Lacs, except in certain conditions. By not choosing this cover, you confirm that you hold an existing PA cover or you do not possess a valid driving license.")
                                                                                 }
                                                                                 this.onRowSelect(e.target.value, e.target.checked, setFieldTouched, setFieldValue)         
                                                                             }
                                                                             }
-                                                                            checked = {values[coverage.id] == coverage.id ? true : false}
+                                                                            checked = {values[`moreCov_${qIndex}`] == coverage.id ? true : false}
                                                                         />
                                                                         <span className="checkmark mL-0"></span>
                                                                         <span className="error-message"></span>
                                                                     </label>
                                                                 </Col>
-                                                                {values.PA_flag == '1' && values[coverage.id] == 'B00075' ?
-                                                                    <Col sm={12} md={11} lg={3} key={qIndex+"b"}>
+                                                                {values.PA_flag == '1' && values[`moreCov_${qIndex}`] == 'B00075' ?
+                                                                    <Col sm={12} md={11} lg={3}>
                                                                         <FormGroup>
                                                                             <div className="formSection">
                                                                                 <Field
