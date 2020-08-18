@@ -921,7 +921,7 @@ class TwoWheelerAdditionalDetails extends Component {
                                             <Field
                                                 name='nominee_first_name'
                                                 type="text"
-                                                placeholder="Nominee Name"
+                                                placeholder="FirstName LastName"
                                                 autoComplete="off"
                                                 onFocus={e => this.changePlaceHoldClassAdd(e)}
                                                 onBlur={e => this.changePlaceHoldClassRemove(e)}

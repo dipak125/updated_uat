@@ -108,6 +108,7 @@ const SelectBrand = Loadable({
     loading: () => loadingContent
 });
 
+// ========== Two-Wheeler TP =============================================
 
 const TwoWheelerSelectBrandTP = Loadable({
     loader: () => import(/*webpackChunkName: "Products" */"../two-wheeler-tp/TwoWheelerSelectBrandTP.jsx"),
@@ -131,6 +132,33 @@ const TwoWheelerVerifyTP = Loadable({
 });
 const TwoWheelerAdditionalDetailsTP = Loadable({
     loader: () => import(/*webpackChunkName: "Products" */"../two-wheeler-tp/TwoWheelerAdditionalDetailsTP.jsx"),
+    loading: () => loadingContent
+});
+
+// ======================== Four-Wheeler TP ========================================
+
+const FourWheelerSelectBrandTP = Loadable({
+    loader: () => import(/*webpackChunkName: "Products" */"../four-wheeler-tp/FourWheelerSelectBrandTP.jsx"),
+    loading: () => loadingContent
+});
+const FourWheelerVehicleDetailsTP = Loadable({
+    loader: () => import(/*webpackChunkName: "Products" */"../four-wheeler-tp/FourWheelerVehicleDetailsTP.jsx"),
+    loading: () => loadingContent
+});
+const FourWheelerPolicyPremiumDetailsTP = Loadable({
+    loader: () => import(/*webpackChunkName: "Products" */"../four-wheeler-tp/FourWheelerPolicyPremiumDetailsTP.jsx"),
+    loading: () => loadingContent
+});
+const FourWheelerOtherComprehensiveTP = Loadable({
+    loader: () => import(/*webpackChunkName: "Products" */"../four-wheeler-tp/FourWheelerOtherComprehensiveTP.jsx"),
+    loading: () => loadingContent
+});
+const FourWheelerVerifyTP = Loadable({
+    loader: () => import(/*webpackChunkName: "Products" */"../four-wheeler-tp/FourWheelerVerifyTP.jsx"),
+    loading: () => loadingContent
+});
+const FourWheelerAdditionalDetailsTP = Loadable({
+    loader: () => import(/*webpackChunkName: "Products" */"../four-wheeler-tp/FourWheelerAdditionalDetailsTP.jsx"),
     loading: () => loadingContent
 });
 
@@ -183,6 +211,14 @@ class Routes extends Component {
                         <PrivateRoute exact path="/two_wheeler_additional_detailsTP/:productId" component={TwoWheelerAdditionalDetailsTP} />  
                         <PrivateRoute exact path="/two_wheeler_policy_premium_detailsTP/:productId" component={TwoWheelerPolicyPremiumDetailsTP} />
                         {/* <PrivateRoute exact path="/two_wheeler_ThankYou_motorTP/:policyId" component={TwoWheelerThankYou_motorTP} /> */}
+
+                        {/************ FourWheelerTP ******************/}
+                        <PrivateRoute exact path="/four_wheeler_Select-brandTP/:productId" component={FourWheelerSelectBrandTP} />
+                        <PrivateRoute exact path="/four_wheeler_Vehicle_detailsTP/:productId" component={FourWheelerVehicleDetailsTP} />
+                        <PrivateRoute exact path="/four_wheeler_OtherComprehensiveTP/:productId" component={FourWheelerOtherComprehensiveTP} />
+                        <PrivateRoute exact path="/four_wheeler_verifyTP/:productId" component={FourWheelerVerifyTP} />
+                        <PrivateRoute exact path="/four_wheeler_additional_detailsTP/:productId" component={FourWheelerAdditionalDetailsTP} />  
+                        <PrivateRoute exact path="/four_wheeler_policy_premium_detailsTP/:productId" component={FourWheelerPolicyPremiumDetailsTP} />
 
                         {/************ Support ******************/}
                         <PrivateRoute exact path="/Documents" component={Documents} />

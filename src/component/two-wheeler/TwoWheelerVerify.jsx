@@ -102,18 +102,22 @@ const ComprehensiveValidation = Yup.object().shape({
         }
     ),
 
+
     previous_start_date:Yup.date()
     .notRequired('Previous Start date is required')
     .test(
-        "currentMonthChecking",
-        function() {
-            return "Please enter Start date"
-        },
-        function (value) {
-            if (this.parent.policy_type_id > 1 && !value) {   
-                return false;    
-            }
-            return true;
+            "validRegistrationChecking",
+            function() {
+                return "Please select if you have previous claim"
+            },
+            function (value) {
+                if (this.parent.lapse_duration == '2' && this.parent.policy_type_id == '3') {
+                    return true
+                }
+                else if(value ) {
+                    return true
+                }
+                else return false
         }
     ).test(
         "checkGreaterTimes",
@@ -134,18 +138,22 @@ const ComprehensiveValidation = Yup.object().shape({
           return true;
       }
     ),
+
     previous_end_date:Yup.date()
     .notRequired('Previous end date is required')
     .test(
-        "currentMonthChecking",
+        "validRegistrationChecking",
         function() {
-            return "Please enter end date"
+            return "Please select if you have previous claim"
         },
         function (value) {
-            if (this.parent.policy_type_id > 1 && !value) {   
-                return false;    
+            if (this.parent.lapse_duration == '2' && this.parent.policy_type_id == '3') {
+                return true
             }
-            return true;
+            else if(value ) {
+                return true
+            }
+            else return false
         }
     ).test( 
         "checkGreaterTimes",
@@ -169,15 +177,18 @@ const ComprehensiveValidation = Yup.object().shape({
     previous_policy_name:Yup.string()
     .notRequired('Please select Policy Type')
     .test(
-        "currentMonthChecking",
+        "validRegistrationChecking",
         function() {
-            return "Please select Policy Type"
+            return "Please select if you have previous claim"
         },
         function (value) {
-            if (this.parent.policy_type_id > 1 && !value) {   
-                return false;    
+            if (this.parent.lapse_duration == '2' && this.parent.policy_type_id == '3') {
+                return true
             }
-            return true;
+            else if(value ) {
+                return true
+            }
+            else return false
         }
     ).test(
         "currentMonthChecking",
@@ -194,29 +205,35 @@ const ComprehensiveValidation = Yup.object().shape({
     insurance_company_id:Yup.number()
     .notRequired('Insurance company is required')
     .test(
-        "currentMonthChecking",
+        "validRegistrationChecking",
         function() {
-            return "Please enter previous insurance company"
+            return "Please select if you have previous claim"
         },
         function (value) {
-            if (this.parent.policy_type_id > 1 && !value) {   
-                return false;    
+            if (this.parent.lapse_duration == '2' && this.parent.policy_type_id == '3') {
+                return true
             }
-            return true;
+            else if(value ) {
+                return true
+            }
+            else return false
         }
     ),
     previous_city:Yup.string()
     .notRequired('Previous city is required')
     .test(
-        "currentMonthChecking",
+        "validRegistrationChecking",
         function() {
-            return "Please enter previous insurance company city"
+            return "Please select if you have previous claim"
         },
         function (value) {
-            if (this.parent.policy_type_id > 1 && !value) {   
-                return false;    
+            if (this.parent.lapse_duration == '2' && this.parent.policy_type_id == '3') {
+                return true
             }
-            return true;
+            else if(value ) {
+                return true
+            }
+            else return false
         }
     )
     .matches(/^[a-zA-Z0-9][a-zA-Z0-9-/.,\s]*$/, 
@@ -227,15 +244,18 @@ const ComprehensiveValidation = Yup.object().shape({
     previous_policy_no:Yup.string()
     .notRequired('Previous policy number is required')
     .test(
-        "currentMonthChecking",
+        "validRegistrationChecking",
         function() {
-            return "Please enter previous policy number"
+            return "Please select if you have previous claim"
         },
         function (value) {
-            if (this.parent.policy_type_id > 1 && !value) {   
-                return false;    
+            if (this.parent.lapse_duration == '2' && this.parent.policy_type_id == '3') {
+                return true
             }
-            return true;
+            else if(value ) {
+                return true
+            }
+            else return false
         }
     )
     .matches(/^[a-zA-Z0-9][a-zA-Z0-9\s-/]*$/, 
@@ -361,30 +381,42 @@ class TwoWheelerVerify extends Component {
         if(errors.registration_no || errors.chasis_no_last_part) {
             swal("Please provide correct Registration number and Chasis number")
         }
+        // else {
+        //     this.props.loadingStart()
+        //     axios
+        //     .post(`/getVahanDetails`,formData)
+        //     .then((res) => {
+        //         this.setState({
+        //         vahanDetails: res.data,
+        //         vahanVerify: res.data.length > 0 ? true : false
+        //         });
+
+        //         setFieldTouched('vahanVerify')
+        //         res.data.length > 0 ?
+        //         setFieldValue('vahanVerify', true) 
+        //         : setFieldValue('vahanVerify', false)
+
+        //         this.props.loadingStop();
+        //     })
+        //     .catch((err) => {
+        //         this.setState({
+        //             vahanDetails: [],
+        //         });
+        //         swal("Please provide correct Registration number and Chasis number")
+        //         this.props.loadingStop();
+        //     });
+        // }
         else {
             this.props.loadingStart()
-            axios
-            .post(`/getVahanDetails`,formData)
-            .then((res) => {
                 this.setState({
-                vahanDetails: res.data,
-                vahanVerify: res.data.length > 0 ? true : false
+                vahanDetails: [],
+                vahanVerify:  true 
                 });
 
                 setFieldTouched('vahanVerify')
-                res.data.length > 0 ?
                 setFieldValue('vahanVerify', true) 
-                : setFieldValue('vahanVerify', false)
 
                 this.props.loadingStop();
-            })
-            .catch((err) => {
-                this.setState({
-                    vahanDetails: [],
-                });
-                swal("Please provide correct Registration number and Chasis number")
-                this.props.loadingStop();
-            });
         }
     };
 
@@ -412,7 +444,7 @@ class TwoWheelerVerify extends Component {
         const formData = new FormData();
         let encryption = new Encryption();
         let post_data = {}
-        if(motorInsurance.policytype_id == '1'){
+        if(motorInsurance && motorInsurance.policytype_id == '1' || (motorInsurance && motorInsurance.policytype_id == '3' && motorInsurance.lapse_duration == '2')){
             post_data = {
                 'policy_holder_id': localStorage.getItem('policyHolder_id'),
                 'menumaster_id': 3,
@@ -467,31 +499,30 @@ class TwoWheelerVerify extends Component {
     regnoFormat = (e, setFieldTouched, setFieldValue) => {
         
         let regno = e.target.value
-        let formatVal = e.target.value
+        let formatVal = ""
         let regnoLength = regno.length
         var letter = /^[a-zA-Z]+$/;
         var number = /^[0-9]+$/;
         let subString = regno.substring(regnoLength-1, regnoLength)
         let preSubString = regno.substring(regnoLength-2, regnoLength-1)
-    
-    
+
         if(subString.match(letter) && preSubString.match(letter)) {
             formatVal = regno
         }
         else if(subString.match(number) && preSubString.match(number)) {
             formatVal = regno
         } 
-        if(subString.match(number) && preSubString.match(letter)) {
-            formatVal = regno.replace(regno.substring(regnoLength-1, regnoLength), " ")
-            formatVal = formatVal+subString
+        else if(subString.match(number) && preSubString.match(letter)) {        
+            formatVal = regno.substring(0, regnoLength-1) + " " +subString      
         } 
         else if(subString.match(letter) && preSubString.match(number)) {
-            formatVal = regno.replace(regno.substring(regnoLength-1, regnoLength), " ")
-            formatVal = formatVal+subString
+            formatVal = regno.substring(0, regnoLength-1) + " " +subString   
         } 
-    
+
+        else formatVal = regno.toUpperCase()
+        
         e.target.value = formatVal.toUpperCase()
-    
+
     }
 
 
@@ -518,7 +549,8 @@ class TwoWheelerVerify extends Component {
             previous_city: previousPolicy && previousPolicy.city ? previousPolicy.city : "",
             previous_policy_no: previousPolicy && previousPolicy.policy_no ? previousPolicy.policy_no : "",
             newRegistrationNo:  motorInsurance.registration_no &&  motorInsurance.registration_no == "NEW" ? motorInsurance.registration_no : "",
-            policy_type_id: motorInsurance && motorInsurance.policytype_id ? motorInsurance.policytype_id : ""
+            policy_type_id: motorInsurance && motorInsurance.policytype_id ? motorInsurance.policytype_id : "",
+            lapse_duration: motorInsurance && motorInsurance.lapse_duration ? motorInsurance.lapse_duration : "",
 
         });
 
@@ -557,7 +589,8 @@ class TwoWheelerVerify extends Component {
                     validationSchema={ComprehensiveValidation}
                     >
                     {({ values, errors, setFieldValue, setFieldTouched, isValid, isSubmitting, touched }) => {
-                            
+            console.log("errors==--", errors)
+
                     return (
                         <Form>
                         <FormGroup>
@@ -720,7 +753,9 @@ class TwoWheelerVerify extends Component {
                                         </FormGroup>
                                     </Col>
                                 </Row>
-                                {values.policy_type_id != '1' ? 
+                                {(motorInsurance && motorInsurance.policytype_id && motorInsurance.policytype_id == '2') || 
+                                    (motorInsurance && motorInsurance.policytype_id && motorInsurance.policytype_id == '3' && 
+                                        motorInsurance && motorInsurance.lapse_duration == '1' ) ?
                                 <Fragment>
                                 <Row>
                                     <Col sm={12}>
@@ -891,6 +926,7 @@ class TwoWheelerVerify extends Component {
                                 );
                             }}
                         </Formik>
+                        
                     </section>
                     <Footer />
                     </div>

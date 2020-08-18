@@ -121,7 +121,7 @@ class TwoWheelerOtherComprehensive extends Component {
     }
 
     vehicleDetails = (productId) => {
-        this.props.history.push(`/two_wheeler_Vehicle_details/${productId}`);
+        this.props.history.push(`/two_wheeler_Vehicle_detailsTP/${productId}`);
     }
 
 
@@ -209,12 +209,7 @@ class TwoWheelerOtherComprehensive extends Component {
 
     fullQuote = (access_token, values) => {
         const { PolicyArray, sliderVal, add_more_coverage, motorInsurance } = this.state
-        let cng_kit_flag = 0;
-        let cngKit_Cost = 0;
-        if (values.toString()) {
-            cng_kit_flag = values.cng_kit
-            cngKit_Cost = values.cngKit_Cost
-        }
+
         let defaultSliderValue = PolicyArray.length > 0 ? Math.floor(PolicyArray[0].PolicyRiskList[0].IDV_Suggested) : 0
         const formData = new FormData();
 
@@ -229,7 +224,7 @@ class TwoWheelerOtherComprehensive extends Component {
             'PA_Cover': values.PA_flag ? values.PA_Cover : "0",
             'policy_for': motorInsurance ? motorInsurance.policy_for : ""
         }
-        console.log('fullQuote_post_data', post_data)
+
         // let encryption = new Encryption();
         // formData.append('enc_data',encryption.encrypt(JSON.stringify(post_data)))
         formData.append('id',localStorage.getItem('policyHolder_refNo'))
@@ -241,7 +236,7 @@ class TwoWheelerOtherComprehensive extends Component {
         formData.append('PA_Cover',values.PA_flag ? values.PA_Cover : "0")
         formData.append('policy_for',motorInsurance ? motorInsurance.policy_for : "")
 
-        axios.post('fullQuotePM2W', formData)
+        axios.post('fullQuotePM2WTP', formData)
             .then(res => {
                 if (res.data.PolicyObject) {
                     this.setState({
@@ -267,6 +262,7 @@ class TwoWheelerOtherComprehensive extends Component {
                 this.props.loadingStop();
             })
     }
+
 
     handleSubmit = (values) => {
         const { productId } = this.props.match.params
@@ -304,7 +300,7 @@ class TwoWheelerOtherComprehensive extends Component {
             let decryptResp = JSON.parse(encryption.decrypt(res.data));
             console.log('decryptResp---', decryptResp)
             if (decryptResp.error == false) {
-                this.props.history.push(`/two_wheeler_verify/${productId}`);
+                this.props.history.push(`/two_wheeler_verifyTP/${productId}`);
             }
 
         })
@@ -362,19 +358,12 @@ class TwoWheelerOtherComprehensive extends Component {
 
     render() {
         const { vahanDetails, error, policyCoverage, vahanVerify, fulQuoteResp, PolicyArray, motorInsurance, serverResponse, add_more_coverage,
-            step_completed, vehicleDetails, selectFlag, sliderVal} = this.state
+            step_completed, vehicleDetails, selectFlag} = this.state
         const { productId } = this.props.match.params
         let covList = motorInsurance && motorInsurance.add_more_coverage ? motorInsurance.add_more_coverage.split(",") : ""
         let newInnitialArray = {}
         let PA_flag = motorInsurance && motorInsurance.pa_cover != null ? '1' : '0'
         let PA_Cover = motorInsurance &&  motorInsurance.pa_cover != null ? motorInsurance.pa_cover : '0'
-
-        let defaultSliderValue = PolicyArray.length > 0 ? Math.round(PolicyArray[0].PolicyRiskList[0].IDV_Suggested) : 0
-        let sliderValue = sliderVal
-        let minIDV = PolicyArray.length > 0 ? Math.floor(PolicyArray[0].PolicyRiskList[0].MinIDV_Suggested) : null
-        let maxIDV = PolicyArray.length > 0 ? Math.floor(PolicyArray[0].PolicyRiskList[0].MaxIDV_Suggested) : null
-        minIDV = minIDV + 1;
-        maxIDV = maxIDV - 1;
 
         if(selectFlag == '1') {
             initialValue = {
@@ -447,8 +436,6 @@ class TwoWheelerOtherComprehensive extends Component {
                 </span>
             ) : null;
 
-            console.log("step_completed---", step_completed)
-
         return (
             
             <>
@@ -460,7 +447,7 @@ class TwoWheelerOtherComprehensive extends Component {
                             </div>
                             <div className="col-sm-12 col-md-12 col-lg-10 col-xl-10 infobox">
                                 <h4 className="text-center mt-3 mb-3">SBI General Insurance Company Limited</h4>
-                                { step_completed >= '2' && vehicleDetails.vehicletype_id == '4' ?
+                                { step_completed >= '2' && vehicleDetails.vehicletype_id == '3' ?
                                 <section className="brand colpd m-b-25">
                                     <div className="d-flex justify-content-left">
                                         <div className="brandhead m-b-10">
@@ -485,54 +472,6 @@ class TwoWheelerOtherComprehensive extends Component {
                                                                     </div>
                                                                 </Collapsible>
                                                             </div>
-                                                            <Row>
-                                                                <Col sm={12} md={4} lg={4}>
-                                                                    <FormGroup>
-                                                                        <div className="insurerName">
-                                                                            <span className="fs-16">Insured Declared Value</span>
-                                                                        </div>
-                                                                    </FormGroup>
-                                                                </Col>
-                                                                <Col sm={12} md={3} lg={2}>
-                                                                    <FormGroup>
-                                                                        <div className="insurerName">
-                                                                            <Field
-                                                                                name="IDV"
-                                                                                type="text"
-                                                                                placeholder=""
-                                                                                autoComplete="off"
-                                                                                className="premiumslid"
-                                                                                onFocus={e => this.changePlaceHoldClassAdd(e)}
-                                                                                onBlur={e => this.changePlaceHoldClassRemove(e)}
-                                                                                value={sliderValue ? sliderValue : defaultSliderValue}
-                                                                            />
-                                                                            {errors.IDV && touched.IDV ? (
-                                                                                <span className="errorMsg">{errors.IDV}</span>
-                                                                            ) : null}
-                                                                        </div>
-                                                                    </FormGroup>
-                                                                </Col>
-                                                                {defaultSliderValue ? 
-                                                                <Col sm={12} md={12} lg={6}>
-                                                                    <FormGroup>
-                                                                        <input type="range" className="W-90"
-                                                                            name='slider'
-                                                                            defaultValue={defaultSliderValue}
-                                                                            min={minIDV}
-                                                                            max={maxIDV}
-                                                                            step='1'
-                                                                            value={values.slider}
-                                                                            onChange={(e) => {
-                                                                                setFieldTouched("slider");
-                                                                                setFieldValue("slider", values.slider);
-                                                                                this.sliderValue(e.target.value)
-                                                                            }}
-                                                                        />
-                                                                        
-                                                                    </FormGroup>
-                                                                </Col> : null }
-                                                            </Row>
-
                                                             {motorInsurance && motorInsurance.policy_for == '1' ?
                                                             <Row>
                                                                 <Col sm={12} md={12} lg={12}>
@@ -631,7 +570,8 @@ class TwoWheelerOtherComprehensive extends Component {
                                             );
                                         }}
                                     </Formik>
-                                </section> : step_completed == "" ? "Forbidden" : null } 
+                                </section> : step_completed == "" ? "Forbidden" : null }
+
                                 <Footer />
                             </div>
                         </div>

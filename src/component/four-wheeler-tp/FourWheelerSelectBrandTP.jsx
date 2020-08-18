@@ -24,8 +24,8 @@ const initialValues = {
     selectedVarientId: '',
     regNumber:'',
     check_registration: 2,
-    policy_for: "",
-    lapse_duration: ''
+    policy_for: ""
+
 
 };
 
@@ -38,7 +38,6 @@ const fuel = {
 const vehicleValidation = Yup.object().shape({
     policy_type: Yup.string().required("Please enter policy type"),
     policy_for: Yup.string().required("Please select policy for indivudal or corporate"),
-    check_registration: Yup.string().notRequired(),  
 
     regNumber: Yup.string().when("check_registration", {
         is: "1",       
@@ -58,11 +57,6 @@ const vehicleValidation = Yup.object().shape({
                     }
                     return true;
             })
-    }),
-    lapse_duration: Yup.string().when("policy_type", {
-        is: "3",       
-        then: Yup.string().required('Please select lapse duration'),
-        otherwise: Yup.string()
     }),
 })
 
@@ -150,7 +144,7 @@ class TwoWheelerSelectBrand extends Component {
         const {vehicleDetails} = this.state
         let brandId = vehicleDetails && vehicleDetails.vehiclebrand_id ? vehicleDetails.vehiclebrand_id : ""
         return new Promise(resolve => {
-            axios.get(`vehicle/brand-with-image/3`)
+            axios.get(`vehicle/brand-with-image`)
                 .then(res => {
                     let brandList = res && res.data.data.list ? res.data.data.list : []
                     this.setState({
@@ -176,8 +170,9 @@ class TwoWheelerSelectBrand extends Component {
 
     getOtherBrands = () => {
         let encryption = new Encryption();
+        let policyHolder_id = localStorage.getItem("policyHolder_id") ? localStorage.getItem("policyHolder_id") : 0;
         this.props.loadingStart();
-        axios.get(`two-wh/without-image/3`).then(res => {
+        axios.get(`two-wh/without-image/1`).then(res => {
             let decryptResp = JSON.parse(encryption.decrypt(res.data));
             console.log('decryptResp_otherBrand', decryptResp)
 
@@ -234,10 +229,10 @@ class TwoWheelerSelectBrand extends Component {
 
 
     registration = (productId) => {
-        this.props.history.push(`/two_wheeler_Select-brand/${productId}`);
+        this.props.history.push(`/two_wheeler_Select-brandTP/${productId}`);
     }
     selectVehicle = (productId) => {
-        this.props.history.push(`/two_wheeler_Select-brand/${productId}`);
+        this.props.history.push(`/two_wheeler_Select-brandTP/${productId}`);
     }
     selectBrand = (productId) => {
         const {selectedBrandId , vehicleDetails, otherBrands} = this.state
@@ -249,14 +244,6 @@ class TwoWheelerSelectBrand extends Component {
             this.getOtherBrands()
         }
         
-        // if(otherBrands) {
-        //     this.getOtherBrands()
-        // }
-        // else {
-        //     this.setBrandName(brandId)
-        // }
-        
-        // this.props.history.push(`/Select-brand/${productId}`);
     }
 
 
@@ -321,21 +308,20 @@ class TwoWheelerSelectBrand extends Component {
         let encryption = new Encryption();
         let policyHolder_id = localStorage.getItem('policyHolder_id') ? localStorage.getItem('policyHolder_id') :0
         localStorage.setItem('check_registration', values.check_registration)
-
+        
         let bc_data = sessionStorage.getItem('bcLoginData') ? sessionStorage.getItem('bcLoginData') : "";
         if(bc_data) {
             bc_data = JSON.parse(encryption.decrypt(bc_data));
         }
-        
 
-        if(policyHolder_id > 0) {
+        if(policyHolder_id > 0 ) {
             if(sessionStorage.getItem('csc_id')) {
                 post_data = {
                     'menumaster_id': 3,
                     'brand_id': values.selectedBrandId,
                     'brand_model_id': values.selectedModelId,
                     'model_varient_id': values.selectedVarientId,
-                    'vehicle_type_id':4,
+                    'vehicle_type_id':3,
                     'registration_no':values.regNumber,
                     'policy_type_id':values.policy_type,
                     'policy_holder_id': policyHolder_id,
@@ -344,7 +330,6 @@ class TwoWheelerSelectBrand extends Component {
                     'agent_name':sessionStorage.getItem('agent_name') ? sessionStorage.getItem('agent_name') : "",
                     'product_id':sessionStorage.getItem('product_id') ? sessionStorage.getItem('product_id') : "",
                     'bcmaster_id': "5",
-                    'lapse_duration': values.lapse_duration,
                     'policy_for': values.policy_for
                 }
             }
@@ -354,17 +339,17 @@ class TwoWheelerSelectBrand extends Component {
                     'brand_id': values.selectedBrandId,
                     'brand_model_id': values.selectedModelId,
                     'model_varient_id': values.selectedVarientId,
-                    'vehicle_type_id':4,
+                    'vehicle_type_id':3,
                     'registration_no':values.regNumber,
                     'policy_type_id':values.policy_type,
                     'policy_holder_id': policyHolder_id,
                     'check_registration': values.check_registration,
                     'bcmaster_id': bc_data ? bc_data.agent_id : "",
                     'bc_token': bc_data ? bc_data.token : "",
-                    'lapse_duration': values.lapse_duration,
                     'policy_for': values.policy_for
                 }
             }
+            
             console.log('post_data-----', post_data)
             formData.append('enc_data', encryption.encrypt(JSON.stringify(post_data)))
             this.props.loadingStart();
@@ -382,7 +367,7 @@ class TwoWheelerSelectBrand extends Component {
                         localStorage.setItem('brandEdit', 1)
                         localStorage.removeItem('newBrandEdit')
                     }
-                    this.props.history.push(`/two_wheeler_Vehicle_details/${productId}`);
+                    this.props.history.push(`/two_wheeler_Vehicle_detailsTP/${productId}`);
                 }
                 else {
                     swal(decryptResp.msg)
@@ -404,7 +389,7 @@ class TwoWheelerSelectBrand extends Component {
                     'brand_id': selectedBrandId,
                     'brand_model_id': selectedModelId,
                     'model_varient_id': selectedVarientId,
-                    'vehicle_type_id':4,
+                    'vehicle_type_id':3,
                     'registration_no':values.regNumber,
                     'policy_type_id':values.policy_type,
                     'check_registration': values.check_registration,
@@ -412,23 +397,21 @@ class TwoWheelerSelectBrand extends Component {
                     'agent_name':sessionStorage.getItem('agent_name') ? sessionStorage.getItem('agent_name') : "",
                     'product_id':sessionStorage.getItem('product_id') ? sessionStorage.getItem('product_id') : "",
                     'bcmaster_id': "5",
-                    'lapse_duration': values.lapse_duration,
                     'policy_for': values.policy_for
                 }
             }
-            else{
+            else {
                 post_data = {
                     'menumaster_id': 3,
                     'brand_id': selectedBrandId,
                     'brand_model_id': selectedModelId,
                     'model_varient_id': selectedVarientId,
-                    'vehicle_type_id':4,
+                    'vehicle_type_id':3,
                     'registration_no':values.regNumber,
                     'policy_type_id':values.policy_type,
                     'check_registration': values.check_registration,
                     'bcmaster_id': bc_data ? bc_data.agent_id : "",
                     'bc_token': bc_data ? bc_data.token : "",
-                    'lapse_duration': values.lapse_duration,
                     'policy_for': values.policy_for
                 }
             }
@@ -451,7 +434,7 @@ class TwoWheelerSelectBrand extends Component {
                         localStorage.setItem('brandEdit', 1)
                         localStorage.removeItem('newBrandEdit')
                     }
-                    this.props.history.push(`/two_wheeler_Vehicle_details/${productId}`);
+                    this.props.history.push(`/two_wheeler_Vehicle_detailsTP/${productId}`);
                 }
                 else {
                     swal(decryptResp.msg)
@@ -529,7 +512,6 @@ class TwoWheelerSelectBrand extends Component {
             policy_type: motorInsurance && motorInsurance.policytype_id ? motorInsurance.policytype_id : "",
             regNumber: motorInsurance && motorInsurance.registration_no ? motorInsurance.registration_no : "",
             check_registration: localStorage.getItem('check_registration') ? localStorage.getItem('check_registration') : "2",
-            lapse_duration: motorInsurance && motorInsurance.lapse_duration ? motorInsurance.lapse_duration : "",
             policy_for: motorInsurance && motorInsurance.policy_for ? motorInsurance.policy_for : "",
         })
 
@@ -554,8 +536,8 @@ class TwoWheelerSelectBrand extends Component {
                                             <Form>
                                                 <section className="brand">
                                                     <div className="brand-bg">
-                                                    <div className="d-flex justify-content-left">
-                                                        <div className="brandhead"> 
+                                                        <div className="d-flex justify-content-left">
+                                                            <div className="brandhead"> 
                                                             <p>Taking 2-Wheeler policy for</p>
                                                                 <div className="d-inline-flex m-b-15">
                                                                     <div className="p-r-25">
@@ -605,25 +587,7 @@ class TwoWheelerSelectBrand extends Component {
                                                             <div className="brandhead"> 
                                                                 <p>Tell us about your policy details</p>
 
-                                                                <div className="d-inline-flex m-b-15">
-                                                                    <div className="p-r-25">
-                                                                        <label className="customRadio3">
-                                                                            <Field
-                                                                                type="radio"
-                                                                                name='policy_type'
-                                                                                value='1'
-                                                                                key='1'
-                                                                                checked = {values.policy_type == '1' ? true : false}
-                                                                                onChange = {() =>{
-                                                                                    setFieldTouched('policy_type')
-                                                                                    setFieldValue('policy_type', '1');
-                                                                                    this.handleChange(values,setFieldTouched, setFieldValue)
-                                                                                }  
-                                                                                }
-                                                                            />
-                                                                            <span className="checkmark " /><span className="fs-14"> New Policy</span>
-                                                                        </label>
-                                                                    </div>
+                                                                <div className="d-inline-flex m-b-15">   
                                                                     
                                                                     <div className="p-r-25">
                                                                         <label className="customRadio3">
@@ -669,42 +633,6 @@ class TwoWheelerSelectBrand extends Component {
                                                                 </div>
                                                             </div>
                                                         </div>
-                                                        {values.policy_type == '3' ? 
-                                                        <div className="d-flex justify-content-left">
-                                                            <div className="brandhead"> 
-                                                            <p>Please select lapse duration</p>
-                                                                <div className="d-inline-flex m-b-15">
-                                                                    <div className="p-r-25">
-                                                                        <label className="customRadio3">
-                                                                            <Field
-                                                                                type="radio"
-                                                                                name='lapse_duration'
-                                                                                value='1'
-                                                                                key='1'
-                                                                                checked = {values.lapse_duration == '1' ? true : false}
-                                                                            />
-                                                                            <span className="checkmark " /><span className="fs-14"> Before 90 days</span>
-                                                                        </label>
-                                                                    </div>
-                                                                    <div className="p-r-25">
-                                                                        <label className="customRadio3">
-                                                                            <Field
-                                                                                type="radio"
-                                                                                name='lapse_duration'
-                                                                                value='2'
-                                                                                key='1'
-                                                                                checked = {values.lapse_duration == '2' ? true : false}
-                                                                            />
-                                                                            <span className="checkmark " /><span className="fs-14"> Over 90 days</span>
-                                                                        </label>
-                                                                        {errors.lapse_duration && touched.lapse_duration ? (
-                                                                            <span className="errorMsg">{errors.lapse_duration}</span>
-                                                                        ) : null}
-                                                                    </div>
-                                                                </div>
-                                                            </div>
-                                                        </div> : null }
-
                                                         <div className="brandhead">
                                                         <h4 className="m-b-30">Help us with some information about yourself</h4></div>
                                                         <Row className="m-b-15">
@@ -749,47 +677,6 @@ class TwoWheelerSelectBrand extends Component {
                                                                 </div>                                                           
                                                             </Col>
                                                         </Row>
-                                                    {values.policy_type == '1' ?
-                                                        <div className="row formSection">
-                                                            <label className="customCheckBox formGrp formGrp">
-                                                            Continue Without Vehicle Registration Number
-                                                            <Field
-                                                                type="checkbox"
-                                                                name="check_registration"
-                                                                value="1"
-                                                                className="user-self"
-                                                                onChange={(e) => {
-                                                                    if (e.target.checked === true) {
-                                                                        setFieldTouched('regNumber')
-                                                                        setFieldValue('regNumber', 'NEW');
-                                                                        setFieldTouched('check_registration')
-                                                                        setFieldValue('check_registration', e.target.value);
-                
-                                                                    } else {
-                                                                        setFieldValue('check_registration', '2');  
-                                                                        setFieldValue('regNumber', '');                                                          
-                                                                    }
-                                                                    if(this.setValueData()){
-                                                                        this.setState({
-                                                                            check_registration:1
-                                                                        })
-                                                                    }
-                                                                    else{
-                                                                        this.setState({
-                                                                            check_registration:2
-                                                                        })
-                                                                    }
-                                                                }}
-                                                                checked={values.check_registration == '1' ? true : false}
-                                                            />
-                                                                <span className="checkmark mL-0"></span>
-                                                            </label>
-                                                            {errors.check_registration && (touched.looking_for_2 || touched.looking_for_3 || touched.looking_for_4) ? 
-                                                                    <span className="errorMsg">{errors.check_registration}</span> : ""
-                                                                }
-                                                            
-                                                        </div> : null }
-
 
                                                         <div className="brandhead">
                                                             <h4>Please select your Vehicle brand</h4>
@@ -829,7 +716,7 @@ class TwoWheelerSelectBrand extends Component {
 
 
                                                                     <div className="d-flex justify-content-between flex-lg-row flex-md-column m-b-25">
-                                                                        <div className="txtRegistr resmb-15">Car Brand
+                                                                        <div className="txtRegistr resmb-15">Two-wheeler Brand
                                                                             - <strong>{brandName ? brandName : (vehicleDetails && vehicleDetails.vehiclebrand && vehicleDetails.vehiclebrand.name ? vehicleDetails.vehiclebrand.name : "")}</strong>
                                                                         </div>
 
@@ -837,7 +724,7 @@ class TwoWheelerSelectBrand extends Component {
                                                                     </div>
 
                                                                     <div className="d-flex justify-content-between flex-lg-row flex-md-column m-b-25">
-                                                                        <div className="txtRegistr">Car Model<br />
+                                                                        <div className="txtRegistr">Two-wheeler Model<br />
                                                                             <strong>{modelName ? modelName : (selectedBrandId ? "" : vehicleDetails && vehicleDetails.vehiclemodel && vehicleDetails.vehiclemodel.description ? vehicleDetails.vehiclemodel.description+" "+vehicleDetails.varientmodel.varient : "")}</strong></div>
 
                                                                         <div> <button type="button" className="rgistrBtn" onClick={this.selectBrand.bind(this, productId)}>Edit</button></div>
@@ -845,7 +732,7 @@ class TwoWheelerSelectBrand extends Component {
 
                                                                     <div className="d-flex justify-content-between flex-lg-row flex-md-column m-b-25">
                                                                         <div className="txtRegistr">Fuel Type<br />
-                                                                        <strong>{fuel[fuelType] ? fuel[fuelType] : (vehicleDetails && vehicleDetails.varientmodel && vehicleDetails.varientmodel.fuel_type ? fuel[Math.floor(vehicleDetails.varientmodel.fuel_type)] : null)} </strong></div>
+                                                                            <strong>{fuel[fuelType] ? fuel[fuelType] : (vehicleDetails && vehicleDetails.varientmodel && vehicleDetails.varientmodel.fuel_type ? fuel[Math.floor(vehicleDetails.varientmodel.fuel_type)] : null)} </strong></div>
 
                                                                     </div>
                                                                 </div>
@@ -872,8 +759,7 @@ class TwoWheelerSelectBrand extends Component {
                         <div className="cntrbody">
                             <h3>Select Model </h3>
                             {selectedBrandDetails.image ?
-                                <img src={`${process.env.REACT_APP_PAYMENT_URL}/core/public/image/car_brand_image/` + selectedBrandDetails.image} alt={selectedBrandDetails.name} /> :
-                                <img src={require('../../assets/images/car.svg')} alt="" />
+                                <img src={`${process.env.REACT_APP_PAYMENT_URL}/core/public/image/car_brand_image/` + selectedBrandDetails.image} alt={selectedBrandDetails.name} /> : <img src={require('../../assets/images/car.svg')} alt="" />     
                             }
                         </div>
                     </Modal.Header>
@@ -949,6 +835,7 @@ class TwoWheelerSelectBrand extends Component {
                                                                     varient.fuel_type)
                                                                 }
                                                             />
+
                                                             <span className="checkmark mL-0"></span>
                                                             <span className="error-message"></span>
                                                         </div>

@@ -20,7 +20,9 @@ import Encryption from '../../shared/payload-encryption';
 const minDobAdult = moment(moment().subtract(100, 'years').calendar())
 const maxDobAdult = moment().subtract(18, 'years').calendar();
 const minDobNominee = moment(moment().subtract(100, 'years').calendar())
-const maxDobNominee = moment().subtract(18, 'years').calendar();
+const maxDobNominee = moment().subtract(3, 'months').calendar();
+const maxDoi = new Date()
+const minDoi = moment(moment().subtract(100, 'years').calendar())
 
 const initialValue = {
     first_name:"",
@@ -40,7 +42,7 @@ const initialValue = {
     phone: "",
     email: "",
     address: "",
-    is_eia_account: "",
+    is_eia_account: "0",
     eia_no: "",
     stateName: "",
     pinDataArr: [],
@@ -50,7 +52,7 @@ const initialValue = {
 const ownerValidation = Yup.object().shape({
     first_name: Yup.string().required('Name is required')
         .min(3, function() {
-            return "First name must be 3 chracters & last name 1 characters long"
+            return "First name must be 3 chracters"
         })
         .max(40, function() {
             return "Full name must be maximum 40 chracters"
@@ -59,24 +61,33 @@ const ownerValidation = Yup.object().shape({
             return "Please enter valid name"
         }),
     // last_name:Yup.string().required('Last name is required'),
-    gender: Yup.string().required('Gender is required')
-    .matches(/^[MmFf]$/, function() {
-        return "Please select valid gender"
+    gender: Yup.string().when(['policy_for'], {
+        is: policy_for => policy_for == '1',  
+        then: Yup.string().required('Gender is required'),
+            // .matches(/^[MmFf]$/, function() {
+            //     return "Please select valid gender"
+            // }),
+        otherwise: Yup.string().nullable()
     }),
-    dob:Yup.date().required('Date of birth is required')
-    .test(
-        "18YearsChecking",
-        function() {
-            return "Age should me minium 18 years and maximum 100 years"
-        },
-        function (value) {
-            if (value) {
-                const ageObj = new PersonAge();
-                return ageObj.whatIsMyAge(value) <= 100 && ageObj.whatIsMyAge(value) >= 18;
-            }
-            return true;
-        }
-    ),
+
+    dob: Yup.date().when(['policy_for'], {
+        is: policy_for => policy_for == '1', 
+        then: Yup.date().required('Date of birth is required')
+            .test(
+                "18YearsChecking",
+                function() {
+                    return "Age should me minium 18 years and maximum 100 years"
+                },
+                function (value) {
+                    if (value) {
+                        const ageObj = new PersonAge();
+                        return ageObj.whatIsMyAge(value) <= 100 && ageObj.whatIsMyAge(value) >= 18;
+                    }
+                    return true;
+            }),
+        otherwise: Yup.date().nullable()
+    }),
+
     pancard: Yup.string()
     .notRequired(function() {
         return "Enter PAN number"
@@ -92,7 +103,7 @@ const ownerValidation = Yup.object().shape({
 
     address:Yup.string().required('Address is required')
     // .matches(/^(?![0-9._])(?!.*[0-9._]$)(?!.*\d_)(?!.*_\d)[a-zA-Z0-9_.,-\\]+$/, 
-    .matches(/^[a-zA-Z0-9\s,/.-]*$/, 
+    .matches(/^[a-zA-Z0-9][a-zA-Z0-9\s,/.-]*$/, 
     function() {
         return "Please enter valid address"
     }),
@@ -106,89 +117,145 @@ const ownerValidation = Yup.object().shape({
             return "Email must be maximum 75 chracters"
         }).matches(/^[a-zA-Z0-9]+([._\-]?[a-zA-Z0-9]+)*@\w+([-]?\w+)*(\.\w{2,3})+$/,'Invalid Email Id'),
 
-    is_carloan: Yup.mixed().required('This field is required'),
-    bank_name:Yup.string().notRequired('Bank Name is required')
-    .test(
-        "isLoanChecking",
-        function() {
-            return "Please enter bank name"
-        },
-        function (value) {
-            if (this.parent.is_carloan == 1 && !value) {   
-                return false;    
-            }
-            return true;
-        }
-    ).matches(/^[A-Za-z][A-Za-z\s]*$/, function() {
-        return "Please enter bank name"
-    }),
-    bank_branch: Yup.string().notRequired('Bank branch is required')
-    .test(
-        "isLoanChecking",
-        function() {
-            return "Please enter bank branch"
-        },
-        function (value) {
-            if (this.parent.is_carloan == 1 && !value) {   
-                return false;    
-            }
-            return true;
-        }
-    ).matches(/^[A-Za-z][A-Za-z\s]*$/, function() {
-        return "Please enter bank branch"
+    nominee_relation_with: Yup.string().when(['policy_for'], {
+        is: policy_for => policy_for == '1',       
+        then: Yup.string().required('Nominee relation is required'),
+        otherwise: Yup.string().nullable()
     }),
 
-    nominee_relation_with:Yup.string().required('Nominee relation is required'),
-    nominee_first_name: Yup.string().required('Nominee name is required')
-        .min(3, function() {
-            return "Name must be minimum 3 chracters"
-        })
-        .max(40, function() {
-            return "Name must be maximum 40 chracters"
-        })
-        .matches(/^[A-Za-z]{3,20}[\s][A-Za-z]{1,20}$/, function() {
-            return "Please enter valid name"
-        }),
-    // nominee_last_name:Yup.string().required('Nominee last name is required'), 
-    nominee_gender: Yup.string().required('Nominee gender is required')
-        .matches(/^[MmFf]$/, function() {
-            return "Please select valid gender"
+    nominee_first_name: Yup.string().when(['policy_for'], {
+        is: policy_for => policy_for == '1',       
+        then: Yup.string().required('Nominee name is required')
+            .min(3, function() {
+                return "Name must be minimum 3 chracters"
+            })
+            .max(40, function() {
+                return "Name must be maximum 40 chracters"
+            })
+            .matches(/^[a-zA-Z]+([\s]?[a-zA-Z]+)([\s]?[a-zA-Z]+)$/, function() {
+                return "Please enter valid name"
+            }),
+        otherwise: Yup.string().nullable()
     }),
-    nominee_dob:Yup.date().required('Nominee DOB is required')
-        .test(
-        "3monthsChecking",
-        function() {
-            return "Age should be minium 3 months"
-        },
-        function (value) {
-            if (value) {
-                const ageObj = new PersonAge();
-                return ageObj.whatIsMyAge(value) <= 100 && ageObj.whatIsMyAge(value) >= 18;
-            }
-            return true;
-        }
-    ),
-   
+
+        // nominee_last_name:Yup.string().required('Nominee last name is required'), 
+
+    nominee_gender: Yup.string().when(['policy_for'], {
+        is: policy_for => policy_for == '1',       
+        then: Yup.string().required('Nominee gender is required')
+            .matches(/^[MmFf]$/, function() {
+                return "Please select valid gender"
+            }),
+        otherwise: Yup.string()
+    }),
+
+    nominee_dob: Yup.date().when(['policy_for'], {
+        is: policy_for => policy_for == '1', 
+        then: Yup.date().required('Nominee DOB is required')
+            .test(
+                "3monthsChecking",
+                function() {
+                    return "Age should be minium 3 months"
+                },
+                function (value) {
+                    if (value) {
+                        const ageObj = new PersonAge();
+                        return ageObj.whatIsMyAge(value) <= 100 && ageObj.whatIsMyAgeMonth(value) >= 3;
+                    }
+                    return true;
+                }
+            ),
+        otherwise: Yup.date()
+    }),
+    
     is_eia_account: Yup.string().required('This field is required'),
     eia_no: Yup.string()
-    .test(
-        "isEIAchecking",
-        function() {
-            return "Please enter EIA no"
-        },
-        function (value) {
-            if (this.parent.is_eia_account == 1 && !value) {   
-                return false;    
+        .test(
+            "isEIAchecking",
+            function() {
+                return "Please enter EIA no"
+            },
+            function (value) {
+                if (this.parent.is_eia_account == 1 && !value) {   
+                    return false;    
+                }
+                return true;
             }
-            return true;
-        }
-    )
-    .min(13, function() {
-        return "EIA no must be minimum 13 chracters"
-    })
-    .max(13, function() {
-        return "EIA no must be maximum 13 chracters"
-    }).matches(/^[1245][0-9]{0,13}$/,'Please enter valid EIA no').notRequired('EIA no is required'),
+        )
+        .min(13, function() {
+            return "EIA no must be minimum 13 chracters"
+        })
+        .max(13, function() {
+            return "EIA no must be maximum 13 chracters"
+        }).matches(/^[1245][0-9]{0,13}$/,'Please enter valid EIA no').notRequired('EIA no is required'),
+
+    appointee_name: Yup.string().when(['policy_for'], {
+        is: policy_for => policy_for == '1', 
+        then:  Yup.string().notRequired(function() {
+                return "Please enter appointee name"
+                })
+                .min(3, function() {
+                    return "Name must be minimum 3 chracters"
+                })
+                .max(40, function() {
+                    return "Name must be maximum 40 chracters"
+                })        
+                .matches(/^[a-zA-Z]+([\s]?[a-zA-Z]+)([\s]?[a-zA-Z]+)$/, function() {
+                    return "Please enter valid name"
+                }).test(
+                    "18YearsChecking",
+                    function() {
+                        return "Please enter appointee name"
+                    },
+                    function (value) {
+                        const ageObj = new PersonAge();
+                        if (ageObj.whatIsMyAge(this.parent.nominee_dob) < 18 && !value) {   
+                            return false  
+                        }
+                        return true;
+                    }
+                ),
+        otherwise: Yup.string().nullable()
+    }),
+
+    appointee_relation_with: Yup.string().when(['policy_for'], {
+        is: policy_for => policy_for == '1', 
+        then: Yup.string().notRequired(function() {
+                return "Please select relation"
+                }).test(
+                    "18YearsChecking",
+                    function() {
+                        return 'Apppointee relation is required'
+                    },
+                    function (value) {
+                        const ageObj = new PersonAge();
+                        if (ageObj.whatIsMyAge(this.parent.nominee_dob) < 18 && !value) {   
+                            return false;    
+                        }
+                        return true;
+                    }
+                ),
+        otherwise: Yup.string().nullable()
+    }),
+
+    date_of_incorporation: Yup.date().when(['policy_for'], {
+        is: policy_for => policy_for == '2', 
+        then: Yup.date().required('Date of incorporation is required'),
+        otherwise: Yup.date().nullable()
+    }),
+
+    org_level: Yup.string().when(['policy_for'], {
+        is: policy_for => policy_for == '2', 
+        then: Yup.string().required('Organization level is required'),
+        otherwise: Yup.string().nullable()
+    }), 
+
+    gstn_no: Yup.string().when(['policy_for'], {
+        is: policy_for => policy_for == '2',       
+        then: Yup.string().required('GSTIN is required')
+            .matches(/^[0-9]{2}[A-Z]{3}[CPHFATBLJG]{1}[A-Z]{1}[0-9]{4}[A-Z]{1}[0-9]{1}[A-Z]{1}[0-9]{1}$/,'Invalid GSTIN'),
+        otherwise: Yup.string().nullable()
+    }),
 })
 
 class TwoWheelerAdditionalDetails extends Component {
@@ -205,9 +272,28 @@ class TwoWheelerAdditionalDetails extends Component {
         quoteId: "",
         bankDetails: {},
         addressDetails: [],
-        relation: []
+        relation: [],
+        step_completed: "0",
+        appointeeFlag: false,
+        is_appointee:0
     };
     
+    ageCheck = (value) => {
+        const ageObj = new PersonAge();
+        let age = ageObj.whatIsMyAge(value)
+        if(age < 18){
+            this.setState({
+                appointeeFlag: true,
+                is_appointee:1
+            })
+        }
+        else {
+            this.setState({
+                appointeeFlag: false,
+                is_appointee:0
+            })
+        } 
+    }
 
     changePlaceHoldClassAdd(e) {
         let element = e.target.parentElement;
@@ -219,20 +305,20 @@ class TwoWheelerAdditionalDetails extends Component {
         e.target.value.length === 0 && element.classList.remove('active');
     }
 
-    showEIAText = (value) =>{
-        if(value == 1){
-            this.setState({
-                showEIA:true,
-                is_eia_account:1
-            })
-        }
-        else{
-            this.setState({
-                showEIA:false,
-                is_eia_account:0
-            })
-        }
-    }
+    // showEIAText = (value) =>{
+    //     if(value == 1){
+    //         this.setState({
+    //             showEIA:true,
+    //             is_eia_account:1
+    //         })
+    //     }
+    //     else{
+    //         this.setState({
+    //             showEIA:false,
+    //             is_eia_account:0
+    //         })
+    //     }
+    // }
 
     showLoanText = (value) =>{
         if(value == 1){
@@ -256,15 +342,14 @@ class TwoWheelerAdditionalDetails extends Component {
 
     handleSubmit = (values, actions) => {
         const {productId} = this.props.match.params 
+        const {motorInsurance} = this.state
         const formData = new FormData(); 
         let encryption = new Encryption();
-        const post_data = {
+        let post_data = {
             'policy_holder_id':localStorage.getItem('policyHolder_id'),
             'menumaster_id':1,
             'first_name':values['first_name'],
             'last_name':values['last_name'],
-            'gender':values['gender'],
-            'dob':moment(values['dob']).format("YYYY-MM-DD"),
             'pancard':values['pancard'],
             'pincode_id':values['pincode_id'],
             'district':values['district'],
@@ -272,17 +357,31 @@ class TwoWheelerAdditionalDetails extends Component {
             'is_carloan':values['is_carloan'],
             'bank_name':values['bank_name'],
             'bank_branch':values['bank_branch'],
-            'nominee_relation_with':values['nominee_relation_with'],
-            'nominee_first_name':values['nominee_first_name'],
-            'nominee_last_name':values['nominee_last_name'],
-            'nominee_gender':values['nominee_gender'],
-            'nominee_dob':moment(values['nominee_dob']).format("YYYY-MM-DD"),
             'phone': values['phone'],
             'email': values['email'],
             'is_eia_account': values['is_eia_account'],
             'eia_no': values['eia_no'],
-            'address': values['address']
+            'address': values['address'],          
+            'gstn_no': values['gstn_no']
         }
+        if(motorInsurance.policy_for == '1'){
+            post_data['dob'] = moment(values['dob']).format("YYYY-MM-DD")
+            post_data['nominee_relation_with'] = values['nominee_relation_with']
+            post_data['nominee_first_name'] = values['nominee_first_name']
+            post_data['nominee_last_name']= values['nominee_last_name']
+            post_data['nominee_gender'] = values['nominee_gender']
+            post_data['nominee_dob'] = moment(values['nominee_dob']).format("YYYY-MM-DD")
+            post_data['appointee_name'] = values['appointee_name']
+            post_data['appointee_relation_with'] = values['appointee_relation_with']
+            post_data['is_appointee'] = this.state.is_appointee
+            post_data['gender']= values['gender']
+        }
+        else {
+            post_data['gender']= "cc"
+            post_data['date_of_incorporation'] = moment(values['date_of_incorporation']).format("YYYY-MM-DD")
+            post_data['org_level'] = values['org_level']
+        }
+            
         console.log('post_data', post_data);
         formData.append('enc_data',encryption.encrypt(JSON.stringify(post_data)))
         this.props.loadingStart();
@@ -313,7 +412,7 @@ class TwoWheelerAdditionalDetails extends Component {
         axios.get(`two-wh/details/${policyHolder_id}`)
             .then(res => {
                  let decryptResp = JSON.parse(encryption.decrypt(res.data))
-                 console.log("decrypt", decryptResp)
+                 console.log("decrypt---", decryptResp)
                  let motorInsurance = decryptResp.data.policyHolder ? decryptResp.data.policyHolder.motorinsurance : {};
                  let previousPolicy = decryptResp.data.policyHolder ? decryptResp.data.policyHolder.previouspolicy : {};
                  let vehicleDetails = decryptResp.data.policyHolder ? decryptResp.data.policyHolder.vehiclebrandmodel : {};
@@ -324,10 +423,16 @@ class TwoWheelerAdditionalDetails extends Component {
                  let is_eia_account=  policyHolder && (policyHolder.is_eia_account == 0 || policyHolder.is_eia_account == 1) ? policyHolder.is_eia_account : ""
                  let bankDetails = decryptResp.data.policyHolder && decryptResp.data.policyHolder.bankdetail ? decryptResp.data.policyHolder.bankdetail[0] : {};
                  let addressDetails = JSON.parse(decryptResp.data.policyHolder.pincode_response)
+                 let step_completed = decryptResp.data.policyHolder ? decryptResp.data.policyHolder.step_no : "";
+            
+                 console.log('is_appointee', nomineeDetails ? nomineeDetails.is_appointee : "efg")
+                //  return false;
                  this.setState({
-                    quoteId, motorInsurance, previousPolicy, vehicleDetails, policyHolder, nomineeDetails, is_loan_account, is_eia_account, bankDetails, addressDetails
+                    quoteId, motorInsurance, previousPolicy, vehicleDetails, policyHolder, nomineeDetails, is_loan_account, 
+                    is_eia_account, bankDetails, addressDetails, step_completed,
+                    is_appointee: nomineeDetails ? nomineeDetails.is_appointee : ""
+                    
                 })
-                this.props.loadingStop();
                 this.fetchPrevAreaDetails(addressDetails)
             })
             .catch(err => {
@@ -387,18 +492,18 @@ class TwoWheelerAdditionalDetails extends Component {
                     pinDataArr: res.data.data,
                     stateName,
                 });
-                this.props.loadingStop();
+                this.fetchRelationships();
             }).
             catch(err=>{
                 this.props.loadingStop();
             })
         }
+        else this.fetchRelationships();
         
     }
 
     fetchRelationships=()=>{
 
-            this.props.loadingStart();
             axios.get('relations')
             .then(res=>{
                 let relation = res.data.data ? res.data.data : []                        
@@ -412,22 +517,19 @@ class TwoWheelerAdditionalDetails extends Component {
                 this.setState({
                     relation: []
                 });
-            })
-        
+            })       
     }
 
     componentDidMount() {
         this.fetchData();
-        this.fetchRelationships();
     }
 
    
 
     render() {
-        const {showEIA, is_eia_account, showLoan, is_loan_account, nomineeDetails, 
-            bankDetails,policyHolder, stateName, pinDataArr, quoteId, addressDetails, relation} = this.state
+        const {showEIA, is_eia_account, is_loan_account, nomineeDetails, motorInsurance,appointeeFlag, is_appointee,
+            bankDetails,policyHolder, stateName, pinDataArr, quoteId, addressDetails, relation,step_completed,vehicleDetails} = this.state
         const {productId} = this.props.match.params 
-        
 
         let newInitialValues = Object.assign(initialValue, {
             first_name: policyHolder && policyHolder.first_name ? policyHolder.first_name : "",
@@ -442,15 +544,19 @@ class TwoWheelerAdditionalDetails extends Component {
             bank_branch: bankDetails ? bankDetails.bank_branch : "",
             nominee_relation_with: nomineeDetails && nomineeDetails.relation_with ? nomineeDetails.relation_with.toString() : "",
             nominee_first_name: nomineeDetails && nomineeDetails.first_name ? nomineeDetails.first_name : "",
-            nominee_gender: nomineeDetails && nomineeDetails.gender ? nomineeDetails.gender : "",
+            nominee_gender: nomineeDetails && nomineeDetails.gender ? nomineeDetails.gender : "cc",
             nominee_dob: nomineeDetails && nomineeDetails.dob ? new Date(nomineeDetails.dob) : "",
-            
+            gstn_no: policyHolder && policyHolder.gstn_no ? policyHolder.gstn_no : "",
             phone: policyHolder && policyHolder.mobile ? policyHolder.mobile : "",
             email:  policyHolder && policyHolder.email_id ? policyHolder.email_id : "",
             address: policyHolder && policyHolder.address ? policyHolder.address : "",
-            is_eia_account:  is_eia_account,
+            // is_eia_account:  is_eia_account,
             eia_no: policyHolder && policyHolder.eia_no ? policyHolder.eia_no : "",
-
+            policy_for : motorInsurance ? motorInsurance.policy_for : "",
+            appointee_relation_with: nomineeDetails && nomineeDetails.appointee_relation_with ? nomineeDetails.appointee_relation_with : "",
+            appointee_name: nomineeDetails && nomineeDetails.appointee_name ? nomineeDetails.appointee_name : "",
+            date_of_incorporation: policyHolder && policyHolder.date_of_incorporation ? new Date(policyHolder.date_of_incorporation) : "",
+            org_level: policyHolder ? policyHolder.org_level : "",
         });
 
         const quoteNumber =
@@ -458,7 +564,7 @@ class TwoWheelerAdditionalDetails extends Component {
             <h4>You are just one steps away in getting your policy ready and your Quotation Number: {quoteId}. Please share a few more details. </h4>
         ) : null;
 
-        // console.log("newInitialValues", newInitialValues)
+        
         return (
             <>
                 <BaseComponent>
@@ -469,6 +575,7 @@ class TwoWheelerAdditionalDetails extends Component {
                     </div>
                 <div className="col-sm-12 col-md-12 col-lg-10 col-xl-10 infobox">
                 <h4 className="text-center mt-3 mb-3">SBI General Insurance Company Limited</h4>
+                { step_completed >= '4' && vehicleDetails.vehicletype_id == '4' ?
                 <section className="brand m-b-25">
                     <div className="brand-bg">
 
@@ -477,107 +584,14 @@ class TwoWheelerAdditionalDetails extends Component {
                         >
                         {({ values, errors, setFieldValue, setFieldTouched, isValid, isSubmitting, touched }) => {
                              let value = values.nominee_first_name;
-
-                            //  value = value.replace(/[^A-Za-z]/ig, '')
-                            //  values.nominee_first_name = value;
-                            
+                             console.log("errors", errors)
                         return (
                         <Form>
                         <Row>
                             <Col sm={12} md={9} lg={9}>
                                 <div className="d-flex justify-content-left brandhead">
-                                    {quoteNumber}
+                                {quoteNumber}
                                 </div>
-                            
-                                <div className="d-flex justify-content-left carloan">
-                                    <h4> Taken Two-wheeler Loan</h4>
-                                </div>
-
-                                <Row>
-                                    <Col sm={12} md={4} lg={4}>
-                                        <div className="d-inline-flex m-b-35">
-                                            <div className="p-r-25">
-                                                <label className="customRadio3">
-                                                <Field
-                                                    type="radio"
-                                                    name='is_carloan'                                            
-                                                    value='1'
-                                                    key='1'  
-                                                    onChange={(e) => {
-                                                        setFieldValue(`is_carloan`, e.target.value);
-                                                        this.showLoanText(1);
-                                                    }}
-                                                    checked={values.is_carloan == '1' ? true : false}
-                                                />
-                                                    <span className="checkmark " /><span className="fs-14"> Yes</span>
-                                                </label>
-                                            </div>
-
-                                            <div className="">
-                                                <label className="customRadio3">
-                                                <Field
-                                                    type="radio"
-                                                    name='is_carloan'                                            
-                                                    value='0'
-                                                    key='1'  
-                                                    onChange={(e) => {
-                                                        setFieldValue(`is_carloan`, e.target.value); 
-                                                        this.showLoanText(0);  
-                                                    }}
-                                                    checked={values.is_carloan == '0' ? true : false}
-                                                />
-                                                    <span className="checkmark" />
-                                                    <span className="fs-14">No</span>
-                                                </label>
-                                                {errors.is_carloan && touched.is_carloan ? (
-                                                <span className="errorMsg">{errors.is_carloan}</span>
-                                                ) : null}
-                                            </div>
-                                        </div>
-                                    </Col>
-                                    {showLoan || is_loan_account == 1 ?
-                                    <Fragment>
-                                    <Col sm={12} md={4} lg={4}>
-                                        <FormGroup>
-                                            <div className="insurerName">
-                                            <Field
-                                                    name='bank_name'
-                                                    type="text"
-                                                    placeholder="Bank Name"
-                                                    autoComplete="off"
-                                                    onFocus={e => this.changePlaceHoldClassAdd(e)}
-                                                    onBlur={e => this.changePlaceHoldClassRemove(e)}
-                                                    value = {values.bank_name}                                                                            
-                                            />
-                                                {errors.bank_name && touched.bank_name ? (
-                                            <span className="errorMsg">{errors.bank_name}</span>
-                                            ) : null}
-                                            </div>
-                                        </FormGroup>
-                                    </Col> 
-                                    <Col sm={12} md={4} lg={4}>
-                                        <FormGroup>
-                                            <div className="insurerName">
-                                            <Field
-                                                    name='bank_branch'
-                                                    type="text"
-                                                    placeholder="Bank Branch"
-                                                    autoComplete="off"
-                                                    onFocus={e => this.changePlaceHoldClassAdd(e)}
-                                                    onBlur={e => this.changePlaceHoldClassRemove(e)}
-                                                    value = {values.bank_branch}                                                                            
-                                            />
-                                                {errors.bank_branch && touched.bank_branch ? (
-                                            <span className="errorMsg">{errors.bank_branch}</span>
-                                            ) : null} 
-                                            </div>
-                                        </FormGroup>
-                                    </Col>
-                                    </Fragment>: ''}
-                                </Row>
-                                <Row>
-                                    <Col>&nbsp;</Col>
-                                </Row>
 
                                 <div className="d-flex justify-content-left carloan">
                                     <h4> Owners Details</h4>
@@ -590,7 +604,7 @@ class TwoWheelerAdditionalDetails extends Component {
                                             <Field
                                                 name='first_name'
                                                 type="text"
-                                                placeholder="Full Name"
+                                                placeholder={values.policy_for == '2' ? "Company Name" : "Full Name"}
                                                 autoComplete="off"
                                                 onFocus={e => this.changePlaceHoldClassAdd(e)}
                                                 onBlur={e => this.changePlaceHoldClassRemove(e)}
@@ -602,6 +616,52 @@ class TwoWheelerAdditionalDetails extends Component {
                                             </div>
                                         </FormGroup>
                                     </Col>
+                                    {motorInsurance && motorInsurance.policy_for == '2' ?
+                                        <Col sm={12} md={4} lg={4}>
+                                            <FormGroup>
+                                                <div className="insurerName">
+                                                <Field
+                                                    name='gstn_no'
+                                                    type="text"
+                                                    placeholder= "GSTIN"
+                                                    autoComplete="off"
+                                                    onFocus={e => this.changePlaceHoldClassAdd(e)}
+                                                    onBlur={e => this.changePlaceHoldClassRemove(e)}
+                                                    value = {values.gstn_no.toUpperCase()}                                                                            
+                                                />
+                                                    {errors.gstn_no && touched.gstn_no ? (
+                                                <span className="errorMsg">{errors.gstn_no}</span>
+                                                ) : null} 
+                                                </div>
+                                            </FormGroup>
+                                        </Col> : null }
+                                        {motorInsurance && motorInsurance.policy_for == '2' ?
+                                        <Col sm={12} md={4} lg={4}>
+                                            <FormGroup>
+                                            <DatePicker
+                                                name="date_of_incorporation"
+                                                dateFormat="dd MMM yyyy"
+                                                placeholderText="Incorporation Date"
+                                                peekPreviousMonth
+                                                peekPreviousYear
+                                                showMonthDropdown
+                                                showYearDropdown
+                                                dropdownMode="select"
+                                                maxDate={new Date(maxDoi)}
+                                                minDate={new Date(minDoi)}
+                                                className="datePckr"
+                                                selected={values.date_of_incorporation}
+                                                onChange={(val) => {
+                                                    setFieldTouched('date_of_incorporation');
+                                                    setFieldValue('date_of_incorporation', val);
+                                                    }}
+                                            />
+                                            {errors.date_of_incorporation && touched.date_of_incorporation ? (
+                                                <span className="errorMsg">{errors.date_of_incorporation}</span>
+                                            ) : null}  
+                                            </FormGroup>
+                                        </Col> : null }
+                                    {motorInsurance && motorInsurance.policy_for == '1' ?
                                     <Col sm={12} md={4} lg={4}>
                                         <FormGroup>
                                             <div className="formSection">
@@ -620,7 +680,8 @@ class TwoWheelerAdditionalDetails extends Component {
                                             ) : null}              
                                             </div>
                                         </FormGroup>
-                                    </Col>
+                                    </Col> : null}
+                                    {motorInsurance && motorInsurance.policy_for == '1' ?
                                     <Col sm={12} md={4} lg={4}>
                                         <FormGroup>
                                         <DatePicker
@@ -645,7 +706,7 @@ class TwoWheelerAdditionalDetails extends Component {
                                             <span className="errorMsg">{errors.dob}</span>
                                         ) : null}  
                                         </FormGroup>
-                                    </Col>
+                                    </Col> : null }
                                 </Row>
 
                                 <Row>
@@ -783,11 +844,69 @@ class TwoWheelerAdditionalDetails extends Component {
                                         </FormGroup>
                                     </Col>
                                 </Row>
+                                {motorInsurance && motorInsurance.policy_for == '2' ?
+                                <Row>
+                                    <Col sm={12} md={4} lg={4}>
+                                        <FormGroup>
+                                            <div className="formSection">
+                                            <Field
+                                                name="org_level"
+                                                component="select"
+                                                autoComplete="off"
+                                                value={values.org_level}
+                                                className="formGrp"
+                                            >
+                                            <option value="">Select Organization Level</option>
+                                            <option value="1">Corporate Public</option> 
+                                            <option value="2">Corporate (PSU)</option>        
+                                            <option value="3">Corporate (Private)</option>        
+                                            <option value="4">Firm</option>        
+                                            <option value="5">HUF</option>        
+                                            <option value="6">Society</option>  
+                                            <option value="7">NGO</option>       
+                                            <option value="8">Trust</option>   
+                                            <option value="9">BOA</option>        
+                                            <option value="10">Government</option>        
+                                            <option value="11">SME</option>                                              
+                                           
+                                            </Field>     
+                                            {errors.org_level && touched.org_level ? (
+                                                <span className="errorMsg">{errors.org_level}</span>
+                                            ) : null}        
+                                            </div>
+                                        </FormGroup>
+                                    </Col>
+                                </Row> : null }
+                                {motorInsurance && motorInsurance.policy_for == '1' ?
+                                <Row>
+                                    <Col sm={12} md={4} lg={4}>
+                                        <FormGroup>
+                                            <div className="insurerName">
+                                            <Field
+                                                name='pancard'
+                                                type="text"
+                                                placeholder="PAN Card No. "
+                                                autoComplete="off"
+                                                onFocus={e => this.changePlaceHoldClassAdd(e)}
+                                                onBlur={e => this.changePlaceHoldClassRemove(e)}
+                                                value = {values.pancard.toUpperCase()} 
+                                                onChange= {(e)=> 
+                                                    setFieldValue('pancard', e.target.value.toUpperCase())
+                                                    }                                                                           
+                                            />
+                                            {errors.pancard && touched.pancard ? (
+                                            <span className="errorMsg">{errors.pancard}</span>
+                                            ) : null} 
+                                            </div>
+                                        </FormGroup>
+                                    </Col>
+                                </Row> : null }
 
                                 <div className="d-flex justify-content-left carloan">
                                     <h4> </h4>
                                 </div>
-
+                                {motorInsurance && motorInsurance.policy_for == '1' ?
+                                <Fragment>
                                 <div className="d-flex justify-content-left carloan">
                                     <h4> Nominee Details</h4>
                                 </div>
@@ -799,7 +918,7 @@ class TwoWheelerAdditionalDetails extends Component {
                                             <Field
                                                 name='nominee_first_name'
                                                 type="text"
-                                                placeholder="FirstName LastName"
+                                                placeholder="Nominee Name"
                                                 autoComplete="off"
                                                 onFocus={e => this.changePlaceHoldClassAdd(e)}
                                                 onBlur={e => this.changePlaceHoldClassRemove(e)}
@@ -846,6 +965,7 @@ class TwoWheelerAdditionalDetails extends Component {
                                             className="datePckr"
                                             selected={values.nominee_dob}
                                             onChange={(val) => {
+                                                this.ageCheck(val)
                                                 setFieldTouched('nominee_dob');
                                                 setFieldValue('nominee_dob', val);
                                                 }}
@@ -880,10 +1000,64 @@ class TwoWheelerAdditionalDetails extends Component {
                                         </FormGroup>
                                     </Col>
                                 </Row>
+                                {appointeeFlag || is_appointee == '1' ? 
+                                    <div>
+                                        <div className="d-flex justify-content-left carloan">
+                                            <h4> </h4>
+                                        </div>
+                                        <div className="d-flex justify-content-left carloan">
+                                            <h4> Appointee  Details</h4>
+                                        </div>
+                                        <Row className="m-b-45">
+                                            <Col sm={12} md={4} lg={4}>
+                                                <FormGroup>
+                                                    <div className="insurerName">
+                                                        <Field
+                                                            name="appointee_name"
+                                                            type="text"
+                                                            placeholder="Appointee Name"
+                                                            autoComplete="off"
+                                                            onFocus={e => this.changePlaceHoldClassAdd(e)}
+                                                            onBlur={e => this.changePlaceHoldClassRemove(e)}
+                                                            value={values.appointee_name}
+                                                        />
+                                                        {errors.appointee_name && touched.appointee_name ? (
+                                                        <span className="errorMsg">{errors.appointee_name}</span>
+                                                        ) : null}
+                                                        
+                                                    </div>
+                                                </FormGroup>
+                                            </Col>
+                                            <Col sm={12} md={4} lg={6}>
+                                                <FormGroup>
+                                                    <div className="formSection">                                                           
+                                                        <Field
+                                                            name="appointee_relation_with"
+                                                            component="select"
+                                                            autoComplete="off"
+                                                            value={values.appointee_relation_with}
+                                                            className="formGrp"
+                                                        >
+                                                        <option value="">Relation with Nominee</option>
+                                                        { relation.map((relations, qIndex) => 
+                                                            <option value={relations.id}>{relations.name}</option>                                        
+                                                        )}
+                                                        </Field>     
+                                                        {errors.appointee_relation_with && touched.appointee_relation_with ? (
+                                                            <span className="errorMsg">{errors.appointee_relation_with}</span>
+                                                        ) : null}        
+                                                    </div>
+                                                </FormGroup>
+                                            </Col>
+                                        </Row>
+                                </div>  : null } 
+                                </Fragment> : null }
+
                                 <div className="d-flex justify-content-left carloan">
                                     <h4> </h4>
                                 </div>
-                                <Row>
+
+                                {/* <Row>
                                     <Col sm={12} md={4} lg={4}>
                                         <FormGroup>
                                             <div className="insurerName">
@@ -934,6 +1108,7 @@ class TwoWheelerAdditionalDetails extends Component {
                                             </div>
                                         </FormGroup>
                                     </Col>
+                                    
                                     {showEIA || is_eia_account == '1' ?
                                     <Col sm={12} md={4} lg={4}>
                                         <FormGroup>
@@ -954,7 +1129,8 @@ class TwoWheelerAdditionalDetails extends Component {
                                             </div>
                                         </FormGroup>
                                     </Col> : ''}
-                                </Row> 
+                                </Row>  */}
+
                                 <div className="d-flex justify-content-left carloan">
                                     <h4> </h4>
                                 </div>
@@ -978,7 +1154,8 @@ class TwoWheelerAdditionalDetails extends Component {
                         }}
                         </Formik>
                     </div>
-                </section>
+                </section> 
+                : step_completed == "" ? "Forbidden" : null } 
                 </div>
                 <Footer />
                 </div>

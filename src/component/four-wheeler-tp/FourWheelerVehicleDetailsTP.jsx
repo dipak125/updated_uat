@@ -20,22 +20,14 @@ import swal from 'sweetalert';
 
 const ageObj = new PersonAge();
 let encryption = new Encryption();
-// const maxRegnDate = moment(moment().subtract(1, 'years').calendar()).add(1, 'day').calendar();
+const maxRegnDate = moment(moment().subtract(1, 'years').calendar()).add(1, 'day').calendar();
 const minRegnDate = moment().subtract(20, 'years').calendar();
 
-const ncbArr = {
-    0:"0",
-    20:"20",
-    25:"25",
-    35:"35",
-    45:"45",
-    50:"50"
-}
 
 const initialValue = {
     registration_date: "",
     location_id:"",
-    previous_is_claim:'',
+    previous_is_claim:'2',
     previous_city:"",
     insurance_company_id:"0",
     previous_policy_name:"",
@@ -52,32 +44,6 @@ const vehicleRegistrationValidation = Yup.object().shape({
     })
     .matches(/^([0-9]*)$/, function() {
         return "No special Character allowed"
-    }),
-
-    previous_is_claim: Yup.string().when("policy_type_Id", {
-        is: 1,       
-        then: Yup.string(),
-        otherwise: Yup.string()
-            .test(
-                "validRegistrationChecking",
-                function() {
-                    return "Please select if you have previous claim"
-                },
-                function (value) {
-                    if (this.parent.lapse_duration == '2' && this.parent.policy_type_Id == '3') {
-                       return true
-                    }
-                    else if(value &&  value != '2') {
-                        return true
-                    }
-                    else return false
-            })
-    }),
-
-    previous_claim_bonus:Yup.string().when("previous_is_claim", {
-        is: "0" ,       
-        then: Yup.string().required('Please provide previous NCB'),
-        othewise: Yup.string()
     }),
    
 });
@@ -102,7 +68,8 @@ class TwoWheelerVehicleDetails extends Component {
         selectedCustomerRecords: [],
         CustIdkeyword: "",
         RTO_location: "",
-        maxRegnDate: ""
+        step_completed: "0",
+        location_reset_flag: 0
     };
 
     changePlaceHoldClassAdd(e) {
@@ -125,11 +92,11 @@ class TwoWheelerVehicleDetails extends Component {
         else if(localStorage.getItem('brandEdit') == '2') {
             localStorage.setItem('newBrandEdit', '2')
         }
-        this.props.history.push(`/two_wheeler_Select-brand/${productId}`);
+        this.props.history.push(`/two_wheeler_Select-brandTP/${productId}`);
     }
 
     selectBrand = (productId) => {
-        this.props.history.push(`/two_wheeler_Select-brand/${productId}`);
+        this.props.history.push(`/two_wheeler_Select-brandTP/${productId}`);
     }
 
     showClaimText = (value) =>{
@@ -162,9 +129,11 @@ class TwoWheelerVehicleDetails extends Component {
     onChangeCustomerID = (event, { newValue, method }) => {
         //const input = newValue;
            // if (/^[a-zA-Z]+$/.test(input) || input === "") {
+            let location_reset_flag = this.state.motorInsurance && this.state.motorInsurance.location_id ? 1 : 0
                 this.setState({
                     CustomerID: newValue,
-                    RTO_location: ""
+                    RTO_location: "",
+                    location_reset_flag
                     });
             //}
         
@@ -175,8 +144,8 @@ class TwoWheelerVehicleDetails extends Component {
     if (escapedValue === '') {
       return [];
     }  
-    const regex = new RegExp('^' + escapedValue, 'i');
-    if(this.state.customerDetails) {
+    const regex = new RegExp( escapedValue, 'i');
+    if(this.state.customerDetails && escapedValue.length >1) {
       return this.state.customerDetails.filter(language => regex.test(language.RTO_LOCATION));
     }
     else return 0;
@@ -213,37 +182,22 @@ class TwoWheelerVehicleDetails extends Component {
 
         const formData = new FormData(); 
         let post_data = {}
-        if(motorInsurance && motorInsurance.policytype_id && motorInsurance.policytype_id == '1') {
+
             post_data = {
                 'policy_holder_id':localStorage.getItem("policyHolder_id"),
                 'menumaster_id':3,
                 'registration_date':moment(values.registration_date).format("YYYY-MM-DD"),
                 'location_id':values.location_id,
-                'previous_is_claim':2,     
-                'prev_policy_flag': 0,
-                'vehicleAge': vehicleAge,
-                'pol_start_date': moment(newPolStartDate).format('YYYY-MM-DD'),
-                'pol_end_date': moment(newPolEndDate).format('YYYY-MM-DD') ,
-                'policy_type':  policy_type    
-            } 
-            
-        }
-        else {
-            post_data = {
-                'policy_holder_id':localStorage.getItem("policyHolder_id"),
-                'menumaster_id':3,
-                'registration_date':moment(values.registration_date).format("YYYY-MM-DD"),
-                'location_id':values.location_id,
-                'previous_is_claim':values.lapse_duration == '2' ? '2' : (values.previous_is_claim == 0 || values.previous_is_claim == 1 ? values.previous_is_claim : '2'),
+                'previous_is_claim':values.previous_is_claim,
                 'previous_claim_bonus': values.previous_claim_bonus == "" ? "2" : values.previous_claim_bonus,      
-                'prev_policy_flag': 1,
+                'prev_policy_flag': 0,
                 'vehicleAge': vehicleAge,
                 'pol_start_date': moment(newPolStartDate).format('YYYY-MM-DD'),
                 'pol_end_date': moment(newPolEndDate).format('YYYY-MM-DD'),
                 'policy_type':  policy_type,
                 'insurance_company_id': values.insurance_company_id
             }
-        }
+
         console.log('post_data', post_data)
         formData.append('enc_data',encryption.encrypt(JSON.stringify(post_data)))
         this.props.loadingStart();
@@ -254,7 +208,7 @@ class TwoWheelerVehicleDetails extends Component {
             let decryptResp = JSON.parse(encryption.decrypt(res.data));
             console.log('decryptResp-----', decryptResp)
             if(decryptResp.error == false){
-                this.props.history.push(`/two_wheeler_OtherComprehensive/${productId}`);
+                this.props.history.push(`/two_wheeler_OtherComprehensiveTP/${productId}`);
             }
             else{
                 actions.setSubmitting(false)
@@ -312,9 +266,9 @@ class TwoWheelerVehicleDetails extends Component {
                  let previousPolicy = decryptResp.data.policyHolder ? decryptResp.data.policyHolder.previouspolicy : {};
                  let vehicleDetails = decryptResp.data.policyHolder ? decryptResp.data.policyHolder.vehiclebrandmodel : {};
                  let RTO_location = motorInsurance && motorInsurance.location && motorInsurance.location.RTO_LOCATION ? motorInsurance.location.RTO_LOCATION : ""
-                 let maxRegnDate= motorInsurance && motorInsurance.policytype_id == '1' ? moment() : moment(moment().subtract(1, 'years').calendar()).add(1, 'day').calendar()
-                 this.setState({
-                    motorInsurance, previousPolicy, vehicleDetails,RTO_location, maxRegnDate
+                 let step_completed = decryptResp.data.policyHolder ? decryptResp.data.policyHolder.step_no : "";
+                this.setState({
+                    motorInsurance, previousPolicy, vehicleDetails,RTO_location,step_completed
                 })
                 this.props.loadingStop();
             })
@@ -343,23 +297,13 @@ class TwoWheelerVehicleDetails extends Component {
 
     render() {
         const {productId} = this.props.match.params  
-        const {insurerList, showClaim, previous_is_claim, motorInsurance, previousPolicy,
-            CustomerID,suggestions, vehicleDetails, RTO_location, maxRegnDate} = this.state
+        const { motorInsurance, CustomerID,suggestions, vehicleDetails, RTO_location, step_completed, location_reset_flag} = this.state
 
         let newInitialValues = Object.assign(initialValue, {
             registration_date: motorInsurance && motorInsurance.registration_date ? new Date(motorInsurance.registration_date) : "",
-            location_id:  motorInsurance && motorInsurance.location_id ? motorInsurance.location_id : "",
-            previous_start_date: previousPolicy && previousPolicy.start_date ? new Date(previousPolicy.start_date) : "",
-            previous_end_date: previousPolicy && previousPolicy.end_date ? new Date(previousPolicy.end_date) : "",
-            previous_policy_name: previousPolicy && previousPolicy.name ? previousPolicy.name : "",
-            // insurance_company_id: previousPolicy && previousPolicy.insurancecompany && previousPolicy.insurancecompany.id ? previousPolicy.insurancecompany.id : "",
-            previous_city: previousPolicy && previousPolicy.city ? previousPolicy.city : "",
-            previous_is_claim: previousPolicy && (previousPolicy.is_claim == 0 || previousPolicy.is_claim == 1) ? previousPolicy.is_claim : "",
-            previous_claim_bonus: previousPolicy && ncbArr[previousPolicy.claim_bonus]  && previousPolicy.claim_bonus != 2 ? Math.floor(previousPolicy.claim_bonus) : "",
-            policy_type_Id : motorInsurance && motorInsurance.policytype_id ? motorInsurance.policytype_id : "0",
-            lapse_duration: motorInsurance && motorInsurance.lapse_duration ? motorInsurance.lapse_duration : "",
+            location_id:  motorInsurance && motorInsurance.location_id && location_reset_flag == 0 ? motorInsurance.location_id : "",
+            policy_type_Id : motorInsurance && motorInsurance.policytype_id ? motorInsurance.policytype_id : "0"
         });
-
 
         const inputCustomerID = {
             placeholder: "Search City",
@@ -369,7 +313,7 @@ class TwoWheelerVehicleDetails extends Component {
           
 
         return (
-            <>
+            <>        
                 <BaseComponent>
                 <div className="container-fluid">
                 <div className="row">
@@ -378,6 +322,7 @@ class TwoWheelerVehicleDetails extends Component {
                     </div>
                 <div className="col-sm-12 col-md-12 col-lg-10 col-xl-10 infobox">
                 <h4 className="text-center mt-3 mb-3">SBI General Insurance Company Limited</h4>
+                { step_completed >= '1' && vehicleDetails.vehicletype_id == '3' ?
                 <section className="brand m-b-25">
                     <div className="d-flex justify-content-left">
                         <div className="brandhead">
@@ -464,170 +409,7 @@ class TwoWheelerVehicleDetails extends Component {
                                                         </FormGroup>
                                                     </Col>
                                                 </Row>
-                                            {(motorInsurance && motorInsurance.policytype_id && motorInsurance.policytype_id == '2') || 
-                                            (motorInsurance && motorInsurance.policytype_id && motorInsurance.policytype_id == '3' && 
-                                             motorInsurance && motorInsurance.lapse_duration == '1' ) ?
-                                                <Fragment>
                                                 
-
-                                                <Row>
-                                                    <Col sm={12}>
-                                                        <FormGroup>
-                                                            <div className="carloan">
-                                                                <h4>Have you made a claim in your last Policy</h4>
-                                                            </div>
-                                                        </FormGroup>
-                                                    </Col>
-                                                </Row>
-
-                                                <Row>
-                                                    <Col sm={4}>
-                                                        <FormGroup>
-                                                            <div className="d-inline-flex m-b-35">
-                                                                <div className="p-r-25">
-                                                                    <label className="customRadio3">
-                                                                    <Field
-                                                                        type="radio"
-                                                                        name='previous_is_claim'                                            
-                                                                        value='0'
-                                                                        key='1'  
-                                                                        onChange={(e) => {
-                                                                            setFieldTouched('previous_is_claim')
-                                                                            setFieldValue(`previous_is_claim`, e.target.value);
-                                                                            this.showClaimText(0);
-                                                                        }}
-                                                                        checked={values.previous_is_claim == '0' ? true : false}
-                                                                    />
-                                                                        <span className="checkmark " /><span className="fs-14"> No, I haven't</span>
-                                                                    </label>
-                                                                </div>
-
-                                                                <div className="">
-                                                                    <label className="customRadio3">
-                                                                    <Field
-                                                                        type="radio"
-                                                                        name='previous_is_claim'                                            
-                                                                        value='1'
-                                                                        key='1'  
-                                                                        onChange={(e) => {
-                                                                            setFieldTouched('previous_is_claim')
-                                                                            setFieldValue(`previous_is_claim`, e.target.value);
-                                                                            setFieldTouched('previous_claim_bonus')
-                                                                            setFieldValue(`previous_claim_bonus`, "");
-                                                                            this.showClaimText(1);
-                                                                        }}
-                                                                        checked={values.previous_is_claim == '1' ? true : false}
-                                                                    />
-                                                                        <span className="checkmark" />
-                                                                        <span className="fs-14">Yes I have</span>
-                                                                    </label>
-                                                                    {errors.previous_is_claim && touched.previous_is_claim ? (
-                                                                    <span className="errorMsg">{errors.previous_is_claim}</span>
-                                                                ) : null}
-                                                                </div>
-                                                            </div>
-                                                        </FormGroup>
-                                                    </Col>
-                                                </Row>
-                                            {showClaim || values.previous_is_claim == "0" ? 
-                                            <Fragment>
-                                                <Row>
-                                                    <Col sm={12}>
-                                                        <FormGroup>
-                                                            <div className="carloan">
-                                                            Select NCB mentioned on last policy
-                                                            </div>
-                                                        </FormGroup>
-                                                    </Col>
-                                                </Row>
-                                                <Row className="m-b-40">
-                                                    <Col sm={12} md={6} lg={6}>
-                                                    <FormGroup>
-                                                            <div className="d-inline-flex m-b-35">
-                                                                <div className="p-r-25">
-                                                                    <label className="customRadio3">
-                                                                    <Field
-                                                                        type="radio"
-                                                                        name='previous_claim_bonus'                                            
-                                                                        value='0'
-                                                                        key='1'  
-                                                                        checked = {values.previous_claim_bonus == '0' ? true : false}
-                                                                    />
-                                                                        <span className="checkmark " /><span className="fs-14"> 0</span>
-                                                                    </label>
-                                                                </div>
-                                                                <div className="p-r-25">
-                                                                    <label className="customRadio3">
-                                                                    <Field
-                                                                        type="radio"
-                                                                        name='previous_claim_bonus'                                            
-                                                                        value='20'
-                                                                        key='1'  
-                                                                        checked = {values.previous_claim_bonus == '20' ? true : false}
-                                                                    />
-                                                                        <span className="checkmark " /><span className="fs-14"> 20</span>
-                                                                    </label>
-                                                                </div>
-                                                                <div className="p-r-25">
-                                                                    <label className="customRadio3">
-                                                                    <Field
-                                                                        type="radio"
-                                                                        name='previous_claim_bonus'                                            
-                                                                        value='25'
-                                                                        key='1'  
-                                                                        checked = {values.previous_claim_bonus == '25' ? true : false}
-                                                                    />
-                                                                        <span className="checkmark " /><span className="fs-14"> 25</span>
-                                                                    </label>
-                                                                </div>
-                                                                <div className="p-r-25">
-                                                                    <label className="customRadio3">
-                                                                    <Field
-                                                                        type="radio"
-                                                                        name='previous_claim_bonus'                                            
-                                                                        value='35'
-                                                                        key='1'  
-                                                                        checked = {values.previous_claim_bonus == '35' ? true : false}
-                                                                    />
-                                                                        <span className="checkmark " /><span className="fs-14"> 35</span>
-                                                                    </label>
-                                                                </div>
-                                                                <div className="p-r-25">
-                                                                    <label className="customRadio3">
-                                                                    <Field
-                                                                        type="radio"
-                                                                        name='previous_claim_bonus'                                            
-                                                                        value='45'
-                                                                        key='1'  
-                                                                        checked = {values.previous_claim_bonus == '45' ? true : false}
-                                                                    />
-                                                                        <span className="checkmark " /><span className="fs-14"> 45</span>
-                                                                    </label>
-                                                                </div>
-
-                                                                <div className="">
-                                                                    <label className="customRadio3">
-                                                                    <Field
-                                                                        type="radio"
-                                                                        name='previous_claim_bonus'                                            
-                                                                        value='50'
-                                                                        key='1'  
-                                                                        checked = {values.previous_claim_bonus == '50' ? true : false}
-                                                                    />
-                                                                        <span className="checkmark" />
-                                                                        <span className="fs-14">50</span>
-                                                                    </label>
-                                                                    {errors.previous_claim_bonus && touched.previous_claim_bonus ? (
-                                                                    <span className="errorMsg">{errors.previous_claim_bonus}</span>
-                                                                ) : null}
-                                                                </div>
-                                                            </div>
-                                                        </FormGroup>
-                                                    </Col>
-                                                </Row>
-                                            </Fragment>
-                                            : null} 
-                                            </Fragment> : null }
                                                 <div className="d-flex justify-content-left resmb">
                                                 <Button className={`backBtn`} type="button"  disabled={isSubmitting ? true : false} onClick= {this.selectBrand.bind(this,productId)}>
                                                     {isSubmitting ? 'Wait..' : 'Back'}
@@ -688,7 +470,9 @@ class TwoWheelerVehicleDetails extends Component {
                             }}
                         </Formik>
                     </div>
-                </section>
+                </section> : step_completed == "" ? "Forbidden" : null
+            }
+
                 <Footer />
                 </div>
                 </div>

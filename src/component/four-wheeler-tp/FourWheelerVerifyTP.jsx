@@ -453,30 +453,31 @@ class TwoWheelerVerify extends Component {
     regnoFormat = (e, setFieldTouched, setFieldValue) => {
         
         let regno = e.target.value
-        let formatVal = ""
+        let formatVal = e.target.value
         let regnoLength = regno.length
         var letter = /^[a-zA-Z]+$/;
         var number = /^[0-9]+$/;
         let subString = regno.substring(regnoLength-1, regnoLength)
         let preSubString = regno.substring(regnoLength-2, regnoLength-1)
-
+    
+    
         if(subString.match(letter) && preSubString.match(letter)) {
             formatVal = regno
         }
         else if(subString.match(number) && preSubString.match(number)) {
             formatVal = regno
         } 
-        else if(subString.match(number) && preSubString.match(letter)) {        
-            formatVal = regno.substring(0, regnoLength-1) + " " +subString      
+        if(subString.match(number) && preSubString.match(letter)) {
+            formatVal = regno.replace(regno.substring(regnoLength-1, regnoLength), " ")
+            formatVal = formatVal+subString
         } 
         else if(subString.match(letter) && preSubString.match(number)) {
-            formatVal = regno.substring(0, regnoLength-1) + " " +subString   
+            formatVal = regno.replace(regno.substring(regnoLength-1, regnoLength), " ")
+            formatVal = formatVal+subString
         } 
-
-        else formatVal = regno.toUpperCase()
-        
+    
         e.target.value = formatVal.toUpperCase()
-
+    
     }
 
 

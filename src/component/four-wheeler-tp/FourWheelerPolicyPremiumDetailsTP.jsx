@@ -12,6 +12,7 @@ import { loaderStart, loaderStop } from "../../store/actions/loader";
 import { connect } from "react-redux";
 import * as Yup from "yup";
 import Encryption from '../../shared/payload-encryption';
+// import Razorpay from "./Razorpay.jsx"
 
 const initialValue = {}
 
@@ -31,6 +32,7 @@ class Premium extends Component {
 
         this.state = {
             show: false,
+            show1: true,
             refNo: "",
             whatsapp: "",
             fulQuoteResp: [],
@@ -45,21 +47,15 @@ class Premium extends Component {
             memberdetails: [],
             nomineedetails:[],
             relation: [],
-            policyHolder: [],
+            step_completed: "0",
             vehicleDetails: [],
-            step_completed: []
+            policyHolder: []
         };
     }
 
 
     handleClose(e) {
         this.setState({ show: false, });
-    }
-
-    handleOtp(e) {
-        console.log("otp", e)
-        this.setState({ show: false, });
-        this.props.history.push(`/ThankYou_motor`)
     }
 
     changePlaceHoldClassAdd(e) {
@@ -73,7 +69,7 @@ class Premium extends Component {
     }
 
     additionalDetails = (productId) => {
-        this.props.history.push(`/two_wheeler_additional_details/${productId}`);
+        this.props.history.push(`/two_wheeler_additional_detailsTP/${productId}`);
     }
 
     handleSubmit = (values) => {
@@ -92,12 +88,12 @@ class Premium extends Component {
                 let decryptResp = JSON.parse(encryption.decrypt(res.data))
                 console.log("decrypt", decryptResp)
                 let motorInsurance = decryptResp.data.policyHolder ? decryptResp.data.policyHolder.motorinsurance : {}
-                let policyHolder = decryptResp.data.policyHolder ? decryptResp.data.policyHolder : [];
                 let vehicleDetails = decryptResp.data.policyHolder ? decryptResp.data.policyHolder.vehiclebrandmodel : {};
                 let step_completed = decryptResp.data.policyHolder ? decryptResp.data.policyHolder.step_no : "";
+                let policyHolder = decryptResp.data.policyHolder ? decryptResp.data.policyHolder : [];
 
                 this.setState({
-                    motorInsurance,policyHolder,vehicleDetails,step_completed,
+                    motorInsurance,vehicleDetails,step_completed,policyHolder,
                     refNumber: decryptResp.data.policyHolder.reference_no,
                     paymentStatus: decryptResp.data.policyHolder.payment ? decryptResp.data.policyHolder.payment[0] : [],
                     memberdetails : decryptResp.data.policyHolder ? decryptResp.data.policyHolder : [],
@@ -141,6 +137,7 @@ class Premium extends Component {
             'idv_value': motorInsurance.idv_value,
             'policy_type': localStorage.getItem('policy_type'),
             'add_more_coverage': motorInsurance.add_more_coverage,
+            'policy_for': motorInsurance ? motorInsurance.policy_for : ""
             // 'cng_kit': motorInsurance.cng_kit,
             // 'cngKit_Cost': Math.floor(motorInsurance.cngkit_cost)
         }
@@ -155,7 +152,7 @@ class Premium extends Component {
 
         // formData.append('enc_data',encryption.encrypt(JSON.stringify(post_data)))
 
-        axios.post('fullQuotePM2W', formData)
+        axios.post('fullQuotePM2WTP', formData)
             .then(res => {
                 if (res.data.PolicyObject) {
                     this.setState({
@@ -216,8 +213,8 @@ class Premium extends Component {
     }
 
     render() {
-        const { policyHolder, whatsapp, show, fulQuoteResp, motorInsurance, error, error1, refNumber, 
-            paymentStatus, relation, memberdetails,nomineedetails, vehicleDetails,step_completed } = this.state
+        const { policyHolder, show, fulQuoteResp, motorInsurance, error, error1, refNumber, 
+            paymentStatus, relation, memberdetails,nomineedetails,vehicleDetails,step_completed } = this.state
         const { productId } = this.props.match.params
 
         const errMsg =
@@ -246,13 +243,15 @@ class Premium extends Component {
 
         return (
             <>
+            
+            <div>
                 <BaseComponent>
                     <div className="container-fluid">
                         <div className="row">
                             <div className="col-sm-12 col-md-12 col-lg-2 col-xl-2 pd-l-0">
                                 <SideNav />
                             </div>
-                            { step_completed >= '4' && vehicleDetails.vehicletype_id == '4' ?
+                            { step_completed >= '4' && vehicleDetails.vehicletype_id == '3' ?
                             <div className="col-sm-12 col-md-12 col-lg-10 col-xl-10 infobox">
                                 <h4 className="text-center mt-3 mb-3">SBI General Insurance Company Limited</h4>
                                 <Formik initialValues={initialValue} onSubmit={this.handleSubmit}
@@ -334,7 +333,7 @@ class Premium extends Component {
                                                                                 <div>
                                                                                     <strong>Owner Details :</strong>
                                                                                     <br/>
-                                                                                    <Row>
+                                                                                       <Row>
                                                                                         <Col sm={12} md={6}>
                                                                                             <Row>
                                                                                                 <Col sm={12} md={6}>
@@ -538,11 +537,14 @@ class Premium extends Component {
                                     </div>
                                 </Modal> */}
 
+
+
                             </div> : step_completed == "" ? "Forbidden" : null }
                             <Footer />
                         </div>
                     </div>
                 </BaseComponent>
+                </div> 
             </>
         );
     }
