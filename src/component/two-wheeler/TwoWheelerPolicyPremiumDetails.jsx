@@ -139,7 +139,7 @@ class Premium extends Component {
             'id':localStorage.getItem('policyHolder_id'),
             'access_token':access_token,
             'idv_value': motorInsurance.idv_value,
-            'policy_type': localStorage.getItem('policy_type'),
+            'policy_type': motorInsurance ? motorInsurance.policy_type : "",
             'add_more_coverage': motorInsurance.add_more_coverage,
             // 'cng_kit': motorInsurance.cng_kit,
             // 'cngKit_Cost': Math.floor(motorInsurance.cngkit_cost)
@@ -279,7 +279,7 @@ class Premium extends Component {
                                                     <Row>
                                                         <Col sm={12} md={9} lg={9}>
                                                             <div className="rghtsideTrigr">
-                                                                <Collapsible trigger="Retail Motor Policy" >
+                                                                <Collapsible trigger="Retail Motor Policy" open = {true}>
                                                                     <div className="listrghtsideTrigr">
                                                                         <Row>
                                                                             <Col sm={12} md={3}>

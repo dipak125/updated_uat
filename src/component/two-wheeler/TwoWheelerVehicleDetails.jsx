@@ -17,6 +17,7 @@ import {  PersonAge } from "../../shared/dateFunctions";
 import Autosuggest from 'react-autosuggest';
 import { addDays } from 'date-fns';
 import swal from 'sweetalert';
+import fuel from '../common/FuelTypes';
 
 const ageObj = new PersonAge();
 let encryption = new Encryption();
@@ -81,11 +82,6 @@ const vehicleRegistrationValidation = Yup.object().shape({
     }),
    
 });
-
-const fuel = {
-    1: 'Petrol',
-    2: 'Diesel'
-}
 
 
 class TwoWheelerVehicleDetails extends Component {

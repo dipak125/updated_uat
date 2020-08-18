@@ -13,6 +13,7 @@ import { connect } from "react-redux";
 import swal from 'sweetalert';
 import ScrollArea from 'react-scrollbar';
 import Encryption from '../../shared/payload-encryption';
+import fuel from '../common/FuelTypes';
 
 
 
@@ -28,11 +29,6 @@ const initialValues = {
     lapse_duration: ''
 
 };
-
-const fuel = {
-    1: 'Petrol',
-    2: 'Diesel'
-}
 
 
 const vehicleValidation = Yup.object().shape({
@@ -872,8 +868,7 @@ class TwoWheelerSelectBrand extends Component {
                         <div className="cntrbody">
                             <h3>Select Model </h3>
                             {selectedBrandDetails.image ?
-                                <img src={`${process.env.REACT_APP_PAYMENT_URL}/core/public/image/car_brand_image/` + selectedBrandDetails.image} alt={selectedBrandDetails.name} /> :
-                                <img src={require('../../assets/images/car.svg')} alt="" />
+                                <img src={`${process.env.REACT_APP_PAYMENT_URL}/core/public/image/car_brand_image/` + selectedBrandDetails.image} alt={selectedBrandDetails.name} /> : null
                             }
                         </div>
                     </Modal.Header>

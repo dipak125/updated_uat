@@ -13,6 +13,7 @@ import { connect } from "react-redux";
 import swal from 'sweetalert';
 import ScrollArea from 'react-scrollbar';
 import Encryption from '../../shared/payload-encryption';
+import fuel from '../common/FuelTypes';
 
 
 
@@ -29,10 +30,6 @@ const initialValues = {
 
 };
 
-const fuel = {
-    1: 'Petrol',
-    2: 'Diesel'
-}
 
 
 const vehicleValidation = Yup.object().shape({

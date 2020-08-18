@@ -217,7 +217,6 @@ class TwoWheelerOtherComprehensive extends Component {
             'id':localStorage.getItem('policyHolder_refNo'),
             'access_token':access_token,
             'idv_value': sliderVal ? sliderVal : defaultSliderValue.toString(),
-            'policy_type': localStorage.getItem('policy_type'),
             'add_more_coverage': add_more_coverage.toString(),
             'policy_type': motorInsurance ? motorInsurance.policy_type : "",
             'policytype_id': motorInsurance ? motorInsurance.policytype_id : "",
