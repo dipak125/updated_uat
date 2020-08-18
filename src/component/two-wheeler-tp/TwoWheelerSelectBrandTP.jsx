@@ -24,7 +24,7 @@ const initialValues = {
     selectedVarientId: '',
     regNumber:'',
     check_registration: 2,
-    policy_for: ""
+    policy_for: "1"
 
 
 };
@@ -511,7 +511,7 @@ class TwoWheelerSelectBrand extends Component {
             policy_type: motorInsurance && motorInsurance.policytype_id ? motorInsurance.policytype_id : "",
             regNumber: motorInsurance && motorInsurance.registration_no ? motorInsurance.registration_no : "",
             check_registration: localStorage.getItem('check_registration') ? localStorage.getItem('check_registration') : "2",
-            policy_for: motorInsurance && motorInsurance.policy_for ? motorInsurance.policy_for : "",
+            policy_for: motorInsurance && motorInsurance.policy_for ? motorInsurance.policy_for : "1",
         })
 
         return (

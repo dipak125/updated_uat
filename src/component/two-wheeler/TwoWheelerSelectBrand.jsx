@@ -24,7 +24,7 @@ const initialValues = {
     selectedVarientId: '',
     regNumber:'',
     check_registration: 2,
-    policy_for: "",
+    policy_for: "1",
     lapse_duration: ''
 
 };
@@ -530,7 +530,7 @@ class TwoWheelerSelectBrand extends Component {
             regNumber: motorInsurance && motorInsurance.registration_no ? motorInsurance.registration_no : "",
             check_registration: localStorage.getItem('check_registration') ? localStorage.getItem('check_registration') : "2",
             lapse_duration: motorInsurance && motorInsurance.lapse_duration ? motorInsurance.lapse_duration : "",
-            policy_for: motorInsurance && motorInsurance.policy_for ? motorInsurance.policy_for : "",
+            policy_for: motorInsurance && motorInsurance.policy_for ? motorInsurance.policy_for : "1",
         })
 
         return (
@@ -829,7 +829,7 @@ class TwoWheelerSelectBrand extends Component {
 
 
                                                                     <div className="d-flex justify-content-between flex-lg-row flex-md-column m-b-25">
-                                                                        <div className="txtRegistr resmb-15">Car Brand
+                                                                        <div className="txtRegistr resmb-15">Two-wheeler Brand
                                                                             - <strong>{brandName ? brandName : (vehicleDetails && vehicleDetails.vehiclebrand && vehicleDetails.vehiclebrand.name ? vehicleDetails.vehiclebrand.name : "")}</strong>
                                                                         </div>
 
@@ -837,7 +837,7 @@ class TwoWheelerSelectBrand extends Component {
                                                                     </div>
 
                                                                     <div className="d-flex justify-content-between flex-lg-row flex-md-column m-b-25">
-                                                                        <div className="txtRegistr">Car Model<br />
+                                                                        <div className="txtRegistr">Two-wheeler Model<br />
                                                                             <strong>{modelName ? modelName : (selectedBrandId ? "" : vehicleDetails && vehicleDetails.vehiclemodel && vehicleDetails.vehiclemodel.description ? vehicleDetails.vehiclemodel.description+" "+vehicleDetails.varientmodel.varient : "")}</strong></div>
 
                                                                         <div> <button type="button" className="rgistrBtn" onClick={this.selectBrand.bind(this, productId)}>Edit</button></div>

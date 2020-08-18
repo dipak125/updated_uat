@@ -547,7 +547,7 @@ class TwoWheelerOtherComprehensive extends Component {
                                                                 <Col sm={12} md={11} lg={6} key={qIndex+"a"} >
                                                                     <label className="customCheckBox formGrp formGrp">{coverage.name}
                                                                         <OverlayTrigger overlay={<Tooltip id="tooltip-disabled">{coverage.description}</Tooltip>}>
-                                                                            <a href="#" className="infoIcon"><img src={require('../../assets/images/i.svg')} alt="" className="premtool" /></a>
+                                                                            <a className="infoIcon"><img src={require('../../assets/images/i.svg')} alt="" className="premtool" /></a>
                                                                         </OverlayTrigger>
                                                                         <Field
                                                                             type="checkbox"

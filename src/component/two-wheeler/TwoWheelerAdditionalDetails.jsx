@@ -46,11 +46,15 @@ const initialValue = {
     eia_no: "",
     stateName: "",
     pinDataArr: [],
-    pincode_id: ""
+    pincode_id: "",
+    org_level: ""
 }
 
 const ownerValidation = Yup.object().shape({
-    first_name: Yup.string().required('Name is required')
+
+    first_name: Yup.string().when(['policy_for'], {
+        is: policy_for => policy_for == '1',       
+        then: Yup.string().required('Name is required')
         .min(3, function() {
             return "First name must be 3 chracters"
         })
@@ -60,6 +64,10 @@ const ownerValidation = Yup.object().shape({
         .matches(/^[a-zA-Z]+([\s]?[a-zA-Z]+)([\s]?[a-zA-Z]+)$/, function() {
             return "Please enter valid name"
         }),
+        otherwise: Yup.string().required('Company name is required')
+    }),
+
+
     // last_name:Yup.string().required('Last name is required'),
     gender: Yup.string().when(['policy_for'], {
         is: policy_for => policy_for == '1',  
@@ -247,7 +255,7 @@ const ownerValidation = Yup.object().shape({
     org_level: Yup.string().when(['policy_for'], {
         is: policy_for => policy_for == '2', 
         then: Yup.string().required('Organization level is required'),
-        otherwise: Yup.string().nullable()
+        otherwise: Yup.string()
     }), 
 
     gstn_no: Yup.string().when(['policy_for'], {
@@ -556,7 +564,7 @@ class TwoWheelerAdditionalDetails extends Component {
             appointee_relation_with: nomineeDetails && nomineeDetails.appointee_relation_with ? nomineeDetails.appointee_relation_with : "",
             appointee_name: nomineeDetails && nomineeDetails.appointee_name ? nomineeDetails.appointee_name : "",
             date_of_incorporation: policyHolder && policyHolder.date_of_incorporation ? new Date(policyHolder.date_of_incorporation) : "",
-            org_level: policyHolder ? policyHolder.org_level : "",
+            org_level: policyHolder && policyHolder.org_level ? policyHolder.org_level : "",
         });
 
         const quoteNumber =

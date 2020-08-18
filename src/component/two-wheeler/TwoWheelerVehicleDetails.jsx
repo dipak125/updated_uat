@@ -170,18 +170,19 @@ class TwoWheelerVehicleDetails extends Component {
         
     };
   
-   getCustomerIDSuggestions(value) {
-    const escapedValue = this.escapeRegexCharacters(value.trim());   
-    if (escapedValue === '') {
-      return [];
-    }  
-    const regex = new RegExp('^' + escapedValue, 'i');
-    if(this.state.customerDetails) {
-      return this.state.customerDetails.filter(language => regex.test(language.RTO_LOCATION));
-    }
-    else return 0;
-    
-  }
+    getCustomerIDSuggestions(value) {
+        const escapedValue = this.escapeRegexCharacters(value.trim());   
+        if (escapedValue === '') {
+            return [];
+        }  
+        const regex = new RegExp( escapedValue, 'i');
+        if(this.state.customerDetails && escapedValue.length >1) {
+            return this.state.customerDetails.filter(language => regex.test(language.RTO_LOCATION));
+        }
+        else return 0;
+        
+        }
+      
   
   onSuggestionsFetchCustomerID = ({ value }) => {
     this.setState({

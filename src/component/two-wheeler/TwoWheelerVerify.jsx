@@ -52,7 +52,21 @@ const ComprehensiveValidation = Yup.object().shape({
     registration_no: Yup.string().when("newRegistrationNo", {
         is: "NEW",       
         then: Yup.string(),
-        otherwise: Yup.string().required('Please provide registration number').matches(/^[A-Z]{2}[ -][0-9]{1,2}(?: [A-Z])?(?: [A-Z]*)? [0-9]{4}$/, 'Invalid Registration number'),
+        otherwise: Yup.string().required('Please provide registration number').matches(/^[A-Z]{2}[ -][0-9]{1,2}(?: [A-Z])?(?: [A-Z]*)? [0-9]{4}$/, 'Invalid Registration number')
+            .test(
+                "validRegistrationChecking",
+                function() {
+                    return "Enter valid registration number"
+                },
+                function (value) {
+                    if (value) {
+                        let reg = value.split(" ")
+                        if(reg && reg[3]) {
+                            return parseInt(reg[3])
+                        }
+                    }
+                    return true;
+            })
     }),
 
     chasis_no_last_part:Yup.string().required('This field is required')
@@ -448,7 +462,8 @@ class TwoWheelerVerify extends Component {
             post_data = {
                 'policy_holder_id': localStorage.getItem('policyHolder_id'),
                 'menumaster_id': 3,
-                'registration_no': motorInsurance.registration_no ? motorInsurance.registration_no : values.registration_no,
+                // 'registration_no': motorInsurance.registration_no ? motorInsurance.registration_no : values.registration_no,
+                'registration_no': values.registration_no,
                 'chasis_no': values.chasis_no,
                 'chasis_no_last_part': values.chasis_no_last_part,
                 'engine_no': values.engine_no,
@@ -460,7 +475,8 @@ class TwoWheelerVerify extends Component {
             post_data = {
                 'policy_holder_id': localStorage.getItem('policyHolder_id'),
                 'menumaster_id': 3,
-                'registration_no':motorInsurance.registration_no ? motorInsurance.registration_no : values.registration_no,
+                // 'registration_no':motorInsurance.registration_no ? motorInsurance.registration_no : values.registration_no,
+                'registration_no': values.registration_no,
                 'chasis_no': values.chasis_no,
                 'chasis_no_last_part': values.chasis_no_last_part,
                 'engine_no': values.engine_no,
@@ -484,6 +500,9 @@ class TwoWheelerVerify extends Component {
             console.log('decryptResp-----', decryptResp)
             if (decryptResp.error == false) {
                 this.props.history.push(`/two_wheeler_additional_details/${productId}`);
+            }
+            else {
+                swal(decryptResp.msg)
             }
 
         })
@@ -589,7 +608,6 @@ class TwoWheelerVerify extends Component {
                     validationSchema={ComprehensiveValidation}
                     >
                     {({ values, errors, setFieldValue, setFieldTouched, isValid, isSubmitting, touched }) => {
-            console.log("errors==--", errors)
 
                     return (
                         <Form>
