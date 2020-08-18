@@ -57,7 +57,21 @@ const ComprehensiveValidation = Yup.object().shape({
     registration_no: Yup.string().when("newRegistrationNo", {
         is: "NEW",       
         then: Yup.string(),
-        otherwise: Yup.string().required('Please provide registration number').matches(/^[A-Z]{2}[ -][0-9]{1,2}(?: [A-Z])?(?: [A-Z]*)? [0-9]{4}$/, 'Invalid Registration number'),
+        otherwise: Yup.string().required('Please provide registration number').matches(/^[A-Z]{2}[ -][0-9]{1,2}(?: [A-Z])?(?: [A-Z]*)? [0-9]{4}$/, 'Invalid Registration number')
+            .test(
+                "validRegistrationChecking",
+                function() {
+                    return "Enter valid registration number"
+                },
+                function (value) {
+                    if (value) {
+                        let reg = value.split(" ")
+                        if(reg && reg[3]) {
+                            return parseInt(reg[3])
+                        }
+                    }
+                    return true;
+            })
     }),
 
     chasis_no_last_part:Yup.string().required('This field is required')
@@ -402,7 +416,7 @@ class TwoWheelerVerify extends Component {
             post_data = {
                 'policy_holder_id': localStorage.getItem('policyHolder_id'),
                 'menumaster_id': 3,
-                'registration_no': motorInsurance.registration_no ? motorInsurance.registration_no : values.registration_no,
+                'registration_no': values.registration_no,
                 'chasis_no': values.chasis_no,
                 'chasis_no_last_part': values.chasis_no_last_part,
                 'engine_no': values.engine_no,
@@ -414,7 +428,7 @@ class TwoWheelerVerify extends Component {
             post_data = {
                 'policy_holder_id': localStorage.getItem('policyHolder_id'),
                 'menumaster_id': 3,
-                'registration_no':motorInsurance.registration_no ? motorInsurance.registration_no : values.registration_no,
+                'registration_no': values.registration_no,
                 'chasis_no': values.chasis_no,
                 'chasis_no_last_part': values.chasis_no_last_part,
                 'engine_no': values.engine_no,
@@ -439,6 +453,9 @@ class TwoWheelerVerify extends Component {
             if (decryptResp.error == false) {
                 this.props.history.push(`/two_wheeler_additional_detailsTP/${productId}`);
             }
+            else {
+                swal(decryptResp.msg)
+            }
 
         })
         .catch(err => {
@@ -453,30 +470,31 @@ class TwoWheelerVerify extends Component {
     regnoFormat = (e, setFieldTouched, setFieldValue) => {
         
         let regno = e.target.value
-        let formatVal = ""
+        let formatVal = e.target.value
         let regnoLength = regno.length
         var letter = /^[a-zA-Z]+$/;
         var number = /^[0-9]+$/;
         let subString = regno.substring(regnoLength-1, regnoLength)
         let preSubString = regno.substring(regnoLength-2, regnoLength-1)
-
+    
+    
         if(subString.match(letter) && preSubString.match(letter)) {
             formatVal = regno
         }
         else if(subString.match(number) && preSubString.match(number)) {
             formatVal = regno
         } 
-        else if(subString.match(number) && preSubString.match(letter)) {        
-            formatVal = regno.substring(0, regnoLength-1) + " " +subString      
+        if(subString.match(number) && preSubString.match(letter)) {
+            formatVal = regno.replace(regno.substring(regnoLength-1, regnoLength), " ")
+            formatVal = formatVal+subString
         } 
         else if(subString.match(letter) && preSubString.match(number)) {
-            formatVal = regno.substring(0, regnoLength-1) + " " +subString   
+            formatVal = regno.replace(regno.substring(regnoLength-1, regnoLength), " ")
+            formatVal = formatVal+subString
         } 
-
-        else formatVal = regno.toUpperCase()
-        
+    
         e.target.value = formatVal.toUpperCase()
-
+    
     }
 
 
@@ -588,7 +606,7 @@ class TwoWheelerVerify extends Component {
                                 </Row>
                                 </Col>
 
-                                <Col sm={12} md={6} lg={5}>
+                                <Col sm={12} md={6} lg={4}>
                                 <Row sm={12} md={6} lg={4}>
                                 <Col sm={12} md={5} lg={6}>
                                     <FormGroup>
@@ -598,7 +616,7 @@ class TwoWheelerVerify extends Component {
                                     </FormGroup>
                                 </Col>
                                     
-                                <Col sm={12} md={5} lg={4}>
+                                <Col sm={12} md={5} lg={6}>
                                         <FormGroup>
                                             <div className="insurerName">
                                                     <Field
@@ -625,7 +643,7 @@ class TwoWheelerVerify extends Component {
                                 </Row>
                                 </Col>
 
-                                <Col sm={12} md={2} lg={2}>
+                                <Col sm={12} md={6} lg={2}>
                                     <FormGroup>
                                     
                                         <Button className="btn btn-primary vrifyBtn" onClick= {!errors.chasis_no_last_part ? this.getVahanDetails.bind(this,values, setFieldTouched, setFieldValue, errors) : null}>Verify</Button>
@@ -909,7 +927,8 @@ class TwoWheelerVerify extends Component {
                                 );
                             }}
                         </Formik>
-                    </section> : step_completed == "" ? "Forbidden" : null }
+                    </section> 
+                     : step_completed == "" ? "Forbidden" : null }
                     <Footer />
                     </div>
                     </div>
