@@ -92,11 +92,11 @@ class TwoWheelerVehicleDetails extends Component {
         else if(localStorage.getItem('brandEdit') == '2') {
             localStorage.setItem('newBrandEdit', '2')
         }
-        this.props.history.push(`/two_wheeler_Select-brandTP/${productId}`);
+        this.props.history.push(`/four_wheeler_Select-brandTP/${productId}`);
     }
 
     selectBrand = (productId) => {
-        this.props.history.push(`/two_wheeler_Select-brandTP/${productId}`);
+        this.props.history.push(`/four_wheeler_Select-brandTP/${productId}`);
     }
 
     showClaimText = (value) =>{
@@ -208,7 +208,7 @@ class TwoWheelerVehicleDetails extends Component {
             let decryptResp = JSON.parse(encryption.decrypt(res.data));
             console.log('decryptResp-----', decryptResp)
             if(decryptResp.error == false){
-                this.props.history.push(`/two_wheeler_OtherComprehensiveTP/${productId}`);
+                this.props.history.push(`/four_wheeler_OtherComprehensiveTP/${productId}`);
             }
             else{
                 actions.setSubmitting(false)
@@ -436,8 +436,8 @@ class TwoWheelerVehicleDetails extends Component {
 
                                                     <Row className="m-b-25">
                                                         <Col sm={12} md={7}>
-                                                            <div className="txtRegistr">Two-wheeler Brand<br/>
-                                                                <strong>{vehicleDetails && vehicleDetails.vehiclebrand && vehicleDetails.vehiclebrand.name ? vehicleDetails.vehiclebrand.name : ""}</strong></div>
+                                                            <div className="txtRegistr">Four-wheeler Brand<br/>
+                                                            <strong>{vehicleDetails && vehicleDetails.vehiclebrand && vehicleDetails.vehiclebrand.name ? vehicleDetails.vehiclebrand.name : ""}</strong></div>
                                                         </Col>
 
                                                         <Col sm={12} md={5} className="text-right">
@@ -447,8 +447,8 @@ class TwoWheelerVehicleDetails extends Component {
 
                                                     <Row className="m-b-25">
                                                         <Col sm={12} md={7}>
-                                                            <div className="txtRegistr">Two-wheeler Model<br/>
-                                                                <strong>{vehicleDetails && vehicleDetails.vehiclemodel && vehicleDetails.vehiclemodel.description ? vehicleDetails.vehiclemodel.description+" "+vehicleDetails.varientmodel.varient : ""}</strong></div>
+                                                            <div className="txtRegistr">Four-wheeler Model<br/>
+                                                            <strong>{vehicleDetails && vehicleDetails.vehiclemodel && vehicleDetails.vehiclemodel.description ? vehicleDetails.vehiclemodel.description+" "+vehicleDetails.varientmodel.varient : ""}</strong></div>
                                                         </Col>
 
                                                         <Col sm={12} md={5} className="text-right">

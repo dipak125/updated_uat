@@ -7,7 +7,8 @@ import { loaderStart, loaderStop } from "../../store/actions/loader";
 import Encryption from '../../shared/payload-encryption';
 
 const initialValues = {};
-  
+
+
 
 class Motor extends Component {
 
@@ -22,15 +23,18 @@ class Motor extends Component {
     //       ]
       };
 
+
     buy_policy = (productId) => {
         if(productId == '2'){
-            this.props.history.push(`/Registration/${productId}`);
+         this.props.history.push(`/Registration/${productId}`);      
         }
         else if(productId == '3') {
             this.props.history.push(`/two_wheeler_Select-brandTP/${productId}`)
+            // document.getElementById('bootstrapForm').submit()
         }
         else if(productId == '4') {
             this.props.history.push(`/two_wheeler_Select-brand/${productId}`)
+            // document.getElementById('bootstrapForm').submit()
         }
         else if(productId == '6') {
             this.props.history.push(`/four_wheeler_Select-brandTP/${productId}`)
@@ -43,7 +47,7 @@ class Motor extends Component {
         if(bc_data) {
             bc_data = JSON.parse(encryption.decrypt(bc_data));
         }
-        let bcmaster_id = bc_data ? bc_data.agent_id : ""
+        let bcmaster_id = sessionStorage.getItem('csc_id') ? sessionStorage.getItem('csc_id') : (bc_data ? bc_data.agent_id : "")
         this.props.loadingStart();
         axios.get(`vehicle/types/${bcmaster_id}`)
           .then(res => {
@@ -103,6 +107,11 @@ class Motor extends Component {
                             }
                         </table>
                         : null}
+
+                        <form action="https://secure.sbigeneral.in/SBIGTP/csc/display" target="_self" id="bootstrapForm" method="POST"> `
+                            <input type="hidden" id="csc_id" name="csc_id" value={sessionStorage.getItem('csc_id')}/>
+                            <input type="hidden" id="agent_name" name="agent_name" value={sessionStorage.getItem('agent_name')}/>
+                        </form>
                     </div>
                     </Col>
                   </Row>  

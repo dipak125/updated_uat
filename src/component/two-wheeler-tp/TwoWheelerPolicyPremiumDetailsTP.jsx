@@ -49,7 +49,7 @@ class Premium extends Component {
             relation: [],
             step_completed: "0",
             vehicleDetails: [],
-            policyHolder: []
+            policyHolder: [],
         };
     }
 
@@ -91,6 +91,7 @@ class Premium extends Component {
                 let vehicleDetails = decryptResp.data.policyHolder ? decryptResp.data.policyHolder.vehiclebrandmodel : {};
                 let step_completed = decryptResp.data.policyHolder ? decryptResp.data.policyHolder.step_no : "";
                 let policyHolder = decryptResp.data.policyHolder ? decryptResp.data.policyHolder : [];
+
 
                 this.setState({
                     motorInsurance,vehicleDetails,step_completed,policyHolder,
@@ -240,6 +241,7 @@ class Premium extends Component {
                     </h6>
                 </span>
             ) : null;
+
 
         return (
             <>
@@ -393,7 +395,7 @@ class Premium extends Component {
                                                                                     </Row>
                                                                                 </div>
                                                                             : (<p></p>)}
-                                                                        {motorInsurance.policy_for == '1' ?      
+                                                                        {motorInsurance.policy_for == '1' && motorInsurance.pa_flag == '1' ?      
                                                                             <div>
                                                                             <strong>Nominee Details :</strong>
                                                                                 <br/>
@@ -444,7 +446,7 @@ class Premium extends Component {
                                                                                 </Row>
                                                                             </div> : null }
 
-                                                                            {motorInsurance.policy_for == '1' && nomineedetails && nomineedetails.is_appointee == '1'?      
+                                                                            {motorInsurance.policy_for == '1' && nomineedetails && nomineedetails.is_appointee == '1' && motorInsurance.pa_flag == '1' ?      
                                                                             <div>
                                                                             <strong>Appointee Details :</strong>
                                                                                 <br/>

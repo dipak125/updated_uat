@@ -1,8 +1,11 @@
 import axios from 'axios';
+import Encryption from './payload-encryption';
 
 const instance = axios.create({
     baseURL: process.env.REACT_APP_API_URL
 });
+
+let encryption = new Encryption();
 
 // Add a request interceptor
 
@@ -18,6 +21,7 @@ instance.interceptors.request.use(config => {
 
 // Add a response interceptor
 instance.interceptors.response.use( response => {
+    // response.data = JSON.parse(encryption.decrypt(response.data))
     return response;
 }, error => {
     return Promise.reject(error.response);

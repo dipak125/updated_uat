@@ -26,7 +26,7 @@ class Health extends Component {
         if(bc_data) {
             bc_data = JSON.parse(encryption.decrypt(bc_data));
         }
-        let bcmaster_id = bc_data ? bc_data.agent_id : ""
+        let bcmaster_id = sessionStorage.getItem('csc_id') ? sessionStorage.getItem('csc_id') : (bc_data ? bc_data.agent_id : "")
         this.props.loadingStart();
         axios.get(`health/types/${bcmaster_id}`)
           .then(res => {

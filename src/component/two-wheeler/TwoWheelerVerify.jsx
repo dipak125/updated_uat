@@ -122,10 +122,13 @@ const ComprehensiveValidation = Yup.object().shape({
     .test(
             "validRegistrationChecking",
             function() {
-                return "Please select if you have previous claim"
+                return "Please select previous policy start date"
             },
             function (value) {
                 if (this.parent.lapse_duration == '2' && this.parent.policy_type_id == '3') {
+                    return true
+                }
+                else if(this.parent.policy_type_id == '1' ) {
                     return true
                 }
                 else if(value ) {
@@ -158,10 +161,13 @@ const ComprehensiveValidation = Yup.object().shape({
     .test(
         "validRegistrationChecking",
         function() {
-            return "Please select if you have previous claim"
+            return "Please select previous policy end date"
         },
         function (value) {
             if (this.parent.lapse_duration == '2' && this.parent.policy_type_id == '3') {
+                return true
+            }
+            else if(this.parent.policy_type_id == '1' ) {
                 return true
             }
             else if(value ) {
@@ -193,10 +199,13 @@ const ComprehensiveValidation = Yup.object().shape({
     .test(
         "validRegistrationChecking",
         function() {
-            return "Please select if you have previous claim"
+            return "Please select previous policy type"
         },
         function (value) {
             if (this.parent.lapse_duration == '2' && this.parent.policy_type_id == '3') {
+                return true
+            }
+            else if(this.parent.policy_type_id == '1' ) {
                 return true
             }
             else if(value ) {
@@ -221,10 +230,13 @@ const ComprehensiveValidation = Yup.object().shape({
     .test(
         "validRegistrationChecking",
         function() {
-            return "Please select if you have previous claim"
+            return "Please select Previous insurance company"
         },
         function (value) {
             if (this.parent.lapse_duration == '2' && this.parent.policy_type_id == '3') {
+                return true
+            }
+            else if(this.parent.policy_type_id == '1' ) {
                 return true
             }
             else if(value ) {
@@ -238,10 +250,13 @@ const ComprehensiveValidation = Yup.object().shape({
     .test(
         "validRegistrationChecking",
         function() {
-            return "Please select if you have previous claim"
+            return "Please enter previous city"
         },
         function (value) {
             if (this.parent.lapse_duration == '2' && this.parent.policy_type_id == '3') {
+                return true
+            }
+            else if(this.parent.policy_type_id == '1' ) {
                 return true
             }
             else if(value ) {
@@ -260,10 +275,13 @@ const ComprehensiveValidation = Yup.object().shape({
     .test(
         "validRegistrationChecking",
         function() {
-            return "Please select if you have previous claim"
+            return "Please enter previous policy number"
         },
         function (value) {
             if (this.parent.lapse_duration == '2' && this.parent.policy_type_id == '3') {
+                return true
+            }
+            else if(this.parent.policy_type_id == '1' ) {
                 return true
             }
             else if(value ) {
@@ -617,9 +635,9 @@ class TwoWheelerVerify extends Component {
                                 </div>
                             </FormGroup>
                         <Row>
-                            <Col sm={12} md={9} lg={9}>
+                            <Col sm={12} md={9} lg={8}>
                                 <Row>
-                                <Col sm={12} md={6} lg={4}>
+                                <Col sm={12} md={6} lg={5}>
                                 <Row>
                                     
                                 <Col sm={12} md={5} lg={6}>
@@ -665,8 +683,8 @@ class TwoWheelerVerify extends Component {
                                 </Col>
 
                                 <Col sm={12} md={6} lg={5}>
-                                <Row>
-                                <Col sm={12} md={5} lg={6}>
+                                <Row >
+                                <Col sm={12} md={5} lg={7}>
                                     <FormGroup>
                                         <div className="insurerName">
                                         Please Enter Last 5 digits of Chassis no.
@@ -674,7 +692,7 @@ class TwoWheelerVerify extends Component {
                                     </FormGroup>
                                 </Col>
                                     
-                                <Col sm={12} md={5} lg={6}>
+                                <Col sm={12} md={5} lg={5}>
                                         <FormGroup>
                                             <div className="insurerName">
                                                     <Field

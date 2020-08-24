@@ -261,7 +261,7 @@ const vehicleRegistrationValidation = Yup.object().shape({
     previous_claim_for:Yup.string().when(['previous_is_claim'], {
         is: previous_is_claim => previous_is_claim == '1',       
         then: Yup.string().required('Please provide previous clain for'),
-        othewise: Yup.string()
+        otherwise: Yup.string()
     }),
    
 });
@@ -917,7 +917,7 @@ class VehicleDetails extends Component {
                                                     <Col sm={12} md={5} lg={5}>
                                                         <FormGroup>
                                                             <div className="fs-18">
-                                                                Current No Claim Bonus
+                                                            Select NCB mentioned on last policy
                                                        </div>
                                                         </FormGroup>
                                                     </Col>

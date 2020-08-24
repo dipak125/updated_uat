@@ -279,15 +279,15 @@ class TwoWheelerVerify extends Component {
         else if(localStorage.getItem('brandEdit') == '2') {
             localStorage.setItem('newBrandEdit', '2')
         }
-        this.props.history.push(`/two_wheeler_Select-brandTP/${productId}`);
+        this.props.history.push(`/four_wheeler_Select-brandTP/${productId}`);
     }
 
     selectBrand = (productId) => {
-        this.props.history.push(`/two_wheeler_Select-brandTP/${productId}`);
+        this.props.history.push(`/four_wheeler_Select-brandTP/${productId}`);
     }
 
     otherComprehensive = (productId) => {      
-        this.props.history.push(`/two_wheeler_OtherComprehensiveTP/${productId}`);
+        this.props.history.push(`/four_wheeler_OtherComprehensiveTP/${productId}`);
     }
 
 
@@ -437,7 +437,7 @@ class TwoWheelerVerify extends Component {
             let decryptResp = JSON.parse(encryption.decrypt(res.data));
             console.log('decryptResp-----', decryptResp)
             if (decryptResp.error == false) {
-                this.props.history.push(`/two_wheeler_additional_detailsTP/${productId}`);
+                this.props.history.push(`/four_wheeler_additional_detailsTP/${productId}`);
             }
 
         })
@@ -877,8 +877,8 @@ class TwoWheelerVerify extends Component {
 
                                             <Row className="m-b-25">
                                                 <Col sm={12} md={7}>
-                                                    <div className="txtRegistr">Two-wheeler Brand<br/>
-                                                        <strong>{vehicleDetails && vehicleDetails.vehiclebrand && vehicleDetails.vehiclebrand.name ? vehicleDetails.vehiclebrand.name : ""}</strong></div>
+                                                    <div className="txtRegistr">Four-wheeler Brand<br/>
+                                                    <strong>{vehicleDetails && vehicleDetails.vehiclebrand && vehicleDetails.vehiclebrand.name ? vehicleDetails.vehiclebrand.name : ""}</strong></div>
                                                 </Col>
 
                                                 <Col sm={12} md={5} className="text-right">
@@ -888,8 +888,8 @@ class TwoWheelerVerify extends Component {
 
                                             <Row className="m-b-25">
                                                 <Col sm={12} md={7}>
-                                                    <div className="txtRegistr">Two-wheeler Model<br/>
-                                                        <strong>{vehicleDetails && vehicleDetails.vehiclemodel && vehicleDetails.vehiclemodel.description ? vehicleDetails.vehiclemodel.description+" "+vehicleDetails.varientmodel.varient : ""}</strong></div>
+                                                    <div className="txtRegistr">Four-wheeler Model<br/>
+                                                    <strong>{vehicleDetails && vehicleDetails.vehiclemodel && vehicleDetails.vehiclemodel.description ? vehicleDetails.vehiclemodel.description+" "+vehicleDetails.varientmodel.varient : ""}</strong></div>
                                                 </Col>
 
                                                 <Col sm={12} md={5} className="text-right">

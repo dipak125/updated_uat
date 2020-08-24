@@ -40,26 +40,13 @@ const ComprehensiveValidation = Yup.object().shape({
 });
 
 
-const moreCoverage = [
-    {
-        "id": "B00015",
-        "name": "PA for Owner Driver",
-        "description": "The e-Insurance account or Electronic Insurance Account offers policyholders online space to hold all their insurance policies electronically under one e-insurance account number. This allows the policyholder to access all their policies with a few clicks and no risk of losing the physical insurance policy"
-    },
-    {
-        "id": "B00075",
-        "name": "PA For Unnamed Passenger",
-        "description": "The e-Insurance account or Electronic Insurance Account offers policyholders online space to hold all their insurance policies electronically under one e-insurance account number. This allows the policyholder to access all their policies with a few clicks and no risk of losing the physical insurance policy"
-    }
-    
-]
-
 const Coverage = {
     "B00002": "Own Damage Basic",
     "B00008": "Third Party Bodily Injury",
     "B00013": "Legal Liability to Paid Drivers",
     "B00015": "PA -  Owner Driver",
-    "B00075": "PA for Unnamed Passenger"
+    "B00075": "PA for Unnamed Passenger",
+    "B00009": "Third Party Property Damage Limit",
 }
 
 class TwoWheelerOtherComprehensive extends Component {
@@ -86,7 +73,8 @@ class TwoWheelerOtherComprehensive extends Component {
             policyCoverage: [],
             step_completed: "0",
             vehicleDetails: [],
-            selectFlag: ''
+            selectFlag: '',
+            moreCoverage: []
         };
     }
 
@@ -172,6 +160,23 @@ class TwoWheelerOtherComprehensive extends Component {
             .catch((err) => {
                 this.setState({
                     accessToken: '',
+                });
+                this.props.loadingStop();
+            });
+    };
+
+    getCoverage = () => {
+        this.props.loadingStart();
+        axios
+            .get(`/coverage-list/${localStorage.getItem("policyHolder_id") ? localStorage.getItem("policyHolder_id") : 0}`)
+            .then((res) => {
+                this.setState({
+                    moreCoverage: res.data.data,
+                });
+            })
+            .catch((err) => {
+                this.setState({
+                    moreCoverage: [],
                 });
                 this.props.loadingStop();
             });
@@ -283,7 +288,8 @@ class TwoWheelerOtherComprehensive extends Component {
                 'registration_no': motorInsurance.registration_no,
                 'idv_value': sliderVal ? sliderVal : defaultSliderValue.toString(),
                 'add_more_coverage': add_more_coverage,
-                'pa_cover': values.PA_flag ? values.PA_Cover : "0"
+                'pa_cover': values.PA_flag ? values.PA_Cover : "0",
+                'pa_flag' : values.PA_cover_flag
             }
         }
         else {
@@ -293,6 +299,7 @@ class TwoWheelerOtherComprehensive extends Component {
                 'cng_kit': values.cng_kit,
                 'registration_no': motorInsurance.registration_no,
                 'idv_value': sliderVal ? sliderVal : defaultSliderValue.toString(),
+                'pa_flag' : values.PA_cover_flag
             }
         }
         console.log('post_data', post_data)
@@ -331,6 +338,10 @@ class TwoWheelerOtherComprehensive extends Component {
             if(values == "B00075") {
                 setFieldTouched("PA_flag");
                 setFieldValue("PA_flag", '1');
+            }  
+            if(values == "B00015") {
+                setFieldTouched("PA_cover_flag");
+                setFieldValue("PA_cover_flag", '1');
             }            
         }
         else {
@@ -348,7 +359,11 @@ class TwoWheelerOtherComprehensive extends Component {
                 setFieldValue("PA_flag", '0');
                 setFieldTouched("PA_Cover");
                 setFieldValue("PA_Cover", '');
-            }      
+            } 
+            if(values == "B00015") {
+                setFieldTouched("PA_cover_flag");
+                setFieldValue("PA_cover_flag", '0');
+            }       
         }
         
     }
@@ -356,12 +371,13 @@ class TwoWheelerOtherComprehensive extends Component {
 
     componentDidMount() {
         this.fetchData()
+        this.getCoverage()
     }
 
 
     render() {
         const { vahanDetails, error, policyCoverage, vahanVerify, fulQuoteResp, PolicyArray, motorInsurance, serverResponse, add_more_coverage,
-            step_completed, vehicleDetails, selectFlag, sliderVal} = this.state
+            step_completed, vehicleDetails, selectFlag, sliderVal, moreCoverage} = this.state
         const { productId } = this.props.match.params
         let covList = motorInsurance && motorInsurance.add_more_coverage ? motorInsurance.add_more_coverage.split(",") : ""
         let newInnitialArray = {}
@@ -478,7 +494,7 @@ class TwoWheelerOtherComprehensive extends Component {
                                                     <Row>
                                                         <Col sm={12} md={9} lg={9}>
                                                             <div className="rghtsideTrigr W-90 m-b-30">
-                                                                <Collapsible trigger="Default Covered Coverages & Benefit" >
+                                                                <Collapsible trigger="Default Covered Coverages & Benefit" open={true}>
                                                                     <div className="listrghtsideTrigr">
                                                                     {policyCoverageList}
                                                                     </div>
@@ -551,24 +567,24 @@ class TwoWheelerOtherComprehensive extends Component {
                                                                         <Field
                                                                             type="checkbox"
                                                                             // name={`moreCov_${qIndex}`}
-                                                                            name={coverage.id}
-                                                                            value={coverage.id}
+                                                                            name={coverage.code}
+                                                                            value={coverage.code}
                                                                             className="user-self"
                                                                             // checked={values.roadsideAssistance ? true : false}
                                                                             onClick={(e) =>{
-                                                                                if( e.target.checked == false && values[coverage.id] == 'B00015') {
+                                                                                if( e.target.checked == false && values[coverage.code] == 'B00015') {
                                                                                     swal("This cover is mandated by IRDAI, it is compulsory for Owner-Driver to possess a PA cover of minimum Rs 15 Lacs, except in certain conditions. By not choosing this cover, you confirm that you hold an existing PA cover or you do not possess a valid driving license.")
                                                                                 }
                                                                                 this.onRowSelect(e.target.value, e.target.checked, setFieldTouched, setFieldValue)         
                                                                             }
                                                                             }
-                                                                            checked = {values[coverage.id] == coverage.id ? true : false}
+                                                                            checked = {values[coverage.code] == coverage.code ? true : false}
                                                                         />
                                                                         <span className="checkmark mL-0"></span>
                                                                         <span className="error-message"></span>
                                                                     </label>
                                                                 </Col>
-                                                                {values.PA_flag == '1' && values[coverage.id] == 'B00075' ?
+                                                                {values.PA_flag == '1' && values[coverage.code] == 'B00075' ?
                                                                     <Col sm={12} md={11} lg={3} key={qIndex+"b"}>
                                                                         <FormGroup>
                                                                             <div className="formSection">

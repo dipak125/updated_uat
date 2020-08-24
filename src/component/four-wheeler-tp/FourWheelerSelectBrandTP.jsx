@@ -13,6 +13,7 @@ import { connect } from "react-redux";
 import swal from 'sweetalert';
 import ScrollArea from 'react-scrollbar';
 import Encryption from '../../shared/payload-encryption';
+import fuel from '../common/FuelTypes';
 
 
 
@@ -28,11 +29,6 @@ const initialValues = {
 
 
 };
-
-const fuel = {
-    1: 'Petrol',
-    2: 'Diesel'
-}
 
 
 const vehicleValidation = Yup.object().shape({
@@ -144,7 +140,7 @@ class TwoWheelerSelectBrand extends Component {
         const {vehicleDetails} = this.state
         let brandId = vehicleDetails && vehicleDetails.vehiclebrand_id ? vehicleDetails.vehiclebrand_id : ""
         return new Promise(resolve => {
-            axios.get(`vehicle/brand-with-image`)
+            axios.get(`vehicle/brand-with-image/3`)
                 .then(res => {
                     let brandList = res && res.data.data.list ? res.data.data.list : []
                     this.setState({
@@ -170,9 +166,8 @@ class TwoWheelerSelectBrand extends Component {
 
     getOtherBrands = () => {
         let encryption = new Encryption();
-        let policyHolder_id = localStorage.getItem("policyHolder_id") ? localStorage.getItem("policyHolder_id") : 0;
         this.props.loadingStart();
-        axios.get(`two-wh/without-image/1`).then(res => {
+        axios.get(`two-wh/without-image/3`).then(res => {
             let decryptResp = JSON.parse(encryption.decrypt(res.data));
             console.log('decryptResp_otherBrand', decryptResp)
 
@@ -229,10 +224,10 @@ class TwoWheelerSelectBrand extends Component {
 
 
     registration = (productId) => {
-        this.props.history.push(`/two_wheeler_Select-brandTP/${productId}`);
+        this.props.history.push(`/four_wheeler_Select-brandTP/${productId}`);
     }
     selectVehicle = (productId) => {
-        this.props.history.push(`/two_wheeler_Select-brandTP/${productId}`);
+        this.props.history.push(`/four_wheeler_Select-brandTP/${productId}`);
     }
     selectBrand = (productId) => {
         const {selectedBrandId , vehicleDetails, otherBrands} = this.state
@@ -367,7 +362,7 @@ class TwoWheelerSelectBrand extends Component {
                         localStorage.setItem('brandEdit', 1)
                         localStorage.removeItem('newBrandEdit')
                     }
-                    this.props.history.push(`/two_wheeler_Vehicle_detailsTP/${productId}`);
+                    this.props.history.push(`/four_wheeler_Vehicle_detailsTP/${productId}`);
                 }
                 else {
                     swal(decryptResp.msg)
@@ -434,7 +429,7 @@ class TwoWheelerSelectBrand extends Component {
                         localStorage.setItem('brandEdit', 1)
                         localStorage.removeItem('newBrandEdit')
                     }
-                    this.props.history.push(`/two_wheeler_Vehicle_detailsTP/${productId}`);
+                    this.props.history.push(`/four_wheeler_Vehicle_detailsTP/${productId}`);
                 }
                 else {
                     swal(decryptResp.msg)
@@ -538,7 +533,7 @@ class TwoWheelerSelectBrand extends Component {
                                                     <div className="brand-bg">
                                                         <div className="d-flex justify-content-left">
                                                             <div className="brandhead"> 
-                                                            <p>Taking 2-Wheeler policy for</p>
+                                                            <p>Taking 4-Wheeler policy for</p>
                                                                 <div className="d-inline-flex m-b-15">
                                                                     <div className="p-r-25">
                                                                         <label className="customRadio3">
@@ -716,7 +711,7 @@ class TwoWheelerSelectBrand extends Component {
 
 
                                                                     <div className="d-flex justify-content-between flex-lg-row flex-md-column m-b-25">
-                                                                        <div className="txtRegistr resmb-15">Two-wheeler Brand
+                                                                        <div className="txtRegistr resmb-15">Car Brand
                                                                             - <strong>{brandName ? brandName : (vehicleDetails && vehicleDetails.vehiclebrand && vehicleDetails.vehiclebrand.name ? vehicleDetails.vehiclebrand.name : "")}</strong>
                                                                         </div>
 
@@ -724,7 +719,7 @@ class TwoWheelerSelectBrand extends Component {
                                                                     </div>
 
                                                                     <div className="d-flex justify-content-between flex-lg-row flex-md-column m-b-25">
-                                                                        <div className="txtRegistr">Two-wheeler Model<br />
+                                                                        <div className="txtRegistr">Car Model<br />
                                                                             <strong>{modelName ? modelName : (selectedBrandId ? "" : vehicleDetails && vehicleDetails.vehiclemodel && vehicleDetails.vehiclemodel.description ? vehicleDetails.vehiclemodel.description+" "+vehicleDetails.varientmodel.varient : "")}</strong></div>
 
                                                                         <div> <button type="button" className="rgistrBtn" onClick={this.selectBrand.bind(this, productId)}>Edit</button></div>
@@ -759,7 +754,7 @@ class TwoWheelerSelectBrand extends Component {
                         <div className="cntrbody">
                             <h3>Select Model </h3>
                             {selectedBrandDetails.image ?
-                                <img src={`${process.env.REACT_APP_PAYMENT_URL}/core/public/image/car_brand_image/` + selectedBrandDetails.image} alt={selectedBrandDetails.name} /> : <img src={require('../../assets/images/car.svg')} alt="" />     
+                                <img src={`${process.env.REACT_APP_PAYMENT_URL}/core/public/image/car_brand_image/` + selectedBrandDetails.image} alt={selectedBrandDetails.name} /> : null     
                             }
                         </div>
                     </Modal.Header>

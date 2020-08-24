@@ -121,7 +121,7 @@ class TwoWheelerOtherComprehensive extends Component {
     }
 
     vehicleDetails = (productId) => {
-        this.props.history.push(`/two_wheeler_Vehicle_detailsTP/${productId}`);
+        this.props.history.push(`/four_wheeler_Vehicle_detailsTP/${productId}`);
     }
 
 
@@ -300,7 +300,7 @@ class TwoWheelerOtherComprehensive extends Component {
             let decryptResp = JSON.parse(encryption.decrypt(res.data));
             console.log('decryptResp---', decryptResp)
             if (decryptResp.error == false) {
-                this.props.history.push(`/two_wheeler_verifyTP/${productId}`);
+                this.props.history.push(`/four_wheeler_verifyTP/${productId}`);
             }
 
         })

@@ -64,7 +64,9 @@ const ownerValidation = Yup.object().shape({
         .matches(/^[a-zA-Z]+([\s]?[a-zA-Z]+)([\s]?[a-zA-Z]+)$/, function() {
             return "Please enter valid name"
         }),
-        otherwise: Yup.string().required('Company name is required')
+        otherwise: Yup.string().required('Company name is required').min(3, function() {
+            return "Company name must be min 3 chracters"
+        })
     }),
 
 
@@ -127,53 +129,67 @@ const ownerValidation = Yup.object().shape({
 
     nominee_relation_with: Yup.string().when(['policy_for'], {
         is: policy_for => policy_for == '1',       
-        then: Yup.string().required('Nominee relation is required'),
+        then: Yup.string().when(['pa_flag'], {
+            is: pa_flag => pa_flag == '1',       
+            then:Yup.string().required('Please select nominee relation'),
+            otherwise: Yup.string().nullable()
+        }),
         otherwise: Yup.string().nullable()
     }),
 
     nominee_first_name: Yup.string().when(['policy_for'], {
         is: policy_for => policy_for == '1',       
-        then: Yup.string().required('Nominee name is required')
-            .min(3, function() {
-                return "Name must be minimum 3 chracters"
-            })
-            .max(40, function() {
-                return "Name must be maximum 40 chracters"
-            })
-            .matches(/^[a-zA-Z]+([\s]?[a-zA-Z]+)([\s]?[a-zA-Z]+)$/, function() {
-                return "Please enter valid name"
-            }),
+        then: Yup.string().when(['pa_flag'], {
+            is: pa_flag => pa_flag == '1',       
+            then: Yup.string().required('Nominee name is required')
+                .min(3, function() {
+                    return "Name must be minimum 3 chracters"
+                })
+                .max(40, function() {
+                    return "Name must be maximum 40 chracters"
+                })
+                .matches(/^[a-zA-Z]+([\s]?[a-zA-Z]+)([\s]?[a-zA-Z]+)$/, function() {
+                    return "Please enter valid name"
+                }),
+            otherwise: Yup.string().nullable()
+        }),
         otherwise: Yup.string().nullable()
     }),
 
-        // nominee_last_name:Yup.string().required('Nominee last name is required'), 
-
     nominee_gender: Yup.string().when(['policy_for'], {
         is: policy_for => policy_for == '1',       
-        then: Yup.string().required('Nominee gender is required')
-            .matches(/^[MmFf]$/, function() {
-                return "Please select valid gender"
+        then: Yup.string().when(['pa_flag'], {
+            is: pa_flag => pa_flag == '1',       
+            then: Yup.string().required('Nominee gender is required')
+                .matches(/^[MmFf]$/, function() {
+                    return "Please select valid gender"
+                }),
+            otherwise: Yup.string()
             }),
         otherwise: Yup.string()
     }),
 
     nominee_dob: Yup.date().when(['policy_for'], {
-        is: policy_for => policy_for == '1', 
-        then: Yup.date().required('Nominee DOB is required')
-            .test(
-                "3monthsChecking",
-                function() {
-                    return "Age should be minium 3 months"
-                },
-                function (value) {
-                    if (value) {
-                        const ageObj = new PersonAge();
-                        return ageObj.whatIsMyAge(value) <= 100 && ageObj.whatIsMyAgeMonth(value) >= 3;
+        is: policy_for => policy_for == '1',       
+        then: Yup.date().when(['pa_flag'], {
+            is: pa_flag => pa_flag == '1', 
+            then: Yup.date().required('Nominee DOB is required')
+                .test(
+                    "3monthsChecking",
+                    function() {
+                        return "Age should be minium 3 months"
+                    },
+                    function (value) {
+                        if (value) {
+                            const ageObj = new PersonAge();
+                            return ageObj.whatIsMyAge(value) <= 100 && ageObj.whatIsMyAgeMonth(value) >= 3;
+                        }
+                        return true;
                     }
-                    return true;
-                }
-            ),
-        otherwise: Yup.date()
+                ),
+            otherwise: Yup.date()
+            }),
+        otherwise: Yup.date()   
     }),
     
     is_eia_account: Yup.string().required('This field is required'),
@@ -198,51 +214,59 @@ const ownerValidation = Yup.object().shape({
         }).matches(/^[1245][0-9]{0,13}$/,'Please enter valid EIA no').notRequired('EIA no is required'),
 
     appointee_name: Yup.string().when(['policy_for'], {
-        is: policy_for => policy_for == '1', 
-        then:  Yup.string().notRequired(function() {
-                return "Please enter appointee name"
-                })
-                .min(3, function() {
-                    return "Name must be minimum 3 chracters"
-                })
-                .max(40, function() {
-                    return "Name must be maximum 40 chracters"
-                })        
-                .matches(/^[a-zA-Z]+([\s]?[a-zA-Z]+)([\s]?[a-zA-Z]+)$/, function() {
-                    return "Please enter valid name"
-                }).test(
-                    "18YearsChecking",
-                    function() {
-                        return "Please enter appointee name"
-                    },
-                    function (value) {
-                        const ageObj = new PersonAge();
-                        if (ageObj.whatIsMyAge(this.parent.nominee_dob) < 18 && !value) {   
-                            return false  
+        is: policy_for => policy_for == '1',       
+        then: Yup.string().when(['pa_flag'], {
+            is: pa_flag => pa_flag == '1', 
+            then:  Yup.string().notRequired(function() {
+                    return "Please enter appointee name"
+                    })
+                    .min(3, function() {
+                        return "Name must be minimum 3 chracters"
+                    })
+                    .max(40, function() {
+                        return "Name must be maximum 40 chracters"
+                    })        
+                    .matches(/^[a-zA-Z]+([\s]?[a-zA-Z]+)([\s]?[a-zA-Z]+)$/, function() {
+                        return "Please enter valid name"
+                    }).test(
+                        "18YearsChecking",
+                        function() {
+                            return "Please enter appointee name"
+                        },
+                        function (value) {
+                            const ageObj = new PersonAge();
+                            if (ageObj.whatIsMyAge(this.parent.nominee_dob) < 18 && !value) {   
+                                return false  
+                            }
+                            return true;
                         }
-                        return true;
-                    }
-                ),
+                    ),
+            otherwise: Yup.string().nullable()
+            }),
         otherwise: Yup.string().nullable()
     }),
 
     appointee_relation_with: Yup.string().when(['policy_for'], {
-        is: policy_for => policy_for == '1', 
-        then: Yup.string().notRequired(function() {
-                return "Please select relation"
-                }).test(
-                    "18YearsChecking",
-                    function() {
-                        return 'Apppointee relation is required'
-                    },
-                    function (value) {
-                        const ageObj = new PersonAge();
-                        if (ageObj.whatIsMyAge(this.parent.nominee_dob) < 18 && !value) {   
-                            return false;    
+        is: policy_for => policy_for == '1',       
+        then: Yup.string().when(['pa_flag'], {
+            is: pa_flag => pa_flag == '1', 
+            then: Yup.string().notRequired(function() {
+                    return "Please select relation"
+                    }).test(
+                        "18YearsChecking",
+                        function() {
+                            return 'Apppointee relation is required'
+                        },
+                        function (value) {
+                            const ageObj = new PersonAge();
+                            if (ageObj.whatIsMyAge(this.parent.nominee_dob) < 18 && !value) {   
+                                return false;    
+                            }
+                            return true;
                         }
-                        return true;
-                    }
-                ),
+                    ),
+            otherwise: Yup.string().nullable()
+            }),
         otherwise: Yup.string().nullable()
     }),
 
@@ -263,6 +287,38 @@ const ownerValidation = Yup.object().shape({
         then: Yup.string().required('GSTIN is required')
             .matches(/^[0-9]{2}[A-Z]{3}[CPHFATBLJG]{1}[A-Z]{1}[0-9]{4}[A-Z]{1}[0-9]{1}[A-Z]{1}[0-9]{1}$/,'Invalid GSTIN'),
         otherwise: Yup.string().nullable()
+    }),
+
+    is_carloan: Yup.mixed().required('This field is required'),
+    bank_name:Yup.string().notRequired('Bank Name is required')
+    .test(
+        "isLoanChecking",
+        function() {
+            return "Please enter bank name"
+        },
+        function (value) {
+            if (this.parent.is_carloan == 1 && !value) {   
+                return false;    
+            }
+            return true;
+        }
+    ).matches(/^[A-Za-z][A-Za-z\s]*$/, function() {
+        return "Please enter bank name"
+    }),
+    bank_branch: Yup.string().notRequired('Bank branch is required')
+    .test(
+        "isLoanChecking",
+        function() {
+            return "Please enter bank branch"
+        },
+        function (value) {
+            if (this.parent.is_carloan == 1 && !value) {   
+                return false;    
+            }
+            return true;
+        }
+    ).matches(/^[A-Za-z][A-Za-z\s]*$/, function() {
+        return "Please enter bank branch"
     }),
 })
 
@@ -372,7 +428,7 @@ class TwoWheelerAdditionalDetails extends Component {
             'address': values['address'],          
             'gstn_no': values['gstn_no']
         }
-        if(motorInsurance.policy_for == '1'){
+        if(motorInsurance.policy_for == '1' && motorInsurance.pa_flag == '1'){
             post_data['dob'] = moment(values['dob']).format("YYYY-MM-DD")
             post_data['nominee_relation_with'] = values['nominee_relation_with']
             post_data['nominee_first_name'] = values['nominee_first_name']
@@ -383,6 +439,10 @@ class TwoWheelerAdditionalDetails extends Component {
             post_data['appointee_relation_with'] = values['appointee_relation_with']
             post_data['is_appointee'] = this.state.is_appointee
             post_data['gender']= values['gender']
+        }
+        else if(motorInsurance.policy_for == '1' && motorInsurance.pa_flag == '0') {
+            post_data['gender']= values['gender']
+            post_data['dob'] = moment(values['dob']).format("YYYY-MM-DD")
         }
         else {
             post_data['gender']= "cc"
@@ -535,7 +595,7 @@ class TwoWheelerAdditionalDetails extends Component {
    
 
     render() {
-        const {showEIA, is_eia_account, is_loan_account, nomineeDetails, motorInsurance,appointeeFlag, is_appointee,
+        const {showLoan, is_eia_account, is_loan_account, nomineeDetails, motorInsurance,appointeeFlag, is_appointee,
             bankDetails,policyHolder, stateName, pinDataArr, quoteId, addressDetails, relation,step_completed,vehicleDetails} = this.state
         const {productId} = this.props.match.params 
 
@@ -600,6 +660,95 @@ class TwoWheelerAdditionalDetails extends Component {
                                 <div className="d-flex justify-content-left brandhead">
                                 {quoteNumber}
                                 </div>
+
+                                 <div className="d-flex justify-content-left carloan">
+                                    <h4> Taken Car Loan</h4>
+                                </div>
+                                <Row>
+                                    <Col sm={12} md={4} lg={4}>
+                                        <div className="d-inline-flex m-b-35">
+                                            <div className="p-r-25">
+                                                <label className="customRadio3">
+                                                <Field
+                                                    type="radio"
+                                                    name='is_carloan'                                            
+                                                    value='1'
+                                                    key='1'  
+                                                    onChange={(e) => {
+                                                        setFieldValue(`is_carloan`, e.target.value);
+                                                        this.showLoanText(1);
+                                                    }}
+                                                    checked={values.is_carloan == '1' ? true : false}
+                                                />
+                                                    <span className="checkmark " /><span className="fs-14"> Yes</span>
+                                                </label>
+                                            </div>
+
+                                            <div className="">
+                                                <label className="customRadio3">
+                                                <Field
+                                                    type="radio"
+                                                    name='is_carloan'                                            
+                                                    value='0'
+                                                    key='1'  
+                                                    onChange={(e) => {
+                                                        setFieldValue(`is_carloan`, e.target.value); 
+                                                        this.showLoanText(0);  
+                                                    }}
+                                                    checked={values.is_carloan == '0' ? true : false}
+                                                />
+                                                    <span className="checkmark" />
+                                                    <span className="fs-14">No</span>
+                                                </label>
+                                                {errors.is_carloan && touched.is_carloan ? (
+                                                <span className="errorMsg">{errors.is_carloan}</span>
+                                                ) : null}
+                                            </div>
+                                        </div>
+                                    </Col>
+                                    {showLoan || is_loan_account == 1 ?
+                                    <Fragment>
+                                    <Col sm={12} md={4} lg={4}>
+                                        <FormGroup>
+                                            <div className="insurerName">
+                                            <Field
+                                                    name='bank_name'
+                                                    type="text"
+                                                    placeholder="Bank Name"
+                                                    autoComplete="off"
+                                                    onFocus={e => this.changePlaceHoldClassAdd(e)}
+                                                    onBlur={e => this.changePlaceHoldClassRemove(e)}
+                                                    value = {values.bank_name}                                                                            
+                                            />
+                                                {errors.bank_name && touched.bank_name ? (
+                                            <span className="errorMsg">{errors.bank_name}</span>
+                                            ) : null}
+                                            </div>
+                                        </FormGroup>
+                                    </Col> 
+                                    <Col sm={12} md={4} lg={4}>
+                                        <FormGroup>
+                                            <div className="insurerName">
+                                            <Field
+                                                    name='bank_branch'
+                                                    type="text"
+                                                    placeholder="Bank Branch"
+                                                    autoComplete="off"
+                                                    onFocus={e => this.changePlaceHoldClassAdd(e)}
+                                                    onBlur={e => this.changePlaceHoldClassRemove(e)}
+                                                    value = {values.bank_branch}                                                                            
+                                            />
+                                                {errors.bank_branch && touched.bank_branch ? (
+                                            <span className="errorMsg">{errors.bank_branch}</span>
+                                            ) : null} 
+                                            </div>
+                                        </FormGroup>
+                                    </Col>
+                                    </Fragment>: ''}
+                                </Row>
+                                <Row>
+                                    <Col>&nbsp;</Col>
+                                </Row>
 
                                 <div className="d-flex justify-content-left carloan">
                                     <h4> Owners Details</h4>
@@ -913,7 +1062,7 @@ class TwoWheelerAdditionalDetails extends Component {
                                 <div className="d-flex justify-content-left carloan">
                                     <h4> </h4>
                                 </div>
-                                {motorInsurance && motorInsurance.policy_for == '1' ?
+                                {motorInsurance && motorInsurance.policy_for == '1' && motorInsurance.pa_flag == '1' ?
                                 <Fragment>
                                 <div className="d-flex justify-content-left carloan">
                                     <h4> Nominee Details</h4>
@@ -1163,7 +1312,7 @@ class TwoWheelerAdditionalDetails extends Component {
                         </Formik>
                     </div>
                 </section> 
-                : step_completed == "" ? "Forbidden" : null } 
+                : step_completed == "" ? "Forbidden" : null }
                 </div>
                 <Footer />
                 </div>

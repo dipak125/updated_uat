@@ -336,7 +336,7 @@ class TwoWheelerAdditionalDetails extends Component {
     }
 
     otherComprehensive = (productId) => {
-        this.props.history.push(`/two_wheeler_verifyTP/${productId}`);
+        this.props.history.push(`/four_wheeler_verifyTP/${productId}`);
     }
 
 
@@ -392,7 +392,7 @@ class TwoWheelerAdditionalDetails extends Component {
             console.log('decryptResp-----', decryptResp)
             this.props.loadingStop();
             if (decryptResp.error == false) {
-            this.props.history.push(`/two_wheeler_policy_premium_detailsTP/${productId}`);
+            this.props.history.push(`/four_wheeler_policy_premium_detailsTP/${productId}`);
             }
         })
         .catch(err => { 
@@ -921,7 +921,7 @@ class TwoWheelerAdditionalDetails extends Component {
                                             <Field
                                                 name='nominee_first_name'
                                                 type="text"
-                                                placeholder="FirstName LastName"
+                                                placeholder="Nominee Name"
                                                 autoComplete="off"
                                                 onFocus={e => this.changePlaceHoldClassAdd(e)}
                                                 onBlur={e => this.changePlaceHoldClassRemove(e)}
@@ -1149,7 +1149,7 @@ class TwoWheelerAdditionalDetails extends Component {
                             </Col>
 
                             <Col sm={12} md={3} lg={3}>
-                                <div className="motrcar"><img src={require('../../assets/images/two-wheeler-addl.svg')} alt="" /></div>
+                                <div className="motrcar"><img src={require('../../assets/images/motor-car.svg')} alt="" /></div>
                             </Col>
                         </Row>
                         </Form>

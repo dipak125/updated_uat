@@ -394,7 +394,7 @@ class Premium extends Component {
                                                                                     </Row>
                                                                                 </div>
                                                                             : (<p></p>)}
-                                                                        {motorInsurance.policy_for == '1' ?      
+                                                                         {motorInsurance.policy_for == '1' && motorInsurance.pa_flag == '1' ?          
                                                                             <div>
                                                                             <strong>Nominee Details :</strong>
                                                                                 <br/>
@@ -445,7 +445,7 @@ class Premium extends Component {
                                                                                 </Row>
                                                                             </div> : null }
 
-                                                                            {motorInsurance.policy_for == '1' && nomineedetails && nomineedetails.is_appointee == '1'?      
+                                                                            {motorInsurance.policy_for == '1' && nomineedetails && nomineedetails.is_appointee == '1' && motorInsurance.pa_flag == '1' ?      
                                                                             <div>
                                                                             <strong>Appointee Details :</strong>
                                                                                 <br/>

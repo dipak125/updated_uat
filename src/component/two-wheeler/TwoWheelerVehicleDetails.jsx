@@ -203,7 +203,7 @@ class TwoWheelerVehicleDetails extends Component {
     handleSubmit = (values, actions) => {
         const {productId} = this.props.match.params 
         const {motorInsurance} = this.state
-        let policy_type = ageObj.whatIsCurrentMonth(values.registration_date) < 7 ? 6 : 1
+        let policy_type = ageObj.whatIsCurrentMonth(values.registration_date) < 6 ? 6 : 1
         let newPolStartDate = addDays(new Date(), 1)           
         let newPolEndDate = addDays(new Date(newPolStartDate), 364) 
         let vehicleAge = Math.floor(moment().diff(values.registration_date, 'months', true))
@@ -613,12 +613,12 @@ class TwoWheelerVehicleDetails extends Component {
                                                                     />
                                                                         <span className="checkmark" />
                                                                         <span className="fs-14">50</span>
-                                                                    </label>
-                                                                    {errors.previous_claim_bonus && touched.previous_claim_bonus ? (
+                                                                    </label>                                      
+                                                                </div>     
+                                                            </div>
+                                                            {errors.previous_claim_bonus && touched.previous_claim_bonus ? (
                                                                     <span className="errorMsg">{errors.previous_claim_bonus}</span>
                                                                 ) : null}
-                                                                </div>
-                                                            </div>
                                                         </FormGroup>
                                                     </Col>
                                                 </Row>

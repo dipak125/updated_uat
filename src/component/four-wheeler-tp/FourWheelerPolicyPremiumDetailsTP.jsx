@@ -513,7 +513,7 @@ class Premium extends Component {
 
 
                                                         <Col sm={12} md={3} lg={3}>
-                                                            <div className="motrcar"><img src={require('../../assets/images/two-wheeler-addl.svg')} alt="" /></div>
+                                                            <div className="motrcar"><img src={require('../../assets/images/motor-car.svg')} alt="" /></div>
                                                         </Col>
                                                     </Row>
                                                 </section>
