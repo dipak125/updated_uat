@@ -129,19 +129,35 @@ const ownerValidation = Yup.object().shape({
 
     nominee_relation_with: Yup.string().when(['policy_for'], {
         is: policy_for => policy_for == '1',       
-        then: Yup.string().when(['pa_flag'], {
-            is: pa_flag => pa_flag == '1',       
-            then:Yup.string().required('Please select nominee relation'),
-            otherwise: Yup.string().nullable()
-        }),
+        then:  Yup.string()
+                .test(
+                    "18YearsChecking",
+                    function() {
+                        return "Please select nominee relation"
+                    },
+                    function (value) {
+                        if (this.parent.pa_flag == 1 && !value) {
+                            return false
+                        }
+                        return true;
+                }),
         otherwise: Yup.string().nullable()
     }),
 
     nominee_first_name: Yup.string().when(['policy_for'], {
         is: policy_for => policy_for == '1',       
-        then: Yup.string().when(['pa_flag'], {
-            is: pa_flag => pa_flag == '1',       
-            then: Yup.string().required('Nominee name is required')
+        then: Yup.string()
+                .test(
+                    "18YearsChecking",
+                    function() {
+                        return "Nominee name is required"
+                    },
+                    function (value) {
+                        if (this.parent.pa_flag == 1 && !value) {
+                            return false
+                        }
+                        return true;
+                })
                 .min(3, function() {
                     return "Name must be minimum 3 chracters"
                 })
@@ -151,29 +167,40 @@ const ownerValidation = Yup.object().shape({
                 .matches(/^[a-zA-Z]+([\s]?[a-zA-Z]+)([\s]?[a-zA-Z]+)$/, function() {
                     return "Please enter valid name"
                 }),
-            otherwise: Yup.string().nullable()
-        }),
         otherwise: Yup.string().nullable()
     }),
 
     nominee_gender: Yup.string().when(['policy_for'], {
         is: policy_for => policy_for == '1',       
-        then: Yup.string().when(['pa_flag'], {
-            is: pa_flag => pa_flag == '1',       
-            then: Yup.string().required('Nominee gender is required')
-                .matches(/^[MmFf]$/, function() {
-                    return "Please select valid gender"
+        then: Yup.string()
+                .test(
+                    "18YearsChecking",
+                    function() {
+                        return "Nominee gender is required"
+                    },
+                    function (value) {
+                        if (this.parent.pa_flag == 1 && !value) {
+                            return false
+                        }
+                        return true;
                 }),
-            otherwise: Yup.string()
-            }),
         otherwise: Yup.string()
     }),
 
     nominee_dob: Yup.date().when(['policy_for'], {
         is: policy_for => policy_for == '1',       
-        then: Yup.date().when(['pa_flag'], {
-            is: pa_flag => pa_flag == '1', 
-            then: Yup.date().required('Nominee DOB is required')
+        then: Yup.date()
+                .test(
+                    "18YearsChecking",
+                    function() {
+                        return "Nominee gender is required"
+                    },
+                    function (value) {
+                        if (this.parent.pa_flag == 1 && !value) {
+                            return false
+                        }
+                        return true;
+                })
                 .test(
                     "3monthsChecking",
                     function() {
@@ -187,8 +214,6 @@ const ownerValidation = Yup.object().shape({
                         return true;
                     }
                 ),
-            otherwise: Yup.date()
-            }),
         otherwise: Yup.date()   
     }),
     
@@ -215,58 +240,47 @@ const ownerValidation = Yup.object().shape({
 
     appointee_name: Yup.string().when(['policy_for'], {
         is: policy_for => policy_for == '1',       
-        then: Yup.string().when(['pa_flag'], {
-            is: pa_flag => pa_flag == '1', 
-            then:  Yup.string().notRequired(function() {
-                    return "Please enter appointee name"
-                    })
-                    .min(3, function() {
-                        return "Name must be minimum 3 chracters"
-                    })
-                    .max(40, function() {
-                        return "Name must be maximum 40 chracters"
-                    })        
-                    .matches(/^[a-zA-Z]+([\s]?[a-zA-Z]+)([\s]?[a-zA-Z]+)$/, function() {
-                        return "Please enter valid name"
-                    }).test(
-                        "18YearsChecking",
-                        function() {
-                            return "Please enter appointee name"
-                        },
-                        function (value) {
-                            const ageObj = new PersonAge();
-                            if (ageObj.whatIsMyAge(this.parent.nominee_dob) < 18 && !value) {   
-                                return false  
-                            }
-                            return true;
+        then: Yup.string().notRequired("Please enter appointee name")
+                .min(3, function() {
+                    return "Name must be minimum 3 chracters"
+                })
+                .max(40, function() {
+                    return "Name must be maximum 40 chracters"
+                })        
+                .matches(/^[a-zA-Z]+([\s]?[a-zA-Z]+)([\s]?[a-zA-Z]+)$/, function() {
+                    return "Please enter valid name"
+                }).test(
+                    "18YearsChecking",
+                    function() {
+                        return "Please enter appointee name"
+                    },
+                    function (value) {
+                        const ageObj = new PersonAge();
+                        if (ageObj.whatIsMyAge(this.parent.nominee_dob) < 18 && this.parent.pa_flag == 1 && !value) {   
+                            return false  
                         }
-                    ),
-            otherwise: Yup.string().nullable()
-            }),
+                        return true;
+                    }
+                ),
         otherwise: Yup.string().nullable()
     }),
 
     appointee_relation_with: Yup.string().when(['policy_for'], {
         is: policy_for => policy_for == '1',       
-        then: Yup.string().when(['pa_flag'], {
-            is: pa_flag => pa_flag == '1', 
-            then: Yup.string().notRequired(function() {
-                    return "Please select relation"
-                    }).test(
-                        "18YearsChecking",
-                        function() {
-                            return 'Apppointee relation is required'
-                        },
-                        function (value) {
-                            const ageObj = new PersonAge();
-                            if (ageObj.whatIsMyAge(this.parent.nominee_dob) < 18 && !value) {   
-                                return false;    
-                            }
-                            return true;
+        then: Yup.string().notRequired("Please select relation")
+                .test(
+                    "18YearsChecking",
+                    function() {
+                        return 'Apppointee relation is required'
+                    },
+                    function (value) {
+                        const ageObj = new PersonAge();
+                        if (ageObj.whatIsMyAge(this.parent.nominee_dob) < 18 && this.parent.pa_flag == 1 && !value) {   
+                            return false;    
                         }
-                    ),
-            otherwise: Yup.string().nullable()
-            }),
+                        return true;
+                    }
+                ),
         otherwise: Yup.string().nullable()
     }),
 
@@ -612,7 +626,7 @@ class TwoWheelerAdditionalDetails extends Component {
             bank_branch: bankDetails ? bankDetails.bank_branch : "",
             nominee_relation_with: nomineeDetails && nomineeDetails.relation_with ? nomineeDetails.relation_with.toString() : "",
             nominee_first_name: nomineeDetails && nomineeDetails.first_name ? nomineeDetails.first_name : "",
-            nominee_gender: nomineeDetails && nomineeDetails.gender ? nomineeDetails.gender : "cc",
+            nominee_gender: nomineeDetails && nomineeDetails.gender ? nomineeDetails.gender : "",
             nominee_dob: nomineeDetails && nomineeDetails.dob ? new Date(nomineeDetails.dob) : "",
             gstn_no: policyHolder && policyHolder.gstn_no ? policyHolder.gstn_no : "",
             phone: policyHolder && policyHolder.mobile ? policyHolder.mobile : "",
@@ -621,6 +635,7 @@ class TwoWheelerAdditionalDetails extends Component {
             // is_eia_account:  is_eia_account,
             eia_no: policyHolder && policyHolder.eia_no ? policyHolder.eia_no : "",
             policy_for : motorInsurance ? motorInsurance.policy_for : "",
+            pa_flag : motorInsurance ? motorInsurance.pa_flag : 0,
             appointee_relation_with: nomineeDetails && nomineeDetails.appointee_relation_with ? nomineeDetails.appointee_relation_with : "",
             appointee_name: nomineeDetails && nomineeDetails.appointee_name ? nomineeDetails.appointee_name : "",
             date_of_incorporation: policyHolder && policyHolder.date_of_incorporation ? new Date(policyHolder.date_of_incorporation) : "",
