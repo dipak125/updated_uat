@@ -36,25 +36,32 @@ const vehicleValidation = Yup.object().shape({
     policy_for: Yup.string().required("Please select policy for indivudal or corporate"),
     check_registration: Yup.string().notRequired(),  
 
+    // regNumber: Yup.string().when("check_registration", {
+    //     is: "1",       
+    //     then: Yup.string(),
+    //     otherwise: Yup.string().required('Please provide registration number').matches(/^[A-Z]{2}[ -][0-9]{1,2}[ -][A-Z]{1,3}[ -][0-9]{4}$/, 'Invalid Registration number')
+    //         .test(
+    //             "validRegistrationChecking",
+    //             function() {
+    //                 return "Enter valid registration number"
+    //             },
+    //             function (value) {
+    //                 if (value) {
+    //                     let reg = value.split(" ")
+    //                     if(reg && reg[3]) {
+    //                         return parseInt(reg[3])
+    //                     }
+    //                 }
+    //                 return true;
+    //         })
+    // }),
+
     regNumber: Yup.string().when("check_registration", {
         is: "1",       
         then: Yup.string(),
-        otherwise: Yup.string().required('Please provide registration number').matches(/^[A-Z]{2}[ -][0-9]{1,2}[ -][A-Z]{1,3}[ -][0-9]{4}$/, 'Invalid Registration number')
-            .test(
-                "validRegistrationChecking",
-                function() {
-                    return "Enter valid registration number"
-                },
-                function (value) {
-                    if (value) {
-                        let reg = value.split(" ")
-                        if(reg && reg[3]) {
-                            return parseInt(reg[3])
-                        }
-                    }
-                    return true;
-            })
+        otherwise: Yup.string().required('Please provide registration number').matches(/^[A-Z]{2}[0-9]{2}(?:[A-Z])?(?:[A-Z]*)?[0-9]{4}$/, 'Invalid Registration number')
     }),
+
     lapse_duration: Yup.string().when("policy_type", {
         is: "3",       
         then: Yup.string().required('Please select lapse duration'),
@@ -322,7 +329,7 @@ class TwoWheelerSelectBrand extends Component {
         if(bc_data) {
             bc_data = JSON.parse(encryption.decrypt(bc_data));
         }
-        
+        console.log('bc_data=====', bc_data)
 
         if(policyHolder_id > 0) {
             if(sessionStorage.getItem('csc_id')) {
@@ -358,7 +365,8 @@ class TwoWheelerSelectBrand extends Component {
                     'bcmaster_id': bc_data ? bc_data.agent_id : "",
                     'bc_token': bc_data ? bc_data.token : "",
                     'lapse_duration': values.lapse_duration,
-                    'policy_for': values.policy_for
+                    'policy_for': values.policy_for,
+                    'bc_agent_id': bc_data ? bc_data.user_info.data.user.username : "",
                 }
             }
             console.log('post_data-----', post_data)
@@ -425,7 +433,8 @@ class TwoWheelerSelectBrand extends Component {
                     'bcmaster_id': bc_data ? bc_data.agent_id : "",
                     'bc_token': bc_data ? bc_data.token : "",
                     'lapse_duration': values.lapse_duration,
-                    'policy_for': values.policy_for
+                    'policy_for': values.policy_for,
+                    'bc_agent_id': bc_data ? bc_data.user_info.data.user.username : "",
                 }
             }
             console.log('post_data-----', post_data)
@@ -485,31 +494,32 @@ class TwoWheelerSelectBrand extends Component {
     regnoFormat = (e, setFieldTouched, setFieldValue) => {
         
         let regno = e.target.value
-        let formatVal = ""
-        let regnoLength = regno.length
-        var letter = /^[a-zA-Z]+$/;
-        var number = /^[0-9]+$/;
-        let subString = regno.substring(regnoLength-1, regnoLength)
-        let preSubString = regno.substring(regnoLength-2, regnoLength-1)
+        // let formatVal = ""
+        // let regnoLength = regno.length
+        // var letter = /^[a-zA-Z]+$/;
+        // var number = /^[0-9]+$/;
+        // let subString = regno.substring(regnoLength-1, regnoLength)
+        // let preSubString = regno.substring(regnoLength-2, regnoLength-1)
 
-        if(subString.match(letter) && preSubString.match(letter)) {
-            formatVal = regno
-        }
-        else if(subString.match(number) && preSubString.match(number)) {
-            formatVal = regno
-        } 
-        else if(subString.match(number) && preSubString.match(letter)) {        
-            formatVal = regno.substring(0, regnoLength-1) + " " +subString      
-        } 
-        else if(subString.match(letter) && preSubString.match(number)) {
-            formatVal = regno.substring(0, regnoLength-1) + " " +subString   
-        } 
+        // if(subString.match(letter) && preSubString.match(letter)) {
+        //     formatVal = regno
+        // }
+        // else if(subString.match(number) && preSubString.match(number)) {
+        //     formatVal = regno
+        // } 
+        // else if(subString.match(number) && preSubString.match(letter)) {        
+        //     formatVal = regno.substring(0, regnoLength-1) + " " +subString      
+        // } 
+        // else if(subString.match(letter) && preSubString.match(number)) {
+        //     formatVal = regno.substring(0, regnoLength-1) + " " +subString   
+        // } 
 
-        else formatVal = regno.toUpperCase()
+        // else formatVal = regno.toUpperCase()
         
-        e.target.value = formatVal.toUpperCase()
+        e.target.value = regno.toUpperCase()
 
     }
+
 
 
     render() {
@@ -709,7 +719,7 @@ class TwoWheelerSelectBrand extends Component {
                                                                 <div className="row formSection">
                                                                     <label className="col-md-4">Enter Vehicle Registration Number:</label>
                                                                     <div className="col-md-4">
-                                                                    {values.regNumber != "NEW" ?
+                                                                    {values.regNumber != "NEW" ? 
                                                                         <Field
                                                                             name="regNumber"
                                                                             type="text"
@@ -723,7 +733,8 @@ class TwoWheelerSelectBrand extends Component {
                                                                                 this.regnoFormat(e, setFieldTouched, setFieldValue)
                                                                                 setFieldTouched('check_registration')
                                                                                 setFieldValue('check_registration', '2');
-                                                                            }}                              
+                                                                            }}  
+                             
                                                                         /> : 
                                                                         <Field
                                                                             type="text"

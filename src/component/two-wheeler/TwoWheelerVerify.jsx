@@ -52,22 +52,9 @@ const ComprehensiveValidation = Yup.object().shape({
     registration_no: Yup.string().when("newRegistrationNo", {
         is: "NEW",       
         then: Yup.string(),
-        otherwise: Yup.string().required('Please provide registration number').matches(/^[A-Z]{2}[ -][0-9]{1,2}(?: [A-Z])?(?: [A-Z]*)? [0-9]{4}$/, 'Invalid Registration number')
-            .test(
-                "validRegistrationChecking",
-                function() {
-                    return "Enter valid registration number"
-                },
-                function (value) {
-                    if (value) {
-                        let reg = value.split(" ")
-                        if(reg && reg[3]) {
-                            return parseInt(reg[3])
-                        }
-                    }
-                    return true;
-            })
+        otherwise: Yup.string().required('Please provide registration number').matches(/^[A-Z]{2}[0-9]{2}(?:[A-Z])?(?:[A-Z]*)?[0-9]{4}$/, 'Invalid Registration number')
     }),
+
 
     chasis_no_last_part:Yup.string().required('This field is required')
     .matches(/^([0-9]*)$/, function() {
@@ -413,43 +400,58 @@ class TwoWheelerVerify extends Component {
         if(errors.registration_no || errors.chasis_no_last_part) {
             swal("Please provide correct Registration number and Chasis number")
         }
+        // else {
+        //     if(values.newRegistrationNo != "NEW") {
+        //         this.props.loadingStart()
+        //         axios
+        //         .post(`/getVahanDetails`,formData)
+        //         .then((res) => {
+        //             this.setState({
+        //             vahanDetails: res.data,
+        //             vahanVerify: res.data.length > 0 ? true : false
+        //             });
+
+        //             setFieldTouched('vahanVerify')
+        //             res.data.length > 0 ?
+        //             setFieldValue('vahanVerify', true) 
+        //             : setFieldValue('vahanVerify', false)
+
+        //             this.props.loadingStop();
+        //         })
+        //         .catch((err) => {
+        //             this.setState({
+        //                 vahanDetails: [],
+        //             });
+        //             swal("Please provide correct Registration number and Chasis number")
+        //             this.props.loadingStop();
+        //         });
+        //     }
+        //     else {
+        //         this.props.loadingStart()
+        //             this.setState({
+        //             vahanDetails: [],
+        //             vahanVerify:  true 
+        //             });
+    
+        //             setFieldTouched('vahanVerify')
+        //             setFieldValue('vahanVerify', true) 
+    
+        //             this.props.loadingStop();
+        //     }
+
+        // }
         else {
             this.props.loadingStart()
-            axios
-            .post(`/getVahanDetails`,formData)
-            .then((res) => {
                 this.setState({
-                vahanDetails: res.data,
-                vahanVerify: res.data.length > 0 ? true : false
+                vahanDetails: [],
+                vahanVerify:  true 
                 });
 
                 setFieldTouched('vahanVerify')
-                res.data.length > 0 ?
                 setFieldValue('vahanVerify', true) 
-                : setFieldValue('vahanVerify', false)
 
                 this.props.loadingStop();
-            })
-            .catch((err) => {
-                this.setState({
-                    vahanDetails: [],
-                });
-                swal("Please provide correct Registration number and Chasis number")
-                this.props.loadingStop();
-            });
         }
-        // else {
-        //     this.props.loadingStart()
-        //         this.setState({
-        //         vahanDetails: [],
-        //         vahanVerify:  true 
-        //         });
-
-        //         setFieldTouched('vahanVerify')
-        //         setFieldValue('vahanVerify', true) 
-
-        //         this.props.loadingStop();
-        // }
     };
 
     getInsurerList = () => {
@@ -536,29 +538,29 @@ class TwoWheelerVerify extends Component {
     regnoFormat = (e, setFieldTouched, setFieldValue) => {
         
         let regno = e.target.value
-        let formatVal = ""
-        let regnoLength = regno.length
-        var letter = /^[a-zA-Z]+$/;
-        var number = /^[0-9]+$/;
-        let subString = regno.substring(regnoLength-1, regnoLength)
-        let preSubString = regno.substring(regnoLength-2, regnoLength-1)
+        // let formatVal = ""
+        // let regnoLength = regno.length
+        // var letter = /^[a-zA-Z]+$/;
+        // var number = /^[0-9]+$/;
+        // let subString = regno.substring(regnoLength-1, regnoLength)
+        // let preSubString = regno.substring(regnoLength-2, regnoLength-1)
 
-        if(subString.match(letter) && preSubString.match(letter)) {
-            formatVal = regno
-        }
-        else if(subString.match(number) && preSubString.match(number)) {
-            formatVal = regno
-        } 
-        else if(subString.match(number) && preSubString.match(letter)) {        
-            formatVal = regno.substring(0, regnoLength-1) + " " +subString      
-        } 
-        else if(subString.match(letter) && preSubString.match(number)) {
-            formatVal = regno.substring(0, regnoLength-1) + " " +subString   
-        } 
+        // if(subString.match(letter) && preSubString.match(letter)) {
+        //     formatVal = regno
+        // }
+        // else if(subString.match(number) && preSubString.match(number)) {
+        //     formatVal = regno
+        // } 
+        // else if(subString.match(number) && preSubString.match(letter)) {        
+        //     formatVal = regno.substring(0, regnoLength-1) + " " +subString      
+        // } 
+        // else if(subString.match(letter) && preSubString.match(number)) {
+        //     formatVal = regno.substring(0, regnoLength-1) + " " +subString   
+        // } 
 
-        else formatVal = regno.toUpperCase()
+        // else formatVal = regno.toUpperCase()
         
-        e.target.value = formatVal.toUpperCase()
+        e.target.value = regno.toUpperCase()
 
     }
 
@@ -811,6 +813,7 @@ class TwoWheelerVerify extends Component {
                                                 name="previous_start_date"
                                                 minDate={new Date(minDate)}
                                                 maxDate={new Date(maxDate)}
+                                                autoComplete="off"
                                                 dateFormat="dd MMM yyyy"
                                                 placeholderText="Previous policy start date"
                                                 peekPreviousMonth
@@ -837,6 +840,7 @@ class TwoWheelerVerify extends Component {
                                                 name="previous_end_date"
                                                 dateFormat="dd MMM yyyy"
                                                 placeholderText="Previous policy end date"
+                                                autoComplete="off"
                                                 disabled = {true}
                                                 dropdownMode="select"
                                                 className="datePckr inputfs12"

@@ -813,6 +813,7 @@ class TwoWheelerAdditionalDetails extends Component {
                                             <DatePicker
                                                 name="date_of_incorporation"
                                                 dateFormat="dd MMM yyyy"
+                                                autoComplete="off"
                                                 placeholderText="Incorporation Date"
                                                 peekPreviousMonth
                                                 peekPreviousYear
@@ -860,6 +861,7 @@ class TwoWheelerAdditionalDetails extends Component {
                                             name="dob"
                                             dateFormat="dd MMM yyyy"
                                             placeholderText="DOB"
+                                            autoComplete="off"
                                             peekPreviousMonth
                                             peekPreviousYear
                                             showMonthDropdown
@@ -1127,6 +1129,7 @@ class TwoWheelerAdditionalDetails extends Component {
                                             name="nominee_dob"
                                             dateFormat="dd MMM yyyy"
                                             placeholderText="DOB"
+                                            autoComplete="off"
                                             peekPreviousMonth
                                             peekPreviousYear
                                             showMonthDropdown

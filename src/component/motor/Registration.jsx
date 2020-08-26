@@ -23,21 +23,38 @@ const vehicleRegistrationValidation = Yup.object().shape({
     check_registration: Yup.string().notRequired(),
 
     // regNumber: Yup.string().matches(/^[A-Z]{2}[ -][0-9]{1,2}(?: [A-Z])?(?: [A-Z]*)? [0-9]{4}$/, 'Invalid Registration number').required('Please enter valid registration number')
-    regNumber: Yup.string().matches(/^[A-Z]{2}[ -][0-9]{1,2}[ -][A-Z]{1,3}[ -][0-9]{4}$/, 'Invalid Registration number')
-    .test(
-        "registrationNumberCheck",
-        function() {
-            return "Please Provide Vehicle Registration Number"
-        },
-        function (value) {
-            // console.log('YUP', value)
-            if ((value == "" || value == undefined) && this.parent.check_registration == 2 ) {  
-                return false;
-            }
-            return true;
-        }
-    ),
+//     regNumber: Yup.string().matches(/^[A-Z]{2}[ -][0-9]{1,2}[ -][A-Z]{1,3}[ -][0-9]{4}$/, 'Invalid Registration number')
+//     .test(
+//         "registrationNumberCheck",
+//         function() {
+//             return "Please Provide Vehicle Registration Number"
+//         },
+//         function (value) {
+//             // console.log('YUP', value)
+//             if ((value == "" || value == undefined) && this.parent.check_registration == 2 ) {  
+//                 return false;
+//             }
+//             return true;
+//         }
+//     ),
    
+// });
+
+regNumber: Yup.string().matches(/^[A-Z]{2}[0-9]{2}(?:[A-Z])?(?:[A-Z]*)?[0-9]{4}$/, 'Invalid Registration number')
+.test(
+    "registrationNumberCheck",
+    function() {
+        return "Please Provide Vehicle Registration Number"
+    },
+    function (value) {
+        // console.log('YUP', value)
+        if ((value == "" || value == undefined) && this.parent.check_registration == 2 ) {  
+            return false;
+        }
+        return true;
+    }
+),
+
 });
 
 
@@ -216,29 +233,29 @@ fetchData=()=>{
     regnoFormat = (e, setFieldTouched, setFieldValue) => {
         
         let regno = e.target.value
-        let formatVal = ""
-        let regnoLength = regno.length
-        var letter = /^[a-zA-Z]+$/;
-        var number = /^[0-9]+$/;
-        let subString = regno.substring(regnoLength-1, regnoLength)
-        let preSubString = regno.substring(regnoLength-2, regnoLength-1)
+        // let formatVal = ""
+        // let regnoLength = regno.length
+        // var letter = /^[a-zA-Z]+$/;
+        // var number = /^[0-9]+$/;
+        // let subString = regno.substring(regnoLength-1, regnoLength)
+        // let preSubString = regno.substring(regnoLength-2, regnoLength-1)
     
-        if(subString.match(letter) && preSubString.match(letter)) {
-            formatVal = regno
-        }
-        else if(subString.match(number) && preSubString.match(number)) {
-            formatVal = regno
-        } 
-        else if(subString.match(number) && preSubString.match(letter)) {        
-            formatVal = regno.substring(0, regnoLength-1) + " " +subString      
-        } 
-        else if(subString.match(letter) && preSubString.match(number)) {
-            formatVal = regno.substring(0, regnoLength-1) + " " +subString   
-        } 
+        // if(subString.match(letter) && preSubString.match(letter)) {
+        //     formatVal = regno
+        // }
+        // else if(subString.match(number) && preSubString.match(number)) {
+        //     formatVal = regno
+        // } 
+        // else if(subString.match(number) && preSubString.match(letter)) {        
+        //     formatVal = regno.substring(0, regnoLength-1) + " " +subString      
+        // } 
+        // else if(subString.match(letter) && preSubString.match(number)) {
+        //     formatVal = regno.substring(0, regnoLength-1) + " " +subString   
+        // } 
     
-        else formatVal = regno.toUpperCase()
+        // else formatVal = regno.toUpperCase()
         
-        e.target.value = formatVal.toUpperCase()
+        e.target.value = regno.toUpperCase()
     
     }
 

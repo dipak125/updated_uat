@@ -36,24 +36,30 @@ const vehicleValidation = Yup.object().shape({
     policy_type: Yup.string().required("Please enter policy type"),
     policy_for: Yup.string().required("Please select policy for indivudal or corporate"),
 
+    // regNumber: Yup.string().when("check_registration", {
+    //     is: "1",       
+    //     then: Yup.string(),
+    //     otherwise: Yup.string().required('Please provide registration number').matches(/^[A-Z]{2}[ -][0-9]{1,2}[ -][A-Z]{1,3}[ -][0-9]{4}$/, 'Invalid Registration number')
+    //         .test(
+    //             "validRegistrationChecking",
+    //             function() {
+    //                 return "Enter valid registration number"
+    //             },
+    //             function (value) {
+    //                 if (value) {
+    //                     let reg = value.split(" ")
+    //                     if(reg && reg[3]) {
+    //                         return parseInt(reg[3])
+    //                     }
+    //                 }
+    //                 return true;
+    //         })
+    // }),
+
     regNumber: Yup.string().when("check_registration", {
         is: "1",       
         then: Yup.string(),
-        otherwise: Yup.string().required('Please provide registration number').matches(/^[A-Z]{2}[ -][0-9]{1,2}[ -][A-Z]{1,3}[ -][0-9]{4}$/, 'Invalid Registration number')
-            .test(
-                "validRegistrationChecking",
-                function() {
-                    return "Enter valid registration number"
-                },
-                function (value) {
-                    if (value) {
-                        let reg = value.split(" ")
-                        if(reg && reg[3]) {
-                            return parseInt(reg[3])
-                        }
-                    }
-                    return true;
-            })
+        otherwise: Yup.string().required('Please provide registration number').matches(/^[A-Z]{2}[0-9]{2}(?:[A-Z])?(?:[A-Z]*)?[0-9]{4}$/, 'Invalid Registration number')
     }),
 })
 
@@ -470,29 +476,29 @@ class TwoWheelerSelectBrand extends Component {
     regnoFormat = (e, setFieldTouched, setFieldValue) => {
         
         let regno = e.target.value
-        let formatVal = ""
-        let regnoLength = regno.length
-        var letter = /^[a-zA-Z]+$/;
-        var number = /^[0-9]+$/;
-        let subString = regno.substring(regnoLength-1, regnoLength)
-        let preSubString = regno.substring(regnoLength-2, regnoLength-1)
+        // let formatVal = ""
+        // let regnoLength = regno.length
+        // var letter = /^[a-zA-Z]+$/;
+        // var number = /^[0-9]+$/;
+        // let subString = regno.substring(regnoLength-1, regnoLength)
+        // let preSubString = regno.substring(regnoLength-2, regnoLength-1)
 
-        if(subString.match(letter) && preSubString.match(letter)) {
-            formatVal = regno
-        }
-        else if(subString.match(number) && preSubString.match(number)) {
-            formatVal = regno
-        } 
-        else if(subString.match(number) && preSubString.match(letter)) {        
-            formatVal = regno.substring(0, regnoLength-1) + " " +subString      
-        } 
-        else if(subString.match(letter) && preSubString.match(number)) {
-            formatVal = regno.substring(0, regnoLength-1) + " " +subString   
-        } 
+        // if(subString.match(letter) && preSubString.match(letter)) {
+        //     formatVal = regno
+        // }
+        // else if(subString.match(number) && preSubString.match(number)) {
+        //     formatVal = regno
+        // } 
+        // else if(subString.match(number) && preSubString.match(letter)) {        
+        //     formatVal = regno.substring(0, regnoLength-1) + " " +subString      
+        // } 
+        // else if(subString.match(letter) && preSubString.match(number)) {
+        //     formatVal = regno.substring(0, regnoLength-1) + " " +subString   
+        // } 
 
-        else formatVal = regno.toUpperCase()
+        // else formatVal = regno.toUpperCase()
         
-        e.target.value = formatVal.toUpperCase()
+        e.target.value = regno.toUpperCase()
 
     }
 

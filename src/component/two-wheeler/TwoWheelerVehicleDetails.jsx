@@ -407,6 +407,7 @@ class TwoWheelerVehicleDetails extends Component {
                                                                 name="registration_date"
                                                                 minDate={new Date(minRegnDate)}
                                                                 maxDate={new Date(maxRegnDate)}
+                                                                autoComplete="off"
                                                                 dateFormat="dd MMM yyyy"
                                                                 placeholderText="Registration Date"
                                                                 peekPreviousMonth
