@@ -143,7 +143,7 @@ class TwoWheelerVehicleDetails extends Component {
     }  
     const regex = new RegExp( escapedValue, 'i');
     if(this.state.customerDetails && escapedValue.length >1) {
-      return this.state.customerDetails.filter(language => regex.test(language.RTO_LOCATION));
+      return this.state.customerDetails.filter(language => regex.test(language.RTO_LOCATION+" - "+language.NameCode));
     }
     else return 0;
     
@@ -159,12 +159,12 @@ class TwoWheelerVehicleDetails extends Component {
     this.setState({
       selectedCustomerRecords: suggestion
     });
-    return suggestion.RTO_LOCATION;
+    return suggestion.RTO_LOCATION+" - "+suggestion.NameCode;
   }
   
    renderCustomerIDSuggestion(suggestion) {
     return (
-      <span>{suggestion.RTO_LOCATION}</span>
+      <span>{suggestion.RTO_LOCATION+" - "+suggestion.NameCode}</span>
     );
   }
   //--------------------------------------------------------
@@ -262,7 +262,7 @@ class TwoWheelerVehicleDetails extends Component {
                  let motorInsurance = decryptResp.data.policyHolder ? decryptResp.data.policyHolder.motorinsurance : {};
                  let previousPolicy = decryptResp.data.policyHolder ? decryptResp.data.policyHolder.previouspolicy : {};
                  let vehicleDetails = decryptResp.data.policyHolder ? decryptResp.data.policyHolder.vehiclebrandmodel : {};
-                 let RTO_location = motorInsurance && motorInsurance.location && motorInsurance.location.RTO_LOCATION ? motorInsurance.location.RTO_LOCATION : ""
+                 let RTO_location = motorInsurance && motorInsurance.location && motorInsurance.location.RTO_LOCATION ? motorInsurance.location.RTO_LOCATION+" - "+motorInsurance.location.NameCode : ""
                  let step_completed = decryptResp.data.policyHolder ? decryptResp.data.policyHolder.step_no : "";
                 this.setState({
                     motorInsurance, previousPolicy, vehicleDetails,RTO_location,step_completed

@@ -342,7 +342,8 @@ class TwoWheelerSelectBrand extends Component {
                     'check_registration': values.check_registration,
                     'bcmaster_id': bc_data ? bc_data.agent_id : "",
                     'bc_token': bc_data ? bc_data.token : "",
-                    'policy_for': values.policy_for
+                    'policy_for': values.policy_for,
+                    'bc_agent_id': bc_data ? bc_data.user_info.data.user.username : "",
                 }
             }
             
@@ -408,7 +409,8 @@ class TwoWheelerSelectBrand extends Component {
                     'check_registration': values.check_registration,
                     'bcmaster_id': bc_data ? bc_data.agent_id : "",
                     'bc_token': bc_data ? bc_data.token : "",
-                    'policy_for': values.policy_for
+                    'policy_for': values.policy_for,
+                    'bc_agent_id': bc_data ? bc_data.user_info.data.user.username : "",
                 }
             }
             console.log('post_data-----', post_data)

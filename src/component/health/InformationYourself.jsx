@@ -944,6 +944,8 @@ class InformationYourself extends Component {
     else {
         post_data['bcmaster_id'] = bc_data ? bc_data.agent_id : ""
         post_data['bc_token'] = bc_data ? bc_data.token : ""
+        post_data['bc_agent_id'] = bc_data ? bc_data.user_info.data.user.username : ""
+
     }
      
 

@@ -127,6 +127,7 @@ fetchData=()=>{
                     'vehicle_type_id':productId,
                     'bcmaster_id': bc_data ? bc_data.agent_id : "",
                     'bc_token': bc_data ? bc_data.token : "",
+                    'bc_agent_id': bc_data ? bc_data.user_info.data.user.username : "",
                 } 
             }
 
@@ -174,6 +175,7 @@ fetchData=()=>{
                     'vehicle_type_id':productId,
                     'bcmaster_id': bc_data ? bc_data.agent_id : "",
                     'bc_token': bc_data ? bc_data.token : "",
+                    'bc_agent_id': bc_data ? bc_data.user_info.data.user.username : "",
                 } 
             }
             console.log('post_data', post_data)

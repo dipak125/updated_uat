@@ -74,7 +74,8 @@ class TwoWheelerOtherComprehensive extends Component {
             step_completed: "0",
             vehicleDetails: [],
             selectFlag: '',
-            moreCoverage: []
+            moreCoverage: [],
+            ncbDiscount: 0
         };
     }
 
@@ -254,6 +255,7 @@ class TwoWheelerOtherComprehensive extends Component {
                         error: [],
                         serverResponse: res.data.PolicyObject,
                         policyCoverage: res.data.PolicyObject.PolicyLobList ? res.data.PolicyObject.PolicyLobList[0].PolicyRiskList[0].PolicyCoverageList : [],
+                        ncbDiscount: res.data.PolicyObject.PolicyLobList ? res.data.PolicyObject.PolicyLobList[0].PolicyRiskList[0].NCBDiscountAmt : 0,
                     });
                 } else {
                     this.setState({
@@ -377,7 +379,7 @@ class TwoWheelerOtherComprehensive extends Component {
 
     render() {
         const { vahanDetails, error, policyCoverage, vahanVerify, fulQuoteResp, PolicyArray, motorInsurance, serverResponse, add_more_coverage,
-            step_completed, vehicleDetails, selectFlag, sliderVal, moreCoverage} = this.state
+            step_completed, vehicleDetails, selectFlag, sliderVal, moreCoverage, ncbDiscount} = this.state
         const { productId } = this.props.match.params
         let covList = motorInsurance && motorInsurance.add_more_coverage ? motorInsurance.add_more_coverage.split(",") : ""
         let newInnitialArray = {}
@@ -386,8 +388,8 @@ class TwoWheelerOtherComprehensive extends Component {
 
         let defaultSliderValue = PolicyArray.length > 0 ? Math.round(PolicyArray[0].PolicyRiskList[0].IDV_Suggested) : 0
         let sliderValue = sliderVal
-        let minIDV = PolicyArray.length > 0 ? Math.floor(PolicyArray[0].PolicyRiskList[0].MinIDV_Suggested) : null
-        let maxIDV = PolicyArray.length > 0 ? Math.floor(PolicyArray[0].PolicyRiskList[0].MaxIDV_Suggested) : null
+        let minIDV = PolicyArray.length > 0 ? Math.round(PolicyArray[0].PolicyRiskList[0].MinIDV_Suggested) : null
+        let maxIDV = PolicyArray.length > 0 ? Math.round(PolicyArray[0].PolicyRiskList[0].MaxIDV_Suggested) : null
         minIDV = minIDV + 1;
         maxIDV = maxIDV - 1;
 
@@ -408,7 +410,8 @@ class TwoWheelerOtherComprehensive extends Component {
                 cng_kit: '0',
                 // B00015: "B00015",
                 PA_flag: '0',
-                PA_Cover: ""
+                PA_Cover: "",
+                PA_cover_flag: motorInsurance && motorInsurance.pa_flag ? motorInsurance.pa_flag : '0'
             
             }
         }
@@ -439,6 +442,20 @@ class TwoWheelerOtherComprehensive extends Component {
                     </div>     
             ))
         )) : null 
+
+        const ncb_Discount = ncbDiscount && ncbDiscount != 0 ? (
+            <div>
+                <Row>
+                    <Col sm={12} md={6}>
+                        <FormGroup>NCB Discount</FormGroup>
+                    </Col>
+                    <Col sm={12} md={6}>
+                        <FormGroup>₹ -{Math.round(PolicyArray[0].PolicyRiskList[0].NCBDiscountAmt)}</FormGroup>
+                    </Col>
+                </Row>
+            </div>    
+        ) : ""
+        
 
         const premiumBreakup = policyCoverage && policyCoverage.length > 0 ?
             policyCoverage.map((coverage, qIndex) => (
@@ -498,6 +515,7 @@ class TwoWheelerOtherComprehensive extends Component {
                                                                 <Collapsible trigger="Default Covered Coverages & Benefit" open={true}>
                                                                     <div className="listrghtsideTrigr">
                                                                     {policyCoverageList}
+                                                                    {ncb_Discount}
                                                                     </div>
                                                                 </Collapsible>
                                                             </div>
@@ -671,6 +689,13 @@ class TwoWheelerOtherComprehensive extends Component {
                             </thead>
                             <tbody>
                                 {premiumBreakup}
+                                {ncbDiscount != 0 ? (
+                                <tr>
+                                    <td>NCB Discount:</td>
+                                    <td>₹ -{Math.round(ncbDiscount)}</td>
+                                </tr>
+                                ) : ""}
+                                
                                 <tr>
                                     <td>Gross Premium:</td>
                                     <td>₹ {Math.round(fulQuoteResp.BeforeVatPremium)}</td>

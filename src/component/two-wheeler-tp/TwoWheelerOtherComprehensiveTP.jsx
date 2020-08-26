@@ -397,7 +397,8 @@ class TwoWheelerOtherComprehensive extends Component {
                 cng_kit: '0',
                 // B00015: "B00015",
                 PA_flag: '0',
-                PA_Cover: ""
+                PA_Cover: "",
+                PA_cover_flag: motorInsurance && motorInsurance.pa_flag ? motorInsurance.pa_flag : '0'
             
             }
         }

@@ -671,7 +671,6 @@ class TwoWheelerAdditionalDetails extends Component {
                         >
                         {({ values, errors, setFieldValue, setFieldTouched, isValid, isSubmitting, touched }) => {
                              let value = values.nominee_first_name;
-                             console.log("errors", errors)
                         return (
                         <Form>
                         <Row>
@@ -681,7 +680,7 @@ class TwoWheelerAdditionalDetails extends Component {
                                 </div>
                                 
                                 <div className="d-flex justify-content-left carloan">
-                                    <h4> Taken Car Loan</h4>
+                                    <h4> Taken 2-wheeler Loan</h4>
                                 </div>
                                 <Row>
                                     <Col sm={12} md={4} lg={4}>

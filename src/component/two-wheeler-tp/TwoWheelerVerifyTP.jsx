@@ -349,43 +349,43 @@ class TwoWheelerVerify extends Component {
         if(errors.registration_no || errors.chasis_no_last_part) {
             swal("Please provide correct Registration number and Chasis number")
         }
-        // else {
-        //     this.props.loadingStart()
-        //     axios
-        //     .post(`/getVahanDetails`,formData)
-        //     .then((res) => {
-        //         this.setState({
-        //         vahanDetails: res.data,
-        //         vahanVerify: res.data.length > 0 ? true : false
-        //         });
-
-        //         setFieldTouched('vahanVerify')
-        //         res.data.length > 0 ?
-        //         setFieldValue('vahanVerify', true) 
-        //         : setFieldValue('vahanVerify', false)
-
-        //         this.props.loadingStop();
-        //     })
-        //     .catch((err) => {
-        //         this.setState({
-        //             vahanDetails: [],
-        //         });
-        //         swal("Please provide correct Registration number and Chasis number")
-        //         this.props.loadingStop();
-        //     });
-        // }
         else {
             this.props.loadingStart()
+            axios
+            .post(`/getVahanDetails`,formData)
+            .then((res) => {
                 this.setState({
-                vahanDetails: [],
-                vahanVerify:  true 
+                vahanDetails: res.data,
+                vahanVerify: res.data.length > 0 ? true : false
                 });
 
                 setFieldTouched('vahanVerify')
+                res.data.length > 0 ?
                 setFieldValue('vahanVerify', true) 
+                : setFieldValue('vahanVerify', false)
 
                 this.props.loadingStop();
+            })
+            .catch((err) => {
+                this.setState({
+                    vahanDetails: [],
+                });
+                swal("Please provide correct Registration number and Chasis number")
+                this.props.loadingStop();
+            });
         }
+        // else {
+        //     this.props.loadingStart()
+        //         this.setState({
+        //         vahanDetails: [],
+        //         vahanVerify:  true 
+        //         });
+
+        //         setFieldTouched('vahanVerify')
+        //         setFieldValue('vahanVerify', true) 
+
+        //         this.props.loadingStop();
+        // }
     };
 
     getInsurerList = () => {

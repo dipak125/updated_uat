@@ -173,7 +173,7 @@ class TwoWheelerVehicleDetails extends Component {
         }  
         const regex = new RegExp( escapedValue, 'i');
         if(this.state.customerDetails && escapedValue.length >1) {
-            return this.state.customerDetails.filter(language => regex.test(language.RTO_LOCATION));
+            return this.state.customerDetails.filter(language => regex.test(language.RTO_LOCATION+" - "+language.NameCode));
         }
         else return 0;
         
@@ -190,12 +190,12 @@ class TwoWheelerVehicleDetails extends Component {
     this.setState({
       selectedCustomerRecords: suggestion
     });
-    return suggestion.RTO_LOCATION;
+    return suggestion.RTO_LOCATION+" - "+suggestion.NameCode;
   }
   
    renderCustomerIDSuggestion(suggestion) {
     return (
-      <span>{suggestion.RTO_LOCATION}</span>
+      <span>{suggestion.RTO_LOCATION+" - "+suggestion.NameCode}</span>
     );
   }
   //--------------------------------------------------------
@@ -203,11 +203,11 @@ class TwoWheelerVehicleDetails extends Component {
     handleSubmit = (values, actions) => {
         const {productId} = this.props.match.params 
         const {motorInsurance} = this.state
-        let policy_type = ageObj.whatIsCurrentMonth(values.registration_date) < 6 ? 6 : 1
         let newPolStartDate = addDays(new Date(), 1)           
         let newPolEndDate = addDays(new Date(newPolStartDate), 364) 
-        let vehicleAge = Math.floor(moment().diff(values.registration_date, 'months', true))
-
+        let vehicleAge = Math.floor(moment(newPolStartDate).diff(values.registration_date, 'months', true))
+        let policy_type = vehicleAge < 6 ? 6 : 1
+        console.log("vehicleAge===", vehicleAge)
         const formData = new FormData(); 
         let post_data = {}
         if(motorInsurance && motorInsurance.policytype_id && motorInsurance.policytype_id == '1') {
@@ -308,7 +308,7 @@ class TwoWheelerVehicleDetails extends Component {
                  let motorInsurance = decryptResp.data.policyHolder ? decryptResp.data.policyHolder.motorinsurance : {};
                  let previousPolicy = decryptResp.data.policyHolder ? decryptResp.data.policyHolder.previouspolicy : {};
                  let vehicleDetails = decryptResp.data.policyHolder ? decryptResp.data.policyHolder.vehiclebrandmodel : {};
-                 let RTO_location = motorInsurance && motorInsurance.location && motorInsurance.location.RTO_LOCATION ? motorInsurance.location.RTO_LOCATION : ""
+                 let RTO_location = motorInsurance && motorInsurance.location && motorInsurance.location.RTO_LOCATION ? motorInsurance.location.RTO_LOCATION+" - "+motorInsurance.location.NameCode : ""
                  let maxRegnDate= motorInsurance && motorInsurance.policytype_id == '1' ? moment() : moment(moment().subtract(1, 'years').calendar()).add(1, 'day').calendar()
                  this.setState({
                     motorInsurance, previousPolicy, vehicleDetails,RTO_location, maxRegnDate
