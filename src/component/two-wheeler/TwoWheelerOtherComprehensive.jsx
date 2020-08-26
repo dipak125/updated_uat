@@ -28,6 +28,16 @@ let encryption = new Encryption()
     // PA_Cover: ""
 
 }
+
+const insert = (arr, index, newItem) => [
+    // part of the array before the specified index
+    ...arr.slice(0, index),
+    // inserted item
+    newItem,
+    // part of the array after the specified index
+    ...arr.slice(index)
+  ]
+
 const ComprehensiveValidation = Yup.object().shape({
     // is_carloan: Yup.number().required('Please select one option')
 
@@ -47,6 +57,8 @@ const Coverage = {
     "B00015": "PA -  Owner Driver",
     "B00075": "PA for Unnamed Passenger",
     "B00009": "Third Party Property Damage Limit",
+    "NCB": "NCB Discount",
+    "TOTALOD": "Total Own Damage"
 }
 
 class TwoWheelerOtherComprehensive extends Component {
@@ -249,13 +261,34 @@ class TwoWheelerOtherComprehensive extends Component {
         axios.post('fullQuotePM2W', formData)
             .then(res => {
                 if (res.data.PolicyObject) {
+                    let policyCoverage= res.data.PolicyObject.PolicyLobList ? res.data.PolicyObject.PolicyLobList[0].PolicyRiskList[0].PolicyCoverageList : []
+                    let ncbDiscount= res.data.PolicyObject.PolicyLobList ? res.data.PolicyObject.PolicyLobList[0].PolicyRiskList[0].NCBDiscountAmt : 0
+                    if(ncbDiscount != '0') {
+                        let ncbArr = {}
+                        ncbArr.PolicyBenefitList = [{
+                            BeforeVatPremium : 0 - Math.round(ncbDiscount),
+                            ProductElementCode : 'NCB'
+                        }]
+    
+                        let totOD = {}
+                        totOD.PolicyBenefitList = [{
+                            BeforeVatPremium : Math.round(policyCoverage[0]['PolicyBenefitList'][0]['BeforeVatPremium']) - Math.round(ncbDiscount),
+                            ProductElementCode : 'TOTALOD'
+                        }]
+    
+                        policyCoverage = ncbDiscount != '0' ?  insert(policyCoverage, 1, ncbArr) : ""
+                        policyCoverage = ncbDiscount != '0' ?  insert(policyCoverage, 2, totOD) : ""
+                    }
+                    
+
                     this.setState({
                         fulQuoteResp: res.data.PolicyObject,
                         PolicyArray: res.data.PolicyObject.PolicyLobList,
                         error: [],
                         serverResponse: res.data.PolicyObject,
-                        policyCoverage: res.data.PolicyObject.PolicyLobList ? res.data.PolicyObject.PolicyLobList[0].PolicyRiskList[0].PolicyCoverageList : [],
-                        ncbDiscount: res.data.PolicyObject.PolicyLobList ? res.data.PolicyObject.PolicyLobList[0].PolicyRiskList[0].NCBDiscountAmt : 0,
+                        policyCoverage
+                        // policyCoverage: res.data.PolicyObject.PolicyLobList ? res.data.PolicyObject.PolicyLobList[0].PolicyRiskList[0].PolicyCoverageList : [],
+                        // ncbDiscount: res.data.PolicyObject.PolicyLobList ? res.data.PolicyObject.PolicyLobList[0].PolicyRiskList[0].NCBDiscountAmt : 0,
                     });
                 } else {
                     this.setState({
@@ -424,8 +457,9 @@ class TwoWheelerOtherComprehensive extends Component {
         newInnitialArray.PA_Cover = PA_Cover
         let newInitialValues = Object.assign(initialValue, newInnitialArray );
 
-        console.log("InitialValues---", newInnitialArray)
-        console.log("add_more_coverage---", add_more_coverage)
+        // console.log("InitialValues---", newInnitialArray)
+        // console.log("add_more_coverage---", add_more_coverage)
+        // console.log('policyCoverage', policyCoverage)
 
         const policyCoverageList =  policyCoverage && policyCoverage.length > 0 ?
             policyCoverage.map((coverage, qIndex) => (
@@ -480,7 +514,7 @@ class TwoWheelerOtherComprehensive extends Component {
                 </span>
             ) : null;
 
-            console.log("step_completed---", step_completed)
+            // console.log("step_completed---", step_completed)
 
         return (
             
