@@ -283,8 +283,8 @@ const ComprehensiveValidation = Yup.object().shape({
         }).min(6, function() {
             return "Policy No. must be minimum 6 chracters"
         })
-        .max(18, function() {
-            return "Policy No. must be maximum 18 chracters"
+        .max(20, function() {
+            return "Policy No. must be maximum 20 chracters"
         }),
 
    
@@ -927,6 +927,7 @@ class TwoWheelerVerify extends Component {
                                                 <Field
                                                     name="previous_policy_no"
                                                     type="text"
+                                                    maxLength="20"
                                                     placeholder="Previous Policy Number"
                                                     autoComplete="off"
                                                     onFocus={e => this.changePlaceHoldClassAdd(e)}

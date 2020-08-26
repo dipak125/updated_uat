@@ -53,6 +53,10 @@ const Break_form = Loadable({
     loading: () => loadingContent
 });
 
+const Dashboard = Loadable({
+    loader: () => import(/*webpackChunkName: "Products" */"../common/Dashboard.jsx"),
+    loading: () => loadingContent
+});
 
 
 const Products = Loadable({
@@ -227,7 +231,10 @@ class Routes extends Component {
 
                         {/************ BREAK IN ******************/}
                         <PrivateRoute exact path="/Break_in" component={Break_in} />
-                        <PrivateRoute exact path="/Break_form" component={Break_form} />
+                        <PrivateRoute exact path="/Break_form" component={Break_form} /> 
+
+                        {/************ Dashboard ******************/}
+                        <PrivateRoute exact path="/Dashboard" component={Dashboard} />
 
                         <PrivateRoute exact path="/UnderMaintenance" component={UnderMaintenance} />
                         <Redirect from="/" to="/Products" />
