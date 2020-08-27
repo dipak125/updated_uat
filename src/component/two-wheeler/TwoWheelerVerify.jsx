@@ -27,9 +27,8 @@ import {
 let encryption = new Encryption();
 
 const ageObj = new PersonAge();
-const minDate = moment(moment().subtract(1, 'years').calendar()).add(1, 'day').calendar();
-const maxDate = moment(minDate).add(30, 'day').calendar();
-const minRegnDate = moment().subtract(18, 'years').calendar();
+let minDate = ""
+let maxDate = ""
 
 const initialValue = {
     registration_no: "",
@@ -592,6 +591,18 @@ class TwoWheelerVerify extends Component {
             lapse_duration: motorInsurance && motorInsurance.lapse_duration ? motorInsurance.lapse_duration : "",
 
         });
+
+        if(newInitialValues.lapse_duration == '1') {
+            minDate = moment(moment().subtract(1, 'years').calendar()).add(1, 'day').calendar();
+            minDate = moment(minDate).subtract(90, 'day').calendar()
+            maxDate = moment(minDate).add(89, 'day').calendar();
+        }
+        else {
+            minDate = moment(moment().subtract(1, 'years').calendar()).add(1, 'day').calendar();
+            maxDate = moment(minDate).add(30, 'day').calendar();
+        }
+         
+
 
         const errMsg =
             error && error.message ? (

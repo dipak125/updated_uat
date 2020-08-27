@@ -12,6 +12,7 @@ import { loaderStart, loaderStop } from "../../store/actions/loader";
 import { connect } from "react-redux";
 import * as Yup from "yup";
 import Encryption from '../../shared/payload-encryption';
+import queryString from 'query-string';
 
 const initialValue = {}
 
@@ -45,7 +46,10 @@ class Premium extends Component {
             memberdetails: [],
             nomineedetails:[],
             relation: [],
-            policyHolder: []
+            policyHolder: [],
+            policyHolder_refNo: queryString.parse(this.props.location.search).access_id ? 
+                                queryString.parse(this.props.location.search).access_id : 
+                                localStorage.getItem("policyHolder_refNo")
         };
     }
 
@@ -82,7 +86,7 @@ class Premium extends Component {
 
     fetchData = () => {
         const { productId } = this.props.match.params
-        let policyHolder_id = localStorage.getItem("policyHolder_refNo") ? localStorage.getItem("policyHolder_refNo") : 0;
+        let policyHolder_id = this.state.policyHolder_refNo ? this.state.policyHolder_refNo : '0'
         let encryption = new Encryption();
     
         axios.get(`policy-holder/motor/${policyHolder_id}`)
@@ -131,7 +135,7 @@ class Premium extends Component {
         let encryption = new Encryption();
 
         const post_data = {
-            'id':localStorage.getItem('policyHolder_id'),
+            'id':this.state.policyHolder_refNo ? this.state.policyHolder_refNo : '0',
             'access_token':access_token,
             'idv_value': motorInsurance.idv_value,
             'policy_type': localStorage.getItem('policy_type'),

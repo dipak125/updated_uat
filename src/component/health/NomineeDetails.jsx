@@ -216,6 +216,7 @@ class NomineeDetails extends Component {
         formArr['is_appointee'] = this.state.is_appointee
         let formObj = {}
         Object.assign(formObj,formArr)
+        console.log("PostData---", formObj)
         let encryption = new Encryption();
         formData.append('enc_data',encryption.encrypt(JSON.stringify(formObj)))
 
@@ -240,9 +241,7 @@ class NomineeDetails extends Component {
 
     fetchPolicyRelations = (family_relations)=>{        
         let relations = family_relations.map(resource=>resource.relation_with=='self'?1:0)
-        console.log("UDAAAAAAAAAAA=======>",relations)
         let self_selected = relations && relations.length>0 && relations.includes(1)
-        console.log("UDAAAAAAAAAAA=11111111======>",self_selected)
         this.setState({
             self_selected
         })
@@ -294,10 +293,6 @@ class NomineeDetails extends Component {
 
         })
         
-        
-        // console.log("newInitialValues", moment(NomineeDetails.dob, moment.defaultFormat).toDate())
-        // console.log("newInitialValues", moment(NomineeDetails.dob).utc())
-        // console.log("newInitialValues", newInitialValues)
 
         return (
             <>

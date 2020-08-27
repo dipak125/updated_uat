@@ -421,10 +421,17 @@ class TwoWheelerOtherComprehensive extends Component {
 
         let defaultSliderValue = PolicyArray.length > 0 ? Math.round(PolicyArray[0].PolicyRiskList[0].IDV_Suggested) : 0
         let sliderValue = sliderVal
-        let minIDV = PolicyArray.length > 0 ? Math.floor(PolicyArray[0].PolicyRiskList[0].MinIDV_Suggested) : null
-        let maxIDV = PolicyArray.length > 0 ? Math.floor(PolicyArray[0].PolicyRiskList[0].MaxIDV_Suggested) : null
-        minIDV = minIDV + 1;
-        // maxIDV = maxIDV - 1;
+        let min_IDV_suggested = PolicyArray.length > 0 ? PolicyArray[0].PolicyRiskList[0].MinIDV_Suggested : 0
+        let max_IDV_suggested = PolicyArray.length > 0 ? PolicyArray[0].PolicyRiskList[0].MaxIDV_Suggested : 0
+        let minIDV = min_IDV_suggested
+        let maxIDV = PolicyArray.length > 0 ? Math.floor(max_IDV_suggested) : null
+
+        if(Number.isInteger(min_IDV_suggested) == false ) {
+            minIDV = PolicyArray.length > 0 ? Math.floor(PolicyArray[0].PolicyRiskList[0].MinIDV_Suggested) : null           
+            minIDV = minIDV + 1;
+            // maxIDV = maxIDV - 1;
+        }
+         
 
         if(selectFlag == '1') {
             initialValue = {

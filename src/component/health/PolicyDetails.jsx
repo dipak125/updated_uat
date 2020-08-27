@@ -22,6 +22,7 @@ import moment from "moment";
 import Otp from "./Otp";
 import swal from 'sweetalert';
 import Encryption from '../../shared/payload-encryption';
+import queryString from 'query-string';
 
 
 const genderArr = {
@@ -75,6 +76,8 @@ class PolicyDetails extends Component {
   };
 
   getPolicyHolderDetails = () => {
+    let policyHolder_id = 0
+    
     this.props.loadingStart();
     axios
       .get(`/policy-holder/${localStorage.getItem("policyHolder_id")}`)
@@ -126,8 +129,41 @@ class PolicyDetails extends Component {
   };
 
 
+  getPolicyHolderId = (ref_no) => {
+    let policyHolder_id = 0
+    
+    this.props.loadingStart();
+    axios
+      .get(`/health-policy/${ref_no}`)
+      .then((res) => {
+
+        this.setState({
+          policyHolderDetails: res.data.data.policyHolder ? res.data.data.policyHolder : [],
+          familyMember: res.data.data.policyHolder.request_data.family_members,
+          refNumber: res.data.data.policyHolder.reference_no,
+          paymentStatus: res.data.data.policyHolder.payment ? res.data.data.policyHolder.payment[0] : []
+        });
+        this.getAccessToken(
+          res.data.data.policyHolder,
+          res.data.data.policyHolder.request_data.family_members
+        );
+      })
+      .catch((err) => {
+        if(err.status == 401) {
+          swal("Session out. Please login")
+        }
+        else swal("Something wrong happened. Please try after some")
+
+        this.setState({
+          policyHolderDetails: [],
+        });
+        this.props.loadingStop();
+      });
+  };
+
+
   fullQuote = (access_token, policyHolderDetails) => {
-    let id = localStorage.getItem("policyHolder_id");
+    let id = policyHolderDetails.id;
     let insureValue = Math.floor(policyHolderDetails.request_data.sum_insured);
 
     const formData = new FormData();
@@ -186,7 +222,10 @@ class PolicyDetails extends Component {
 }
 
   componentDidMount() {
-    this.getPolicyHolderDetails();
+    if(queryString.parse(this.props.location.search).access_id) {
+       this.getPolicyHolderId(queryString.parse(this.props.location.search).access_id)
+    }
+    else this.getPolicyHolderDetails();
   }
 
   render() {
