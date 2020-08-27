@@ -12,6 +12,7 @@ import { loaderStart, loaderStop } from "../../store/actions/loader";
 import { connect } from "react-redux";
 import * as Yup from "yup";
 import Encryption from '../../shared/payload-encryption';
+import queryString from 'query-string';
 // import Razorpay from "./Razorpay.jsx"
 
 const initialValue = {}
@@ -50,6 +51,9 @@ class Premium extends Component {
             step_completed: "0",
             vehicleDetails: [],
             policyHolder: [],
+            policyHolder_refNo: queryString.parse(this.props.location.search).access_id ? 
+                                queryString.parse(this.props.location.search).access_id : 
+                                localStorage.getItem("policyHolder_refNo")
         };
     }
 
@@ -80,7 +84,7 @@ class Premium extends Component {
 
     fetchData = () => {
         const { productId } = this.props.match.params
-        let policyHolder_id = localStorage.getItem("policyHolder_refNo") ? localStorage.getItem("policyHolder_refNo") : 0;
+        let policyHolder_id = this.state.policyHolder_refNo ? this.state.policyHolder_refNo : '0'
         let encryption = new Encryption();
     
         axios.get(`two-wh/details/${policyHolder_id}`)
@@ -142,7 +146,7 @@ class Premium extends Component {
             // 'cng_kit': motorInsurance.cng_kit,
             // 'cngKit_Cost': Math.floor(motorInsurance.cngkit_cost)
         }
-        formData.append('id',localStorage.getItem('policyHolder_refNo'))
+        formData.append('id',this.state.policyHolder_refNo ? this.state.policyHolder_refNo : '0')
         formData.append('access_token',access_token)
         formData.append('idv_value',motorInsurance.idv_value)
         formData.append('policy_type',motorInsurance ? motorInsurance.policy_type : "")

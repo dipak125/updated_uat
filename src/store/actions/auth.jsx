@@ -49,15 +49,17 @@ const checkLastActionPerformed = (actionTime) => {
 }
 
 export const authLogout = () => {
-    localStorage.removeItem('auth_token');
-    localStorage.removeItem('users');
-    localStorage.removeItem('policyHolder_id');
-    localStorage.removeItem('policyHolder_refNo');
-    sessionStorage.removeItem('pan_data');
-    sessionStorage.removeItem('email_data');
-    sessionStorage.removeItem('proposed_insured');
-    sessionStorage.removeItem('display_looking_for');
-    sessionStorage.removeItem('display_dob');
+    // localStorage.removeItem('auth_token');
+    // localStorage.removeItem('users');
+    // localStorage.removeItem('policyHolder_id');
+    // localStorage.removeItem('policyHolder_refNo');
+    // sessionStorage.removeItem('pan_data');
+    // sessionStorage.removeItem('email_data');
+    // sessionStorage.removeItem('proposed_insured');
+    // sessionStorage.removeItem('display_looking_for');
+    // sessionStorage.removeItem('display_dob');
+    localStorage.clear()
+    sessionStorage.clear()
 
     return {
         type: AUTH_LOGOUT
@@ -121,13 +123,13 @@ export const authValidate = () => {
                     localStorage.setItem('users', JSON.stringify({ user: items.user, permission: items.permission, lastAction: Date.now() }));                    
                     dispatch(authSuccess({ token, user: items.user, permission: items.permission, lastAction: items.lastAction }));
                 } else {
-                    dispatch(authLogout());
+                    // dispatch(authLogout());
                 }
             } else {
-                dispatch(authLogout());
+                // dispatch(authLogout());
             }
         } else {
-            dispatch(authLogout());
+            // dispatch(authLogout());
         }
     }
 }
