@@ -26,7 +26,7 @@ class SideNav extends Component {
         axios.post('/logout', formData)
             .then(res => {
                 localStorage.removeItem('cons_reg_info');
-                this.props.history.push(`/LogIn`);
+                // this.props.history.push(`/LogIn`);
                 window.location = `${res.data.data.logout_url}`
                 this.props.logout();             
             })

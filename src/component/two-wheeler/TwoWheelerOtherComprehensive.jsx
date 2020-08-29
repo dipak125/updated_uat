@@ -310,7 +310,7 @@ class TwoWheelerOtherComprehensive extends Component {
     handleSubmit = (values) => {
         const { productId } = this.props.match.params
         const { motorInsurance, PolicyArray, sliderVal, add_more_coverage } = this.state
-        let defaultSliderValue = PolicyArray.length > 0 ? Math.floor(PolicyArray[0].PolicyRiskList[0].IDV_Suggested) : 0
+        let defaultSliderValue = PolicyArray.length > 0 ? Math.round(PolicyArray[0].PolicyRiskList[0].IDV_Suggested) : 0
 
         const formData = new FormData();
         let encryption = new Encryption();
@@ -538,7 +538,7 @@ class TwoWheelerOtherComprehensive extends Component {
                                 <section className="brand colpd m-b-25">
                                     <div className="d-flex justify-content-left">
                                         <div className="brandhead m-b-10">
-                                            <h4 className="m-b-30">Third Party Liability Coverage</h4>
+                                            <h4 className="m-b-30">Covers your Two Wheeler + Damage to Others (Comprehensive)</h4>
                                             <h5>{errMsg}</h5>
                                         </div>
                                     </div>

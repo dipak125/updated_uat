@@ -123,7 +123,7 @@ export const authValidate = () => {
                     localStorage.setItem('users', JSON.stringify({ user: items.user, permission: items.permission, lastAction: Date.now() }));                    
                     dispatch(authSuccess({ token, user: items.user, permission: items.permission, lastAction: items.lastAction }));
                 } else {
-                    // dispatch(authLogout());
+                    dispatch(authLogout());
                 }
             } else {
                 // dispatch(authLogout());

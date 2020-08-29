@@ -50,7 +50,8 @@ const initialValue = {
     previous_policy_no: "",
     previous_policy_name: "",
     insurance_company_id: 0,
-    policy_type_id: ""
+    policy_type_id: "",
+    puc: '1'
 }
 const ComprehensiveValidation = Yup.object().shape({
 
@@ -79,6 +80,8 @@ const ComprehensiveValidation = Yup.object().shape({
         then: Yup.string(),
         otherwise: Yup.string().required('Please provide registration number').matches(/^[A-Z]{2}[0-9]{2}(?:[A-Z])?(?:[A-Z]*)?[0-9]{4}$/, 'Invalid Registration number')
     }),
+
+    puc: Yup.string().required("Please verify pollution certificate to proceed"),
 
     chasis_no_last_part:Yup.string().required('This field is required')
     .matches(/^([0-9]*)$/, function() {
@@ -355,58 +358,56 @@ class TwoWheelerVerify extends Component {
         if(errors.registration_no || errors.chasis_no_last_part) {
             swal("Please provide correct Registration number and Chasis number")
         }
-        // else {
-        //     if(values.newRegistrationNo != "NEW") {
-        //         this.props.loadingStart()
-        //         axios
-        //         .post(`/getVahanDetails`,formData)
-        //         .then((res) => {
-        //             this.setState({
-        //             vahanDetails: res.data,
-        //             vahanVerify: res.data.length > 0 ? true : false
-        //             });
-
-        //             setFieldTouched('vahanVerify')
-        //             res.data.length > 0 ?
-        //             setFieldValue('vahanVerify', true) 
-        //             : setFieldValue('vahanVerify', false)
-
-        //             this.props.loadingStop();
-        //         })
-        //         .catch((err) => {
-        //             this.setState({
-        //                 vahanDetails: [],
-        //             });
-        //             swal("Please provide correct Registration number and Chasis number")
-        //             this.props.loadingStop();
-        //         });
-        //     }
-        //     else {
-        //         this.props.loadingStart()
-        //             this.setState({
-        //             vahanDetails: [],
-        //             vahanVerify:  true 
-        //             });
-    
-        //             setFieldTouched('vahanVerify')
-        //             setFieldValue('vahanVerify', true) 
-    
-        //             this.props.loadingStop();
-        //     }
-
-        // }
         else {
-            this.props.loadingStart()
-                this.setState({
-                vahanDetails: [],
-                vahanVerify:  true 
+            if(values.newRegistrationNo != "NEW") {
+                this.props.loadingStart()
+                axios
+                .post(`/getVahanDetails`,formData)
+                .then((res) => {
+                    this.setState({
+                    vahanDetails: res.data,
+                    vahanVerify:  true 
+                    });
+
+                    setFieldTouched('vahanVerify')
+                    setFieldValue('vahanVerify', true) 
+
+                    this.props.loadingStop();
+                })
+                .catch((err) => {
+                    this.setState({
+                        vahanDetails: [],
+                    });
+                    swal("Please provide correct Registration number and Chasis number")
+                    this.props.loadingStop();
                 });
+            }
+            else {
+                this.props.loadingStart()
+                    this.setState({
+                    vahanDetails: [],
+                    vahanVerify:  true 
+                    });
+    
+                    setFieldTouched('vahanVerify')
+                    setFieldValue('vahanVerify', true) 
+    
+                    this.props.loadingStop();
+            }
 
-                setFieldTouched('vahanVerify')
-                setFieldValue('vahanVerify', true) 
-
-                this.props.loadingStop();
         }
+        // else {
+        //     this.props.loadingStart()
+        //         this.setState({
+        //         vahanDetails: [],
+        //         vahanVerify:  true 
+        //         });
+
+        //         setFieldTouched('vahanVerify')
+        //         setFieldValue('vahanVerify', true) 
+
+        //         this.props.loadingStop();
+        // }
     };
 
     getInsurerList = () => {
@@ -891,13 +892,73 @@ class TwoWheelerVerify extends Component {
                                 </Fragment> 
                               : null}
 
+                               <Row>
+                                    <Col sm={12}>
+                                        <FormGroup>
+                                            <div className="carloan">
+                                                <h4> </h4>
+                                            </div>
+                                            <div className="col-md-15">
+                                                <div className="brandhead"> 
+                                                    I/we hold a valid and effective PUC and/or fitness certificate, as applicable, for the vehicle mentioned herein and undertake to renew the same during the policy period
+                                                    <div className="carloan">
+                                                        <h4> </h4>
+                                                    </div>
+                                                        <div className="d-inline-flex m-b-15">
+                                                            <div className="p-r-25">
+                                                                <label className="customRadio3">
+                                                                    <Field
+                                                                        type="radio"
+                                                                        name='puc'
+                                                                        value='1'
+                                                                        key='1'
+                                                                        checked = {values.puc == '1' ? true : false}
+                                                                        onChange = {() =>{
+                                                                            setFieldTouched('puc')
+                                                                            setFieldValue('puc', '1');
+                                                                        }  
+                                                                        }
+                                                                    />
+                                                                    <span className="checkmark " /><span className="fs-14"> Yes</span>
+                                                                </label>
+                                                            </div>
+                                                            <div className="p-r-25">
+                                                                <label className="customRadio3">
+                                                                    <Field
+                                                                        type="radio"
+                                                                        name='puc'
+                                                                        value='2'
+                                                                        key='1'
+                                                                        checked = {values.puc == '2' ? true : false}
+                                                                        onChange = {() =>{
+                                                                            setFieldTouched('puc')
+                                                                            setFieldValue('puc', '2');
+                                                                        }  
+                                                                        }
+                                                                    />
+                                                                    <span className="checkmark " /><span className="fs-14"> No</span>
+                                                                </label>
+                                                                {errors.puc && touched.puc ? (
+                                                                    <span className="errorMsg">{errors.puc}</span>
+                                                                ) : null}
+                                                            </div>
+                                                        </div>
+                                                </div>
+                                            </div> 
+                                            
+                                        </FormGroup>
+                                    </Col>
+                                </Row>
+
                                     <div className="d-flex justify-content-left resmb">
                                         <Button className={`backBtn`} type="button"  onClick= {this.otherComprehensive.bind(this,productId)}>
                                             Back
                                         </Button> 
+                                        {values.puc == '1' ? 
                                         <Button className={`proceedBtn`} type="submit"  >
                                             Continue
                                         </Button>
+                                        : null }
                                         </div>
                                     </Col>
                                     <Col sm={12} md={3}>

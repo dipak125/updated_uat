@@ -28,7 +28,8 @@ const initialValue = {
     // cngKit_Cost: 0,
     engine_no: "",
     vahanVerify: false,
-    newRegistrationNo: ""
+    newRegistrationNo: "",
+    puc: '1'
 }
 const ComprehensiveValidation = Yup.object().shape({
     // is_carloan: Yup.number().required('Please select one option')
@@ -39,8 +40,10 @@ const ComprehensiveValidation = Yup.object().shape({
     registration_no: Yup.string().when("newRegistrationNo", {
         is: "NEW",       
         then: Yup.string(),
-        otherwise: Yup.string().required('Please provide registration number').matches(/^[A-Z]{2}[0-9]{2}(?:[A-Z])?(?:[A-Z]*)?[0-9]{4}$/, 'Invalid Registration number'),
+        otherwise: Yup.string().required('Please provide registration number').matches(/^[A-Z]{2}[ -][0-9]{1,2}[ -][A-Z]{1,3}[ -][0-9]{4}$/, 'Invalid Registration number'),
     }),
+
+    puc: Yup.string().required("Please verify pollution certificate to proceed"),
 
     chasis_no_last_part:Yup.string().required('This field is required')
     .matches(/^([0-9]*)$/, function() {
@@ -138,7 +141,9 @@ class OtherComprehensive extends Component {
             policyCoverage: [],
             regno:'',
             length:14,
-            moreCoverage: []
+            moreCoverage: [],
+            engine_no: "",
+            chasis_no: ""
         };
     }
 
@@ -275,29 +280,44 @@ class OtherComprehensive extends Component {
     //         swal("Please provide correct Registration number and Chasis number")
     //     }
     //     else {
-    //         this.props.loadingStart()
-    //         axios
-    //         .post(`/getVahanDetails`,formData)
-    //         .then((res) => {
-    //             this.setState({
-    //             vahanDetails: res.data,
-    //             vahanVerify: res.data.length > 0 ? true : false
+    //         if(values.newRegistrationNo != "NEW") {
+    //             this.props.loadingStart()
+    //             axios
+    //             .post(`/getVahanDetails`,formData)
+    //             .then((res) => {
+    //                 this.setState({
+    //                 vahanDetails: res.data,
+    //                 vahanVerify:  true ,
+    //                 engine_no: res.data.status == "Found" ? res.data.engineNo : "",
+    //                 chasis_no: res.data.status == "Found" ? res.data.chasiNo : "",
+    //                 });
+
+    //                 setFieldTouched('vahanVerify')
+    //                 setFieldValue('vahanVerify', true) 
+
+    //                 this.props.loadingStop();
+    //             })
+    //             .catch((err) => {
+    //                 this.setState({
+    //                     vahanDetails: [],
+    //                 });
+    //                 swal("Please provide correct Registration number and Chasis number")
+    //                 this.props.loadingStop();
     //             });
-
-    //             setFieldTouched('vahanVerify')
-    //             res.data.length > 0 ?
-    //             setFieldValue('vahanVerify', true) 
-    //             : setFieldValue('vahanVerify', false)
-
-    //             this.props.loadingStop();
-    //         })
-    //         .catch((err) => {
-    //             this.setState({
+    //         }
+    //         else {
+    //             this.props.loadingStart()
+    //                 this.setState({
     //                 vahanDetails: [],
-    //             });
-    //             swal("Please provide correct Registration number and Chasis number")
-    //             this.props.loadingStop();
-    //         });
+    //                 vahanVerify:  true 
+    //                 });
+    
+    //                 setFieldTouched('vahanVerify')
+    //                 setFieldValue('vahanVerify', true) 
+    
+    //                 this.props.loadingStop();
+    //         }
+
     //     }
     // };
 
@@ -402,7 +422,8 @@ class OtherComprehensive extends Component {
                 // 'cngkit_cost': values.cngKit_Cost,
                 'engine_no': values.engine_no,
                 'idv_value': sliderVal ? sliderVal : defaultSliderValue.toString(),
-                'add_more_coverage': add_more_coverage
+                'add_more_coverage': add_more_coverage,
+                'puc': values.puc
             }
         }
         else {
@@ -416,6 +437,7 @@ class OtherComprehensive extends Component {
                 // 'cngkit_cost': values.cngKit_Cost,
                 'engine_no': values.engine_no,
                 'idv_value': sliderVal ? sliderVal : defaultSliderValue.toString(),
+                'puc': values.puc
             }
         }
         console.log('post_data',post_data)
@@ -461,29 +483,29 @@ class OtherComprehensive extends Component {
     regnoFormat = (e, setFieldTouched, setFieldValue) => {
         
         let regno = e.target.value
-        // let formatVal = ""
-        // let regnoLength = regno.length
-        // var letter = /^[a-zA-Z]+$/;
-        // var number = /^[0-9]+$/;
-        // let subString = regno.substring(regnoLength-1, regnoLength)
-        // let preSubString = regno.substring(regnoLength-2, regnoLength-1)
+        let formatVal = ""
+        let regnoLength = regno.length
+        var letter = /^[a-zA-Z]+$/;
+        var number = /^[0-9]+$/;
+        let subString = regno.substring(regnoLength-1, regnoLength)
+        let preSubString = regno.substring(regnoLength-2, regnoLength-1)
 
-        // if(subString.match(letter) && preSubString.match(letter)) {
-        //     formatVal = regno
-        // }
-        // else if(subString.match(number) && preSubString.match(number)) {
-        //     formatVal = regno
-        // } 
-        // else if(subString.match(number) && preSubString.match(letter)) {        
-        //     formatVal = regno.substring(0, regnoLength-1) + " " +subString      
-        // } 
-        // else if(subString.match(letter) && preSubString.match(number)) {
-        //     formatVal = regno.substring(0, regnoLength-1) + " " +subString   
-        // } 
+        if(subString.match(letter) && preSubString.match(letter)) {
+            formatVal = regno
+        }
+        else if(subString.match(number) && preSubString.match(number)) {
+            formatVal = regno
+        } 
+        else if(subString.match(number) && preSubString.match(letter)) {        
+            formatVal = regno.substring(0, regnoLength-1) + " " +subString      
+        } 
+        else if(subString.match(letter) && preSubString.match(number)) {
+            formatVal = regno.substring(0, regnoLength-1) + " " +subString   
+        } 
 
-        // else formatVal = regno.toUpperCase()
+        else formatVal = regno.toUpperCase()
         
-        e.target.value = regno.toUpperCase()
+        e.target.value = formatVal.toUpperCase()
 
     }
 
@@ -495,7 +517,7 @@ class OtherComprehensive extends Component {
 
     render() {
         const {showCNG, vahanDetails,error, policyCoverage, vahanVerify, is_CNG_account, fulQuoteResp, PolicyArray, 
-            moreCoverage, sliderVal, motorInsurance, serverResponse} = this.state
+            moreCoverage, sliderVal, motorInsurance, serverResponse, engine_no, chasis_no} = this.state
         const {productId} = this.props.match.params 
         let defaultSliderValue = PolicyArray.length > 0 ? Math.round(PolicyArray[0].PolicyRiskList[0].IDV_Suggested) : 0
         let sliderValue = sliderVal
@@ -505,17 +527,19 @@ class OtherComprehensive extends Component {
         maxIDV = maxIDV - 1;
         let newInitialValues = Object.assign(initialValue, {
             registration_no: motorInsurance.registration_no ? motorInsurance.registration_no : "",
-            chasis_no: motorInsurance.chasis_no ? motorInsurance.chasis_no : "",
+            chasis_no: motorInsurance.chasis_no ? motorInsurance.chasis_no : (chasis_no ? chasis_no : ""),
             chasis_no_last_part: motorInsurance.chasis_no_last_part ? motorInsurance.chasis_no_last_part : "",
             add_more_coverage: motorInsurance.add_more_coverage ? motorInsurance.add_more_coverage : "",
             // cng_kit: motorInsurance.cng_kit ? motorInsurance.cng_kit : "",
             // cng_kit: motorInsurance.cng_kit == 0 || motorInsurance.cng_kit == 1 ? motorInsurance.cng_kit : is_CNG_account,
             // cngKit_Cost: motorInsurance.cngkit_cost ? Math.round(motorInsurance.cngkit_cost) : 0,
-            engine_no: motorInsurance.engine_no ? motorInsurance.engine_no : "",
+            engine_no: motorInsurance.engine_no ? motorInsurance.engine_no : (engine_no ? engine_no : ""),
             vahanVerify: vahanVerify,
             newRegistrationNo: localStorage.getItem('registration_number') == "NEW" ? localStorage.getItem('registration_number') : ""
 
         });
+
+        console.log("engine_no -------chasis_no--- ", engine_no+"-------"+chasis_no)
 
         let OD_TP_premium = serverResponse.PolicyLobList ? serverResponse.PolicyLobList[0].PolicyRiskList[0] : []
 
@@ -903,18 +927,79 @@ class OtherComprehensive extends Component {
                                 </Col>
                             )) : null}
                                 </Row>    
+                                
+                                <Row>
+                                    <Col sm={12}>
+                                        <FormGroup>
+                                            <div className="carloan">
+                                                <h4> </h4>
+                                            </div>
+                                            <div className="col-md-15">
+                                                <div className="brandhead"> 
+                                                    I/we hold a valid and effective PUC and/or fitness certificate, as applicable, for the vehicle mentioned herein and undertake to renew the same during the policy period
+                                                    <div className="carloan">
+                                                        <h4> </h4>
+                                                    </div>
+                                                        <div className="d-inline-flex m-b-15">
+                                                            <div className="p-r-25">
+                                                                <label className="customRadio3">
+                                                                    <Field
+                                                                        type="radio"
+                                                                        name='puc'
+                                                                        value='1'
+                                                                        key='1'
+                                                                        checked = {values.puc == '1' ? true : false}
+                                                                        onChange = {() =>{
+                                                                            setFieldTouched('puc')
+                                                                            setFieldValue('puc', '1');
+                                                                        }  
+                                                                        }
+                                                                    />
+                                                                    <span className="checkmark " /><span className="fs-14"> Yes</span>
+                                                                </label>
+                                                            </div>
+                                                            <div className="p-r-25">
+                                                                <label className="customRadio3">
+                                                                    <Field
+                                                                        type="radio"
+                                                                        name='puc'
+                                                                        value='2'
+                                                                        key='1'
+                                                                        checked = {values.puc == '2' ? true : false}
+                                                                        onChange = {() =>{
+                                                                            setFieldTouched('puc')
+                                                                            setFieldValue('puc', '2');
+                                                                        }  
+                                                                        }
+                                                                    />
+                                                                    <span className="checkmark " /><span className="fs-14"> No</span>
+                                                                </label>
+                                                                {errors.puc && touched.puc ? (
+                                                                    <span className="errorMsg">{errors.puc}</span>
+                                                                ) : null}
+                                                            </div>
+                                                        </div>
+                                                </div>
+                                            </div> 
+                                            
+                                        </FormGroup>
+                                    </Col>
+                                </Row>
+                                
                                 <div className="d-flex justify-content-left resmb">
                                     <Button className={`backBtn`} type="button"  onClick= {this.vehicleDetails.bind(this,productId)}>
                                         Back
                                     </Button> 
-                                    { serverResponse && serverResponse != "" ? (serverResponse.message ? 
-                                    <Button className={`proceedBtn`} type="submit"  >
-                                        Recalculate
-                                    </Button> : <Button className={`proceedBtn`} type="submit"  >
-                                        Continue
-                                    </Button> ) : <Button className={`proceedBtn`} type="submit"  >
-                                        Recalculate
-                                    </Button>}
+
+                                        { serverResponse && serverResponse != "" ? (serverResponse.message ? 
+                                        <Button className={`proceedBtn`} type="submit"  >
+                                            Recalculate
+                                        </Button> : (values.puc == '1' ?  <Button className={`proceedBtn`} type="submit"  >
+                                            Continue
+                                        </Button>  : null)) : <Button className={`proceedBtn`} type="submit"  >
+                                            Recalculate
+                                        </Button>}
+
                                     </div>
                                 </Col>
 
