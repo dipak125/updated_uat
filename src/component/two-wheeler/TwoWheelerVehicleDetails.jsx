@@ -311,7 +311,7 @@ class TwoWheelerVehicleDetails extends Component {
                  let RTO_location = motorInsurance && motorInsurance.location && motorInsurance.location.RTO_LOCATION ? motorInsurance.location.RTO_LOCATION+" - "+motorInsurance.location.NameCode : ""
                  let maxRegnDate= motorInsurance && motorInsurance.policytype_id == '1' ? moment() 
                         : (motorInsurance && motorInsurance.policytype_id == '2' ? moment(moment().subtract(1, 'years').calendar()).add(1, 'day').calendar() 
-                        : (motorInsurance && motorInsurance.policytype_id == '3' && motorInsurance.lapse_duration == '1' ? moment(moment().subtract(1, 'years')).subtract(1, 'day').calendar() : moment(moment().subtract(1, 'years')).subtract(2, 'day').calendar())) 
+                        : (motorInsurance && motorInsurance.policytype_id == '3' && motorInsurance.lapse_duration == '1' ? previousPolicy && previousPolicy.start_date ? moment(previousPolicy.start_date) : moment(moment().subtract(1, 'years')).subtract(1, 'day').calendar() : moment(moment().subtract(1, 'years')).subtract(2, 'day').calendar())) 
                  this.setState({
                     motorInsurance, previousPolicy, vehicleDetails,RTO_location, maxRegnDate
                 })

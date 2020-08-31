@@ -603,8 +603,16 @@ class TwoWheelerVerify extends Component {
             var month = motorInsurance && motorInsurance.registration_date ? date.getMonth() : ""
              year =   year.getFullYear() - 1
             minDate = new Date(year,month,day)
-            // minDate = moment(minDate).subtract(90, 'day').calendar()
             maxDate = moment().subtract(1, 'years').calendar()
+
+            var difference =  moment(maxDate).diff(minDate, 'days', true)
+            if(difference >= 90) {
+                // minDate = moment(moment().subtract(1, 'years').calendar()).add(1, 'day').calendar()
+                minDate = moment().subtract(1, 'years').calendar()
+                minDate = moment(minDate).subtract(89, 'day').calendar()
+
+            }
+            console.log("difference---", difference)
         }
         else {
             minDate = moment(moment().subtract(1, 'years').calendar()).add(1, 'day').calendar();
