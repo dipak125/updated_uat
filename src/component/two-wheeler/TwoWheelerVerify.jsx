@@ -596,15 +596,20 @@ class TwoWheelerVerify extends Component {
         });
 
         if(newInitialValues.lapse_duration == '1') {
-            minDate = moment(moment().subtract(1, 'years').calendar()).add(1, 'day').calendar();
-            minDate = moment(minDate).subtract(90, 'day').calendar()
-            maxDate = moment(minDate).add(89, 'day').calendar();
+            // minDate = moment(moment().subtract(1, 'years').calendar()).add(1, 'day').calendar();
+            var date = new Date(motorInsurance.registration_date);
+            var year = new Date()
+            var day = motorInsurance && motorInsurance.registration_date ? date.getDate() : ""
+            var month = motorInsurance && motorInsurance.registration_date ? date.getMonth() : ""
+             year =   year.getFullYear() - 1
+            minDate = new Date(year,month,day)
+            // minDate = moment(minDate).subtract(90, 'day').calendar()
+            maxDate = moment().subtract(1, 'years').calendar()
         }
         else {
             minDate = moment(moment().subtract(1, 'years').calendar()).add(1, 'day').calendar();
             maxDate = moment(minDate).add(30, 'day').calendar();
         }
-         
 
 
         const errMsg =
