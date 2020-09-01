@@ -9,7 +9,7 @@ import { connect } from "react-redux";
 import swal from 'sweetalert';
 import Encryption from '../../shared/payload-encryption';
 
-const refNumber = localStorage.getItem("policyHolder_id")
+// const refNumber = localStorage.getItem("policyHolder_id")
 
 class ThankYouPage extends Component {
 
@@ -29,7 +29,12 @@ class ThankYouPage extends Component {
         this.setState({
           accessToken: res.data.access_token
         })
-        this.getPolicyDoc(res.data.access_token)
+        return new Promise(resolve => {setTimeout(() => {
+          this.getPolicyDoc(res.data.access_token)
+            }
+            ,10000)
+        })
+        
       })
       .catch(err => {
         this.setState({
@@ -47,7 +52,8 @@ class ThankYouPage extends Component {
     //formData.append('policyNo', policyId)
     const post_data_obj = {
       'access_token': access_token,
-      'policyNo': policyId
+      'policyNo': policyId,
+      'policyHolder_Id':  this.state.policy_holder_id
     }
     let encryption = new Encryption();
     formData.append('enc_data', encryption.encrypt(JSON.stringify(post_data_obj)))
@@ -56,18 +62,23 @@ class ThankYouPage extends Component {
       .post(`/callDocApi`, formData)
       .then(res => {
         this.props.loadingStop();
-        if (res.data.getPolicyDocumentResponseBody.payload.URL[0] == "No Results found for the given Criteria") {
+
+        if(res.data.error == true) {
+          swal("Could not get policy document please try after some time")
+        }
+        else if (res.data.data.getPolicyDocumentResponseBody.payload.URL[0] == "No Results found for the given Criteria") {
           // swal(res.data.getPolicyDocumentResponseBody.payload.URL[0]);
           swal("Thank you for showing your interest for buying product.Due to some reasons, we are not able to issue the policy document online. Please call 180 22 1111");
         }
+        
         else {
           this.setState({
             response_text: res.data,
             res_error: false
           })
-          this.generate_pdf(res.data, refNumber)
-        }
 
+          this.generate_pdf(res.data.data, this.state.policy_holder_id)    
+        }
       })
       .catch(err => {
         this.setState({
