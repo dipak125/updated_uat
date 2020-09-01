@@ -87,6 +87,7 @@ class Premium extends Component {
     fetchData = () => {
         const { productId } = this.props.match.params
         let policyHolder_id = this.state.policyHolder_refNo ? this.state.policyHolder_refNo : '0'
+        let policyHolder_id_new = ''
         let encryption = new Encryption();
     
         axios.get(`policy-holder/motor/${policyHolder_id}`)
@@ -98,12 +99,13 @@ class Premium extends Component {
                 this.setState({
                     motorInsurance,policyHolder,
                     refNumber: decryptResp.data.policyHolder.reference_no,
+                    policyHolder_id_new: decryptResp.data.policyHolder.id,
                     paymentStatus: decryptResp.data.policyHolder.payment ? decryptResp.data.policyHolder.payment[0] : [],
                     memberdetails : decryptResp.data.policyHolder ? decryptResp.data.policyHolder : [],
                     nomineedetails: decryptResp.data.policyHolder ? decryptResp.data.policyHolder.request_data.nominee[0]:[]
                     
                 })
-
+                console.log('policyHolder_id_new', this.state.policyHolder_id_new)
                 this.getAccessToken(motorInsurance)
                
             })
@@ -135,7 +137,7 @@ class Premium extends Component {
         let encryption = new Encryption();
 
         const post_data = {
-            'id':this.state.policyHolder_refNo ? this.state.policyHolder_refNo : '0',
+            'id':this.state.policyHolder_id_new ? this.state.policyHolder_id_new : '0',
             'access_token':access_token,
             'idv_value': motorInsurance.idv_value,
             'policy_type': localStorage.getItem('policy_type'),
@@ -143,6 +145,7 @@ class Premium extends Component {
             'cng_kit': motorInsurance.cng_kit,
             'cngKit_Cost': Math.floor(motorInsurance.cngkit_cost)
         }
+        console.log('post_data', post_data)
 
         formData.append('enc_data',encryption.encrypt(JSON.stringify(post_data)))
 
