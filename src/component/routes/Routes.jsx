@@ -11,7 +11,6 @@ import Loader from "react-loader-spinner";
 import LogIn from "../common/login/LogIn";
 
 import Registration from '../motor/Registration';
-// import SelectBrand from '../motor/SelectBrand';
 import VehicleDetails from '../motor/VehicleDetails';
 import AdditionalDetails from '../motor/AdditionalDetails';
 import OtherComprehensive from '../motor/OtherComprehensive';
@@ -42,6 +41,11 @@ const componentLoader = () => {
     )
 }
 const loadingContent = componentLoader();
+
+const Error = Loadable({
+    loader: () => import(/*webpackChunkName: "Products" */"../common/ErrorPage.jsx"),
+    loading: () => loadingContent
+});
 
 const Break_in = Loadable({
     loader: () => import(/*webpackChunkName: "Products" */"../support/StatusTable.jsx"),
@@ -177,7 +181,8 @@ class Routes extends Component {
             <>
                 <HashRouter>
                     <Switch>
-                        <Route exact path="/login" component={LogIn} />                        
+                        <Route exact path="/login" component={LogIn} />                
+                        <Route exact path="/logout" component={Error} /> 
                         <PrivateRoute exact path="/Products" component={Products} />
                         <PrivateRoute exact path="/Health/:productId" component={Health} />
                         <PrivateRoute exact path="/MedicalDetails/:productId" component={MedicalDetails} />

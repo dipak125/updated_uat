@@ -32,7 +32,7 @@ class ThankYouPage extends Component {
         return new Promise(resolve => {setTimeout(() => {
           this.getPolicyDoc(res.data.access_token)
             }
-            ,10000)
+            ,5000)
         })
         
       })
@@ -64,7 +64,19 @@ class ThankYouPage extends Component {
         this.props.loadingStop();
 
         if(res.data.error == true) {
-          swal("Could not get policy document please try after some time")
+          swal({
+            title: "Alert",
+            text: "PDF Generation process is taking longer time than expected. Please have patience.",
+            icon: "warning",
+            // buttons: true,
+            dangerMode: true,
+          })
+          .then((willDownload) => {
+            if (willDownload) {
+            this.getAccessToken()
+            }
+          })
+
         }
         else if (res.data.data.getPolicyDocumentResponseBody.payload.URL[0] == "No Results found for the given Criteria") {
           // swal(res.data.getPolicyDocumentResponseBody.payload.URL[0]);

@@ -26,9 +26,9 @@ class SideNav extends Component {
         axios.post('/logout', formData)
             .then(res => {
                 localStorage.removeItem('cons_reg_info');
-                // this.props.history.push(`/LogIn`);
-                window.location = `${res.data.data.logout_url}`
-                this.props.logout();             
+                // window.location = `${res.data.data.logout_url}`
+                this.props.logout()
+                    // this.props.history.push(`/Error`);                                 
             })
             .catch(err => {
                 this.props.logout();
@@ -43,29 +43,29 @@ class SideNav extends Component {
             <>
                 <nav className="flex-fill leftNav">
                     <ul className="navPan">
-                        {/* <li>
+                        <li>
 							<Link to="/Dashboard" activeClassName="active"><span className="leftIcon01"><img src={require('../../../assets/images/leftIcon01.svg')} alt="" /></span>Dashboard</Link>
-                        </li> */}
+                        </li>
                         <li>
 							<Link to="/Products" activeClassName="active"><span className="leftIcon01"><img src={require('../../../assets/images/leftIcon02Hover.svg')} alt="" /></span>Products</Link>
                         </li>
                         <li>
 							<Link to="/Documents" activeClassName="active"><span className="leftIcon01"><img src={require('../../../assets/images/document.png')} alt="" /></span>Documents</Link>
                         </li>
-                        {/* <li>
+                        <li>
 							<Link to="/Supports" activeClassName="active"><span className="leftIcon01"><img src={require('../../../assets/images/support.png')} alt="" /></span>Support</Link>
-                        </li> */}
-                        {/* <li>
+                        </li>
+                        <li>
 							<Link to="/Break_in" activeClassName="active"><span className="leftIcon01"><img src={require('../../../assets/images/leftIcon01.svg')} alt="" /></span>Break In</Link>
-                        </li> */}
+                        </li>
                        {/* <li>
 							<Link to="/UnderMaintenance" activeClassName="active"><span className="leftIcon01"><img src={require('../../../assets/images/leftIcon05.svg')} alt="" /></span>Support</Link>
                         </li> */}
                     </ul>
 
-                    {/* <button className="btn-lg" onClick = {this.handleLogout}>
+                    <button className="btn-lg" onClick = {this.handleLogout}>
 							<a activeClassName="active"><span className="leftIcon01"><img src={require('../../../assets/images/Logout.svg')} alt="" /></span>Logout</a>
-                    </button> */}
+                    </button>
                 </nav>
             </>
         )
