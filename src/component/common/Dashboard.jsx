@@ -55,7 +55,8 @@ class Dashboard extends Component {
     state = {
         statusCount: [],
         policyHolder: [],
-        searchValues: {}
+        searchValues: {},
+        products: []
 
     }
 
@@ -97,10 +98,10 @@ class Dashboard extends Component {
             bc_data = JSON.parse(encryption.decrypt(bc_data));
         }
 
-        formData.append('bcmaster_id', bc_data ? bc_data.agent_id : "")  
+        formData.append('bcmaster_id', sessionStorage.getItem('csc_id') ? "5" : bc_data ? bc_data.agent_id : "" ) 
         formData.append('page_no', page_no)   
-        // formData.append('policy_status', 'complete')
-        formData.append('bc_agent_id', bc_data ? bc_data.user_info.data.user.username : "",) 
+        formData.append('policy_status', 'complete')
+        formData.append('bc_agent_id', sessionStorage.getItem('csc_id') ? sessionStorage.getItem('csc_id') : bc_data ? bc_data.user_info.data.user.username : "") 
 
         this.props.loadingStart();
         axios.post('bc/policy-customer',formData)
@@ -200,13 +201,27 @@ class Dashboard extends Component {
         );
       }
 
-    componentDidMount() {
+    getAllProducts = () => {
+    this.props.loadingStart();
+    axios.get('all-product')
+        .then(res => {
+        this.setState({
+            products: res.data.data ? res.data.data : [],
+        });
         this.fetchDashboard();
+        })
+        .catch(err => {
+        this.props.loadingStop();
+        });
+    }
+
+    componentDidMount() {
+        this.getAllProducts()
     }
 
 
     render() {
-        const { statusCount, policyHolder } = this.state
+        const { statusCount, policyHolder, products } = this.state
         var totalRecord = statusCount ? statusCount.totalRecord : 1
         var page_no = statusCount ? statusCount.page_no : 1 
 
@@ -247,7 +262,7 @@ class Dashboard extends Component {
                                 return (
                                     <Form>
                                         <div className="rghtsideTrigr collinput W-90 m-b-30">
-                                            <Collapsible trigger="Search with Policy Number" open={false}>
+                                            <Collapsible trigger="Search with Policy Number" open={false} >
                                                 <div className="listrghtsideTrigr">
                                                 <Row>
                                                     <Col sm={12} md={4} lg={4}>
@@ -280,12 +295,7 @@ class Dashboard extends Component {
                                                 <Button className={`proceedBtn`} type="submit" >
                                                     Search
                                                 </Button>
-                                                <Row>
-                                                    <Col sm={12} md={4} lg={4}> &nbsp;</Col>
-                                                </Row>
-                                                <Row>
-                                                    <Col sm={12} md={4} lg={4}> &nbsp;</Col>
-                                                </Row>
+                                                <Row><Col>&nbsp;</Col></Row>
                                                 </div>                    
                                             </Collapsible>
                                             <Collapsible trigger="Search with Proposer Details" open={false}>
@@ -442,16 +452,11 @@ class Dashboard extends Component {
                                                 <Button className={`proceedBtn`} type="submit" >
                                                     Search
                                                 </Button>
-                                                <Row>
-                                                    <Col sm={12} md={4} lg={4}> &nbsp;</Col>
-                                                </Row>
-                                                <Row>
-                                                    <Col sm={12} md={4} lg={4}> &nbsp;</Col>
-                                                </Row>
+                                                <Row><Col>&nbsp;</Col></Row>
                                                 </div>
                                             </Collapsible>
                                             <Collapsible trigger="Search with Dates & Products" open={false}>
-                                                <div className="listrghtsideTrigr">
+                                                <div  className="listrghtsideTrigr">
                                                 <Row className="m-b-20">
                                                 <Col sm={12} md={6} lg={6}>
                                                     <Row>
@@ -549,7 +554,9 @@ class Dashboard extends Component {
                                                                 className="formGrp"
                                                             >
                                                             <option value="">Product Id</option>
-                                                            <option value='1'>Two wheeler</option>                                        
+                                                            {products.map((productName, qIndex) => ( 
+                                                                <option value={productName.id}>{productName.name}</option>    
+                                                            ))}                                    
                                                             </Field>     
                                                             {errors.product_id && touched.product_id ? (
                                                                 <span className="errorMsg">{errors.product_id}</span>
@@ -561,12 +568,7 @@ class Dashboard extends Component {
                                                 <Button className={`proceedBtn`} type="submit" >
                                                     Search
                                                 </Button>
-                                                <Row>
-                                                    <Col sm={12} md={4} lg={4}> &nbsp;</Col>
-                                                </Row>
-                                                <Row>
-                                                    <Col sm={12} md={4} lg={4}> &nbsp;</Col>
-                                                </Row>
+                                                
                                                 </div>
                                             </Collapsible>
                                         </div>
