@@ -143,7 +143,9 @@ class OtherComprehensive extends Component {
             length:14,
             moreCoverage: [],
             engine_no: "",
-            chasis_no: ""
+            chasis_no: "",
+            chasiNo:'',
+            engineNo:''
         };
     }
 
@@ -262,6 +264,76 @@ class OtherComprehensive extends Component {
           });
       };
 
+    getVahanDetails = async(values, setFieldTouched, setFieldValue, errors) => {
+
+        const formData = new FormData();
+        if(values.newRegistrationNo == "NEW") {
+            formData.append("regnNo", values.newRegistrationNo);
+            setFieldTouched('registration_no');
+            setFieldValue('registration_no', values.newRegistrationNo);
+        }
+        else {
+            formData.append("regnNo", values.registration_no);
+        }
+
+        formData.append("chasiNo", values.chasis_no_last_part);
+        
+        if(errors.registration_no || errors.chasis_no_last_part) {
+            swal("Please provide correct Registration number and Chasis number")
+        }
+        else {
+            if(values.newRegistrationNo != "NEW") {
+                this.props.loadingStart()
+                await axios
+                .post(`/getVahanDetails`,formData)
+                .then((res) => {
+                    this.setState({
+                    vahanDetails: res.data,
+                    vahanVerify:  true 
+                });
+                if(this.state.vahanDetails.data[0].chasiNo){
+                    this.setState({chasiNo: this.state.vahanDetails.data[0].chasiNo})
+                }
+
+                if(this.state.vahanDetails.data[0].engineNo){
+                    this.setState({engineNo: this.state.vahanDetails.data[0].engineNo})
+                }
+
+                setFieldTouched('vahanVerify')
+                setFieldValue('vahanVerify', true)
+                console.log('chasiNo', this.state.chasiNo)
+                console.log('engineNo', this.state.engineNo)
+                setFieldTouched('engine_no')
+                setFieldValue('engine_no', this.state.engineNo)
+                setFieldTouched('chasis_no')
+                setFieldValue('chasis_no', this.state.chasiNo)
+
+                this.props.loadingStop();
+                })
+                .catch((err) => {
+                    this.setState({
+                        vahanDetails: [],
+                    });
+                    swal("Please provide correct Registration number and Chasis number")
+                    this.props.loadingStop();
+                });
+            }
+            else {
+                this.props.loadingStart()
+                    this.setState({
+                    vahanDetails: [],
+                    vahanVerify:  true 
+                    });
+    
+                    setFieldTouched('vahanVerify')
+                    setFieldValue('vahanVerify', true) 
+    
+                    this.props.loadingStop();
+            }
+
+        }
+    };
+
     // getVahanDetails = (values, setFieldTouched, setFieldValue, errors) => {
 
     //     const formData = new FormData();
@@ -280,77 +352,18 @@ class OtherComprehensive extends Component {
     //         swal("Please provide correct Registration number and Chasis number")
     //     }
     //     else {
-    //         if(values.newRegistrationNo != "NEW") {
-    //             this.props.loadingStart()
-    //             axios
-    //             .post(`/getVahanDetails`,formData)
-    //             .then((res) => {
-    //                 this.setState({
-    //                 vahanDetails: res.data,
-    //                 vahanVerify:  true ,
-    //                 engine_no: res.data.status == "Found" ? res.data.engineNo : "",
-    //                 chasis_no: res.data.status == "Found" ? res.data.chasiNo : "",
-    //                 });
-
-    //                 setFieldTouched('vahanVerify')
-    //                 setFieldValue('vahanVerify', true) 
-
-    //                 this.props.loadingStop();
-    //             })
-    //             .catch((err) => {
-    //                 this.setState({
-    //                     vahanDetails: [],
-    //                 });
-    //                 swal("Please provide correct Registration number and Chasis number")
-    //                 this.props.loadingStop();
+    //         this.props.loadingStart()
+    //             this.setState({
+    //             vahanDetails: [],
+    //             vahanVerify:  true 
     //             });
-    //         }
-    //         else {
-    //             this.props.loadingStart()
-    //                 this.setState({
-    //                 vahanDetails: [],
-    //                 vahanVerify:  true 
-    //                 });
-    
-    //                 setFieldTouched('vahanVerify')
-    //                 setFieldValue('vahanVerify', true) 
-    
-    //                 this.props.loadingStop();
-    //         }
 
+    //             setFieldTouched('vahanVerify')
+    //             setFieldValue('vahanVerify', true) 
+
+    //             this.props.loadingStop();
     //     }
     // };
-
-    getVahanDetails = (values, setFieldTouched, setFieldValue, errors) => {
-
-        const formData = new FormData();
-        if(values.newRegistrationNo == "NEW") {
-            formData.append("regnNo", values.newRegistrationNo);
-            setFieldTouched('registration_no');
-            setFieldValue('registration_no', values.newRegistrationNo);
-        }
-        else {
-            formData.append("regnNo", values.registration_no);
-        }
-
-        formData.append("chasiNo", values.chasis_no_last_part);
-        
-        if(errors.registration_no || errors.chasis_no_last_part) {
-            swal("Please provide correct Registration number and Chasis number")
-        }
-        else {
-            this.props.loadingStart()
-                this.setState({
-                vahanDetails: [],
-                vahanVerify:  true 
-                });
-
-                setFieldTouched('vahanVerify')
-                setFieldValue('vahanVerify', true) 
-
-                this.props.loadingStop();
-        }
-    };
 
     fullQuote = (access_token, values) => {
         const { PolicyArray, sliderVal, add_more_coverage } = this.state

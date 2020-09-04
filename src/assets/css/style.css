@@ -589,6 +589,15 @@ Note: Beware of modifying this element as it can break the animations - you shou
     .pagiRtArrow:hover{ border: 1px solid transparent!important; color:#AAAAAA!important;}
           /*--Ticket Count Close--*/
 
+
+
+ /*-- Dashboard Start--*/
+ .collinput .insurerName textarea, .insurerName input {background-color: #ffffff !important;}
+ .collinput .datePckr {background-color: #ffffff !important;}
+ .collinput .formSection select {background-color: #ffffff !important;}
+ .collinput .react-datepicker__tab-loop {min-height: 250px;}
+ /*-- Dashboard Start--*/
+
 /*********** Extra large devices (large desktops, 1200px and up)***************/
 @media (min-width: 1200px) and (max-width: 1399.98px) {
     

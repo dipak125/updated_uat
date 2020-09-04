@@ -6,11 +6,15 @@ import { authLogout } from "../../../../store/actions/auth";
 import axios from "../../../../shared/axios"
 import Encryption from '../../../../shared/payload-encryption';
 
-let logo = sessionStorage.getItem('logo') && sessionStorage.getItem('logo') != "undefined" ? sessionStorage.getItem('logo') : "search.svg"
+// let logo = sessionStorage.getItem('logo') && sessionStorage.getItem('logo') != "undefined" ? sessionStorage.getItem('logo') : "search.svg"
 
 let bc_data = {}
 
 class HeaderTop extends Component {
+
+    state = {
+        logo: sessionStorage.getItem('logo') && sessionStorage.getItem('logo') != "undefined" ? sessionStorage.getItem('logo') : "",
+    }
 
     handleLogout = () => {
         let token = localStorage.getItem("auth_token");
@@ -29,7 +33,7 @@ class HeaderTop extends Component {
 
 
     componentWillUpdate(nextProps, nextState) {
-        logo = sessionStorage.getItem('logo') && sessionStorage.getItem('logo') != "undefined" ? sessionStorage.getItem('logo') : ""
+        // logo = sessionStorage.getItem('logo') && sessionStorage.getItem('logo') != "undefined" ? sessionStorage.getItem('logo') : ""
         bc_data = sessionStorage.getItem('bcLoginData') ? sessionStorage.getItem('bcLoginData') : "";
         if(bc_data) {
             let encryption = new Encryption();
@@ -40,6 +44,7 @@ class HeaderTop extends Component {
       
     render() {
         // console.log("BC_data---", bc_data.user_info )
+        const { logo } = this.state
         return (
             <>
                 <section className="container-fluid headerTop d-flex justify-content-between">
@@ -79,7 +84,8 @@ class HeaderTop extends Component {
                                     </div>
                                     : null }
                                     <div className="align-self-center">
-                                    {logo ? 
+                                     {this.props.flag == "logout" ? null :  
+                                    logo ? 
                                     <img src={require(`../../../../assets/images/${logo}`)} alt="" className="notiBell"/>
                                     : <img src={require(`../../../../assets/images/vedavaag.png`)} alt="" className="notiBell"/>}
                                     </div>

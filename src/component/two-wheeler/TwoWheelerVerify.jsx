@@ -318,6 +318,8 @@ class TwoWheelerVerify extends Component {
             vahanVerify: false,
             policyCoverage: [],
             regno:'',
+            chasiNo:'',
+            engineNo:'',
             length:15,
             insurerList: [],
         };
@@ -384,7 +386,7 @@ class TwoWheelerVerify extends Component {
 
 
 
-    getVahanDetails = (values, setFieldTouched, setFieldValue, errors) => {
+    getVahanDetails = async(values, setFieldTouched, setFieldValue, errors) => {
 
         const formData = new FormData();
         if(values.newRegistrationNo == "NEW") {
@@ -404,16 +406,29 @@ class TwoWheelerVerify extends Component {
         else {
             if(values.newRegistrationNo != "NEW") {
                 this.props.loadingStart()
-                axios
+                await axios
                 .post(`/getVahanDetails`,formData)
                 .then((res) => {
                     this.setState({
                     vahanDetails: res.data,
                     vahanVerify: true 
                     });
+                    if(this.state.vahanDetails.data[0].chasiNo){
+                        this.setState({chasiNo: this.state.vahanDetails.data[0].chasiNo})
+                    }
+
+                    if(this.state.vahanDetails.data[0].engineNo){
+                        this.setState({engineNo: this.state.vahanDetails.data[0].engineNo})
+                    }
 
                     setFieldTouched('vahanVerify')
-                    setFieldValue('vahanVerify', true) 
+                    setFieldValue('vahanVerify', true)
+                    console.log('chasiNo', this.state.chasiNo)
+                    console.log('engineNo', this.state.engineNo)
+                    setFieldTouched('engine_no')
+                    setFieldValue('engine_no', this.state.engineNo)
+                    setFieldTouched('chasis_no')
+                    setFieldValue('chasis_no', this.state.chasiNo)
 
                     this.props.loadingStop();
                 })
