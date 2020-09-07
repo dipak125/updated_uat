@@ -73,6 +73,11 @@ const Documents = Loadable({
     loading: () => loadingContent
 });
 
+const Services = Loadable({
+    loader: () => import(/*webpackChunkName: "Documents" */"../services/Services.jsx"),
+    loading: () => loadingContent
+});
+
 const Supports = Loadable({
     loader: () => import(/*webpackChunkName: "Supports" */"../support/Supports.jsx"),
     loading: () => loadingContent
@@ -239,7 +244,12 @@ class Routes extends Component {
                         <PrivateRoute exact path="/Break_form" component={Break_form} /> 
 
                         {/************ Dashboard ******************/}
-                        <PrivateRoute exact path="/Dashboard" component={Dashboard} />
+                        <PrivateRoute exact path="/Dashboard" component={Dashboard} />   
+
+                        {/************ Services ******************/}
+                        <PrivateRoute exact path="/Services" component={Services} />
+
+
 
                         <PrivateRoute exact path="/UnderMaintenance" component={UnderMaintenance} />
                         <Redirect from="/" to="/Products" />

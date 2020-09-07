@@ -132,7 +132,8 @@ class Dashboard extends Component {
             });
             
             for (const key in values) {
-                if (values.hasOwnProperty(key)) {
+                console.log("values--- ", values[key])
+                if (values.hasOwnProperty(key) && values[key] != "") {
                   if(key == "start_date" || key == "end_date"){
                     formData.append(key, moment(values[key]).format("YYYY-MM-DD"));
                   }
@@ -151,7 +152,7 @@ class Dashboard extends Component {
 
         formData.append('bcmaster_id', bc_data ? bc_data.agent_id : "")  
         formData.append('page_no', 1)   
-        // formData.append('policy_status', 'complete')
+        formData.append('policy_status', 'complete')
         formData.append('bc_agent_id', bc_data ? bc_data.user_info.data.user.username : "",) 
 
         this.props.loadingStart();
@@ -215,6 +216,34 @@ class Dashboard extends Component {
         });
     }
 
+    handleClose = (val,setFieldValue,setFieldTouched) => {
+        if(val == 1) {
+            setFieldTouched('policy_no')
+            setFieldValue('policy_no', "")
+        }
+        if(val == 2) {
+            setFieldTouched('mobile_no')
+            setFieldValue('mobile_no', "")
+            setFieldTouched('email_id')
+            setFieldValue('email_id', "")
+        }
+        if(val == 3) {
+            setFieldTouched('start_date')
+            setFieldValue('start_date', "")
+            setFieldTouched('end_date')
+            setFieldValue('end_date', "")
+        }
+        if(val == 4) {
+            setFieldTouched('start_date')
+            setFieldValue('start_date', "")
+            setFieldTouched('end_date')
+            setFieldValue('end_date', "")
+            setFieldTouched('product_id')
+            setFieldValue('product_id', "")
+        }
+        
+    }
+
     componentDidMount() {
         this.getAllProducts()
     }
@@ -262,17 +291,19 @@ class Dashboard extends Component {
                                 return (
                                     <Form>
                                         <div className="rghtsideTrigr collinput W-90 m-b-30">
-                                            <Collapsible trigger="Search with Policy Number" open={false} >
+                                            <Collapsible trigger="Search with Policy Number" open={false} onClose = {this.handleClose.bind(this,1,setFieldValue,setFieldTouched)}>
                                                 <div className="listrghtsideTrigr">
                                                 <Row>
-                                                    <Col sm={12} md={4} lg={4}>
+                                                <Col sm={12} md={6} lg={10}>
+                                                    <Row>
+                                                    <Col sm={12} md={2} lg={4}>
                                                         <FormGroup>
                                                             <div className="insurerName">
                                                                 <span className="fs-16">Enter policy Number</span>
                                                             </div>
                                                         </FormGroup>
                                                     </Col>
-                                                    <Col sm={12} md={3} lg={2}>
+                                                    <Col sm={12} md={3} lg={4}>
                                                         <FormGroup>
                                                             <div className="insurerName">
                                                                 <Field
@@ -291,17 +322,21 @@ class Dashboard extends Component {
                                                             </div>
                                                         </FormGroup>
                                                     </Col>
+                                                    <Col sm={12} md={3} lg={2}>&nbsp;</Col>
+                                                    </Row>
+                                                    </Col>
+                                                    <Button className={`proceedBtn`} type="submit" >
+                                                        Search
+                                                    </Button>
                                                 </Row>
-                                                <Button className={`proceedBtn`} type="submit" >
-                                                    Search
-                                                </Button>
+                                               
                                                 <Row><Col>&nbsp;</Col></Row>
                                                 </div>                    
                                             </Collapsible>
-                                            <Collapsible trigger="Search with Proposer Details" open={false}>
+                                            <Collapsible trigger="Search with Proposer Details" open={false} onClose = {this.handleClose.bind(this,2,setFieldValue,setFieldTouched)}>
                                                 <div className="listrghtsideTrigr">
                                                 <Row>
-                                                <Col sm={12} md={6} lg={6}>
+                                                <Col sm={12} md={6} lg={5}>
                                                 <Row>
                                                     <Col sm={12} md={6} lg={6}>
                                                         <FormGroup>
@@ -310,7 +345,7 @@ class Dashboard extends Component {
                                                             </div>
                                                         </FormGroup>
                                                     </Col>
-                                                    <Col sm={12} md={6} lg={6}>
+                                                    <Col sm={12} md={6} lg={4}>
                                                         <FormGroup>
                                                             <div className="insurerName">
                                                                 <Field
@@ -332,7 +367,7 @@ class Dashboard extends Component {
                                                     </Row>
                                                     </Col>
                                                
-                                                    <Col sm={12} md={6} lg={6}>
+                                                    <Col sm={12} md={6} lg={5}>
                                                     <Row>
                                                     <Col sm={12} md={6} lg={6}>
                                                         <FormGroup>
@@ -341,7 +376,7 @@ class Dashboard extends Component {
                                                             </div>
                                                         </FormGroup>
                                                     </Col>
-                                                    <Col sm={12} md={6} lg={6}>
+                                                    <Col sm={12} md={6} lg={4}>
                                                         <FormGroup>
                                                             <div className="insurerName">
                                                                 <Field
@@ -362,16 +397,17 @@ class Dashboard extends Component {
                                                     </Col>
                                                     </Row>
                                                     </Col>
+                                                    <Button className={`proceedBtn m-b-40`} type="submit" >
+                                                        Search
+                                                    </Button>
                                                 </Row>
-                                                <Button className={`proceedBtn m-b-40`} type="submit" >
-                                                    Search
-                                                </Button>
+                                                
                                                 </div>
                                             </Collapsible>
-                                            <Collapsible trigger="Seach with Dates" open={false}>
+                                            <Collapsible trigger="Seach with Dates" open={false} onClose = {this.handleClose.bind(this,3,setFieldValue,setFieldTouched)}>
                                                 <div className="listrghtsideTrigr">
                                                 <Row>
-                                                <Col sm={12} md={6}>
+                                                <Col sm={12} md={5}>
                                                     <Row>
                                                     <Col sm={12} md={4} lg={4}>
                                                         <FormGroup>
@@ -410,7 +446,7 @@ class Dashboard extends Component {
                                                     </Row>
                                                     </Col>
                                                 
-                                                    <Col sm={12} md={6}>
+                                                    <Col sm={12} md={5}>
                                                     <Row>
                                                     <Col sm={12} md={4} lg={4}>
                                                         <FormGroup>
@@ -448,17 +484,18 @@ class Dashboard extends Component {
                                                     </Col>
                                                     </Row>
                                                     </Col>
+                                                    <Button className={`proceedBtn`} type="submit" >
+                                                        Search
+                                                    </Button>
                                                 </Row>
-                                                <Button className={`proceedBtn`} type="submit" >
-                                                    Search
-                                                </Button>
+                                                
                                                 <Row><Col>&nbsp;</Col></Row>
                                                 </div>
                                             </Collapsible>
-                                            <Collapsible trigger="Search with Dates & Products" open={false}>
+                                            <Collapsible trigger="Search with Dates & Products" open={false} onClose = {this.handleClose.bind(this,3,setFieldValue,setFieldTouched)}>
                                                 <div  className="listrghtsideTrigr">
                                                 <Row className="m-b-20">
-                                                <Col sm={12} md={6} lg={6}>
+                                                <Col sm={12} md={6} lg={5}>
                                                     <Row>
                                                     <Col sm={12} md={4} lg={4}>
                                                         <FormGroup>
@@ -496,7 +533,7 @@ class Dashboard extends Component {
                                                     </Col>
                                                     </Row>
                                                     </Col>
-                                                    <Col sm={12} md={6} lg={6}>
+                                                    <Col sm={12} md={6} lg={5}>
                                                     <Row>
                                                     <Col sm={12} md={4} lg={4}>
                                                         <FormGroup>
@@ -536,14 +573,16 @@ class Dashboard extends Component {
                                                     </Col>
                                                 </Row>
                                                 <Row>
-                                                    <Col sm={12} md={2} lg={2}>
+                                                <Col sm={12} md={6} lg={10}>
+                                                    <Row>
+                                                    <Col sm={12} md={2} lg={4}>
                                                         <FormGroup>
                                                             <div className="insurerName">
                                                                 <span className="fs-16">Product Id</span>
                                                             </div>
                                                         </FormGroup>
                                                     </Col>
-                                                    <Col sm={12} md={3} lg={3}>
+                                                    <Col sm={12} md={3} lg={4}>
                                                         <FormGroup>
                                                             <div className="formSection">
                                                             <Field
@@ -564,10 +603,13 @@ class Dashboard extends Component {
                                                             </div>
                                                         </FormGroup>
                                                     </Col>
+                                                    <Col sm={12} md={3} lg={2}>&nbsp;</Col>
+                                                    </Row>
+                                                    </Col>
+                                                    <Button className={`proceedBtn`} type="submit" >
+                                                        Search
+                                                    </Button>
                                                 </Row>
-                                                <Button className={`proceedBtn`} type="submit" >
-                                                    Search
-                                                </Button>
                                                 
                                                 </div>
                                             </Collapsible>
@@ -582,26 +624,34 @@ class Dashboard extends Component {
                                     &nbsp;
                                 </Row>
                                 {policyHolder ? 
+                                <div className="customInnerTable">
                                 <BootstrapTable ref="table"
                                     data={policyHolder}
                                     pagination={true}
                                     options={options}
                                     remote={true}
                                     fetchInfo={{ dataTotalSize: totalRecord }}
-                                    striped
-                                    hover
-                                    wrapperClasses="table-responsive"
+                                    // striped
+                                    // hover
+                                    // wrapperClasses="table-responsive"
                                 >
 
-                                    <TableHeaderColumn width='100px' dataField='created_at' dataFormat={(cell) => (cell !== '0000-00-00 00:00:00' ? moment(cell).format("MM-DD-YYYY") : '')} dataSort>Date</TableHeaderColumn>
-                                    <TableHeaderColumn width='100px' dataField="first_name" >Name</TableHeaderColumn>
-                                    <TableHeaderColumn width='100px' dataField="request_data" dataFormat={quoteFormatter} >Quote Number</TableHeaderColumn>
-                                    <TableHeaderColumn width='100px' dataField="request_data" dataFormat={premiumFormatter} >Net Premium</TableHeaderColumn>
-                                    <TableHeaderColumn width='200px' dataField="request_data" dataFormat={polNumFormatter} >Policy Number</TableHeaderColumn>
-                                    <TableHeaderColumn width='100px' dataField="vehiclebrandmodel" dataFormat={productFormatter} >Product</TableHeaderColumn>
-                                    <TableHeaderColumn width='100px' dataField="reference_no" isKey dataAlign="center" dataFormat={ actionFormatter(this) }>Download</TableHeaderColumn>
+                                    <TableHeaderColumn width='150px'  dataField="request_data" dataFormat={polNumFormatter} >Policy Number</TableHeaderColumn>
+                                    <TableHeaderColumn width='100px'  dataField='request_data' dataFormat={(cell) => (cell !== '0000-00-00 00:00:00' ? moment(cell.start_date).format("MM-DD-YYYY") : '')} dataSort>Policy Start Date</TableHeaderColumn>
+                                    <TableHeaderColumn width='100px'  dataField='request_data' dataFormat={(cell) => (cell !== '0000-00-00 00:00:00' ? moment(cell.end_date).format("MM-DD-YYYY") : '')} dataSort>Policy End Date</TableHeaderColumn>
+                                    <TableHeaderColumn width='100px'  dataField="vehiclebrandmodel" dataFormat={productFormatter} >Product</TableHeaderColumn>
+                                    <TableHeaderColumn width='100px'  dataField="first_name" >Proposer Name</TableHeaderColumn>
+                                    <TableHeaderColumn width='100px'  dataField="mobile"  >Mobile Number</TableHeaderColumn>
+                                    <TableHeaderColumn width='100px'  dataField="email_id"  >Email ID</TableHeaderColumn>
+{/* 
+                                    <TableHeaderColumn width='100px' tdStyle={{ whiteSpace: 'normal', width: '120px'}} dataField="request_data" dataFormat={quoteFormatter} >Quote Number</TableHeaderColumn>
+                                    <TableHeaderColumn width='100px' tdStyle={{ whiteSpace: 'normal', width: '120px'}} dataField="request_data" dataFormat={premiumFormatter} >Net Premium</TableHeaderColumn> */}
+                                    
+
+                                    <TableHeaderColumn width='100px'  dataField="reference_no" isKey dataAlign="center" dataFormat={ actionFormatter(this) }>Download</TableHeaderColumn>
 
                                 </BootstrapTable>
+                                </div>
                                 : null }
                             </div>
                         </div>

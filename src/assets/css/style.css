@@ -753,3 +753,76 @@ img.avatar {  border-radius: inherit;}
  /* 04-09-20*/
 /* .rghtsideTrigr .Collapsible__contentOuter{ overflow-y: inherit!important;} */
 /* .rghtsideTrigr .listrghtsideTrigr.listrghtsideTrigrHeight { min-height: 250px;} */
+/* .react-bs-table-container .react-bs-table table td,
+.react-bs-table-container .react-bs-table table th {
+    white-space: pre-line;
+    text-overflow: unset;
+    overflow-wrap: break-word;
+} */
+
+
+/*  React Boiotstrap Table */
+
+.table-bordered > thead > tr > th, .table-bordered > tbody > tr > th, .table-bordered > tfoot > tr > th, .table-bordered > thead > tr > td, .table-bordered > tbody > tr > td, .table-bordered > tfoot > tr > td{border:0;}
+
+.react-bs-table{border-radius:10px!important; overflow: hidden; border: 1px solid #f1f1f1; -webkit-box-shadow: 1px 1px 10px 1px rgba(0,0,0,.1); box-shadow: 1px 1px 10px 1px rgba(0,0,0,.1);}
+.react-bs-table .react-bs-container-header>table>thead>tr>th{ border-bottom: none;}
+.react-bs-table .react-bs-container-header {background: rgba(77,77,77,1);/* Old Browsers */
+    background: -moz-linear-gradient(top, rgba(77,77,77,1) 0%, rgba(77,77,77,1) 36%, rgba(188,188,188,1) 36%, rgba(188,188,188,1) 100%); /* FF3.6+ */
+    background: -webkit-gradient(left top, left bottom, color-stop(0%, rgba(77,77,77,1)), color-stop(36%, rgba(77,77,77,1)), color-stop(36%, rgba(188,188,188,1)), color-stop(100%, rgba(188,188,188,1)));/* Chrome, Safari4+ */
+    background: -webkit-linear-gradient(top, rgba(77,77,77,1) 0%, rgba(77,77,77,1) 36%, rgba(188,188,188,1) 36%, rgba(188,188,188,1) 100%); /* Chrome10+,Safari5.1+ */
+    background: -o-linear-gradient(top, rgba(77,77,77,1) 0%, rgba(77,77,77,1) 36%, rgba(188,188,188,1) 36%, rgba(188,188,188,1) 100%); /* Opera 11.10+ */
+    background: -ms-linear-gradient(top, rgba(77,77,77,1) 0%, rgba(77,77,77,1) 36%, rgba(188,188,188,1) 36%, rgba(188,188,188,1) 100%); /* IE 10+ */
+    background: linear-gradient(to bottom, rgba(77,77,77,1) 0%, rgba(77,77,77,1) 36%, rgba(188,188,188,1) 36%, rgba(188,188,188,1) 100%);/* W3C */
+    filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#4d4d4d', endColorstr='#bcbcbc', GradientType=0 );/* IE6-9 */ color: #ffffff; border-radius: 10px 10px 0 0; text-transform: uppercase;}
+
+.react-bs-table .react-bs-container-header>table>thead>tr>th{ padding:7px 10px 30px 10px; line-height: 1.728571!important;}
+.react-bs-table .react-bs-container-header thead th > div{ height:36px; padding-top:20px; padding-bottom: 20px}
+.react-bs-table .react-bs-container-header thead th .form-control {border-color: transparent; border-radius:5px;}
+.react-bs-table .react-bs-container-header thead th .form-control:focus {border-color: #c2c2bc;}
+.react-bs-table .react-bs-container-body .table>tbody>tr{ background: #ffffff; color: #4d4d4d; font-weight: 400;}
+.react-bs-table .react-bs-container-body .table>tbody>tr>td{ font-size: 15px; border-top:1px solid #cacaca;} 
+.react-bs-table .react-bs-container-body .table tbody tr td .actionStyle, .react-bs-table .react-bs-container-body .table tbody tr td .clickLink{text-align:left; width:auto;}
+.react-bs-table .react-bs-container-body .table tbody tr td .actionStyle a, .react-bs-table .react-bs-container-body .table tbody tr td .clickLink a{ margin-right:20px; display:inline-block; font-size: 18px;}
+.react-bs-table .react-bs-container-body .table tbody tr td .actionStyle a:last-child, .react-bs-table .react-bs-container-body .table tbody tr td .clickLink a:last-child{ margin-right: 0;}
+.react-bs-table .react-bs-container-body .table tbody tr td .userId > span p{ font-size: 12px; margin-bottom: 0;}
+
+.react-bs-table .react-bs-container-body .table tbody tr:hover{ background: #2c92e0; color: #fff; font-weight: 600;}
+.react-bs-table .react-bs-container-body .table tbody tr:hover .userId > span p{ color: #fff;}
+.react-bs-table .react-bs-container-body .table tbody tr:hover a{ color: #96c9f0;}
+.react-bs-table .react-bs-container-body .table tbody tr:hover a:hover{ color: #fff;}
+.react-bs-table .react-bs-container-body .table tbody tr:hover .actionStyle a, .react-bs-table .react-bs-container-body .table tbody tr:hover .clickLink a{ color: #96c9f0;}
+.react-bs-table .react-bs-container-body .table tbody tr:hover .actionStyle a:hover, .react-bs-table .react-bs-container-body .table tbody tr:hover .clickLink a:hover{ color: #fff;}
+
+.react-bs-table-pagination .dropdown .btn-default{ background: #077fdb; border-radius: 10px; color: #fff;}
+.react-bs-table-pagination .dropdown .btn-default:hover{ border:1px solid #fff;}
+.react-bs-table-pagination .dropdown.show.open .btn-default{ background: #077fdb; color: #fff; border:1px solid #fff;}
+
+.pagination > .active > a, .pagination > .active > span, .pagination > .active > a:hover, .pagination > .active > span:hover, .pagination > .active > a:focus, .pagination > .active > span:focus { background-color: #7f7f7f; border-color: #7f7f7f;}
+
+
+.no-hover .react-bs-table .react-bs-table-bordered, .no-hover .react-bs-table { border-radius: 0 !important}
+.no-hover .react-bs-table .react-bs-container-header { border-radius: 0;}
+.no-hover * tr:hover{ background: none !important; color: inherit !important; font-weight: 400;}
+
+.no-hover:hover{ background: none !important; color: inherit !important; font-weight: 400;}
+.no-hover .table { background: none !important;}
+
+.no-hover .table tbody tr:hover td .actionStyle a, .no-hover .table tbody tr:hover td .actionStyle a:hover {color: #333 !important;}
+/*--customInnerTable--*/
+.customInnerTable .react-bs-table .react-bs-container-header thead th > div{ display: none;}
+
+.customInnerTable .react-bs-table .react-bs-container-header { background: #d8cdd7;}
+.customInnerTable .react-bs-table .react-bs-container-header>table>thead>tr>th{ padding-top:7px; padding-bottom:7px; background: #d8cdd7;}
+.customInnerTable .react-bs-table .react-bs-container-body .table tbody tr td .actionStyle a{ color:#d8cdd7;}
+.customInnerTable .react-bs-table .react-bs-container-body .table tbody tr:hover .actionStyle a{ color:#96c9f0;}
+.customInnerTable .react-bs-table .react-bs-container-body .table tbody tr:hover .actionStyle a:hover{ color:#fff;}
+
+/*--customInnerTable with child Table with Expend icon--*/
+.customInnerTable .react-bs-table .react-bs-container-body .table tbody tr td .react-bs-table{ border: none; margin: -11px -10px;}
+
+.customInnerTable .react-bs-table .react-bs-container-body .table tbody tr td .table tbody tr td .actionStyle a{ color:#4d4d4d;}
+.customInnerTable .react-bs-table .react-bs-container-body .table tbody tr:hover .table tbody tr:hover td .actionStyle a{ color:#96c9f0;}
+.customInnerTable .react-bs-table .react-bs-container-body .table tbody tr:hover .table tbody tr:hover td .actionStyle a:hover{ color:#fff;}
+
+/* React Bootstrap Table End*/

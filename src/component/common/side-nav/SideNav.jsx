@@ -44,13 +44,16 @@ class SideNav extends Component {
                 <nav className="flex-fill leftNav">
                     <ul className="navPan">
                         <li>
-							<Link to="/Dashboard" activeClassName="active"><span className="leftIcon01"><img src={require('../../../assets/images/document.png')} alt="" /></span>Policy PDF Download</Link>
+							<Link to="/Dashboard" activeClassName="active"><span className="leftIcon01"><img src={require('../../../assets/images/document.png')} alt="" /></span>Policy Search</Link>
                         </li>
                         <li>
 							<Link to="/Products" activeClassName="active"><span className="leftIcon01"><img src={require('../../../assets/images/leftIcon02Hover.svg')} alt="" /></span>Products</Link>
                         </li>
                         <li>
 							<Link to="/Documents" activeClassName="active"><span className="leftIcon01"><img src={require('../../../assets/images/document.png')} alt="" /></span>Documents</Link>
+                        </li>
+                        <li>
+							<Link to="Services" activeClassName="active"><span className="leftIcon01"><img src={require('../../../assets/images/support.png')} alt="" /></span>Services</Link>
                         </li>
                         {/* <li>
 							<Link to="/Supports" activeClassName="active"><span className="leftIcon01"><img src={require('../../../assets/images/support.png')} alt="" /></span>Support</Link>
