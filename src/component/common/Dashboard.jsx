@@ -19,7 +19,7 @@ import DatePicker from "react-datepicker";
 const actionFormatter = (refObj) => (cell, row, enumObject) => {
     return (
         <LinkWithTooltip
-            tooltip="Get Status"
+            tooltip="Download PDF"
             href="#"
             clicked={() => refObj.downloadDoc(cell)
             }
@@ -150,10 +150,15 @@ class Dashboard extends Component {
             bc_data = JSON.parse(encryption.decrypt(bc_data));
         }
 
-        formData.append('bcmaster_id', bc_data ? bc_data.agent_id : "")  
+        // formData.append('bcmaster_id', bc_data ? bc_data.agent_id : "")  
+        // formData.append('page_no', 1)   
+        // formData.append('policy_status', 'complete')
+        // formData.append('bc_agent_id', bc_data ? bc_data.user_info.data.user.username : "",) 
+
+        formData.append('bcmaster_id', sessionStorage.getItem('csc_id') ? "5" : bc_data ? bc_data.agent_id : "" ) 
         formData.append('page_no', 1)   
         formData.append('policy_status', 'complete')
-        formData.append('bc_agent_id', bc_data ? bc_data.user_info.data.user.username : "",) 
+        formData.append('bc_agent_id', sessionStorage.getItem('csc_id') ? sessionStorage.getItem('csc_id') : bc_data ? bc_data.user_info.data.user.username : "") 
 
         this.props.loadingStart();
         axios.post('bc/policy-customer',formData)
@@ -280,7 +285,7 @@ class Dashboard extends Component {
                         <div className="col-sm-12 col-md-12 col-lg-10 col-xl-10 infobox">
                         <h4 className="text-center mt-3 mb-3">SBI General Insurance Company Limited</h4>
                             <div className="contBox m-b-45 tickedTable">
-                            <h4 className="text-center mt-3 mb-3">Policy Download</h4>
+                            <h4 className="text-center mt-3 mb-3">Policy Search</h4>
 
                              <Formik initialValues={newInitialValues}
                                 onSubmit={this.handleSubmit}
@@ -578,7 +583,7 @@ class Dashboard extends Component {
                                                     <Col sm={12} md={2} lg={4}>
                                                         <FormGroup>
                                                             <div className="insurerName">
-                                                                <span className="fs-16">Product Id</span>
+                                                                <span className="fs-16">Products</span>
                                                             </div>
                                                         </FormGroup>
                                                     </Col>
@@ -592,7 +597,7 @@ class Dashboard extends Component {
                                                                 value={values.product_id}
                                                                 className="formGrp"
                                                             >
-                                                            <option value="">Product Id</option>
+                                                            <option value="">Products</option>
                                                             {products.map((productName, qIndex) => ( 
                                                                 <option value={productName.id}>{productName.name}</option>    
                                                             ))}                                    
@@ -633,7 +638,7 @@ class Dashboard extends Component {
                                     fetchInfo={{ dataTotalSize: totalRecord }}
                                     // striped
                                     // hover
-                                    // wrapperClasses="table-responsive"
+                                    wrapperClasses="table-responsive"
                                 >
 
                                     <TableHeaderColumn width='150px'  dataField="request_data" dataFormat={polNumFormatter} >Policy Number</TableHeaderColumn>
