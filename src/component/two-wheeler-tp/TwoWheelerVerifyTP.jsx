@@ -397,7 +397,6 @@ class TwoWheelerVerify extends Component {
                     });
                     setFieldTouched('vahanVerify')
                     setFieldValue('vahanVerify', true) 
-                    // swal("Please provide correct Registration number and Chasis number")
                     this.props.loadingStop();
                 });
             }
