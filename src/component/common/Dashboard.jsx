@@ -214,7 +214,8 @@ class Dashboard extends Component {
         this.setState({
             products: res.data.data ? res.data.data : [],
         });
-        this.fetchDashboard();
+        // this.fetchDashboard();
+        this.props.loadingStop();
         })
         .catch(err => {
         this.props.loadingStop();

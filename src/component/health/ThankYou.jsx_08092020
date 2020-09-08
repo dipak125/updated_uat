@@ -187,64 +187,28 @@ class ThankYouPage extends Component {
       
   }
 
+  // getPolicyHolderDetails = () => {
+  //   this.props.loadingStart();
+  //   axios
+  //     .get(`/policy-holder/${localStorage.getItem("policyHolder_refNo")}`)
+  //     .then((res) => {
+  //       this.setState({
+  //         refNumber: res.data.data.policyHolder.reference_no,
+  //       });
+  //       this.props.loadingStop();
+  //     })
+  //     .catch((err) => {
+  //       if(err.status == 401) {
+  //         swal("Session out. Please login")
+  //       }
+  //       else swal("Something wrong happened. Please try after some")
 
-  alternateDload = (access_token) => {
-
-    const { policyId } = this.props.match.params
-    const formData = new FormData();
-    //formData.append('access_token', access_token);
-    //formData.append('policyNo', policyId)
-    const post_data_obj = {
-      // 'access_token': access_token,
-      'policyNo': policyId,
-      // 'policyHolder_Id':  this.state.policy_holder_id
-    }
-    let encryption = new Encryption();
-    // formData.append('enc_data', encryption.encrypt(JSON.stringify(post_data_obj)))
-    formData.append('policyNo', policyId)
-    this.props.loadingStart();
-    axios
-      .post(`/policy-download/external`, formData)
-      .then(res => {
-        this.props.loadingStop();
-
-        if(res.data.error == true) {
-          swal({
-            title: "Alert",
-            text: "PDF Generation process is taking longer time than expected. Please have patience.",
-            icon: "warning",
-            // buttons: true,
-            dangerMode: true,
-          })
-          .then((willDownload) => {
-            if (willDownload) {
-            this.getAccessToken()
-            }
-          })
-
-        }
-        else if (res.data.data.getPolicyDocumentResponseBody.payload.URL[0] == "No Results found for the given Criteria") {
-          // swal(res.data.getPolicyDocumentResponseBody.payload.URL[0]);
-          swal("Thank you for showing your interest for buying product.Due to some reasons, we are not able to issue the policy document online. Please call 180 22 1111");
-        }
-        
-        else {
-          this.setState({
-            response_text: res.data,
-            res_error: false
-          })
-
-          this.generate_pdf(res.data.data, this.state.policy_holder_id)    
-        }
-      })
-      .catch(err => {
-        this.setState({
-          response_text: []
-        });
-        this.props.loadingStop();
-      });
-  }
-
+  //       this.setState({
+  //         policyHolderDetails: [],
+  //       });
+  //       this.props.loadingStop();
+  //     });
+  // };
 
   componentDidMount() {
     // this.getAccessToken();       
@@ -285,11 +249,6 @@ class ThankYouPage extends Component {
                       <div className="d-flex justify-content-center align-items-center">
                         {/* <button className="proposal" onClick={this.downloadDoc}>Eproposal Form</button> */}
                         <button className="policy m-l-20" onClick={this.getAccessToken}>Policy Copy</button>
-                      </div>
-                      <div>&nbsp;</div>
-                      <div className="d-flex justify-content-center align-items-center">
-                        {/* <button className="proposal" onClick={this.downloadDoc}>Eproposal Form</button> */}
-                        <button className="policy m-l-20" onClick={this.alternateDload}> Alternate Policy Download </button>
                       </div>
                     </div>
                   </div>
