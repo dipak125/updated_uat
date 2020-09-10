@@ -44,7 +44,10 @@ class SideNav extends Component {
                 <nav className="flex-fill leftNav">
                     <ul className="navPan">
                         <li>
-							<Link to="/Dashboard" activeClassName="active"><span className="leftIcon01"><img src={require('../../../assets/images/document.png')} alt="" /></span>Policy Search</Link>
+							<Link to="/PolicySearch" activeClassName="active"><span className="leftIcon01"><img src={require('../../../assets/images/document.png')} alt="" /></span>Policy Search</Link>
+                        </li>
+                        <li>
+							<Link to="/QuoteSearch" activeClassName="active"><span className="leftIcon01"><img src={require('../../../assets/images/document.png')} alt="" /></span>Quote Search</Link>
                         </li>
                         <li>
 							<Link to="/Products" activeClassName="active"><span className="leftIcon01"><img src={require('../../../assets/images/leftIcon02Hover.svg')} alt="" /></span>Products</Link>

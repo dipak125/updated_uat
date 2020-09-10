@@ -207,35 +207,21 @@ class ThankYouPage extends Component {
       .post(`/policy-download/external`, formData)
       .then(res => {
         this.props.loadingStop();
-
-        if(res.data.error == true) {
-          swal({
-            title: "Alert",
-            text: "PDF Generation process is taking longer time than expected. Please have patience.",
-            icon: "warning",
-            // buttons: true,
-            dangerMode: true,
-          })
-          .then((willDownload) => {
-            if (willDownload) {
-            this.getAccessToken()
-            }
-          })
-
+        if(res.data.error == 'false') {
+          let file_path = res.data.data.uploded_path
+          console.log(file_path);
+          const url = file_path;
+          const pom = document.createElement('a');
+  
+          pom.style.display = 'none';
+          pom.href = url;
+      
+          document.body.appendChild(pom);
+          pom.click(); 
+          window.URL.revokeObjectURL(url);
         }
-        else if (res.data.data.getPolicyDocumentResponseBody.payload.URL[0] == "No Results found for the given Criteria") {
-          // swal(res.data.getPolicyDocumentResponseBody.payload.URL[0]);
-          swal("Thank you for showing your interest for buying product.Due to some reasons, we are not able to issue the policy document online. Please call 180 22 1111");
-        }
-        
-        else {
-          this.setState({
-            response_text: res.data,
-            res_error: false
-          })
-
-          this.generate_pdf(res.data.data, this.state.policy_holder_id)    
-        }
+        else swal("Document not found")
+               
       })
       .catch(err => {
         this.setState({

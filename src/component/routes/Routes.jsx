@@ -57,8 +57,13 @@ const Break_form = Loadable({
     loading: () => loadingContent
 });
 
-const Dashboard = Loadable({
-    loader: () => import(/*webpackChunkName: "Products" */"../common/Dashboard.jsx"),
+const PolicySearch = Loadable({
+    loader: () => import(/*webpackChunkName: "Products" */"../common/PolicySearch.jsx"),
+    loading: () => loadingContent
+});
+
+const QuoteSearch = Loadable({
+    loader: () => import(/*webpackChunkName: "Products" */"../common/QuoteSearch.jsx"),
     loading: () => loadingContent
 });
 
@@ -244,10 +249,11 @@ class Routes extends Component {
                         <PrivateRoute exact path="/Break_form" component={Break_form} /> 
 
                         {/************ Dashboard ******************/}
-                        <PrivateRoute exact path="/Dashboard" component={Dashboard} />   
+                        <PrivateRoute exact path="/PolicySearch" component={PolicySearch} />   
+                        <PrivateRoute exact path="/QuoteSearch" component={QuoteSearch} />
 
                         {/************ Services ******************/}
-                        <PrivateRoute exact path="/Services" component={Services} />
+                        <PrivateRoute exact path="/ kkkk" component={Services} />
 
 
 

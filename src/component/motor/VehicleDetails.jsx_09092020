@@ -213,7 +213,7 @@ const vehicleRegistrationValidation = Yup.object().shape({
         }).min(6, function() {
             return "Policy No. must be minimum 6 chracters"
         })
-        .max(28, function() {
+        .max(18, function() {
             return "Policy No. must be maximum 18 chracters"
         }),
 
@@ -801,7 +801,6 @@ class VehicleDetails extends Component {
                                                                     type="text"
                                                                     placeholder="Previous Policy Number"
                                                                     autoComplete="off"
-                                                                    maxLength="28"
                                                                     onFocus={e => this.changePlaceHoldClassAdd(e)}
                                                                     onBlur={e => this.changePlaceHoldClassRemove(e)}
                                                                     
