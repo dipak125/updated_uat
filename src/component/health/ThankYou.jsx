@@ -199,7 +199,7 @@ class ThankYouPage extends Component {
         return new Promise(resolve => {setTimeout(() => {
           this.alternateDload(res.data.access_token)
             }
-            ,5000)
+            ,15000)
         })
         
       })
