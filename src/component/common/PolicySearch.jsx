@@ -51,7 +51,7 @@ function productFormatter(cell) {
 const newInitialValues = {}
 
 
-class Dashboard extends Component {
+class PolicySearch extends Component {
     state = {
         statusCount: [],
         policyHolder: [],
@@ -200,6 +200,9 @@ class Dashboard extends Component {
     }
 
     renderShowsTotal(start, to, total) {
+        start = start ? start : 0
+        to = to ? to : 0
+        total = total ? total : 0
         return (
           <p style={ { color: 'blue' } }>
             From { start } to { to }, total is { total }
@@ -682,4 +685,4 @@ const mapStateToProps = state => {
     };
   };
 
-export default connect( mapStateToProps, mapDispatchToProps)(Dashboard);
+export default connect( mapStateToProps, mapDispatchToProps)(PolicySearch);

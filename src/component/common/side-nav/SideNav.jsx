@@ -46,9 +46,9 @@ class SideNav extends Component {
                         <li>
 							<Link to="/PolicySearch" activeClassName="active"><span className="leftIcon01"><img src={require('../../../assets/images/document.png')} alt="" /></span>Policy Search</Link>
                         </li>
-                        <li>
+                        {/* <li>
 							<Link to="/QuoteSearch" activeClassName="active"><span className="leftIcon01"><img src={require('../../../assets/images/document.png')} alt="" /></span>Quote Search</Link>
-                        </li>
+                        </li> */}
                         <li>
 							<Link to="/Products" activeClassName="active"><span className="leftIcon01"><img src={require('../../../assets/images/leftIcon02Hover.svg')} alt="" /></span>Products</Link>
                         </li>
