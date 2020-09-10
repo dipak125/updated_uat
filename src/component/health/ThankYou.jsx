@@ -234,15 +234,24 @@ class ThankYouPage extends Component {
         if(res.data.error == false) {
           let file_path = res.data.data.uploded_path
           console.log(file_path);
-          const url = file_path;
-          const pom = document.createElement('a');
-  
-          pom.style.display = 'none';
-          pom.href = url;
-      
-          document.body.appendChild(pom);
-          pom.click(); 
-          window.URL.revokeObjectURL(url);
+          fetch(file_path,{
+            mode: 'no-cors' // 'cors' by default
+          })
+            .then(resp => resp.blob())
+            .then(blob => {
+              const url = window.URL.createObjectURL(blob);
+              const a = document.createElement('a');
+              a.style.display = 'none';
+              a.href = url;
+              // the filename you want
+              // a.download = 'b7b98d12c9da4f44b7f5e372945fbf7f.pdf';
+              a.download = policyId+'.pdf';
+              document.body.appendChild(a);
+              a.click();
+              window.URL.revokeObjectURL(url);
+              this.props.loadingStop();
+              //alert('your file has downloaded!'); // or you know, something with better UX...
+            })
         }
         else swal("Document not found")
                
