@@ -188,6 +188,30 @@ class ThankYouPage extends Component {
   }
 
 
+  getAlternateAccessToken = () => {
+    this.props.loadingStart();
+    axios
+      .post(`/callTokenService`)
+      .then(res => {
+        this.setState({
+          accessToken: res.data.access_token
+        })
+        return new Promise(resolve => {setTimeout(() => {
+          this.alternateDload(res.data.access_token)
+            }
+            ,5000)
+        })
+        
+      })
+      .catch(err => {
+        this.setState({
+          accessToken: []
+        });
+        this.props.loadingStop();
+      });
+  }
+
+
   alternateDload = (access_token) => {
 
     const { policyId } = this.props.match.params
@@ -268,14 +292,12 @@ class ThankYouPage extends Component {
                       <img src={require('../../assets/images/like.svg')} alt="" className="m-b-30" />
                       <p>Thank you for choosing SBI General Insurance</p>
                       <p className="fs-16 m-b-30">Policy No <span className="lghtBlue"> {policyId}</span></p>
-                      <div className="d-flex justify-content-center align-items-center">
-                        {/* <button className="proposal" onClick={this.downloadDoc}>Eproposal Form</button> */}
+                      {/* <div className="d-flex justify-content-center align-items-center">
                         <button className="policy m-l-20" onClick={this.getAccessToken}>Policy Copy</button>
-                      </div>
-                      <div>&nbsp;</div>
+                      </div> */}
+
                       <div className="d-flex justify-content-center align-items-center">
-                        {/* <button className="proposal" onClick={this.downloadDoc}>Eproposal Form</button> */}
-                        <button className="policy m-l-20" onClick={this.alternateDload}> Alternate Policy Download </button>
+                        <button className="policy m-l-20" onClick={this.getAlternateAccessToken}>Policy Copy </button>
                       </div>
                     </div>
                   </div>
