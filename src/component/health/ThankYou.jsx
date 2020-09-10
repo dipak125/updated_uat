@@ -207,7 +207,7 @@ class ThankYouPage extends Component {
       .post(`/policy-download/external`, formData)
       .then(res => {
         this.props.loadingStop();
-        if(res.data.error == 'false') {
+        if(res.data.error == false) {
           let file_path = res.data.data.uploded_path
           console.log(file_path);
           const url = file_path;
