@@ -379,7 +379,7 @@ class OtherComprehensive extends Component {
         const formData = new FormData();
 
         const post_data = {
-            'id':localStorage.getItem('policyHolder_id'),
+            'ref_no':localStorage.getItem('policyHolder_refNo'),
             'access_token':access_token,
             'idv_value': sliderVal ? sliderVal : defaultSliderValue.toString(),
             'policy_type': localStorage.getItem('policy_type'),
