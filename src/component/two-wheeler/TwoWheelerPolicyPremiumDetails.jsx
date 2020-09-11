@@ -16,6 +16,7 @@ import queryString from 'query-string';
 
 const initialValue = {}
 
+
 const validatePremium = Yup.object().shape({
     refNo: Yup.string().notRequired('Reference number is required')
     .matches(/^[a-zA-Z0-9]*$/, function() {
@@ -83,7 +84,19 @@ class Premium extends Component {
     handleSubmit = (values) => {
         // this.setState({ show: true, refNo: values.refNo, whatsapp: values.whatsapp });
         const {policyHolder} = this.state
-        policyHolder && policyHolder.csc_id ? this.payment() : this.Razor_payment()
+
+        // policyHolder && policyHolder.csc_id ? this.payment() : this.Razor_payment()
+        if(policyHolder && policyHolder.bcmaster && policyHolder.bcmaster.paymentgateway && policyHolder.bcmaster.paymentgateway.slug) {
+            if(policyHolder.bcmaster.paymentgateway.slug == "csc_wallet") {
+                this.payment()
+            }
+            if(policyHolder.bcmaster.paymentgateway.slug == "razorpay") {
+                this.Razor_payment()
+            }
+            if(policyHolder.bcmaster.paymentgateway.slug == "PPINL") {
+                this.paypoint_payment()
+            }
+        }
     }
 
     fetchData = () => {
@@ -191,6 +204,11 @@ class Premium extends Component {
     Razor_payment = () => {
         const { refNumber } = this.state;
         window.location = `${process.env.REACT_APP_PAYMENT_URL}/razorpay/pay.php?refrence_no=${refNumber}`
+    }
+
+    paypoint_payment = () => {
+        const { refNumber } = this.state;
+        window.location = `${process.env.REACT_APP_PAYMENT_URL}/ppinl/pay.php?refrence_no=${refNumber}`
     }
 
     fetchRelationships=()=>{
@@ -495,9 +513,13 @@ class Premium extends Component {
                                                                         Select Payment Gateway
                                                                         <div>
                                                                         <img src={require('../../assets/images/green-check.svg')} alt="" className="m-r-10" />
-                                                                        {policyHolder && policyHolder.csc_id ? <img src={require('../../assets/images/CSC.svg')} alt="" /> :
-                                                                        <img src={require('../../assets/images/razorpay.svg')} alt="" />
+                                                                        { policyHolder && policyHolder.bcmaster && policyHolder.bcmaster.logo ? <img src={require('../../assets/images/'+policyHolder.bcmaster.logo)} alt="" /> :
+                                                                        null
                                                                         }
+
+                                                                        {/* {policyHolder && policyHolder.csc_id ? <img src={require('../../assets/images/CSC.svg')} alt="" /> :
+                                                                        <img src={require('../../assets/images/razorpay.svg')} alt="" />
+                                                                        } */}
                                                                         </div>
                                                                     </div>
                                                                     </FormGroup>

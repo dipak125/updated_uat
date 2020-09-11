@@ -207,7 +207,17 @@ class PolicyDetails extends Component {
 
   handleSubmit = () => {
     const {policyHolderDetails} = this.state
-    policyHolderDetails && policyHolderDetails.csc_id ? this.payment() : this.Razor_payment()
+    if(policyHolderDetails && policyHolderDetails.bcmaster && policyHolderDetails.bcmaster.paymentgateway && policyHolderDetails.bcmaster.paymentgateway.slug) {
+      if(policyHolderDetails.bcmaster.paymentgateway.slug == "csc_wallet") {
+          this.payment()
+      }
+      if(policyHolderDetails.bcmaster.paymentgateway.slug == "razorpay") {
+          this.Razor_payment()
+      }
+      if(policyHolderDetails.bcmaster.paymentgateway.slug == "PPINL") {
+          this.paypoint_payment()
+      }
+  }
 }
 
 
@@ -219,6 +229,11 @@ class PolicyDetails extends Component {
   Razor_payment = () => {
     const { refNumber } = this.state;
     window.location = `${process.env.REACT_APP_PAYMENT_URL}/razorpay/pay.php?refrence_no=${refNumber}`
+}
+
+paypoint_payment = () => {
+  const { refNumber } = this.state;
+  window.location = `${process.env.REACT_APP_PAYMENT_URL}/ppinl/pay.php?refrence_no=${refNumber}`
 }
 
   componentDidMount() {
@@ -431,8 +446,8 @@ class PolicyDetails extends Component {
                                       Select Payment Gateway
                                       <div>
                                       <img src={require('../../assets/images/green-check.svg')} alt="" className="m-r-10" />
-                                      {policyHolderDetails && policyHolderDetails.csc_id ? <img src={require('../../assets/images/CSC.svg')} alt="" /> :
-                                      <img src={require('../../assets/images/razorpay.svg')} alt="" />
+                                      { policyHolderDetails && policyHolderDetails.bcmaster && policyHolderDetails.bcmaster.logo ? <img src={require('../../assets/images/'+policyHolderDetails.bcmaster.logo)} alt="" /> :
+                                      null
                                       }
                                       </div>
                                   </div>
