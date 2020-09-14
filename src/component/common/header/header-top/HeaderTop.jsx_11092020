@@ -8,12 +8,12 @@ import Encryption from '../../../../shared/payload-encryption';
 
 // let logo = sessionStorage.getItem('logo') && sessionStorage.getItem('logo') != "undefined" ? sessionStorage.getItem('logo') : "search.svg"
 
+let bc_data = {}
 
 class HeaderTop extends Component {
 
     state = {
         logo: sessionStorage.getItem('logo') && sessionStorage.getItem('logo') != "undefined" ? sessionStorage.getItem('logo') : "",
-        bc_data: {}
     }
 
     handleLogout = () => {
@@ -34,22 +34,17 @@ class HeaderTop extends Component {
 
     componentWillUpdate(nextProps, nextState) {
         // logo = sessionStorage.getItem('logo') && sessionStorage.getItem('logo') != "undefined" ? sessionStorage.getItem('logo') : ""
-        
-    }
-
-    componentDidMount() {
-        let bc_data = sessionStorage.getItem('bcLoginData') ? sessionStorage.getItem('bcLoginData') : "";
+        bc_data = sessionStorage.getItem('bcLoginData') ? sessionStorage.getItem('bcLoginData') : "";
         if(bc_data) {
             let encryption = new Encryption();
             bc_data = JSON.parse(encryption.decrypt(bc_data));
-            this.setState({bc_data})
         }
     }
 
       
     render() {
         // console.log("BC_data---", bc_data.user_info )
-        const { logo, bc_data } = this.state
+        const { logo } = this.state
         return (
             <>
                 <section className="container-fluid headerTop d-flex justify-content-between">
@@ -92,7 +87,7 @@ class HeaderTop extends Component {
                                      {this.props.flag == "logout" ? null :  
                                     logo ? 
                                     <img src={require(`../../../../assets/images/${logo}`)} alt="" className="notiBell"/>
-                                    : null}
+                                    : <img src={require(`../../../../assets/images/vedavaag.png`)} alt="" className="notiBell"/>}
                                     </div>
                                     
                                     {/* <div className="align-self-center d-none d-sm-block">

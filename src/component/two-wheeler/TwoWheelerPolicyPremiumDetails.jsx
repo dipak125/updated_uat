@@ -513,7 +513,7 @@ class Premium extends Component {
                                                                         Select Payment Gateway
                                                                         <div>
                                                                         <img src={require('../../assets/images/green-check.svg')} alt="" className="m-r-10" />
-                                                                        { policyHolder && policyHolder.bcmaster && policyHolder.bcmaster.logo ? <img src={require('../../assets/images/'+policyHolder.bcmaster.logo)} alt="" /> :
+                                                                        { policyHolder && policyHolder.bcmaster && policyHolder.bcmaster.paymentgateway && policyHolder.bcmaster.paymentgateway.logo ? <img src={require('../../assets/images/'+ policyHolder.bcmaster.paymentgateway.logo)} alt="" /> :
                                                                         null
                                                                         }
 

@@ -446,7 +446,7 @@ paypoint_payment = () => {
                                       Select Payment Gateway
                                       <div>
                                       <img src={require('../../assets/images/green-check.svg')} alt="" className="m-r-10" />
-                                      { policyHolderDetails && policyHolderDetails.bcmaster && policyHolderDetails.bcmaster.logo ? <img src={require('../../assets/images/'+policyHolderDetails.bcmaster.logo)} alt="" /> :
+                                      { policyHolderDetails && policyHolderDetails.bcmaster && policyHolderDetails.bcmaster.paymentgateway && policyHolderDetails.bcmaster.paymentgateway.logo ? <img src={require('../../assets/images/'+ policyHolderDetails.bcmaster.paymentgateway.logo)} alt="" /> :
                                       null
                                       }
                                       </div>

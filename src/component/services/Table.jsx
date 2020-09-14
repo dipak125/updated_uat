@@ -34,13 +34,13 @@ class Table extends Component {
         let filePath = `${process.env.REACT_APP_PAYMENT_URL}/core/public/pdf_files/`
         let fileName = ""
         if(productId == '1'){          
-            window.location = 'https://www.sbigeneral.in/portal/contact-us/garage'
+            window.open('https://www.sbigeneral.in/portal/contact-us/garage')
         }
         else if(productId == '2') {
-            window.location = 'https://www.sbigeneral.in/portal/contact-us/hospital'
+            window.open('https://www.sbigeneral.in/portal/contact-us/hospital')
         }
         else if(productId == '3') {
-            window.location = 'https://www.sbigeneral.in/portal/buy-online/changepolicydetails'
+            window.open('https://www.sbigeneral.in/portal/buy-online/changepolicydetails')
         }
     }   
 
