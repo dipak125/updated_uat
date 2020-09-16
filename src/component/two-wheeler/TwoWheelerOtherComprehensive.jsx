@@ -236,6 +236,17 @@ class TwoWheelerOtherComprehensive extends Component {
         let defaultSliderValue = PolicyArray.length > 0 ? Math.floor(PolicyArray[0].PolicyRiskList[0].IDV_Suggested) : 0
         const formData = new FormData();
 
+        let csc_data = localStorage.getItem('users') ? localStorage.getItem('users') : "";
+        let csc_user_type = "";
+
+        if(csc_data && sessionStorage.getItem('csc_id')) {
+            let encryption = new Encryption();
+            csc_data = JSON.parse(csc_data)        
+            csc_data = csc_data.user
+            csc_data = JSON.parse(encryption.decrypt(csc_data));           
+            csc_user_type = csc_data.type
+        }
+
         const post_data = {
             'id':localStorage.getItem('policyHolder_refNo'),
             'access_token':access_token,
@@ -247,6 +258,11 @@ class TwoWheelerOtherComprehensive extends Component {
             'policy_for': motorInsurance ? motorInsurance.policy_for : ""
         }
         console.log('fullQuote_post_data', post_data)
+        if(post_data.idv_value > 5000000 && csc_user_type == "POSP") {
+            swal("Quote cannot proceed with IDV greater than 5000000")
+            this.props.loadingStop();
+            return false
+        }
         // let encryption = new Encryption();
         // formData.append('enc_data',encryption.encrypt(JSON.stringify(post_data)))
         formData.append('id',localStorage.getItem('policyHolder_refNo'))
@@ -312,6 +328,17 @@ class TwoWheelerOtherComprehensive extends Component {
         const { motorInsurance, PolicyArray, sliderVal, add_more_coverage } = this.state
         let defaultSliderValue = PolicyArray.length > 0 ? Math.round(PolicyArray[0].PolicyRiskList[0].IDV_Suggested) : 0
 
+        let csc_data = localStorage.getItem('users') ? localStorage.getItem('users') : "";
+        let csc_user_type = "";
+
+        if(csc_data && sessionStorage.getItem('csc_id')) {
+            let encryption = new Encryption();
+            csc_data = JSON.parse(csc_data)        
+            csc_data = csc_data.user
+            csc_data = JSON.parse(encryption.decrypt(csc_data));           
+            csc_user_type = csc_data.type
+        }
+
         const formData = new FormData();
         let encryption = new Encryption();
         let post_data = {}
@@ -338,6 +365,11 @@ class TwoWheelerOtherComprehensive extends Component {
             }
         }
         console.log('post_data', post_data)
+        if(post_data.idv_value > 5000000 && csc_user_type == "POSP") {
+            swal("Quote cannot proceed with IDV greater than 5000000")
+            this.props.loadingStop();
+            return false
+        }
         formData.append('enc_data', encryption.encrypt(JSON.stringify(post_data)))
         this.props.loadingStart();
         axios.post('two-wh/insured-value', formData).then(res => {

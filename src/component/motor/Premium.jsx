@@ -13,7 +13,7 @@ import { connect } from "react-redux";
 import * as Yup from "yup";
 import Encryption from '../../shared/payload-encryption';
 import queryString from 'query-string';
-import fuel from '../common/FuelTypes'
+import fuel from '../common/FuelTypes';
 
 const initialValue = {}
 
@@ -511,7 +511,7 @@ console.log('nomineedetails', nomineedetails)
                                                                                                     <FormGroup>Fuel Type</FormGroup>
                                                                                                 </Col>
                                                                                                 <Col sm={12} md={6}>
-                                                                                                    <FormGroup>{vehicleDetails && vehicleDetails.varientmodel && vehicleDetails.varientmodel.fuel_type ? fuel[vehicleDetails.varientmodel.fuel_type] : null}</FormGroup>
+                                                                                                    <FormGroup>{vehicleDetails && vehicleDetails.varientmodel && vehicleDetails.varientmodel.fuel_type ? fuel[parseInt(vehicleDetails.varientmodel.fuel_type)] : null}</FormGroup>
                                                                                                 </Col>
                                                                                             </Row>
 

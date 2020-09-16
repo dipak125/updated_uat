@@ -201,10 +201,8 @@ class LogIn extends Component {
                 values.rememberMe = this.state.rememberMe;
                 values.emailAddress= "csc@gmail.com";
                 values.password= "12345";
-                values.bc_id= sessionStorage.getItem('csc_id')
-                
                 // this.setState({ errMsg: '' });
-                console.log("values-- ", values)
+
                 this.props.onFormSubmit(values,
                     () => {
                         this.props.loadingStop();

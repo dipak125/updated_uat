@@ -13,6 +13,7 @@ import { connect } from "react-redux";
 import * as Yup from "yup";
 import Encryption from '../../shared/payload-encryption';
 import queryString from 'query-string';
+import fuel from '../common/FuelTypes';
 // import Razorpay from "./Razorpay.jsx"
 
 const initialValue = {}
@@ -497,6 +498,99 @@ class Premium extends Component {
                                                                                     <p></p>
                                                                                 </Row>
                                                                             </div> : null }
+                                                                    </div>
+
+                                                                </Collapsible>
+                                                            </div>
+
+                                                            <div className="rghtsideTrigr m-b-30">
+                                                                <Collapsible trigger="Vehicle Details" >
+                                                                    <div className="listrghtsideTrigr">
+                                                                        {memberdetails ?
+
+                                                                                <div>
+                                                                                    <Row>
+                                                                                        <Col sm={12} md={6}>
+                                                                                            <Row>
+                                                                                                <Col sm={12} md={6}>
+                                                                                                    <FormGroup>Registration No:</FormGroup>
+                                                                                                </Col>
+                                                                                                <Col sm={12} md={6}>
+                                                                                                    <FormGroup>{motorInsurance && motorInsurance.registration_no}</FormGroup>
+                                                                                                </Col>
+                                                                                            </Row>
+
+                                                                                            <Row>
+                                                                                                <Col sm={12} md={6}>
+                                                                                                    <FormGroup>Car Brand:</FormGroup>
+                                                                                                </Col>
+                                                                                                <Col sm={12} md={6}>
+                                                                                                    <FormGroup>{vehicleDetails && vehicleDetails.vehiclebrand && vehicleDetails.vehiclebrand.name ? vehicleDetails.vehiclebrand.name : ""}</FormGroup>
+                                                                                                </Col>
+                                                                                            </Row>
+                                                                                            <Row>
+                                                                                                <Col sm={12} md={6}>
+                                                                                                    <FormGroup>Car Model</FormGroup>
+                                                                                                </Col>
+                                                                                                <Col sm={12} md={6}>
+                                                                                                    <FormGroup>{vehicleDetails && vehicleDetails.vehiclemodel && vehicleDetails.vehiclemodel.description ? vehicleDetails.vehiclemodel.description+" "+vehicleDetails.varientmodel.varient : ""}</FormGroup>
+                                                                                                </Col>
+                                                                                            </Row>
+                                                                                            <Row>
+                                                                                                <Col sm={12} md={6}>
+                                                                                                    <FormGroup>Varient</FormGroup>
+                                                                                                </Col>
+                                                                                                <Col sm={12} md={6}>
+                                                                                                    <FormGroup>{vehicleDetails && vehicleDetails.varientmodel && vehicleDetails.varientmodel.varient ? vehicleDetails.varientmodel.varient : ""}</FormGroup>
+                                                                                                </Col>
+                                                                                            </Row>
+                                                                                            <Row>
+                                                                                                <Col sm={12} md={6}>
+                                                                                                    <FormGroup>Chasis Number</FormGroup>
+                                                                                                </Col>
+                                                                                                <Col sm={12} md={6}>
+                                                                                                    <FormGroup>{motorInsurance && motorInsurance.chasis_no  ? motorInsurance.chasis_no : ""}</FormGroup>
+                                                                                                </Col>
+                                                                                            </Row>
+                                                                                            <Row>
+                                                                                                <Col sm={12} md={6}>
+                                                                                                    <FormGroup>Engine Number</FormGroup>
+                                                                                                </Col>
+                                                                                                <Col sm={12} md={6}>
+                                                                                                <FormGroup>{motorInsurance && motorInsurance.engine_no  ? motorInsurance.engine_no : ""}</FormGroup>
+                                                                                                </Col>
+                                                                                            </Row>
+                                                                                            <Row>
+                                                                                                <Col sm={12} md={6}>
+                                                                                                    <FormGroup>Fuel Type</FormGroup>
+                                                                                                </Col>
+                                                                                                <Col sm={12} md={6}>
+                                                                                                    <FormGroup>{vehicleDetails && vehicleDetails.varientmodel && vehicleDetails.varientmodel.fuel_type ? fuel[parseInt(vehicleDetails.varientmodel.fuel_type)] : null}</FormGroup>
+                                                                                                </Col>
+                                                                                            </Row>
+
+                                                                                            <Row>
+                                                                                                <Col sm={12} md={6}>
+                                                                                                    <FormGroup>Seating</FormGroup>
+                                                                                                </Col>
+                                                                                                <Col sm={12} md={6}>
+                                                                                                    <FormGroup>{vehicleDetails && vehicleDetails.varientmodel && vehicleDetails.varientmodel.seating ? vehicleDetails.varientmodel.seating : null}</FormGroup>
+                                                                                                </Col>
+                                                                                            </Row>
+
+                                                                                        </Col>
+                                                                                    </Row>
+                                                                                    <Row>
+                                                                                        <p></p>
+                                                                                    </Row>
+                                                                                </div>
+                                                                            : (<p></p>)}
+                                                                                   
+                                                                        <div>
+                                                                            <Row>
+                                                                                <p></p>
+                                                                            </Row>
+                                                                        </div>
                                                                     </div>
 
                                                                 </Collapsible>
