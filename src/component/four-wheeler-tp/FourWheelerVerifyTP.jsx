@@ -50,15 +50,38 @@ const initialValue = {
     previous_policy_no: "",
     previous_policy_name: "",
     insurance_company_id: 0,
-    policy_type_id: ""
+    policy_type_id: "",
+    puc: '1'
 }
 const ComprehensiveValidation = Yup.object().shape({
+
+    // registration_no: Yup.string().when("newRegistrationNo", {
+    //     is: "NEW",       
+    //     then: Yup.string(),
+    //     otherwise: Yup.string().required('Please provide registration number').matches(/^[A-Z]{2}[ -][0-9]{1,2}(?: [A-Z])?(?: [A-Z]*)? [0-9]{4}$/, 'Invalid Registration number')
+    //         .test(
+    //             "validRegistrationChecking",
+    //             function() {
+    //                 return "Enter valid registration number"
+    //             },
+    //             function (value) {
+    //                 if (value) {
+    //                     let reg = value.split(" ")
+    //                     if(reg && reg[3]) {
+    //                         return parseInt(reg[3])
+    //                     }
+    //                 }
+    //                 return true;
+    //         })
+    // }),
 
     registration_no: Yup.string().when("newRegistrationNo", {
         is: "NEW",       
         then: Yup.string(),
-        otherwise: Yup.string().required('Please provide registration number').matches(/^[A-Z]{2}[ -][0-9]{1,2}(?: [A-Z])?(?: [A-Z]*)? [0-9]{4}$/, 'Invalid Registration number'),
+        otherwise: Yup.string().required('Please provide registration number').matches(/^[A-Z]{2}[ -][0-9]{1,2}[ -][A-Z]{1,3}[ -][0-9]{4}$/, 'Invalid Registration number'),
     }),
+
+    puc: Yup.string().required("Please verify pollution certificate to proceed"),
 
     chasis_no_last_part:Yup.string().required('This field is required')
     .matches(/^([0-9]*)$/, function() {
@@ -238,8 +261,8 @@ const ComprehensiveValidation = Yup.object().shape({
         }).min(6, function() {
             return "Policy No. must be minimum 6 chracters"
         })
-        .max(18, function() {
-            return "Policy No. must be maximum 18 chracters"
+        .max(28, function() {
+            return "Policy No. must be maximum 28 chracters"
         }),
 
    
@@ -247,7 +270,7 @@ const ComprehensiveValidation = Yup.object().shape({
 
 
 
-class TwoWheelerVerify extends Component {
+class FourWheelerVerifyTP extends Component {
 
         state = {
             previousPolicy: [],
@@ -256,6 +279,8 @@ class TwoWheelerVerify extends Component {
             vahanVerify: false,
             policyCoverage: [],
             regno:'',
+            chasiNo:'',
+            engineNo:'',
             length:15,
             insurerList: [],
             vehicleDetails: [],
@@ -295,7 +320,7 @@ class TwoWheelerVerify extends Component {
         const { productId } = this.props.match.params
         let policyHolder_id = localStorage.getItem("policyHolder_refNo") ? localStorage.getItem("policyHolder_refNo") : 0;
         this.props.loadingStart();
-        axios.get(`two-wh/details/${policyHolder_id}`)
+        axios.get(`four-wh-tp/details/${policyHolder_id}`)
             .then(res => {
                 let decryptResp = JSON.parse(encryption.decrypt(res.data))
                 console.log("decryptResp====", decryptResp)
@@ -318,7 +343,7 @@ class TwoWheelerVerify extends Component {
 
 
 
-    getVahanDetails = (values, setFieldTouched, setFieldValue, errors) => {
+    getVahanDetails = async(values, setFieldTouched, setFieldValue, errors) => {
 
         const formData = new FormData();
         if(values.newRegistrationNo == "NEW") {
@@ -335,42 +360,60 @@ class TwoWheelerVerify extends Component {
         if(errors.registration_no || errors.chasis_no_last_part) {
             swal("Please provide correct Registration number and Chasis number")
         }
-        // else {
-        //     this.props.loadingStart()
-        //     axios
-        //     .post(`/getVahanDetails`,formData)
-        //     .then((res) => {
-        //         this.setState({
-        //         vahanDetails: res.data,
-        //         vahanVerify: res.data.length > 0 ? true : false
-        //         });
-
-        //         setFieldTouched('vahanVerify')
-        //         res.data.length > 0 ?
-        //         setFieldValue('vahanVerify', true) 
-        //         : setFieldValue('vahanVerify', false)
-
-        //         this.props.loadingStop();
-        //     })
-        //     .catch((err) => {
-        //         this.setState({
-        //             vahanDetails: [],
-        //         });
-        //         swal("Please provide correct Registration number and Chasis number")
-        //         this.props.loadingStop();
-        //     });
-        // }
         else {
-            this.props.loadingStart()
-                this.setState({
-                vahanDetails: [],
-                vahanVerify:  true 
+            if(values.newRegistrationNo != "NEW") {
+                this.props.loadingStart()
+                await axios
+                .post(`/getVahanDetails`,formData)
+                .then((res) => {
+                    this.setState({
+                    vahanDetails: res.data,
+                    vahanVerify:  true 
+                    });
+
+                    if(this.state.vahanDetails.data[0].chasiNo){
+                        this.setState({chasiNo: this.state.vahanDetails.data[0].chasiNo})
+                    }
+
+                    if(this.state.vahanDetails.data[0].engineNo){
+                        this.setState({engineNo: this.state.vahanDetails.data[0].engineNo})
+                    }
+
+                    console.log('chasiNo', this.state.chasiNo)
+                    console.log('engineNo', this.state.engineNo)
+                    setFieldTouched('vahanVerify')
+                    setFieldValue('vahanVerify', true)
+                    setFieldTouched('engine_no')
+                    setFieldValue('engine_no', this.state.engineNo)
+                    setFieldTouched('chasis_no')
+                    setFieldValue('chasis_no', this.state.chasiNo)
+
+                    this.props.loadingStop();
+                })
+                .catch((err) => {
+                    this.setState({
+                        vahanDetails: [],
+                        vahanVerify:  true 
+                    });
+                    setFieldTouched('vahanVerify')
+                    setFieldValue('vahanVerify', true) 
+                    // swal("Please provide correct Registration number and Chasis number")
+                    this.props.loadingStop();
                 });
+            }
+            else {
+                this.props.loadingStart()
+                    this.setState({
+                    vahanDetails: [],
+                    vahanVerify:  true 
+                    });
+    
+                    setFieldTouched('vahanVerify')
+                    setFieldValue('vahanVerify', true) 
+    
+                    this.props.loadingStop();
+            }
 
-                setFieldTouched('vahanVerify')
-                setFieldValue('vahanVerify', true) 
-
-                this.props.loadingStop();
         }
     };
 
@@ -401,8 +444,8 @@ class TwoWheelerVerify extends Component {
         if(motorInsurance.policytype_id == '3'){
             post_data = {
                 'policy_holder_id': localStorage.getItem('policyHolder_id'),
-                'menumaster_id': 3,
-                'registration_no': motorInsurance.registration_no ? motorInsurance.registration_no : values.registration_no,
+                'menumaster_id': 1,
+                'registration_no': values.registration_no,
                 'chasis_no': values.chasis_no,
                 'chasis_no_last_part': values.chasis_no_last_part,
                 'engine_no': values.engine_no,
@@ -413,8 +456,8 @@ class TwoWheelerVerify extends Component {
         else {
             post_data = {
                 'policy_holder_id': localStorage.getItem('policyHolder_id'),
-                'menumaster_id': 3,
-                'registration_no':motorInsurance.registration_no ? motorInsurance.registration_no : values.registration_no,
+                'menumaster_id': 1,
+                'registration_no': values.registration_no,
                 'chasis_no': values.chasis_no,
                 'chasis_no_last_part': values.chasis_no_last_part,
                 'engine_no': values.engine_no,
@@ -432,12 +475,15 @@ class TwoWheelerVerify extends Component {
         console.log('post_data',post_data)
         formData.append('enc_data', encryption.encrypt(JSON.stringify(post_data)))
         this.props.loadingStart();
-        axios.post('two-wh/previous-vehicle-details', formData).then(res => {
+        axios.post('four-wh-tp/previous-vehicle-details', formData).then(res => {
             this.props.loadingStop();
             let decryptResp = JSON.parse(encryption.decrypt(res.data));
             console.log('decryptResp-----', decryptResp)
             if (decryptResp.error == false) {
                 this.props.history.push(`/four_wheeler_additional_detailsTP/${productId}`);
+            }
+            else {
+                swal(decryptResp.msg)
             }
 
         })
@@ -453,31 +499,30 @@ class TwoWheelerVerify extends Component {
     regnoFormat = (e, setFieldTouched, setFieldValue) => {
         
         let regno = e.target.value
-        let formatVal = e.target.value
-        let regnoLength = regno.length
-        var letter = /^[a-zA-Z]+$/;
-        var number = /^[0-9]+$/;
-        let subString = regno.substring(regnoLength-1, regnoLength)
-        let preSubString = regno.substring(regnoLength-2, regnoLength-1)
-    
-    
-        if(subString.match(letter) && preSubString.match(letter)) {
-            formatVal = regno
-        }
-        else if(subString.match(number) && preSubString.match(number)) {
-            formatVal = regno
-        } 
-        if(subString.match(number) && preSubString.match(letter)) {
-            formatVal = regno.replace(regno.substring(regnoLength-1, regnoLength), " ")
-            formatVal = formatVal+subString
-        } 
-        else if(subString.match(letter) && preSubString.match(number)) {
-            formatVal = regno.replace(regno.substring(regnoLength-1, regnoLength), " ")
-            formatVal = formatVal+subString
-        } 
-    
-        e.target.value = formatVal.toUpperCase()
-    
+        // let formatVal = ""
+        // let regnoLength = regno.length
+        // var letter = /^[a-zA-Z]+$/;
+        // var number = /^[0-9]+$/;
+        // let subString = regno.substring(regnoLength-1, regnoLength)
+        // let preSubString = regno.substring(regnoLength-2, regnoLength-1)
+
+        // if(subString.match(letter) && preSubString.match(letter)) {
+        //     formatVal = regno
+        // }
+        // else if(subString.match(number) && preSubString.match(number)) {
+        //     formatVal = regno
+        // } 
+        // else if(subString.match(number) && preSubString.match(letter)) {        
+        //     formatVal = regno.substring(0, regnoLength-1) + " " +subString      
+        // } 
+        // else if(subString.match(letter) && preSubString.match(number)) {
+        //     formatVal = regno.substring(0, regnoLength-1) + " " +subString   
+        // } 
+
+        // else formatVal = regno.toUpperCase()
+        
+        e.target.value = regno.toUpperCase()
+
     }
 
 
@@ -531,7 +576,7 @@ class TwoWheelerVerify extends Component {
                     </div>
                 <div className="col-sm-12 col-md-12 col-lg-10 col-xl-10 infobox">
                 <h4 className="text-center mt-3 mb-3">SBI General Insurance Company Limited</h4>
-                { step_completed >= '3' && vehicleDetails.vehicletype_id == '3' ?
+                { step_completed >= '3' && vehicleDetails.vehicletype_id == '6' ?
                 <section className="brand m-b-25">
                     <div className="d-flex justify-content-left">
                         <div className="brandhead">
@@ -589,7 +634,7 @@ class TwoWheelerVerify extends Component {
                                 </Row>
                                 </Col>
 
-                                <Col sm={12} md={6} lg={5}>
+                                <Col sm={12} md={6} lg={4}>
                                 <Row sm={12} md={6} lg={4}>
                                 <Col sm={12} md={5} lg={6}>
                                     <FormGroup>
@@ -599,7 +644,7 @@ class TwoWheelerVerify extends Component {
                                     </FormGroup>
                                 </Col>
                                     
-                                <Col sm={12} md={5} lg={4}>
+                                <Col sm={12} md={5} lg={6}>
                                         <FormGroup>
                                             <div className="insurerName">
                                                     <Field
@@ -626,7 +671,7 @@ class TwoWheelerVerify extends Component {
                                 </Row>
                                 </Col>
 
-                                <Col sm={12} md={2} lg={2}>
+                                <Col sm={12} md={6} lg={2}>
                                     <FormGroup>
                                     
                                         <Button className="btn btn-primary vrifyBtn" onClick= {!errors.chasis_no_last_part ? this.getVahanDetails.bind(this,values, setFieldTouched, setFieldValue, errors) : null}>Verify</Button>
@@ -830,6 +875,7 @@ class TwoWheelerVerify extends Component {
                                                     type="text"
                                                     placeholder="Previous Policy Number"
                                                     autoComplete="off"
+                                                    maxLength="28"
                                                     onFocus={e => this.changePlaceHoldClassAdd(e)}
                                                     onBlur={e => this.changePlaceHoldClassRemove(e)}
                                                     
@@ -853,13 +899,73 @@ class TwoWheelerVerify extends Component {
                                 </Fragment> 
                               : null}
 
+                               <Row>
+                                    <Col sm={12}>
+                                        <FormGroup>
+                                            <div className="carloan">
+                                                <h4> </h4>
+                                            </div>
+                                            <div className="col-md-15">
+                                                <div className="brandhead"> 
+                                                    I/we hold a valid and effective PUC and/or fitness certificate, as applicable, for the vehicle mentioned herein and undertake to renew the same during the policy period
+                                                    <div className="carloan">
+                                                        <h4> </h4>
+                                                    </div>
+                                                        <div className="d-inline-flex m-b-15">
+                                                            <div className="p-r-25">
+                                                                <label className="customRadio3">
+                                                                    <Field
+                                                                        type="radio"
+                                                                        name='puc'
+                                                                        value='1'
+                                                                        key='1'
+                                                                        checked = {values.puc == '1' ? true : false}
+                                                                        onChange = {() =>{
+                                                                            setFieldTouched('puc')
+                                                                            setFieldValue('puc', '1');
+                                                                        }  
+                                                                        }
+                                                                    />
+                                                                    <span className="checkmark " /><span className="fs-14"> Yes</span>
+                                                                </label>
+                                                            </div>
+                                                            <div className="p-r-25">
+                                                                <label className="customRadio3">
+                                                                    <Field
+                                                                        type="radio"
+                                                                        name='puc'
+                                                                        value='2'
+                                                                        key='1'
+                                                                        checked = {values.puc == '2' ? true : false}
+                                                                        onChange = {() =>{
+                                                                            setFieldTouched('puc')
+                                                                            setFieldValue('puc', '2');
+                                                                        }  
+                                                                        }
+                                                                    />
+                                                                    <span className="checkmark " /><span className="fs-14"> No</span>
+                                                                </label>
+                                                                {errors.puc && touched.puc ? (
+                                                                    <span className="errorMsg">{errors.puc}</span>
+                                                                ) : null}
+                                                            </div>
+                                                        </div>
+                                                </div>
+                                            </div> 
+                                            
+                                        </FormGroup>
+                                    </Col>
+                                </Row>
+
                                     <div className="d-flex justify-content-left resmb">
                                         <Button className={`backBtn`} type="button"  onClick= {this.otherComprehensive.bind(this,productId)}>
                                             Back
                                         </Button> 
+                                        {values.puc == '1' ? 
                                         <Button className={`proceedBtn`} type="submit"  >
                                             Continue
                                         </Button>
+                                        : null }
                                         </div>
                                     </Col>
                                     <Col sm={12} md={3}>
@@ -878,7 +984,7 @@ class TwoWheelerVerify extends Component {
                                             <Row className="m-b-25">
                                                 <Col sm={12} md={7}>
                                                     <div className="txtRegistr">Four-wheeler Brand<br/>
-                                                    <strong>{vehicleDetails && vehicleDetails.vehiclebrand && vehicleDetails.vehiclebrand.name ? vehicleDetails.vehiclebrand.name : ""}</strong></div>
+                                                        <strong>{vehicleDetails && vehicleDetails.vehiclebrand && vehicleDetails.vehiclebrand.name ? vehicleDetails.vehiclebrand.name : ""}</strong></div>
                                                 </Col>
 
                                                 <Col sm={12} md={5} className="text-right">
@@ -889,7 +995,7 @@ class TwoWheelerVerify extends Component {
                                             <Row className="m-b-25">
                                                 <Col sm={12} md={7}>
                                                     <div className="txtRegistr">Four-wheeler Model<br/>
-                                                    <strong>{vehicleDetails && vehicleDetails.vehiclemodel && vehicleDetails.vehiclemodel.description ? vehicleDetails.vehiclemodel.description+" "+vehicleDetails.varientmodel.varient : ""}</strong></div>
+                                                        <strong>{vehicleDetails && vehicleDetails.vehiclemodel && vehicleDetails.vehiclemodel.description ? vehicleDetails.vehiclemodel.description+" "+vehicleDetails.varientmodel.varient : ""}</strong></div>
                                                 </Col>
 
                                                 <Col sm={12} md={5} className="text-right">
@@ -910,7 +1016,8 @@ class TwoWheelerVerify extends Component {
                                 );
                             }}
                         </Formik>
-                    </section> : step_completed == "" ? "Forbidden" : null }
+                    </section> 
+                      : step_completed == "" ? "Forbidden" : null } 
                     <Footer />
                     </div>
                     </div>
@@ -934,4 +1041,4 @@ const mapStateToProps = state => {
     };
   };
 
-export default withRouter (connect( mapStateToProps, mapDispatchToProps)(TwoWheelerVerify));
+export default withRouter (connect( mapStateToProps, mapDispatchToProps)(FourWheelerVerifyTP));

@@ -40,28 +40,38 @@ const ComprehensiveValidation = Yup.object().shape({
 });
 
 
-const moreCoverage = [
-    {
-        "id": "B00015",
-        "name": "PA for Owner Driver",
-        "description": "The e-Insurance account or Electronic Insurance Account offers policyholders online space to hold all their insurance policies electronically under one e-insurance account number. This allows the policyholder to access all their policies with a few clicks and no risk of losing the physical insurance policy"
-    },
-    {
-        "id": "B00075",
-        "name": "PA For Unnamed Passenger",
-        "description": "The e-Insurance account or Electronic Insurance Account offers policyholders online space to hold all their insurance policies electronically under one e-insurance account number. This allows the policyholder to access all their policies with a few clicks and no risk of losing the physical insurance policy"
-    }
+// const moreCoverage = [
+//     {
+//         "id": "B00015",
+//         "name": "PA for Owner Driver",
+//         "description": "The e-Insurance account or Electronic Insurance Account offers policyholders online space to hold all their insurance policies electronically under one e-insurance account number. This allows the policyholder to access all their policies with a few clicks and no risk of losing the physical insurance policy"
+//     },
+//     {
+//         "id": "B00016",
+//         "name": "PA For Unnamed Passenger",
+//         "description": "The e-Insurance account or Electronic Insurance Account offers policyholders online space to hold all their insurance policies electronically under one e-insurance account number. This allows the policyholder to access all their policies with a few clicks and no risk of losing the physical insurance policy"
+//     }
     
-]
+// ]
 
 const Coverage = {
+    "C101064":"Own Damage",
+    "C101065":"Legal Liability to Third Party",
+    "C101066":"PA Cover",
+    "C101069":"Basic Road Side Assistance",
+    "C101072":"Depreciation Reimbursement",
+    "C101067":"Return to Invoice",
+    "C101108":"Engine Guard",
+    "C101111":"Cover for consumables",
     "B00002": "Own Damage Basic",
     "B00008": "Third Party Bodily Injury",
     "B00013": "Legal Liability to Paid Drivers",
     "B00015": "PA -  Owner Driver",
-    "B00075": "PA for Unnamed Passenger"
+    "B00016": "PA for Unnamed Passenger",
+    "B00009": "Third Party Property Damage Limit",
+    "NCB": "NCB Discount",
+    "TOTALOD": "Total Own Damage"
 }
-
 class TwoWheelerOtherComprehensive extends Component {
 
     constructor(props) {
@@ -86,7 +96,8 @@ class TwoWheelerOtherComprehensive extends Component {
             policyCoverage: [],
             step_completed: "0",
             vehicleDetails: [],
-            selectFlag: ''
+            selectFlag: '',
+            moreCoverage: []
         };
     }
 
@@ -129,10 +140,10 @@ class TwoWheelerOtherComprehensive extends Component {
         const { productId } = this.props.match.params
         let policyHolder_id = localStorage.getItem("policyHolder_refNo") ? localStorage.getItem("policyHolder_refNo") : 0;
         this.props.loadingStart();
-        axios.get(`two-wh/details/${policyHolder_id}`)
+        axios.get(`four-wh-tp/details/${policyHolder_id}`)
             .then(res => {
                 let decryptResp = JSON.parse(encryption.decrypt(res.data));
-                console.log("decryptResp----", decryptResp)
+                console.log("decryptResp----1", decryptResp)
                 let values = []
                 let motorInsurance = decryptResp.data.policyHolder ? decryptResp.data.policyHolder.motorinsurance : {}
                 let vehicleDetails = decryptResp.data.policyHolder ? decryptResp.data.policyHolder.vehiclebrandmodel : {};
@@ -214,10 +225,9 @@ class TwoWheelerOtherComprehensive extends Component {
         const formData = new FormData();
 
         const post_data = {
-            'id':localStorage.getItem('policyHolder_refNo'),
+            'ref_no':localStorage.getItem('policyHolder_refNo'),
             'access_token':access_token,
-            'idv_value': sliderVal ? sliderVal : defaultSliderValue.toString(),
-            'policy_type': localStorage.getItem('policy_type'),
+            'idv_value': "0",
             'add_more_coverage': add_more_coverage.toString(),
             'policy_type': motorInsurance ? motorInsurance.policy_type : "",
             'policytype_id': motorInsurance ? motorInsurance.policytype_id : "",
@@ -225,18 +235,19 @@ class TwoWheelerOtherComprehensive extends Component {
             'policy_for': motorInsurance ? motorInsurance.policy_for : ""
         }
 
-        // let encryption = new Encryption();
-        // formData.append('enc_data',encryption.encrypt(JSON.stringify(post_data)))
-        formData.append('id',localStorage.getItem('policyHolder_refNo'))
-        formData.append('access_token',access_token)
-        formData.append('idv_value',sliderVal ? sliderVal : defaultSliderValue.toString())
-        formData.append('policy_type',motorInsurance ? motorInsurance.policy_type : "")
-        formData.append('add_more_coverage',JSON.stringify(add_more_coverage))
-        formData.append('policytype_id',motorInsurance ? motorInsurance.policytype_id : "")
-        formData.append('PA_Cover',values.PA_flag ? values.PA_Cover : "0")
-        formData.append('policy_for',motorInsurance ? motorInsurance.policy_for : "")
+        let encryption = new Encryption();
+        formData.append('enc_data',encryption.encrypt(JSON.stringify(post_data)))
 
-        axios.post('fullQuotePM2WTP', formData)
+        // formData.append('id',localStorage.getItem('policyHolder_refNo'))
+        // formData.append('access_token',access_token)
+        // formData.append('idv_value',sliderVal ? sliderVal : defaultSliderValue.toString())
+        // formData.append('policy_type',motorInsurance ? motorInsurance.policy_type : "")
+        // formData.append('add_more_coverage',JSON.stringify(add_more_coverage))
+        // formData.append('policytype_id',motorInsurance ? motorInsurance.policytype_id : "")
+        // formData.append('PA_Cover',values.PA_flag ? values.PA_Cover : "0")
+        // formData.append('policy_for',motorInsurance ? motorInsurance.policy_for : "")
+
+        axios.post('fullQuotePMCARTP', formData)
             .then(res => {
                 if (res.data.PolicyObject) {
                     this.setState({
@@ -275,10 +286,10 @@ class TwoWheelerOtherComprehensive extends Component {
         if (add_more_coverage.length > 0) {
             post_data = {
                 'policy_holder_id': localStorage.getItem('policyHolder_id'),
-                'menumaster_id': 3,
+                'menumaster_id': 1,
                 'cng_kit': values.cng_kit,
                 'registration_no': motorInsurance.registration_no,
-                'idv_value': sliderVal ? sliderVal : defaultSliderValue.toString(),
+                'idv_value': "0",
                 'add_more_coverage': add_more_coverage,
                 'pa_cover': values.PA_flag ? values.PA_Cover : "0"
             }
@@ -286,16 +297,16 @@ class TwoWheelerOtherComprehensive extends Component {
         else {
             post_data = {
                 'policy_holder_id': localStorage.getItem('policyHolder_id'),
-                'menumaster_id': 3,
+                'menumaster_id': 1,
                 'cng_kit': values.cng_kit,
                 'registration_no': motorInsurance.registration_no,
-                'idv_value': sliderVal ? sliderVal : defaultSliderValue.toString(),
+                'idv_value': "0",
             }
         }
         console.log('post_data', post_data)
         formData.append('enc_data', encryption.encrypt(JSON.stringify(post_data)))
         this.props.loadingStart();
-        axios.post('two-wh/insured-value', formData).then(res => {
+        axios.post('four-wh-tp/insured-value', formData).then(res => {
             this.props.loadingStop();
             let decryptResp = JSON.parse(encryption.decrypt(res.data));
             console.log('decryptResp---', decryptResp)
@@ -325,9 +336,13 @@ class TwoWheelerOtherComprehensive extends Component {
                 serverResponse: [],
                 error: []
             });
-            if(values == "B00075") {
+            if(values == "B00016") {
                 setFieldTouched("PA_flag");
                 setFieldValue("PA_flag", '1');
+            }   
+            if(values == "B00015") {
+                setFieldTouched("PA_cover_flag");
+                setFieldValue("PA_cover_flag", '1');
             }            
         }
         else {
@@ -340,25 +355,47 @@ class TwoWheelerOtherComprehensive extends Component {
                 });
             }
 
-            if(values == "B00075") {
+            if(values == "B00016") {
                 setFieldTouched("PA_flag");
                 setFieldValue("PA_flag", '0');
                 setFieldTouched("PA_Cover");
                 setFieldValue("PA_Cover", '');
-            }      
+            }   
+            if(values == "B00015") {
+                setFieldTouched("PA_cover_flag");
+                setFieldValue("PA_cover_flag", '0');
+            }   
         }
         
     }
 
+    getCoverage = () => {
+        this.props.loadingStart();
+        axios
+            .get(`/coverage-list/${localStorage.getItem("policyHolder_id") ? localStorage.getItem("policyHolder_id") : 0}`)
+            .then((res) => {
+                this.setState({
+                    moreCoverage: res.data.data,
+                });
+                this.fetchData()
+            })
+            .catch((err) => {
+                this.setState({
+                    moreCoverage: [],
+                });
+                this.props.loadingStop();
+            });
+    };
+
 
     componentDidMount() {
-        this.fetchData()
+        this.getCoverage()
     }
 
 
     render() {
         const { vahanDetails, error, policyCoverage, vahanVerify, fulQuoteResp, PolicyArray, motorInsurance, serverResponse, add_more_coverage,
-            step_completed, vehicleDetails, selectFlag} = this.state
+            step_completed, vehicleDetails, selectFlag, moreCoverage} = this.state
         const { productId } = this.props.match.params
         let covList = motorInsurance && motorInsurance.add_more_coverage ? motorInsurance.add_more_coverage.split(",") : ""
         let newInnitialArray = {}
@@ -447,7 +484,7 @@ class TwoWheelerOtherComprehensive extends Component {
                             </div>
                             <div className="col-sm-12 col-md-12 col-lg-10 col-xl-10 infobox">
                                 <h4 className="text-center mt-3 mb-3">SBI General Insurance Company Limited</h4>
-                                { step_completed >= '2' && vehicleDetails.vehicletype_id == '3' ?
+                                { step_completed >= '2' && vehicleDetails.vehicletype_id == '6' ?
                                 <section className="brand colpd m-b-25">
                                     <div className="d-flex justify-content-left">
                                         <div className="brandhead m-b-10">
@@ -486,29 +523,29 @@ class TwoWheelerOtherComprehensive extends Component {
                                                                 <Col sm={12} md={11} lg={6} key={qIndex+"a"} >
                                                                     <label className="customCheckBox formGrp formGrp">{coverage.name}
                                                                         <OverlayTrigger overlay={<Tooltip id="tooltip-disabled">{coverage.description}</Tooltip>}>
-                                                                            <a href="#" className="infoIcon"><img src={require('../../assets/images/i.svg')} alt="" className="premtool" /></a>
+                                                                            <a className="infoIcon"><img src={require('../../assets/images/i.svg')} alt="" className="premtool" /></a>
                                                                         </OverlayTrigger>
                                                                         <Field
                                                                             type="checkbox"
                                                                             // name={`moreCov_${qIndex}`}
-                                                                            name={coverage.id}
-                                                                            value={coverage.id}
+                                                                            name={coverage.code}
+                                                                            value={coverage.code}
                                                                             className="user-self"
                                                                             // checked={values.roadsideAssistance ? true : false}
                                                                             onClick={(e) =>{
-                                                                                if( e.target.checked == false && values[coverage.id] == 'B00015') {
+                                                                                if( e.target.checked == false && values[coverage.code] == 'B00015') {
                                                                                     swal("This cover is mandated by IRDAI, it is compulsory for Owner-Driver to possess a PA cover of minimum Rs 15 Lacs, except in certain conditions. By not choosing this cover, you confirm that you hold an existing PA cover or you do not possess a valid driving license.")
                                                                                 }
                                                                                 this.onRowSelect(e.target.value, e.target.checked, setFieldTouched, setFieldValue)         
                                                                             }
                                                                             }
-                                                                            checked = {values[coverage.id] == coverage.id ? true : false}
+                                                                            checked = {values[coverage.code] == coverage.code ? true : false}
                                                                         />
                                                                         <span className="checkmark mL-0"></span>
                                                                         <span className="error-message"></span>
                                                                     </label>
                                                                 </Col>
-                                                                {values.PA_flag == '1' && values[coverage.id] == 'B00075' ?
+                                                                {values.PA_flag == '1' && values[coverage.code] == 'B00016' ?
                                                                     <Col sm={12} md={11} lg={3} key={qIndex+"b"}>
                                                                         <FormGroup>
                                                                             <div className="formSection">

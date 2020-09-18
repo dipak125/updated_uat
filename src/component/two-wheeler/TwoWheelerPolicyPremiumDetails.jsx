@@ -524,7 +524,7 @@ class Premium extends Component {
 
                                                                                             <Row>
                                                                                                 <Col sm={12} md={6}>
-                                                                                                    <FormGroup>Car Brand:</FormGroup>
+                                                                                                    <FormGroup>Two-Wheeler Brand:</FormGroup>
                                                                                                 </Col>
                                                                                                 <Col sm={12} md={6}>
                                                                                                     <FormGroup>{vehicleDetails && vehicleDetails.vehiclebrand && vehicleDetails.vehiclebrand.name ? vehicleDetails.vehiclebrand.name : ""}</FormGroup>
@@ -532,7 +532,7 @@ class Premium extends Component {
                                                                                             </Row>
                                                                                             <Row>
                                                                                                 <Col sm={12} md={6}>
-                                                                                                    <FormGroup>Car Model</FormGroup>
+                                                                                                    <FormGroup>Two-Wheeler Model</FormGroup>
                                                                                                 </Col>
                                                                                                 <Col sm={12} md={6}>
                                                                                                     <FormGroup>{vehicleDetails && vehicleDetails.vehiclemodel && vehicleDetails.vehiclemodel.description ? vehicleDetails.vehiclemodel.description+" "+vehicleDetails.varientmodel.varient : ""}</FormGroup>

@@ -185,7 +185,7 @@ class TwoWheelerVehicleDetails extends Component {
 
             post_data = {
                 'policy_holder_id':localStorage.getItem("policyHolder_id"),
-                'menumaster_id':3,
+                'menumaster_id':1,
                 'registration_date':moment(values.registration_date).format("YYYY-MM-DD"),
                 'location_id':values.location_id,
                 'previous_is_claim':values.previous_is_claim,
@@ -202,7 +202,7 @@ class TwoWheelerVehicleDetails extends Component {
         formData.append('enc_data',encryption.encrypt(JSON.stringify(post_data)))
         this.props.loadingStart();
         axios
-        .post(`/two-wh/vehicle-details`, formData)
+        .post(`/four-wh-tp/vehicle-details`, formData)
         .then(res => { 
             this.props.loadingStop();
             let decryptResp = JSON.parse(encryption.decrypt(res.data));
@@ -258,7 +258,7 @@ class TwoWheelerVehicleDetails extends Component {
     fetchData = () => {
         const { productId } = this.props.match.params
         this.props.loadingStart();
-        axios.get(`two-wh/details/${localStorage.getItem("policyHolder_refNo")}`)
+        axios.get(`four-wh-tp/details/${localStorage.getItem("policyHolder_refNo")}`)
             .then(res => {
                  let decryptResp = JSON.parse(encryption.decrypt(res.data));
                 console.log('decryptResp_fetchData', decryptResp)
@@ -322,7 +322,7 @@ class TwoWheelerVehicleDetails extends Component {
                     </div>
                 <div className="col-sm-12 col-md-12 col-lg-10 col-xl-10 infobox">
                 <h4 className="text-center mt-3 mb-3">SBI General Insurance Company Limited</h4>
-                { step_completed >= '1' && vehicleDetails.vehicletype_id == '3' ?
+                { step_completed >= '1' && vehicleDetails.vehicletype_id == '6' ?
                 <section className="brand m-b-25">
                     <div className="d-flex justify-content-left">
                         <div className="brandhead">

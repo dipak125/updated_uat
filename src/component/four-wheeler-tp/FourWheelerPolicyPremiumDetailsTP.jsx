@@ -5,14 +5,15 @@ import { Formik, Field, Form } from "formik";
 import BaseComponent from '.././BaseComponent';
 import SideNav from '../common/side-nav/SideNav';
 import Footer from '../common/footer/Footer';
-import Otp from "./Otp"
+// import Otp from "./Otp"
 import axios from "../../shared/axios";
 import { withRouter, Link, Route } from "react-router-dom";
 import { loaderStart, loaderStop } from "../../store/actions/loader";
 import { connect } from "react-redux";
 import * as Yup from "yup";
 import Encryption from '../../shared/payload-encryption';
-// import Razorpay from "./Razorpay.jsx"
+import queryString from 'query-string';
+import fuel from '../common/FuelTypes';
 
 const initialValue = {}
 
@@ -49,7 +50,10 @@ class Premium extends Component {
             relation: [],
             step_completed: "0",
             vehicleDetails: [],
-            policyHolder: []
+            policyHolder: [],
+            policyHolder_refNo: queryString.parse(this.props.location.search).access_id ? 
+                                queryString.parse(this.props.location.search).access_id : 
+                                localStorage.getItem("policyHolder_refNo")
         };
     }
 
@@ -69,21 +73,31 @@ class Premium extends Component {
     }
 
     additionalDetails = (productId) => {
-        this.props.history.push(`/two_wheeler_additional_detailsTP/${productId}`);
+        this.props.history.push(`/four_wheeler_additional_detailsTP/${productId}`);
     }
 
     handleSubmit = (values) => {
         // this.setState({ show: true, refNo: values.refNo, whatsapp: values.whatsapp });
         const {policyHolder} = this.state
-        policyHolder && policyHolder.csc_id ? this.payment() : this.Razor_payment()
+        if(policyHolder && policyHolder.bcmaster && policyHolder.bcmaster.paymentgateway && policyHolder.bcmaster.paymentgateway.slug) {
+            if(policyHolder.bcmaster.paymentgateway.slug == "csc_wallet") {
+                this.payment()
+            }
+            if(policyHolder.bcmaster.paymentgateway.slug == "razorpay") {
+                this.Razor_payment()
+            }
+            if(policyHolder.bcmaster.paymentgateway.slug == "PPINL") {
+                this.paypoint_payment()
+            }
+        }
     }
 
     fetchData = () => {
         const { productId } = this.props.match.params
-        let policyHolder_id = localStorage.getItem("policyHolder_refNo") ? localStorage.getItem("policyHolder_refNo") : 0;
+        let policyHolder_id = this.state.policyHolder_refNo ? this.state.policyHolder_refNo : '0'
         let encryption = new Encryption();
     
-        axios.get(`two-wh/details/${policyHolder_id}`)
+        axios.get(`four-wh-tp/details/${policyHolder_id}`)
             .then(res => {
                 let decryptResp = JSON.parse(encryption.decrypt(res.data))
                 console.log("decrypt", decryptResp)
@@ -132,27 +146,27 @@ class Premium extends Component {
         let encryption = new Encryption();
 
         const post_data = {
-            'id':localStorage.getItem('policyHolder_id'),
+            'ref_no':localStorage.getItem('policyHolder_refNo'),
             'access_token':access_token,
             'idv_value': motorInsurance.idv_value,
-            'policy_type': localStorage.getItem('policy_type'),
+            'policy_type': motorInsurance ? motorInsurance.policy_type : "",
             'add_more_coverage': motorInsurance.add_more_coverage,
-            'policy_for': motorInsurance ? motorInsurance.policy_for : ""
-            // 'cng_kit': motorInsurance.cng_kit,
-            // 'cngKit_Cost': Math.floor(motorInsurance.cngkit_cost)
+            'policy_for': motorInsurance ? motorInsurance.policy_for : "",
+            'policytype_id': motorInsurance ? motorInsurance.policytype_id : "",
+            'PA_Cover': motorInsurance ? motorInsurance.pa_cover : "",
         }
-        formData.append('id',localStorage.getItem('policyHolder_refNo'))
-        formData.append('access_token',access_token)
-        formData.append('idv_value',motorInsurance.idv_value)
-        formData.append('policy_type',motorInsurance ? motorInsurance.policy_type : "")
-        formData.append('add_more_coverage',JSON.stringify(motorInsurance.add_more_coverage))
-        formData.append('policytype_id',motorInsurance ? motorInsurance.policytype_id : "")
-        formData.append('policy_for',motorInsurance ? motorInsurance.policy_for : "")
-        formData.append('PA_Cover',motorInsurance ? motorInsurance.pa_cover : "0")
+        // formData.append('id',localStorage.getItem('policyHolder_refNo'))
+        // formData.append('access_token',access_token)
+        // formData.append('idv_value',motorInsurance.idv_value)
+        // formData.append('policy_type',motorInsurance ? motorInsurance.policy_type : "")
+        // formData.append('add_more_coverage',JSON.stringify(motorInsurance.add_more_coverage))
+        // formData.append('policytype_id',motorInsurance ? motorInsurance.policytype_id : "")
+        // formData.append('policy_for',motorInsurance ? motorInsurance.policy_for : "")
+        // formData.append('PA_Cover',motorInsurance ? motorInsurance.pa_cover : "0")
 
-        // formData.append('enc_data',encryption.encrypt(JSON.stringify(post_data)))
-
-        axios.post('fullQuotePM2WTP', formData)
+        formData.append('enc_data',encryption.encrypt(JSON.stringify(post_data)))
+console.log("fullQuote post_data--- ", post_data)
+        axios.post('fullQuotePMCARTP', formData)
             .then(res => {
                 if (res.data.PolicyObject) {
                     this.setState({
@@ -184,6 +198,11 @@ class Premium extends Component {
     Razor_payment = () => {
         const { refNumber } = this.state;
         window.location = `${process.env.REACT_APP_PAYMENT_URL}/razorpay/pay.php?refrence_no=${refNumber}`
+    }
+
+    paypoint_payment = () => {
+        const { refNumber } = this.state;
+        window.location = `${process.env.REACT_APP_PAYMENT_URL}/ppinl/pay.php?refrence_no=${refNumber}`
     }
 
     fetchRelationships=()=>{
@@ -251,7 +270,7 @@ class Premium extends Component {
                             <div className="col-sm-12 col-md-12 col-lg-2 col-xl-2 pd-l-0">
                                 <SideNav />
                             </div>
-                            { step_completed >= '4' && vehicleDetails.vehicletype_id == '3' ?
+                            { step_completed >= '4' && vehicleDetails.vehicletype_id == '6' ?
                             <div className="col-sm-12 col-md-12 col-lg-10 col-xl-10 infobox">
                                 <h4 className="text-center mt-3 mb-3">SBI General Insurance Company Limited</h4>
                                 <Formik initialValues={initialValue} onSubmit={this.handleSubmit}
@@ -481,6 +500,100 @@ class Premium extends Component {
                                                                 </Collapsible>
                                                             </div>
 
+                                                            <div className="rghtsideTrigr m-b-30">
+                                                                <Collapsible trigger="Vehicle Details" >
+                                                                    <div className="listrghtsideTrigr">
+                                                                        {memberdetails ?
+
+                                                                                <div>
+                                                                                    <Row>
+                                                                                        <Col sm={12} md={6}>
+                                                                                            <Row>
+                                                                                                <Col sm={12} md={6}>
+                                                                                                    <FormGroup>Registration No:</FormGroup>
+                                                                                                </Col>
+                                                                                                <Col sm={12} md={6}>
+                                                                                                    <FormGroup>{motorInsurance && motorInsurance.registration_no}</FormGroup>
+                                                                                                </Col>
+                                                                                            </Row>
+
+                                                                                            <Row>
+                                                                                                <Col sm={12} md={6}>
+                                                                                                    <FormGroup>Car Brand:</FormGroup>
+                                                                                                </Col>
+                                                                                                <Col sm={12} md={6}>
+                                                                                                    <FormGroup>{vehicleDetails && vehicleDetails.vehiclebrand && vehicleDetails.vehiclebrand.name ? vehicleDetails.vehiclebrand.name : ""}</FormGroup>
+                                                                                                </Col>
+                                                                                            </Row>
+                                                                                            <Row>
+                                                                                                <Col sm={12} md={6}>
+                                                                                                    <FormGroup>Car Model</FormGroup>
+                                                                                                </Col>
+                                                                                                <Col sm={12} md={6}>
+                                                                                                    <FormGroup>{vehicleDetails && vehicleDetails.vehiclemodel && vehicleDetails.vehiclemodel.description ? vehicleDetails.vehiclemodel.description+" "+vehicleDetails.varientmodel.varient : ""}</FormGroup>
+                                                                                                </Col>
+                                                                                            </Row>
+                                                                                            <Row>
+                                                                                                <Col sm={12} md={6}>
+                                                                                                    <FormGroup>Varient</FormGroup>
+                                                                                                </Col>
+                                                                                                <Col sm={12} md={6}>
+                                                                                                    <FormGroup>{vehicleDetails && vehicleDetails.varientmodel && vehicleDetails.varientmodel.varient ? vehicleDetails.varientmodel.varient : ""}</FormGroup>
+                                                                                                </Col>
+                                                                                            </Row>
+                                                                                            <Row>
+                                                                                                <Col sm={12} md={6}>
+                                                                                                    <FormGroup>Chasis Number</FormGroup>
+                                                                                                </Col>
+                                                                                                <Col sm={12} md={6}>
+                                                                                                    <FormGroup>{motorInsurance && motorInsurance.chasis_no  ? motorInsurance.chasis_no : ""}</FormGroup>
+                                                                                                </Col>
+                                                                                            </Row>
+                                                                                            <Row>
+                                                                                                <Col sm={12} md={6}>
+                                                                                                    <FormGroup>Engine Number</FormGroup>
+                                                                                                </Col>
+                                                                                                <Col sm={12} md={6}>
+                                                                                                <FormGroup>{motorInsurance && motorInsurance.engine_no  ? motorInsurance.engine_no : ""}</FormGroup>
+                                                                                                </Col>
+                                                                                            </Row>
+                                                                                            <Row>
+                                                                                                <Col sm={12} md={6}>
+                                                                                                    <FormGroup>Fuel Type</FormGroup>
+                                                                                                </Col>
+                                                                                                <Col sm={12} md={6}>
+                                                                                                    <FormGroup>{vehicleDetails && vehicleDetails.varientmodel && vehicleDetails.varientmodel.fuel_type ? fuel[parseInt(vehicleDetails.varientmodel.fuel_type)] : null}</FormGroup>
+                                                                                                </Col>
+                                                                                            </Row>
+
+                                                                                            <Row>
+                                                                                                <Col sm={12} md={6}>
+                                                                                                    <FormGroup>Seating</FormGroup>
+                                                                                                </Col>
+                                                                                                <Col sm={12} md={6}>
+                                                                                                    <FormGroup>{vehicleDetails && vehicleDetails.varientmodel && vehicleDetails.varientmodel.seating ? vehicleDetails.varientmodel.seating : null}</FormGroup>
+                                                                                                </Col>
+                                                                                            </Row>
+
+                                                                                        </Col>
+                                                                                    </Row>
+                                                                                    <Row>
+                                                                                        <p></p>
+                                                                                    </Row>
+                                                                                </div>
+                                                                            : (<p></p>)}
+                                                                                   
+                                                                        <div>
+                                                                            <Row>
+                                                                                <p></p>
+                                                                            </Row>
+                                                                        </div>
+                                                                    </div>
+
+                                                                </Collapsible>
+                                                            </div>
+
+
                                                             <Row>
                                                             <Col sm={12} md={6}>
                                                             </Col>
@@ -490,8 +603,8 @@ class Premium extends Component {
                                                                         Select Payment Gateway
                                                                         <div>
                                                                         <img src={require('../../assets/images/green-check.svg')} alt="" className="m-r-10" />
-                                                                        {policyHolder && policyHolder.csc_id ? <img src={require('../../assets/images/CSC.svg')} alt="" /> :
-                                                                        <img src={require('../../assets/images/razorpay.svg')} alt="" />
+                                                                        { policyHolder && policyHolder.bcmaster && policyHolder.bcmaster.paymentgateway && policyHolder.bcmaster.paymentgateway.logo ? <img src={require('../../assets/images/'+ policyHolder.bcmaster.paymentgateway.logo)} alt="" /> :
+                                                                        null
                                                                         }
                                                                         </div>
                                                                     </div>
@@ -510,7 +623,6 @@ class Premium extends Component {
                                                             : null}
                                                             </div>
                                                         </Col>
-
 
                                                         <Col sm={12} md={3} lg={3}>
                                                             <div className="motrcar"><img src={require('../../assets/images/motor-car.svg')} alt="" /></div>

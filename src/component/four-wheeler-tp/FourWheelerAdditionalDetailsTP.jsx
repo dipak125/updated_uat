@@ -46,7 +46,8 @@ const initialValue = {
     eia_no: "",
     stateName: "",
     pinDataArr: [],
-    pincode_id: ""
+    pincode_id: "",
+    org_level: ""
 }
 
 const ownerValidation = Yup.object().shape({
@@ -386,7 +387,7 @@ class TwoWheelerAdditionalDetails extends Component {
         formData.append('enc_data',encryption.encrypt(JSON.stringify(post_data)))
         this.props.loadingStart();
         axios
-        .post(`/two-wh/owner-details`, formData)
+        .post(`/four-wh-tp/owner-details`, formData)
         .then(res => { 
             let decryptResp = JSON.parse(encryption.decrypt(res.data));
             console.log('decryptResp-----', decryptResp)
@@ -409,7 +410,7 @@ class TwoWheelerAdditionalDetails extends Component {
         let policyHolder_id = localStorage.getItem("policyHolder_refNo") ? localStorage.getItem("policyHolder_refNo") : 0;
         let encryption = new Encryption();
         this.props.loadingStart();
-        axios.get(`two-wh/details/${policyHolder_id}`)
+        axios.get(`four-wh-tp/details/${policyHolder_id}`)
             .then(res => {
                  let decryptResp = JSON.parse(encryption.decrypt(res.data))
                  console.log("decrypt---", decryptResp)
@@ -511,7 +512,7 @@ class TwoWheelerAdditionalDetails extends Component {
                 this.setState({
                     relation
                 });
-                this.props.loadingStop();
+                this.fetchData();
             }).
             catch(err=>{
                 this.props.loadingStop();
@@ -523,7 +524,6 @@ class TwoWheelerAdditionalDetails extends Component {
     }
 
     componentDidMount() {
-        this.fetchData();
         this.fetchRelationships();
     }
 
@@ -559,7 +559,7 @@ class TwoWheelerAdditionalDetails extends Component {
             appointee_relation_with: nomineeDetails && nomineeDetails.appointee_relation_with ? nomineeDetails.appointee_relation_with : "",
             appointee_name: nomineeDetails && nomineeDetails.appointee_name ? nomineeDetails.appointee_name : "",
             date_of_incorporation: policyHolder && policyHolder.date_of_incorporation ? new Date(policyHolder.date_of_incorporation) : "",
-            org_level: policyHolder ? policyHolder.org_level : "",
+            org_level: policyHolder && policyHolder.org_level ? policyHolder.org_level : "",
         });
 
         const quoteNumber =
@@ -578,7 +578,7 @@ class TwoWheelerAdditionalDetails extends Component {
                     </div>
                 <div className="col-sm-12 col-md-12 col-lg-10 col-xl-10 infobox">
                 <h4 className="text-center mt-3 mb-3">SBI General Insurance Company Limited</h4>
-                { step_completed >= '4' && vehicleDetails.vehicletype_id == '3' ?
+                { step_completed >= '4' && vehicleDetails.vehicletype_id == '6' ?
                 <section className="brand m-b-25">
                     <div className="brand-bg">
 

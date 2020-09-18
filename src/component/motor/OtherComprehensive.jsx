@@ -1,4 +1,4 @@
-import React, { Component } from 'react';
+import React, { Component, Fragment } from 'react';
 import { Row, Col, Modal, Button, FormGroup, OverlayTrigger, Tooltip } from 'react-bootstrap';
 import Collapsible from 'react-collapsible';
 import BackContinueButton from '../common/button/BackContinueButton';
@@ -676,10 +676,20 @@ console.log("newInitialValues---- ", newInitialValues)
         const premiumBreakup = policyCoverage && policyCoverage.length > 0 ?
             policyCoverage.map((coverage, qIndex) => {
                 return(
-                    <tr>
-                        <td>{Coverage[coverage.ProductElementCode]}:</td>
-                        <td>₹ {Math.round(coverage.BeforeVatPremium)}</td>
-                    </tr>
+                    <Fragment>
+                        {coverage.ProductElementCode == "C101066" ? 
+                            coverage.PolicyBenefitList.map((coverage1, qIndex) => {
+                                return(
+                                        <tr>
+                                            <td>{Coverage[coverage1.ProductElementCode]}</td>
+                                            <td>₹ {Math.round(coverage1.BeforeVatPremium)}  </td>                      
+
+                                        </tr>)}) :
+                            <tr>
+                                <td>{Coverage[coverage.ProductElementCode]}:</td>
+                                <td>₹ {Math.round(coverage.BeforeVatPremium)}</td>
+                            </tr>}
+                    </Fragment>
                 )   
             }) : null
         

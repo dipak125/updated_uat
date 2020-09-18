@@ -140,7 +140,7 @@ class TwoWheelerSelectBrand extends Component {
         const {vehicleDetails} = this.state
         let brandId = vehicleDetails && vehicleDetails.vehiclebrand_id ? vehicleDetails.vehiclebrand_id : ""
         return new Promise(resolve => {
-            axios.get(`vehicle/brand-with-image/3`)
+            axios.get(`vehicle/brand-with-image/1`)
                 .then(res => {
                     let brandList = res && res.data.data.list ? res.data.data.list : []
                     this.setState({
@@ -167,7 +167,7 @@ class TwoWheelerSelectBrand extends Component {
     getOtherBrands = () => {
         let encryption = new Encryption();
         this.props.loadingStart();
-        axios.get(`two-wh/without-image/3`).then(res => {
+        axios.get(`four-wh-tp/without-image/1`).then(res => {
             let decryptResp = JSON.parse(encryption.decrypt(res.data));
             console.log('decryptResp_otherBrand', decryptResp)
 
@@ -205,7 +205,7 @@ class TwoWheelerSelectBrand extends Component {
         let policyHolder_id = localStorage.getItem("policyHolder_refNo") ? localStorage.getItem("policyHolder_refNo") : 0;
         let encryption = new Encryption();
         this.props.loadingStart();
-        axios.get(`two-wh/details/${policyHolder_id}`)
+        axios.get(`four-wh-tp/details/${policyHolder_id}`)
             .then(res => {
                 let decryptResp = JSON.parse(encryption.decrypt(res.data));
                 console.log('decryptResp', decryptResp)
@@ -245,7 +245,7 @@ class TwoWheelerSelectBrand extends Component {
     setBrandName = (brand_id) => {
         let encryption = new Encryption();
         this.props.loadingStart();
-        axios.get(`two-wh/model-with-varient/3/${brand_id}`).then(res => {
+        axios.get(`four-wh-tp/model-with-varient/1/${brand_id}`).then(res => {
             let decryptResp = JSON.parse(encryption.decrypt(res.data));
             console.log('decryptResp',decryptResp)
             let selectedBrandDetails = decryptResp && decryptResp.data.list ? decryptResp.data.list : {};
@@ -312,11 +312,11 @@ class TwoWheelerSelectBrand extends Component {
         if(policyHolder_id > 0 ) {
             if(sessionStorage.getItem('csc_id')) {
                 post_data = {
-                    'menumaster_id': 3,
+                    'menumaster_id': 1,
                     'brand_id': values.selectedBrandId,
                     'brand_model_id': values.selectedModelId,
                     'model_varient_id': values.selectedVarientId,
-                    'vehicle_type_id':3,
+                    'vehicle_type_id':6,
                     'registration_no':values.regNumber,
                     'policy_type_id':values.policy_type,
                     'policy_holder_id': policyHolder_id,
@@ -330,11 +330,11 @@ class TwoWheelerSelectBrand extends Component {
             }
             else {
                 post_data = {
-                    'menumaster_id': 3,
+                    'menumaster_id': 1,
                     'brand_id': values.selectedBrandId,
                     'brand_model_id': values.selectedModelId,
                     'model_varient_id': values.selectedVarientId,
-                    'vehicle_type_id':3,
+                    'vehicle_type_id':6,
                     'registration_no':values.regNumber,
                     'policy_type_id':values.policy_type,
                     'policy_holder_id': policyHolder_id,
@@ -348,7 +348,7 @@ class TwoWheelerSelectBrand extends Component {
             console.log('post_data-----', post_data)
             formData.append('enc_data', encryption.encrypt(JSON.stringify(post_data)))
             this.props.loadingStart();
-            axios.post('two-wh/update-registration', formData).then(res => {
+            axios.post('four-wh-tp/update-registration', formData).then(res => {
                 this.props.loadingStop();
                 let decryptResp = JSON.parse(encryption.decrypt(res.data));
                 console.log('decryptResp-----', decryptResp)
@@ -380,11 +380,11 @@ class TwoWheelerSelectBrand extends Component {
         else {
             if(sessionStorage.getItem('csc_id')) {
                 post_data = {
-                    'menumaster_id': 3,
+                    'menumaster_id': 1,
                     'brand_id': selectedBrandId,
                     'brand_model_id': selectedModelId,
                     'model_varient_id': selectedVarientId,
-                    'vehicle_type_id':3,
+                    'vehicle_type_id':6,
                     'registration_no':values.regNumber,
                     'policy_type_id':values.policy_type,
                     'check_registration': values.check_registration,
@@ -397,11 +397,11 @@ class TwoWheelerSelectBrand extends Component {
             }
             else {
                 post_data = {
-                    'menumaster_id': 3,
+                    'menumaster_id': 1,
                     'brand_id': selectedBrandId,
                     'brand_model_id': selectedModelId,
                     'model_varient_id': selectedVarientId,
-                    'vehicle_type_id':3,
+                    'vehicle_type_id':6,
                     'registration_no':values.regNumber,
                     'policy_type_id':values.policy_type,
                     'check_registration': values.check_registration,
@@ -414,7 +414,7 @@ class TwoWheelerSelectBrand extends Component {
 
             formData.append('enc_data', encryption.encrypt(JSON.stringify(post_data)))
             this.props.loadingStart();
-            axios.post('two-wh/registration', formData).then(res => {
+            axios.post('four-wh-tp/registration', formData).then(res => {
                 this.props.loadingStop();
                 let decryptResp = JSON.parse(encryption.decrypt(res.data));
                 console.log('decryptResp-----', decryptResp)

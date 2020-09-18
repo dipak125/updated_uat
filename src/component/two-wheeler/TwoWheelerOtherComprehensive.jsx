@@ -449,7 +449,7 @@ class TwoWheelerOtherComprehensive extends Component {
         let covList = motorInsurance && motorInsurance.add_more_coverage ? motorInsurance.add_more_coverage.split(",") : ""
         let newInnitialArray = {}
         let PA_flag = motorInsurance && motorInsurance.pa_cover != null ? '1' : '0'
-        let PA_Cover = motorInsurance &&  motorInsurance.pa_cover != null ? motorInsurance.pa_cover : '0'
+        let PA_Cover = motorInsurance &&  motorInsurance.pa_cover != null ? motorInsurance.pa_cover : ''
 
         let defaultSliderValue = PolicyArray.length > 0 ? Math.round(PolicyArray[0].PolicyRiskList[0].IDV_Suggested) : 0
         let sliderValue = sliderVal
