@@ -361,7 +361,7 @@ class OtherComprehensive extends Component {
 
 
     fullQuote = (access_token, values) => {
-        const { PolicyArray, sliderVal, add_more_coverage } = this.state
+        const { PolicyArray, sliderVal, add_more_coverage, motorInsurance } = this.state
         // let cng_kit_flag = 0;
         // let cngKit_Cost = 0;
         // if(values.toString()) {            
@@ -386,7 +386,7 @@ class OtherComprehensive extends Component {
             'ref_no':localStorage.getItem('policyHolder_refNo'),
             'access_token':access_token,
             'idv_value': sliderVal ? sliderVal : defaultSliderValue.toString(),
-            'policy_type': localStorage.getItem('policy_type'),
+            'policy_type': motorInsurance.policy_type,
             'add_more_coverage': add_more_coverage.toString(),
             'PA_Cover': values.PA_flag ? values.PA_Cover : "0",
             // 'cng_kit': cng_kit_flag,
@@ -463,7 +463,8 @@ class OtherComprehensive extends Component {
                 'add_more_coverage': add_more_coverage,
                 'puc': values.puc,
                 'pa_cover': values.PA_flag ? values.PA_Cover : "0",
-                'pa_flag' : values.PA_cover_flag
+                'pa_flag' : values.PA_cover_flag,
+                'page_name': `OtherComprehensive/${productId}`
             }
         }
         else {
@@ -477,7 +478,8 @@ class OtherComprehensive extends Component {
                 // 'cngkit_cost': values.cngKit_Cost,
                 'engine_no': values.engine_no,
                 'idv_value': sliderVal ? sliderVal : defaultSliderValue.toString(),
-                'puc': values.puc
+                'puc': values.puc,
+                'page_name': `OtherComprehensive/${productId}`
             }
         }
         console.log('post_data',post_data)
@@ -596,7 +598,7 @@ class OtherComprehensive extends Component {
 
         let covList = motorInsurance && motorInsurance.add_more_coverage ? motorInsurance.add_more_coverage.split(",") : ""
         let newInnitialArray = {}
-        let PA_flag = motorInsurance && motorInsurance.pa_cover != null ? '1' : '0'
+        let PA_flag = motorInsurance && motorInsurance.pa_cover != null ? "1" : '0'
         let PA_Cover = motorInsurance &&  motorInsurance.pa_cover != null ? motorInsurance.pa_cover : ''
         let newInitialValues = {}
 
@@ -640,8 +642,6 @@ class OtherComprehensive extends Component {
         newInnitialArray.PA_Cover = PA_Cover
         newInitialValues = Object.assign(initialValue, newInnitialArray );
 
-
-console.log("newInitialValues---- ", newInitialValues)
 
         let OD_TP_premium = serverResponse.PolicyLobList ? serverResponse.PolicyLobList[0].PolicyRiskList[0] : []
 
@@ -728,7 +728,7 @@ console.log("newInitialValues---- ", newInitialValues)
                     onSubmit={ serverResponse && serverResponse != "" ? (serverResponse.message ? this.getAccessToken : this.handleSubmit ) : this.getAccessToken} 
                     validationSchema={ComprehensiveValidation}>
                     {({ values, errors, setFieldValue, setFieldTouched, isValid, isSubmitting, touched }) => {
-
+console.log("errors---- ", errors)
                     return (
                         <Form>
                         <Row>

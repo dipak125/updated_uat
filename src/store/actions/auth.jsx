@@ -78,7 +78,8 @@ export const authProcess = (data, onSuccess, onFailure) => {
             post_data_obj = {
                 'email': data.emailAddress,
                 'password':data.password,
-                'bc_id': data.bc_id
+                'bc_id': data.bc_id,
+                'user_type': data.user_type
             }
         }
         else {
@@ -88,7 +89,6 @@ export const authProcess = (data, onSuccess, onFailure) => {
             }
         }
         let encryption = new Encryption();
-        
         formData.append('enc_data',encryption.encrypt(JSON.stringify(post_data_obj)))
 
         axios

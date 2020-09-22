@@ -535,7 +535,7 @@ console.log("fullQuote post_data--- ", post_data)
                                                                                             </Row>
                                                                                             <Row>
                                                                                                 <Col sm={12} md={6}>
-                                                                                                    <FormGroup>Varient</FormGroup>
+                                                                                                    <FormGroup>Variant</FormGroup>
                                                                                                 </Col>
                                                                                                 <Col sm={12} md={6}>
                                                                                                     <FormGroup>{vehicleDetails && vehicleDetails.varientmodel && vehicleDetails.varientmodel.varient ? vehicleDetails.varientmodel.varient : ""}</FormGroup>

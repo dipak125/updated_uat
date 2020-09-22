@@ -46,9 +46,9 @@ class SideNav extends Component {
                         <li>
 							<Link to="/PolicySearch" activeClassName="active"><span className="leftIcon01"><img src={require('../../../assets/images/document.png')} alt="" /></span>Policy Search</Link>
                         </li>
-                        {/* <li>
+                        <li>
 							<Link to="/QuoteSearch" activeClassName="active"><span className="leftIcon01"><img src={require('../../../assets/images/document.png')} alt="" /></span>Quote Search</Link>
-                        </li> */}
+                        </li>
                         <li>
 							<Link to="/Products" activeClassName="active"><span className="leftIcon01"><img src={require('../../../assets/images/leftIcon02Hover.svg')} alt="" /></span>Products</Link>
                         </li>
@@ -60,10 +60,10 @@ class SideNav extends Component {
                         </li>
                         {/* <li>
 							<Link to="/Supports" activeClassName="active"><span className="leftIcon01"><img src={require('../../../assets/images/support.png')} alt="" /></span>Support</Link>
-                        </li>
+                        </li>*/}
                         <li>
 							<Link to="/Break_in" activeClassName="active"><span className="leftIcon01"><img src={require('../../../assets/images/leftIcon01.svg')} alt="" /></span>Break In</Link>
-                        </li> */}
+                        </li> 
                        {/* <li>
 							<Link to="/UnderMaintenance" activeClassName="active"><span className="leftIcon01"><img src={require('../../../assets/images/leftIcon05.svg')} alt="" /></span>Support</Link>
                         </li> */}

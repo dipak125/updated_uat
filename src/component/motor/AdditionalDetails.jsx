@@ -281,7 +281,8 @@ class AdditionalDetails extends Component {
             'email': values['email'],
             'is_eia_account': values['is_eia_account'],
             'eia_no': values['eia_no'],
-            'address': values['address']
+            'address': values['address'],
+            'page_name': `Additional_details/${productId}`,
         }
 console.log('post_data', post_data);
         formData.append('enc_data',encryption.encrypt(JSON.stringify(post_data)))

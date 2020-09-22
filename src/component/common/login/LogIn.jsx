@@ -202,6 +202,7 @@ class LogIn extends Component {
                 values.emailAddress= "csc@gmail.com";
                 values.password= "12345";
                 values.bc_id= sessionStorage.getItem('csc_id')
+                values.user_type= sessionStorage.getItem('user_type')
                 
                 // this.setState({ errMsg: '' });
                 console.log("values-- ", values)

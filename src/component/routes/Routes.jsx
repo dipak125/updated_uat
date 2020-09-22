@@ -48,7 +48,7 @@ const Error = Loadable({
 });
 
 const Break_in = Loadable({
-    loader: () => import(/*webpackChunkName: "Products" */"../support/StatusTable.jsx"),
+    loader: () => import(/*webpackChunkName: "Products" */"../support/BreakinList.jsx"),
     loading: () => loadingContent
 });
 

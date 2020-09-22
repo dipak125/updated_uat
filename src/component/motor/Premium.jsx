@@ -14,6 +14,8 @@ import * as Yup from "yup";
 import Encryption from '../../shared/payload-encryption';
 import queryString from 'query-string';
 import fuel from '../common/FuelTypes';
+import swal from 'sweetalert';
+import moment from "moment";
 
 const initialValue = {}
 
@@ -108,6 +110,8 @@ class Premium extends Component {
                 let motorInsurance = decryptResp.data.policyHolder ? decryptResp.data.policyHolder.motorinsurance : {}
                 let policyHolder = decryptResp.data.policyHolder ? decryptResp.data.policyHolder : [];
                 let vehicleDetails = decryptResp.data.policyHolder ? decryptResp.data.policyHolder.vehiclebrandmodel : {};
+                let previousPolicy = decryptResp.data.policyHolder ? decryptResp.data.policyHolder.previouspolicy : {}
+                let dateDiff = 0
                 this.setState({
                     motorInsurance,policyHolder,vehicleDetails,
                     refNumber: decryptResp.data.policyHolder.reference_no,
@@ -116,14 +120,48 @@ class Premium extends Component {
                     nomineedetails: decryptResp.data.policyHolder ? decryptResp.data.policyHolder.request_data.nominee[0]:[]
                     
                 })
-
-                this.getAccessToken(motorInsurance)
-               
+                if(previousPolicy && policyHolder.break_in_status != 2) {
+                    console.log("AAAAAAAAAAAAAAAAAAAA")
+                    dateDiff = Math.floor(moment().diff(previousPolicy.end_date, 'days', true));
+                    console.log("BBBBBBBBBBBB ", dateDiff)
+                    if(dateDiff > 0 || previousPolicy.name == "2") {
+                        swal("Since previous policy is a liability/lapse policy, issuance of a package policy will be subjet to successful inspection of your vehicle. Our Customer care executive will call you to assit on same, shortly")
+                        this.callBreakin()
+                    }
+                    else {
+                        this.getAccessToken(motorInsurance)
+                    }
+                }
+                else{
+                    this.getAccessToken(motorInsurance)
+                }           
             })
             .catch(err => {
                 // handle error
                 this.props.loadingStop();
             })
+    }
+
+    callBreakin=()=>{
+
+        const formData = new FormData();
+        let encryption = new Encryption();
+        let policyHolder_id = this.state.policyHolder_refNo ? this.state.policyHolder_refNo : '0'
+        let bc_data = sessionStorage.getItem('bcLoginData') ? sessionStorage.getItem('bcLoginData') : "";
+        if(bc_data) {
+            bc_data = JSON.parse(encryption.decrypt(bc_data));
+        }
+        formData.append('bcmaster_id', sessionStorage.getItem('csc_id') ? "5" : bc_data ? bc_data.agent_id : "" ) 
+        formData.append('ref_no', policyHolder_id) 
+
+        this.props.loadingStart();
+        axios.post('breakin/create',formData)
+        .then(res=>{
+            this.props.loadingStop();
+        }).
+        catch(err=>{
+            this.props.loadingStop();
+        })  
     }
 
     getAccessToken = (motorInsurance) => {
@@ -151,7 +189,7 @@ class Premium extends Component {
             'ref_no':this.state.policyHolder_refNo ? this.state.policyHolder_refNo : '0',
             'access_token':access_token,
             'idv_value': motorInsurance.idv_value,
-            'policy_type': localStorage.getItem('policy_type'),
+            'policy_type':  motorInsurance.policy_type,
             'add_more_coverage': motorInsurance.add_more_coverage,
             'cng_kit': motorInsurance.cng_kit,
             'cngKit_Cost': Math.floor(motorInsurance.cngkit_cost)
@@ -484,7 +522,7 @@ console.log('nomineedetails', nomineedetails)
                                                                                             </Row>
                                                                                             <Row>
                                                                                                 <Col sm={12} md={6}>
-                                                                                                    <FormGroup>Varient</FormGroup>
+                                                                                                    <FormGroup>Variant</FormGroup>
                                                                                                 </Col>
                                                                                                 <Col sm={12} md={6}>
                                                                                                     <FormGroup>{vehicleDetails && vehicleDetails.varientmodel && vehicleDetails.varientmodel.varient ? vehicleDetails.varientmodel.varient : ""}</FormGroup>

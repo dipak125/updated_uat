@@ -133,6 +133,7 @@ fetchData=()=>{
                     'agent_name':sessionStorage.getItem('agent_name') ? sessionStorage.getItem('agent_name') : "",
                     'product_id':sessionStorage.getItem('product_id') ? sessionStorage.getItem('product_id') : "",
                     'bc_token': "5",
+                    'page_name': `Registration/${productId}`
                 } 
             }
             else {
@@ -145,6 +146,7 @@ fetchData=()=>{
                     'bcmaster_id': bc_data ? bc_data.agent_id : "",
                     'bc_token': bc_data ? bc_data.token : "",
                     'bc_agent_id': bc_data ? bc_data.user_info.data.user.username : "",
+                    'page_name': `Registration/${productId}`
                 } 
             }
 
@@ -181,7 +183,8 @@ fetchData=()=>{
                     'csc_id':sessionStorage.getItem('csc_id') ? sessionStorage.getItem('csc_id') : "",
                     'agent_name':sessionStorage.getItem('agent_name') ? sessionStorage.getItem('agent_name') : "",
                     'product_id':sessionStorage.getItem('product_id') ? sessionStorage.getItem('product_id') : "",
-                    'bcmaster_id': "5"
+                    'bcmaster_id': "5",
+                    'page_name': `Registration/${productId}`
                 } 
             }
             else {
@@ -193,6 +196,7 @@ fetchData=()=>{
                     'bcmaster_id': bc_data ? bc_data.agent_id : "",
                     'bc_token': bc_data ? bc_data.token : "",
                     'bc_agent_id': bc_data ? bc_data.user_info.data.user.username : "",
+                    'page_name': `Registration/${productId}`
                 } 
             }
             console.log('post_data', post_data)

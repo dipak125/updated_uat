@@ -288,6 +288,7 @@ class SelectBrand extends Component {
             'brand_id': values.selectedBrandId,
             'brand_model_id': values.selectedModelId,
             'model_varient_id': values.selectedVarientId,
+            'page_name': `Select-brand/${productId}`
         }
         formData.append('enc_data', encryption.encrypt(JSON.stringify(post_data)))
         this.props.loadingStart();

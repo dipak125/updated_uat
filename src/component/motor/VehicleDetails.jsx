@@ -151,9 +151,9 @@ const vehicleRegistrationValidation = Yup.object().shape({
             return "Since previous policy is a liability policy, issuance of a package policy will be subjet to successful inspection of your vehicle. Our Customer care executive will call you to assit on same, shortly"
         },
         function (value) {
-            if (value == '2' ) {   
-                return false;    
-            }
+            // if (value == '2' ) {   
+            //     return false;    
+            // }
             return true;
         }
     ),
@@ -260,7 +260,7 @@ const vehicleRegistrationValidation = Yup.object().shape({
     ),
     previous_claim_for:Yup.string().when(['previous_is_claim'], {
         is: previous_is_claim => previous_is_claim == '1',       
-        then: Yup.string().required('Please provide previous clain for'),
+        then: Yup.string().required('Please provide previous claim for'),
         otherwise: Yup.string()
     }),
    
@@ -394,8 +394,7 @@ class VehicleDetails extends Component {
     handleSubmit = (values, actions) => {
         const {productId} = this.props.match.params 
         const {motorInsurance} = this.state
-        ageObj.whatIsCurrentMonth(values.registration_date) < 7 ? localStorage.setItem('policy_type', 6) : 
-        localStorage.setItem('policy_type', 1)
+        let policy_type = ageObj.whatIsCurrentMonth(values.registration_date) < 7 ? 6 : 1
         // let vehicleAge = ageObj.whatIsMyVehicleAge(values.registration_date)
         let vehicleAge = Math.floor(moment().diff(values.registration_date, 'months', true))
         // let ageDiff = Math.floor(moment().diff(values.registration_date, 'days', true));
@@ -419,9 +418,9 @@ class VehicleDetails extends Component {
                 'previous_claim_bonus': values.previous_claim_bonus ? values.previous_claim_bonus : 1,
                 'previous_claim_for': values.previous_claim_for,        
                 'vehicleAge': vehicleAge,
-                'policy_type': localStorage.getItem('policy_type'),
+                'policy_type': policy_type,
                 'prev_policy_flag': 1,
-                
+                'page_name': `VehicleDetails/${productId}`          
             } 
         }
         else if(ageObj.whatIsCurrentMonth(values.registration_date) <= 0)  {
@@ -433,8 +432,9 @@ class VehicleDetails extends Component {
                 'previous_is_claim':'0', 
                 'previous_claim_bonus': 1,
                 'vehicleAge': vehicleAge ,
-                'policy_type': localStorage.getItem('policy_type'),
+                'policy_type': policy_type,
                 'prev_policy_flag': 0,
+                'page_name': `VehicleDetails/${productId}`
             } 
         }
 
