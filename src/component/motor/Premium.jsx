@@ -110,7 +110,8 @@ class Premium extends Component {
                 let motorInsurance = decryptResp.data.policyHolder ? decryptResp.data.policyHolder.motorinsurance : {}
                 let policyHolder = decryptResp.data.policyHolder ? decryptResp.data.policyHolder : [];
                 let vehicleDetails = decryptResp.data.policyHolder ? decryptResp.data.policyHolder.vehiclebrandmodel : {};
-                let previousPolicy = decryptResp.data.policyHolder ? decryptResp.data.policyHolder.previouspolicy : {}
+                let previousPolicy = decryptResp.data.policyHolder ? decryptResp.data.policyHolder.previouspolicy : {};
+                let request_data = decryptResp.data.policyHolder ? decryptResp.data.policyHolder.request_data : {}
                 let dateDiff = 0
                 this.setState({
                     motorInsurance,policyHolder,vehicleDetails,
@@ -120,13 +121,24 @@ class Premium extends Component {
                     nomineedetails: decryptResp.data.policyHolder ? decryptResp.data.policyHolder.request_data.nominee[0]:[]
                     
                 })
-                if(previousPolicy && policyHolder.break_in_status != 2) {
-                    console.log("AAAAAAAAAAAAAAAAAAAA")
+                if(previousPolicy && policyHolder.break_in_status != "Vehicle Recommended and Reports Uploaded") {
                     dateDiff = Math.floor(moment().diff(previousPolicy.end_date, 'days', true));
-                    console.log("BBBBBBBBBBBB ", dateDiff)
                     if(dateDiff > 0 || previousPolicy.name == "2") {
-                        swal("Since previous policy is a liability/lapse policy, issuance of a package policy will be subjet to successful inspection of your vehicle. Our Customer care executive will call you to assit on same, shortly")
-                        this.callBreakin()
+                        swal({
+                            title: "Breakin",
+                            text: `Your Quotation number is ${request_data.quote_id}. Your vehicle needs inspection. Do you want to raise inspection.`,
+                            icon: "warning",
+                            buttons: true,
+                            dangerMode: true,
+                        })
+                        .then((willCreate) => {
+                            if (willCreate) {
+                                this.callBreakin()
+                            }
+                            else {
+                                this.props.loadingStop();
+                            }
+                        })                     
                     }
                     else {
                         this.getAccessToken(motorInsurance)
@@ -157,6 +169,7 @@ class Premium extends Component {
         this.props.loadingStart();
         axios.post('breakin/create',formData)
         .then(res=>{
+            swal(`Your breakin request has been raised. Your inspection Number: ${res.data.data.inspection_no}`)
             this.props.loadingStop();
         }).
         catch(err=>{

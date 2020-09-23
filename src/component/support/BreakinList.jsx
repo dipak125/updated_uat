@@ -10,9 +10,10 @@ import Encryption from '../../shared/payload-encryption';
 import axios from "../../shared/axios";
 import { loaderStart, loaderStop } from "../../store/actions/loader";
 import { connect } from "react-redux";
+import moment from "moment";
 
 const actionFormatter = (refObj) => (cell, row, enumObject) => {
-    if(row.break_in_status == 2){
+    if(row.break_in_status == "Vehicle Recommended and Reports Uploaded"){
         return (
             <LinkWithTooltip
                 tooltip="Click to proceed"
@@ -48,6 +49,10 @@ function productFormatter(cell) {
 
 function premiumFormatter(cell) {
     return (cell ? (cell.net_premium ? cell.net_premium: null): null);
+} 
+
+function breakinFormatter(cell) {
+    return (cell ? (cell.inspection_no ? cell.inspection_no: null): null);
 } 
 
 class BreakinList extends Component {
@@ -171,13 +176,14 @@ class BreakinList extends Component {
                                     wrapperClasses="table-responsive"
                                 >
 
-                                    <TableHeaderColumn width='100px' dataField='choiceno' isKey dataSort>choice No</TableHeaderColumn>
+                                    <TableHeaderColumn width='200px' dataField='breakin' dataFormat={breakinFormatter} isKey dataSort>choice No</TableHeaderColumn>
                                     <TableHeaderColumn width='100px' dataField="vehiclebrandmodel" dataFormat={productFormatter} >Product</TableHeaderColumn>
-                                    <TableHeaderColumn width='100px' dataField="inspection">Inspection Date</TableHeaderColumn>
+                                    <TableHeaderColumn width='100px' dataField="breakin" dataFormat={(cell) => (cell.created_at !== '0000-00-00 00:00:00' ? moment(cell.created_at).format("DD-MM-YYYY") : '')}>Inspection Date</TableHeaderColumn>
                                     <TableHeaderColumn width='100px' dataField="request_data" dataFormat={premiumFormatter} >Premium</TableHeaderColumn>
-                                    <TableHeaderColumn width='200px' dataField="break_in_status"  dataFormat={(cell) => (cell == 1 ? "Approval pending" : "Approved")} >Status</TableHeaderColumn>
-                                    <TableHeaderColumn width='100px' dataField="tat" >TAT</TableHeaderColumn>
-                                    <TableHeaderColumn width='100px' dataField="getstatus" dataAlign="center" dataFormat={ actionFormatter(this) }>Status</TableHeaderColumn>
+                                    {/* <TableHeaderColumn width='200px' dataField="break_in_status"  dataFormat={(cell) => (cell == 1 ? "Approval pending" : "Approved")} >Status</TableHeaderColumn> */}
+                                    <TableHeaderColumn width='200px' dataField="break_in_status" >Status</TableHeaderColumn>
+                                    <TableHeaderColumn width='100px' dataField="request_data" dataFormat={(cell) =>(cell.quote_id) } >Quotatioin No.</TableHeaderColumn>
+                                    <TableHeaderColumn width='150px' dataField="getstatus" dataAlign="center" dataFormat={ actionFormatter(this) }>Status</TableHeaderColumn>
 
                                 </BootstrapTable>
                             </div>
