@@ -261,8 +261,8 @@ const ComprehensiveValidation = Yup.object().shape({
         }).min(6, function() {
             return "Policy No. must be minimum 6 chracters"
         })
-        .max(20, function() {
-            return "Policy No. must be maximum 20 chracters"
+        .max(28, function() {
+            return "Policy No. must be maximum 28 chracters"
         }),
 
    
@@ -284,7 +284,8 @@ class TwoWheelerVerify extends Component {
             length:15,
             insurerList: [],
             vehicleDetails: [],
-            step_completed: "0"
+            step_completed: "0",
+            request_data: []
         };
 
     changePlaceHoldClassAdd(e) {
@@ -328,9 +329,10 @@ class TwoWheelerVerify extends Component {
                 let previousPolicy = decryptResp.data.policyHolder ? decryptResp.data.policyHolder.previouspolicy : {};
                 let vehicleDetails = decryptResp.data.policyHolder ? decryptResp.data.policyHolder.vehiclebrandmodel : {};
                 let step_completed = decryptResp.data.policyHolder ? decryptResp.data.policyHolder.step_no : "";
+                let request_data = decryptResp.data.policyHolder ? decryptResp.data.policyHolder.request_data : {};
                 this.getInsurerList()
                 this.setState({
-                    motorInsurance, previousPolicy,vehicleDetails,step_completed,
+                    motorInsurance, previousPolicy,vehicleDetails,step_completed,request_data,
                     vahanVerify: motorInsurance.chasis_no && motorInsurance.engine_no ? true : false
                 })
                 this.props.loadingStop();
@@ -356,6 +358,7 @@ class TwoWheelerVerify extends Component {
         }
 
         formData.append("chasiNo", values.chasis_no_last_part);
+        formData.append("policy_holder_id", this.state.request_data.policyholder_id);
         
         if(errors.registration_no || errors.chasis_no_last_part) {
             swal("Please provide correct Registration number and Chasis number")
@@ -397,6 +400,7 @@ class TwoWheelerVerify extends Component {
                     });
                     setFieldTouched('vahanVerify')
                     setFieldValue('vahanVerify', true) 
+                    // swal("Please provide correct Registration number and Chasis number")
                     this.props.loadingStop();
                 });
             }
@@ -886,7 +890,7 @@ class TwoWheelerVerify extends Component {
                                                     type="text"
                                                     placeholder="Previous Policy Number"
                                                     autoComplete="off"
-                                                    maxLength="20"
+                                                    maxLength="28"
                                                     onFocus={e => this.changePlaceHoldClassAdd(e)}
                                                     onBlur={e => this.changePlaceHoldClassRemove(e)}
                                                     

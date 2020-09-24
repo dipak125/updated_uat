@@ -69,7 +69,8 @@ class TwoWheelerVehicleDetails extends Component {
         CustIdkeyword: "",
         RTO_location: "",
         step_completed: "0",
-        location_reset_flag: 0
+        location_reset_flag: 0,
+        request_data: []
     };
 
     changePlaceHoldClassAdd(e) {
@@ -162,19 +163,19 @@ class TwoWheelerVehicleDetails extends Component {
     this.setState({
       selectedCustomerRecords: suggestion
     });
-    return suggestion.RTO_LOCATION;
+    return suggestion.RTO_LOCATION+" - "+suggestion.NameCode;
   }
   
    renderCustomerIDSuggestion(suggestion) {
     return (
-      <span>{suggestion.RTO_LOCATION}</span>
+      <span>{suggestion.RTO_LOCATION+" - "+suggestion.NameCode}</span>
     );
   }
   //--------------------------------------------------------
 
     handleSubmit = (values, actions) => {
         const {productId} = this.props.match.params 
-        const {motorInsurance} = this.state
+        const {motorInsurance, request_data} = this.state
         let policy_type = ageObj.whatIsCurrentMonth(values.registration_date) < 7 ? 6 : 1
         let newPolStartDate = addDays(new Date(), 1)           
         let newPolEndDate = addDays(new Date(newPolStartDate), 364) 
@@ -184,7 +185,7 @@ class TwoWheelerVehicleDetails extends Component {
         let post_data = {}
 
             post_data = {
-                'policy_holder_id':localStorage.getItem("policyHolder_id"),
+                'policy_holder_id':request_data.policyholder_id,
                 'menumaster_id':1,
                 'registration_date':moment(values.registration_date).format("YYYY-MM-DD"),
                 'location_id':values.location_id,
@@ -267,8 +268,9 @@ class TwoWheelerVehicleDetails extends Component {
                  let vehicleDetails = decryptResp.data.policyHolder ? decryptResp.data.policyHolder.vehiclebrandmodel : {};
                  let RTO_location = motorInsurance && motorInsurance.location && motorInsurance.location.RTO_LOCATION ? motorInsurance.location.RTO_LOCATION : ""
                  let step_completed = decryptResp.data.policyHolder ? decryptResp.data.policyHolder.step_no : "";
+                 let request_data = decryptResp.data.policyHolder ? decryptResp.data.policyHolder.request_data : {};
                 this.setState({
-                    motorInsurance, previousPolicy, vehicleDetails,RTO_location,step_completed
+                    motorInsurance, previousPolicy, vehicleDetails,RTO_location,step_completed, request_data
                 })
                 this.props.loadingStop();
             })

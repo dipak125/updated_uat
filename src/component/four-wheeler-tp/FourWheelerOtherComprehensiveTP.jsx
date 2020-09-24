@@ -97,7 +97,8 @@ class TwoWheelerOtherComprehensive extends Component {
             step_completed: "0",
             vehicleDetails: [],
             selectFlag: '',
-            moreCoverage: []
+            moreCoverage: [],
+            request_data: []
         };
     }
 
@@ -148,6 +149,7 @@ class TwoWheelerOtherComprehensive extends Component {
                 let motorInsurance = decryptResp.data.policyHolder ? decryptResp.data.policyHolder.motorinsurance : {}
                 let vehicleDetails = decryptResp.data.policyHolder ? decryptResp.data.policyHolder.vehiclebrandmodel : {};
                 let step_completed = decryptResp.data.policyHolder ? decryptResp.data.policyHolder.step_no : "";
+                let request_data = decryptResp.data.policyHolder ? decryptResp.data.policyHolder.request_data : {};
 
                 let add_more_coverage = motorInsurance && motorInsurance.policy_for == '2' ? [] : (motorInsurance.add_more_coverage != null ? motorInsurance.add_more_coverage.split(",") : ['B00015']) 
                 add_more_coverage = add_more_coverage.flat()
@@ -156,7 +158,7 @@ class TwoWheelerOtherComprehensive extends Component {
                  values.PA_Cover = motorInsurance && motorInsurance.pa_cover != "" ? motorInsurance.pa_cover : '0'
                 
                 this.setState({
-                    motorInsurance,vehicleDetails,step_completed,
+                    motorInsurance,vehicleDetails,step_completed,request_data,
                     add_more_coverage: add_more_coverage, 
                     selectFlag: motorInsurance && motorInsurance.policy_for == '2' ? [] : (motorInsurance.add_more_coverage != null ? '0' : '1') 
                     
@@ -188,40 +190,10 @@ class TwoWheelerOtherComprehensive extends Component {
             });
     };
 
-    getVahanDetails = (chasiNo, regnNo, setFieldTouched, setFieldValue) => {
-
-        const formData = new FormData();
-        formData.append("chasiNo", chasiNo);
-        formData.append("regnNo", regnNo);
-
-        this.props.loadingStart();
-        axios
-            .post(`/getVahanDetails`, formData)
-            .then((res) => {
-                this.setState({
-                    vahanDetails: res.data,
-                    vahanVerify: res.data.length > 0 ? true : false
-                });
-
-                setFieldTouched('vahanVerify')
-                res.data.length > 0 ?
-                    setFieldValue('vahanVerify', true)
-                    : setFieldValue('vahanVerify', false)
-
-                this.props.loadingStop();
-            })
-            .catch((err) => {
-                this.setState({
-                    vahanDetails: [],
-                });
-                this.props.loadingStop();
-            });
-    };
 
     fullQuote = (access_token, values) => {
         const { PolicyArray, sliderVal, add_more_coverage, motorInsurance } = this.state
 
-        let defaultSliderValue = PolicyArray.length > 0 ? Math.floor(PolicyArray[0].PolicyRiskList[0].IDV_Suggested) : 0
         const formData = new FormData();
 
         const post_data = {
@@ -237,15 +209,7 @@ class TwoWheelerOtherComprehensive extends Component {
 
         let encryption = new Encryption();
         formData.append('enc_data',encryption.encrypt(JSON.stringify(post_data)))
-
-        // formData.append('id',localStorage.getItem('policyHolder_refNo'))
-        // formData.append('access_token',access_token)
-        // formData.append('idv_value',sliderVal ? sliderVal : defaultSliderValue.toString())
-        // formData.append('policy_type',motorInsurance ? motorInsurance.policy_type : "")
-        // formData.append('add_more_coverage',JSON.stringify(add_more_coverage))
-        // formData.append('policytype_id',motorInsurance ? motorInsurance.policytype_id : "")
-        // formData.append('PA_Cover',values.PA_flag ? values.PA_Cover : "0")
-        // formData.append('policy_for',motorInsurance ? motorInsurance.policy_for : "")
+        console.log("fullquote-postdata--- ", post_data)
 
         axios.post('fullQuotePMCARTP', formData)
             .then(res => {
@@ -277,7 +241,7 @@ class TwoWheelerOtherComprehensive extends Component {
 
     handleSubmit = (values) => {
         const { productId } = this.props.match.params
-        const { motorInsurance, PolicyArray, sliderVal, add_more_coverage } = this.state
+        const { motorInsurance, PolicyArray, sliderVal, add_more_coverage, request_data } = this.state
         let defaultSliderValue = PolicyArray.length > 0 ? Math.floor(PolicyArray[0].PolicyRiskList[0].IDV_Suggested) : 0
 
         const formData = new FormData();
@@ -285,22 +249,24 @@ class TwoWheelerOtherComprehensive extends Component {
         let post_data = {}
         if (add_more_coverage.length > 0) {
             post_data = {
-                'policy_holder_id': localStorage.getItem('policyHolder_id'),
+                'policy_holder_id': request_data.policyholder_id,
                 'menumaster_id': 1,
                 'cng_kit': values.cng_kit,
                 'registration_no': motorInsurance.registration_no,
                 'idv_value': "0",
                 'add_more_coverage': add_more_coverage,
-                'pa_cover': values.PA_flag ? values.PA_Cover : "0"
+                'pa_cover': values.PA_flag ? values.PA_Cover : "0",
+                'pa_flag' : values.PA_cover_flag
             }
         }
         else {
             post_data = {
-                'policy_holder_id': localStorage.getItem('policyHolder_id'),
+                'policy_holder_id': request_data.policyholder_id,
                 'menumaster_id': 1,
                 'cng_kit': values.cng_kit,
                 'registration_no': motorInsurance.registration_no,
                 'idv_value': "0",
+                'pa_flag' : values.PA_cover_flag
             }
         }
         console.log('post_data', post_data)
@@ -399,7 +365,7 @@ class TwoWheelerOtherComprehensive extends Component {
         const { productId } = this.props.match.params
         let covList = motorInsurance && motorInsurance.add_more_coverage ? motorInsurance.add_more_coverage.split(",") : ""
         let newInnitialArray = {}
-        let PA_flag = motorInsurance && motorInsurance.pa_cover != null ? '1' : '0'
+        let PA_flag = motorInsurance && (motorInsurance.pa_cover == null || motorInsurance.pa_cover == "") ? '0' : '1'
         let PA_Cover = motorInsurance &&  motorInsurance.pa_cover != null ? motorInsurance.pa_cover : '0'
 
         if(selectFlag == '1') {
@@ -408,7 +374,8 @@ class TwoWheelerOtherComprehensive extends Component {
                 cng_kit: '0',
                 B00015: "B00015",
                 PA_flag: '0',
-                PA_Cover: ""
+                PA_Cover: "",
+                PA_cover_flag: "1"
             
             }
            
@@ -418,7 +385,8 @@ class TwoWheelerOtherComprehensive extends Component {
                 cng_kit: '0',
                 // B00015: "B00015",
                 PA_flag: '0',
-                PA_Cover: ""
+                PA_Cover: "",
+                PA_cover_flag: motorInsurance && motorInsurance.pa_flag ? motorInsurance.pa_flag : '0'
             
             }
         }
@@ -503,7 +471,7 @@ class TwoWheelerOtherComprehensive extends Component {
                                                     <Row>
                                                         <Col sm={12} md={9} lg={9}>
                                                             <div className="rghtsideTrigr W-90 m-b-30">
-                                                                <Collapsible trigger="Default Covered Coverages & Benefit" >
+                                                                <Collapsible trigger="Default Covered Coverages & Benefit"  open= {true}>
                                                                     <div className="listrghtsideTrigr">
                                                                     {policyCoverageList}
                                                                     </div>

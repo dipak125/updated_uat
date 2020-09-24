@@ -24,7 +24,7 @@ const initialValues = {
     selectedModelName: '',
     selectedVarientId: '',
     regNumber:'',
-    check_registration: 2,
+    check_registration: 1,
     policy_for: ""
 
 
@@ -38,21 +38,7 @@ const vehicleValidation = Yup.object().shape({
     regNumber: Yup.string().when("check_registration", {
         is: "1",       
         then: Yup.string(),
-        otherwise: Yup.string().required('Please provide registration number').matches(/^[A-Z]{2}[ -][0-9]{1,2}[ -][A-Z]{1,3}[ -][0-9]{4}$/, 'Invalid Registration number')
-            .test(
-                "validRegistrationChecking",
-                function() {
-                    return "Enter valid registration number"
-                },
-                function (value) {
-                    if (value) {
-                        let reg = value.split(" ")
-                        if(reg && reg[3]) {
-                            return parseInt(reg[3])
-                        }
-                    }
-                    return true;
-            })
+        otherwise: Yup.string().required('Please provide registration number').matches(/^[A-Z]{2}[0-9]{2}(?:[A-Z])?(?:[A-Z]*)?[0-9]{4}$/, 'Invalid Registration number')
     }),
 })
 
@@ -85,6 +71,7 @@ class TwoWheelerSelectBrand extends Component {
             vehicleDetails: [],
             error_msg: [],
             length:14,
+            request_data: []
         };
     }
 
@@ -211,8 +198,9 @@ class TwoWheelerSelectBrand extends Component {
                 console.log('decryptResp', decryptResp)
                 let motorInsurance = decryptResp.data.policyHolder ? decryptResp.data.policyHolder.motorinsurance : {}
                 let vehicleDetails = decryptResp.data.policyHolder ? decryptResp.data.policyHolder.vehiclebrandmodel : {};
+                let request_data = decryptResp.data.policyHolder ? decryptResp.data.policyHolder.request_data : {};
                 this.setState({
-                    motorInsurance, vehicleDetails
+                    motorInsurance, vehicleDetails, request_data
                 })
                 this.getBrands();
             })
@@ -297,11 +285,11 @@ class TwoWheelerSelectBrand extends Component {
 
     handleSubmit = (values) => {
         const { productId } = this.props.match.params
-        const { selectedVarientId, selectedModelId, selectedBrandId } = this.state
+        const { selectedVarientId, selectedModelId, selectedBrandId, request_data } = this.state
         let post_data = {}
         const formData = new FormData();
         let encryption = new Encryption();
-        let policyHolder_id = localStorage.getItem('policyHolder_id') ? localStorage.getItem('policyHolder_id') :0
+        let policyHolder_id = request_data.policyholder_id
         localStorage.setItem('check_registration', values.check_registration)
         
         let bc_data = sessionStorage.getItem('bcLoginData') ? sessionStorage.getItem('bcLoginData') : "";
@@ -467,29 +455,29 @@ class TwoWheelerSelectBrand extends Component {
     regnoFormat = (e, setFieldTouched, setFieldValue) => {
         
         let regno = e.target.value
-        let formatVal = ""
-        let regnoLength = regno.length
-        var letter = /^[a-zA-Z]+$/;
-        var number = /^[0-9]+$/;
-        let subString = regno.substring(regnoLength-1, regnoLength)
-        let preSubString = regno.substring(regnoLength-2, regnoLength-1)
+        // let formatVal = ""
+        // let regnoLength = regno.length
+        // var letter = /^[a-zA-Z]+$/;
+        // var number = /^[0-9]+$/;
+        // let subString = regno.substring(regnoLength-1, regnoLength)
+        // let preSubString = regno.substring(regnoLength-2, regnoLength-1)
 
-        if(subString.match(letter) && preSubString.match(letter)) {
-            formatVal = regno
-        }
-        else if(subString.match(number) && preSubString.match(number)) {
-            formatVal = regno
-        } 
-        else if(subString.match(number) && preSubString.match(letter)) {        
-            formatVal = regno.substring(0, regnoLength-1) + " " +subString      
-        } 
-        else if(subString.match(letter) && preSubString.match(number)) {
-            formatVal = regno.substring(0, regnoLength-1) + " " +subString   
-        } 
+        // if(subString.match(letter) && preSubString.match(letter)) {
+        //     formatVal = regno
+        // }
+        // else if(subString.match(number) && preSubString.match(number)) {
+        //     formatVal = regno
+        // } 
+        // else if(subString.match(number) && preSubString.match(letter)) {        
+        //     formatVal = regno.substring(0, regnoLength-1) + " " +subString      
+        // } 
+        // else if(subString.match(letter) && preSubString.match(number)) {
+        //     formatVal = regno.substring(0, regnoLength-1) + " " +subString   
+        // } 
 
-        else formatVal = regno.toUpperCase()
+        // else formatVal = regno.toUpperCase()
         
-        e.target.value = formatVal.toUpperCase()
+        e.target.value = regno.toUpperCase()
 
     }
 
@@ -506,7 +494,6 @@ class TwoWheelerSelectBrand extends Component {
             selectedVarientId: selectedVarientId ? selectedVarientId : (selectedBrandId ? "" :  vehicleDetails && vehicleDetails.varientmodel_id ? vehicleDetails.varientmodel_id : ""),
             policy_type: motorInsurance && motorInsurance.policytype_id ? motorInsurance.policytype_id : "",
             regNumber: motorInsurance && motorInsurance.registration_no ? motorInsurance.registration_no : "",
-            check_registration: localStorage.getItem('check_registration') ? localStorage.getItem('check_registration') : "2",
             policy_for: motorInsurance && motorInsurance.policy_for ? motorInsurance.policy_for : "",
         })
 
@@ -636,7 +623,6 @@ class TwoWheelerSelectBrand extends Component {
                                                                 <div className="row formSection">
                                                                     <label className="col-md-4">Enter Vehicle Registration Number:</label>
                                                                     <div className="col-md-4">
-                                                                    {values.regNumber != "NEW" ?
                                                                         <Field
                                                                             name="regNumber"
                                                                             type="text"
@@ -648,19 +634,9 @@ class TwoWheelerSelectBrand extends Component {
                                                                             maxLength={this.state.length}
                                                                             onInput={e=>{
                                                                                 this.regnoFormat(e, setFieldTouched, setFieldValue)
-                                                                                setFieldTouched('check_registration')
-                                                                                setFieldValue('check_registration', '2');
                                                                             }}                              
-                                                                        /> : 
-                                                                        <Field
-                                                                            type="text"
-                                                                            name='regNumber' 
-                                                                            autoComplete="off"
-                                                                            className="premiumslid"   
-                                                                            value= {values.regNumber}    
-                                                                            disabled = {true}                                                 
-                                                                        />
-                                                                        }
+                                                                        /> 
+                                                                        
                                                                         {errors.regNumber && touched.regNumber ? (
                                                                             <span className="errorMsg">{errors.regNumber}</span>
                                                                         ) : null}   

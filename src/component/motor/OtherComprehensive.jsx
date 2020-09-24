@@ -160,7 +160,8 @@ class OtherComprehensive extends Component {
                 vahanVerify: false,
                 newRegistrationNo: "",
                 puc: '1',
-            }
+            },
+            request_data: []
         };
     }
 
@@ -228,6 +229,7 @@ class OtherComprehensive extends Component {
                 let decryptResp = JSON.parse(encryption.decrypt(res.data))
                 console.log("decrypt--fetchData-- ", decryptResp)
                 let motorInsurance = decryptResp.data.policyHolder ? decryptResp.data.policyHolder.motorinsurance : {}
+                let request_data = decryptResp.data.policyHolder ? decryptResp.data.policyHolder.request_data : {};
                 let values = []
                 let add_more_coverage = motorInsurance && motorInsurance.add_more_coverage != null ? motorInsurance.add_more_coverage.split(",") : ['B00015']
                 add_more_coverage = add_more_coverage.flat()
@@ -235,7 +237,7 @@ class OtherComprehensive extends Component {
                 values.PA_Cover = motorInsurance && motorInsurance.pa_cover != "" ? motorInsurance.pa_cover : '0'
 
                 this.setState({
-                    motorInsurance, add_more_coverage,
+                    motorInsurance, add_more_coverage,request_data,
                     showCNG: motorInsurance.cng_kit == 1 ? true : false,
                     vahanVerify: motorInsurance.chasis_no && motorInsurance.engine_no ? true : false,
                     selectFlag: motorInsurance && motorInsurance.add_more_coverage != null ? '0' : '1'
@@ -298,6 +300,7 @@ class OtherComprehensive extends Component {
         }
 
         formData.append("chasiNo", values.chasis_no_last_part);
+        formData.append("policy_holder_id", this.state.request_data.policyholder_id);
         
         if(errors.registration_no || errors.chasis_no_last_part) {
             swal("Please provide correct Registration number and Chasis number")
@@ -394,7 +397,7 @@ class OtherComprehensive extends Component {
         }
         console.log('fullQuote_post_data', post_data)
 
-        if(post_data.idv_value > 5000000 && (csc_user_type == "POSP" || csc_user_type == "RAP")) {
+        if(post_data.idv_value > 5000000 && csc_user_type == "POSP" ) {
             swal("Quote cannot proceed with IDV greater than 5000000")
             this.props.loadingStop();
             return false
@@ -483,7 +486,7 @@ class OtherComprehensive extends Component {
             }
         }
         console.log('post_data',post_data)
-        if(post_data.idv_value > 5000000 && (csc_user_type == "POSP" || csc_user_type == "RAP")) {
+        if(post_data.idv_value > 5000000 && csc_user_type == "POSP" ) {
             swal("Quote cannot proceed with IDV greater than 5000000")
             this.props.loadingStop();
             return false
@@ -598,7 +601,7 @@ class OtherComprehensive extends Component {
 
         let covList = motorInsurance && motorInsurance.add_more_coverage ? motorInsurance.add_more_coverage.split(",") : ""
         let newInnitialArray = {}
-        let PA_flag = motorInsurance && motorInsurance.pa_cover != null ? "1" : '0'
+        let PA_flag = motorInsurance && (motorInsurance.pa_cover == null || motorInsurance.pa_cover == "") ? '0' : '1'
         let PA_Cover = motorInsurance &&  motorInsurance.pa_cover != null ? motorInsurance.pa_cover : ''
         let newInitialValues = {}
 

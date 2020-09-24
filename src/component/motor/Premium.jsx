@@ -205,7 +205,8 @@ class Premium extends Component {
             'policy_type':  motorInsurance.policy_type,
             'add_more_coverage': motorInsurance.add_more_coverage,
             'cng_kit': motorInsurance.cng_kit,
-            'cngKit_Cost': Math.floor(motorInsurance.cngkit_cost)
+            'cngKit_Cost': Math.floor(motorInsurance.cngkit_cost),
+            'PA_Cover': motorInsurance && motorInsurance.pa_cover ? motorInsurance.pa_cover : '0',
         }
 
         formData.append('enc_data',encryption.encrypt(JSON.stringify(post_data)))

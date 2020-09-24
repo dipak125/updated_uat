@@ -55,30 +55,10 @@ const initialValue = {
 }
 const ComprehensiveValidation = Yup.object().shape({
 
-    // registration_no: Yup.string().when("newRegistrationNo", {
-    //     is: "NEW",       
-    //     then: Yup.string(),
-    //     otherwise: Yup.string().required('Please provide registration number').matches(/^[A-Z]{2}[ -][0-9]{1,2}(?: [A-Z])?(?: [A-Z]*)? [0-9]{4}$/, 'Invalid Registration number')
-    //         .test(
-    //             "validRegistrationChecking",
-    //             function() {
-    //                 return "Enter valid registration number"
-    //             },
-    //             function (value) {
-    //                 if (value) {
-    //                     let reg = value.split(" ")
-    //                     if(reg && reg[3]) {
-    //                         return parseInt(reg[3])
-    //                     }
-    //                 }
-    //                 return true;
-    //         })
-    // }),
-
     registration_no: Yup.string().when("newRegistrationNo", {
         is: "NEW",       
         then: Yup.string(),
-        otherwise: Yup.string().required('Please provide registration number').matches(/^[A-Z]{2}[ -][0-9]{1,2}[ -][A-Z]{1,3}[ -][0-9]{4}$/, 'Invalid Registration number'),
+        otherwise: Yup.string().required('Please provide registration number').matches(/^[A-Z]{2}[0-9]{2}(?:[A-Z])?(?:[A-Z]*)?[0-9]{4}$/, 'Invalid Registration number')
     }),
 
     puc: Yup.string().required("Please verify pollution certificate to proceed"),
@@ -284,7 +264,8 @@ class FourWheelerVerifyTP extends Component {
             length:15,
             insurerList: [],
             vehicleDetails: [],
-            step_completed: "0"
+            step_completed: "0",
+            request_data: []
         };
 
     changePlaceHoldClassAdd(e) {
@@ -328,9 +309,10 @@ class FourWheelerVerifyTP extends Component {
                 let previousPolicy = decryptResp.data.policyHolder ? decryptResp.data.policyHolder.previouspolicy : {};
                 let vehicleDetails = decryptResp.data.policyHolder ? decryptResp.data.policyHolder.vehiclebrandmodel : {};
                 let step_completed = decryptResp.data.policyHolder ? decryptResp.data.policyHolder.step_no : "";
+                let request_data = decryptResp.data.policyHolder ? decryptResp.data.policyHolder.request_data : {};
                 this.getInsurerList()
                 this.setState({
-                    motorInsurance, previousPolicy,vehicleDetails,step_completed,
+                    motorInsurance, previousPolicy,vehicleDetails,step_completed,request_data,
                     vahanVerify: motorInsurance.chasis_no && motorInsurance.engine_no ? true : false
                 })
                 this.props.loadingStop();
@@ -356,6 +338,7 @@ class FourWheelerVerifyTP extends Component {
         }
 
         formData.append("chasiNo", values.chasis_no_last_part);
+        formData.append("policy_holder_id", this.state.request_data.policyholder_id);
         
         if(errors.registration_no || errors.chasis_no_last_part) {
             swal("Please provide correct Registration number and Chasis number")
@@ -379,8 +362,6 @@ class FourWheelerVerifyTP extends Component {
                         this.setState({engineNo: this.state.vahanDetails.data[0].engineNo})
                     }
 
-                    console.log('chasiNo', this.state.chasiNo)
-                    console.log('engineNo', this.state.engineNo)
                     setFieldTouched('vahanVerify')
                     setFieldValue('vahanVerify', true)
                     setFieldTouched('engine_no')
@@ -436,14 +417,14 @@ class FourWheelerVerifyTP extends Component {
 
     handleSubmit = (values) => {
         const { productId } = this.props.match.params
-        const { motorInsurance } = this.state
+        const { motorInsurance, request_data } = this.state
         
         const formData = new FormData();
         let encryption = new Encryption();
         let post_data = {}
         if(motorInsurance.policytype_id == '3'){
             post_data = {
-                'policy_holder_id': localStorage.getItem('policyHolder_id'),
+                'policy_holder_id': request_data.policyholder_id,
                 'menumaster_id': 1,
                 'registration_no': values.registration_no,
                 'chasis_no': values.chasis_no,
@@ -455,7 +436,7 @@ class FourWheelerVerifyTP extends Component {
         }
         else {
             post_data = {
-                'policy_holder_id': localStorage.getItem('policyHolder_id'),
+                'policy_holder_id': request_data.policyholder_id,
                 'menumaster_id': 1,
                 'registration_no': values.registration_no,
                 'chasis_no': values.chasis_no,

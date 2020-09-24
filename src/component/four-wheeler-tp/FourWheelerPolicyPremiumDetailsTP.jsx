@@ -146,23 +146,15 @@ class Premium extends Component {
         let encryption = new Encryption();
 
         const post_data = {
-            'ref_no':localStorage.getItem('policyHolder_refNo'),
+            'ref_no':this.state.policyHolder_refNo ? this.state.policyHolder_refNo : '0',
             'access_token':access_token,
             'idv_value': motorInsurance.idv_value,
             'policy_type': motorInsurance ? motorInsurance.policy_type : "",
             'add_more_coverage': motorInsurance.add_more_coverage,
             'policy_for': motorInsurance ? motorInsurance.policy_for : "",
             'policytype_id': motorInsurance ? motorInsurance.policytype_id : "",
-            'PA_Cover': motorInsurance ? motorInsurance.pa_cover : "",
+            'PA_Cover': motorInsurance ? motorInsurance.pa_cover : "0",
         }
-        // formData.append('id',localStorage.getItem('policyHolder_refNo'))
-        // formData.append('access_token',access_token)
-        // formData.append('idv_value',motorInsurance.idv_value)
-        // formData.append('policy_type',motorInsurance ? motorInsurance.policy_type : "")
-        // formData.append('add_more_coverage',JSON.stringify(motorInsurance.add_more_coverage))
-        // formData.append('policytype_id',motorInsurance ? motorInsurance.policytype_id : "")
-        // formData.append('policy_for',motorInsurance ? motorInsurance.policy_for : "")
-        // formData.append('PA_Cover',motorInsurance ? motorInsurance.pa_cover : "0")
 
         formData.append('enc_data',encryption.encrypt(JSON.stringify(post_data)))
 console.log("fullQuote post_data--- ", post_data)
@@ -297,7 +289,7 @@ console.log("fullQuote post_data--- ", post_data)
                                                     <Row>
                                                         <Col sm={12} md={9} lg={9}>
                                                             <div className="rghtsideTrigr">
-                                                                <Collapsible trigger="Retail Motor Policy" >
+                                                                <Collapsible trigger="Retail Motor Policy"  open= {true}>
                                                                     <div className="listrghtsideTrigr">
                                                                         <Row>
                                                                             <Col sm={12} md={3}>
@@ -412,7 +404,7 @@ console.log("fullQuote post_data--- ", post_data)
                                                                                     </Row>
                                                                                 </div>
                                                                             : (<p></p>)}
-                                                                        {motorInsurance.policy_for == '1' ?      
+                                                                        {motorInsurance.policy_for == '1'  && motorInsurance.pa_flag == '1' ?      
                                                                             <div>
                                                                             <strong>Nominee Details :</strong>
                                                                                 <br/>
@@ -463,7 +455,7 @@ console.log("fullQuote post_data--- ", post_data)
                                                                                 </Row>
                                                                             </div> : null }
 
-                                                                            {motorInsurance.policy_for == '1' && nomineedetails && nomineedetails.is_appointee == '1'?      
+                                                                            {motorInsurance.policy_for == '1' && nomineedetails && nomineedetails.is_appointee == '1'  && motorInsurance.pa_flag == '1'?      
                                                                             <div>
                                                                             <strong>Appointee Details :</strong>
                                                                                 <br/>
