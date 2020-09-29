@@ -535,7 +535,7 @@ console.log("fullQuote post_data--- ", post_data)
                                                                                             </Row>
                                                                                             <Row>
                                                                                                 <Col sm={12} md={6}>
-                                                                                                    <FormGroup>Chasis Number</FormGroup>
+                                                                                                    <FormGroup>Chassis Number</FormGroup>
                                                                                                 </Col>
                                                                                                 <Col sm={12} md={6}>
                                                                                                     <FormGroup>{motorInsurance && motorInsurance.chasis_no  ? motorInsurance.chasis_no : ""}</FormGroup>
