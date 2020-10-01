@@ -330,14 +330,14 @@ class TwoWheelerSelectBrand extends Component {
         if(bc_data) {
             bc_data = JSON.parse(encryption.decrypt(bc_data));
         }
-
+console.log("values fastlane--- ", values)
         if(policyHolder_id > 0 ) {
             if(sessionStorage.getItem('csc_id')) {
                 post_data = {
                     'menumaster_id': 3,
-                    'brand_id': values.selectedBrandId ? values.selectedBrandId : fastLaneData && fastLaneData.brand_id ? fastLaneData.brand_id : "",
-                    'brand_model_id': values.selectedModelId ? values.selectedModelId : fastLaneData && fastLaneData.brand_model_id ? fastLaneData.brand_model_id : "",
-                    'model_varient_id': values.selectedVarientId ? values.selectedVarientId : fastLaneData && fastLaneData.model_varient_id ? fastLaneData.model_varient_id : "",
+                    'brand_id': selectedBrandId ? selectedBrandId : fastLaneData && fastLaneData.brand_id ? fastLaneData.brand_id : values.selectedBrandId ? values.selectedBrandId : "",
+                    'brand_model_id': selectedModelId ? selectedModelId : fastLaneData && fastLaneData.brand_model_id ? fastLaneData.brand_model_id : values.selectedModelId ? values.selectedModelId : "",
+                    'model_varient_id': selectedVarientId ? selectedVarientId : fastLaneData && fastLaneData.model_varient_id ? fastLaneData.model_varient_id : values.selectedVarientId ? values.selectedVarientId : "",
                     'vehicle_type_id':3,
                     'registration_no':values.regNumber,
                     'policy_type_id':values.policy_type,
@@ -354,9 +354,9 @@ class TwoWheelerSelectBrand extends Component {
             else {
                 post_data = {
                     'menumaster_id': 3,
-                    'brand_id': values.selectedBrandId ? values.selectedBrandId : fastLaneData && fastLaneData.brand_id ? fastLaneData.brand_id : "",
-                    'brand_model_id': values.selectedModelId ? values.selectedModelId : fastLaneData && fastLaneData.brand_model_id ? fastLaneData.brand_model_id : "",
-                    'model_varient_id': values.selectedVarientId ? values.selectedVarientId : fastLaneData && fastLaneData.model_varient_id ? fastLaneData.model_varient_id : "",
+                    'brand_id': selectedBrandId ? selectedBrandId : fastLaneData && fastLaneData.brand_id ? fastLaneData.brand_id : values.selectedBrandId ? values.selectedBrandId : "",
+                    'brand_model_id': selectedModelId ? selectedModelId : fastLaneData && fastLaneData.brand_model_id ? fastLaneData.brand_model_id : values.selectedModelId ? values.selectedModelId : "",
+                    'model_varient_id': selectedVarientId ? selectedVarientId : fastLaneData && fastLaneData.model_varient_id ? fastLaneData.model_varient_id : values.selectedVarientId ? values.selectedVarientId : "",
                     'vehicle_type_id':3,
                     'registration_no':values.regNumber,
                     'policy_type_id':values.policy_type,
@@ -517,6 +517,8 @@ class TwoWheelerSelectBrand extends Component {
         
         let regno = e.target.value
         this.setState({fastLaneData: [], brandView: '0', vehicleDetails: []})
+        let brandEdit = {'brandEdit' : 1}
+            this.props.setData(brandEdit)
         // let formatVal = ""
         // let regnoLength = regno.length
         // var letter = /^[a-zA-Z]+$/;
@@ -545,7 +547,7 @@ class TwoWheelerSelectBrand extends Component {
 
 
     render() {
-        const { brandList, motorInsurance, selectedBrandDetails, brandModelList, selectedBrandId,fuelType, fastLaneData,
+        const { brandList, motorInsurance, selectedBrandDetails, brandModelList,fuelType, fastLaneData, selectedBrandId,
             selectedModelId, selectedVarientId, otherBrands, vehicleDetails, error_msg, brandName, modelName, brandView } = this.state
         const { productId } = this.props.match.params
 
@@ -560,7 +562,7 @@ class TwoWheelerSelectBrand extends Component {
             check_registration: localStorage.getItem('check_registration') ? localStorage.getItem('check_registration') : "2",
             policy_for: motorInsurance && motorInsurance.policy_for ? motorInsurance.policy_for : "1",
         }) 
-         
+        
         return (
             <>
                 <BaseComponent>
@@ -577,7 +579,7 @@ class TwoWheelerSelectBrand extends Component {
                                     validationSchema={vehicleValidation}
                                     >
                                     {({ values, errors, setFieldValue, setFieldTouched, isValid, isSubmitting, touched }) => {
-                                     
+                                      console.log("newInitialValues===== ", values)
                                         return (
                                             <Form>
                                                 <section className="brand">
@@ -1009,6 +1011,7 @@ const mapDispatchToProps = dispatch => {
     return {
         loadingStart: () => dispatch(loaderStart()),
         loadingStop: () => dispatch(loaderStop()),
+        setData: (data) => dispatch(setData(data))
     };
 };
 

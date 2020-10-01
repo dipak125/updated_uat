@@ -949,49 +949,38 @@ class FourWheelerVerifyTP extends Component {
                                         : null }
                                         </div>
                                     </Col>
+
+
                                     <Col sm={12} md={3}>
                                         <div className="vehbox">
-                                            <Row className="m-b-25">
-                                                <Col sm={12} md={7}>
+                                            <div className="d-flex justify-content-between flex-lg-row flex-md-column m-b-25">
+                                                
                                                     <div className="txtRegistr">Registration No.<br />
                                                     {motorInsurance && motorInsurance.registration_no}</div>
-                                                </Col>
-
-                                                <Col sm={12} md={5} className="text-right">
+                                                    <div>
                                                     <button className="rgistrBtn" type="button" onClick={this.selectBrand.bind(this, productId)}>Edit</button>
-                                                </Col>
-                                            </Row>
+                                                    </div>
+                                            </div>
 
-                                            <Row className="m-b-25">
-                                                <Col sm={12} md={7}>
-                                                    <div className="txtRegistr">Four-wheeler Brand<br/>
-                                                        <strong>{vehicleDetails && vehicleDetails.vehiclebrand && vehicleDetails.vehiclebrand.name ? vehicleDetails.vehiclebrand.name : ""}</strong></div>
-                                                </Col>
+                                            <div className="d-flex justify-content-between flex-lg-row flex-md-column m-b-25">
+                                                <div className="txtRegistr">Car Brand<br/>
+                                                    <strong>{vehicleDetails && vehicleDetails.vehiclebrand && vehicleDetails.vehiclebrand.name ? vehicleDetails.vehiclebrand.name : ""}</strong></div>
+                                                <div><button className="rgistrBtn" type="button" onClick= {this.selectBrand.bind(this,productId)}>Edit</button></div>
+                                            </div>
 
-                                                <Col sm={12} md={5} className="text-right">
-                                                    <button className="rgistrBtn" type="button" onClick= {this.selectBrand.bind(this,productId)}>Edit</button>
-                                                </Col>
-                                            </Row>
+                                            <div className="d-flex justify-content-between flex-lg-row flex-md-column m-b-25">
+                                                    <div className="txtRegistr">Car Model<br/>
+                                                    <strong>{vehicleDetails && vehicleDetails.vehiclemodel && vehicleDetails.vehiclemodel.description ? vehicleDetails.vehiclemodel.description+" "+vehicleDetails.varientmodel.varient : ""}</strong></div>
+                                                <div><button className="rgistrBtn" type="button" onClick= {this.selectVehicleBrand.bind(this,productId)}>Edit</button></div>          
+                                            </div>
 
-                                            <Row className="m-b-25">
-                                                <Col sm={12} md={7}>
-                                                    <div className="txtRegistr">Four-wheeler Model<br/>
-                                                        <strong>{vehicleDetails && vehicleDetails.vehiclemodel && vehicleDetails.vehiclemodel.description ? vehicleDetails.vehiclemodel.description+" "+vehicleDetails.varientmodel.varient : ""}</strong></div>
-                                                </Col>
-
-                                                <Col sm={12} md={5} className="text-right">
-                                                    <button className="rgistrBtn" type="button" onClick= {this.selectVehicleBrand.bind(this,productId)}>Edit</button>
-                                                </Col>
-                                            </Row>
-
-                                            <Row className="m-b-25">
-                                                <Col sm={12} md={7}>
-                                                    <div className="txtRegistr">Fuel Type<br/>
-                                                        <strong>{vehicleDetails && vehicleDetails.varientmodel && fuel[Math.floor(vehicleDetails.varientmodel.fuel_type)]} </strong></div>
-                                                </Col>
-                                            </Row>
+                                            <div className="d-flex justify-content-between flex-lg-row flex-md-column m-b-25">
+                                                <div className="txtRegistr">Fuel Type<br/>
+                                                    <strong>{vehicleDetails && vehicleDetails.varientmodel && fuel[Math.floor(vehicleDetails.varientmodel.fuel_type)]} </strong></div>
+                                            </div>
                                         </div>
                                     </Col>
+
                                 </Row>
                                 </Form>
                                 );

@@ -14,6 +14,7 @@ import swal from 'sweetalert';
 import ScrollArea from 'react-scrollbar';
 import Encryption from '../../shared/payload-encryption';
 import fuel from '../common/FuelTypes';
+import { setData } from "../../store/actions/data";
 
 
 
@@ -340,9 +341,9 @@ class TwoWheelerSelectBrand extends Component {
             if(sessionStorage.getItem('csc_id')) {
                 post_data = {
                     'menumaster_id': 3,
-                    'brand_id': values.selectedBrandId ? values.selectedBrandId : fastLaneData && fastLaneData.brand_id ? fastLaneData.brand_id : "",
-                    'brand_model_id': values.selectedModelId ? values.selectedModelId : fastLaneData && fastLaneData.brand_model_id ? fastLaneData.brand_model_id : "",
-                    'model_varient_id': values.selectedVarientId ? values.selectedVarientId : fastLaneData && fastLaneData.model_varient_id ? fastLaneData.model_varient_id : "",
+                    'brand_id': selectedBrandId ? selectedBrandId : fastLaneData && fastLaneData.brand_id ? fastLaneData.brand_id : values.selectedBrandId ? values.selectedBrandId : "",
+                    'brand_model_id': selectedModelId ? selectedModelId : fastLaneData && fastLaneData.brand_model_id ? fastLaneData.brand_model_id : values.selectedModelId ? values.selectedModelId : "",
+                    'model_varient_id': selectedVarientId ? selectedVarientId : fastLaneData && fastLaneData.model_varient_id ? fastLaneData.model_varient_id : values.selectedVarientId ? values.selectedVarientId : "",
                     'vehicle_type_id':4,
                     'registration_no':values.regNumber,
                     'policy_type_id':values.policy_type,
@@ -360,9 +361,9 @@ class TwoWheelerSelectBrand extends Component {
             else {
                 post_data = {
                     'menumaster_id': 3,
-                    'brand_id': values.selectedBrandId ? values.selectedBrandId : fastLaneData && fastLaneData.brand_id ? fastLaneData.brand_id : "",
-                    'brand_model_id': values.selectedModelId ? values.selectedModelId : fastLaneData && fastLaneData.brand_model_id ? fastLaneData.brand_model_id : "",
-                    'model_varient_id': values.selectedVarientId ? values.selectedVarientId : fastLaneData && fastLaneData.model_varient_id ? fastLaneData.model_varient_id : "",
+                    'brand_id': selectedBrandId ? selectedBrandId : fastLaneData && fastLaneData.brand_id ? fastLaneData.brand_id : values.selectedBrandId ? values.selectedBrandId : "",
+                    'brand_model_id': selectedModelId ? selectedModelId : fastLaneData && fastLaneData.brand_model_id ? fastLaneData.brand_model_id : values.selectedModelId ? values.selectedModelId : "",
+                    'model_varient_id': selectedVarientId ? selectedVarientId : fastLaneData && fastLaneData.model_varient_id ? fastLaneData.model_varient_id : values.selectedVarientId ? values.selectedVarientId : "",
                     'vehicle_type_id':4,
                     'registration_no':values.regNumber,
                     'policy_type_id':values.policy_type,
@@ -525,6 +526,8 @@ class TwoWheelerSelectBrand extends Component {
         
         let regno = e.target.value
         this.setState({fastLaneData: [], brandView: '0', vehicleDetails: []})
+        let brandEdit = {'brandEdit' : 1}
+        this.props.setData(brandEdit)
         // let formatVal = ""
         // let regnoLength = regno.length
         // var letter = /^[a-zA-Z]+$/;
@@ -1121,7 +1124,8 @@ const mapStateToProps = state => {
 const mapDispatchToProps = dispatch => {
     return {
         loadingStart: () => dispatch(loaderStart()),
-        loadingStop: () => dispatch(loaderStop())
+        loadingStop: () => dispatch(loaderStop()),
+        setData: (data) => dispatch(setData(data))
     };
 };
 

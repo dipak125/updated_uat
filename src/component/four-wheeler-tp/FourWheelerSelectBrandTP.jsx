@@ -24,7 +24,7 @@ const initialValues = {
     selectedModelName: '',
     selectedVarientId: '',
     regNumber:'',
-    check_registration: 1,
+    check_registration: 2,
     policy_for: ""
 
 
@@ -38,7 +38,7 @@ const vehicleValidation = Yup.object().shape({
     regNumber: Yup.string().when("check_registration", {
         is: "1",       
         then: Yup.string(),
-        otherwise: Yup.string().required('Please provide registration number').matches(/^[A-Z]{2}[0-9]{2}(?:[A-Z])?(?:[A-Z]*)?[0-9]{4}$/, 'Invalid Registration number')
+        otherwise: Yup.string().required('Please provide registration number').matches(/^[A-Z]{2}[0-9]{2}(?:[A-Z])?(?:[A-Z])?(?:[A-Z])?[0-9]{4}$/, 'Invalid Registration number')
     }),
 })
 
@@ -95,6 +95,16 @@ class TwoWheelerSelectBrand extends Component {
 
     componentDidMount() {
         // this.callFetchBrands();
+        window.onload = function () {  
+            document.onkeydown = function (e) {  
+                if (e.key == "F5" || e.key == "F11" || 
+                (e.ctrlKey == true && (e.key == 'r' || e.key == 'R')) || 
+                e.keyCode == 116 || e.keyCode == 82) {
+    
+                       e.preventDefault();
+                       swal("Page refresh disabled")
+            }
+            };}
         this.fetchData();
 
     }
