@@ -17,6 +17,7 @@ import {  PersonAge } from "../../shared/dateFunctions";
 import Autosuggest from 'react-autosuggest';
 import { addDays } from 'date-fns';
 import swal from 'sweetalert';
+import { setData } from "../../store/actions/data";
 
 const ageObj = new PersonAge();
 let encryption = new Encryption();
@@ -98,6 +99,12 @@ class TwoWheelerVehicleDetails extends Component {
 
     selectBrand = (productId) => {
         this.props.history.push(`/four_wheeler_Select-brandTP/${productId}`);
+    }
+
+    editBrand = (productId) => {
+        let brandEdit = {'brandEdit' : 1}
+            this.props.setData(brandEdit)
+            this.props.history.push(`/two_wheeler_Select-brandTP/${productId}`);     
     }
 
     showClaimText = (value) =>{
@@ -437,7 +444,7 @@ class TwoWheelerVehicleDetails extends Component {
                                                     <div className="d-flex justify-content-between flex-lg-row flex-md-column m-b-25">
                                                         <div className="txtRegistr">Car Brand<br/>
                                                             <strong>{vehicleDetails && vehicleDetails.vehiclebrand && vehicleDetails.vehiclebrand.name ? vehicleDetails.vehiclebrand.name : ""}</strong></div>
-                                                        <div><button className="rgistrBtn" type="button" onClick= {this.selectBrand.bind(this,productId)}>Edit</button></div>
+                                                        <div><button className="rgistrBtn" type="button" onClick= {this.editBrand.bind(this,productId)}>Edit</button></div>
                                                     </div>
 
                                                     <div className="d-flex justify-content-between flex-lg-row flex-md-column m-b-25">
@@ -474,14 +481,16 @@ class TwoWheelerVehicleDetails extends Component {
 
 const mapStateToProps = state => {
     return {
-      loading: state.loader.loading
+      loading: state.loader.loading,
+      data: state.processData.data
     };
   };
   
   const mapDispatchToProps = dispatch => {
     return {
       loadingStart: () => dispatch(loaderStart()),
-      loadingStop: () => dispatch(loaderStop())
+      loadingStop: () => dispatch(loaderStop()),
+      setData: (data) => dispatch(setData(data))
     };
   };
 
