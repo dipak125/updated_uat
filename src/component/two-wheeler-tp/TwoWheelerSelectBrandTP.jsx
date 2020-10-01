@@ -1,4 +1,4 @@
-import React, { Component } from 'react';
+import React, { Component, Fragment } from 'react';
 import HeaderSecond from '../common/header/HeaderSecond';
 import { Row, Col, Modal, Button, FormGroup } from 'react-bootstrap';
 import TwoWheelerBrandTable from '../common/BrandTable';
@@ -14,6 +14,7 @@ import swal from 'sweetalert';
 import ScrollArea from 'react-scrollbar';
 import Encryption from '../../shared/payload-encryption';
 import fuel from '../common/FuelTypes';
+import { setData } from "../../store/actions/data";
 
 
 
@@ -92,6 +93,9 @@ class TwoWheelerSelectBrand extends Component {
             vehicleDetails: [],
             error_msg: [],
             length:14,
+            fastLaneData: [],
+            brandView: '0',
+            fastlanelog: []
         };
     }
 
@@ -161,6 +165,11 @@ class TwoWheelerSelectBrand extends Component {
                     else if(localStorage.getItem('newBrandEdit') == '2') {
                         this.getOtherBrands()
                     }
+                    else if(this.props.data.brandEdit == 1) {
+                        this.setState({
+                            brandView: '1'
+                        })
+                    }
                 })
                 .catch(err => {
                     // handle error
@@ -192,7 +201,8 @@ class TwoWheelerSelectBrand extends Component {
                 selectedBrandId: "",
                 selectedModelId: [], 
                 selectedVarientId: [],
-                brandName: ""
+                brandName: "",
+                brandView: '1'
                 // selectedBrandId: brand_id
             })
 
@@ -218,8 +228,9 @@ class TwoWheelerSelectBrand extends Component {
                 console.log('decryptResp', decryptResp)
                 let motorInsurance = decryptResp.data.policyHolder ? decryptResp.data.policyHolder.motorinsurance : {}
                 let vehicleDetails = decryptResp.data.policyHolder ? decryptResp.data.policyHolder.vehiclebrandmodel : {};
+                let fastlanelog = decryptResp.data.policyHolder ? decryptResp.data.policyHolder.fastlanelog : {};
                 this.setState({
-                    motorInsurance, vehicleDetails
+                    motorInsurance, vehicleDetails, fastlanelog
                 })
                 this.getBrands();
             })
@@ -234,7 +245,10 @@ class TwoWheelerSelectBrand extends Component {
         this.props.history.push(`/two_wheeler_Select-brandTP/${productId}`);
     }
     selectVehicle = (productId) => {
-        this.props.history.push(`/two_wheeler_Select-brandTP/${productId}`);
+        this.setState({
+            brandView: '1'
+        })
+        // this.props.history.push(`/two_wheeler_Select-brandTP/${productId}`);
     }
     selectBrand = (productId) => {
         const {selectedBrandId , vehicleDetails, otherBrands} = this.state
@@ -267,7 +281,8 @@ class TwoWheelerSelectBrand extends Component {
                 brandName: selectedBrandDetails.name,
                 searchitem: [],
                 modelName: "",
-                vehicleDetails: []
+                vehicleDetails: [],
+                brandView: '1'
             })
 
             this.props.loadingStop();
@@ -304,7 +319,7 @@ class TwoWheelerSelectBrand extends Component {
 
     handleSubmit = (values) => {
         const { productId } = this.props.match.params
-        const { selectedVarientId, selectedModelId, selectedBrandId } = this.state
+        const { selectedVarientId, selectedModelId, selectedBrandId, brandView, fastLaneData, fastlanelog } = this.state
         let post_data = {}
         const formData = new FormData();
         let encryption = new Encryption();
@@ -320,9 +335,9 @@ class TwoWheelerSelectBrand extends Component {
             if(sessionStorage.getItem('csc_id')) {
                 post_data = {
                     'menumaster_id': 3,
-                    'brand_id': values.selectedBrandId,
-                    'brand_model_id': values.selectedModelId,
-                    'model_varient_id': values.selectedVarientId,
+                    'brand_id': values.selectedBrandId ? values.selectedBrandId : fastLaneData && fastLaneData.brand_id ? fastLaneData.brand_id : "",
+                    'brand_model_id': values.selectedModelId ? values.selectedModelId : fastLaneData && fastLaneData.brand_model_id ? fastLaneData.brand_model_id : "",
+                    'model_varient_id': values.selectedVarientId ? values.selectedVarientId : fastLaneData && fastLaneData.model_varient_id ? fastLaneData.model_varient_id : "",
                     'vehicle_type_id':3,
                     'registration_no':values.regNumber,
                     'policy_type_id':values.policy_type,
@@ -332,15 +347,16 @@ class TwoWheelerSelectBrand extends Component {
                     'agent_name':sessionStorage.getItem('agent_name') ? sessionStorage.getItem('agent_name') : "",
                     'product_id':sessionStorage.getItem('product_id') ? sessionStorage.getItem('product_id') : "",
                     'bcmaster_id': "5",
-                    'policy_for': values.policy_for
+                    'policy_for': values.policy_for,
+                    'fastlaneLog_id': this.state.fastLaneData && this.state.fastLaneData.fastlaneLog_id ? this.state.fastLaneData.fastlaneLog_id : fastlanelog && fastlanelog.id ? fastlanelog.id : ""
                 }
             }
             else {
                 post_data = {
                     'menumaster_id': 3,
-                    'brand_id': values.selectedBrandId,
-                    'brand_model_id': values.selectedModelId,
-                    'model_varient_id': values.selectedVarientId,
+                    'brand_id': values.selectedBrandId ? values.selectedBrandId : fastLaneData && fastLaneData.brand_id ? fastLaneData.brand_id : "",
+                    'brand_model_id': values.selectedModelId ? values.selectedModelId : fastLaneData && fastLaneData.brand_model_id ? fastLaneData.brand_model_id : "",
+                    'model_varient_id': values.selectedVarientId ? values.selectedVarientId : fastLaneData && fastLaneData.model_varient_id ? fastLaneData.model_varient_id : "",
                     'vehicle_type_id':3,
                     'registration_no':values.regNumber,
                     'policy_type_id':values.policy_type,
@@ -350,6 +366,7 @@ class TwoWheelerSelectBrand extends Component {
                     'bc_token': bc_data ? bc_data.token : "",
                     'policy_for': values.policy_for,
                     'bc_agent_id': bc_data ? bc_data.user_info.data.user.username : "",
+                    'fastlaneLog_id': this.state.fastLaneData && this.state.fastLaneData.fastlaneLog_id ? this.state.fastLaneData.fastlaneLog_id : fastlanelog && fastlanelog.id ? fastlanelog.id : ""
                 }
             }
             
@@ -389,9 +406,9 @@ class TwoWheelerSelectBrand extends Component {
             if(sessionStorage.getItem('csc_id')) {
                 post_data = {
                     'menumaster_id': 3,
-                    'brand_id': selectedBrandId,
-                    'brand_model_id': selectedModelId,
-                    'model_varient_id': selectedVarientId,
+                    'brand_id': brandView == '1' ? selectedBrandId : fastLaneData ? fastLaneData.brand_id : "",
+                    'brand_model_id': brandView == '1' ? selectedModelId : fastLaneData ? fastLaneData.brand_model_id : "",
+                    'model_varient_id': brandView == '1' ? selectedVarientId : fastLaneData ? fastLaneData.model_varient_id : "",
                     'vehicle_type_id':3,
                     'registration_no':values.regNumber,
                     'policy_type_id':values.policy_type,
@@ -400,15 +417,16 @@ class TwoWheelerSelectBrand extends Component {
                     'agent_name':sessionStorage.getItem('agent_name') ? sessionStorage.getItem('agent_name') : "",
                     'product_id':sessionStorage.getItem('product_id') ? sessionStorage.getItem('product_id') : "",
                     'bcmaster_id': "5",
-                    'policy_for': values.policy_for
+                    'policy_for': values.policy_for,
+                    'fastlaneLog_id': this.state.fastLaneData && this.state.fastLaneData.fastlaneLog_id ? this.state.fastLaneData.fastlaneLog_id : fastlanelog && fastlanelog.id ? fastlanelog.id : ""
                 }
             }
             else {
                 post_data = {
                     'menumaster_id': 3,
-                    'brand_id': selectedBrandId,
-                    'brand_model_id': selectedModelId,
-                    'model_varient_id': selectedVarientId,
+                    'brand_id':  brandView == '1' ? selectedBrandId : fastLaneData ? fastLaneData.brand_id : "",
+                    'brand_model_id': brandView == '1' ? selectedModelId : fastLaneData ? fastLaneData.brand_model_id : "",
+                    'model_varient_id': brandView == '1' ? selectedVarientId : fastLaneData ? fastLaneData.model_varient_id : "",
                     'vehicle_type_id':3,
                     'registration_no':values.regNumber,
                     'policy_type_id':values.policy_type,
@@ -417,6 +435,7 @@ class TwoWheelerSelectBrand extends Component {
                     'bc_token': bc_data ? bc_data.token : "",
                     'policy_for': values.policy_for,
                     'bc_agent_id': bc_data ? bc_data.user_info.data.user.username : "",
+                    'fastlaneLog_id': this.state.fastLaneData && this.state.fastLaneData.fastlaneLog_id ? this.state.fastLaneData.fastlaneLog_id : fastlanelog && fastlanelog.id ? fastlanelog.id : ""
                 }
             }
             console.log('post_data-----', post_data)
@@ -473,9 +492,31 @@ class TwoWheelerSelectBrand extends Component {
         }
     }
 
+    fetchFastlane = (values) => {
+        const formData = new FormData();
+        formData.append('registration_no', values.regNumber)
+        formData.append('menumaster_id', '3')
+        this.props.loadingStart();
+        axios.post('fastlane', formData).then(res => {
+
+            if(res.data.error == false) {
+                this.props.loadingStop();
+                this.setState({fastLaneData: res.data.data, brandView: '0'})
+            } 
+            else {
+                this.props.loadingStop();
+                this.setState({fastLaneData: [], brandView: '1', vehicleDetails: []})
+            }       
+        })
+            .catch(err => {
+                this.props.loadingStop();
+            })
+    }
+
     regnoFormat = (e, setFieldTouched, setFieldValue) => {
         
         let regno = e.target.value
+        this.setState({fastLaneData: [], brandView: '0', vehicleDetails: []})
         // let formatVal = ""
         // let regnoLength = regno.length
         // var letter = /^[a-zA-Z]+$/;
@@ -504,10 +545,11 @@ class TwoWheelerSelectBrand extends Component {
 
 
     render() {
-        const { brandList, motorInsurance, selectedBrandDetails, brandModelList, selectedBrandId,fuelType,
-            selectedModelId, selectedVarientId, otherBrands, vehicleDetails, error_msg, brandName, modelName } = this.state
+        const { brandList, motorInsurance, selectedBrandDetails, brandModelList, selectedBrandId,fuelType, fastLaneData,
+            selectedModelId, selectedVarientId, otherBrands, vehicleDetails, error_msg, brandName, modelName, brandView } = this.state
         const { productId } = this.props.match.params
-        const newInitialValues = Object.assign(initialValues, {
+
+         const newInitialValues = Object.assign(initialValues, {
             selectedBrandId: selectedBrandId ? selectedBrandId : (vehicleDetails && vehicleDetails.vehiclebrand_id ? vehicleDetails.vehiclebrand_id : ""),
             selectedModelId:  selectedModelId ? selectedModelId : (selectedBrandId ? "" : vehicleDetails && vehicleDetails.vehiclemodel_id ? vehicleDetails.vehiclemodel_id : ""),
             selectedBrandName: '',
@@ -517,8 +559,8 @@ class TwoWheelerSelectBrand extends Component {
             regNumber: motorInsurance && motorInsurance.registration_no ? motorInsurance.registration_no : "",
             check_registration: localStorage.getItem('check_registration') ? localStorage.getItem('check_registration') : "2",
             policy_for: motorInsurance && motorInsurance.policy_for ? motorInsurance.policy_for : "1",
-        })
-
+        }) 
+         
         return (
             <>
                 <BaseComponent>
@@ -640,12 +682,11 @@ class TwoWheelerSelectBrand extends Component {
                                                         <div className="brandhead">
                                                         <h4 className="m-b-30">Help us with some information about yourself</h4></div>
                                                         <Row className="m-b-15">
-                                                            <Col sm={12}>
+                                                            <Col sm={10}>
                                                             
                                                                 <div className="row formSection">
                                                                     <label className="col-md-4">Enter Vehicle Registration Number:</label>
-                                                                    <div className="col-md-4">
-                                                                    {values.regNumber != "NEW" ?
+                                                                    <div className="col-md-3">
                                                                         <Field
                                                                             name="regNumber"
                                                                             type="text"
@@ -660,16 +701,7 @@ class TwoWheelerSelectBrand extends Component {
                                                                                 setFieldTouched('check_registration')
                                                                                 setFieldValue('check_registration', '2');
                                                                             }}                              
-                                                                        /> : 
-                                                                        <Field
-                                                                            type="text"
-                                                                            name='regNumber' 
-                                                                            autoComplete="off"
-                                                                            className="premiumslid"   
-                                                                            value= {values.regNumber}    
-                                                                            disabled = {true}                                                 
-                                                                        />
-                                                                        }
+                                                                        /> 
                                                                         {errors.regNumber && touched.regNumber ? (
                                                                             <span className="errorMsg">{errors.regNumber}</span>
                                                                         ) : null}   
@@ -678,35 +710,38 @@ class TwoWheelerSelectBrand extends Component {
                                                                             <span className="errorMsg">Please provide registration number</span>
                                                                         ) : null}
                                                                     </div>
-                                                                </div>                                                           
+                                                                    {brandView == '0' && fastLaneData.length == '0' ?
+                                                                    <Button  type="button" onClick = {this.fetchFastlane.bind(this,values)} >
+                                                                        Fetch Details
+                                                                </Button> : null }
+                                                                </div>                       
+                                                                                                  
                                                             </Col>
                                                         </Row>
-
+                                                        {brandView == '1' ?
                                                         <div className="brandhead">
                                                             <h4>Please select your Vehicle brand</h4>
                                                             {error_msg.brand_id || error_msg.brand_model_id || error_msg.model_varient_id ? 
                                                                 <span className="errorMsg">Please select brand and varient</span> : ""
                                                             }
-                                                        </div>
+                                                        </div> : null }
 
                                                         <Row>
                                                             <Col sm={12} md={9} className="two-wheeler">
-                                                                <TwoWheelerBrandTable brandList={brandList && brandList.length > 0 ? brandList : []} selectBrandFunc={this.setBrandName} otherBrandFunc={this.getOtherBrands} />
-
-
+                                                            {brandView == '1' ?
+                                                                <Fragment>
+                                                                    <TwoWheelerBrandTable brandList={brandList && brandList.length > 0 ? brandList : []} selectBrandFunc={this.setBrandName} otherBrandFunc={this.getOtherBrands} />
+                                                                </Fragment> : null}
 
                                                                 <div className="d-flex justify-content-left resmb">
-                                                                    {/* <Button className={`backBtn`} type="button" onClick={this.registration.bind(this, productId)}>
-                                                                        Back
-                                                                </Button> */}
+                                                                {brandView == '1' || (fastLaneData && fastLaneData.brand_text) ?
                                                                     <Button className={`proceedBtn`} type="submit"  >
                                                                         Continue
-                                                                </Button>
+                                                                </Button> : null }
                                                                 </div>
 
-
                                                             </Col>
-
+                                                            {brandView == '1' ?
                                                             <Col sm={12} md={3}>
                                                                 <div className="regisBox">
                                                                     <div className="d-flex justify-content-between flex-lg-row flex-md-column m-b-25">
@@ -716,8 +751,6 @@ class TwoWheelerSelectBrand extends Component {
 
                                                                         <div> <button type="button" className="rgistrBtn" onClick={this.registration.bind(this, productId)}>Edit</button></div>
                                                                     </div>
-
-
 
                                                                     <div className="d-flex justify-content-between flex-lg-row flex-md-column m-b-25">
                                                                         <div className="txtRegistr resmb-15">Two-wheeler Brand
@@ -740,7 +773,39 @@ class TwoWheelerSelectBrand extends Component {
 
                                                                     </div>
                                                                 </div>
-                                                            </Col>
+                                                            </Col> : 
+                                                            <Col sm={12} md={3}>
+                                                                <div className="regisBox">
+                                                                    <div className="d-flex justify-content-between flex-lg-row flex-md-column m-b-25">
+
+                                                                        <div className="txtRegistr resmb-15">Registration No.<br />
+                                                                            {motorInsurance && motorInsurance.registration_no}</div>
+
+                                                                        <div> <button type="button" className="rgistrBtn" onClick={this.registration.bind(this, productId)}>Edit</button></div>
+                                                                    </div>
+
+                                                                    <div className="d-flex justify-content-between flex-lg-row flex-md-column m-b-25">
+                                                                        <div className="txtRegistr resmb-15">Two-wheeler Brand
+                                                                            - <strong>{fastLaneData && fastLaneData.brand_text ? fastLaneData.brand_text  : vehicleDetails && vehicleDetails.vehiclebrand && vehicleDetails.vehiclebrand.name ? vehicleDetails.vehiclebrand.name : ""}</strong>
+                                                                        </div>
+
+                                                                        <div> <button type="button" className="rgistrBtn" onClick={this.selectVehicle.bind(this, productId)}>Edit</button></div>
+                                                                    </div>
+
+                                                                    <div className="d-flex justify-content-between flex-lg-row flex-md-column m-b-25">
+                                                                        <div className="txtRegistr">Two-wheeler Model<br />
+                                                                            <strong>{fastLaneData && fastLaneData.model_text ? fastLaneData.model_text+" "+fastLaneData.varient_text : vehicleDetails && vehicleDetails.vehiclemodel && vehicleDetails.vehiclemodel.description ? vehicleDetails.vehiclemodel.description+" "+vehicleDetails.varientmodel.varient : "" }</strong></div>
+
+                                                                        <div> <button type="button" className="rgistrBtn" onClick={this.selectBrand.bind(this, productId)}>Edit</button></div>
+                                                                    </div>
+
+                                                                    <div className="d-flex justify-content-between flex-lg-row flex-md-column m-b-25">
+                                                                        <div className="txtRegistr">Fuel Type<br />
+                                                                            <strong>{fastLaneData && fastLaneData.fuel ? fastLaneData.fuel : vehicleDetails && vehicleDetails.varientmodel && vehicleDetails.varientmodel.fuel_type ? fuel[Math.floor(vehicleDetails.varientmodel.fuel_type)] : null } </strong></div>
+
+                                                                    </div>
+                                                                </div>
+                                                                </Col> }
                                                             
                                                         </Row>
                                                     </div>
@@ -935,14 +1000,15 @@ class TwoWheelerSelectBrand extends Component {
 }
 const mapStateToProps = state => {
     return {
-        loading: state.loader.loading
+        loading: state.loader.loading,
+        data: state.processData.data
     };
 };
 
 const mapDispatchToProps = dispatch => {
     return {
         loadingStart: () => dispatch(loaderStart()),
-        loadingStop: () => dispatch(loaderStop())
+        loadingStop: () => dispatch(loaderStop()),
     };
 };
 

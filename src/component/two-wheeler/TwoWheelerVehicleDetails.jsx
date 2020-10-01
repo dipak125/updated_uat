@@ -6,6 +6,7 @@ import SideNav from '../common/side-nav/SideNav';
 import Footer from '../common/footer/Footer';
 import { withRouter } from 'react-router-dom';
 import { loaderStart, loaderStop } from "../../store/actions/loader";
+import { setData } from "../../store/actions/data";
 import { connect } from "react-redux";
 // import ReactTooltip from "react-tooltip";
 import * as Yup from 'yup';
@@ -126,6 +127,12 @@ class TwoWheelerVehicleDetails extends Component {
 
     selectBrand = (productId) => {
         this.props.history.push(`/two_wheeler_Select-brand/${productId}`);
+    }
+
+    editBrand = (productId) => {
+        let brandEdit = {'brandEdit' : 1}
+            this.props.setData(brandEdit)
+            this.props.history.push(`/two_wheeler_Select-brandTP/${productId}`);     
     }
 
     showClaimText = (value) =>{
@@ -659,7 +666,7 @@ class TwoWheelerVehicleDetails extends Component {
                                                         </Col>
 
                                                         <Col sm={12} md={5} className="text-right">
-                                                            <button className="rgistrBtn" type="button" onClick= {this.selectBrand.bind(this,productId)}>Edit</button>
+                                                            <button className="rgistrBtn" type="button" onClick= {this.editBrand.bind(this,productId)}>Edit</button>
                                                         </Col>
                                                     </Row>
 
@@ -702,14 +709,16 @@ class TwoWheelerVehicleDetails extends Component {
 
 const mapStateToProps = state => {
     return {
-      loading: state.loader.loading
+      loading: state.loader.loading,
+      data: state.processData.data
     };
   };
   
   const mapDispatchToProps = dispatch => {
     return {
       loadingStart: () => dispatch(loaderStart()),
-      loadingStop: () => dispatch(loaderStop())
+      loadingStop: () => dispatch(loaderStop()),
+      setData: (data) => dispatch(setData(data))
     };
   };
 

@@ -8,3 +8,6 @@ export const LOADER_STOP = 'LOADER_STOP';
 // User Action
 
 export const GET_LOGGED_IN_DETAILS = 'GET_LOGGED_IN_DETAILS';
+
+export const GET_DATA = 'GET_DATA';
+export const SET_DATA = 'SET_DATA';
