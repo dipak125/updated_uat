@@ -13,6 +13,7 @@ import { connect } from "react-redux";
 import swal from 'sweetalert';
 import ScrollArea from 'react-scrollbar';
 import Encryption from '../../shared/payload-encryption';
+import { setData } from "../../store/actions/data";
 
 
 
@@ -64,7 +65,10 @@ class SelectBrand extends Component {
             brandName: '',
             modelName: '',
             fuelType: '',
-            vehicleDetails: []
+            vehicleDetails: [],
+            pageLoad: '0',
+            fastLaneData: [],
+            fastlanelog: []
         };
     }
 
@@ -176,6 +180,7 @@ class SelectBrand extends Component {
 
     fetchData = () => {
         const { productId } = this.props.match.params
+        console.log("redux data----- ", this.props.data)
         let policyHolder_id = localStorage.getItem("policyHolder_refNo") ? localStorage.getItem("policyHolder_refNo") : 0;
         let encryption = new Encryption();
         this.props.loadingStart();
@@ -185,10 +190,20 @@ class SelectBrand extends Component {
                 console.log("decrypt", decryptResp)
                 let motorInsurance = decryptResp.data.policyHolder ? decryptResp.data.policyHolder.motorinsurance : {}
                 let vehicleDetails = decryptResp.data.policyHolder ? decryptResp.data.policyHolder.vehiclebrandmodel : {};
+                let fastlanelog = decryptResp.data.policyHolder ? decryptResp.data.policyHolder.fastlanelog : {};
                 this.setState({
-                    motorInsurance, vehicleDetails
+                    motorInsurance, vehicleDetails, fastlanelog
                 })
-                this.getBrands();
+                if(this.props.data != null && this.props.data.fastLaneData || this.props.data.brandEdit && this.props.data.brandEdit == '0' ) {
+                    this.setState({pageLoad: '0', fastLaneData: this.props.data.fastLaneData})
+                    // this.props.loadingStop();
+                    this.handleSubmit(this.props.data.fastLaneData, '0')
+                }
+                else {
+                    this.setState({pageLoad: '1' })
+                    this.getBrands();
+                }
+               
             })
             .catch(err => {
                 // handle error
@@ -210,15 +225,6 @@ class SelectBrand extends Component {
         else if(localStorage.getItem('brandEdit') == '2') {
             this.getOtherBrands()
         }
-        
-        // if(otherBrands) {
-        //     this.getOtherBrands()
-        // }
-        // else {
-        //     this.setBrandName(brandId)
-        // }
-        
-        // this.props.history.push(`/Select-brand/${productId}`);
     }
 
     selectVehicle = (productId) => {
@@ -277,19 +283,35 @@ class SelectBrand extends Component {
         })
     }
 
-    handleSubmit = (values) => {
+    handleSubmit = (values, pageLoad) => {
         const { productId } = this.props.match.params
-        const { selectedVarientId, selectedModelId, selectedBrandId } = this.state
+        const { selectedVarientId, selectedModelId, selectedBrandId, fastlanelog } = this.state
         const formData = new FormData();
         let encryption = new Encryption();
-        const post_data = {
-            'policy_holder_id': localStorage.getItem('policyHolder_id'),
-            'menumaster_id': 1,
-            'brand_id': values.selectedBrandId,
-            'brand_model_id': values.selectedModelId,
-            'model_varient_id': values.selectedVarientId,
-            'page_name': `Select-brand/${productId}`
+        let post_data = {}
+        pageLoad = pageLoad == '1' || pageLoad == '0' ? pageLoad : '1'
+        console.log('pageLoad--- ', pageLoad)
+        if(pageLoad == '1') {
+             post_data = {
+                'policy_holder_id': localStorage.getItem('policyHolder_id'),
+                'menumaster_id': 1,
+                'brand_id': values.selectedBrandId,
+                'brand_model_id': values.selectedModelId,
+                'model_varient_id': values.selectedVarientId,
+                'page_name': `Select-brand/${productId}`,
+            }
+        } else {
+             post_data = {
+                'policy_holder_id': localStorage.getItem('policyHolder_id'),
+                'menumaster_id': 1,
+                'brand_id': values.brand_id,
+                'brand_model_id': values.brand_model_id,
+                'model_varient_id': values.model_varient_id,
+                'page_name': `Select-brand/${productId}`,
+                'fastlaneLog_id': values && values.fastlaneLog_id ? values.fastlaneLog_id : fastlanelog && fastlanelog.id ? fastlanelog.id : ""
+            }
         }
+        console.log('post_data---fastlane--- ', post_data)
         formData.append('enc_data', encryption.encrypt(JSON.stringify(post_data)))
         this.props.loadingStart();
         axios.post('insert-brand-model-varient', formData).then(res => {
@@ -318,15 +340,26 @@ class SelectBrand extends Component {
 
 
     render() {
-        const { brandList, motorInsurance, selectedBrandDetails, brandModelList, selectedBrandId,
+        const { brandList, motorInsurance, selectedBrandDetails, brandModelList, selectedBrandId, pageLoad, fastLaneData,
              selectedModelId, selectedVarientId, otherBrands, brandName, modelName, fuelType, vehicleDetails } = this.state
         const { productId } = this.props.match.params
-        const newInitialValues = Object.assign(initialValues, {
+        let newInitialValues = {}
+
+        pageLoad == '1' ? 
+         newInitialValues = Object.assign(initialValues, {
             selectedBrandId: selectedBrandId ? selectedBrandId : (vehicleDetails && vehicleDetails.vehiclebrand_id ? vehicleDetails.vehiclebrand_id : ""),
             selectedModelId:  selectedModelId ? selectedModelId : (selectedBrandId ? "" : vehicleDetails && vehicleDetails.vehiclemodel_id ? vehicleDetails.vehiclemodel_id : ""),
             selectedBrandName: '',
             selectedModelName: '',
             selectedVarientId: selectedVarientId ? selectedVarientId : (selectedBrandId ? "" :  vehicleDetails && vehicleDetails.varientmodel_id ? vehicleDetails.varientmodel_id : ""),
+
+        }) : 
+        newInitialValues = Object.assign(initialValues, {
+            selectedBrandId: fastLaneData ? fastLaneData.brand_id : "",
+            selectedModelId:  fastLaneData ? fastLaneData.brand_model_id : "",
+            selectedBrandName: '',
+            selectedModelName: '',
+            selectedVarientId: fastLaneData ? fastLaneData.model_varient_id : "",
 
         })
 
@@ -342,7 +375,7 @@ class SelectBrand extends Component {
                             </div>
                             <div className="col-sm-12 col-md-12 col-lg-10 col-xl-10 infobox">
                                 <h4 className="text-center mt-3 mb-3">SBI General Insurance Company Limited</h4>
-
+                                {this.props.data && this.props.data.brandEdit && this.props.data.brandEdit == '1' ?
                                 <Formik initialValues={newInitialValues}
                                     onSubmit={this.handleSubmit}
                                 // validationSchema={vehicleValidation}
@@ -420,7 +453,7 @@ class SelectBrand extends Component {
                                             </Form>
                                         );
                                     }}
-                                </Formik>
+                                </Formik> : null }
                             </div>
 
                         </div>
@@ -606,14 +639,16 @@ class SelectBrand extends Component {
 }
 const mapStateToProps = state => {
     return {
-        loading: state.loader.loading
+        loading: state.loader.loading,
+        data: state.processData.data
     };
 };
 
 const mapDispatchToProps = dispatch => {
     return {
         loadingStart: () => dispatch(loaderStart()),
-        loadingStop: () => dispatch(loaderStop())
+        loadingStop: () => dispatch(loaderStop()),
+        setData: (data) => dispatch(setData(data))
     };
 };
 

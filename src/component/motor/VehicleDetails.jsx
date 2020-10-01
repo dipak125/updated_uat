@@ -6,6 +6,7 @@ import SideNav from '../common/side-nav/SideNav';
 import Footer from '../common/footer/Footer';
 import { withRouter } from 'react-router-dom';
 import { loaderStart, loaderStop } from "../../store/actions/loader";
+import { setData } from "../../store/actions/data";
 import { connect } from "react-redux";
 // import ReactTooltip from "react-tooltip";
 import * as Yup from 'yup';
@@ -313,11 +314,28 @@ class VehicleDetails extends Component {
         else if(localStorage.getItem('brandEdit') == '2') {
             localStorage.setItem('newBrandEdit', '2')
         }
+
+        let brandEdit = {'brandEdit' : 1}
+            this.props.setData(brandEdit)
         this.props.history.push(`/Select-brand/${productId}`);
     }
 
     selectBrand = (productId) => {
-        this.props.history.push(`/Select-brand/${productId}`);
+        if(this.props.data && this.props.data.fastLaneData){
+            this.props.history.push(`/Registration/${productId}`);
+        } 
+        else {
+            let brandEdit = {'brandEdit' : 1}
+            this.props.setData(brandEdit)
+            this.props.history.push(`/Select-brand/${productId}`);
+        }
+        
+    }
+
+    editBrand = (productId) => {
+        let brandEdit = {'brandEdit' : 1}
+            this.props.setData(brandEdit)
+            this.props.history.push(`/Select-brand/${productId}`);     
     }
 
 
@@ -1009,7 +1027,7 @@ class VehicleDetails extends Component {
                                                         </Col>
 
                                                         <Col sm={12} md={5} className="text-right">
-                                                            <button className="rgistrBtn" onClick= {this.selectBrand.bind(this,productId)}>Edit</button>
+                                                            <button className="rgistrBtn" onClick= {this.editBrand.bind(this,productId)}>Edit</button>
                                                         </Col>
                                                     </Row>
 
@@ -1052,14 +1070,16 @@ class VehicleDetails extends Component {
 
 const mapStateToProps = state => {
     return {
-      loading: state.loader.loading
+      loading: state.loader.loading,
+      data: state.processData.data
     };
   };
   
   const mapDispatchToProps = dispatch => {
     return {
       loadingStart: () => dispatch(loaderStart()),
-      loadingStop: () => dispatch(loaderStop())
+      loadingStop: () => dispatch(loaderStop()),
+      setData: (data) => dispatch(setData(data))
     };
   };
 

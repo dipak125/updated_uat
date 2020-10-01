@@ -11,6 +11,7 @@ import * as Yup from 'yup';
 import swal from 'sweetalert';
 import Encryption from '../../shared/payload-encryption';
 import { Formik, Form, Field, ErrorMessage } from 'formik';
+import { setData } from "../../store/actions/data";
 
 
 const initialValues = {
@@ -62,7 +63,8 @@ class Registration extends Component {
     state = {
         motorInsurance:'',
         regno:'',
-        length:14
+        length:14,
+        fastlanelog: []
     }
    
 
@@ -96,8 +98,9 @@ fetchData=()=>{
             console.log("decrypt", decryptResp)
 
             let motorInsurance = decryptResp.data.policyHolder.motorinsurance           
+            let fastlanelog = decryptResp.data.policyHolder ? decryptResp.data.policyHolder.fastlanelog : {};
             this.setState({ 
-                motorInsurance
+                motorInsurance, fastlanelog
             })
             this.props.loadingStop();
         })
@@ -107,9 +110,34 @@ fetchData=()=>{
         })
 }
 
-    handleSubmit=(values)=>{
+    fetchFastlane = (values) => {
+        const formData = new FormData();
+        formData.append('registration_no', values.regNumber)
+        formData.append('menumaster_id', '1')
+        this.props.loadingStart();
+        axios.post('fastlane', formData).then(res => {
+
+            if(res.data.error == false) {
+                this.props.loadingStop();
+                this.setState({fastLaneData: res.data.data, brandView: '0'})
+                let fastLaneData = {'fastLaneData' : res.data.data}
+                this.props.setData(fastLaneData)
+            } 
+            else {
+                this.props.loadingStop();
+                this.setState({fastLaneData: [], brandView: '1', vehicleDetails: []})
+            }       
+            this.handleSubmit(values, res.data.data)
+        })
+            .catch(err => {
+                this.props.loadingStop();
+            })
+    }
+
+    handleSubmit=(values, fastLaneData)=>{
 
         const {productId} = this.props.match.params;
+        const {fastlanelog} = this.state;
 
         const formData = new FormData();
         let encryption = new Encryption();
@@ -133,7 +161,8 @@ fetchData=()=>{
                     'agent_name':sessionStorage.getItem('agent_name') ? sessionStorage.getItem('agent_name') : "",
                     'product_id':sessionStorage.getItem('product_id') ? sessionStorage.getItem('product_id') : "",
                     'bc_token': "5",
-                    'page_name': `Registration/${productId}`
+                    'page_name': `Registration/${productId}`,
+                    
                 } 
             }
             else {
@@ -146,7 +175,8 @@ fetchData=()=>{
                     'bcmaster_id': bc_data ? bc_data.agent_id : "",
                     'bc_token': bc_data ? bc_data.token : "",
                     'bc_agent_id': bc_data ? bc_data.user_info.data.user.username : "",
-                    'page_name': `Registration/${productId}`
+                    'page_name': `Registration/${productId}`,
+                   
                 } 
             }
 
@@ -184,7 +214,8 @@ fetchData=()=>{
                     'agent_name':sessionStorage.getItem('agent_name') ? sessionStorage.getItem('agent_name') : "",
                     'product_id':sessionStorage.getItem('product_id') ? sessionStorage.getItem('product_id') : "",
                     'bcmaster_id': "5",
-                    'page_name': `Registration/${productId}`
+                    'page_name': `Registration/${productId}`,
+                    
                 } 
             }
             else {
@@ -196,7 +227,8 @@ fetchData=()=>{
                     'bcmaster_id': bc_data ? bc_data.agent_id : "",
                     'bc_token': bc_data ? bc_data.token : "",
                     'bc_agent_id': bc_data ? bc_data.user_info.data.user.username : "",
-                    'page_name': `Registration/${productId}`
+                    'page_name': `Registration/${productId}`,
+                    
                 } 
             }
             console.log('post_data', post_data)
@@ -284,7 +316,7 @@ fetchData=()=>{
                                     <div className="boxpd">
                                         <h4 className="m-b-30">Help us with some information about yourself</h4>
                                         <Formik initialValues={newInitialValues} 
-                                        onSubmit={this.handleSubmit} 
+                                        onSubmit={this.fetchFastlane} 
                                         validationSchema={vehicleRegistrationValidation}>
                                         {({ values, errors, setFieldValue, setFieldTouched, isValid, isSubmitting, touched }) => {
                                             // console.log('values',values)
@@ -380,14 +412,16 @@ fetchData=()=>{
 
 const mapStateToProps = state => {
     return {
-      loading: state.loader.loading
+      loading: state.loader.loading,
+      data: state.processData.data
     };
   };
   
   const mapDispatchToProps = dispatch => {
     return {
       loadingStart: () => dispatch(loaderStart()),
-      loadingStop: () => dispatch(loaderStop())
+      loadingStop: () => dispatch(loaderStop()),
+      setData: (data) => dispatch(setData(data))
     };
   };
 
