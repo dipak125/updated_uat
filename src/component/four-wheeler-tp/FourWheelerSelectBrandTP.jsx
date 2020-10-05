@@ -17,7 +17,6 @@ import fuel from '../common/FuelTypes';
 import { setData } from "../../store/actions/data";
 
 
-
 const initialValues = {
     selectedBrandId: '',
     selectedBrandName: '',
@@ -39,7 +38,22 @@ const vehicleValidation = Yup.object().shape({
     regNumber: Yup.string().when("check_registration", {
         is: "1",       
         then: Yup.string(),
-        otherwise: Yup.string().required('Please provide registration number').matches(/^[A-Z]{2}[0-9]{2}(?:[A-Z])?(?:[A-Z])?(?:[A-Z])?[0-9]{4}$/, 'Invalid Registration number')
+        otherwise: Yup.string().required('Please provide registration number')
+        .matches(/^[A-Z]{2}[0-9]{2}(?:[A-Z])?(?:[A-Z])?(?:[A-Z])?[0-9]{4}$/, 'Invalid Registration number')
+        .test(
+            "last4digitcheck",
+            function() {
+                return "Invalid Registration number"
+            },
+            function (value) {
+                let regnoLength = value.length
+                let subString = value.substring(regnoLength-4, regnoLength)
+                if (subString <= 0) {
+                    return subString > 0;
+                }
+                return true;
+            }
+        )
     }),
 })
 
@@ -99,16 +113,16 @@ class TwoWheelerSelectBrand extends Component {
 
     componentDidMount() {
         // this.callFetchBrands();
-        window.onload = function () {  
-            document.onkeydown = function (e) {  
-                if (e.key == "F5" || e.key == "F11" || 
-                (e.ctrlKey == true && (e.key == 'r' || e.key == 'R')) || 
-                e.keyCode == 116 || e.keyCode == 82) {
+        // window.onload = function () {  
+        //     document.onkeydown = function (e) {  
+        //         if (e.key == "F5" || e.key == "F11" || 
+        //         (e.ctrlKey == true && (e.key == 'r' || e.key == 'R')) || 
+        //         e.keyCode == 116 || e.keyCode == 82) {
     
-                       e.preventDefault();
-                       swal("Page refresh disabled")
-            }
-            };}
+        //                e.preventDefault();
+        //                swal("Page refresh disabled")
+        //     }
+        //     };}
         this.fetchData();
 
     }
@@ -570,6 +584,8 @@ class TwoWheelerSelectBrand extends Component {
                                             <Form>
                                                 <section className="brand">
                                                     <div className="brand-bg">
+                                                    <Row>
+                                                        <div className="col-md-9 col-sm-12">
                                                         <div className="d-flex justify-content-left">
                                                             <div className="brandhead"> 
                                                             <p>Taking 4-Wheeler policy for</p>
@@ -704,6 +720,7 @@ class TwoWheelerSelectBrand extends Component {
                                                                 </div>                                                           
                                                             </Col>
                                                         </Row>
+                                                        
                                                         {brandView == '1' ?
                                                         <div className="brandhead">
                                                             <h4>Please select your Vehicle brand</h4>
@@ -712,8 +729,8 @@ class TwoWheelerSelectBrand extends Component {
                                                             }
                                                         </div> : null }
 
-                                                        <Row>
-                                                            <Col sm={12} md={9} className="two-wheeler">
+                                                      
+                                                            <Col sm={12} md={12} className="two-wheeler">
                                                             {brandView == '1' ?
                                                                 <Fragment>
                                                                 <TwoWheelerBrandTable brandList={brandList && brandList.length > 0 ? brandList : []} selectBrandFunc={this.setBrandName} otherBrandFunc={this.getOtherBrands} />
@@ -729,8 +746,11 @@ class TwoWheelerSelectBrand extends Component {
 
                                                             </Col>
 
-                                                            {brandView == '1' ?
-                                                            <Col sm={12} md={3}>
+                                                            
+                                                        </div>
+                                                        <div className= "col-md-3 col-sm-12">
+                                                        {brandView == '1' ?
+                                                            <Fragment>
                                                                 <div className="regisBox">
                                                                     <div className="d-flex justify-content-between flex-lg-row flex-md-column m-b-25">
 
@@ -761,8 +781,9 @@ class TwoWheelerSelectBrand extends Component {
 
                                                                     </div>
                                                                 </div>
-                                                            </Col> : 
-                                                            <Col sm={12} md={3}>
+                                                            </Fragment> : 
+                                                            
+                                                            <Fragment>
                                                             <div className="regisBox">
                                                                 <div className="d-flex justify-content-between flex-lg-row flex-md-column m-b-25">
 
@@ -793,8 +814,9 @@ class TwoWheelerSelectBrand extends Component {
 
                                                                 </div>
                                                             </div>
-                                                        </Col> }
-                                                            
+                                                        </Fragment> }
+                                                        </div>
+                                                        
                                                         </Row>
                                                     </div>
                                                 </section>

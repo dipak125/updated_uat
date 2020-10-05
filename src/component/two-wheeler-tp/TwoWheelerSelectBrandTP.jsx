@@ -330,7 +330,7 @@ class TwoWheelerSelectBrand extends Component {
         if(bc_data) {
             bc_data = JSON.parse(encryption.decrypt(bc_data));
         }
-console.log("values fastlane--- ", values)
+
         if(policyHolder_id > 0 ) {
             if(sessionStorage.getItem('csc_id')) {
                 post_data = {
