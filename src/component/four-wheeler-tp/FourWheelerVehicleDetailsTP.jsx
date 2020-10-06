@@ -71,7 +71,8 @@ class TwoWheelerVehicleDetails extends Component {
         RTO_location: "",
         step_completed: "0",
         location_reset_flag: 0,
-        request_data: []
+        request_data: [],
+        changeFlag: 0
     };
 
     changePlaceHoldClassAdd(e) {
@@ -141,7 +142,8 @@ class TwoWheelerVehicleDetails extends Component {
                 this.setState({
                     CustomerID: newValue,
                     RTO_location: "",
-                    location_reset_flag
+                    location_reset_flag,
+                    changeFlag: 1
                     });
             //}
         
@@ -159,6 +161,14 @@ class TwoWheelerVehicleDetails extends Component {
     else return 0;
     
   }
+
+  SuggestionSelected = (setFieldTouched,setFieldValue,suggestion) => {
+      this.setState({
+        changeFlag: 0, 
+      });
+    setFieldTouched('location_id')
+    setFieldValue("location_id", suggestion.id)
+  }
   
   onSuggestionsFetchCustomerID = ({ value }) => {
     this.setState({
@@ -168,7 +178,7 @@ class TwoWheelerVehicleDetails extends Component {
 
    getCustomerIDSuggestionValue = (suggestion) => {
     this.setState({
-      selectedCustomerRecords: suggestion
+      selectedCustomerRecords: suggestion, changeFlag: 0, 
     });
     return suggestion.RTO_LOCATION+" - "+suggestion.NameCode;
   }
@@ -182,11 +192,16 @@ class TwoWheelerVehicleDetails extends Component {
 
     handleSubmit = (values, actions) => {
         const {productId} = this.props.match.params 
-        const {motorInsurance, request_data} = this.state
+        const {motorInsurance, request_data, changeFlag} = this.state
         let policy_type = ageObj.whatIsCurrentMonth(values.registration_date) < 7 ? 6 : 1
         let newPolStartDate = addDays(new Date(), 1)           
         let newPolEndDate = addDays(new Date(newPolStartDate), 364) 
         let vehicleAge = Math.floor(moment().diff(values.registration_date, 'months', true))
+
+        if(changeFlag == 1) {
+        swal("Registration city is required")
+        return false
+        }
 
         const formData = new FormData(); 
         let post_data = {}
@@ -407,8 +422,7 @@ class TwoWheelerVehicleDetails extends Component {
                                                                 inputProps={inputCustomerID} 
                                                                 onChange={e=>this.onChange(e,setFieldValue)}
                                                                 onSuggestionSelected={(e, {suggestion,suggestionValue}) => {
-                                                                    setFieldTouched('location_id')
-                                                                    setFieldValue("location_id", suggestion.id)    
+                                                                    this.SuggestionSelected(setFieldTouched,setFieldValue,suggestion)
                                                                     }}
                                                                 />
                                                                 {errors.location_id && touched.location_id ? (
