@@ -674,7 +674,9 @@ Note: Beware of modifying this element as it can break the animations - you shou
 /*.two-wheeler .brand-table img:last-child{ min-width: inherit;}*/
 .customCheckBox.formGrp{margin-left: 15px;}
 .brandModal .cntrbody img{ max-height: 72px;}
-.brandModal .brdrbottom{height: 30px;}
+/* .brandModal .brdrbottom{height: 30px;} */
+/*06-10-20*/
+.brandModal .brdrbottom{height: auto;}
 
 .content > .contBox{ min-height:285px;}
 .contBox{ -webkit-box-shadow: 5px 5px 10px 1px rgba(0,0,0,0.2); box-shadow:  5px 5px 10px 1px rgba(0,0,0,0.2); padding:25px; box-sizing:border-box; background:#fff; border-radius:10px;}

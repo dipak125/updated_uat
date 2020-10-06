@@ -194,14 +194,22 @@ class SelectBrand extends Component {
                 this.setState({
                     motorInsurance, vehicleDetails, fastlanelog
                 })
-                if(this.props.data != null && this.props.data.fastLaneData || this.props.data.brandEdit && this.props.data.brandEdit == '0' ) {
-                    this.setState({pageLoad: '0', fastLaneData: this.props.data.fastLaneData})
-                    // this.props.loadingStop();
-                    this.handleSubmit(this.props.data.fastLaneData, '0')
-                }
-                else {
+                console.log("this.props.data------ ", this.props.data)
+                if(this.props.data == null) {
                     this.setState({pageLoad: '1' })
                     this.getBrands();
+                }             
+                else {
+                    
+                    if( this.props.data.fastLaneData || this.props.data.brandEdit && this.props.data.brandEdit == '0' ) {
+                        this.setState({pageLoad: '0', fastLaneData: this.props.data.fastLaneData})
+                        // this.props.loadingStop();
+                        this.handleSubmit(this.props.data.fastLaneData, '0')
+                    }
+                    else {
+                        this.setState({pageLoad: '1' })
+                        this.getBrands();
+                    }
                 }
                
             })
@@ -375,7 +383,7 @@ class SelectBrand extends Component {
                             </div>
                             <div className="col-sm-12 col-md-12 col-lg-10 col-xl-10 infobox">
                                 <h4 className="text-center mt-3 mb-3">SBI General Insurance Company Limited</h4>
-                                {this.props.data && this.props.data.brandEdit && this.props.data.brandEdit == '1' ?
+                                {this.props.data && this.props.data.brandEdit && this.props.data.brandEdit == '1' || pageLoad == '1' ?
                                 <Formik initialValues={newInitialValues}
                                     onSubmit={this.handleSubmit}
                                 // validationSchema={vehicleValidation}

@@ -9,6 +9,7 @@ import { loaderStart, loaderStop } from "../../store/actions/loader";
 import Motor from '../common/Motor';
 import Health from '../common/Health';
 import Footer from '../common/footer/Footer';
+import { setData } from "../../store/actions/data";
 
 
 class Products extends Component {
@@ -19,6 +20,7 @@ class Products extends Component {
 
     componentDidMount() {
         let product_id = sessionStorage.getItem("product_id")
+        this.props.setData([])
         this.setState({
             product_id: product_id
         })
@@ -146,7 +148,8 @@ const mapStateToProps = state => {
   const mapDispatchToProps = dispatch => {
     return {
       loadingStart: () => dispatch(loaderStart()),
-      loadingStop: () => dispatch(loaderStop())
+      loadingStop: () => dispatch(loaderStop()),
+      setData: (data) => dispatch(setData(data))
     };
   };
   

@@ -126,6 +126,7 @@ fetchData=()=>{
                 } 
                 else {
                     this.props.loadingStop();
+                    this.props.setData([])
                     this.setState({fastLaneData: [], brandView: '1', vehicleDetails: []})
                 }       
                 this.handleSubmit(values, res.data.data)
@@ -134,6 +135,7 @@ fetchData=()=>{
                     this.props.loadingStop();
                 })
         }else {
+            this.props.setData([])
             this.handleSubmit(values, [])
         }
        
