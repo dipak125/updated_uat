@@ -787,10 +787,12 @@ class TwoWheelerSelectBrand extends Component {
                                                                             <span className="errorMsg">Please provide registration number</span>
                                                                         ) : null}
                                                                     </div>
+                                                                    <div >
                                                                     {brandView == '0' && fastLaneData.length == '0' ?
                                                                     <Button  type="button" onClick = {this.fetchFastlane.bind(this,values)} >
                                                                         Fetch Details
-                                                                </Button> : null }
+                                                                    </Button> : null }
+                                                                    </div>
                                                                 </div>                                                           
                                                             </Col>
                                                         </Row>

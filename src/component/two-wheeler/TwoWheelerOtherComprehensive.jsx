@@ -276,7 +276,7 @@ class TwoWheelerOtherComprehensive extends Component {
 
         axios.post('fullQuotePM2W', formData)
             .then(res => {
-                if (res.data.PolicyObject) {
+                if (res.data.PolicyObject && res.data.UnderwritingResult && res.data.UnderwritingResult.Status == "Success") {
                     let policyCoverage= res.data.PolicyObject.PolicyLobList ? res.data.PolicyObject.PolicyLobList[0].PolicyRiskList[0].PolicyCoverageList : []
                     let ncbDiscount= res.data.PolicyObject.PolicyLobList ? res.data.PolicyObject.PolicyLobList[0].PolicyRiskList[0].NCBDiscountAmt : 0
                     if(ncbDiscount != '0') {
@@ -306,7 +306,16 @@ class TwoWheelerOtherComprehensive extends Component {
                         // policyCoverage: res.data.PolicyObject.PolicyLobList ? res.data.PolicyObject.PolicyLobList[0].PolicyRiskList[0].PolicyCoverageList : [],
                         // ncbDiscount: res.data.PolicyObject.PolicyLobList ? res.data.PolicyObject.PolicyLobList[0].PolicyRiskList[0].NCBDiscountAmt : 0,
                     });
-                } else {
+                } 
+                else if (res.data.PolicyObject && res.data.UnderwritingResult && res.data.UnderwritingResult.Status == "Fail") {
+                    this.setState({
+                        fulQuoteResp: res.data.PolicyObject,
+                        error: {"message": 1},
+                        serverResponse: [],
+                        policyCoverage: res.data.PolicyObject.PolicyLobList ? res.data.PolicyObject.PolicyLobList[0].PolicyRiskList[0].PolicyCoverageList : [],
+                    });
+                }
+                else {
                     this.setState({
                         fulQuoteResp: [], add_more_coverage,
                         error: res.data,

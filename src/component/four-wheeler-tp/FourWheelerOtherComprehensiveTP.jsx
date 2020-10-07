@@ -213,7 +213,7 @@ class TwoWheelerOtherComprehensive extends Component {
 
         axios.post('fullQuotePMCARTP', formData)
             .then(res => {
-                if (res.data.PolicyObject) {
+                if (res.data.PolicyObject && res.data.UnderwritingResult && res.data.UnderwritingResult.Status == "Success") {
                     this.setState({
                         fulQuoteResp: res.data.PolicyObject,
                         PolicyArray: res.data.PolicyObject.PolicyLobList,
@@ -221,7 +221,16 @@ class TwoWheelerOtherComprehensive extends Component {
                         serverResponse: res.data.PolicyObject,
                         policyCoverage: res.data.PolicyObject.PolicyLobList ? res.data.PolicyObject.PolicyLobList[0].PolicyRiskList[0].PolicyCoverageList : [],
                     });
-                } else {
+                }
+                else if (res.data.PolicyObject && res.data.UnderwritingResult && res.data.UnderwritingResult.Status == "Fail") {
+                    this.setState({
+                        fulQuoteResp: res.data.PolicyObject,
+                        error: {"message": 1},
+                        serverResponse: [],
+                        policyCoverage: res.data.PolicyObject.PolicyLobList ? res.data.PolicyObject.PolicyLobList[0].PolicyRiskList[0].PolicyCoverageList : [],
+                    });
+                }
+                else {
                     this.setState({
                         fulQuoteResp: [], add_more_coverage,
                         error: res.data,

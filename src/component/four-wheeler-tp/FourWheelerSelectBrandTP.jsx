@@ -26,8 +26,6 @@ const initialValues = {
     regNumber:'',
     check_registration: 2,
     policy_for: ""
-
-
 };
 
 
@@ -713,10 +711,12 @@ class TwoWheelerSelectBrand extends Component {
                                                                             <span className="errorMsg">Please provide registration number</span>
                                                                         ) : null}
                                                                     </div>
+                                                                    <div>
                                                                     {brandView == '0' && fastLaneData.length == '0' ?
-                                                                    <Button  type="button" onClick = {this.fetchFastlane.bind(this,values)} >
+                                                                    <Button  type="button"  onClick = {this.fetchFastlane.bind(this,values)} >
                                                                         Fetch Details
                                                                 </Button> : null }
+                                                                </div>
                                                                 </div>                                                           
                                                             </Col>
                                                         </Row>

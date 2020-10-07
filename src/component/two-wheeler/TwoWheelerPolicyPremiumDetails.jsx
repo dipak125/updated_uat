@@ -175,7 +175,7 @@ class Premium extends Component {
 
         axios.post('fullQuotePM2W', formData)
             .then(res => {
-                if (res.data.PolicyObject) {
+                if (res.data.PolicyObject && res.data.UnderwritingResult && res.data.UnderwritingResult.Status == "Success") {
                     this.setState({
                         fulQuoteResp: res.data.PolicyObject,
                         PolicyArray: res.data.PolicyObject.PolicyLobList,

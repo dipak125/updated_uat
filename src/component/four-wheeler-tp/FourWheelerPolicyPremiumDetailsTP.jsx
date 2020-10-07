@@ -157,10 +157,10 @@ class Premium extends Component {
         }
 
         formData.append('enc_data',encryption.encrypt(JSON.stringify(post_data)))
-console.log("fullQuote post_data--- ", post_data)
+        console.log("fullQuote post_data--- ", post_data)
         axios.post('fullQuotePMCARTP', formData)
             .then(res => {
-                if (res.data.PolicyObject) {
+                if (res.data.PolicyObject && res.data.UnderwritingResult && res.data.UnderwritingResult.Status == "Success") {
                     this.setState({
                         fulQuoteResp: res.data.PolicyObject,
                         PolicyArray: res.data.PolicyObject.PolicyLobList,
