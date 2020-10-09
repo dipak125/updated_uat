@@ -47,6 +47,12 @@ const Error = Loadable({
     loading: () => loadingContent
 });
 
+const Logout = Loadable({
+    loader: () => import(/*webpackChunkName: "Products" */"../common/Logout.jsx"),
+    loading: () => loadingContent
+});
+
+
 const Break_in = Loadable({
     loader: () => import(/*webpackChunkName: "Products" */"../support/BreakinList.jsx"),
     loading: () => loadingContent
@@ -181,6 +187,33 @@ const FourWheelerAdditionalDetailsTP = Loadable({
 });
 
 
+// ======================== Motor GCV ========================================
+
+const RegistrationGCV = Loadable({
+    loader: () => import(/*webpackChunkName: "Products" */"../GCV/RegistrationGCV.jsx"),
+    loading: () => loadingContent
+});
+const SelectBrandGCV = Loadable({
+    loader: () => import(/*webpackChunkName: "Products" */"../GCV/SelectBrandGCV.jsx"),
+    loading: () => loadingContent
+});
+const VehicleDetailsGCV = Loadable({
+    loader: () => import(/*webpackChunkName: "Products" */"../GCV/VehicleDetailsGCV.jsx"),
+    loading: () => loadingContent
+});
+const OtherComprehensiveGCV = Loadable({
+    loader: () => import(/*webpackChunkName: "Products" */"../GCV/OtherComprehensiveGCV.jsx"),
+    loading: () => loadingContent
+});
+const AdditionalDetailsGCV = Loadable({
+    loader: () => import(/*webpackChunkName: "Products" */"../GCV/AdditionalDetailsGCV.jsx"),
+    loading: () => loadingContent
+});
+const PremiumGCV = Loadable({
+    loader: () => import(/*webpackChunkName: "Products" */"../GCV/PremiumGCV.jsx"),
+    loading: () => loadingContent
+});
+
 
 
 
@@ -192,7 +225,9 @@ class Routes extends Component {
                 <HashRouter>
                     <Switch>
                         <Route exact path="/login" component={LogIn} />                
-                        <Route exact path="/logout" component={Error} /> 
+                        <Route exact path="/logout" component={Logout} /> 
+                        <PrivateRoute exact path="/Error" component={Error} />
+
                         <PrivateRoute exact path="/Products" component={Products} />
                         <PrivateRoute exact path="/Health/:productId" component={Health} />
                         <PrivateRoute exact path="/MedicalDetails/:productId" component={MedicalDetails} />
@@ -238,6 +273,14 @@ class Routes extends Component {
                         <PrivateRoute exact path="/four_wheeler_verifyTP/:productId" component={FourWheelerVerifyTP} />
                         <PrivateRoute exact path="/four_wheeler_additional_detailsTP/:productId" component={FourWheelerAdditionalDetailsTP} />  
                         <PrivateRoute exact path="/four_wheeler_policy_premium_detailsTP/:productId" component={FourWheelerPolicyPremiumDetailsTP} />
+
+                         {/************ MotorGCV ******************/}
+                         <PrivateRoute exact path="/Registration_GCV/:productId" component={RegistrationGCV} />
+                        <PrivateRoute exact path="/SelectBrand_GCV/:productId" component={SelectBrandGCV} />
+                        <PrivateRoute exact path="/VehicleDetails_GCV/:productId" component={VehicleDetailsGCV} />
+                        <PrivateRoute exact path="/OtherComprehensive_GCV/:productId" component={OtherComprehensiveGCV} />
+                        <PrivateRoute exact path="/AdditionalDetails_GCV/:productId" component={AdditionalDetailsGCV} />  
+                        <PrivateRoute exact path="/Premium_GCV/:productId" component={PremiumGCV} />
 
                         {/************ Support ******************/}
                         <PrivateRoute exact path="/Documents" component={Documents} />
