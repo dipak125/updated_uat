@@ -95,7 +95,8 @@ class TwoWheelerSelectBrand extends Component {
             length:14,
             fastLaneData: [],
             brandView: '0',
-            fastlanelog: []
+            fastlanelog: [],
+            fastlaneLogId: 0
         };
     }
 
@@ -348,7 +349,7 @@ class TwoWheelerSelectBrand extends Component {
                     'product_id':sessionStorage.getItem('product_id') ? sessionStorage.getItem('product_id') : "",
                     'bcmaster_id': "5",
                     'policy_for': values.policy_for,
-                    'fastlaneLog_id': this.state.fastLaneData && this.state.fastLaneData.fastlaneLog_id ? this.state.fastLaneData.fastlaneLog_id : fastlanelog && fastlanelog.id ? fastlanelog.id : ""
+                    'fastlaneLog_id': this.state.fastlaneLogId ? this.state.fastlaneLogId : fastlanelog && fastlanelog.id ? fastlanelog.id : 0
                 }
             }
             else {
@@ -366,7 +367,7 @@ class TwoWheelerSelectBrand extends Component {
                     'bc_token': bc_data ? bc_data.token : "",
                     'policy_for': values.policy_for,
                     'bc_agent_id': bc_data ? bc_data.user_info.data.user.username : "",
-                    'fastlaneLog_id': this.state.fastLaneData && this.state.fastLaneData.fastlaneLog_id ? this.state.fastLaneData.fastlaneLog_id : fastlanelog && fastlanelog.id ? fastlanelog.id : ""
+                    'fastlaneLog_id': this.state.fastlaneLogId ? this.state.fastlaneLogId : fastlanelog && fastlanelog.id ? fastlanelog.id : 0
                 }
             }
             
@@ -418,7 +419,7 @@ class TwoWheelerSelectBrand extends Component {
                     'product_id':sessionStorage.getItem('product_id') ? sessionStorage.getItem('product_id') : "",
                     'bcmaster_id': "5",
                     'policy_for': values.policy_for,
-                    'fastlaneLog_id': this.state.fastLaneData && this.state.fastLaneData.fastlaneLog_id ? this.state.fastLaneData.fastlaneLog_id : fastlanelog && fastlanelog.id ? fastlanelog.id : ""
+                    'fastlaneLog_id': this.state.fastlaneLogId ? this.state.fastlaneLogId : fastlanelog && fastlanelog.id ? fastlanelog.id : 0
                 }
             }
             else {
@@ -435,7 +436,7 @@ class TwoWheelerSelectBrand extends Component {
                     'bc_token': bc_data ? bc_data.token : "",
                     'policy_for': values.policy_for,
                     'bc_agent_id': bc_data ? bc_data.user_info.data.user.username : "",
-                    'fastlaneLog_id': this.state.fastLaneData && this.state.fastLaneData.fastlaneLog_id ? this.state.fastLaneData.fastlaneLog_id : fastlanelog && fastlanelog.id ? fastlanelog.id : ""
+                    'fastlaneLog_id': this.state.fastlaneLogId ? this.state.fastlaneLogId : fastlanelog && fastlanelog.id ? fastlanelog.id : 0
                 }
             }
             console.log('post_data-----', post_data)
@@ -501,15 +502,16 @@ class TwoWheelerSelectBrand extends Component {
 
             if(res.data.error == false) {
                 this.props.loadingStop();
-                this.setState({fastLaneData: res.data.data, brandView: '0'})
+                this.setState({fastLaneData: res.data.data, brandView: '0', fastlaneLogId: res.data.data.fastlaneLog_id})
             } 
             else {
                 this.props.loadingStop();
-                this.setState({fastLaneData: [], brandView: '1', vehicleDetails: []})
+                this.setState({fastLaneData: [], brandView: '1', vehicleDetails: [], fastlaneLogId: res.data.data.fastlaneLog_id })
             }       
         })
             .catch(err => {
                 this.props.loadingStop();
+                this.setState({fastLaneData: [], brandView: '1', vehicleDetails: [], fastlaneLogId: 0 })
             })
     }
 
@@ -584,6 +586,8 @@ class TwoWheelerSelectBrand extends Component {
                                             <Form>
                                                 <section className="brand">
                                                     <div className="brand-bg">
+                                                    <Row>
+                                                        <div className="col-md-9 col-sm-12">
                                                         <div className="d-flex justify-content-left">
                                                             <div className="brandhead"> 
                                                             <p>Taking 2-Wheeler policy for</p>
@@ -688,7 +692,7 @@ class TwoWheelerSelectBrand extends Component {
                                                             
                                                                 <div className="row formSection">
                                                                     <label className="col-md-4">Enter Vehicle Registration Number:</label>
-                                                                    <div className="col-md-3">
+                                                                    <div className="col-md-4">
                                                                         <Field
                                                                             name="regNumber"
                                                                             type="text"
@@ -730,8 +734,7 @@ class TwoWheelerSelectBrand extends Component {
                                                             }
                                                         </div> : null }
 
-                                                        <Row>
-                                                            <Col sm={12} md={9} className="two-wheeler">
+                                                            <Col sm={12} md={12} className="two-wheeler">
                                                             {brandView == '1' ?
                                                                 <Fragment>
                                                                     <TwoWheelerBrandTable brandList={brandList && brandList.length > 0 ? brandList : []} selectBrandFunc={this.setBrandName} otherBrandFunc={this.getOtherBrands} />
@@ -745,8 +748,11 @@ class TwoWheelerSelectBrand extends Component {
                                                                 </div>
 
                                                             </Col>
+                                                            </div>
+
+                                                            <div className= "col-md-3 col-sm-12">
                                                             {brandView == '1' ?
-                                                            <Col sm={12} md={3}>
+                                                            <Fragment>
                                                                 <div className="regisBox">
                                                                     <div className="d-flex justify-content-between flex-lg-row flex-md-column m-b-25">
 
@@ -777,8 +783,8 @@ class TwoWheelerSelectBrand extends Component {
 
                                                                     </div>
                                                                 </div>
-                                                            </Col> : 
-                                                            <Col sm={12} md={3}>
+                                                            </Fragment> : 
+                                                            <Fragment>
                                                                 <div className="regisBox">
                                                                     <div className="d-flex justify-content-between flex-lg-row flex-md-column m-b-25">
 
@@ -809,7 +815,8 @@ class TwoWheelerSelectBrand extends Component {
 
                                                                     </div>
                                                                 </div>
-                                                                </Col> }
+                                                            </Fragment> }
+                                                            </div>
                                                             
                                                         </Row>
                                                     </div>
