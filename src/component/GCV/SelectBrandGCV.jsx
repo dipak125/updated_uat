@@ -117,10 +117,14 @@ class SelectBrandGCV extends Component {
         const { productId } = this.props.match.params
         const {vehicleDetails} = this.state
         let brandId = vehicleDetails && vehicleDetails.vehiclebrand_id ? vehicleDetails.vehiclebrand_id : ""
+        let encryption = new Encryption();
         return new Promise(resolve => {
-            axios.get(`vehicle/brand-with-image`)
+            axios.get(`gcv/vehicle/brand-with-image`)
                 .then(res => {
-                    let brandList = res && res.data.data.list ? res.data.data.list : []
+                    let decryptResp = JSON.parse(encryption.decrypt(res.data));
+                    console.log('decryptResp', decryptResp)
+
+                    let brandList = res && decryptResp.data.list ? decryptResp.data.list : []
                     this.setState({
                         brandList,
                         otherBrands: false
@@ -134,6 +138,8 @@ class SelectBrandGCV extends Component {
                     }
                 })
                 .catch(err => {
+                    let decryptResp = JSON.parse(encryption.decrypt(err.data));
+                    console.log('decryptErr-- ', decryptResp)
                     // handle error
                     // console.log(error);
                     this.props.loadingStop();
@@ -145,9 +151,13 @@ class SelectBrandGCV extends Component {
     getOtherBrands = () => {
         let policyHolder_id = localStorage.getItem("policyHolder_id") ? localStorage.getItem("policyHolder_id") : 0;
         this.props.loadingStart();
-        axios.get(`vehicle/brand-without-image/${policyHolder_id}`).then(res => {
-            let selectedBrandDetails = res.data && res.data.data ? res.data.data : {};
-            let brandModelList = res.data && res.data.data ? res.data.data.list : [];
+        let encryption = new Encryption();
+        axios.get(`gcv/vehicle/brand-without-image/${policyHolder_id}`).then(res => {
+            let decryptResp = JSON.parse(encryption.decrypt(res.data));
+            console.log('decryptResp', decryptResp)
+
+            let selectedBrandDetails = decryptResp && decryptResp.data ? decryptResp.data : {};
+            let brandModelList = decryptResp && decryptResp.data ? decryptResp.data.list : [];
 
             this.setState({
                 selectedBrandDetails,
@@ -167,6 +177,8 @@ class SelectBrandGCV extends Component {
             this.props.loadingStop();
         })
             .catch(err => {
+                let decryptResp = JSON.parse(encryption.decrypt(err.data));
+                    console.log('decryptErr-- ', decryptResp)
                 // handle error
                // console.log(error);
                 this.props.loadingStop();
@@ -179,7 +191,7 @@ class SelectBrandGCV extends Component {
         let policyHolder_id = localStorage.getItem("policyHolder_refNo") ? localStorage.getItem("policyHolder_refNo") : 0;
         let encryption = new Encryption();
         this.props.loadingStart();
-        axios.get(`policy-holder/motor/${policyHolder_id}`)
+        axios.get(`gcv/policy-holder/details/${policyHolder_id}`)
             .then(res => {
                 let decryptResp = JSON.parse(encryption.decrypt(res.data));
                 console.log("decrypt", decryptResp)
@@ -191,6 +203,8 @@ class SelectBrandGCV extends Component {
                 this.getBrands();
             })
             .catch(err => {
+                let decryptResp = JSON.parse(encryption.decrypt(err.data));
+                console.log('decryptErr-- ', decryptResp)
                 // handle error
                 this.props.loadingStop();
             })
@@ -210,15 +224,6 @@ class SelectBrandGCV extends Component {
         else if(localStorage.getItem('brandEdit') == '2') {
             this.getOtherBrands()
         }
-        
-        // if(otherBrands) {
-        //     this.getOtherBrands()
-        // }
-        // else {
-        //     this.setBrandName(brandId)
-        // }
-        
-        // this.props.history.push(`/Select-brand/${productId}`);
     }
 
     selectVehicle = (productId) => {
@@ -229,10 +234,14 @@ class SelectBrandGCV extends Component {
     setBrandName = (brand_id) => {
         let policyHolder_id = localStorage.getItem("policyHolder_id") ? localStorage.getItem("policyHolder_id") : 0;
         const formData = new FormData();
+        let encryption = new Encryption();
         this.props.loadingStart();
-        axios.get(`vehicle/model-with-varient/${brand_id}/${policyHolder_id}`).then(res => {
-            let selectedBrandDetails = res.data && res.data.data ? res.data.data : {};
-            let brandModelList = res.data && res.data.data.brand_models ? res.data.data.brand_models : [];
+        axios.get(`gcv/vehicle/model-with-varient/${brand_id}/${policyHolder_id}`).then(res => {
+            let decryptResp = JSON.parse(encryption.decrypt(res.data));
+            console.log('decryptResp', decryptResp)
+
+            let selectedBrandDetails = decryptResp && decryptResp.data ? decryptResp.data : {};
+            let brandModelList = decryptResp && decryptResp.data.brand_models ? decryptResp.data.brand_models : [];
 
             this.setState({
                 selectedBrandDetails,
@@ -284,17 +293,21 @@ class SelectBrandGCV extends Component {
         let encryption = new Encryption();
         const post_data = {
             'policy_holder_id': localStorage.getItem('policyHolder_id'),
-            'menumaster_id': 1,
+            'menumaster_id': 4,
             'brand_id': values.selectedBrandId,
             'brand_model_id': values.selectedModelId,
             'model_varient_id': values.selectedVarientId,
             'page_name': `Select-brand/${productId}`
         }
         formData.append('enc_data', encryption.encrypt(JSON.stringify(post_data)))
+        console.log("Post Date---------- ", post_data) 
         this.props.loadingStart();
-        axios.post('insert-brand-model-varient', formData).then(res => {
+        axios.post('gcv/insert-brand-model-varient', formData).then(res => {
             this.props.loadingStop();
-            if (res.data.error == false) {
+            let decryptResp = JSON.parse(encryption.decrypt(res.data))
+            console.log("decrypt", decryptResp)
+
+            if (decryptResp.error == false) {
                 if(this.state.otherBrands) {
                     localStorage.setItem('brandEdit', 2)
                     localStorage.removeItem('newBrandEdit')
@@ -309,7 +322,9 @@ class SelectBrandGCV extends Component {
         })
             .catch(err => {
                 // handle error
-                if(err.status == '422') {
+                let decryptResp = JSON.parse(encryption.decrypt(err.data))
+                console.log("decrypt", decryptResp)
+                if (err.status == '422') {
                     swal("Please select vehicle model")
                 }
                 this.props.loadingStop();

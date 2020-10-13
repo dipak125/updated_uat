@@ -224,7 +224,7 @@ class OtherComprehensiveGCV extends Component {
         let policyHolder_id = localStorage.getItem("policyHolder_refNo") ? localStorage.getItem("policyHolder_refNo") : 0;
         let encryption = new Encryption();
         this.props.loadingStart();
-        axios.get(`policy-holder/motor/${policyHolder_id}`)
+        axios.get(`gcv/policy-holder/details/${policyHolder_id}`)
             .then(res => {
                 let decryptResp = JSON.parse(encryption.decrypt(res.data))
                 console.log("decrypt--fetchData-- ", decryptResp)
@@ -271,11 +271,14 @@ class OtherComprehensiveGCV extends Component {
 
     getMoreCoverage = () => {
         this.props.loadingStart();
+        let encryption = new Encryption();
         axios
-          .get(`/coverage-list/${localStorage.getItem('policyHolder_id')}`)
+          .get(`gcv/coverage-list/${localStorage.getItem('policyHolder_id')}`)
           .then((res) => {
+            let decryptResp = JSON.parse(encryption.decrypt(res.data))
+            console.log("decrypt--getMoreCoverage-- ", decryptResp)
             this.setState({
-            moreCoverage: res.data.data,
+            moreCoverage: decryptResp.data,
             });
             this.fetchData()
           })
@@ -455,7 +458,7 @@ class OtherComprehensiveGCV extends Component {
         if(add_more_coverage.length > 0){
             post_data = {
                 'policy_holder_id': localStorage.getItem('policyHolder_id'),
-                'menumaster_id': 1,
+                'menumaster_id': 4,
                 'registration_no': motorInsurance.registration_no ? motorInsurance.registration_no : values.registration_no,
                 'chasis_no': values.chasis_no,
                 'chasis_no_last_part': values.chasis_no_last_part,
@@ -494,9 +497,11 @@ class OtherComprehensiveGCV extends Component {
 
         formData.append('enc_data', encryption.encrypt(JSON.stringify(post_data)))
         this.props.loadingStart();
-        axios.post('update-insured-value', formData).then(res => {
+        axios.post('gcv/update-insured-value', formData).then(res => {
             this.props.loadingStop();
-            if (res.data.error == false) {
+            let decryptResp = JSON.parse(encryption.decrypt(res.data))
+            console.log("decrypt--fetchData-- ", decryptResp)
+            if (decryptResp.error == false) {
                 this.props.history.push(`/AdditionalDetails_GCV/${productId}`);
             }
 
@@ -527,7 +532,23 @@ class OtherComprehensiveGCV extends Component {
             if(values == "B00015") {
                 setFieldTouched("PA_cover_flag");
                 setFieldValue("PA_cover_flag", '1');
-            }            
+            }  
+            if(values == "B00007") {
+                setFieldTouched("trailer_flag");
+                setFieldValue("trailer_flag", '1');
+            }     
+            if(values == "B00073") {
+                setFieldTouched("pa_coolie_flag");
+                setFieldValue("pa_coolie_flag", '1');
+            }     
+            if(values == "B00003") {
+                setFieldTouched("electric_flag");
+                setFieldValue("electric_flag", '1');
+            }
+            if(values == "B00004") {
+                setFieldTouched("nonElectric_flag");
+                setFieldValue("nonElectric_flag", '1');
+            }
         }
         else {
             const index = add_more_coverage.indexOf(values);
@@ -548,7 +569,23 @@ class OtherComprehensiveGCV extends Component {
             if(values == "B00015") {
                 setFieldTouched("PA_cover_flag");
                 setFieldValue("PA_cover_flag", '0');
-            }       
+            }      
+            if(values == "B00007") {
+                setFieldTouched("trailer_flag");
+                setFieldValue("trailer_flag", '0');
+            } 
+            if(values == "B00073") {
+                setFieldTouched("pa_coolie_flag");
+                setFieldValue("pa_coolie_flag", '0');
+            }
+            if(values == "B00003") {
+                setFieldTouched("electric_flag");
+                setFieldValue("electric_flag", '0');
+            }
+            if(values == "B00004") {
+                setFieldTouched("nonElectric_flag");
+                setFieldValue("nonElectric_flag", '0');
+            }
         }
         
     }
@@ -618,6 +655,10 @@ class OtherComprehensiveGCV extends Component {
                 PA_Cover: "",
                 PA_cover_flag: "1",
                 PA_flag: '0',
+                trailer_flag: '0',
+                pa_coolie_flag: '0',
+                electric_flag: '0',
+                nonElectric_flag: '0'
 
             });
         }
@@ -632,19 +673,29 @@ class OtherComprehensiveGCV extends Component {
                     newRegistrationNo: localStorage.getItem('registration_number') == "NEW" ? localStorage.getItem('registration_number') : "", 
                     PA_flag: '0',
                     PA_Cover: "",
-                    PA_cover_flag: motorInsurance && motorInsurance.pa_flag ? motorInsurance.pa_flag : '0'
+                    PA_cover_flag: motorInsurance && motorInsurance.pa_flag ? motorInsurance.pa_flag : '0',
+                    trailer_flag: '0',
+                    pa_coolie_flag: '0',
+                    electric_flag: '0',
+                    nonElectric_flag: '0'
                 });
         }
 
        
+// For setting up updated value from database----------
 
         for (var i = 0 ; i < covList.length; i++) {
             newInnitialArray[covList[i]] = covList[i];
         }    
         newInnitialArray.PA_flag = PA_flag   
+        newInnitialArray.trailer_flag = '0'
+        newInnitialArray.pa_coolie_flag = '0'
+        newInnitialArray.electric_flag = '0'
+        newInnitialArray.nonElectric_flag = '0'
         newInnitialArray.PA_Cover = PA_Cover
         newInitialValues = Object.assign(initialValue, newInnitialArray );
 
+// -------------------------------------------------------
 
         let OD_TP_premium = serverResponse.PolicyLobList ? serverResponse.PolicyLobList[0].PolicyRiskList[0] : []
 
@@ -939,88 +990,6 @@ console.log("errors---- ", errors)
                                 : null}
                             </Row>
 
-                                                            
-
-                            {/* <Row>
-                                <Col sm={12} md={5} lg={5}>
-                                    <FormGroup>
-                                        <div className="insurerName">
-                                            <span className="fs-16"> Have you fitted external CNG Kit</span>
-                                        </div>
-                                    </FormGroup>
-                                </Col>
-                                <Col sm={12} md={3} lg={3}>
-                                    <FormGroup>
-                                        <div className="d-inline-flex m-b-35">
-                                            <div className="p-r-25">
-                                                <label className="customRadio3">
-                                                <Field
-                                                    type="radio"
-                                                    name='cng_kit'                                            
-                                                    value='1'
-                                                    key='1'  
-                                                    onChange={(e) => {
-                                                        setFieldValue(`cng_kit`, e.target.value);
-                                                        this.showCNGText(1);
-                                                    }}
-                                                    checked={values.cng_kit == '1' ? true : false}
-                                                />
-                                                    <span className="checkmark " /><span className="fs-14"> Yes</span>
-                                                </label>
-                                            </div>
-
-                                            <div className="">
-                                                <label className="customRadio3">
-                                                <Field
-                                                    type="radio"
-                                                    name='cng_kit'                                            
-                                                    value='0'
-                                                    key='1'  
-                                                    onChange={(e) => {
-                                                        setFieldValue(`cng_kit`, e.target.value);
-                                                        this.showCNGText(0);
-                                                    }}
-                                                    checked={values.cng_kit == '0' ? true : false}
-                                                />
-                                                    <span className="checkmark" />
-                                                    <span className="fs-14">No</span>      
-                                                </label>
-                                                {errors.cng_kit && touched.cng_kit ? (
-                                                <span className="errorMsg">{errors.cng_kit}</span>
-                                                ) : null}
-                                            </div>
-                                        </div>
-                                    </FormGroup>
-                                </Col>
-                                {showCNG || is_CNG_account == 1 ?
-                                <Col sm={12} md={12} lg={4}>
-                                    <FormGroup>
-                                    <div className="insurerName">   
-                                        <Field
-                                            name="cngKit_Cost"
-                                            type="text"
-                                            placeholder="Cost of Kit"
-                                            autoComplete="off"
-                                            className="W-80"
-                                            value = {values.cngKit_Cost}
-                                            onFocus={e => this.changePlaceHoldClassAdd(e)}
-                                            onBlur={e => this.changePlaceHoldClassRemove(e)}
-                                            onChange={e => {
-                                                setFieldTouched('cngKit_Cost');
-                                                setFieldValue('cngKit_Cost', e.target.value);
-                                                this.handleChange()
-
-                                            }}
-                                        />
-                                        {errors.cngKit_Cost && touched.cngKit_Cost ? (
-                                        <span className="errorMsg">{errors.cngKit_Cost}</span>
-                                        ) : null}                                             
-                                        </div>
-                                    </FormGroup>
-                                </Col> : ''}
-                            </Row>
-                                */}
-
                             <Row>
                                 <Col sm={12} md={12} lg={12}>
                                     <FormGroup>
@@ -1085,6 +1054,219 @@ console.log("errors---- ", errors)
                                             </FormGroup>
                                         </Col> : null
                                     }
+                                     {values.trailer_flag == '1' && values[coverage.code] == 'B00007' ?
+                                     <Fragment>
+                                        <Col sm={12} md={11} lg={2} key={qIndex+"b"}>
+                                            <FormGroup>
+                                                <div className="formSection">
+                                                    <Field
+                                                        name="previous_policy_no"
+                                                        type="text"
+                                                        placeholder="Trailer IDV"
+                                                        autoComplete="off"
+                                                        maxLength="28"
+                                                        onFocus={e => this.changePlaceHoldClassAdd(e)}
+                                                        onBlur={e => this.changePlaceHoldClassRemove(e)}
+                                                        onChange={(e) => {
+                                                            setFieldTouched('PA_Cover')
+                                                            setFieldValue('PA_Cover', e.target.value);
+                                                            this.handleChange()
+                                                        }}
+                                                    >                                     
+                                                    </Field>
+                                                    {errors.PA_Cover ? (
+                                                        <span className="errorMsg">{errors.PA_Cover}</span>
+                                                    ) : null}
+                                                </div>
+                                            </FormGroup>
+                                        </Col>
+                                        <Col sm={12} md={11} lg={2} key={qIndex+"b"}>
+                                            <FormGroup>
+                                                <div className="formSection">
+                                                    <Field
+                                                        name='PA_Cover'
+                                                        component="select"
+                                                        autoComplete="off"
+                                                        className="formGrp inputfs12"
+                                                        value = {values.PA_Cover}
+                                                        onChange={(e) => {
+                                                            setFieldTouched('PA_Cover')
+                                                            setFieldValue('PA_Cover', e.target.value);
+                                                            this.handleChange()
+                                                        }}
+                                                    >
+                                                        <option value="">No of Trailer</option>
+                                                        <option value="50000">50000</option>
+                                                        <option value="100000">100000</option>  
+                                            
+                                                    </Field>
+                                                    {errors.PA_Cover ? (
+                                                        <span className="errorMsg">{errors.PA_Cover}</span>
+                                                    ) : null}
+                                                </div>
+                                            </FormGroup>
+                                        </Col> </Fragment> : null
+                                    }
+                                    {values.pa_coolie_flag == '1' && values[coverage.code] == 'B00073' ?
+                                     <Fragment>
+                                        <Col sm={12} md={11} lg={2} key={qIndex+"b"}>
+                                            <FormGroup>
+                                                <div className="formSection">
+                                                    <Field
+                                                        name="previous_policy_no"
+                                                        type="text"
+                                                        placeholder="Trailer IDV"
+                                                        autoComplete="off"
+                                                        maxLength="28"
+                                                        onFocus={e => this.changePlaceHoldClassAdd(e)}
+                                                        onBlur={e => this.changePlaceHoldClassRemove(e)}
+                                                        onChange={(e) => {
+                                                            setFieldTouched('PA_Cover')
+                                                            setFieldValue('PA_Cover', e.target.value);
+                                                            this.handleChange()
+                                                        }}
+                                                    >                                     
+                                                    </Field>
+                                                    {errors.PA_Cover ? (
+                                                        <span className="errorMsg">{errors.PA_Cover}</span>
+                                                    ) : null}
+                                                </div>
+                                            </FormGroup>
+                                        </Col>
+                                        <Col sm={12} md={11} lg={2} key={qIndex+"b"}>
+                                            <FormGroup>
+                                                <div className="formSection">
+                                                    <Field
+                                                        name='PA_Cover'
+                                                        component="select"
+                                                        autoComplete="off"
+                                                        className="formGrp inputfs12"
+                                                        value = {values.PA_Cover}
+                                                        onChange={(e) => {
+                                                            setFieldTouched('PA_Cover')
+                                                            setFieldValue('PA_Cover', e.target.value);
+                                                            this.handleChange()
+                                                        }}
+                                                    >
+                                                        <option value="">No of Trailer</option>
+                                                        <option value="50000">50000</option>
+                                                        <option value="100000">100000</option>  
+                                            
+                                                    </Field>
+                                                    {errors.PA_Cover ? (
+                                                        <span className="errorMsg">{errors.PA_Cover}</span>
+                                                    ) : null}
+                                                </div>
+                                            </FormGroup>
+                                        </Col> </Fragment> : null
+                                    }
+                                    {values.electric_flag == '1' && values[coverage.code] == 'B00003' ?
+                                     <Fragment>
+                                        <Col sm={12} md={11} lg={2} key={qIndex+"b"}>
+                                            <FormGroup>
+                                                <div className="formSection">
+                                                    <Field
+                                                        name="previous_policy_no"
+                                                        type="text"
+                                                        placeholder="Trailer IDV"
+                                                        autoComplete="off"
+                                                        maxLength="28"
+                                                        onFocus={e => this.changePlaceHoldClassAdd(e)}
+                                                        onBlur={e => this.changePlaceHoldClassRemove(e)}
+                                                        onChange={(e) => {
+                                                            setFieldTouched('PA_Cover')
+                                                            setFieldValue('PA_Cover', e.target.value);
+                                                            this.handleChange()
+                                                        }}
+                                                    >                                     
+                                                    </Field>
+                                                    {errors.PA_Cover ? (
+                                                        <span className="errorMsg">{errors.PA_Cover}</span>
+                                                    ) : null}
+                                                </div>
+                                            </FormGroup>
+                                        </Col>
+                                        <Col sm={12} md={11} lg={2} key={qIndex+"b"}>
+                                            <FormGroup>
+                                                <div className="formSection">
+                                                    <Field
+                                                        name='PA_Cover'
+                                                        component="select"
+                                                        autoComplete="off"
+                                                        className="formGrp inputfs12"
+                                                        value = {values.PA_Cover}
+                                                        onChange={(e) => {
+                                                            setFieldTouched('PA_Cover')
+                                                            setFieldValue('PA_Cover', e.target.value);
+                                                            this.handleChange()
+                                                        }}
+                                                    >
+                                                        <option value="">No of Trailer</option>
+                                                        <option value="50000">50000</option>
+                                                        <option value="100000">100000</option>  
+                                            
+                                                    </Field>
+                                                    {errors.PA_Cover ? (
+                                                        <span className="errorMsg">{errors.PA_Cover}</span>
+                                                    ) : null}
+                                                </div>
+                                            </FormGroup>
+                                        </Col> </Fragment> : null
+                                    }
+                                    {values.nonElectric_flag == '1' && values[coverage.code] == 'B00004' ?
+                                     <Fragment>
+                                        <Col sm={12} md={11} lg={2} key={qIndex+"b"}>
+                                            <FormGroup>
+                                                <div className="formSection">
+                                                    <Field
+                                                        name="previous_policy_no"
+                                                        type="text"
+                                                        placeholder="Trailer IDV"
+                                                        autoComplete="off"
+                                                        maxLength="28"
+                                                        onFocus={e => this.changePlaceHoldClassAdd(e)}
+                                                        onBlur={e => this.changePlaceHoldClassRemove(e)}
+                                                        onChange={(e) => {
+                                                            setFieldTouched('PA_Cover')
+                                                            setFieldValue('PA_Cover', e.target.value);
+                                                            this.handleChange()
+                                                        }}
+                                                    >                                     
+                                                    </Field>
+                                                    {errors.PA_Cover ? (
+                                                        <span className="errorMsg">{errors.PA_Cover}</span>
+                                                    ) : null}
+                                                </div>
+                                            </FormGroup>
+                                        </Col>
+                                        <Col sm={12} md={11} lg={2} key={qIndex+"b"}>
+                                            <FormGroup>
+                                                <div className="formSection">
+                                                    <Field
+                                                        name='PA_Cover'
+                                                        component="select"
+                                                        autoComplete="off"
+                                                        className="formGrp inputfs12"
+                                                        value = {values.PA_Cover}
+                                                        onChange={(e) => {
+                                                            setFieldTouched('PA_Cover')
+                                                            setFieldValue('PA_Cover', e.target.value);
+                                                            this.handleChange()
+                                                        }}
+                                                    >
+                                                        <option value="">No of Trailer</option>
+                                                        <option value="50000">50000</option>
+                                                        <option value="100000">100000</option>  
+                                            
+                                                    </Field>
+                                                    {errors.PA_Cover ? (
+                                                        <span className="errorMsg">{errors.PA_Cover}</span>
+                                                    ) : null}
+                                                </div>
+                                            </FormGroup>
+                                        </Col> </Fragment> : null
+                                    }
+                                    
                                 </Row>
                                 )) : null}
                                 

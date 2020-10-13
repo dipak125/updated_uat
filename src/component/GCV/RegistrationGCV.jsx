@@ -37,6 +37,8 @@ const vehicleRegistrationValidation = Yup.object().shape({
             return true;
         }
     ),
+    policy_type: Yup.string().required("Please enter policy type"),
+    policy_for: Yup.string().required("Please select policy for indivudal or corporate"),
    
 // });
 
@@ -62,7 +64,9 @@ class RegistrationGCV extends Component {
     state = {
         motorInsurance:'',
         regno:'',
-        length:14
+        length:14,
+        fastLaneData: [],
+        fastlanelog: []
     }
    
 
@@ -90,7 +94,7 @@ fetchData=()=>{
     let policyHolder_id = localStorage.getItem("policyHolder_refNo") ? localStorage.getItem("policyHolder_refNo"):0;
     let encryption = new Encryption();
     this.props.loadingStart();
-    axios.get(`policy-holder/motor/${policyHolder_id}`)
+    axios.get(`gcv/policy-holder/details/${policyHolder_id}`)
         .then(res=>{
             let decryptResp = JSON.parse(encryption.decrypt(res.data))
             console.log("decrypt", decryptResp)
@@ -113,6 +117,7 @@ fetchData=()=>{
 
         const formData = new FormData();
         let encryption = new Encryption();
+        const {fastLaneData, fastlanelog } = this.state
         let post_data = {}
         let policyHolder_id = localStorage.getItem('policyHolder_id') ? localStorage.getItem('policyHolder_id') :0
 
@@ -127,13 +132,16 @@ fetchData=()=>{
                     'policy_holder_id': policyHolder_id,
                     'registration_no':values.regNumber,
                     'check_registration': values.check_registration,
-                    'menumaster_id':1,
+                    'menumaster_id':4,
                     'vehicle_type_id':productId,
                     'csc_id':sessionStorage.getItem('csc_id') ? sessionStorage.getItem('csc_id') : "",
                     'agent_name':sessionStorage.getItem('agent_name') ? sessionStorage.getItem('agent_name') : "",
                     'product_id':sessionStorage.getItem('product_id') ? sessionStorage.getItem('product_id') : "",
                     'bc_token': "5",
-                    'page_name': `Registration/${productId}`
+                    'page_name': `Registration/${productId}`,
+                    'policy_type_id':values.policy_type,
+                    'policy_for': values.policy_for,
+                    'fastlaneLog_id': this.state.fastLaneData && this.state.fastLaneData.fastlaneLog_id ? this.state.fastLaneData.fastlaneLog_id : fastlanelog && fastlanelog.id ? fastlanelog.id : ""
                 } 
             }
             else {
@@ -141,12 +149,15 @@ fetchData=()=>{
                     'policy_holder_id': policyHolder_id,
                     'registration_no':values.regNumber,
                     'check_registration': values.check_registration,
-                    'menumaster_id':1,
+                    'menumaster_id':4,
                     'vehicle_type_id':productId,
                     'bcmaster_id': bc_data ? bc_data.agent_id : "",
                     'bc_token': bc_data ? bc_data.token : "",
                     'bc_agent_id': bc_data ? bc_data.user_info.data.user.username : "",
-                    'page_name': `Registration/${productId}`
+                    'page_name': `Registration/${productId}`,
+                    'policy_type_id':values.policy_type,
+                    'policy_for': values.policy_for,
+                    'fastlaneLog_id': this.state.fastLaneData && this.state.fastLaneData.fastlaneLog_id ? this.state.fastLaneData.fastlaneLog_id : fastlanelog && fastlanelog.id ? fastlanelog.id : ""
                 } 
             }
 
@@ -155,21 +166,26 @@ fetchData=()=>{
       
             this.props.loadingStart();
             axios
-            .post(`/update-registration`, formData)
+            .post(`gcv/update-registration`, formData)
             .then(res => {
-                if(res.data.error == false) {
+                let decryptResp = JSON.parse(encryption.decrypt(res.data))
+                console.log("decrypt", decryptResp)
+
+                if(decryptResp.error == false) {
                     this.props.history.push(`/SelectBrand_GCV/${productId}`);
                 }
                 else{
-                    swal(res.data.msg)
+                    swal(decryptResp.msg)
                 }   
                 this.props.loadingStop();
                     
             })
             .catch(err => {
-            if(err && err.data){
-                swal('Registratioon number required...');
-            }
+                let decryptErr = JSON.parse(encryption.decrypt(err.data));
+                console.log('decryptResp--err---', decryptErr)
+                if(decryptErr && err.data){
+                    swal('Registration number required...');
+                }
             this.props.loadingStop();
             });
         }
@@ -178,40 +194,49 @@ fetchData=()=>{
                 post_data = {
                     'registration_no':values.regNumber,
                     'check_registration': values.check_registration,
-                    'menumaster_id':1,
+                    'menumaster_id':4,
                     'vehicle_type_id':productId,
                     'csc_id':sessionStorage.getItem('csc_id') ? sessionStorage.getItem('csc_id') : "",
                     'agent_name':sessionStorage.getItem('agent_name') ? sessionStorage.getItem('agent_name') : "",
                     'product_id':sessionStorage.getItem('product_id') ? sessionStorage.getItem('product_id') : "",
                     'bcmaster_id': "5",
-                    'page_name': `Registration/${productId}`
+                    'page_name': `Registration/${productId}`,
+                    'policy_type_id':values.policy_type,
+                    'policy_for': values.policy_for,
+                    'fastlaneLog_id': this.state.fastLaneData && this.state.fastLaneData.fastlaneLog_id ? this.state.fastLaneData.fastlaneLog_id : fastlanelog && fastlanelog.id ? fastlanelog.id : ""
                 } 
             }
             else {
                 post_data = {
                     'registration_no':values.regNumber,
                     'check_registration': values.check_registration,
-                    'menumaster_id':1,
+                    'menumaster_id':4,
                     'vehicle_type_id':productId,
                     'bcmaster_id': bc_data ? bc_data.agent_id : "",
                     'bc_token': bc_data ? bc_data.token : "",
                     'bc_agent_id': bc_data ? bc_data.user_info.data.user.username : "",
-                    'page_name': `Registration/${productId}`
+                    'page_name': `Registration/${productId}`,
+                    'policy_type_id':values.policy_type,
+                    'policy_for': values.policy_for,
+                    'fastlaneLog_id': this.state.fastLaneData && this.state.fastLaneData.fastlaneLog_id ? this.state.fastLaneData.fastlaneLog_id : fastlanelog && fastlanelog.id ? fastlanelog.id : ""
                 } 
             }
             console.log('post_data', post_data)
             formData.append('enc_data',encryption.encrypt(JSON.stringify(post_data)))
             this.props.loadingStart();
             axios
-            .post(`/registration`, formData)
+            .post(`gcv/registration`, formData)
             .then(res => {
-                if(res.data.error == false) {
-                    localStorage.setItem('policyHolder_id', res.data.data.policyHolder_id);
-                    localStorage.setItem('policyHolder_refNo', res.data.data.policyHolder_refNo);
+                let decryptResp = JSON.parse(encryption.decrypt(res.data))
+                console.log("decrypt", decryptResp)
+
+                if(decryptResp.error == false) {
+                    localStorage.setItem('policyHolder_id', decryptResp.data.policyHolder_id);
+                    localStorage.setItem('policyHolder_refNo', decryptResp.data.policyHolder_refNo);
                     this.props.history.push(`/SelectBrand_GCV/${productId}`); 
                 }   
                 else{
-                    swal(res.data.msg)
+                    swal(decryptResp.msg)
                 }
                 this.props.loadingStop();                    
             })
@@ -274,7 +299,9 @@ fetchData=()=>{
     render() {
         const {motorInsurance} = this.state
         const newInitialValues = Object.assign(initialValues,{
-            regNumber: motorInsurance ? motorInsurance.registration_no:'' 
+            regNumber: motorInsurance && motorInsurance.registration_no ? motorInsurance.registration_no : "",
+            policy_type: motorInsurance && motorInsurance.policytype_id ? motorInsurance.policytype_id : "",
+            policy_for: motorInsurance && motorInsurance.policy_for ? motorInsurance.policy_for : "",
         })
 
         return (

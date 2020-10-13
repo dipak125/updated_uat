@@ -384,12 +384,12 @@ class VehicleDetailsGCV extends Component {
     this.setState({
       selectedCustomerRecords: suggestion
     });
-    return suggestion.RTO_LOCATION;
+    return suggestion.RTO_LOCATION+" - "+suggestion.RTO_Cluster;
   }
   
    renderCustomerIDSuggestion(suggestion) {
     return (
-      <span>{suggestion.RTO_LOCATION}</span>
+        <span>{suggestion.RTO_LOCATION+" - "+suggestion.RTO_Cluster}</span>
     );
   }
   //--------------------------------------------------------
@@ -408,7 +408,7 @@ class VehicleDetailsGCV extends Component {
         if(ageObj.whatIsCurrentMonth(values.registration_date) > 0 && values.previous_policy_name == '1' ) {
             post_data = {
                 'policy_holder_id':localStorage.getItem('policyHolder_id'),
-                'menumaster_id':1,
+                'menumaster_id':4,
                 'registration_date':moment(values.registration_date).format("YYYY-MM-DD"),
                 'location_id':values.location_id,
                 'previous_start_date':moment(values.previous_start_date).format("YYYY-MM-DD"),
@@ -430,7 +430,7 @@ class VehicleDetailsGCV extends Component {
         else if(ageObj.whatIsCurrentMonth(values.registration_date) > 0 && values.previous_policy_name == '2') {
             post_data = {
                 'policy_holder_id':localStorage.getItem('policyHolder_id'),
-                'menumaster_id':1,
+                'menumaster_id':4,
                 'registration_date':moment(values.registration_date).format("YYYY-MM-DD"),
                 'location_id':values.location_id,
                 'previous_start_date':moment(values.previous_start_date).format("YYYY-MM-DD"),
@@ -450,7 +450,7 @@ class VehicleDetailsGCV extends Component {
         else if(ageObj.whatIsCurrentMonth(values.registration_date) <= 0)  {
             post_data = {
                 'policy_holder_id':localStorage.getItem('policyHolder_id'),
-                'menumaster_id':1,
+                'menumaster_id':4,
                 'registration_date':moment(values.registration_date).format("YYYY-MM-DD"),
                 'location_id':values.location_id,    
                 'previous_is_claim':'0', 
@@ -472,10 +472,13 @@ class VehicleDetailsGCV extends Component {
         formData.append('enc_data',encryption.encrypt(JSON.stringify(post_data)))
         this.props.loadingStart();
         axios
-        .post(`/insert-vehicle-details`, formData)
+        .post(`gcv/insert-vehicle-details`, formData)
         .then(res => { 
+            let decryptResp = JSON.parse(encryption.decrypt(res.data))
+            console.log("decrypt", decryptResp)
+
             this.props.loadingStop();
-            if(res.data.error == false){
+            if(decryptResp.error == false){
                 this.props.history.push(`/OtherComprehensive_GCV/${productId}`);
             }
             else{
@@ -485,6 +488,8 @@ class VehicleDetailsGCV extends Component {
         })
         .catch(err => {
           this.props.loadingStop();
+          let decryptResp = JSON.parse(encryption.decrypt(err.data))
+            console.log("decrypt", decryptResp)
           actions.setSubmitting(false)
         });
     }
@@ -526,7 +531,7 @@ class VehicleDetailsGCV extends Component {
         let policyHolder_id = localStorage.getItem("policyHolder_refNo") ? localStorage.getItem("policyHolder_refNo") : 0;
         let encryption = new Encryption();
         this.props.loadingStart();
-        axios.get(`policy-holder/motor/${policyHolder_id}`)
+        axios.get(`gcv/policy-holder/details/${policyHolder_id}`)
             .then(res => {
                  let decryptResp = JSON.parse(encryption.decrypt(res.data))
                  console.log("decrypt", decryptResp)
@@ -616,7 +621,68 @@ class VehicleDetailsGCV extends Component {
                                     <Form>
                                         <Row>
                                             <Col sm={12} md={9} lg={9}>
-
+                                                <Row>
+                                                    <Col sm={12} md={6} lg={6}>
+                                                        <FormGroup>
+                                                            <div className="fs-18">
+                                                                Branch Name
+                                                            </div>
+                                                        </FormGroup>
+                                                    </Col>
+                                                    <Col sm={12} md={11} lg={4}>
+                                                        <FormGroup>
+                                                            <div className="formSection">
+                                                                <Field
+                                                                    name='branch_name'
+                                                                    component="select"
+                                                                    autoComplete="off"
+                                                                    className="formGrp inputfs12"
+                                                                    value = {values.branch_name}
+                                                                    // value={ageObj.whatIsCurrentMonth(values.registration_date) < 7 ? 6 : values.previous_policy_name}
+                                                                >
+                                                                    <option value="">Select Branch Name</option>
+                                                                    <option value="1">Package</option>
+                                                                    <option value="2">Liability Only</option>  
+                                                        
+                                                                </Field>
+                                                                {errors.branch_name && touched.branch_name ? (
+                                                                    <span className="errorMsg">{errors.branch_name}</span>
+                                                                ) : null}
+                                                            </div>
+                                                        </FormGroup>
+                                                    </Col>
+                                                </Row>
+                                                <Row>
+                                                    <Col sm={12} md={6} lg={6}>
+                                                        <FormGroup>
+                                                            <div className="fs-18">
+                                                                Sub Product
+                                                            </div>
+                                                        </FormGroup>
+                                                    </Col>
+                                                    <Col sm={12} md={11} lg={4}>
+                                                        <FormGroup>
+                                                            <div className="formSection">
+                                                                <Field
+                                                                    name='sub_product'
+                                                                    component="select"
+                                                                    autoComplete="off"
+                                                                    className="formGrp inputfs12"
+                                                                    value = {values.sub_product}
+                                                                    // value={ageObj.whatIsCurrentMonth(values.registration_date) < 7 ? 6 : values.previous_policy_name}
+                                                                >
+                                                                    <option value="">Select Sub Product</option>
+                                                                    <option value="1">Package</option>
+                                                                    <option value="2">Liability Only</option>  
+                                                        
+                                                                </Field>
+                                                                {errors.sub_product && touched.sub_product ? (
+                                                                    <span className="errorMsg">{errors.sub_product}</span>
+                                                                ) : null}
+                                                            </div>
+                                                        </FormGroup>
+                                                    </Col>
+                                                </Row>
                                                 <Row>
                                                     <Col sm={12} md={6} lg={6}>
                                                         <FormGroup>
@@ -990,48 +1056,41 @@ class VehicleDetailsGCV extends Component {
                                             </Col>
 
                                             <Col sm={12} md={3}>
-                                                <div className="vehbox">
-                                                    <Row className="m-b-25">
-                                                        <Col sm={12} md={7}>
-                                                            <div className="txtRegistr">Registration No.<br />
+                                                <div className="regisBox">
+                                                    <div className="d-flex justify-content-between flex-lg-row flex-md-column m-b-25">
+
+                                                        <div className="txtRegistr resmb-15">Registration No.<br />
                                                             {motorInsurance && motorInsurance.registration_no}</div>
-                                                        </Col>
 
-                                                        <Col sm={12} md={5} className="text-right">
-                                                            <button className="rgistrBtn" onClick={this.registration.bind(this, productId)}>Edit</button>
-                                                        </Col>
-                                                    </Row>
+                                                        <div> <button type="button" className="rgistrBtn" onClick={this.registration.bind(this, productId)}>Edit</button></div>
+                                                    </div>
 
-                                                    <Row className="m-b-25">
-                                                        <Col sm={12} md={7}>
-                                                            <div className="txtRegistr">Car Brand<br/>
-                                                                <strong>{vehicleDetails && vehicleDetails.vehiclebrand && vehicleDetails.vehiclebrand.name ? vehicleDetails.vehiclebrand.name : ""}</strong></div>
-                                                        </Col>
 
-                                                        <Col sm={12} md={5} className="text-right">
-                                                            <button className="rgistrBtn" onClick= {this.selectBrand.bind(this,productId)}>Edit</button>
-                                                        </Col>
-                                                    </Row>
 
-                                                    <Row className="m-b-25">
-                                                        <Col sm={12} md={7}>
-                                                            <div className="txtRegistr">Car Model<br/>
-                                                                <strong>{vehicleDetails && vehicleDetails.vehiclemodel && vehicleDetails.vehiclemodel.description ? vehicleDetails.vehiclemodel.description+" "+vehicleDetails.varientmodel.varient : ""}</strong></div>
-                                                        </Col>
+                                                    <div className="d-flex justify-content-between flex-lg-row flex-md-column m-b-25">
+                                                        <div className="txtRegistr resmb-15">GCV Brand
+                                                            - <strong>{vehicleDetails && vehicleDetails.vehiclebrand && vehicleDetails.vehiclebrand.name ? vehicleDetails.vehiclebrand.name : ""}</strong>
+                                                        </div>
 
-                                                        <Col sm={12} md={5} className="text-right">
-                                                            <button className="rgistrBtn" onClick= {this.selectVehicleBrand.bind(this,productId)}>Edit</button>
-                                                        </Col>
-                                                    </Row>
+                                                        <div> <button type="button" className="rgistrBtn" onClick={this.selectBrand.bind(this, productId)}>Edit</button></div>
+                                                    </div>
 
-                                                    <Row className="m-b-25">
-                                                        <Col sm={12} md={7}>
-                                                            <div className="txtRegistr">Fuel Type<br/>
-                                                                <strong>{vehicleDetails && vehicleDetails.varientmodel && vehicleDetails.varientmodel.fuel_type ? fuel[vehicleDetails.varientmodel.fuel_type] : null} </strong></div>
-                                                        </Col>
-                                                    </Row>
+                                                    <div className="d-flex justify-content-between flex-lg-row flex-md-column m-b-25">
+                                                        <div className="txtRegistr">GCV Model<br />
+                                                        <strong>{vehicleDetails && vehicleDetails.vehiclemodel && vehicleDetails.vehiclemodel.description ? vehicleDetails.vehiclemodel.description+" "+vehicleDetails.varientmodel.varient : ""}</strong></div>
+
+                                                        <div> <button type="button" className="rgistrBtn" onClick={this.selectVehicleBrand.bind(this, productId)}>Edit</button></div>
+                                                    </div>
+
+                                                    <div className="d-flex justify-content-between flex-lg-row flex-md-column m-b-25">
+                                                        <div className="txtRegistr">Fuel Type<br />
+                                                        <strong>{vehicleDetails && vehicleDetails.varientmodel && vehicleDetails.varientmodel.fuel_type ? fuel[vehicleDetails.varientmodel.fuel_type] : null} </strong></div>
+
+                                                    </div>
                                                 </div>
                                             </Col>
+
+
                                         </Row>
                                     </Form>
                                 );

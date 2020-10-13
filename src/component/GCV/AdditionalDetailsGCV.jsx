@@ -260,7 +260,7 @@ class AdditionalDetailsGCV extends Component {
         let encryption = new Encryption();
         const post_data = {
             'policy_holder_id':localStorage.getItem('policyHolder_id'),
-            'menumaster_id':1,
+            'menumaster_id':4,
             'first_name':values['first_name'],
             'last_name':values['last_name'],
             'gender':values['gender'],
@@ -284,17 +284,23 @@ class AdditionalDetailsGCV extends Component {
             'address': values['address'],
             'page_name': `Additional_details/${productId}`,
         }
-console.log('post_data', post_data);
+        console.log('post_data', post_data);
         formData.append('enc_data',encryption.encrypt(JSON.stringify(post_data)))
         this.props.loadingStart();
         axios
-        .post(`/owner-details`, formData)
+        .post(`gcv/owner-details`, formData)
         .then(res => { 
-            // this.props.loadingStop();
+            let decryptResp = JSON.parse(encryption.decrypt(res.data))
+            console.log("decrypt", decryptResp)
+            this.props.loadingStop();
+            if (decryptResp.error == false) {
             this.props.history.push(`/Premium_GCV/${productId}`);
+            }
         })
         .catch(err => { 
           this.props.loadingStop();
+          let decryptResp = JSON.parse(encryption.decrypt(err.data))
+          console.log("decrypt", decryptResp)
           actions.setSubmitting(false)
         });
 
@@ -305,7 +311,7 @@ console.log('post_data', post_data);
         let policyHolder_id = localStorage.getItem("policyHolder_refNo") ? localStorage.getItem("policyHolder_refNo") : 0;
         let encryption = new Encryption();
         this.props.loadingStart();
-        axios.get(`policy-holder/motor/${policyHolder_id}`)
+        axios.get(`gcv/policy-holder/details/${policyHolder_id}`)
             .then(res => {
                  let decryptResp = JSON.parse(encryption.decrypt(res.data))
                  console.log("decrypt", decryptResp)

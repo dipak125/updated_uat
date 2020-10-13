@@ -178,7 +178,7 @@ class BreakinList extends Component {
 
                                     <TableHeaderColumn width='200px' dataField='breakin' dataFormat={breakinFormatter} isKey dataSort>choice No</TableHeaderColumn>
                                     <TableHeaderColumn width='100px' dataField="vehiclebrandmodel" dataFormat={productFormatter} >Product</TableHeaderColumn>
-                                    <TableHeaderColumn width='100px' dataField="breakin" dataFormat={(cell) => (cell.created_at !== '0000-00-00 00:00:00' ? moment(cell.created_at).format("DD-MM-YYYY") : '')}>Inspection Date</TableHeaderColumn>
+                                    <TableHeaderColumn width='100px' dataField="breakin" dataFormat={(cell) => (cell && cell.created_at !== '0000-00-00 00:00:00' ? moment(cell.created_at).format("DD-MM-YYYY") : '')}>Inspection Date</TableHeaderColumn>
                                     <TableHeaderColumn width='100px' dataField="request_data" dataFormat={premiumFormatter} >Premium</TableHeaderColumn>
                                     {/* <TableHeaderColumn width='200px' dataField="break_in_status"  dataFormat={(cell) => (cell == 1 ? "Approval pending" : "Approved")} >Status</TableHeaderColumn> */}
                                     <TableHeaderColumn width='200px' dataField="break_in_status" >Status</TableHeaderColumn>

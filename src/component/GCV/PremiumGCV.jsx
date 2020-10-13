@@ -79,7 +79,7 @@ class PremiumGCV extends Component {
     }
 
     additionalDetails = (productId) => {
-        this.props.history.push(`/Additional_details/${productId}`);
+        this.props.history.push(`/AdditionalDetails_GCV/${productId}`);
     }
 
     handleSubmit = (values) => {
@@ -103,7 +103,7 @@ class PremiumGCV extends Component {
         let policyHolder_id = this.state.policyHolder_refNo ? this.state.policyHolder_refNo : '0'
         let encryption = new Encryption();
     
-        axios.get(`policy-holder/motor/${policyHolder_id}`)
+        axios.get(`gcv/policy-holder/details/${policyHolder_id}`)
             .then(res => {
                 let decryptResp = JSON.parse(encryption.decrypt(res.data))
                 console.log("decrypt", decryptResp)
