@@ -95,28 +95,128 @@ const ComprehensiveValidation = Yup.object().shape({
         is: PA_flag => PA_flag == '1',
         then: Yup.string().required('Please provide PA coverage'),
         otherwise: Yup.string()
-    })
+    }),
+
+    ATC_value: Yup.string().when(['ATC_flag'], {
+        is: ATC_flag => ATC_flag == '1',
+        then: Yup.string().required('Please select additional towing charges'),
+        otherwise: Yup.string()
+    }),
+   
+    B00018_value: Yup.string().when(['enhance_PA_OD_flag'], {
+        is: enhance_PA_OD_flag => enhance_PA_OD_flag == '1',
+        then: Yup.string().required('Please provide enhance PA coverage'),
+        otherwise: Yup.string()
+    }),
+   
+    B00069_value: Yup.string().when(['LL_Coolie_flag'], {
+        is: LL_Coolie_flag => LL_Coolie_flag == '1',
+        then: Yup.string().required('Please provide No. of person'),
+        otherwise: Yup.string()
+    }),
+   
+    B00012_value: Yup.string().when(['LL_Emp_flag'], {
+        is: LL_Emp_flag => LL_Emp_flag == '1',
+        then: Yup.string().required('Please provide No. of employee'),
+        otherwise: Yup.string()
+    }),
+   
+    B00013_value: Yup.string().when(['LL_PD_flag'], {
+        is: LL_PD_flag => LL_PD_flag == '1',
+        then: Yup.string().required('Please provide  No. of driver'),
+        otherwise: Yup.string()
+    }),
+
+    B00022_value: Yup.string().when(['hospital_cash_PD_flag'], {
+        is: hospital_cash_PD_flag => hospital_cash_PD_flag == '1',
+        then: Yup.string().required('This field is required'),
+        otherwise: Yup.string()
+    }),
+
+    B00020_value: Yup.string().when(['hospital_cash_OD_flag'], {
+        is: hospital_cash_OD_flag => hospital_cash_OD_flag == '1',
+        then: Yup.string().required('This field is required'),
+        otherwise: Yup.string()
+    }),
+
+    B00004_value: Yup.string().when(['electric_flag'], {
+        is: electric_flag => electric_flag == '1',
+        then: Yup.string().required('Please provide electrical IDV').matches(/^[0-9]*$/, 'Please provide valid IDV'),
+        otherwise: Yup.string()
+    }),
+
+    B00004_description: Yup.string().when(['electric_flag'], {
+        is: electric_flag => electric_flag == '1',
+        then: Yup.string().required('Please provide accessory desription'),
+        otherwise: Yup.string()
+    }),
+
+    B00003_value: Yup.string().when(['nonElectric_flag'], {
+        is: nonElectric_flag => nonElectric_flag == '1',
+        then: Yup.string().required('Please provide non-electrical IDV').matches(/^[0-9]*$/, 'Please provide valid IDV'),
+        otherwise: Yup.string()
+    }),
+
+    B00003_description: Yup.string().when(['nonElectric_flag'], {
+        is: nonElectric_flag => nonElectric_flag == '1',
+        then: Yup.string().required('Please provide accessory desription'),
+        otherwise: Yup.string()
+    }),
+
+
+
+    B00073_value: Yup.string().when(['pa_coolie_flag'], {
+        is: pa_coolie_flag => pa_coolie_flag == '1',
+        then: Yup.string().required('Please provide PA value').matches(/^[0-9]*$/, 'Please provide valid PA value'),
+        otherwise: Yup.string()
+    }),
+
+    B00073_description: Yup.string().when(['pa_coolie_flag'], {
+        is: pa_coolie_flag => pa_coolie_flag == '1',
+        then: Yup.string().required('Please provide No. of paid driver').matches(/^[0-9]*$/, 'Please provide valid number'),
+        otherwise: Yup.string()
+    }),
+
+    B00007_value: Yup.string().when(['trailer_flag'], {
+        is: trailer_flag => trailer_flag == '1',
+        then: Yup.string().required('Please provide No. of trailer').matches(/^[0-9]$/, 'Please provide valid No.'),
+        otherwise: Yup.string()
+    }),
+
+    B00007_description: Yup.string().when(['trailer_flag'], {
+        is: trailer_flag => trailer_flag == '1',
+        then: Yup.string().required('Please provide trailer IDV').matches(/^[0-9]*$/, 'Please provide valid IDV'),
+        otherwise: Yup.string()
+    }),
+   
    
 });
 
 
 const Coverage = {
-        "C101064":"Own Damage",
-        "C101065":"Legal Liability to Third Party",
-        "C101066":"PA Cover",
-        "C101069":"Basic Road Side Assistance",
-        "C101072":"Depreciation Reimbursement",
-        "C101067":"Return to Invoice",
-        "C101108":"Engine Guard",
-        "C101111":"Cover for consumables",
+
         "B00002": "Own Damage Basic",
+        "B00003": "Non Electrical Accessories",
+        "B00004": "Electrical /Electronic Accessories",
+        "B00005": "CNG /LPG Kit - Own Damage",
+        "B00006": "In built - CNG /LPG Kit Own Damage",
+        "B00007": "Trailer - OD",
         "B00008": "Third Party Bodily Injury",
+        "B00009": "Third Party Property Damage",
+        "B00010": "CNG /LPG Kit -  Liability",
+        "B00011": "Trailer - TP",
+        "B00012": "Legal Liability to Employees",
         "B00013": "Legal Liability to Paid Drivers",
+        "B00069": "Legal Liability to Cleaner\Conductor\Coolie",
+        "B00070": "Legal Liability to Workmen",
+        "B00071": "Legal Liability to NFPP",
         "B00015": "PA -  Owner Driver",
-        "B00016": "PA for Unnamed Passenger",
-        "B00009": "Third Party Property Damage Limit",
-        "NCB": "NCB Discount",
-        "TOTALOD": "Total Own Damage"
+        "B00073": "PA Cleaner\Conductor\Coolie & PaidDriver",
+
+        "B00018": "Enhanced PA Cover - Owner driver",
+        "B00019": "Enhanced PA Cover - Paid driver",
+        "B00020": "Hospital Cash Cover - Owner Driver",
+        "B00022": "Hospital Cash Cover - Paid Driver ",  
 }
 
 class OtherComprehensiveGCV extends Component {
@@ -161,7 +261,8 @@ class OtherComprehensiveGCV extends Component {
                 newRegistrationNo: "",
                 puc: '1',
             },
-            request_data: []
+            request_data: [],
+            add_more_coverage_request_array: []
         };
     }
 
@@ -235,12 +336,32 @@ class OtherComprehensiveGCV extends Component {
                 add_more_coverage = add_more_coverage.flat()
                 values.PA_flag = motorInsurance && motorInsurance.pa_cover != "" ? '1' : '0'
                 values.PA_Cover = motorInsurance && motorInsurance.pa_cover != "" ? motorInsurance.pa_cover : '0'
+                let add_more_coverage_request_json = motorInsurance && motorInsurance.add_more_coverage_request_json != null ? motorInsurance.add_more_coverage_request_json : ""
+
+                let add_more_coverage_request_array = add_more_coverage_request_json != "" ? JSON.parse(add_more_coverage_request_json) : []
+
+                values.ATC_value = add_more_coverage_request_array.ATC ? add_more_coverage_request_array.ATC.value : ""
+                values.B00018_value = add_more_coverage_request_array.B00018 ? add_more_coverage_request_array.B00018.value : ""
+                values.B00069_value = add_more_coverage_request_array.B00069 ? add_more_coverage_request_array.B00069.value : ""
+                values.B00012_value = add_more_coverage_request_array.B00012 ? add_more_coverage_request_array.B00012.value : ""
+                values.B00013_value = add_more_coverage_request_array.B00013 ? add_more_coverage_request_array.B00013.value : ""
+                values.B00022_value = add_more_coverage_request_array.B00022 ? add_more_coverage_request_array.B00022.value : ""
+                values.B00020_value = add_more_coverage_request_array.B00020 ? add_more_coverage_request_array.B00020.value : ""
+                values.B00004_value = add_more_coverage_request_array.B00004 ? add_more_coverage_request_array.B00004.value : ""
+                values.B00004_description = add_more_coverage_request_array.B00004 ? add_more_coverage_request_array.B00004.description : ""
+                values.B00003_value = add_more_coverage_request_array.B00003 ? add_more_coverage_request_array.B00003.value : ""
+                values.B00003_description = add_more_coverage_request_array.B00003 ? add_more_coverage_request_array.B00003.description : ""
+                values.B00073_value = add_more_coverage_request_array.B00073 ? add_more_coverage_request_array.B00073.value : ""
+                values.B00073_description = add_more_coverage_request_array.B00073 ? add_more_coverage_request_array.B00073.description : ""
+                values.B00007_value = add_more_coverage_request_array.B00007 ? add_more_coverage_request_array.B00007.value : ""
+                values.B00007_description = add_more_coverage_request_array.B00007 ? add_more_coverage_request_array.B00007.description : ""
 
                 this.setState({
                     motorInsurance, add_more_coverage,request_data,
                     showCNG: motorInsurance.cng_kit == 1 ? true : false,
                     vahanVerify: motorInsurance.chasis_no && motorInsurance.engine_no ? true : false,
-                    selectFlag: motorInsurance && motorInsurance.add_more_coverage != null ? '0' : '1'
+                    selectFlag: motorInsurance && motorInsurance.add_more_coverage != null ? '0' : '1',
+                    add_more_coverage_request_array
                 })
                 this.props.loadingStop();
                 this.getAccessToken(values)
@@ -276,13 +397,18 @@ class OtherComprehensiveGCV extends Component {
           .get(`gcv/coverage-list/${localStorage.getItem('policyHolder_id')}`)
           .then((res) => {
             let decryptResp = JSON.parse(encryption.decrypt(res.data))
+            let Coverage = []
+            let drv = []
             console.log("decrypt--getMoreCoverage-- ", decryptResp)
+
             this.setState({
             moreCoverage: decryptResp.data,
             });
             this.fetchData()
           })
           .catch((err) => {
+            let decryptResp = JSON.parse(encryption.decrypt(err.data))
+            console.log("decryptERR--getMoreCoverage-- ", decryptResp)
             this.setState({
                 moreCoverage: [],
             });
@@ -375,6 +501,7 @@ class OtherComprehensiveGCV extends Component {
         //     cngKit_Cost = values.cngKit_Cost
         // }
         let defaultSliderValue = PolicyArray.length > 0 ? Math.round(PolicyArray[0].PolicyRiskList[0].IDV_Suggested) : 0
+        let coverage_data = {}
         const formData = new FormData();
 
         let csc_data = localStorage.getItem('users') ? localStorage.getItem('users') : "";
@@ -387,6 +514,21 @@ class OtherComprehensiveGCV extends Component {
             csc_data = JSON.parse(encryption.decrypt(csc_data));           
             csc_user_type = csc_data.type
         }
+        if(add_more_coverage) {
+            coverage_data = {
+                'B00018' : {'value': values.B00018_value },
+                'B00069' : {'value': values.B00069_value},
+                'B00012' : {'value': values.B00012_value },
+                'B00013' : {'value': values.B00013_value},
+                'B00022' : {'value': values.B00022_value},
+                'B00020' : {'value': values.B00020_value},
+                'ATC' : {'value': values.ATC_value},
+                'B00004' : {'value': values.B00004_value, 'description': values.B00004_description},
+                'B00003' : {'value': values.B00003_value, 'description': values.B00003_description},
+                'B00073' : {'value': values.B00073_value, 'description': values.B00073_description},
+                'B00007' : {'value': values.B00007_value, 'description': values.B00007_description},
+            }
+        }
 
         const post_data = {
             'ref_no':localStorage.getItem('policyHolder_refNo'),
@@ -395,6 +537,7 @@ class OtherComprehensiveGCV extends Component {
             'policy_type': motorInsurance.policy_type,
             'add_more_coverage': add_more_coverage.toString(),
             'PA_Cover': values.PA_flag ? values.PA_Cover : "0",
+            'coverage_data': JSON.stringify(coverage_data)
             // 'cng_kit': cng_kit_flag,
             // 'cngKit_Cost': cngKit_Cost
         }
@@ -408,8 +551,9 @@ class OtherComprehensiveGCV extends Component {
 
         let encryption = new Encryption();
         formData.append('enc_data',encryption.encrypt(JSON.stringify(post_data)))
-        axios.post('fullQuotePMCAR',formData)
+        axios.post('fullQuotePMGCV',formData)
             .then(res => {
+
                 if (res.data.PolicyObject) {
                     this.setState({
                       fulQuoteResp: res.data.PolicyObject,
@@ -440,6 +584,7 @@ class OtherComprehensiveGCV extends Component {
         const { productId } = this.props.match.params
         const { motorInsurance, PolicyArray, sliderVal, add_more_coverage } = this.state
         let defaultSliderValue = PolicyArray.length > 0 ? Math.round(PolicyArray[0].PolicyRiskList[0].IDV_Suggested) : 0
+        let coverage_data = {}
 
         let csc_data = localStorage.getItem('users') ? localStorage.getItem('users') : "";
         let csc_user_type = "";
@@ -450,6 +595,22 @@ class OtherComprehensiveGCV extends Component {
             csc_data = csc_data.user
             csc_data = JSON.parse(encryption.decrypt(csc_data));           
             csc_user_type = csc_data.type
+        }
+
+        if(add_more_coverage) {
+            coverage_data = {
+                'B00018' : {'value': values.B00018_value },
+                'B00069' : {'value': values.B00069_value},
+                'B00012' : {'value': values.B00012_value },
+                'B00013' : {'value': values.B00013_value},
+                'B00022' : {'value': values.B00022_value},
+                'B00020' : {'value': values.B00020_value},
+                'ATC' : {'value': values.ATC_value},
+                'B00004' : {'value': values.B00004_value, 'description': values.B00004_description},
+                'B00003' : {'value': values.B00003_value, 'description': values.B00003_description},
+                'B00073' : {'value': values.B00073_value, 'description': values.B00073_description},
+                'B00007' : {'value': values.B00007_value, 'description': values.B00007_description},
+            }
         }
 
         const formData = new FormData();
@@ -470,7 +631,8 @@ class OtherComprehensiveGCV extends Component {
                 'puc': values.puc,
                 'pa_cover': values.PA_flag ? values.PA_Cover : "0",
                 'pa_flag' : values.PA_cover_flag,
-                'page_name': `OtherComprehensive/${productId}`
+                'page_name': `OtherComprehensive/${productId}`,
+                'coverage_data': JSON.stringify(coverage_data)
             }
         }
         else {
@@ -542,13 +704,43 @@ class OtherComprehensiveGCV extends Component {
                 setFieldValue("pa_coolie_flag", '1');
             }     
             if(values == "B00003") {
+                setFieldTouched("nonElectric_flag");
+                setFieldValue("nonElectric_flag", '1');
+                
+            }
+            if(values == "B00004") {
                 setFieldTouched("electric_flag");
                 setFieldValue("electric_flag", '1');
             }
-            if(values == "B00004") {
-                setFieldTouched("nonElectric_flag");
-                setFieldValue("nonElectric_flag", '1');
+            if(values == "B00020") {
+                setFieldTouched("hospital_cash_OD_flag");
+                setFieldValue("hospital_cash_OD_flag", '1');
             }
+            if(values == "B00022") {
+                setFieldTouched("hospital_cash_PD_flag");
+                setFieldValue("hospital_cash_PD_flag", '1');
+            }
+            if(values == "B00013") {
+                setFieldTouched("LL_PD_flag");
+                setFieldValue("LL_PD_flag", '1');
+            }
+            if(values == "B00012") {
+                setFieldTouched("LL_Emp_flag");
+                setFieldValue("LL_Emp_flag", '1');
+            }
+            if(values == "B00069") {
+                setFieldTouched("LL_Coolie_flag");
+                setFieldValue("LL_Coolie_flag", '1');
+            }
+            if(values == "B00018") {
+                setFieldTouched("enhance_PA_OD_flag");
+                setFieldValue("enhance_PA_OD_flag", '1');
+            }
+            if(values == "ATC") {
+                setFieldTouched("ATC_flag");
+                setFieldValue("ATC_flag", '1');
+            }
+
         }
         else {
             const index = add_more_coverage.indexOf(values);
@@ -579,12 +771,41 @@ class OtherComprehensiveGCV extends Component {
                 setFieldValue("pa_coolie_flag", '0');
             }
             if(values == "B00003") {
+                setFieldTouched("nonElectric_flag");
+                setFieldValue("nonElectric_flag", '0');
+                
+            }
+            if(values == "B00004") {
                 setFieldTouched("electric_flag");
                 setFieldValue("electric_flag", '0');
             }
-            if(values == "B00004") {
-                setFieldTouched("nonElectric_flag");
-                setFieldValue("nonElectric_flag", '0');
+            if(values == "B00020") {
+                setFieldTouched("hospital_cash_OD_flag");
+                setFieldValue("hospital_cash_OD_flag", '0');
+            }
+            if(values == "B00022") {
+                setFieldTouched("hospital_cash_PD_flag");
+                setFieldValue("hospital_cash_PD_flag", '0');
+            }
+            if(values == "B00013") {
+                setFieldTouched("LL_PD_flag");
+                setFieldValue("LL_PD_flag", '0');
+            }
+            if(values == "B00012") {
+                setFieldTouched("LL_Emp_flag");
+                setFieldValue("LL_Emp_flag", '0');
+            }
+            if(values == "B00069") {
+                setFieldTouched("LL_Coolie_flag");
+                setFieldValue("LL_Coolie_flag", '0');
+            }
+            if(values == "B00018") {
+                setFieldTouched("enhance_PA_OD_flag");
+                setFieldValue("enhance_PA_OD_flag", '0');
+            }
+            if(values == "ATC") {
+                setFieldTouched("ATC_flag");
+                setFieldValue("ATC_flag", '0');
             }
         }
         
@@ -626,8 +847,8 @@ class OtherComprehensiveGCV extends Component {
 
 
     render() {
-        const {showCNG, vahanDetails,error, policyCoverage, vahanVerify, selectFlag, fulQuoteResp, PolicyArray, 
-            moreCoverage, sliderVal, motorInsurance, serverResponse, engine_no, chasis_no, initialValue} = this.state
+        const {showCNG, is_CNG_account, vahanDetails,error, policyCoverage, vahanVerify, selectFlag, fulQuoteResp, PolicyArray, 
+            moreCoverage, sliderVal, motorInsurance, serverResponse, engine_no, chasis_no, initialValue, add_more_coverage_request_array} = this.state
         const {productId} = this.props.match.params 
         let defaultSliderValue = PolicyArray.length > 0 ? Math.round(PolicyArray[0].PolicyRiskList[0].IDV_Suggested) : 0
         let sliderValue = sliderVal
@@ -640,6 +861,19 @@ class OtherComprehensiveGCV extends Component {
         let newInnitialArray = {}
         let PA_flag = motorInsurance && (motorInsurance.pa_cover == null || motorInsurance.pa_cover == "") ? '0' : '1'
         let PA_Cover = motorInsurance &&  motorInsurance.pa_cover != null ? motorInsurance.pa_cover : ''
+
+        let trailer_flag= add_more_coverage_request_array.B00007 && add_more_coverage_request_array.B00007.value ? '1' : '0'
+        let pa_coolie_flag= add_more_coverage_request_array.B00073 && add_more_coverage_request_array.B00073.value ? '1' : '0'
+        let electric_flag= add_more_coverage_request_array.B00004 && add_more_coverage_request_array.B00004.value ? '1' : '0'
+        let nonElectric_flag= add_more_coverage_request_array.B00003 && add_more_coverage_request_array.B00003.value ? '1' : '0'
+        let hospital_cash_OD_flag= add_more_coverage_request_array.B00020 && add_more_coverage_request_array.B00020.value ? '1' : '0'
+        let hospital_cash_PD_flag= add_more_coverage_request_array.B00022 && add_more_coverage_request_array.B00022.value ? '1' : '0'
+        let LL_PD_flag= add_more_coverage_request_array.B00013 && add_more_coverage_request_array.B00013.value ? '1' : '0'
+        let LL_Emp_flag= add_more_coverage_request_array.B00012 && add_more_coverage_request_array.B00012.value ? '1' : '0'
+        let LL_Coolie_flag= add_more_coverage_request_array.B00069 && add_more_coverage_request_array.B00069.value ? '1' : '0'
+        let enhance_PA_OD_flag= add_more_coverage_request_array.B00018 && add_more_coverage_request_array.B00018.value ? '1' : '0'
+        let ATC_flag= add_more_coverage_request_array.ATC && add_more_coverage_request_array.ATC.value ? '1' : '0'
+
         let newInitialValues = {}
 
         if(selectFlag == '1') {
@@ -658,7 +892,14 @@ class OtherComprehensiveGCV extends Component {
                 trailer_flag: '0',
                 pa_coolie_flag: '0',
                 electric_flag: '0',
-                nonElectric_flag: '0'
+                nonElectric_flag: '0',
+                hospital_cash_OD_flag: '0',
+                hospital_cash_PD_flag: '0',
+                LL_PD_flag: '0',
+                LL_Emp_flag: '0',
+                LL_Coolie_flag: '0',
+                enhance_PA_OD_flag: '0',
+                ATC_flag: '0'
 
             });
         }
@@ -677,7 +918,14 @@ class OtherComprehensiveGCV extends Component {
                     trailer_flag: '0',
                     pa_coolie_flag: '0',
                     electric_flag: '0',
-                    nonElectric_flag: '0'
+                    nonElectric_flag: '0',
+                    hospital_cash_OD_flag: '0',
+                    hospital_cash_PD_flag: '0',
+                    LL_PD_flag: '0',
+                    LL_Emp_flag: '0',
+                    LL_Coolie_flag: '0',
+                    enhance_PA_OD_flag: '0',
+                    ATC_flag: '0'
                 });
         }
 
@@ -688,64 +936,65 @@ class OtherComprehensiveGCV extends Component {
             newInnitialArray[covList[i]] = covList[i];
         }    
         newInnitialArray.PA_flag = PA_flag   
-        newInnitialArray.trailer_flag = '0'
-        newInnitialArray.pa_coolie_flag = '0'
-        newInnitialArray.electric_flag = '0'
-        newInnitialArray.nonElectric_flag = '0'
+        newInnitialArray.trailer_flag = trailer_flag
+        newInnitialArray.pa_coolie_flag = pa_coolie_flag
+        newInnitialArray.electric_flag = electric_flag
+        newInnitialArray.nonElectric_flag = nonElectric_flag
+        newInnitialArray.hospital_cash_OD_flag = hospital_cash_OD_flag
+        newInnitialArray.hospital_cash_PD_flag = hospital_cash_PD_flag
+        newInnitialArray.LL_PD_flag = LL_PD_flag
+        newInnitialArray.LL_Emp_flag = LL_Emp_flag
+        newInnitialArray.LL_Coolie_flag = LL_Coolie_flag
+        newInnitialArray.enhance_PA_OD_flag = enhance_PA_OD_flag
+        newInnitialArray.ATC_flag = ATC_flag
         newInnitialArray.PA_Cover = PA_Cover
+        newInnitialArray.ATC_value = add_more_coverage_request_array.ATC ? add_more_coverage_request_array.ATC.value : ""
+        newInnitialArray.B00018_value = add_more_coverage_request_array.B00018 ? add_more_coverage_request_array.B00018.value : ""
+        newInnitialArray.B00069_value = add_more_coverage_request_array.B00069 ? add_more_coverage_request_array.B00069.value : ""
+        newInnitialArray.B00012_value = add_more_coverage_request_array.B00012 ? add_more_coverage_request_array.B00012.value : ""
+        newInnitialArray.B00013_value = add_more_coverage_request_array.B00013 ? add_more_coverage_request_array.B00013.value : ""
+        newInnitialArray.B00022_value = add_more_coverage_request_array.B00022 ? add_more_coverage_request_array.B00022.value : ""
+        newInnitialArray.B00020_value = add_more_coverage_request_array.B00020 ? add_more_coverage_request_array.B00020.value : ""
+        newInnitialArray.B00004_value = add_more_coverage_request_array.B00004 ? add_more_coverage_request_array.B00004.value : ""
+        newInnitialArray.B00004_description = add_more_coverage_request_array.B00004 ? add_more_coverage_request_array.B00004.description : ""
+        newInnitialArray.B00003_value = add_more_coverage_request_array.B00003 ? add_more_coverage_request_array.B00003.value : ""
+        newInnitialArray.B00003_description = add_more_coverage_request_array.B00003 ? add_more_coverage_request_array.B00003.description : ""
+        newInnitialArray.B00073_value = add_more_coverage_request_array.B00073 ? add_more_coverage_request_array.B00073.value : ""
+        newInnitialArray.B00073_description = add_more_coverage_request_array.B00073 ? add_more_coverage_request_array.B00073.description : ""
+        newInnitialArray.B00007_value = add_more_coverage_request_array.B00007 ? add_more_coverage_request_array.B00007.value : ""
+        newInnitialArray.B00007_description = add_more_coverage_request_array.B00007 ? add_more_coverage_request_array.B00007.description : ""
         newInitialValues = Object.assign(initialValue, newInnitialArray );
 
 // -------------------------------------------------------
 
         let OD_TP_premium = serverResponse.PolicyLobList ? serverResponse.PolicyLobList[0].PolicyRiskList[0] : []
 
-        const policyCoverageList = policyCoverage && policyCoverage.length > 0 ?
-        policyCoverage.map((coverage, qIndex) => {
-            // let coverSpan = Math.floor(moment(coverage.ExpiryDate).diff(coverage.EffectiveDate, 'years', true)) + 1;
-            return(
-                <div>
-                    {coverage.ProductElementCode == "C101066" ? 
-                    coverage.PolicyBenefitList.map((coverage1, qIndex) => {
-                        return(
-                                <Row>
-                                    <Col sm={12} md={6}>
-                                    <FormGroup>{Coverage[coverage1.ProductElementCode]}</FormGroup>
-                                    </Col>
-                                    <Col sm={12} md={6}>
-                                    <FormGroup>₹ {Math.round(coverage1.BeforeVatPremium)}  </FormGroup>                      
-                                    </Col>
-                                </Row>)}) :
-                    <Row>
-                        <Col sm={12} md={6}>
-                        <FormGroup>{Coverage[coverage.ProductElementCode]}</FormGroup>
-                        </Col>
-                        <Col sm={12} md={6}>
-                        <FormGroup>₹ {Math.round(coverage.BeforeVatPremium)}  </FormGroup>                      
-                        </Col>
-                    </Row>}
-                </div>
-            )
-        }) : null
+
+        const policyCoverageList =  policyCoverage && policyCoverage.length > 0 ?
+            policyCoverage.map((coverage, qIndex) => (
+                coverage.PolicyBenefitList && coverage.PolicyBenefitList.map((benefit, bIndex) => (
+                    <div>
+                        <Row>
+                            <Col sm={12} md={6}>
+                                <FormGroup>{Coverage[benefit.ProductElementCode]}</FormGroup>
+                            </Col>
+                            <Col sm={12} md={6}>
+                                <FormGroup>₹ {Math.round(benefit.AnnualPremium)}</FormGroup>
+                            </Col>
+                        </Row>
+                    </div>     
+            ))
+        )) : null 
 
         const premiumBreakup = policyCoverage && policyCoverage.length > 0 ?
-            policyCoverage.map((coverage, qIndex) => {
-                return(
-                    <Fragment>
-                        {coverage.ProductElementCode == "C101066" ? 
-                            coverage.PolicyBenefitList.map((coverage1, qIndex) => {
-                                return(
-                                        <tr>
-                                            <td>{Coverage[coverage1.ProductElementCode]}</td>
-                                            <td>₹ {Math.round(coverage1.BeforeVatPremium)}  </td>                      
-
-                                        </tr>)}) :
-                            <tr>
-                                <td>{Coverage[coverage.ProductElementCode]}:</td>
-                                <td>₹ {Math.round(coverage.BeforeVatPremium)}</td>
-                            </tr>}
-                    </Fragment>
-                )   
-            }) : null
+            policyCoverage.map((coverage, qIndex) => (
+                coverage.PolicyBenefitList && coverage.PolicyBenefitList.map((benefit, bIndex) => (
+                        <tr>
+                            <td>{Coverage[benefit.ProductElementCode]}:</td>
+                            <td>₹ {Math.round(benefit.AnnualPremium)}</td>
+                        </tr>  
+                ))
+            )) : null
         
 
         const errMsg =
@@ -782,7 +1031,7 @@ class OtherComprehensiveGCV extends Component {
                     onSubmit={ serverResponse && serverResponse != "" ? (serverResponse.message ? this.getAccessToken : this.handleSubmit ) : this.getAccessToken} 
                     validationSchema={ComprehensiveValidation}>
                     {({ values, errors, setFieldValue, setFieldTouched, isValid, isSubmitting, touched }) => {
-console.log("errors---- ", errors)
+
                     return (
                         <Form>
                         <Row>
@@ -991,6 +1240,86 @@ console.log("errors---- ", errors)
                             </Row>
 
                             <Row>
+                                <Col sm={12} md={5} lg={5}>
+                                    <FormGroup>
+                                        <div className="insurerName">
+                                            <span className="fs-16"> Have you fitted external CNG Kit</span>
+                                        </div>
+                                    </FormGroup>
+                                </Col>
+                                <Col sm={12} md={3} lg={3}>
+                                    <FormGroup>
+                                        <div className="d-inline-flex m-b-35">
+                                            <div className="p-r-25">
+                                                <label className="customRadio3">
+                                                <Field
+                                                    type="radio"
+                                                    name='cng_kit'                                            
+                                                    value='1'
+                                                    key='1'  
+                                                    onChange={(e) => {
+                                                        setFieldValue(`cng_kit`, e.target.value);
+                                                        this.showCNGText(1);
+                                                    }}
+                                                    checked={values.cng_kit == '1' ? true : false}
+                                                />
+                                                    <span className="checkmark " /><span className="fs-14"> Yes</span>
+                                                </label>
+                                            </div>
+
+                                            <div className="">
+                                                <label className="customRadio3">
+                                                <Field
+                                                    type="radio"
+                                                    name='cng_kit'                                            
+                                                    value='0'
+                                                    key='1'  
+                                                    onChange={(e) => {
+                                                        setFieldValue(`cng_kit`, e.target.value);
+                                                        this.showCNGText(0);
+                                                    }}
+                                                    checked={values.cng_kit == '0' ? true : false}
+                                                />
+                                                    <span className="checkmark" />
+                                                    <span className="fs-14">No</span>      
+                                                </label>
+                                                {errors.cng_kit && touched.cng_kit ? (
+                                                <span className="errorMsg">{errors.cng_kit}</span>
+                                                ) : null}
+                                            </div>
+                                        </div>
+                                    </FormGroup>
+                                </Col>
+                                {showCNG || is_CNG_account == 1 ?
+                                <Col sm={12} md={12} lg={4}>
+                                    <FormGroup>
+                                    <div className="insurerName">   
+                                        <Field
+                                            name="cngKit_Cost"
+                                            type="text"
+                                            placeholder="Cost of Kit"
+                                            autoComplete="off"
+                                            className="W-80"
+                                            value = {values.cngKit_Cost}
+                                            onFocus={e => this.changePlaceHoldClassAdd(e)}
+                                            onBlur={e => this.changePlaceHoldClassRemove(e)}
+                                            onChange={e => {
+                                                setFieldTouched('cngKit_Cost');
+                                                setFieldValue('cngKit_Cost', e.target.value);
+                                                this.handleChange()
+
+                                            }}
+                                        />
+                                        {errors.cngKit_Cost && touched.cngKit_Cost ? (
+                                        <span className="errorMsg">{errors.cngKit_Cost}</span>
+                                        ) : null}                                             
+                                        </div>
+                                    </FormGroup>
+                                </Col> : ''}
+                            </Row>
+                               
+
+                            <Row>
                                 <Col sm={12} md={12} lg={12}>
                                     <FormGroup>
                                         <span className="fs-18"> Add  more coverage to your plan.</span>
@@ -1060,7 +1389,34 @@ console.log("errors---- ", errors)
                                             <FormGroup>
                                                 <div className="formSection">
                                                     <Field
-                                                        name="previous_policy_no"
+                                                        name='B00007_value'
+                                                        component="select"
+                                                        autoComplete="off"
+                                                        className="formGrp inputfs12"
+                                                        value = {values.B00007_value}
+                                                        onChange={(e) => {
+                                                            setFieldTouched('B00007_value')
+                                                            setFieldValue('B00007_value', e.target.value);
+                                                            this.handleChange()
+                                                        }}
+                                                    >
+                                                        <option value="">No of Trailer</option>
+                                                        {JSON.parse(coverage.covarage_value).value.length > 0 && JSON.parse(coverage.covarage_value).value.map((insurer, qIndex) => (
+                                                                <option value= {insurer}>{insurer}</option>
+                                                            ))}  
+                                            
+                                                    </Field>
+                                                    {errors.B00007_value ? (
+                                                        <span className="errorMsg">{errors.B00007_value}</span>
+                                                    ) : null}
+                                                </div>
+                                            </FormGroup>
+                                        </Col>
+                                        <Col sm={12} md={11} lg={3} key={qIndex+"c"}>
+                                            <FormGroup>
+                                                <div className="formSection">
+                                                    <Field
+                                                        name="B00007_description"
                                                         type="text"
                                                         placeholder="Trailer IDV"
                                                         autoComplete="off"
@@ -1068,203 +1424,384 @@ console.log("errors---- ", errors)
                                                         onFocus={e => this.changePlaceHoldClassAdd(e)}
                                                         onBlur={e => this.changePlaceHoldClassRemove(e)}
                                                         onChange={(e) => {
-                                                            setFieldTouched('PA_Cover')
-                                                            setFieldValue('PA_Cover', e.target.value);
+                                                            setFieldTouched('B00007_description')
+                                                            setFieldValue('B00007_description', e.target.value);
                                                             this.handleChange()
                                                         }}
                                                     >                                     
                                                     </Field>
-                                                    {errors.PA_Cover ? (
-                                                        <span className="errorMsg">{errors.PA_Cover}</span>
+                                                    {errors.B00007_description ? (
+                                                        <span className="errorMsg">{errors.B00007_description}</span>
                                                     ) : null}
                                                 </div>
                                             </FormGroup>
                                         </Col>
-                                        <Col sm={12} md={11} lg={2} key={qIndex+"b"}>
-                                            <FormGroup>
-                                                <div className="formSection">
-                                                    <Field
-                                                        name='PA_Cover'
-                                                        component="select"
-                                                        autoComplete="off"
-                                                        className="formGrp inputfs12"
-                                                        value = {values.PA_Cover}
-                                                        onChange={(e) => {
-                                                            setFieldTouched('PA_Cover')
-                                                            setFieldValue('PA_Cover', e.target.value);
-                                                            this.handleChange()
-                                                        }}
-                                                    >
-                                                        <option value="">No of Trailer</option>
-                                                        <option value="50000">50000</option>
-                                                        <option value="100000">100000</option>  
-                                            
-                                                    </Field>
-                                                    {errors.PA_Cover ? (
-                                                        <span className="errorMsg">{errors.PA_Cover}</span>
-                                                    ) : null}
-                                                </div>
-                                            </FormGroup>
-                                        </Col> </Fragment> : null
+                                        </Fragment> : null
                                     }
                                     {values.pa_coolie_flag == '1' && values[coverage.code] == 'B00073' ?
                                      <Fragment>
                                         <Col sm={12} md={11} lg={2} key={qIndex+"b"}>
                                             <FormGroup>
                                                 <div className="formSection">
-                                                    <Field
-                                                        name="previous_policy_no"
-                                                        type="text"
-                                                        placeholder="Trailer IDV"
+                                                <Field
+                                                        name='B00073_value'
+                                                        component="select"
                                                         autoComplete="off"
-                                                        maxLength="28"
-                                                        onFocus={e => this.changePlaceHoldClassAdd(e)}
-                                                        onBlur={e => this.changePlaceHoldClassRemove(e)}
+                                                        className="formGrp inputfs12"
+                                                        value = {values.B00073_value}
                                                         onChange={(e) => {
-                                                            setFieldTouched('PA_Cover')
-                                                            setFieldValue('PA_Cover', e.target.value);
+                                                            setFieldTouched('B00073_value')
+                                                            setFieldValue('B00073_value', e.target.value);
                                                             this.handleChange()
                                                         }}
-                                                    >                                     
+                                                    >
+                                                        <option value="">Select</option>
+                                                        {JSON.parse(coverage.covarage_value).value.length > 0 && JSON.parse(coverage.covarage_value).value.map((insurer, qIndex) => (
+                                                                <option value= {insurer}>{insurer}</option>
+                                                            ))} 
+                                            
                                                     </Field>
-                                                    {errors.PA_Cover ? (
-                                                        <span className="errorMsg">{errors.PA_Cover}</span>
+                                                    {errors.B00073_value ? (
+                                                        <span className="errorMsg">{errors.B00073_value}</span>
                                                     ) : null}
                                                 </div>
                                             </FormGroup>
                                         </Col>
-                                        <Col sm={12} md={11} lg={2} key={qIndex+"b"}>
+                                        <Col sm={12} md={11} lg={3} key={qIndex+"c"}>
                                             <FormGroup>
                                                 <div className="formSection">
                                                     <Field
-                                                        name='PA_Cover'
-                                                        component="select"
+                                                        name="B00073_description"
+                                                        type="text"
+                                                        placeholder="Please enter no of paid drivers"
                                                         autoComplete="off"
-                                                        className="formGrp inputfs12"
-                                                        value = {values.PA_Cover}
+                                                        // maxLength="28"
+                                                        onFocus={e => this.changePlaceHoldClassAdd(e)}
+                                                        onBlur={e => this.changePlaceHoldClassRemove(e)}
                                                         onChange={(e) => {
-                                                            setFieldTouched('PA_Cover')
-                                                            setFieldValue('PA_Cover', e.target.value);
+                                                            setFieldTouched('B00073_description')
+                                                            setFieldValue('B00073_description', e.target.value);
                                                             this.handleChange()
                                                         }}
-                                                    >
-                                                        <option value="">No of Trailer</option>
-                                                        <option value="50000">50000</option>
-                                                        <option value="100000">100000</option>  
-                                            
+                                                    >                                     
                                                     </Field>
-                                                    {errors.PA_Cover ? (
-                                                        <span className="errorMsg">{errors.PA_Cover}</span>
+                                                    {errors.B00073_description ? (
+                                                        <span className="errorMsg">{errors.B00073_description}</span>
                                                     ) : null}
                                                 </div>
                                             </FormGroup>
                                         </Col> </Fragment> : null
                                     }
-                                    {values.electric_flag == '1' && values[coverage.code] == 'B00003' ?
+                                    {values.nonElectric_flag == '1' && values[coverage.code] == 'B00003' ?
                                      <Fragment>
                                         <Col sm={12} md={11} lg={2} key={qIndex+"b"}>
                                             <FormGroup>
                                                 <div className="formSection">
                                                     <Field
-                                                        name="previous_policy_no"
+                                                        name="B00003_value"
                                                         type="text"
-                                                        placeholder="Trailer IDV"
+                                                        placeholder="Value of Accessory"
                                                         autoComplete="off"
                                                         maxLength="28"
                                                         onFocus={e => this.changePlaceHoldClassAdd(e)}
                                                         onBlur={e => this.changePlaceHoldClassRemove(e)}
                                                         onChange={(e) => {
-                                                            setFieldTouched('PA_Cover')
-                                                            setFieldValue('PA_Cover', e.target.value);
+                                                            setFieldTouched('B00003_value')
+                                                            setFieldValue('B00003_value', e.target.value);
                                                             this.handleChange()
                                                         }}
                                                     >                                     
                                                     </Field>
-                                                    {errors.PA_Cover ? (
-                                                        <span className="errorMsg">{errors.PA_Cover}</span>
+                                                    {errors.B00003_value ? (
+                                                        <span className="errorMsg">{errors.B00003_value}</span>
                                                     ) : null}
                                                 </div>
                                             </FormGroup>
                                         </Col>
-                                        <Col sm={12} md={11} lg={2} key={qIndex+"b"}>
+                                        <Col sm={12} md={11} lg={3} key={qIndex+"c"}>
                                             <FormGroup>
                                                 <div className="formSection">
                                                     <Field
-                                                        name='PA_Cover'
-                                                        component="select"
+                                                        name="B00003_description"
+                                                        type="text"
+                                                        placeholder="Accessory description"
                                                         autoComplete="off"
-                                                        className="formGrp inputfs12"
-                                                        value = {values.PA_Cover}
+                                                        // maxLength="28"
+                                                        onFocus={e => this.changePlaceHoldClassAdd(e)}
+                                                        onBlur={e => this.changePlaceHoldClassRemove(e)}
                                                         onChange={(e) => {
-                                                            setFieldTouched('PA_Cover')
-                                                            setFieldValue('PA_Cover', e.target.value);
+                                                            setFieldTouched('B00003_description')
+                                                            setFieldValue('B00003_description', e.target.value);
                                                             this.handleChange()
                                                         }}
-                                                    >
-                                                        <option value="">No of Trailer</option>
-                                                        <option value="50000">50000</option>
-                                                        <option value="100000">100000</option>  
-                                            
+                                                    >                                     
                                                     </Field>
-                                                    {errors.PA_Cover ? (
-                                                        <span className="errorMsg">{errors.PA_Cover}</span>
+                                                    {errors.B00003_description ? (
+                                                        <span className="errorMsg">{errors.B00003_description}</span>
                                                     ) : null}
                                                 </div>
                                             </FormGroup>
                                         </Col> </Fragment> : null
                                     }
-                                    {values.nonElectric_flag == '1' && values[coverage.code] == 'B00004' ?
-                                     <Fragment>
+                                    {values.electric_flag == '1' && values[coverage.code] == 'B00004' ?
+                                        <Fragment>
                                         <Col sm={12} md={11} lg={2} key={qIndex+"b"}>
                                             <FormGroup>
                                                 <div className="formSection">
                                                     <Field
-                                                        name="previous_policy_no"
+                                                        name="B00004_value"
                                                         type="text"
-                                                        placeholder="Trailer IDV"
+                                                        placeholder="Value of Accessory"
                                                         autoComplete="off"
-                                                        maxLength="28"
+                                                        // maxLength="28"
                                                         onFocus={e => this.changePlaceHoldClassAdd(e)}
                                                         onBlur={e => this.changePlaceHoldClassRemove(e)}
                                                         onChange={(e) => {
-                                                            setFieldTouched('PA_Cover')
-                                                            setFieldValue('PA_Cover', e.target.value);
+                                                            setFieldTouched('B00004_value')
+                                                            setFieldValue('B00004_value', e.target.value);
                                                             this.handleChange()
                                                         }}
                                                     >                                     
                                                     </Field>
-                                                    {errors.PA_Cover ? (
-                                                        <span className="errorMsg">{errors.PA_Cover}</span>
+                                                    {errors.B00004_value ? (
+                                                        <span className="errorMsg">{errors.B00004_value}</span>
                                                     ) : null}
                                                 </div>
                                             </FormGroup>
                                         </Col>
-                                        <Col sm={12} md={11} lg={2} key={qIndex+"b"}>
+                                        <Col sm={12} md={11} lg={3} key={qIndex+"c"}>
                                             <FormGroup>
                                                 <div className="formSection">
                                                     <Field
-                                                        name='PA_Cover'
-                                                        component="select"
+                                                        name="B00004_description"
+                                                        type="text"
+                                                        placeholder="Accessory description"
                                                         autoComplete="off"
-                                                        className="formGrp inputfs12"
-                                                        value = {values.PA_Cover}
+                                                        // maxLength="28"
+                                                        onFocus={e => this.changePlaceHoldClassAdd(e)}
+                                                        onBlur={e => this.changePlaceHoldClassRemove(e)}
                                                         onChange={(e) => {
-                                                            setFieldTouched('PA_Cover')
-                                                            setFieldValue('PA_Cover', e.target.value);
+                                                            setFieldTouched('B00004_description')
+                                                            setFieldValue('B00004_description', e.target.value);
                                                             this.handleChange()
                                                         }}
-                                                    >
-                                                        <option value="">No of Trailer</option>
-                                                        <option value="50000">50000</option>
-                                                        <option value="100000">100000</option>  
-                                            
+                                                    >                                     
                                                     </Field>
-                                                    {errors.PA_Cover ? (
-                                                        <span className="errorMsg">{errors.PA_Cover}</span>
+                                                    {errors.B00004_description ? (
+                                                        <span className="errorMsg">{errors.B00004_description}</span>
                                                     ) : null}
                                                 </div>
                                             </FormGroup>
                                         </Col> </Fragment> : null
+                                    }
+                                    {values.hospital_cash_OD_flag == '1' && values[coverage.code] == 'B00020' ?
+                                        <Fragment>
+                                        <Col sm={12} md={11} lg={2} key={qIndex+"b"}>
+                                            <FormGroup>
+                                                <div className="formSection">
+                                                    <Field
+                                                        name='B00020_value'
+                                                        component="select"
+                                                        autoComplete="off"
+                                                        className="formGrp inputfs12"
+                                                        value = {values.B00020_value}
+                                                        onChange={(e) => {
+                                                            setFieldTouched('B00020_value')
+                                                            setFieldValue('B00020_value', e.target.value);
+                                                            this.handleChange()
+                                                        }}
+                                                    >
+                                                        <option value="">Select</option>
+                                                        {coverage.covarage_value != null && JSON.parse(coverage.covarage_value).value.length > 0 && JSON.parse(coverage.covarage_value).value.map((insurer, qIndex) => (
+                                                            <option value= {insurer}>{insurer}</option>
+                                                        ))} 
+                                            
+                                                    </Field>
+                                                    {errors.B00020_value ? (
+                                                        <span className="errorMsg">{errors.B00020_value}</span>
+                                                    ) : null}
+                                                </div>
+                                            </FormGroup>
+                                        </Col>
+                                        </Fragment> : null
+                                    }
+                                    {values.hospital_cash_PD_flag == '1' && values[coverage.code] == 'B00022' ?
+                                        <Fragment>
+                                        <Col sm={12} md={11} lg={2} key={qIndex+"b"}>
+                                            <FormGroup>
+                                                <div className="formSection">
+                                                    <Field
+                                                        name='B00022_value'
+                                                        component="select"
+                                                        autoComplete="off"
+                                                        className="formGrp inputfs12"
+                                                        value = {values.B00022_value}
+                                                        onChange={(e) => {
+                                                            setFieldTouched('B00022_value')
+                                                            setFieldValue('B00022_value', e.target.value);
+                                                            this.handleChange()
+                                                        }}
+                                                    >
+                                                        <option value="">Select</option>
+                                                        {coverage.covarage_value != null && JSON.parse(coverage.covarage_value).value.length > 0 && JSON.parse(coverage.covarage_value).value.map((insurer, qIndex) => (
+                                                            <option value= {insurer}>{insurer}</option>
+                                                        ))}  
+                                            
+                                                    </Field>
+                                                    {errors.B00022_value ? (
+                                                        <span className="errorMsg">{errors.B00022_value}</span>
+                                                    ) : null}
+                                                </div>
+                                            </FormGroup>
+                                        </Col>
+                                        </Fragment> : null
+                                    }
+                                    {values.LL_PD_flag == '1' && values[coverage.code] == 'B00013' ?
+                                        <Fragment>
+                                        <Col sm={12} md={11} lg={2} key={qIndex+"c"}>
+                                            <FormGroup>
+                                                <div className="formSection">
+                                                    <Field
+                                                        name='B00013_value'
+                                                        component="select"
+                                                        autoComplete="off"
+                                                        className="formGrp inputfs12"
+                                                        value = {values.B00013_value}
+                                                        onChange={(e) => {
+                                                            setFieldTouched('B00013_value')
+                                                            setFieldValue('B00013_value', e.target.value);
+                                                            this.handleChange()
+                                                        }}
+                                                    >
+                                                        <option value="">Enter No. of Drivers</option>
+                                                        {coverage.covarage_value != null && JSON.parse(coverage.covarage_value).value.length > 0 && JSON.parse(coverage.covarage_value).value.map((insurer, qIndex) => (
+                                                            <option value= {insurer}>{insurer}</option>
+                                                        ))} 
+                                            
+                                                    </Field>
+                                                    {errors.B00013_value ? (
+                                                        <span className="errorMsg">{errors.B00013_value}</span>
+                                                    ) : null}
+                                                </div>
+                                            </FormGroup>
+                                        </Col>
+                                        </Fragment> : null
+                                    }
+
+                                    {values.LL_Emp_flag == '1' && values[coverage.code] == 'B00012' ?
+                                        <Fragment>
+                                        <Col sm={12} md={11} lg={2} key={qIndex+"b"}>
+                                            <FormGroup>
+                                                <div className="formSection">
+                                                <Field
+                                                    name="B00012_value"
+                                                    type="text"
+                                                    placeholder="Enter No. of Employees"
+                                                    autoComplete="off"
+                                                    // maxLength="28"
+                                                    onFocus={e => this.changePlaceHoldClassAdd(e)}
+                                                    onBlur={e => this.changePlaceHoldClassRemove(e)}
+                                                    onChange={(e) => {
+                                                        setFieldTouched('B00012_value')
+                                                        setFieldValue('B00012_value', e.target.value);
+                                                        this.handleChange()
+                                                    }}
+                                                    >                                     
+                                                    </Field>
+                                                    {errors.B00012_value ? (
+                                                        <span className="errorMsg">{errors.B00012_value}</span>
+                                                    ) : null}
+                                                </div>
+                                            </FormGroup>
+                                        </Col>
+                                        </Fragment> : null
+                                    }
+                                    {values.LL_Coolie_flag == '1' && values[coverage.code] == 'B00069' ?
+                                        <Fragment>
+                                        <Col sm={12} md={11} lg={2} key={qIndex+"b"}>
+                                            <FormGroup>
+                                                <div className="formSection">
+                                                <Field
+                                                    name="B00069_value"
+                                                    type="text"
+                                                    placeholder="Enter No. of Person"
+                                                    autoComplete="off"
+                                                    // maxLength="28"
+                                                    onFocus={e => this.changePlaceHoldClassAdd(e)}
+                                                    onBlur={e => this.changePlaceHoldClassRemove(e)}
+                                                    onChange={(e) => {
+                                                        setFieldTouched('B00069_value')
+                                                        setFieldValue('B00069_value', e.target.value);
+                                                        this.handleChange()
+                                                    }}
+                                                    >                                     
+                                                    </Field>
+                                                    {errors.B00069_value ? (
+                                                        <span className="errorMsg">{errors.B00069_value}</span>
+                                                    ) : null}
+                                                </div>
+                                            </FormGroup>
+                                        </Col>
+                                        </Fragment> : null
+                                    }
+                                     {values.enhance_PA_OD_flag == '1' && values[coverage.code] == 'B00018' ?
+                                        <Fragment>
+                                        <Col sm={12} md={11} lg={3} key={qIndex+"b"}>
+                                            <FormGroup>
+                                                <div className="formSection">
+                                                <Field
+                                                    name="B00018_value"
+                                                    type="text"
+                                                    placeholder="Value should be 16L to 50L"
+                                                    autoComplete="off"
+                                                    // maxLength="28"
+                                                    onFocus={e => this.changePlaceHoldClassAdd(e)}
+                                                    onBlur={e => this.changePlaceHoldClassRemove(e)}
+                                                    onChange={(e) => {
+                                                        setFieldTouched('B00018_value')
+                                                        setFieldValue('B00018_value', e.target.value);
+                                                        this.handleChange()
+                                                    }}
+                                                    >                                     
+                                                    </Field>
+                                                    {errors.B00018_value ? (
+                                                        <span className="errorMsg">{errors.B00018_value}</span>
+                                                    ) : null}
+                                                </div>
+                                            </FormGroup>
+                                        </Col>
+                                        </Fragment> : null
+                                    }
+                                    {values.ATC_flag == '1' && values[coverage.code] == 'ATC' ?
+                                        <Fragment>
+                                        <Col sm={12} md={11} lg={2} key={qIndex+"c"}>
+                                            <FormGroup>
+                                                <div className="formSection">
+                                                    <Field
+                                                        name='ATC_value'
+                                                        component="select"
+                                                        autoComplete="off"
+                                                        className="formGrp inputfs12"
+                                                        value = {values.ATC_value}
+                                                        onChange={(e) => {
+                                                            setFieldTouched('ATC_value')
+                                                            setFieldValue('ATC_value', e.target.value);
+                                                            this.handleChange()
+                                                        }}
+                                                    >
+                                                        <option value="">Select</option>
+                                                        {coverage.covarage_value != null && JSON.parse(coverage.covarage_value).value.length > 0 && JSON.parse(coverage.covarage_value).value.map((insurer, qIndex) => (
+                                                            <option value= {insurer}>{insurer}</option>
+                                                        ))} 
+                                            
+                                                    </Field>
+                                                    {errors.ATC_value ? (
+                                                        <span className="errorMsg">{errors.ATC_value}</span>
+                                                    ) : null}
+                                                </div>
+                                            </FormGroup>
+                                        </Col>
+                                        </Fragment> : null
                                     }
                                     
                                 </Row>

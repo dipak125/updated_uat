@@ -119,7 +119,7 @@ class SelectBrandGCV extends Component {
         let brandId = vehicleDetails && vehicleDetails.vehiclebrand_id ? vehicleDetails.vehiclebrand_id : ""
         let encryption = new Encryption();
         return new Promise(resolve => {
-            axios.get(`gcv/vehicle/brand-with-image`)
+            axios.get(`gcv/vehicle/brand-with-image/4`)
                 .then(res => {
                     let decryptResp = JSON.parse(encryption.decrypt(res.data));
                     console.log('decryptResp', decryptResp)

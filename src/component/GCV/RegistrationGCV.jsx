@@ -66,7 +66,8 @@ class RegistrationGCV extends Component {
         regno:'',
         length:14,
         fastLaneData: [],
-        fastlanelog: []
+        fastlanelog: [],
+        subVehicleList: []
     }
    
 
@@ -85,7 +86,7 @@ class RegistrationGCV extends Component {
 
 
 componentDidMount(){
-    this.fetchData();
+    this.fetchSubVehicle();
     
 }
 
@@ -93,7 +94,6 @@ fetchData=()=>{
     const {productId } = this.props.match.params
     let policyHolder_id = localStorage.getItem("policyHolder_refNo") ? localStorage.getItem("policyHolder_refNo"):0;
     let encryption = new Encryption();
-    this.props.loadingStart();
     axios.get(`gcv/policy-holder/details/${policyHolder_id}`)
         .then(res=>{
             let decryptResp = JSON.parse(encryption.decrypt(res.data))
@@ -111,197 +111,224 @@ fetchData=()=>{
         })
 }
 
-    handleSubmit=(values)=>{
+fetchSubVehicle=()=>{
+    const {productId } = this.props.match.params
+    let encryption = new Encryption();
+    this.props.loadingStart();
+    axios.get(`gcv/sub-vehical-list/4`)
+        .then(res=>{
+            let decryptResp = JSON.parse(encryption.decrypt(res.data))
+            console.log("decrypt--fetchSubVehicle------ ", decryptResp)
 
-        const {productId} = this.props.match.params;
-
-        const formData = new FormData();
-        let encryption = new Encryption();
-        const {fastLaneData, fastlanelog } = this.state
-        let post_data = {}
-        let policyHolder_id = localStorage.getItem('policyHolder_id') ? localStorage.getItem('policyHolder_id') :0
-
-        let bc_data = sessionStorage.getItem('bcLoginData') ? sessionStorage.getItem('bcLoginData') : "";
-        if(bc_data) {
-            bc_data = JSON.parse(encryption.decrypt(bc_data));
-        }
-
-        if(policyHolder_id > 0){
-            if(sessionStorage.getItem('csc_id')) {
-                post_data = {
-                    'policy_holder_id': policyHolder_id,
-                    'registration_no':values.regNumber,
-                    'check_registration': values.check_registration,
-                    'menumaster_id':4,
-                    'vehicle_type_id':productId,
-                    'csc_id':sessionStorage.getItem('csc_id') ? sessionStorage.getItem('csc_id') : "",
-                    'agent_name':sessionStorage.getItem('agent_name') ? sessionStorage.getItem('agent_name') : "",
-                    'product_id':sessionStorage.getItem('product_id') ? sessionStorage.getItem('product_id') : "",
-                    'bc_token': "5",
-                    'page_name': `Registration/${productId}`,
-                    'policy_type_id':values.policy_type,
-                    'policy_for': values.policy_for,
-                    'fastlaneLog_id': this.state.fastLaneData && this.state.fastLaneData.fastlaneLog_id ? this.state.fastLaneData.fastlaneLog_id : fastlanelog && fastlanelog.id ? fastlanelog.id : ""
-                } 
-            }
-            else {
-                post_data = {
-                    'policy_holder_id': policyHolder_id,
-                    'registration_no':values.regNumber,
-                    'check_registration': values.check_registration,
-                    'menumaster_id':4,
-                    'vehicle_type_id':productId,
-                    'bcmaster_id': bc_data ? bc_data.agent_id : "",
-                    'bc_token': bc_data ? bc_data.token : "",
-                    'bc_agent_id': bc_data ? bc_data.user_info.data.user.username : "",
-                    'page_name': `Registration/${productId}`,
-                    'policy_type_id':values.policy_type,
-                    'policy_for': values.policy_for,
-                    'fastlaneLog_id': this.state.fastLaneData && this.state.fastLaneData.fastlaneLog_id ? this.state.fastLaneData.fastlaneLog_id : fastlanelog && fastlanelog.id ? fastlanelog.id : ""
-                } 
-            }
-
-            console.log('post_data', post_data)
-            formData.append('enc_data',encryption.encrypt(JSON.stringify(post_data)))
-      
-            this.props.loadingStart();
-            axios
-            .post(`gcv/update-registration`, formData)
-            .then(res => {
-                let decryptResp = JSON.parse(encryption.decrypt(res.data))
-                console.log("decrypt", decryptResp)
-
-                if(decryptResp.error == false) {
-                    this.props.history.push(`/SelectBrand_GCV/${productId}`);
-                }
-                else{
-                    swal(decryptResp.msg)
-                }   
-                this.props.loadingStop();
-                    
+            let subVehicleList = decryptResp.data        
+            this.setState({ 
+                subVehicleList
             })
-            .catch(err => {
-                let decryptErr = JSON.parse(encryption.decrypt(err.data));
-                console.log('decryptResp--err---', decryptErr)
-                if(decryptErr && err.data){
-                    swal('Registration number required...');
-                }
+            this.fetchData()
+        })
+        .catch(err => {
+            // handle error
             this.props.loadingStop();
-            });
-        }
-        else{
-            if(sessionStorage.getItem('csc_id')) {
-                post_data = {
-                    'registration_no':values.regNumber,
-                    'check_registration': values.check_registration,
-                    'menumaster_id':4,
-                    'vehicle_type_id':productId,
-                    'csc_id':sessionStorage.getItem('csc_id') ? sessionStorage.getItem('csc_id') : "",
-                    'agent_name':sessionStorage.getItem('agent_name') ? sessionStorage.getItem('agent_name') : "",
-                    'product_id':sessionStorage.getItem('product_id') ? sessionStorage.getItem('product_id') : "",
-                    'bcmaster_id': "5",
-                    'page_name': `Registration/${productId}`,
-                    'policy_type_id':values.policy_type,
-                    'policy_for': values.policy_for,
-                    'fastlaneLog_id': this.state.fastLaneData && this.state.fastLaneData.fastlaneLog_id ? this.state.fastLaneData.fastlaneLog_id : fastlanelog && fastlanelog.id ? fastlanelog.id : ""
-                } 
-            }
-            else {
-                post_data = {
-                    'registration_no':values.regNumber,
-                    'check_registration': values.check_registration,
-                    'menumaster_id':4,
-                    'vehicle_type_id':productId,
-                    'bcmaster_id': bc_data ? bc_data.agent_id : "",
-                    'bc_token': bc_data ? bc_data.token : "",
-                    'bc_agent_id': bc_data ? bc_data.user_info.data.user.username : "",
-                    'page_name': `Registration/${productId}`,
-                    'policy_type_id':values.policy_type,
-                    'policy_for': values.policy_for,
-                    'fastlaneLog_id': this.state.fastLaneData && this.state.fastLaneData.fastlaneLog_id ? this.state.fastLaneData.fastlaneLog_id : fastlanelog && fastlanelog.id ? fastlanelog.id : ""
-                } 
-            }
-            console.log('post_data', post_data)
-            formData.append('enc_data',encryption.encrypt(JSON.stringify(post_data)))
-            this.props.loadingStart();
-            axios
-            .post(`gcv/registration`, formData)
-            .then(res => {
-                let decryptResp = JSON.parse(encryption.decrypt(res.data))
-                console.log("decrypt", decryptResp)
+        })
+}
 
-                if(decryptResp.error == false) {
-                    localStorage.setItem('policyHolder_id', decryptResp.data.policyHolder_id);
-                    localStorage.setItem('policyHolder_refNo', decryptResp.data.policyHolder_refNo);
-                    this.props.history.push(`/SelectBrand_GCV/${productId}`); 
-                }   
-                else{
-                    swal(decryptResp.msg)
-                }
-                this.props.loadingStop();                    
-            })
-            .catch(err => {
-            if(err && err.data){
-                swal('Please check..something went wrong!!');
+handleSubmit=(values)=>{
+
+    const {productId} = this.props.match.params;
+
+    const formData = new FormData();
+    let encryption = new Encryption();
+    const {fastLaneData, fastlanelog } = this.state
+    let post_data = {}
+    let policyHolder_id = localStorage.getItem('policyHolder_id') ? localStorage.getItem('policyHolder_id') :0
+
+    let bc_data = sessionStorage.getItem('bcLoginData') ? sessionStorage.getItem('bcLoginData') : "";
+    if(bc_data) {
+        bc_data = JSON.parse(encryption.decrypt(bc_data));
+    }
+
+    if(policyHolder_id > 0){
+        if(sessionStorage.getItem('csc_id')) {
+            post_data = {
+                'policy_holder_id': policyHolder_id,
+                'registration_no':values.regNumber,
+                'check_registration': values.check_registration,
+                'menumaster_id':4,
+                'vehicle_type_id':productId,
+                'csc_id':sessionStorage.getItem('csc_id') ? sessionStorage.getItem('csc_id') : "",
+                'agent_name':sessionStorage.getItem('agent_name') ? sessionStorage.getItem('agent_name') : "",
+                'product_id':sessionStorage.getItem('product_id') ? sessionStorage.getItem('product_id') : "",
+                'bc_token': "5",
+                'page_name': `Registration/${productId}`,
+                'policy_type_id':values.policy_type,
+                'policy_for': values.policy_for,
+                'subclass_id' : values.subclass_id,
+                'fastlaneLog_id': this.state.fastLaneData && this.state.fastLaneData.fastlaneLog_id ? this.state.fastLaneData.fastlaneLog_id : fastlanelog && fastlanelog.id ? fastlanelog.id : "",
+
+            } 
+        }
+        else {
+            post_data = {
+                'policy_holder_id': policyHolder_id,
+                'registration_no':values.regNumber,
+                'check_registration': values.check_registration,
+                'menumaster_id':4,
+                'vehicle_type_id':productId,
+                'bcmaster_id': bc_data ? bc_data.agent_id : "",
+                'bc_token': bc_data ? bc_data.token : "",
+                'bc_agent_id': bc_data ? bc_data.user_info.data.user.username : "",
+                'page_name': `Registration/${productId}`,
+                'policy_type_id':values.policy_type,
+                'policy_for': values.policy_for,
+                'subclass_id' : values.subclass_id,
+                'fastlaneLog_id': this.state.fastLaneData && this.state.fastLaneData.fastlaneLog_id ? this.state.fastLaneData.fastlaneLog_id : fastlanelog && fastlanelog.id ? fastlanelog.id : ""
+            } 
+        }
+
+        console.log('post_data', post_data)
+        formData.append('enc_data',encryption.encrypt(JSON.stringify(post_data)))
+    
+        this.props.loadingStart();
+        axios
+        .post(`gcv/update-registration`, formData)
+        .then(res => {
+            let decryptResp = JSON.parse(encryption.decrypt(res.data))
+            console.log("decrypt", decryptResp)
+
+            if(decryptResp.error == false) {
+                this.props.history.push(`/SelectBrand_GCV/${productId}`);
             }
+            else{
+                swal(decryptResp.msg)
+            }   
             this.props.loadingStop();
-            });
-        }
-    }
-      
-    setValueData = () => {
-        var checkBoxAll = document.getElementsByClassName('user-self');
-        for(const a in checkBoxAll){
-            if(checkBoxAll[a].checked){            
-                return true
+                
+        })
+        .catch(err => {
+            let decryptErr = JSON.parse(encryption.decrypt(err.data));
+            console.log('decryptResp--err---', decryptErr)
+            if(decryptErr && err.data){
+                swal('Registration number required...');
             }
-        }
-        return false
+        this.props.loadingStop();
+        });
     }
+    else{
+        if(sessionStorage.getItem('csc_id')) {
+            post_data = {
+                'registration_no':values.regNumber,
+                'check_registration': values.check_registration,
+                'menumaster_id':4,
+                'vehicle_type_id':productId,
+                'csc_id':sessionStorage.getItem('csc_id') ? sessionStorage.getItem('csc_id') : "",
+                'agent_name':sessionStorage.getItem('agent_name') ? sessionStorage.getItem('agent_name') : "",
+                'product_id':sessionStorage.getItem('product_id') ? sessionStorage.getItem('product_id') : "",
+                'bcmaster_id': "5",
+                'page_name': `Registration/${productId}`,
+                'policy_type_id':values.policy_type,
+                'policy_for': values.policy_for,
+                'subclass_id': values.subclass_id,
+                'fastlaneLog_id': this.state.fastLaneData && this.state.fastLaneData.fastlaneLog_id ? this.state.fastLaneData.fastlaneLog_id : fastlanelog && fastlanelog.id ? fastlanelog.id : ""
+            } 
+        }
+        else {
+            post_data = {
+                'registration_no':values.regNumber,
+                'check_registration': values.check_registration,
+                'menumaster_id':4,
+                'vehicle_type_id':productId,
+                'bcmaster_id': bc_data ? bc_data.agent_id : "",
+                'bc_token': bc_data ? bc_data.token : "",
+                'bc_agent_id': bc_data ? bc_data.user_info.data.user.username : "",
+                'page_name': `Registration/${productId}`,
+                'policy_type_id':values.policy_type,
+                'policy_for': values.policy_for,
+                'subclass_id': values.subclass_id,
+                'fastlaneLog_id': this.state.fastLaneData && this.state.fastLaneData.fastlaneLog_id ? this.state.fastLaneData.fastlaneLog_id : fastlanelog && fastlanelog.id ? fastlanelog.id : ""
+            } 
+        }
+        console.log('post_data', post_data)
+        formData.append('enc_data',encryption.encrypt(JSON.stringify(post_data)))
+        this.props.loadingStart();
+        axios
+        .post(`gcv/registration`, formData)
+        .then(res => {
+            let decryptResp = JSON.parse(encryption.decrypt(res.data))
+            console.log("decrypt", decryptResp)
 
-    handleChange = (values, setFieldTouched, setFieldValue) => {
-        if(values.regNumber == "NEW"){
-            // setFieldTouched('check_registration')
-            setFieldValue('regNumber', "");
+            if(decryptResp.error == false) {
+                localStorage.setItem('policyHolder_id', decryptResp.data.policyHolder_id);
+                localStorage.setItem('policyHolder_refNo', decryptResp.data.policyHolder_refNo);
+                this.props.history.push(`/SelectBrand_GCV/${productId}`); 
+            }   
+            else{
+                swal(decryptResp.msg)
+            }
+            this.props.loadingStop();                    
+        })
+        .catch(err => {
+        if(err && err.data){
+            swal('Please check..something went wrong!!');
+        }
+        this.props.loadingStop();
+        });
+    }
+}
+    
+setValueData = () => {
+    var checkBoxAll = document.getElementsByClassName('user-self');
+    for(const a in checkBoxAll){
+        if(checkBoxAll[a].checked){            
+            return true
         }
     }
+    return false
+}
 
-    regnoFormat = (e, setFieldTouched, setFieldValue) => {
-        
-        let regno = e.target.value
-        let formatVal = ""
-        let regnoLength = regno.length
-        var letter = /^[a-zA-Z]+$/;
-        var number = /^[0-9]+$/;
-        let subString = regno.substring(regnoLength-1, regnoLength)
-        let preSubString = regno.substring(regnoLength-2, regnoLength-1)
-    
-        if(subString.match(letter) && preSubString.match(letter)) {
-            formatVal = regno
-        }
-        else if(subString.match(number) && preSubString.match(number)) {
-            formatVal = regno
-        } 
-        else if(subString.match(number) && preSubString.match(letter)) {        
-            formatVal = regno.substring(0, regnoLength-1) + " " +subString      
-        } 
-        else if(subString.match(letter) && preSubString.match(number)) {
-            formatVal = regno.substring(0, regnoLength-1) + " " +subString   
-        } 
-    
-        else formatVal = regno.toUpperCase()
-        
-        e.target.value = formatVal.toUpperCase()
-    
+handleChange = (values, setFieldTouched, setFieldValue) => {
+    if(values.regNumber == "NEW"){
+        // setFieldTouched('check_registration')
+        setFieldValue('regNumber', "");
     }
+}
+
+regnoFormat = (e, setFieldTouched, setFieldValue) => {
+    
+    let regno = e.target.value
+    let formatVal = ""
+    let regnoLength = regno.length
+    var letter = /^[a-zA-Z]+$/;
+    var number = /^[0-9]+$/;
+    let subString = regno.substring(regnoLength-1, regnoLength)
+    let preSubString = regno.substring(regnoLength-2, regnoLength-1)
+
+    if(subString.match(letter) && preSubString.match(letter)) {
+        formatVal = regno
+    }
+    else if(subString.match(number) && preSubString.match(number)) {
+        formatVal = regno
+    } 
+    else if(subString.match(number) && preSubString.match(letter)) {        
+        formatVal = regno.substring(0, regnoLength-1) + " " +subString      
+    } 
+    else if(subString.match(letter) && preSubString.match(number)) {
+        formatVal = regno.substring(0, regnoLength-1) + " " +subString   
+    } 
+
+    else formatVal = regno.toUpperCase()
+    
+    e.target.value = formatVal.toUpperCase()
+
+}
 
 
     render() {
-        const {motorInsurance} = this.state
+        const {motorInsurance, subVehicleList} = this.state
         const newInitialValues = Object.assign(initialValues,{
             regNumber: motorInsurance && motorInsurance.registration_no ? motorInsurance.registration_no : "",
             policy_type: motorInsurance && motorInsurance.policytype_id ? motorInsurance.policytype_id : "",
             policy_for: motorInsurance && motorInsurance.policy_for ? motorInsurance.policy_for : "",
+            subclass_id : motorInsurance && motorInsurance.subclass_id ? motorInsurance.subclass_id : "",
         })
 
         return (
@@ -324,9 +351,9 @@ fetchData=()=>{
                                             // console.log('values',values)
                                             
                                         return (
-                                        <Form>
+                                        <Form>                                           
                                             <div className="d-flex justify-content-left">
-                                            <div className="brandhead"> 
+                                                <div className="brandhead"> 
                                                 <p>Taking GCV policy for</p>
                                                     <div className="d-inline-flex m-b-15">
                                                         <div className="p-r-25">
@@ -413,102 +440,128 @@ fetchData=()=>{
                                                                 <span className="checkmark " /><span className="fs-14"> Roll Over</span>
                                                             </label>
                                                         </div>
-
-                                                        <div>
-                                                            <label className="customRadio3">
-                                                                <Field
-                                                                    type="radio"
-                                                                    name='policy_type'
-                                                                    value='3'
-                                                                    key='1'
-                                                                    checked = {values.policy_type == '3' ? true : false}
-                                                                    onChange = {() =>{
-                                                                        setFieldTouched('policy_type')
-                                                                        setFieldValue('policy_type', '3');
-                                                                        this.handleChange(values,setFieldTouched, setFieldValue)
-                                                                    }  
-                                                                    }
-                                                                />
-                                                                <span className="checkmark" />
-                                                                <span className="fs-14">Lapsed Policy</span>
-                                                            </label>
-                                                            {errors.policy_type && touched.policy_type ? (
-                                                                <span className="errorMsg">{errors.policy_type}</span>
-                                                            ) : null}
-                                                        </div>
                                                     </div>
                                                 </div>
                                             </div>
-                                        <div className="row formSection">
-                                            <label className="col-md-4">Enter Vehicle Registration Number:</label>
-                                            <div className="col-md-4">
+                                            {/* <div className="row formSection">
+                                                <label className="col-md-4">Branch Name:</label>
+                                                <div className="col-md-4">
+                                                    
+                                                    <div className="formSection">
+                                                        <Field
+                                                            name='branch_name'
+                                                            component="select"
+                                                            autoComplete="off"
+                                                            className="formGrp inputfs12"
+                                                            value = {values.branch_name}
+                                                            // value={ageObj.whatIsCurrentMonth(values.registration_date) < 7 ? 6 : values.previous_policy_name}
+                                                        >
+                                                            <option value="">Select Branch Name</option>
+                                                            <option value="1">Package</option>
+                                                            <option value="2">Liability Only</option>  
                                                 
-                                            <Field
-                                                name="regNumber"
-                                                type="text"
-                                                placeholder="Registration Number"
-                                                autoComplete="off"
-                                                onFocus={e => this.changePlaceHoldClassAdd(e)}
-                                                onBlur={e => this.changePlaceHoldClassRemove(e)}
-                                                value= {values.regNumber}   
-                                                maxLength={this.state.length}
-                                                onInput={e=>{
-                                                    this.regnoFormat(e, setFieldTouched, setFieldValue)
-                                                    setFieldTouched('check_registration')
-                                                    setFieldValue('check_registration', '2');
-                                                }}        
-    
-                                            />
-                                            {errors.regNumber && touched.regNumber ? (
-                                                <span className="errorMsg">{errors.regNumber}</span>
-                                            ) : null}    
+                                                        </Field>
+                                                        {errors.branch_name && touched.branch_name ? (
+                                                            <span className="errorMsg">{errors.branch_name}</span>
+                                                        ) : null}
+                                                    </div>
+                                                </div>
+                                            </div> */}
+                                            <div className="row formSection">
+                                                <label className="col-md-4">Sub Product:</label>
+                                                <div className="col-md-4">
+                                                    
+                                                    <div className="formSection">
+                                                        <Field
+                                                            name='subclass_id'
+                                                            component="select"
+                                                            autoComplete="off"
+                                                            className="formGrp inputfs12"
+                                                            value = {values.subclass_id}
+                                                            // value={ageObj.whatIsCurrentMonth(values.registration_date) < 7 ? 6 : values.previous_policy_name}
+                                                        >
+                                                            <option value="">Select Sub Product</option>
+                                                            {subVehicleList.map((subVehicle, qIndex) => ( 
+                                                                <option value= {subVehicle.subclass_id}>{subVehicle.subclass_title}</option>
+                                                            ))}
+                                                
+                                                        </Field>
+                                                        {errors.branch_name && touched.branch_name ? (
+                                                            <span className="errorMsg">{errors.branch_name}</span>
+                                                        ) : null}
+                                                    </div>
+                                                </div>
                                             </div>
-                                        </div>
-                                        <div className="row formSection">
-                                                <label className="customCheckBox formGrp formGrp">
-                                                Continue Without Vehicle Registration Number
+                                            <div className="row formSection">
+                                                <label className="col-md-4">Enter Vehicle Registration Number:</label>
+                                                <div className="col-md-4">
+                                                    
                                                 <Field
-                                                    type="checkbox"
-                                                    name="check_registration"
-                                                    value="1"
-                                                    className="user-self"
-                                                    onChange={(e) => {
-                                                        if (e.target.checked === true) {
-                                                            setFieldTouched('regNumber')
-                                                            setFieldValue('regNumber', '');
-                                                            setFieldTouched('check_registration')
-                                                            setFieldValue('check_registration', e.target.value);
-    
-                                                        } else {
-                                                            setFieldValue('check_registration', '2');                                                            
-                                                        }
-                                                        if(this.setValueData()){
-                                                            this.setState({
-                                                                check_registration:1
-                                                            })
-                                                        }
-                                                        else{
-                                                            this.setState({
-                                                                check_registration:2
-                                                            })
-                                                        }
-                                                    }}
-                                                    checked={values.check_registration == '1' ? true : false}
+                                                    name="regNumber"
+                                                    type="text"
+                                                    placeholder="Registration Number"
+                                                    autoComplete="off"
+                                                    onFocus={e => this.changePlaceHoldClassAdd(e)}
+                                                    onBlur={e => this.changePlaceHoldClassRemove(e)}
+                                                    value= {values.regNumber}   
+                                                    maxLength={this.state.length}
+                                                    onInput={e=>{
+                                                        this.regnoFormat(e, setFieldTouched, setFieldValue)
+                                                        setFieldTouched('check_registration')
+                                                        setFieldValue('check_registration', '2');
+                                                    }}        
+        
                                                 />
-                                                    <span className="checkmark mL-0"></span>
-                                                </label>
-                                                {errors.check_registration && (touched.looking_for_2 || touched.looking_for_3 || touched.looking_for_4) ? 
-                                                        <span className="error-message">{errors.check_registration}</span> : ""
-                                                    }
-                                                
-                                            </div> 
-                                        <div className="cntrbtn">
-                                        <Button className={`btnPrimary`} type="submit" >
-                                            Go
-                                        </Button>
+                                                {errors.regNumber && touched.regNumber ? (
+                                                    <span className="errorMsg">{errors.regNumber}</span>
+                                                ) : null}    
+                                                </div>
+                                            </div>
+                                            <div className="row formSection">
+                                                    <label className="customCheckBox formGrp formGrp">
+                                                    Continue Without Vehicle Registration Number
+                                                    <Field
+                                                        type="checkbox"
+                                                        name="check_registration"
+                                                        value="1"
+                                                        className="user-self"
+                                                        onChange={(e) => {
+                                                            if (e.target.checked === true) {
+                                                                setFieldTouched('regNumber')
+                                                                setFieldValue('regNumber', '');
+                                                                setFieldTouched('check_registration')
+                                                                setFieldValue('check_registration', e.target.value);
+        
+                                                            } else {
+                                                                setFieldValue('check_registration', '2');                                                            
+                                                            }
+                                                            if(this.setValueData()){
+                                                                this.setState({
+                                                                    check_registration:1
+                                                                })
+                                                            }
+                                                            else{
+                                                                this.setState({
+                                                                    check_registration:2
+                                                                })
+                                                            }
+                                                        }}
+                                                        checked={values.check_registration == '1' ? true : false}
+                                                    />
+                                                        <span className="checkmark mL-0"></span>
+                                                    </label>
+                                                    {errors.check_registration && (touched.looking_for_2 || touched.looking_for_3 || touched.looking_for_4) ? 
+                                                            <span className="error-message">{errors.check_registration}</span> : ""
+                                                        }
+                                                    
+                                                </div> 
+                                            <div className="cntrbtn">
+                                            <Button className={`btnPrimary`} type="submit" >
+                                                Go
+                                            </Button>
 
-                                        
-                                        </div>
+                                            
+                                            </div>
                                         </Form>
                                         );
                                     }}

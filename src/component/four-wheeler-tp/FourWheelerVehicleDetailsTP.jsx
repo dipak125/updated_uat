@@ -22,7 +22,7 @@ import { setData } from "../../store/actions/data";
 const ageObj = new PersonAge();
 let encryption = new Encryption();
 const maxRegnDate = moment(moment().subtract(1, 'years').calendar()).add(1, 'day').calendar();
-const minRegnDate = moment(moment().subtract(12, 'years').calendar()).add(1, 'day').calendar();
+const minRegnDate = moment(moment().subtract(20, 'years').calendar()).add(1, 'day').calendar();
 
 
 const initialValue = {

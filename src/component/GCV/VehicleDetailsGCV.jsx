@@ -290,7 +290,12 @@ class VehicleDetailsGCV extends Component {
         selectedCustomerRecords: [],
         CustIdkeyword: "",
         RTO_location: "",
-        previous_is_claim: ""
+        previous_is_claim: "",
+        vehicleDetails: [],
+        averagemonthlyusages: [],
+        goodscarriedtypes: [],
+        permittypes: []
+
     };
 
     changePlaceHoldClassAdd(e) {
@@ -423,6 +428,9 @@ class VehicleDetailsGCV extends Component {
                 'vehicleAge': vehicleAge,
                 'policy_type': policy_type,
                 'prev_policy_flag': 1,
+                'averagemonthlyusage_id': values.averagemonthlyusages_id,
+                'goodscarriedtype_id': values.goodscarriedtypes_id,
+                'permittype_id': values.permittypes_id,
                 'page_name': `VehicleDetails/${productId}`          
             } 
         }
@@ -444,6 +452,9 @@ class VehicleDetailsGCV extends Component {
                 'prev_policy_flag': 1,
                 'previous_is_claim':'0', 
                 'previous_claim_bonus': 1,
+                'averagemonthlyusage_id': values.averagemonthlyusages_id,
+                'goodscarriedtype_id': values.goodscarriedtypes_id,
+                'permittype_id': values.permittypes_id,
                 'page_name': `VehicleDetails/${productId}`          
             } 
         }
@@ -458,6 +469,9 @@ class VehicleDetailsGCV extends Component {
                 'vehicleAge': vehicleAge ,
                 'policy_type': policy_type,
                 'prev_policy_flag': 0,
+                'averagemonthlyusage_id': values.averagemonthlyusages_id,
+                'goodscarriedtype_id': values.goodscarriedtypes_id,
+                'permittype_id': values.permittypes_id,
                 'page_name': `VehicleDetails/${productId}`
             } 
         }
@@ -530,7 +544,6 @@ class VehicleDetailsGCV extends Component {
         const { productId } = this.props.match.params
         let policyHolder_id = localStorage.getItem("policyHolder_refNo") ? localStorage.getItem("policyHolder_refNo") : 0;
         let encryption = new Encryption();
-        this.props.loadingStart();
         axios.get(`gcv/policy-holder/details/${policyHolder_id}`)
             .then(res => {
                  let decryptResp = JSON.parse(encryption.decrypt(res.data))
@@ -551,6 +564,33 @@ class VehicleDetailsGCV extends Component {
             })
     }
 
+    fetchVehicleCarryingList=()=>{
+        const {productId } = this.props.match.params
+        let encryption = new Encryption();
+        this.props.loadingStart();
+        axios.get(`gcv/carrying-capacity-list/4 `)
+            .then(res=>{
+                let decryptResp = JSON.parse(encryption.decrypt(res.data))
+    
+                let averagemonthlyusages =  decryptResp.data ? decryptResp.data.averagemonthlyusages : []
+                let goodscarriedtypes =  decryptResp.data ? decryptResp.data.goodscarriedtypes : []
+                let permittypes =  decryptResp.data ? decryptResp.data.permittypes : []
+
+                console.log("decrypt--fetchSubVehicle------ ", averagemonthlyusages)
+
+                this.setState({ 
+                    averagemonthlyusages, goodscarriedtypes, permittypes
+                })
+                this.fetchData()
+            })
+            .catch(err => {
+                // let decryptResp = JSON.parse(encryption.decrypt(err.data))
+                // console.log("decrypterr--fetchSubVehicle------ ", decryptResp)
+                // handle error
+                this.props.loadingStop();
+            })
+    }
+
     handleChange =(value) => {
         let endDate = moment(value).add(1, 'years').format("YYYY-MM-DD")
         this.setState({
@@ -563,7 +603,7 @@ class VehicleDetailsGCV extends Component {
 
     componentDidMount() {
         this.getInsurerList();
-        this.fetchData();
+        this.fetchVehicleCarryingList();
         
     }
     registration = (productId) => {
@@ -572,8 +612,8 @@ class VehicleDetailsGCV extends Component {
 
     render() {
         const {productId} = this.props.match.params  
-        const {insurerList, showClaim, previous_is_claim, motorInsurance, previousPolicy,
-            CustomerID,suggestions, vehicleDetails, RTO_location} = this.state
+        const {insurerList, showClaim, previous_is_claim, motorInsurance, previousPolicy,CustomerID,suggestions,
+              vehicleDetails, RTO_location, averagemonthlyusages,goodscarriedtypes,permittypes} = this.state
 
         let newInitialValues = Object.assign(initialValue, {
             registration_date: motorInsurance && motorInsurance.registration_date ? new Date(motorInsurance.registration_date) : "",
@@ -621,68 +661,6 @@ class VehicleDetailsGCV extends Component {
                                     <Form>
                                         <Row>
                                             <Col sm={12} md={9} lg={9}>
-                                                <Row>
-                                                    <Col sm={12} md={6} lg={6}>
-                                                        <FormGroup>
-                                                            <div className="fs-18">
-                                                                Branch Name
-                                                            </div>
-                                                        </FormGroup>
-                                                    </Col>
-                                                    <Col sm={12} md={11} lg={4}>
-                                                        <FormGroup>
-                                                            <div className="formSection">
-                                                                <Field
-                                                                    name='branch_name'
-                                                                    component="select"
-                                                                    autoComplete="off"
-                                                                    className="formGrp inputfs12"
-                                                                    value = {values.branch_name}
-                                                                    // value={ageObj.whatIsCurrentMonth(values.registration_date) < 7 ? 6 : values.previous_policy_name}
-                                                                >
-                                                                    <option value="">Select Branch Name</option>
-                                                                    <option value="1">Package</option>
-                                                                    <option value="2">Liability Only</option>  
-                                                        
-                                                                </Field>
-                                                                {errors.branch_name && touched.branch_name ? (
-                                                                    <span className="errorMsg">{errors.branch_name}</span>
-                                                                ) : null}
-                                                            </div>
-                                                        </FormGroup>
-                                                    </Col>
-                                                </Row>
-                                                <Row>
-                                                    <Col sm={12} md={6} lg={6}>
-                                                        <FormGroup>
-                                                            <div className="fs-18">
-                                                                Sub Product
-                                                            </div>
-                                                        </FormGroup>
-                                                    </Col>
-                                                    <Col sm={12} md={11} lg={4}>
-                                                        <FormGroup>
-                                                            <div className="formSection">
-                                                                <Field
-                                                                    name='sub_product'
-                                                                    component="select"
-                                                                    autoComplete="off"
-                                                                    className="formGrp inputfs12"
-                                                                    value = {values.sub_product}
-                                                                    // value={ageObj.whatIsCurrentMonth(values.registration_date) < 7 ? 6 : values.previous_policy_name}
-                                                                >
-                                                                    <option value="">Select Sub Product</option>
-                                                                    <option value="1">Package</option>
-                                                                    <option value="2">Liability Only</option>  
-                                                        
-                                                                </Field>
-                                                                {errors.sub_product && touched.sub_product ? (
-                                                                    <span className="errorMsg">{errors.sub_product}</span>
-                                                                ) : null}
-                                                            </div>
-                                                        </FormGroup>
-                                                    </Col>
-                                                </Row>
                                                 <Row>
                                                     <Col sm={12} md={6} lg={6}>
                                                         <FormGroup>
@@ -756,8 +734,90 @@ class VehicleDetailsGCV extends Component {
                                                         </FormGroup>
                                                     </Col>
                                                 </Row>
+                                                <Row>
+                                                    <Col sm={12} md={11} lg={4}>
+                                                        <FormGroup>
+                                                            <div className="formSection">
+                                                                <Field
+                                                                    name='goodscarriedtypes_id'
+                                                                    component="select"
+                                                                    autoComplete="off"
+                                                                    className="formGrp inputfs12"
+                                                                    value = {values.goodscarriedtypes_id}
+                                                                    // value={ageObj.whatIsCurrentMonth(values.registration_date) < 7 ? 6 : values.previous_policy_name}
+                                                                >
+                                                                    <option value="">Select Type of goods carried</option>
+                                                                    {goodscarriedtypes.map((subVehicle, qIndex) => ( 
+                                                                        <option value= {subVehicle.id}>{subVehicle.goodscarriedtype}</option>
+                                                                    ))}
+                                                        
+                                                                </Field>
+                                                                {errors.goodscarriedtypes_id && touched.goodscarriedtypes_id ? (
+                                                                    <span className="errorMsg">{errors.goodscarriedtypes_id}</span>
+                                                                ) : null}
+                                                            </div>
+                                                        </FormGroup>
+                                                    </Col>
+
+                                                    <Col sm={12} md={11} lg={4}>
+                                                        <FormGroup>
+                                                            <div className="formSection">
+                                                                <Field
+                                                                    name='averagemonthlyusages_id'
+                                                                    component="select"
+                                                                    autoComplete="off"
+                                                                    className="formGrp inputfs12"
+                                                                    value = {values.averagemonthlyusages_id}
+                                                                    // value={ageObj.whatIsCurrentMonth(values.registration_date) < 7 ? 6 : values.previous_policy_name}
+                                                                >
+                                                                    <option value="">Select Avarage Monthly use of Vehicle</option>
+                                                                    {averagemonthlyusages.map((monthlyusages, qIndex) => ( 
+                                                                        <option value= {monthlyusages.id}>{monthlyusages.usage_description}</option>
+                                                                    ))}
+                                                        
+                                                                </Field>
+                                                                {errors.averagemonthlyusages_id && touched.averagemonthlyusages_id ? (
+                                                                    <span className="errorMsg">{errors.averagemonthlyusages_id}</span>
+                                                                ) : null}
+                                                            </div>
+                                                        </FormGroup>
+                                                    </Col>
+                                                    <Col sm={12} md={11} lg={3}>
+                                                        <FormGroup>
+                                                            <div className="formSection">
+                                                                <Field
+                                                                    name='permittypes_id'
+                                                                    component="select"
+                                                                    autoComplete="off"
+                                                                    className="formGrp inputfs12"
+                                                                    value = {values.permittypes_id}
+                                                                    // value={ageObj.whatIsCurrentMonth(values.registration_date) < 7 ? 6 : values.previous_policy_name}
+                                                                >
+                                                                    <option value="">Select Type of permit</option>
+                                                                    {permittypes.map((permittype, qIndex) => ( 
+                                                                        <option value= {permittype.id}>{permittype.permittype}</option>
+                                                                    ))}
+                                                        
+                                                                </Field>
+                                                                {errors.permittypes_id && touched.permittypes_id ? (
+                                                                    <span className="errorMsg">{errors.permittypes_id}</span>
+                                                                ) : null}
+                                                            </div>
+                                                        </FormGroup>
+                                                    </Col>
+                                                </Row>
+
                                             {ageObj.whatIsCurrentMonth(values.registration_date) > 0 || values.registration_date == "" ?
                                                 <Fragment>
+                                                <Row>
+                                                    <Col sm={12}>
+                                                        <FormGroup>
+                                                            <div className="carloan">
+                                                                <h4> </h4>
+                                                            </div>
+                                                        </FormGroup>
+                                                    </Col>
+                                                </Row>
                                                 <Row>
                                                     <Col sm={12}>
                                                         <FormGroup>
@@ -909,6 +969,15 @@ class VehicleDetailsGCV extends Component {
                                                         <Col sm={12}>
                                                             <FormGroup>
                                                                 <div className="carloan">
+                                                                    <h4> </h4>
+                                                                </div>
+                                                            </FormGroup>
+                                                        </Col>
+                                                    </Row>
+                                                    <Row>
+                                                        <Col sm={12}>
+                                                            <FormGroup>
+                                                                <div className="carloan">
                                                                     <h4>Have you made a claim in your existing Policy</h4>
                                                                 </div>
                                                             </FormGroup>
@@ -987,10 +1056,8 @@ class VehicleDetailsGCV extends Component {
                                                                             setFieldValue('previous_claim_for', e.target.value)
                                                                             if(e.target.value == '1') {
                                                                                 setFieldValue('previous_claim_bonus', '1')
-                                                                            }
-                                                                            
-                                                                        } 
-                                                                        }
+                                                                            }      
+                                                                        }}
                                                                     >
                                                                         <option value="">--Select--</option>
                                                                         <option value="1">Own Damage</option>

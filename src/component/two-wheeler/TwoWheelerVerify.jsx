@@ -606,20 +606,34 @@ class TwoWheelerVerify extends Component {
         if(newInitialValues.lapse_duration == '1' && motorInsurance && motorInsurance.policytype_id == '3') {
             // minDate = moment(moment().subtract(1, 'years').calendar()).add(1, 'day').calendar();
             var date = new Date(motorInsurance.registration_date);
+            console.log("date--->",date);
             var year = new Date()
+            // console.log("year");
             var day = motorInsurance && motorInsurance.registration_date ? date.getDate() : ""
             var month = motorInsurance && motorInsurance.registration_date ? date.getMonth() : ""
              year =   year.getFullYear() - 1
             minDate = new Date(year,month,day)
+            // var minD = minDate
+            // console.log("minD");
             maxDate = moment().subtract(1, 'years').calendar()
+            // var maxD = maxDate
+            // console.log("minD");
 
-            var difference =  moment(maxDate).diff(minDate, 'days', true)
-            if(difference >= 90 || difference < 0) {
+            var difference =  moment(maxDate).diff(motorInsurance.registration_date, 'days', true)
+            var difference_1 =  moment(maxDate).diff(minDate, 'days', true)
+            console.log("maxDate--->", maxDate)
+            console.log("minDate--->", minDate)
+            console.log("difference_1---", difference_1)
+            if(difference >= 1 || difference < 0 ) {
                 // minDate = moment(moment().subtract(1, 'years').calendar()).add(1, 'day').calendar()
+                // if(difference > difference_1 && difference < 89){
                 minDate = moment().subtract(1, 'years').calendar()
                 minDate = moment(minDate).subtract(89, 'day').calendar()
+            // }
 
             }
+            console.log("maxDate--->", maxDate)
+            console.log("minDate--->", minDate)
             console.log("difference---", difference)
         }
         else {
