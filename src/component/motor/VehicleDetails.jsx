@@ -738,8 +738,13 @@ class VehicleDetails extends Component {
                                                                 className="datePckr inputfs12"
                                                                 selected={values.previous_start_date}
                                                                 onChange={(val) => {
+                                                                    var date = new Date(val)
+                                                                    date = date.setFullYear(date.getFullYear() + 1);
+                                                                    var date2 = new Date(date)
+                                                                    date2 = date2.setDate(date2.getDate() - 1);
+
                                                                     setFieldTouched('previous_start_date')
-                                                                    setFieldValue("previous_end_date", addDays(new Date(val), 365));
+                                                                    setFieldValue("previous_end_date", date2);
                                                                     setFieldValue('previous_start_date', val);
                                                                 }}
                                                             />
