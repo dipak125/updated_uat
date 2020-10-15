@@ -105,32 +105,19 @@ const ComprehensiveValidation = Yup.object().shape({
    
     B00018_value: Yup.string().when(['enhance_PA_OD_flag'], {
         is: enhance_PA_OD_flag => enhance_PA_OD_flag == '1',
-        then: Yup.string().required('Please provide enhance PA coverage').test(
-                    "isLoanChecking",
-                    function() {
-                        return "Value should be 16L to 50L"
-                    },
-                    function (value) {
-                        if (parseInt(value) < 1600000 || value > 5000000) {   
-                            return false;    
-                        }
-                        return true;
-                    }
-                ).matches(/^[0-9]*$/, function() {
-                    return "Please enter valid IDV"
-                }),
+        then: Yup.string().required('Please provide enhance PA coverage'),
         otherwise: Yup.string()
     }),
    
     B00069_value: Yup.string().when(['LL_Coolie_flag'], {
         is: LL_Coolie_flag => LL_Coolie_flag == '1',
-        then: Yup.string().required('Please provide No. of person').matches(/^[0-9]$/, 'Please provide valid No.'),
+        then: Yup.string().required('Please provide No. of person'),
         otherwise: Yup.string()
     }),
    
     B00012_value: Yup.string().when(['LL_Emp_flag'], {
         is: LL_Emp_flag => LL_Emp_flag == '1',
-        then: Yup.string().required('Please provide No. of employee').matches(/^[0-9]$/, 'Please provide valid No.'),
+        then: Yup.string().required('Please provide No. of employee'),
         otherwise: Yup.string()
     }),
    
@@ -338,7 +325,7 @@ class OtherComprehensiveGCV extends Component {
     }
 
     vehicleDetails = (productId) => {      
-        this.props.history.push(`/VehicleDetails_GCV/${productId}`);
+        this.props.history.push(`/VehicleDetails_GCV_TP/${productId}`);
     }
 
 
@@ -347,7 +334,7 @@ class OtherComprehensiveGCV extends Component {
         let policyHolder_id = localStorage.getItem("policyHolder_refNo") ? localStorage.getItem("policyHolder_refNo") : 0;
         let encryption = new Encryption();
         this.props.loadingStart();
-        axios.get(`gcv/policy-holder/details/${policyHolder_id}`)
+        axios.get(`gcv-tp/policy-holder/details/${policyHolder_id}`)
             .then(res => {
                 let decryptResp = JSON.parse(encryption.decrypt(res.data))
                 console.log("decrypt--fetchData-- ", decryptResp)
@@ -416,7 +403,7 @@ class OtherComprehensiveGCV extends Component {
         this.props.loadingStart();
         let encryption = new Encryption();
         axios
-          .get(`gcv/coverage-list/${localStorage.getItem('policyHolder_id')}`)
+          .get(`gcv-tp/coverage-list/${localStorage.getItem('policyHolder_id')}`)
           .then((res) => {
             let decryptResp = JSON.parse(encryption.decrypt(res.data))
             let Coverage = []
@@ -695,12 +682,12 @@ class OtherComprehensiveGCV extends Component {
 
         formData.append('enc_data', encryption.encrypt(JSON.stringify(post_data)))
         this.props.loadingStart();
-        axios.post('gcv/update-insured-value', formData).then(res => {
+        axios.post('gcv-tp/update-insured-value', formData).then(res => {
             this.props.loadingStop();
             let decryptResp = JSON.parse(encryption.decrypt(res.data))
             console.log("decrypt--fetchData-- ", decryptResp)
             if (decryptResp.error == false) {
-                this.props.history.push(`/AdditionalDetails_GCV/${productId}`);
+                this.props.history.push(`/AdditionalDetails_GCV_TP/${productId}`);
             }
 
         })
@@ -894,7 +881,7 @@ class OtherComprehensiveGCV extends Component {
         maxIDV = maxIDV - 1;
         let minBodyIDV = 0
         let maxBodyIDV = 10000000
-        let defaultBodySliderValue =  motorInsurance && motorInsurance.body_idv_value ? motorInsurance.body_idv_value : 0
+        let defaultBodySliderValue = 0
         let bodySliderValue = bodySliderVal
 
         let covList = motorInsurance && motorInsurance.add_more_coverage ? motorInsurance.add_more_coverage.split(",") : ""
@@ -1279,7 +1266,7 @@ class OtherComprehensiveGCV extends Component {
                                 : null}
                             </Row>
 
-                            {/* <Row>
+                            <Row>
                                 <Col sm={12} md={4} lg={4}>
                                     <FormGroup>
                                         <div className="insurerName">
@@ -1306,7 +1293,7 @@ class OtherComprehensiveGCV extends Component {
                                         </div>
                                     </FormGroup>
                                 </Col>
-                                
+                                {defaultSliderValue ? 
 
                                 <Col sm={12} md={12} lg={6}>
                                     <FormGroup>
@@ -1323,10 +1310,11 @@ class OtherComprehensiveGCV extends Component {
                                     this.bodySliderValue(e.target.value)
                                 }}
                                     />
+                                        {/* <img src={require('../../assets/images/slide.svg')} alt="" className="W-90" /> */}
                                     </FormGroup>
                                 </Col>
-                                
-                            </Row> */}
+                                : null}
+                            </Row>
 
                             <Row>
                                 <Col sm={12} md={5} lg={5}>
@@ -1419,7 +1407,7 @@ class OtherComprehensiveGCV extends Component {
 
                                 {moreCoverage && moreCoverage.length > 0 ? moreCoverage.map((coverage, qIndex) => (
                                 <Row key={qIndex}>   
-                                {motorInsurance && motorInsurance.policy_for == '2' && coverage.code != 'B00015' && coverage.code != 'B00018' && coverage.code != 'B00019' || motorInsurance && motorInsurance.policy_for == '1' ?
+                                 {motorInsurance && motorInsurance.policy_for == '2' && coverage.code != 'B00015' || motorInsurance && motorInsurance.policy_for == '1' ?
                                     <Col sm={12} md={11} lg={6} key={qIndex+"a"} >
                                         <label className="customCheckBox formGrp formGrp">{coverage.name}
                                             <OverlayTrigger overlay={<Tooltip id="tooltip-disabled">{coverage.description}</Tooltip>}>
@@ -1565,7 +1553,7 @@ class OtherComprehensiveGCV extends Component {
                                                         type="text"
                                                         placeholder="Please enter no of paid drivers"
                                                         autoComplete="off"
-                                                        maxLength="1"
+                                                        // maxLength="28"
                                                         onFocus={e => this.changePlaceHoldClassAdd(e)}
                                                         onBlur={e => this.changePlaceHoldClassRemove(e)}
                                                         onChange={(e) => {
@@ -1592,7 +1580,7 @@ class OtherComprehensiveGCV extends Component {
                                                         type="text"
                                                         placeholder="Value of Accessory"
                                                         autoComplete="off"
-                                                        // maxLength="1"
+                                                        maxLength="28"
                                                         onFocus={e => this.changePlaceHoldClassAdd(e)}
                                                         onBlur={e => this.changePlaceHoldClassRemove(e)}
                                                         onChange={(e) => {
@@ -1788,7 +1776,7 @@ class OtherComprehensiveGCV extends Component {
                                                     type="text"
                                                     placeholder="Enter No. of Employees"
                                                     autoComplete="off"
-                                                    maxLength="1"
+                                                    // maxLength="28"
                                                     onFocus={e => this.changePlaceHoldClassAdd(e)}
                                                     onBlur={e => this.changePlaceHoldClassRemove(e)}
                                                     onChange={(e) => {
@@ -1816,7 +1804,7 @@ class OtherComprehensiveGCV extends Component {
                                                     type="text"
                                                     placeholder="Enter No. of Person"
                                                     autoComplete="off"
-                                                    maxLength="1"
+                                                    // maxLength="28"
                                                     onFocus={e => this.changePlaceHoldClassAdd(e)}
                                                     onBlur={e => this.changePlaceHoldClassRemove(e)}
                                                     onChange={(e) => {
@@ -1844,7 +1832,7 @@ class OtherComprehensiveGCV extends Component {
                                                     type="text"
                                                     placeholder="Value should be 16L to 50L"
                                                     autoComplete="off"
-                                                    maxLength="7"
+                                                    // maxLength="28"
                                                     onFocus={e => this.changePlaceHoldClassAdd(e)}
                                                     onBlur={e => this.changePlaceHoldClassRemove(e)}
                                                     onChange={(e) => {

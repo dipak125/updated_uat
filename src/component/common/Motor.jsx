@@ -39,6 +39,9 @@ class Motor extends Component {
         else if(productId == '6') {
             this.props.history.push(`/four_wheeler_Select-brandTP/${productId}`)
         }
+        else if(productId == '7') {
+            this.props.history.push(`/Registration_GCV_TP/${productId}`)
+        }
         else if(productId == '8') {
             this.props.history.push(`/Registration_GCV/${productId}`)
         }

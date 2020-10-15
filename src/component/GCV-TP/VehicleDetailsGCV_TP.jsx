@@ -26,7 +26,7 @@ const ageObj = new PersonAge();
 // const minDate = moment(moment().subtract(1, 'years').calendar()).add(1, 'day').calendar();
 // const maxDate = moment(minDate).add(30, 'day').calendar();
 const minDate = moment(moment().subtract(20, 'years').calendar()).add(1, 'day').calendar();
-const maxDate = moment(moment().subtract(1, 'years').calendar()).add(30, 'day').calendar();
+const maxDate = moment().add(30, 'day').calendar();
 const startRegnDate = moment().subtract(20, 'years').calendar();
 const minRegnDate = moment(startRegnDate).startOf('year').format('YYYY-MM-DD hh:mm');
 const maxRegnDate = new Date();
@@ -333,11 +333,11 @@ class VehicleDetailsGCV extends Component {
         else if(localStorage.getItem('brandEdit') == '2') {
             localStorage.setItem('newBrandEdit', '2')
         }
-        this.props.history.push(`/SelectBrand_GCV/${productId}`);
+        this.props.history.push(`/SelectBrand_GCV_TP/${productId}`);
     }
 
     selectBrand = (productId) => {
-        this.props.history.push(`/SelectBrand_GCV/${productId}`);
+        this.props.history.push(`/SelectBrand_GCV_TP/${productId}`);
     }
 
 
@@ -417,7 +417,7 @@ class VehicleDetailsGCV extends Component {
     handleSubmit = (values, actions) => {
         const {productId} = this.props.match.params 
         const {motorInsurance} = this.state
-        let policy_type = ageObj.whatIsCurrentMonth(values.registration_date) < 7 ? 6 : 1
+        let policy_type = 2
         // let vehicleAge = ageObj.whatIsMyVehicleAge(values.registration_date)
         let vehicleAge = Math.floor(moment().diff(values.registration_date, 'months', true))
         // let ageDiff = Math.floor(moment().diff(values.registration_date, 'days', true));
@@ -501,14 +501,14 @@ class VehicleDetailsGCV extends Component {
         formData.append('enc_data',encryption.encrypt(JSON.stringify(post_data)))
         this.props.loadingStart();
         axios
-        .post(`gcv/insert-vehicle-details`, formData)
+        .post(`gcv-tp/insert-vehicle-details`, formData)
         .then(res => { 
             let decryptResp = JSON.parse(encryption.decrypt(res.data))
             console.log("decrypt", decryptResp)
 
             this.props.loadingStop();
             if(decryptResp.error == false){
-                this.props.history.push(`/OtherComprehensive_GCV/${productId}`);
+                this.props.history.push(`/OtherComprehensive_GCV_TP/${productId}`);
             }
             else{
                 actions.setSubmitting(false)
@@ -559,7 +559,7 @@ class VehicleDetailsGCV extends Component {
         const { productId } = this.props.match.params
         let policyHolder_id = localStorage.getItem("policyHolder_refNo") ? localStorage.getItem("policyHolder_refNo") : 0;
         let encryption = new Encryption();
-        axios.get(`gcv/policy-holder/details/${policyHolder_id}`)
+        axios.get(`gcv-tp/policy-holder/details/${policyHolder_id}`)
             .then(res => {
                  let decryptResp = JSON.parse(encryption.decrypt(res.data))
                  console.log("decrypt", decryptResp)
@@ -583,7 +583,7 @@ class VehicleDetailsGCV extends Component {
         const {productId } = this.props.match.params
         let encryption = new Encryption();
         this.props.loadingStart();
-        axios.get(`gcv/carrying-capacity-list/4 `)
+        axios.get(`gcv-tp/carrying-capacity-list/4 `)
             .then(res=>{
                 let decryptResp = JSON.parse(encryption.decrypt(res.data))
     
@@ -622,7 +622,7 @@ class VehicleDetailsGCV extends Component {
         
     }
     registration = (productId) => {
-        this.props.history.push(`/Registration_GCV/${productId}`);
+        this.props.history.push(`/Registration_GCV_TP/${productId}`);
     }
 
     render() {
@@ -864,13 +864,8 @@ class VehicleDetailsGCV extends Component {
                                                                 className="datePckr inputfs12"
                                                                 selected={values.previous_start_date}
                                                                 onChange={(val) => {
-                                                                    var date = new Date(val)
-                                                                    date = date.setFullYear(date.getFullYear() + 1);
-                                                                    var date2 = new Date(date)
-                                                                    date2 = date2.setDate(date2.getDate() - 1);
-
                                                                     setFieldTouched('previous_start_date')
-                                                                    setFieldValue("previous_end_date", new Date(date2));
+                                                                    setFieldValue("previous_end_date", addDays(new Date(val), 365));
                                                                     setFieldValue('previous_start_date', val);
                                                                 }}
                                                             />

@@ -214,6 +214,33 @@ const PremiumGCV = Loadable({
     loading: () => loadingContent
 });
 
+// ======================== Motor GCV tp ========================================
+
+const RegistrationGCVTP = Loadable({
+    loader: () => import(/*webpackChunkName: "Products" */"../GCV-TP/RegistrationGCV_TP.jsx"),
+    loading: () => loadingContent
+});
+const SelectBrandGCVTP = Loadable({
+    loader: () => import(/*webpackChunkName: "Products" */"../GCV-TP/SelectBrandGCV_TP.jsx"),
+    loading: () => loadingContent
+});
+const VehicleDetailsGCVTP = Loadable({
+    loader: () => import(/*webpackChunkName: "Products" */"../GCV-TP/VehicleDetailsGCV_TP.jsx"),
+    loading: () => loadingContent
+});
+const OtherComprehensiveGCVTP = Loadable({
+    loader: () => import(/*webpackChunkName: "Products" */"../GCV-TP/OtherComprehensiveGCV_TP.jsx"),
+    loading: () => loadingContent
+});
+const AdditionalDetailsGCVTP = Loadable({
+    loader: () => import(/*webpackChunkName: "Products" */"../GCV-TP/AdditionalDetailsGCV_TP.jsx"),
+    loading: () => loadingContent
+});
+const PremiumGCVTP = Loadable({
+    loader: () => import(/*webpackChunkName: "Products" */"../GCV-TP/PremiumGCV_TP.jsx"),
+    loading: () => loadingContent
+});
+
 
 
 
@@ -281,6 +308,14 @@ class Routes extends Component {
                         <PrivateRoute exact path="/OtherComprehensive_GCV/:productId" component={OtherComprehensiveGCV} />
                         <PrivateRoute exact path="/AdditionalDetails_GCV/:productId" component={AdditionalDetailsGCV} />  
                         <PrivateRoute exact path="/Premium_GCV/:productId" component={PremiumGCV} />
+
+                        {/************ MotorGCV ******************/}
+                        <PrivateRoute exact path="/Registration_GCV_TP/:productId" component={RegistrationGCVTP} />
+                        <PrivateRoute exact path="/SelectBrand_GCV_TP/:productId" component={SelectBrandGCVTP} />
+                        <PrivateRoute exact path="/VehicleDetails_GCV_TP/:productId" component={VehicleDetailsGCVTP} />
+                        <PrivateRoute exact path="/OtherComprehensive_GCV_TP/:productId" component={OtherComprehensiveGCVTP} />
+                        <PrivateRoute exact path="/AdditionalDetails_GCV_TP/:productId" component={AdditionalDetailsGCVTP} />  
+                        <PrivateRoute exact path="/Premium_GCV_TP/:productId" component={PremiumGCVTP} />
 
                         {/************ Support ******************/}
                         <PrivateRoute exact path="/Documents" component={Documents} />

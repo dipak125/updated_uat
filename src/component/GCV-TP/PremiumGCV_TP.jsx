@@ -26,7 +26,7 @@ const validatePremium = Yup.object().shape({
     }),
     })
 
-class Premium extends Component {
+class PremiumGCV extends Component {
 
     constructor(props) {
         super(props);
@@ -51,9 +51,6 @@ class Premium extends Component {
             relation: [],
             policyHolder: [],
             vehicleDetails: [],
-            previousPolicy: [],
-            request_data: [],
-            breakin_flag: 0,
             policyHolder_refNo: queryString.parse(this.props.location.search).access_id ? 
                                 queryString.parse(this.props.location.search).access_id : 
                                 localStorage.getItem("policyHolder_refNo")
@@ -82,7 +79,7 @@ class Premium extends Component {
     }
 
     additionalDetails = (productId) => {
-        this.props.history.push(`/Additional_details/${productId}`);
+        this.props.history.push(`/AdditionalDetails_GCV_TP/${productId}`);
     }
 
     handleSubmit = (values) => {
@@ -106,7 +103,7 @@ class Premium extends Component {
         let policyHolder_id = this.state.policyHolder_refNo ? this.state.policyHolder_refNo : '0'
         let encryption = new Encryption();
     
-        axios.get(`policy-holder/motor/${policyHolder_id}`)
+        axios.get(`gcv-tp/policy-holder/details/${policyHolder_id}`)
             .then(res => {
                 let decryptResp = JSON.parse(encryption.decrypt(res.data))
                 console.log("decrypt", decryptResp)
@@ -115,42 +112,41 @@ class Premium extends Component {
                 let vehicleDetails = decryptResp.data.policyHolder ? decryptResp.data.policyHolder.vehiclebrandmodel : {};
                 let previousPolicy = decryptResp.data.policyHolder ? decryptResp.data.policyHolder.previouspolicy : {};
                 let request_data = decryptResp.data.policyHolder ? decryptResp.data.policyHolder.request_data : {}
-                
+                let dateDiff = 0
                 this.setState({
-                    motorInsurance,policyHolder,vehicleDetails, previousPolicy, request_data,
+                    motorInsurance,policyHolder,vehicleDetails,
                     refNumber: decryptResp.data.policyHolder.reference_no,
                     paymentStatus: decryptResp.data.policyHolder.payment ? decryptResp.data.policyHolder.payment[0] : [],
                     memberdetails : decryptResp.data.policyHolder ? decryptResp.data.policyHolder : [],
                     nomineedetails: decryptResp.data.policyHolder ? decryptResp.data.policyHolder.request_data.nominee[0]:[]
                     
                 })
-                this.getAccessToken(motorInsurance)
-                // if(previousPolicy && policyHolder.break_in_status != "Vehicle Recommended and Reports Uploaded") {
-                //     dateDiff = Math.floor(moment().diff(previousPolicy.end_date, 'days', true));
-                //     if(dateDiff > 0 || previousPolicy.name == "2") {
-                //         swal({
-                //             title: "Breakin",
-                //             text: `Your Quotation number is ${request_data.quote_id}. Your vehicle needs inspection. Do you want to raise inspection.`,
-                //             icon: "warning",
-                //             buttons: true,
-                //             dangerMode: true,
-                //         })
-                //         .then((willCreate) => {
-                //             if (willCreate) {
-                //                 this.callBreakin()
-                //             }
-                //             else {
-                //                 this.props.loadingStop();
-                //             }
-                //         })                     
-                //     }
-                //     else {
-                //         this.getAccessToken(motorInsurance)
-                //     }
-                // }
-                // else{
-                //     this.getAccessToken(motorInsurance)
-                // }           
+                if(previousPolicy && policyHolder.break_in_status != "Vehicle Recommended and Reports Uploaded") {
+                    dateDiff = Math.floor(moment().diff(previousPolicy.end_date, 'days', true));
+                    if(dateDiff > 0 || previousPolicy.name == "2") {
+                        swal({
+                            title: "Breakin",
+                            text: `Your Quotation number is ${request_data.quote_id}. Your vehicle needs inspection. Do you want to raise inspection.`,
+                            icon: "warning",
+                            buttons: true,
+                            dangerMode: true,
+                        })
+                        .then((willCreate) => {
+                            if (willCreate) {
+                                this.callBreakin()
+                            }
+                            else {
+                                this.props.loadingStop();
+                            }
+                        })                     
+                    }
+                    else {
+                        this.getAccessToken(motorInsurance)
+                    }
+                }
+                else{
+                    this.getAccessToken(motorInsurance)
+                }           
             })
             .catch(err => {
                 // handle error
@@ -201,8 +197,7 @@ class Premium extends Component {
     fullQuote = (access_token, motorInsurance) => {
         const formData = new FormData();
         let encryption = new Encryption();
-        let dateDiff = 0
-        const {previousPolicy, request_data, policyHolder} = this.state
+
         const post_data = {
             'ref_no':this.state.policyHolder_refNo ? this.state.policyHolder_refNo : '0',
             'access_token':access_token,
@@ -215,10 +210,10 @@ class Premium extends Component {
         }
 
         formData.append('enc_data',encryption.encrypt(JSON.stringify(post_data)))
-        console.log("post_data--fullQuotePMCAR- ", post_data)
-        axios.post('fullQuotePMCAR', formData)
+        console.log("post_data--fullQuotePMGCV- ", post_data)
+        axios.post('fullQuotePMGCV', formData)
             .then(res => {
-                if (res.data.PolicyObject && res.data.UnderwritingResult && res.data.UnderwritingResult.Status == "Success") {
+                if (res.data.PolicyObject) {
                     this.setState({
                         fulQuoteResp: res.data.PolicyObject,
                         PolicyArray: res.data.PolicyObject.PolicyLobList,
@@ -231,29 +226,6 @@ class Premium extends Component {
                     });
                 }
                 this.props.loadingStop();
-
-                if(previousPolicy && policyHolder.break_in_status != "Vehicle Recommended and Reports Uploaded") {
-                    dateDiff = Math.floor(moment().diff(previousPolicy.end_date, 'days', true));
-                    if(dateDiff > 0 || previousPolicy.name == "2") {
-                        this.setState({breakin_flag: 1})
-                        swal({
-                            title: "Breakin",
-                            text: `Your Quotation number is ${request_data.quote_id}. Your vehicle needs inspection. Do you want to raise inspection.`,
-                            icon: "warning",
-                            buttons: true,
-                            dangerMode: true,
-                        })
-                        .then((willCreate) => {
-                            if (willCreate) {
-                                this.callBreakin()
-                            }
-                            else {
-                                this.props.loadingStop();
-                            }
-                        })                     
-                    }     
-                }
-                          
             })
             .catch(err => {
                 this.setState({
@@ -305,7 +277,7 @@ class Premium extends Component {
     }
 
     render() {
-        const { policyHolder, show, fulQuoteResp, motorInsurance, error, error1, refNumber, paymentStatus, relation, memberdetails,nomineedetails, vehicleDetails, breakin_flag } = this.state
+        const { policyHolder, show, fulQuoteResp, motorInsurance, error, error1, refNumber, paymentStatus, relation, memberdetails,nomineedetails, vehicleDetails } = this.state
         const { productId } = this.props.match.params
 console.log('nomineedetails', nomineedetails)
         const errMsg =
@@ -657,7 +629,7 @@ console.log('nomineedetails', nomineedetails)
                                                             </Row> */}
                                                             <div className="d-flex justify-content-left resmb">
                                                                 <Button className="backBtn" type="button" onClick={this.additionalDetails.bind(this, productId)}>Back</Button>
-                                                                {fulQuoteResp.QuotationNo && breakin_flag == 0 ?
+                                                                {fulQuoteResp.QuotationNo ?
                                                                     <Button type="submit"
                                                                         className="proceedBtn"
                                                                     >
@@ -717,5 +689,5 @@ const mapDispatchToProps = (dispatch) => {
 };
 
 export default withRouter(
-    connect(mapStateToProps, mapDispatchToProps)(Premium)
+    connect(mapStateToProps, mapDispatchToProps)(PremiumGCV)
 );

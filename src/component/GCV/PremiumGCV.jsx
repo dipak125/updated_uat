@@ -204,14 +204,16 @@ class PremiumGCV extends Component {
             'idv_value': motorInsurance.idv_value,
             'policy_type':  motorInsurance.policy_type,
             'add_more_coverage': motorInsurance.add_more_coverage,
-            'cng_kit': motorInsurance.cng_kit,
-            'cngKit_Cost': Math.floor(motorInsurance.cngkit_cost),
+            // 'cng_kit': motorInsurance.cng_kit,
+            // 'cngKit_Cost': Math.floor(motorInsurance.cngkit_cost),
             'PA_Cover': motorInsurance && motorInsurance.pa_cover ? motorInsurance.pa_cover : '0',
+            'coverage_data': motorInsurance && motorInsurance.add_more_coverage_request_json != null ? motorInsurance.add_more_coverage_request_json : "",
+            'body_idv_value' : motorInsurance && motorInsurance.body_idv_value ? motorInsurance.body_idv_value : '0',
         }
 
         formData.append('enc_data',encryption.encrypt(JSON.stringify(post_data)))
-console.log("post_data--fullQuotePMCAR- ", post_data)
-        axios.post('fullQuotePMCAR', formData)
+        console.log("post_data--fullQuotePMGCV- ", post_data)
+        axios.post('fullQuotePMGCV', formData)
             .then(res => {
                 if (res.data.PolicyObject) {
                     this.setState({
