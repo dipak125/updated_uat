@@ -51,6 +51,9 @@ class PremiumGCV extends Component {
             relation: [],
             policyHolder: [],
             vehicleDetails: [],
+            previousPolicy: [],
+            request_data: [],
+            breakin_flag: 0,
             policyHolder_refNo: queryString.parse(this.props.location.search).access_id ? 
                                 queryString.parse(this.props.location.search).access_id : 
                                 localStorage.getItem("policyHolder_refNo")
@@ -112,41 +115,16 @@ class PremiumGCV extends Component {
                 let vehicleDetails = decryptResp.data.policyHolder ? decryptResp.data.policyHolder.vehiclebrandmodel : {};
                 let previousPolicy = decryptResp.data.policyHolder ? decryptResp.data.policyHolder.previouspolicy : {};
                 let request_data = decryptResp.data.policyHolder ? decryptResp.data.policyHolder.request_data : {}
-                let dateDiff = 0
+
                 this.setState({
-                    motorInsurance,policyHolder,vehicleDetails,
+                    motorInsurance,policyHolder,vehicleDetails,previousPolicy,request_data,
                     refNumber: decryptResp.data.policyHolder.reference_no,
                     paymentStatus: decryptResp.data.policyHolder.payment ? decryptResp.data.policyHolder.payment[0] : [],
                     memberdetails : decryptResp.data.policyHolder ? decryptResp.data.policyHolder : [],
                     nomineedetails: decryptResp.data.policyHolder ? decryptResp.data.policyHolder.request_data.nominee[0]:[]
                     
                 })
-                if(previousPolicy && policyHolder.break_in_status != "Vehicle Recommended and Reports Uploaded") {
-                    dateDiff = Math.floor(moment().diff(previousPolicy.end_date, 'days', true));
-                    if(dateDiff > 0 || previousPolicy.name == "2") {
-                        swal({
-                            title: "Breakin",
-                            text: `Your Quotation number is ${request_data.quote_id}. Your vehicle needs inspection. Do you want to raise inspection.`,
-                            icon: "warning",
-                            buttons: true,
-                            dangerMode: true,
-                        })
-                        .then((willCreate) => {
-                            if (willCreate) {
-                                this.callBreakin()
-                            }
-                            else {
-                                this.props.loadingStop();
-                            }
-                        })                     
-                    }
-                    else {
-                        this.getAccessToken(motorInsurance)
-                    }
-                }
-                else{
-                    this.getAccessToken(motorInsurance)
-                }           
+                this.getAccessToken(motorInsurance)       
             })
             .catch(err => {
                 // handle error
@@ -197,6 +175,8 @@ class PremiumGCV extends Component {
     fullQuote = (access_token, motorInsurance) => {
         const formData = new FormData();
         let encryption = new Encryption();
+        let dateDiff = 0
+        const {previousPolicy, request_data, policyHolder} = this.state
 
         const post_data = {
             'ref_no':this.state.policyHolder_refNo ? this.state.policyHolder_refNo : '0',
@@ -228,6 +208,28 @@ class PremiumGCV extends Component {
                     });
                 }
                 this.props.loadingStop();
+
+                if(previousPolicy && policyHolder.break_in_status != "Vehicle Recommended and Reports Uploaded") {
+                    dateDiff = Math.floor(moment().diff(previousPolicy.end_date, 'days', true));
+                    if(dateDiff > 0 || previousPolicy.name == "2") {
+                        this.setState({breakin_flag: 1})
+                        swal({
+                            title: "Breakin",
+                            text: `Your Quotation number is ${request_data.quote_id}. Your vehicle needs inspection. Do you want to raise inspection.`,
+                            icon: "warning",
+                            buttons: true,
+                            dangerMode: true,
+                        })
+                        .then((willCreate) => {
+                            if (willCreate) {
+                                this.callBreakin()
+                            }
+                            else {
+                                this.props.loadingStop();
+                            }
+                        })                     
+                    }     
+                }
             })
             .catch(err => {
                 this.setState({
@@ -279,9 +281,9 @@ class PremiumGCV extends Component {
     }
 
     render() {
-        const { policyHolder, show, fulQuoteResp, motorInsurance, error, error1, refNumber, paymentStatus, relation, memberdetails,nomineedetails, vehicleDetails } = this.state
+        const { policyHolder, show, fulQuoteResp, motorInsurance, error, error1, refNumber, paymentStatus, relation, memberdetails,nomineedetails, vehicleDetails, breakin_flag } = this.state
         const { productId } = this.props.match.params
-console.log('nomineedetails', nomineedetails)
+
         const errMsg =
             error && error.message ? (
                 <span className="errorMsg">
@@ -631,7 +633,7 @@ console.log('nomineedetails', nomineedetails)
                                                             </Row> */}
                                                             <div className="d-flex justify-content-left resmb">
                                                                 <Button className="backBtn" type="button" onClick={this.additionalDetails.bind(this, productId)}>Back</Button>
-                                                                {fulQuoteResp.QuotationNo ?
+                                                                {fulQuoteResp.QuotationNo && breakin_flag == 0 ?
                                                                     <Button type="submit"
                                                                         className="proceedBtn"
                                                                     >

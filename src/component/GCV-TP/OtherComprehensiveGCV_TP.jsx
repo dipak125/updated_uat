@@ -101,6 +101,12 @@ const ComprehensiveValidation = Yup.object().shape({
         is: ATC_flag => ATC_flag == '1',
         then: Yup.string().required('Please select additional towing charges'),
         otherwise: Yup.string()
+    }), 
+
+    B00070_value: Yup.string().when(['LL_workman_flag'], {
+        is: LL_workman_flag => LL_workman_flag == '1',
+        then: Yup.string().required('Please enter No. of workman').matches(/^[0-9]*$/, 'Please provide valid No.'),
+        otherwise: Yup.string()
     }),
    
     B00018_value: Yup.string().when(['enhance_PA_OD_flag'], {
@@ -341,7 +347,7 @@ class OtherComprehensiveGCV extends Component {
                 let motorInsurance = decryptResp.data.policyHolder ? decryptResp.data.policyHolder.motorinsurance : {}
                 let request_data = decryptResp.data.policyHolder ? decryptResp.data.policyHolder.request_data : {};
                 let values = []
-                let add_more_coverage = motorInsurance && motorInsurance.policy_for == '2' ? [] : (motorInsurance.add_more_coverage != null ? motorInsurance.add_more_coverage.split(",") : ['B00015']) 
+                let add_more_coverage = motorInsurance && motorInsurance.policy_for == '1' && motorInsurance.add_more_coverage == null ? ['B00015']  :  (motorInsurance && motorInsurance.add_more_coverage != null ? motorInsurance.add_more_coverage.split(",") : [])
                 add_more_coverage = add_more_coverage.flat()
                 values.PA_flag = motorInsurance && motorInsurance.pa_cover != "" ? '1' : '0'
                 values.PA_Cover = motorInsurance && motorInsurance.pa_cover != "" ? motorInsurance.pa_cover : '0'
@@ -364,6 +370,7 @@ class OtherComprehensiveGCV extends Component {
                 values.B00073_description = add_more_coverage_request_array.B00073 ? add_more_coverage_request_array.B00073.description : ""
                 values.B00007_value = add_more_coverage_request_array.B00007 ? add_more_coverage_request_array.B00007.value : ""
                 values.B00007_description = add_more_coverage_request_array.B00007 ? add_more_coverage_request_array.B00007.description : ""
+                values.B00070_value = add_more_coverage_request_array.B00070 ? add_more_coverage_request_array.B00070.value : ""
 
                 this.setState({
                     motorInsurance, add_more_coverage,request_data,
@@ -537,18 +544,19 @@ class OtherComprehensiveGCV extends Component {
                 'B00003' : {'value': values.B00003_value, 'description': values.B00003_description},
                 'B00073' : {'value': values.B00073_value, 'description': values.B00073_description},
                 'B00007' : {'value': values.B00007_value, 'description': values.B00007_description},
+                'B00070' : {'value': values.B00070_value}
             }
         }
 
         const post_data = {
             'ref_no':localStorage.getItem('policyHolder_refNo'),
             'access_token':access_token,
-            'idv_value': sliderVal ? sliderVal : defaultSliderValue.toString(),
+            // 'idv_value': sliderVal ? sliderVal : defaultSliderValue.toString(),
             'policy_type': motorInsurance.policy_type,
             'add_more_coverage': add_more_coverage.toString(),
             'PA_Cover': values.PA_flag ? values.PA_Cover : "0",
             'coverage_data': JSON.stringify(coverage_data),
-            'body_idv_value' : bodySliderVal ? bodySliderVal : defaultBodySliderValue
+            // 'body_idv_value' : bodySliderVal ? bodySliderVal : defaultBodySliderValue
             // 'cng_kit': cng_kit_flag,
             // 'cngKit_Cost': cngKit_Cost
         }
@@ -631,48 +639,33 @@ class OtherComprehensiveGCV extends Component {
                 'B00003' : {'value': values.B00003_value, 'description': values.B00003_description},
                 'B00073' : {'value': values.B00073_value, 'description': values.B00073_description},
                 'B00007' : {'value': values.B00007_value, 'description': values.B00007_description},
+                'B00070' : {'value': values.B00070_value}
             }
         }
 
         const formData = new FormData();
         let encryption = new Encryption();
         let post_data = {}
-        if(add_more_coverage.length > 0){
+
             post_data = {
                 'policy_holder_id': localStorage.getItem('policyHolder_id'),
                 'menumaster_id': 4,
                 'registration_no': motorInsurance.registration_no ? motorInsurance.registration_no : values.registration_no,
                 'chasis_no': values.chasis_no,
                 'chasis_no_last_part': values.chasis_no_last_part,
-                'cng_kit': values.cng_kit,
-                // 'cngkit_cost': values.cngKit_Cost,
+                'cng_kit': '0',
+                'cngkit_cost': '0',
                 'engine_no': values.engine_no,
-                'idv_value': sliderVal ? sliderVal : defaultSliderValue.toString(),
+                'idv_value': '0',
                 'add_more_coverage': add_more_coverage,
                 'puc': values.puc,
                 'pa_cover': values.PA_flag ? values.PA_Cover : "0",
                 'pa_flag' : values.PA_cover_flag,
                 'page_name': `OtherComprehensive/${productId}`,
                 'coverage_data': JSON.stringify(coverage_data),
-                'body_idv_value' : bodySliderVal ? bodySliderVal : defaultBodySliderValue
+                // 'body_idv_value' : bodySliderVal ? bodySliderVal : defaultBodySliderValue
             }
-        }
-        else {
-            post_data = {
-                'policy_holder_id': localStorage.getItem('policyHolder_id'),
-                'menumaster_id': 1,
-                'registration_no':motorInsurance.registration_no ? motorInsurance.registration_no : values.registration_no,
-                'chasis_no': values.chasis_no,
-                'chasis_no_last_part': values.chasis_no_last_part,
-                'cng_kit': values.cng_kit,
-                // 'cngkit_cost': values.cngKit_Cost,
-                'engine_no': values.engine_no,
-                'idv_value': sliderVal ? sliderVal : defaultSliderValue.toString(),
-                'puc': values.puc,
-                'page_name': `OtherComprehensive/${productId}`,
-                'body_idv_value' : bodySliderVal ? bodySliderVal : defaultBodySliderValue
-            }
-        }
+
         console.log('post_data',post_data)
         if(post_data.idv_value > 5000000 && csc_user_type == "POSP" ) {
             swal("Quote cannot proceed with IDV greater than 5000000")
@@ -689,10 +682,11 @@ class OtherComprehensiveGCV extends Component {
             if (decryptResp.error == false) {
                 this.props.history.push(`/AdditionalDetails_GCV_TP/${productId}`);
             }
-
         })
             .catch(err => {
                 // handle error
+                let decryptResp = JSON.parse(encryption.decrypt(err.data))
+            console.log("decrypterr--fetchData-- ", decryptResp)
                 this.props.loadingStop();
             })
     }
@@ -758,6 +752,10 @@ class OtherComprehensiveGCV extends Component {
             if(values == "B00018") {
                 setFieldTouched("enhance_PA_OD_flag");
                 setFieldValue("enhance_PA_OD_flag", '1');
+            }
+            if(values == "B00070") {
+                setFieldTouched("LL_workman_flag");
+                setFieldValue("LL_workman_flag", '1');
             }
             if(values == "ATC") {
                 setFieldTouched("ATC_flag");
@@ -826,6 +824,10 @@ class OtherComprehensiveGCV extends Component {
                 setFieldTouched("enhance_PA_OD_flag");
                 setFieldValue("enhance_PA_OD_flag", '0');
             }
+            if(values == "B00070") {
+                setFieldTouched("LL_workman_flag");
+                setFieldValue("LL_workman_flag", '0');
+            }
             if(values == "ATC") {
                 setFieldTouched("ATC_flag");
                 setFieldValue("ATC_flag", '0');
@@ -873,16 +875,6 @@ class OtherComprehensiveGCV extends Component {
         const {showCNG, is_CNG_account, vahanDetails,error, policyCoverage, vahanVerify, selectFlag, fulQuoteResp, PolicyArray, 
             moreCoverage, sliderVal, bodySliderVal, motorInsurance, serverResponse, engine_no, chasis_no, initialValue, add_more_coverage_request_array} = this.state
         const {productId} = this.props.match.params 
-        let defaultSliderValue = PolicyArray.length > 0 ? Math.round(PolicyArray[0].PolicyRiskList[0].IDV_Suggested) : 0
-        let sliderValue = sliderVal
-        let minIDV = PolicyArray.length > 0 ? Math.floor(PolicyArray[0].PolicyRiskList[0].MinIDV_Suggested) : null
-        let maxIDV = PolicyArray.length > 0 ? Math.floor(PolicyArray[0].PolicyRiskList[0].MaxIDV_Suggested) : null
-        minIDV = minIDV + 1;
-        maxIDV = maxIDV - 1;
-        let minBodyIDV = 0
-        let maxBodyIDV = 10000000
-        let defaultBodySliderValue = 0
-        let bodySliderValue = bodySliderVal
 
         let covList = motorInsurance && motorInsurance.add_more_coverage ? motorInsurance.add_more_coverage.split(",") : ""
         let newInnitialArray = {}
@@ -900,6 +892,8 @@ class OtherComprehensiveGCV extends Component {
         let LL_Coolie_flag= add_more_coverage_request_array.B00069 && add_more_coverage_request_array.B00069.value ? '1' : '0'
         let enhance_PA_OD_flag= add_more_coverage_request_array.B00018 && add_more_coverage_request_array.B00018.value ? '1' : '0'
         let ATC_flag= add_more_coverage_request_array.ATC && add_more_coverage_request_array.ATC.value ? '1' : '0'
+        let LL_workman_flag= add_more_coverage_request_array.B00070 && add_more_coverage_request_array.B00070.value ? '1' : '0'
+        
 
         let newInitialValues = {}
 
@@ -926,7 +920,8 @@ class OtherComprehensiveGCV extends Component {
                 LL_Emp_flag: '0',
                 LL_Coolie_flag: '0',
                 enhance_PA_OD_flag: '0',
-                ATC_flag: '0'
+                ATC_flag: '0',
+                LL_workman_flag: '0'
 
             });
         }
@@ -952,7 +947,8 @@ class OtherComprehensiveGCV extends Component {
                     LL_Emp_flag: '0',
                     LL_Coolie_flag: '0',
                     enhance_PA_OD_flag: '0',
-                    ATC_flag: '0'
+                    ATC_flag: '0',
+                    LL_workman_flag: '0'
                 });
         }
 
@@ -974,6 +970,7 @@ class OtherComprehensiveGCV extends Component {
         newInnitialArray.LL_Coolie_flag = LL_Coolie_flag
         newInnitialArray.enhance_PA_OD_flag = enhance_PA_OD_flag
         newInnitialArray.ATC_flag = ATC_flag
+        newInnitialArray.LL_workman_flag = LL_workman_flag       
         newInnitialArray.PA_Cover = PA_Cover
         newInnitialArray.ATC_value = add_more_coverage_request_array.ATC ? add_more_coverage_request_array.ATC.value : ""
         newInnitialArray.B00018_value = add_more_coverage_request_array.B00018 ? add_more_coverage_request_array.B00018.value : ""
@@ -990,6 +987,7 @@ class OtherComprehensiveGCV extends Component {
         newInnitialArray.B00073_description = add_more_coverage_request_array.B00073 ? add_more_coverage_request_array.B00073.description : ""
         newInnitialArray.B00007_value = add_more_coverage_request_array.B00007 ? add_more_coverage_request_array.B00007.value : ""
         newInnitialArray.B00007_description = add_more_coverage_request_array.B00007 ? add_more_coverage_request_array.B00007.description : ""
+        newInnitialArray.B00070_value = add_more_coverage_request_array.B00070 ? add_more_coverage_request_array.B00070.value : ""    
         newInitialValues = Object.assign(initialValue, newInnitialArray );
 
 // -------------------------------------------------------
@@ -1050,7 +1048,7 @@ class OtherComprehensiveGCV extends Component {
                 <section className="brand colpd m-b-25">
                     <div className="d-flex justify-content-left">
                         <div className="brandhead m-b-10">
-                            <h4 className="m-b-30">Covers your Car + Damage to Others (Comprehensive)</h4>
+                            <h4 className="m-b-30">Covers Damage to Others </h4>
                             <h5>{errMsg}</h5>
                         </div>
                     </div>
@@ -1214,187 +1212,7 @@ class OtherComprehensiveGCV extends Component {
                                     </FormGroup>
                                 </Col>
                             </Row>
-                            : null}
-
-                            <Row>
-                                <Col sm={12} md={4} lg={4}>
-                                    <FormGroup>
-                                        <div className="insurerName">
-                                            <span className="fs-16">Insured Declared Value</span>
-                                        </div>
-                                    </FormGroup>
-                                </Col>
-                                <Col sm={12} md={3} lg={2}>
-                                    <FormGroup>
-                                        <div className="insurerName">
-                                        <Field
-                                            name="IDV"
-                                            type="text"
-                                            placeholder=""
-                                            autoComplete="off"
-                                            className="premiumslid"
-                                            onFocus={e => this.changePlaceHoldClassAdd(e)}
-                                            onBlur={e => this.changePlaceHoldClassRemove(e)}
-                                            value={sliderValue ? sliderValue : defaultSliderValue}  
-                                        />
-                                        {errors.IDV && touched.IDV ? (
-                                            <span className="errorMsg">{errors.IDV}</span>
-                                        ) : null}
-                                        </div>
-                                    </FormGroup>
-                                </Col>
-                                {defaultSliderValue ? 
-
-                                <Col sm={12} md={12} lg={6}>
-                                    <FormGroup>
-                                    <input type="range" className="W-90" 
-                                    name= 'slider'
-                                    defaultValue= {defaultSliderValue}
-                                    min= {minIDV}
-                                    max= {maxIDV}
-                                    step= '1'
-                                    value={values.slider}
-                                    onChange= {(e) =>{
-                                    setFieldTouched("slider");
-                                    setFieldValue("slider",values.slider);
-                                    this.sliderValue(e.target.value)
-                                }}
-                                    />
-                                        {/* <img src={require('../../assets/images/slide.svg')} alt="" className="W-90" /> */}
-                                    </FormGroup>
-                                </Col>
-                                : null}
-                            </Row>
-
-                            <Row>
-                                <Col sm={12} md={4} lg={4}>
-                                    <FormGroup>
-                                        <div className="insurerName">
-                                            <span className="fs-16">Body IDV</span>
-                                        </div>
-                                    </FormGroup>
-                                </Col>
-                                <Col sm={12} md={3} lg={2}>
-                                    <FormGroup>
-                                        <div className="insurerName">
-                                        <Field
-                                            name="IDV"
-                                            type="text"
-                                            placeholder=""
-                                            autoComplete="off"
-                                            className="premiumslid"
-                                            onFocus={e => this.changePlaceHoldClassAdd(e)}
-                                            onBlur={e => this.changePlaceHoldClassRemove(e)}
-                                            value={bodySliderValue ? bodySliderValue : defaultBodySliderValue}  
-                                        />
-                                        {errors.IDV && touched.IDV ? (
-                                            <span className="errorMsg">{errors.IDV}</span>
-                                        ) : null}
-                                        </div>
-                                    </FormGroup>
-                                </Col>
-                                {defaultSliderValue ? 
-
-                                <Col sm={12} md={12} lg={6}>
-                                    <FormGroup>
-                                    <input type="range" className="W-90" 
-                                    name= 'slider'
-                                    defaultValue= {defaultBodySliderValue}
-                                    min= {minBodyIDV}
-                                    max= {maxBodyIDV}
-                                    step= '1'
-                                    value={values.slider}
-                                    onChange= {(e) =>{
-                                    setFieldTouched("slider");
-                                    setFieldValue("slider",values.slider);
-                                    this.bodySliderValue(e.target.value)
-                                }}
-                                    />
-                                        {/* <img src={require('../../assets/images/slide.svg')} alt="" className="W-90" /> */}
-                                    </FormGroup>
-                                </Col>
-                                : null}
-                            </Row>
-
-                            <Row>
-                                <Col sm={12} md={5} lg={5}>
-                                    <FormGroup>
-                                        <div className="insurerName">
-                                            <span className="fs-16"> Have you fitted external CNG Kit</span>
-                                        </div>
-                                    </FormGroup>
-                                </Col>
-                                <Col sm={12} md={3} lg={3}>
-                                    <FormGroup>
-                                        <div className="d-inline-flex m-b-35">
-                                            <div className="p-r-25">
-                                                <label className="customRadio3">
-                                                <Field
-                                                    type="radio"
-                                                    name='cng_kit'                                            
-                                                    value='1'
-                                                    key='1'  
-                                                    onChange={(e) => {
-                                                        setFieldValue(`cng_kit`, e.target.value);
-                                                        this.showCNGText(1);
-                                                    }}
-                                                    checked={values.cng_kit == '1' ? true : false}
-                                                />
-                                                    <span className="checkmark " /><span className="fs-14"> Yes</span>
-                                                </label>
-                                            </div>
-
-                                            <div className="">
-                                                <label className="customRadio3">
-                                                <Field
-                                                    type="radio"
-                                                    name='cng_kit'                                            
-                                                    value='0'
-                                                    key='1'  
-                                                    onChange={(e) => {
-                                                        setFieldValue(`cng_kit`, e.target.value);
-                                                        this.showCNGText(0);
-                                                    }}
-                                                    checked={values.cng_kit == '0' ? true : false}
-                                                />
-                                                    <span className="checkmark" />
-                                                    <span className="fs-14">No</span>      
-                                                </label>
-                                                {errors.cng_kit && touched.cng_kit ? (
-                                                <span className="errorMsg">{errors.cng_kit}</span>
-                                                ) : null}
-                                            </div>
-                                        </div>
-                                    </FormGroup>
-                                </Col>
-                                {showCNG || is_CNG_account == 1 ?
-                                <Col sm={12} md={12} lg={4}>
-                                    <FormGroup>
-                                    <div className="insurerName">   
-                                        <Field
-                                            name="cngKit_Cost"
-                                            type="text"
-                                            placeholder="Cost of Kit"
-                                            autoComplete="off"
-                                            className="W-80"
-                                            value = {values.cngKit_Cost}
-                                            onFocus={e => this.changePlaceHoldClassAdd(e)}
-                                            onBlur={e => this.changePlaceHoldClassRemove(e)}
-                                            onChange={e => {
-                                                setFieldTouched('cngKit_Cost');
-                                                setFieldValue('cngKit_Cost', e.target.value);
-                                                this.handleChange()
-
-                                            }}
-                                        />
-                                        {errors.cngKit_Cost && touched.cngKit_Cost ? (
-                                        <span className="errorMsg">{errors.cngKit_Cost}</span>
-                                        ) : null}                                             
-                                        </div>
-                                    </FormGroup>
-                                </Col> : ''}
-                            </Row>
-                               
+                            : null}                 
 
                             <Row>
                                 <Col sm={12} md={12} lg={12}>
@@ -1844,6 +1662,34 @@ class OtherComprehensiveGCV extends Component {
                                                     </Field>
                                                     {errors.B00018_value ? (
                                                         <span className="errorMsg">{errors.B00018_value}</span>
+                                                    ) : null}
+                                                </div>
+                                            </FormGroup>
+                                        </Col>
+                                        </Fragment> : null
+                                    }
+                                    {values.LL_workman_flag == '1' && values[coverage.code] == 'B00070' ?
+                                        <Fragment>
+                                        <Col sm={12} md={11} lg={3} key={qIndex+"b"}>
+                                            <FormGroup>
+                                                <div className="formSection">
+                                                <Field
+                                                    name="B00070_value"
+                                                    type="text"
+                                                    placeholder="Enter No. of workman"
+                                                    autoComplete="off"
+                                                    maxLength="1"
+                                                    onFocus={e => this.changePlaceHoldClassAdd(e)}
+                                                    onBlur={e => this.changePlaceHoldClassRemove(e)}
+                                                    onChange={(e) => {
+                                                        setFieldTouched('B00070_value')
+                                                        setFieldValue('B00070_value', e.target.value);
+                                                        this.handleChange()
+                                                    }}
+                                                    >                                     
+                                                    </Field>
+                                                    {errors.B00070_value ? (
+                                                        <span className="errorMsg">{errors.B00070_value}</span>
                                                     ) : null}
                                                 </div>
                                             </FormGroup>

@@ -354,7 +354,7 @@ class OtherComprehensiveGCV extends Component {
                 let motorInsurance = decryptResp.data.policyHolder ? decryptResp.data.policyHolder.motorinsurance : {}
                 let request_data = decryptResp.data.policyHolder ? decryptResp.data.policyHolder.request_data : {};
                 let values = []
-                let add_more_coverage = motorInsurance && motorInsurance.policy_for == '2' ? [] : (motorInsurance.add_more_coverage != null ? motorInsurance.add_more_coverage.split(",") : ['B00015']) 
+                let add_more_coverage = motorInsurance && motorInsurance.policy_for == '1' && motorInsurance.add_more_coverage == null ? ['B00015']  :  (motorInsurance && motorInsurance.add_more_coverage != null ? motorInsurance.add_more_coverage.split(",") : [])
                 add_more_coverage = add_more_coverage.flat()
                 values.PA_flag = motorInsurance && motorInsurance.pa_cover != "" ? '1' : '0'
                 values.PA_Cover = motorInsurance && motorInsurance.pa_cover != "" ? motorInsurance.pa_cover : '0'
@@ -377,6 +377,7 @@ class OtherComprehensiveGCV extends Component {
                 values.B00073_description = add_more_coverage_request_array.B00073 ? add_more_coverage_request_array.B00073.description : ""
                 values.B00007_value = add_more_coverage_request_array.B00007 ? add_more_coverage_request_array.B00007.value : ""
                 values.B00007_description = add_more_coverage_request_array.B00007 ? add_more_coverage_request_array.B00007.description : ""
+                values.B00070_value = add_more_coverage_request_array.B00070 ? add_more_coverage_request_array.B00070.value : ""
 
                 this.setState({
                     motorInsurance, add_more_coverage,request_data,
@@ -550,6 +551,7 @@ class OtherComprehensiveGCV extends Component {
                 'B00003' : {'value': values.B00003_value, 'description': values.B00003_description},
                 'B00073' : {'value': values.B00073_value, 'description': values.B00073_description},
                 'B00007' : {'value': values.B00007_value, 'description': values.B00007_description},
+                'B00070' : {'value': values.B00070_value}
             }
         }
 
@@ -644,6 +646,7 @@ class OtherComprehensiveGCV extends Component {
                 'B00003' : {'value': values.B00003_value, 'description': values.B00003_description},
                 'B00073' : {'value': values.B00073_value, 'description': values.B00073_description},
                 'B00007' : {'value': values.B00007_value, 'description': values.B00007_description},
+                'B00070' : {'value': values.B00070_value}
             }
         }
 
@@ -673,7 +676,7 @@ class OtherComprehensiveGCV extends Component {
         else {
             post_data = {
                 'policy_holder_id': localStorage.getItem('policyHolder_id'),
-                'menumaster_id': 1,
+                'menumaster_id': 4,
                 'registration_no':motorInsurance.registration_no ? motorInsurance.registration_no : values.registration_no,
                 'chasis_no': values.chasis_no,
                 'chasis_no_last_part': values.chasis_no_last_part,
@@ -706,6 +709,8 @@ class OtherComprehensiveGCV extends Component {
         })
             .catch(err => {
                 // handle error
+                let decryptResp = JSON.parse(encryption.decrypt(err.data))
+            console.log("decryptErr--fetchData-- ", decryptResp)
                 this.props.loadingStop();
             })
     }
@@ -771,6 +776,10 @@ class OtherComprehensiveGCV extends Component {
             if(values == "B00018") {
                 setFieldTouched("enhance_PA_OD_flag");
                 setFieldValue("enhance_PA_OD_flag", '1');
+            }
+            if(values == "B00070") {
+                setFieldTouched("LL_workman_flag");
+                setFieldValue("LL_workman_flag", '1');
             }
             if(values == "ATC") {
                 setFieldTouched("ATC_flag");
@@ -838,6 +847,10 @@ class OtherComprehensiveGCV extends Component {
             if(values == "B00018") {
                 setFieldTouched("enhance_PA_OD_flag");
                 setFieldValue("enhance_PA_OD_flag", '0');
+            }
+            if(values == "B00070") {
+                setFieldTouched("LL_workman_flag");
+                setFieldValue("LL_workman_flag", '0');
             }
             if(values == "ATC") {
                 setFieldTouched("ATC_flag");
@@ -913,6 +926,7 @@ class OtherComprehensiveGCV extends Component {
         let LL_Coolie_flag= add_more_coverage_request_array.B00069 && add_more_coverage_request_array.B00069.value ? '1' : '0'
         let enhance_PA_OD_flag= add_more_coverage_request_array.B00018 && add_more_coverage_request_array.B00018.value ? '1' : '0'
         let ATC_flag= add_more_coverage_request_array.ATC && add_more_coverage_request_array.ATC.value ? '1' : '0'
+        let LL_workman_flag= add_more_coverage_request_array.B00070 && add_more_coverage_request_array.B00070.value ? '1' : '0'
 
         let newInitialValues = {}
 
@@ -939,7 +953,8 @@ class OtherComprehensiveGCV extends Component {
                 LL_Emp_flag: '0',
                 LL_Coolie_flag: '0',
                 enhance_PA_OD_flag: '0',
-                ATC_flag: '0'
+                ATC_flag: '0',
+                LL_workman_flag: '0'
 
             });
         }
@@ -965,7 +980,8 @@ class OtherComprehensiveGCV extends Component {
                     LL_Emp_flag: '0',
                     LL_Coolie_flag: '0',
                     enhance_PA_OD_flag: '0',
-                    ATC_flag: '0'
+                    ATC_flag: '0',
+                    LL_workman_flag: '0'
                 });
         }
 
@@ -987,6 +1003,7 @@ class OtherComprehensiveGCV extends Component {
         newInnitialArray.LL_Coolie_flag = LL_Coolie_flag
         newInnitialArray.enhance_PA_OD_flag = enhance_PA_OD_flag
         newInnitialArray.ATC_flag = ATC_flag
+        newInnitialArray.LL_workman_flag = LL_workman_flag   
         newInnitialArray.PA_Cover = PA_Cover
         newInnitialArray.ATC_value = add_more_coverage_request_array.ATC ? add_more_coverage_request_array.ATC.value : ""
         newInnitialArray.B00018_value = add_more_coverage_request_array.B00018 ? add_more_coverage_request_array.B00018.value : ""
@@ -1003,6 +1020,7 @@ class OtherComprehensiveGCV extends Component {
         newInnitialArray.B00073_description = add_more_coverage_request_array.B00073 ? add_more_coverage_request_array.B00073.description : ""
         newInnitialArray.B00007_value = add_more_coverage_request_array.B00007 ? add_more_coverage_request_array.B00007.value : ""
         newInnitialArray.B00007_description = add_more_coverage_request_array.B00007 ? add_more_coverage_request_array.B00007.description : ""
+        newInnitialArray.B00070_value = add_more_coverage_request_array.B00070 ? add_more_coverage_request_array.B00070.value : ""
         newInitialValues = Object.assign(initialValue, newInnitialArray );
 
 // -------------------------------------------------------
@@ -1856,6 +1874,34 @@ class OtherComprehensiveGCV extends Component {
                                                     </Field>
                                                     {errors.B00018_value ? (
                                                         <span className="errorMsg">{errors.B00018_value}</span>
+                                                    ) : null}
+                                                </div>
+                                            </FormGroup>
+                                        </Col>
+                                        </Fragment> : null
+                                    }
+                                    {values.LL_workman_flag == '1' && values[coverage.code] == 'B00070' ?
+                                        <Fragment>
+                                        <Col sm={12} md={11} lg={3} key={qIndex+"b"}>
+                                            <FormGroup>
+                                                <div className="formSection">
+                                                <Field
+                                                    name="B00070_value"
+                                                    type="text"
+                                                    placeholder="Enter No. of workman"
+                                                    autoComplete="off"
+                                                    maxLength="1"
+                                                    onFocus={e => this.changePlaceHoldClassAdd(e)}
+                                                    onBlur={e => this.changePlaceHoldClassRemove(e)}
+                                                    onChange={(e) => {
+                                                        setFieldTouched('B00070_value')
+                                                        setFieldValue('B00070_value', e.target.value);
+                                                        this.handleChange()
+                                                    }}
+                                                    >                                     
+                                                    </Field>
+                                                    {errors.B00070_value ? (
+                                                        <span className="errorMsg">{errors.B00070_value}</span>
                                                     ) : null}
                                                 </div>
                                             </FormGroup>

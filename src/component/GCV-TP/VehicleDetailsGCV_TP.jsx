@@ -26,7 +26,7 @@ const ageObj = new PersonAge();
 // const minDate = moment(moment().subtract(1, 'years').calendar()).add(1, 'day').calendar();
 // const maxDate = moment(minDate).add(30, 'day').calendar();
 const minDate = moment(moment().subtract(20, 'years').calendar()).add(1, 'day').calendar();
-const maxDate = moment().add(30, 'day').calendar();
+const maxDate = moment(moment().subtract(1, 'years').calendar()).add(30, 'day').calendar();
 const startRegnDate = moment().subtract(20, 'years').calendar();
 const minRegnDate = moment(startRegnDate).startOf('year').format('YYYY-MM-DD hh:mm');
 const maxRegnDate = new Date();
@@ -222,53 +222,6 @@ const vehicleRegistrationValidation = Yup.object().shape({
             return "Policy No. must be maximum 18 chracters"
         }),
 
-    previous_claim_bonus:Yup.mixed()
-    .notRequired('No Claim bonus is required')
-    .test(
-        "currentMonthChecking",
-        function() {
-            return "Please enter previous claim bonus"
-        },
-        function (value) {
-            if (this.parent.previous_is_claim == '0' && this.parent.previous_policy_name == '1' && (!value || value == '1')) {   
-                return false;    
-            }
-            return true;
-        }
-    )
-    .test(
-        "previousClaimChecking",
-        function() {
-            return "Please enter previous claim bonus"
-        },
-        function (value) {
-            if (this.parent.previous_is_claim == '1' && !value && this.parent.previous_claim_for == '2') {   
-                return false;    
-            }
-            return true;
-        }
-    ),
-    previous_is_claim:Yup.string()
-    .notRequired('Please select one option')
-    .test(
-        "currentMonthChecking",
-        function() {
-            return "Please select if you have previous claim"
-        },
-        function (value) {
-            const ageObj = new PersonAge();
-            if (ageObj.whatIsCurrentMonth(this.parent.registration_date) > 0 && this.parent.previous_policy_name == '1' &&
-            Math.floor(moment().diff(this.parent.previous_end_date, 'days', true)) <= 90 && !value) {   
-                return false;    
-            }
-            return true;
-        }
-    ),
-    previous_claim_for:Yup.string().when(['previous_is_claim'], {
-        is: previous_is_claim => previous_is_claim == '1',       
-        then: Yup.string().required('Please provide previous claim for'),
-        otherwise: Yup.string()
-    }),
 
     goodscarriedtypes_id: Yup.string()
     .required(function() {
@@ -857,6 +810,7 @@ class VehicleDetailsGCV extends Component {
                                                                 dateFormat="dd MMM yyyy"
                                                                 placeholderText="Previous policy start date"
                                                                 peekPreviousMonth
+                                                                autoComplete="off"
                                                                 peekPreviousYear
                                                                 showMonthDropdown
                                                                 showYearDropdown
@@ -864,8 +818,13 @@ class VehicleDetailsGCV extends Component {
                                                                 className="datePckr inputfs12"
                                                                 selected={values.previous_start_date}
                                                                 onChange={(val) => {
+                                                                    var date = new Date(val)
+                                                                    date = date.setFullYear(date.getFullYear() + 1);
+                                                                    var date2 = new Date(date)
+                                                                    date2 = date2.setDate(date2.getDate() - 1);
+
                                                                     setFieldTouched('previous_start_date')
-                                                                    setFieldValue("previous_end_date", addDays(new Date(val), 365));
+                                                                    setFieldValue("previous_end_date", new Date(date2));
                                                                     setFieldValue('previous_start_date', val);
                                                                 }}
                                                             />
@@ -992,139 +951,7 @@ class VehicleDetailsGCV extends Component {
                                                             </FormGroup>
                                                         </Col>
                                                     </Row>
-                                                    <Row>
-                                                        <Col sm={12}>
-                                                            <FormGroup>
-                                                                <div className="carloan">
-                                                                    <h4>Have you made a claim in your existing Policy</h4>
-                                                                </div>
-                                                            </FormGroup>
-                                                        </Col>
-                                                    </Row>
-
-                                                    <Row>
-                                                        <Col sm={4}>
-                                                            <FormGroup>
-                                                                <div className="d-inline-flex m-b-35">
-                                                                    <div className="p-r-25">
-                                                                        <label className="customRadio3">
-                                                                        <Field
-                                                                            type="radio"
-                                                                            name='previous_is_claim'                                            
-                                                                            value='0'
-                                                                            key='1'  
-                                                                            onChange={(e) => {
-                                                                                setFieldTouched('previous_is_claim')
-                                                                                setFieldValue(`previous_is_claim`, e.target.value);
-                                                                                setFieldValue('previous_claim_for', "")
-                                                                                this.showClaimText(0);
-                                                                            }}
-                                                                            checked={values.previous_is_claim == '0' ? true : false}
-                                                                        />
-                                                                            <span className="checkmark " /><span className="fs-14"> No, I haven't</span>
-                                                                        </label>
-                                                                    </div>
-
-                                                                    <div className="">
-                                                                        <label className="customRadio3">
-                                                                        <Field
-                                                                            type="radio"
-                                                                            name='previous_is_claim'                                            
-                                                                            value='1'
-                                                                            key='1'  
-                                                                            onChange={(e) => {
-                                                                                setFieldTouched('previous_is_claim')
-                                                                                setFieldValue(`previous_is_claim`, e.target.value);
-                                                                                setFieldValue('previous_claim_for', "")
-                                                                                this.showClaimText(1);
-                                                                            }}
-                                                                            checked={values.previous_is_claim == '1' ? true : false}
-                                                                        />
-                                                                            <span className="checkmark" />
-                                                                            <span className="fs-14">Yes I have</span>
-                                                                        </label>
-                                                                        {errors.previous_is_claim && touched.previous_is_claim ? (
-                                                                        <span className="errorMsg">{errors.previous_is_claim}</span>
-                                                                    ) : null}
-                                                                    </div>
-                                                                </div>
-                                                            </FormGroup>
-                                                        </Col>
-                                                    </Row>
-                                                {showClaim || previous_is_claim == 1 ?
-                                                    <Row className="m-b-30">
-                                                        <Col sm={12} md={5} lg={5}>
-                                                            <FormGroup>
-                                                                <div className="fs-18">
-                                                                You have claimed for
-                                                        </div>
-                                                            </FormGroup>
-                                                        </Col>
-                                                        <Col sm={12} md={6} lg={6}>
-                                                            <FormGroup>
-                                                                <div className="formSection">
-                                                                    <Field
-                                                                        name='previous_claim_for'
-                                                                        component="select"
-                                                                        autoComplete="off"                                                                        
-                                                                        className="formGrp"
-                                                                        value = {values.previous_claim_for}
-                                                                        onChange = {(e) => {
-                                                                            setFieldTouched('previous_claim_for')
-                                                                            setFieldValue('previous_claim_for', e.target.value)
-                                                                            if(e.target.value == '1') {
-                                                                                setFieldValue('previous_claim_bonus', '1')
-                                                                            }      
-                                                                        }}
-                                                                    >
-                                                                        <option value="">--Select--</option>
-                                                                        <option value="1">Own Damage</option>
-                                                                        <option value="2">Liability</option>
-                                                                    </Field>     
-                                                                    {errors.previous_claim_for && touched.previous_claim_for ? (
-                                                                    <span className="errorMsg">{errors.previous_claim_for}</span>
-                                                                    ) : null}       
-                                                                </div>
-                                                            </FormGroup>
-                                                        </Col>
-                                                    </Row>
-                                                : null }
-                                                { values.previous_claim_for == "2" || previous_is_claim == "0" ?
-                                                    <Row className="m-b-30">
-                                                        <Col sm={12} md={5} lg={5}>
-                                                            <FormGroup>
-                                                                <div className="fs-18">
-                                                                Select NCB mentioned on last policy
-                                                        </div>
-                                                            </FormGroup>
-                                                        </Col>
-                                                        <Col sm={12} md={6} lg={6}>
-                                                            <FormGroup>
-                                                                <div className="formSection">
-                                                                    <Field
-                                                                        name='previous_claim_bonus'
-                                                                        component="select"
-                                                                        autoComplete="off"                                                                        
-                                                                        className="formGrp"
-                                                                        value = {values.previous_claim_bonus}
-                                                                        
-                                                                    >
-                                                                        <option value="">--Select--</option>
-                                                                        <option value="0">0</option>
-                                                                        <option value="20">20</option>
-                                                                        <option value="25">25</option>
-                                                                        <option value="35">35</option>
-                                                                        <option value="45">45</option>
-                                                                        <option value="50">50</option>
-                                                                    </Field>     
-                                                                    {errors.previous_claim_bonus && touched.previous_claim_bonus ? (
-                                                                    <span className="errorMsg">{errors.previous_claim_bonus}</span>
-                                                                    ) : null}       
-                                                                </div>
-                                                            </FormGroup>
-                                                        </Col>
-                                                    </Row>
-                                                : null} 
+                                                   
                                                 </Fragment> : null}
                                                 
                                             </Fragment> : null }

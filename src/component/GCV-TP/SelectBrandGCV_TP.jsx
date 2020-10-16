@@ -117,9 +117,10 @@ class SelectBrandGCV extends Component {
         const { productId } = this.props.match.params
         const {vehicleDetails} = this.state
         let brandId = vehicleDetails && vehicleDetails.vehiclebrand_id ? vehicleDetails.vehiclebrand_id : ""
+        let policyHolder_id = localStorage.getItem("policyHolder_refNo") ? localStorage.getItem("policyHolder_refNo") : 0;
         let encryption = new Encryption();
         return new Promise(resolve => {
-            axios.get(`gcv-tp/vehicle/brand-with-image/4`)
+            axios.get(`gcv-tp/vehicle/brand-with-image/4/${policyHolder_id}`)
                 .then(res => {
                     let decryptResp = JSON.parse(encryption.decrypt(res.data));
                     console.log('decryptResp', decryptResp)
