@@ -20,6 +20,7 @@ import {
     checkGreaterTimes,
     checkGreaterStartEndTimes
   } from "../../shared/validationFunctions";
+import swal from 'sweetalert';
 
 const year = new Date('Y')
 const ageObj = new PersonAge();
@@ -309,7 +310,9 @@ class VehicleDetailsGCV extends Component {
         vehicleDetails: [],
         averagemonthlyusages: [],
         goodscarriedtypes: [],
-        permittypes: []
+        permittypes: [],
+        location_reset_flag: 0,
+        changeFlag: 0
 
     };
 
@@ -371,9 +374,12 @@ class VehicleDetailsGCV extends Component {
     onChangeCustomerID = (event, { newValue, method }) => {
         //const input = newValue;
            // if (/^[a-zA-Z]+$/.test(input) || input === "") {
+            let location_reset_flag = this.state.motorInsurance && this.state.motorInsurance.location_id ? 1 : 0
                 this.setState({
                     CustomerID: newValue,
-                    RTO_location: ""
+                    RTO_location: "",
+                    location_reset_flag,
+                    changeFlag: 1
                     });
             //}
         
@@ -393,6 +399,14 @@ class VehicleDetailsGCV extends Component {
     else return 0;
     
   }
+
+  SuggestionSelected = (setFieldTouched,setFieldValue,suggestion) => {
+    this.setState({
+      changeFlag: 0, 
+    });
+  setFieldTouched('location_id')
+  setFieldValue("location_id", suggestion.id)
+}
   
   onSuggestionsFetchCustomerID = ({ value }) => {
     this.setState({
@@ -402,7 +416,7 @@ class VehicleDetailsGCV extends Component {
 
    getCustomerIDSuggestionValue = (suggestion) => {
     this.setState({
-      selectedCustomerRecords: suggestion
+      selectedCustomerRecords: suggestion, changeFlag: 0, 
     });
     return suggestion.RTO_LOCATION+" - "+suggestion.RTO_Cluster;
   }
@@ -416,12 +430,18 @@ class VehicleDetailsGCV extends Component {
 
     handleSubmit = (values, actions) => {
         const {productId} = this.props.match.params 
-        const {motorInsurance} = this.state
+        const {motorInsurance, changeFlag} = this.state
         let policy_type = ageObj.whatIsCurrentMonth(values.registration_date) < 7 ? 6 : 1
         // let vehicleAge = ageObj.whatIsMyVehicleAge(values.registration_date)
         let vehicleAge = Math.floor(moment().diff(values.registration_date, 'months', true))
         // let ageDiff = Math.floor(moment().diff(values.registration_date, 'days', true));
         let ageDiff = ageObj.whatIsCurrentMonth(values.registration_date);
+
+        if(changeFlag == 1) {
+        swal("Registration city is required")
+        return false
+        }
+
         const formData = new FormData(); 
         let encryption = new Encryption();
         let post_data = {}
@@ -628,11 +648,11 @@ class VehicleDetailsGCV extends Component {
     render() {
         const {productId} = this.props.match.params  
         const {insurerList, showClaim, previous_is_claim, motorInsurance, previousPolicy,CustomerID,suggestions,
-              vehicleDetails, RTO_location, averagemonthlyusages,goodscarriedtypes,permittypes} = this.state
+              vehicleDetails, RTO_location, averagemonthlyusages,goodscarriedtypes,permittypes, location_reset_flag} = this.state
 
         let newInitialValues = Object.assign(initialValue, {
             registration_date: motorInsurance && motorInsurance.registration_date ? new Date(motorInsurance.registration_date) : "",
-            location_id:  motorInsurance && motorInsurance.location_id ? motorInsurance.location_id : "",
+            location_id:  motorInsurance && motorInsurance.location_id && location_reset_flag == 0 ? motorInsurance.location_id : "",
             previous_start_date: previousPolicy && previousPolicy.start_date ? new Date(previousPolicy.start_date) : "",
             previous_end_date: previousPolicy && previousPolicy.end_date ? new Date(previousPolicy.end_date) : "",
             previous_policy_name: previousPolicy && previousPolicy.name ? previousPolicy.name : "",
@@ -741,8 +761,7 @@ class VehicleDetailsGCV extends Component {
                                                                 inputProps={inputCustomerID} 
                                                                 onChange={e=>this.onChange(e,setFieldValue)}
                                                                 onSuggestionSelected={(e, {suggestion,suggestionValue}) => {
-                                                                    setFieldTouched('location_id')
-                                                                    setFieldValue("location_id", suggestion.id)    
+                                                                    this.SuggestionSelected(setFieldTouched,setFieldValue,suggestion)
                                                                     }}
                                                                 />
                                                                 {errors.location_id && touched.location_id ? (

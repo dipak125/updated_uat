@@ -23,7 +23,7 @@ const vehicleRegistrationValidation = Yup.object().shape({
     check_registration: Yup.string().notRequired(),
 
     // regNumber: Yup.string().matches(/^[A-Z]{2}[ -][0-9]{1,2}(?: [A-Z])?(?: [A-Z]*)? [0-9]{4}$/, 'Invalid Registration number').required('Please enter valid registration number')
-    regNumber: Yup.string().matches(/^[A-Z]{2}[ -][0-9]{1,2}[ -][A-Z]{1,3}[ -][0-9]{4}$/, 'Invalid Registration number')
+    regNumber: Yup.string().matches(/^[A-Z]{2}[ -][0-9]{1,2}(?: [A-Z])?(?: [A-Z]*)? [0-9]{4}$/, 'Invalid Registration number')
     .test(
         "registrationNumberCheck",
         function() {
@@ -39,6 +39,8 @@ const vehicleRegistrationValidation = Yup.object().shape({
     ),
     policy_type: Yup.string().required("Please enter policy type"),
     policy_for: Yup.string().required("Please select policy for indivudal or corporate"),
+    policy_for: Yup.string().required("Please select policy for indivudal or corporate"),
+    subclass_id: Yup.string().required("Please select sub product"),
    
 // });
 
@@ -194,6 +196,7 @@ handleSubmit=(values)=>{
         .then(res => {
             let decryptResp = JSON.parse(encryption.decrypt(res.data))
             console.log("decrypt", decryptResp)
+            this.props.loadingStop();
 
             if(decryptResp.error == false) {
                 this.props.history.push(`/SelectBrand_GCV_TP/${productId}`);
@@ -201,16 +204,15 @@ handleSubmit=(values)=>{
             else{
                 swal(decryptResp.msg)
             }   
-            this.props.loadingStop();
                 
         })
         .catch(err => {
             let decryptErr = JSON.parse(encryption.decrypt(err.data));
             console.log('decryptResp--err---', decryptErr)
+            this.props.loadingStop();
             if(decryptErr && err.data){
                 swal('Registration number required...');
             }
-        this.props.loadingStop();
         });
     }
     else{
@@ -302,11 +304,12 @@ regnoFormat = (e, setFieldTouched, setFieldValue) => {
     let subString = regno.substring(regnoLength-1, regnoLength)
     let preSubString = regno.substring(regnoLength-2, regnoLength-1)
 
+
     if(subString.match(letter) && preSubString.match(letter)) {
         formatVal = regno
     }
-    else if(subString.match(number) && preSubString.match(number)) {
-        formatVal = regno
+    else if(subString.match(number) && preSubString.match(number) && regnoLength == 6) {
+        formatVal =  formatVal = regno.substring(0, regnoLength-1) + " " +subString  
     } 
     else if(subString.match(number) && preSubString.match(letter)) {        
         formatVal = regno.substring(0, regnoLength-1) + " " +subString      
@@ -439,34 +442,14 @@ regnoFormat = (e, setFieldTouched, setFieldValue) => {
                                                                 />
                                                                 <span className="checkmark " /><span className="fs-14"> Roll Over</span>
                                                             </label>
+                                                            {errors.policy_type && touched.policy_type ? (
+                                                                    <span className="errorMsg">{errors.policy_type}</span>
+                                                                ) : null}
                                                         </div>
                                                     </div>
                                                 </div>
                                             </div>
-                                            {/* <div className="row formSection">
-                                                <label className="col-md-4">Branch Name:</label>
-                                                <div className="col-md-4">
-                                                    
-                                                    <div className="formSection">
-                                                        <Field
-                                                            name='branch_name'
-                                                            component="select"
-                                                            autoComplete="off"
-                                                            className="formGrp inputfs12"
-                                                            value = {values.branch_name}
-                                                            // value={ageObj.whatIsCurrentMonth(values.registration_date) < 7 ? 6 : values.previous_policy_name}
-                                                        >
-                                                            <option value="">Select Branch Name</option>
-                                                            <option value="1">Package</option>
-                                                            <option value="2">Liability Only</option>  
-                                                
-                                                        </Field>
-                                                        {errors.branch_name && touched.branch_name ? (
-                                                            <span className="errorMsg">{errors.branch_name}</span>
-                                                        ) : null}
-                                                    </div>
-                                                </div>
-                                            </div> */}
+                                            
                                             <div className="row formSection">
                                                 <label className="col-md-4">Sub Product:</label>
                                                 <div className="col-md-4">
@@ -486,8 +469,8 @@ regnoFormat = (e, setFieldTouched, setFieldValue) => {
                                                             ))}
                                                 
                                                         </Field>
-                                                        {errors.branch_name && touched.branch_name ? (
-                                                            <span className="errorMsg">{errors.branch_name}</span>
+                                                        {errors.subclass_id && touched.subclass_id ? (
+                                                            <span className="errorMsg">{errors.subclass_id}</span>
                                                         ) : null}
                                                     </div>
                                                 </div>

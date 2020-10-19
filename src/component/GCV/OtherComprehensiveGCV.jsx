@@ -186,7 +186,7 @@ const ComprehensiveValidation = Yup.object().shape({
 
     B00073_description: Yup.string().when(['pa_coolie_flag'], {
         is: pa_coolie_flag => pa_coolie_flag == '1',
-        then: Yup.string().required('Please provide No. of paid driver').matches(/^[0-9]*$/, 'Please provide valid number'),
+        then: Yup.string().required('Please provide No. of paid driver').matches(/^[0-9]$/, 'Please provide valid number'),
         otherwise: Yup.string()
     }),
 
@@ -905,9 +905,10 @@ class OtherComprehensiveGCV extends Component {
         let maxIDV = PolicyArray.length > 0 ? Math.floor(PolicyArray[0].PolicyRiskList[0].MaxIDV_Suggested) : null
         minIDV = minIDV + 1;
         maxIDV = maxIDV - 1;
+        
         let minBodyIDV = 0
-        let maxBodyIDV = 10000000
-        let defaultBodySliderValue =  motorInsurance && motorInsurance.body_idv_value ? motorInsurance.body_idv_value : 0
+        let maxBodyIDV = PolicyArray.length > 0 ? Math.round(PolicyArray[0].PolicyRiskList[0].IDV_Suggested/2) : 0
+        let defaultBodySliderValue =  motorInsurance && motorInsurance.body_idv_value ? Math.round(motorInsurance.body_idv_value) : 0
         let bodySliderValue = bodySliderVal
 
         let covList = motorInsurance && motorInsurance.add_more_coverage ? motorInsurance.add_more_coverage.split(",") : ""
@@ -1297,7 +1298,7 @@ class OtherComprehensiveGCV extends Component {
                                 : null}
                             </Row>
 
-                            {/* <Row>
+                            <Row>
                                 <Col sm={12} md={4} lg={4}>
                                     <FormGroup>
                                         <div className="insurerName">
@@ -1309,7 +1310,7 @@ class OtherComprehensiveGCV extends Component {
                                     <FormGroup>
                                         <div className="insurerName">
                                         <Field
-                                            name="IDV"
+                                            name="body_idv_value"
                                             type="text"
                                             placeholder=""
                                             autoComplete="off"
@@ -1318,14 +1319,14 @@ class OtherComprehensiveGCV extends Component {
                                             onBlur={e => this.changePlaceHoldClassRemove(e)}
                                             value={bodySliderValue ? bodySliderValue : defaultBodySliderValue}  
                                         />
-                                        {errors.IDV && touched.IDV ? (
-                                            <span className="errorMsg">{errors.IDV}</span>
+                                        {errors.body_idv_value && touched.body_idv_value ? (
+                                            <span className="errorMsg">{errors.body_idv_value}</span>
                                         ) : null}
                                         </div>
                                     </FormGroup>
                                 </Col>
                                 
-
+                            {defaultSliderValue ?
                                 <Col sm={12} md={12} lg={6}>
                                     <FormGroup>
                                     <input type="range" className="W-90" 
@@ -1336,15 +1337,15 @@ class OtherComprehensiveGCV extends Component {
                                     step= '1'
                                     value={values.slider}
                                     onChange= {(e) =>{
-                                    setFieldTouched("slider");
-                                    setFieldValue("slider",values.slider);
+                                    setFieldTouched("slider1");
+                                    setFieldValue("slider1",values.slider);
                                     this.bodySliderValue(e.target.value)
                                 }}
                                     />
                                     </FormGroup>
                                 </Col>
-                                
-                            </Row> */}
+                            : null }
+                            </Row>
 
                             <Row>
                                 <Col sm={12} md={5} lg={5}>
@@ -1437,7 +1438,7 @@ class OtherComprehensiveGCV extends Component {
 
                                 {moreCoverage && moreCoverage.length > 0 ? moreCoverage.map((coverage, qIndex) => (
                                 <Row key={qIndex}>   
-                                {motorInsurance && motorInsurance.policy_for == '2' && coverage.code != 'B00015' && coverage.code != 'B00018' && coverage.code != 'B00019' || motorInsurance && motorInsurance.policy_for == '1' ?
+                                {motorInsurance && motorInsurance.policy_for == '2' && coverage.code != 'B00015' && coverage.code != 'B00018' || motorInsurance && motorInsurance.policy_for == '1' ?
                                     <Col sm={12} md={11} lg={6} key={qIndex+"a"} >
                                         <label className="customCheckBox formGrp formGrp">{coverage.name}
                                             <OverlayTrigger overlay={<Tooltip id="tooltip-disabled">{coverage.description}</Tooltip>}>

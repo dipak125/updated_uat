@@ -65,9 +65,12 @@ class LogIn extends Component {
             sessionStorage.removeItem('product_id');
             this.fetchTokenDetails(queryString.parse(this.props.location.search).authentication_token )
         }
-        else if(sessionStorage.getItem('csc_id')) {
+        else if(queryString.parse(this.props.location.search).csc_id) {
             sessionStorage.removeItem('bcLoginData');
-            sessionStorage.setItem('logo', "CSC.svg") 
+            sessionStorage.setItem('logo', "CSC.svg");
+            let encryption = new Encryption();
+            let csc_id = encryption.decrypt(queryString.parse(this.props.location.search).csc_id);
+            sessionStorage.setItem('csc_id', csc_id);
             this.callLogin();          
         }
         else{
@@ -242,7 +245,7 @@ class LogIn extends Component {
             <BaseComponent>
                 <div className="d-flex justify-content-center brand lginpg">
                     <div className="login-box-body">
-                    {sessionStorage.getItem('csc_id')|| queryString.parse(this.props.location.search).authentication_token ? null :
+                    {queryString.parse(this.props.location.search).csc_id || queryString.parse(this.props.location.search).authentication_token ? null :
                         <Formik
                             initialValues={newInitialValues}
                             validationSchema={loginvalidation}

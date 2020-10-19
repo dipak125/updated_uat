@@ -650,7 +650,7 @@ class TwoWheelerSelectBrand extends Component {
                                                                 <p>Tell us about your policy details</p>
 
                                                                 <div className="d-inline-flex m-b-15">
-                                                                    {/* <div className="p-r-25">
+                                                                    <div className="p-r-25">
                                                                         <label className="customRadio3">
                                                                             <Field
                                                                                 type="radio"
@@ -667,7 +667,7 @@ class TwoWheelerSelectBrand extends Component {
                                                                             />
                                                                             <span className="checkmark " /><span className="fs-14"> New Policy</span>
                                                                         </label>
-                                                                    </div> */}
+                                                                    </div>
                                                                     
                                                                     <div className="p-r-25">
                                                                         <label className="customRadio3">

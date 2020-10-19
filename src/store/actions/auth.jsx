@@ -38,12 +38,13 @@ const checkLastActionPerformed = (actionTime) => {
     const timeleft = parseInt(actionTime) + 60 * 60 * 1000;   // 60 mins until auto logout
     const diff = timeleft - now;
     const isTimeout = diff < 0;
-    //console.log('diff', diff);
-    //console.log('isTimeout', isTimeout);
-    if (isTimeout) {
-        //console.log('Logout');
-        return false;
-    }
+    console.log('now-----= ', now);
+    console.log('timeleft--------= ', timeleft);
+
+    // if (isTimeout) {
+    //     //console.log('Logout');
+    //     return false;
+    // }
     //console.log('Continue...');
     return true;
 }
@@ -101,7 +102,7 @@ export const authProcess = (data, onSuccess, onFailure) => {
                 } else {
                     loginData = {email: '', pass: '', rememberMe: ''};
                 }
-                localStorage.setItem('auth_token', response.data.token_type+" "+response.data.token);
+                sessionStorage.setItem('auth_token', response.data.token_type+" "+response.data.token);
                 // localStorage.setItem('users', JSON.stringify({ user: response.data.user, permission: response.data.permission, lastAction: Date.now() }));
                 localStorage.setItem('users', JSON.stringify({ user: encryption.encrypt(JSON.stringify(response.data.user_data)), permission: [], lastAction: Date.now() }));
                 localStorage.setItem('loginData', JSON.stringify( loginData ));

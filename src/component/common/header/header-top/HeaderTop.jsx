@@ -96,14 +96,15 @@ class HeaderTop extends Component {
                         <Dropdown alignRight>
                             <Dropdown.Toggle variant="" id="dropdown-basic">
                                 <div className="d-flex topUserBtn">
-                                {localStorage.getItem("auth_token") && bc_data.user_info ?
+                                {sessionStorage.getItem("auth_token") && bc_data.user_info ?
                                     <div className="align-self-center userNameImg">
                                         Welcome {bc_data.user_info.data.user.name}
                                     </div>
                                         :  
-                                        localStorage.getItem("auth_token") && csc_data ?
+                                        sessionStorage.getItem("auth_token") && csc_data ?
                                         <div className="align-self-center userNameImg">
                                             Welcome {csc_data.name}
+                                            <p><a href={process.env.REACT_APP_PAYMENT_URL+'/core/public/pdf_files/RM-name-SBIG.xlsx'}><strong>Download RM List</strong></a></p>
                                         </div>
                                         : null }
                                     <div className="align-self-center">
@@ -118,9 +119,9 @@ class HeaderTop extends Component {
                                     </div> */}
                                 </div>
                             </Dropdown.Toggle>
-                            <Dropdown.Menu>
-                                {/* <Dropdown.Item >Logout</Dropdown.Item> */}
-                            </Dropdown.Menu>
+                            {/* <Dropdown.Menu>
+                                <Dropdown.Item >Logout</Dropdown.Item> 
+                            </Dropdown.Menu> */}
                         </Dropdown>                       
                     </div>
                     

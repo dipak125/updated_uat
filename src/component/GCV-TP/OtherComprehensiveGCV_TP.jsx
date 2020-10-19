@@ -117,13 +117,13 @@ const ComprehensiveValidation = Yup.object().shape({
    
     B00069_value: Yup.string().when(['LL_Coolie_flag'], {
         is: LL_Coolie_flag => LL_Coolie_flag == '1',
-        then: Yup.string().required('Please provide No. of person'),
+        then: Yup.string().required('Please provide No. of person').matches(/^[0-9]$/, 'Please provide valid No.'),
         otherwise: Yup.string()
     }),
    
     B00012_value: Yup.string().when(['LL_Emp_flag'], {
         is: LL_Emp_flag => LL_Emp_flag == '1',
-        then: Yup.string().required('Please provide No. of employee'),
+        then: Yup.string().required('Please provide No. of employee').matches(/^[0-9]$/, 'Please provide valid No.'),
         otherwise: Yup.string()
     }),
    
@@ -179,7 +179,7 @@ const ComprehensiveValidation = Yup.object().shape({
 
     B00073_description: Yup.string().when(['pa_coolie_flag'], {
         is: pa_coolie_flag => pa_coolie_flag == '1',
-        then: Yup.string().required('Please provide No. of paid driver').matches(/^[0-9]*$/, 'Please provide valid number'),
+        then: Yup.string().required('Please provide No. of paid driver').matches(/^[0-9]$/, 'Please provide valid number'),
         otherwise: Yup.string()
     }),
 
@@ -1371,7 +1371,7 @@ class OtherComprehensiveGCV extends Component {
                                                         type="text"
                                                         placeholder="Please enter no of paid drivers"
                                                         autoComplete="off"
-                                                        // maxLength="28"
+                                                        maxLength="1"
                                                         onFocus={e => this.changePlaceHoldClassAdd(e)}
                                                         onBlur={e => this.changePlaceHoldClassRemove(e)}
                                                         onChange={(e) => {
@@ -1594,7 +1594,7 @@ class OtherComprehensiveGCV extends Component {
                                                     type="text"
                                                     placeholder="Enter No. of Employees"
                                                     autoComplete="off"
-                                                    // maxLength="28"
+                                                    maxLength="1"
                                                     onFocus={e => this.changePlaceHoldClassAdd(e)}
                                                     onBlur={e => this.changePlaceHoldClassRemove(e)}
                                                     onChange={(e) => {
@@ -1622,7 +1622,7 @@ class OtherComprehensiveGCV extends Component {
                                                     type="text"
                                                     placeholder="Enter No. of Person"
                                                     autoComplete="off"
-                                                    // maxLength="28"
+                                                    maxLength="1"
                                                     onFocus={e => this.changePlaceHoldClassAdd(e)}
                                                     onBlur={e => this.changePlaceHoldClassRemove(e)}
                                                     onChange={(e) => {

@@ -7,6 +7,7 @@ import axios from "../../shared/axios";
 import { withRouter } from 'react-router-dom';
 import { loaderStart, loaderStop } from "../../store/actions/loader";
 import { connect } from "react-redux";
+import Footer from '../common/footer/Footer';
 
 class ErrorPage extends Component {
 
@@ -41,23 +42,28 @@ class ErrorPage extends Component {
         const { errorDetails } = this.state
         return (
             <>
-                 <BaseComponent>
-                    <div className="container-fluid">
-                    <div className="row">
-                        <div className="col-sm-12 col-md-12 col-lg-2 col-xl-2 pd-l-0">
-                            <SideNav />
+             <BaseComponent>
+                <div className="container-fluid">
+                  <div className="row">
+                    <div className="col-sm-12 col-md-12 col-lg-2 col-xl-2 pd-l-0">
+                      <SideNav />
+                    </div>
+                    <div className="col-sm-12 col-md-12 col-lg-10 col-xl-10">
+                      <section className="thankuBox">
+                        <div className="text-center custtxt">
+                        <p className="fs-16 m-b-30"><span className="lghtBlue">&nbsp;</span></p>
+                          <img src={require('../../assets/images/Error.png')} alt="" className="m-b-30" />
+                          <p className="fs-16 m-b-30">&nbsp;&nbsp;&nbsp;&nbsp;<span className="lghtBlue">{errorDetails.message}</span></p>
+                          <p className="fs-16 m-b-30"><span className="lghtBlue">&nbsp;</span></p>
+                            
                         </div>
-                            <div className="col-sm-12 col-md-12 col-lg-12 col-xl-12 pd-l-0">
-                                <div className="error404">
-                                    <h3>Sorry!</h3>
-                                    {errorDetails.message}
-                                    {/* <p>Sorry, but the page you are looking for is not found. Please, make sure you have typed the currect URL.</p> */}
-                                    {/* <p>Please login to continue.</p> */}
-                                </div>
-                                </div>
-                            </div>
-                    </div>   
-                </BaseComponent>
+                      </section>
+                      {/* <div className="dashbrd"><a href="#">Go to Dashboard</a></div> */}
+                      <Footer />
+                    </div>
+                  </div>
+                </div>
+              </BaseComponent>
             </>
         );
     }

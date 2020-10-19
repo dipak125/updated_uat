@@ -11,7 +11,7 @@ let encryption = new Encryption();
 
 instance.interceptors.request.use(config => {
     // Insert authorization token on request call
-    const auth_token = localStorage.getItem('auth_token');
+    const auth_token = sessionStorage.getItem('auth_token');
     if( auth_token ) config.headers['Authorization'] = auth_token;
 
     return config;
@@ -24,7 +24,12 @@ instance.interceptors.response.use( response => {
     // response.data = JSON.parse(encryption.decrypt(response.data))
     return response;
 }, error => {
+    if(error.response.status == 401) {
+        localStorage.clear()
+        sessionStorage.clear()
+    }   
     return Promise.reject(error.response);
 });
+
 
 export default instance;

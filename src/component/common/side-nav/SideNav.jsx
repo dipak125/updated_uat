@@ -27,8 +27,8 @@ class SideNav extends Component {
             .then(res => {
                 localStorage.removeItem('cons_reg_info');
                 // window.location = `${res.data.data.logout_url}`
-                this.props.logout()
-                    // this.props.history.push(`/Error`);                                 
+                this.props.history.push(`/logout`); 
+                this.props.logout()                                                  
             })
             .catch(err => {
                 this.props.logout();
