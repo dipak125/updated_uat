@@ -5,6 +5,8 @@ import axios from "../../shared/axios"
 import { connect } from "react-redux";
 import { loaderStart, loaderStop } from "../../store/actions/loader";
 import Encryption from '../../shared/payload-encryption';
+import swal from 'sweetalert';
+import { authLogout } from "../../store/actions/auth";
 
 const initialValues = {};
 
@@ -57,6 +59,10 @@ class Motor extends Component {
         this.props.loadingStart();
         axios.get(`vehicle/types/${bcmaster_id}`)
           .then(res => {
+              if(res.data.error == true && res.data.msg == "Invalid User") {
+                swal(res.data.msg)
+                this.props.logout() 
+              }
             this.setState({
                 motor_list: res.data.data
             });
@@ -134,7 +140,8 @@ const mapStateToProps = state => {
   const mapDispatchToProps = dispatch => {
     return {
       loadingStart: () => dispatch(loaderStart()),
-      loadingStop: () => dispatch(loaderStop())
+      loadingStop: () => dispatch(loaderStop()),
+      logout: () => dispatch(authLogout())
     };
   };
 

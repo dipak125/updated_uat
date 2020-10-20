@@ -5,6 +5,7 @@ import { connect } from "react-redux";
 import { authLogout } from "../../../../store/actions/auth";
 import axios from "../../../../shared/axios"
 import Encryption from '../../../../shared/payload-encryption';
+import Blink from 'react-blink-text';
 
 // let logo = sessionStorage.getItem('logo') && sessionStorage.getItem('logo') != "undefined" ? sessionStorage.getItem('logo') : "search.svg"
 
@@ -104,7 +105,12 @@ class HeaderTop extends Component {
                                         sessionStorage.getItem("auth_token") && csc_data ?
                                         <div className="align-self-center userNameImg">
                                             Welcome {csc_data.name}
-                                            <p><a href={process.env.REACT_APP_PAYMENT_URL+'/core/public/pdf_files/RM-name-SBIG.xlsx'}><strong>Download RM List</strong></a></p>
+                                            <p><a href={process.env.REACT_APP_PAYMENT_URL+'/core/public/pdf_files/RM-name-SBIG.xlsx'}>
+                                                <Blink color='blue' text='Download RM List' fontSize='14'>
+                                                    Download RM List
+                                                </Blink> 
+                                            </a></p>
+                                                {/* <strong>Download RM List</strong></a></p> */}
                                         </div>
                                         : null }
                                     <div className="align-self-center">

@@ -60,7 +60,7 @@ class SelectBrandGCV extends Component {
             selectedVarientId: '',
             searchitem: [],
             search: "",
-            otherBrands: false,
+            otherBrands: localStorage.getItem("brandEdit") == "2" ? true : false,
             brandName: '',
             modelName: '',
             fuelType: '',
@@ -128,7 +128,7 @@ class SelectBrandGCV extends Component {
                     let brandList = res && decryptResp.data.list ? decryptResp.data.list : []
                     this.setState({
                         brandList,
-                        otherBrands: false
+                        otherBrands: localStorage.getItem("brandEdit") == "2" ? true : false,
                     })
                     this.props.loadingStop();
                     if(localStorage.getItem('newBrandEdit') == '1') {
@@ -223,6 +223,12 @@ class SelectBrandGCV extends Component {
             this.setBrandName(brandId)
         }
         else if(localStorage.getItem('brandEdit') == '2') {
+            this.getOtherBrands()
+        }
+        else if(otherBrands == false) {
+            this.setBrandName(brandId)
+        }
+        else {
             this.getOtherBrands()
         }
     }
@@ -411,7 +417,7 @@ class SelectBrandGCV extends Component {
                                                                             - <strong>{brandName ? brandName : (vehicleDetails && vehicleDetails.vehiclebrand && vehicleDetails.vehiclebrand.name ? vehicleDetails.vehiclebrand.name : "")}</strong>
                                                                         </div>
 
-                                                                        <div> <button type="button" className="rgistrBtn" onClick={this.selectVehicle.bind(this, productId)}>Edit</button></div>
+                                                                        {/* <div> <button type="button" className="rgistrBtn" onClick={this.selectVehicle.bind(this, productId)}>Edit</button></div> */}
                                                                     </div>
 
                                                                     <div className="d-flex justify-content-between flex-lg-row flex-md-column m-b-25">

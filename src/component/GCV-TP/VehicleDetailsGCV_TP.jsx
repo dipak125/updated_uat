@@ -217,17 +217,28 @@ const vehicleRegistrationValidation = Yup.object().shape({
         function() {
             return "Please enter valid policy number"
         }).min(6, function() {
-            return "Policy No. must be minimum 6 chracters"
+            return "Policy No. must be minimum 6 characters"
         })
         .max(28, function() {
-            return "Policy No. must be maximum 18 chracters"
+            return "Policy No. must be maximum 18 characters"
         }),
 
 
     goodscarriedtypes_id: Yup.string()
     .required(function() {
         return "Please select type of goods"
-    }),
+    }).test(
+        "currentMonthChecking",
+        function() {
+            return "Hazardous goods not allowed"
+        },
+        function (value) {
+            if (value == '1' ) {   
+                return false;    
+            }
+            return true;
+        }
+    ),
     averagemonthlyusages_id: Yup.string()
     .required(function() {
         return "Please select avarage monthly use"
@@ -618,6 +629,7 @@ class VehicleDetailsGCV extends Component {
             goodscarriedtypes_id: motorInsurance && motorInsurance.goodscarriedtype_id ? motorInsurance.goodscarriedtype_id : "",
             averagemonthlyusages_id: motorInsurance && motorInsurance.averagemonthlyusage_id ? motorInsurance.averagemonthlyusage_id : "",
             permittypes_id: motorInsurance && motorInsurance.permittype_id ? motorInsurance.permittype_id : "",
+            policy_type_id: motorInsurance && motorInsurance.policytype_id ? motorInsurance.policytype_id : ""
 
         });
 
@@ -797,7 +809,7 @@ class VehicleDetailsGCV extends Component {
                                                     </Col>
                                                 </Row>
 
-                                            {ageObj.whatIsCurrentMonth(values.registration_date) > 0 || values.registration_date == "" ?
+                                            {values.policy_type_id == '2' ?
                                                 <Fragment>
                                                 <Row>
                                                     <Col sm={12}>

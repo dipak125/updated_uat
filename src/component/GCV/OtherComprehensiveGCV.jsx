@@ -273,10 +273,13 @@ class OtherComprehensiveGCV extends Component {
                 vahanVerify: false,
                 newRegistrationNo: "",
                 puc: '1',
+                fuel_type: ""
             },
             request_data: [],
             add_more_coverage_request_array: [],
-            bodySliderVal: ''
+            bodySliderVal: '',
+            fuelList: [],
+            vehicleDetails: []
         };
     }
 
@@ -346,13 +349,13 @@ class OtherComprehensiveGCV extends Component {
         const { productId } = this.props.match.params
         let policyHolder_id = localStorage.getItem("policyHolder_refNo") ? localStorage.getItem("policyHolder_refNo") : 0;
         let encryption = new Encryption();
-        this.props.loadingStart();
         axios.get(`gcv/policy-holder/details/${policyHolder_id}`)
             .then(res => {
                 let decryptResp = JSON.parse(encryption.decrypt(res.data))
                 console.log("decrypt--fetchData-- ", decryptResp)
                 let motorInsurance = decryptResp.data.policyHolder ? decryptResp.data.policyHolder.motorinsurance : {}
                 let request_data = decryptResp.data.policyHolder ? decryptResp.data.policyHolder.request_data : {};
+                let vehicleDetails = decryptResp.data.policyHolder ? decryptResp.data.policyHolder.vehiclebrandmodel : {};
                 let values = []
                 let add_more_coverage = motorInsurance && motorInsurance.policy_for == '1' && motorInsurance.add_more_coverage == null ? ['B00015']  :  (motorInsurance && motorInsurance.add_more_coverage != null ? motorInsurance.add_more_coverage.split(",") : [])
                 add_more_coverage = add_more_coverage.flat()
@@ -380,7 +383,7 @@ class OtherComprehensiveGCV extends Component {
                 values.B00070_value = add_more_coverage_request_array.B00070 ? add_more_coverage_request_array.B00070.value : ""
 
                 this.setState({
-                    motorInsurance, add_more_coverage,request_data,
+                    motorInsurance, add_more_coverage,request_data, vehicleDetails, 
                     showCNG: motorInsurance.cng_kit == 1 ? true : false,
                     vahanVerify: motorInsurance.chasis_no && motorInsurance.engine_no ? true : false,
                     selectFlag: motorInsurance && motorInsurance.add_more_coverage != null ? '0' : '1',
@@ -413,6 +416,25 @@ class OtherComprehensiveGCV extends Component {
           });
       };
 
+      getFuelList = (values) => {
+        this.props.loadingStart();
+        axios
+          .get(`/fuel-list`)
+          .then((res) => {
+              console.log("fuel list--------- ", res.data)
+            this.setState({
+              fuelList: res.data.data.fuellist,
+            });
+            this.fetchData()
+          })
+          .catch((err) => {
+            this.setState({
+                fuelList: [],
+            });
+            this.props.loadingStop();
+          });
+      };
+
     getMoreCoverage = () => {
         this.props.loadingStart();
         let encryption = new Encryption();
@@ -427,7 +449,7 @@ class OtherComprehensiveGCV extends Component {
             this.setState({
             moreCoverage: decryptResp.data,
             });
-            this.fetchData()
+            this.getFuelList()
           })
           .catch((err) => {
             let decryptResp = JSON.parse(encryption.decrypt(err.data))
@@ -563,7 +585,8 @@ class OtherComprehensiveGCV extends Component {
             'add_more_coverage': add_more_coverage.toString(),
             'PA_Cover': values.PA_flag ? values.PA_Cover : "0",
             'coverage_data': JSON.stringify(coverage_data),
-            'body_idv_value' : bodySliderVal ? bodySliderVal : defaultBodySliderValue
+            'body_idv_value' : bodySliderVal ? bodySliderVal : defaultBodySliderValue,
+            'fuel_type' : values.fuel_type
             // 'cng_kit': cng_kit_flag,
             // 'cngKit_Cost': cngKit_Cost
         }
@@ -670,7 +693,8 @@ class OtherComprehensiveGCV extends Component {
                 'pa_flag' : values.PA_cover_flag,
                 'page_name': `OtherComprehensive/${productId}`,
                 'coverage_data': JSON.stringify(coverage_data),
-                'body_idv_value' : bodySliderVal ? bodySliderVal : defaultBodySliderValue
+                'body_idv_value' : bodySliderVal ? bodySliderVal : defaultBodySliderValue,
+                'fuel_type' : values.fuel_type
             }
         }
         else {
@@ -686,7 +710,8 @@ class OtherComprehensiveGCV extends Component {
                 'idv_value': sliderVal ? sliderVal : defaultSliderValue.toString(),
                 'puc': values.puc,
                 'page_name': `OtherComprehensive/${productId}`,
-                'body_idv_value' : bodySliderVal ? bodySliderVal : defaultBodySliderValue
+                'body_idv_value' : bodySliderVal ? bodySliderVal : defaultBodySliderValue,
+                'fuel_type' : values.fuel_type
             }
         }
         console.log('post_data',post_data)
@@ -896,7 +921,7 @@ class OtherComprehensiveGCV extends Component {
 
 
     render() {
-        const {showCNG, is_CNG_account, vahanDetails,error, policyCoverage, vahanVerify, selectFlag, fulQuoteResp, PolicyArray, 
+        const {showCNG, is_CNG_account, vahanDetails,error, policyCoverage, vahanVerify, selectFlag, fulQuoteResp, PolicyArray, fuelList, vehicleDetails,
             moreCoverage, sliderVal, bodySliderVal, motorInsurance, serverResponse, engine_no, chasis_no, initialValue, add_more_coverage_request_array} = this.state
         const {productId} = this.props.match.params 
         let defaultSliderValue = PolicyArray.length > 0 ? Math.round(PolicyArray[0].PolicyRiskList[0].IDV_Suggested) : 0
@@ -915,6 +940,7 @@ class OtherComprehensiveGCV extends Component {
         let newInnitialArray = {}
         let PA_flag = motorInsurance && (motorInsurance.pa_cover == null || motorInsurance.pa_cover == "") ? '0' : '1'
         let PA_Cover = motorInsurance &&  motorInsurance.pa_cover != null ? motorInsurance.pa_cover : ''
+        let fuel_type = vehicleDetails && vehicleDetails.varientmodel && vehicleDetails.varientmodel.fueltype  ? vehicleDetails.varientmodel.fueltype.id : ""
 
         let trailer_flag= add_more_coverage_request_array.B00007 && add_more_coverage_request_array.B00007.value ? '1' : '0'
         let pa_coolie_flag= add_more_coverage_request_array.B00073 && add_more_coverage_request_array.B00073.value ? '1' : '0'
@@ -955,7 +981,8 @@ class OtherComprehensiveGCV extends Component {
                 LL_Coolie_flag: '0',
                 enhance_PA_OD_flag: '0',
                 ATC_flag: '0',
-                LL_workman_flag: '0'
+                LL_workman_flag: '0',
+                fuel_type: fuel_type
 
             });
         }
@@ -982,7 +1009,8 @@ class OtherComprehensiveGCV extends Component {
                     LL_Coolie_flag: '0',
                     enhance_PA_OD_flag: '0',
                     ATC_flag: '0',
-                    LL_workman_flag: '0'
+                    LL_workman_flag: '0',
+                    fuel_type: fuel_type
                 });
         }
 
@@ -1252,7 +1280,7 @@ class OtherComprehensiveGCV extends Component {
                                 <Col sm={12} md={4} lg={4}>
                                     <FormGroup>
                                         <div className="insurerName">
-                                            <span className="fs-16">Insured Declared Value</span>
+                                            Insured Declared Value
                                         </div>
                                     </FormGroup>
                                 </Col>
@@ -1302,7 +1330,7 @@ class OtherComprehensiveGCV extends Component {
                                 <Col sm={12} md={4} lg={4}>
                                     <FormGroup>
                                         <div className="insurerName">
-                                            <span className="fs-16">Body IDV</span>
+                                            Body IDV
                                         </div>
                                     </FormGroup>
                                 </Col>
@@ -1348,85 +1376,41 @@ class OtherComprehensiveGCV extends Component {
                             </Row>
 
                             <Row>
-                                <Col sm={12} md={5} lg={5}>
+                                <Col sm={12} md={5} lg={4}>
                                     <FormGroup>
                                         <div className="insurerName">
-                                            <span className="fs-16"> Have you fitted external CNG Kit</span>
+                                             Fuel Type
                                         </div>
                                     </FormGroup>
                                 </Col>
                                 <Col sm={12} md={3} lg={3}>
-                                    <FormGroup>
-                                        <div className="d-inline-flex m-b-35">
-                                            <div className="p-r-25">
-                                                <label className="customRadio3">
-                                                <Field
-                                                    type="radio"
-                                                    name='cng_kit'                                            
-                                                    value='1'
-                                                    key='1'  
-                                                    onChange={(e) => {
-                                                        setFieldValue(`cng_kit`, e.target.value);
-                                                        this.showCNGText(1);
-                                                    }}
-                                                    checked={values.cng_kit == '1' ? true : false}
-                                                />
-                                                    <span className="checkmark " /><span className="fs-14"> Yes</span>
-                                                </label>
-                                            </div>
-
-                                            <div className="">
-                                                <label className="customRadio3">
-                                                <Field
-                                                    type="radio"
-                                                    name='cng_kit'                                            
-                                                    value='0'
-                                                    key='1'  
-                                                    onChange={(e) => {
-                                                        setFieldValue(`cng_kit`, e.target.value);
-                                                        this.showCNGText(0);
-                                                    }}
-                                                    checked={values.cng_kit == '0' ? true : false}
-                                                />
-                                                    <span className="checkmark" />
-                                                    <span className="fs-14">No</span>      
-                                                </label>
-                                                {errors.cng_kit && touched.cng_kit ? (
-                                                <span className="errorMsg">{errors.cng_kit}</span>
-                                                ) : null}
-                                            </div>
-                                        </div>
+                                    <FormGroup>                                      
+                                        <div className="formSection">
+                                            <Field
+                                                name='fuel_type'
+                                                component="select"
+                                                autoComplete="off"
+                                                className="formGrp inputfs12"
+                                                value = {values.fuel_type}
+                                                onChange={(e) => {
+                                                    setFieldTouched('fuel_type')
+                                                    setFieldValue('fuel_type', e.target.value);
+                                                    this.handleChange()
+                                                }}  
+                                            >
+                                                <option value="">Fuel Type</option>
+                                                {fuelList.map((fuel, qIndex) => ( 
+                                                    <option value= {fuel.id}>{fuel.descriptions}</option>
+                                                ))}
+                                    
+                                            </Field>
+                                            {errors.fuel_type && touched.fuel_type ? (
+                                                <span className="errorMsg">{errors.fuel_type}</span>
+                                            ) : null}
+                                        </div>               
                                     </FormGroup>
                                 </Col>
-                                {showCNG || is_CNG_account == 1 ?
-                                <Col sm={12} md={12} lg={4}>
-                                    <FormGroup>
-                                    <div className="insurerName">   
-                                        <Field
-                                            name="cngKit_Cost"
-                                            type="text"
-                                            placeholder="Cost of Kit"
-                                            autoComplete="off"
-                                            className="W-80"
-                                            value = {values.cngKit_Cost}
-                                            onFocus={e => this.changePlaceHoldClassAdd(e)}
-                                            onBlur={e => this.changePlaceHoldClassRemove(e)}
-                                            onChange={e => {
-                                                setFieldTouched('cngKit_Cost');
-                                                setFieldValue('cngKit_Cost', e.target.value);
-                                                this.handleChange()
-
-                                            }}
-                                        />
-                                        {errors.cngKit_Cost && touched.cngKit_Cost ? (
-                                        <span className="errorMsg">{errors.cngKit_Cost}</span>
-                                        ) : null}                                             
-                                        </div>
-                                    </FormGroup>
-                                </Col> : ''}
                             </Row>
-                               
-
                             <Row>
                                 <Col sm={12} md={12} lg={12}>
                                     <FormGroup>
@@ -1541,6 +1525,61 @@ class OtherComprehensiveGCV extends Component {
                                                     </Field>
                                                     {errors.B00007_description ? (
                                                         <span className="errorMsg">{errors.B00007_description}</span>
+                                                    ) : null}
+                                                </div>
+                                            </FormGroup>
+                                        </Col>
+                                        </Fragment> : null
+                                    }
+                                    {values.trailer_flag == '1' && values[coverage.code] == 'B00011' ?
+                                     <Fragment>
+                                        <Col sm={12} md={11} lg={2} key={qIndex+"b"}>
+                                            <FormGroup>
+                                                <div className="formSection">
+                                                    <Field
+                                                        name='B00011_value'
+                                                        component="select"
+                                                        autoComplete="off"
+                                                        className="formGrp inputfs12"
+                                                        value = {values.B00011_value}
+                                                        onChange={(e) => {
+                                                            setFieldTouched('B00011_value')
+                                                            setFieldValue('B00011_value', e.target.value);
+                                                            this.handleChange()
+                                                        }}
+                                                    >
+                                                        <option value="">No of Trailer</option>
+                                                        {JSON.parse(coverage.covarage_value).value.length > 0 && JSON.parse(coverage.covarage_value).value.map((insurer, qIndex) => (
+                                                                <option value= {insurer}>{insurer}</option>
+                                                            ))}  
+                                            
+                                                    </Field>
+                                                    {errors.B00011_value ? (
+                                                        <span className="errorMsg">{errors.B00011_value}</span>
+                                                    ) : null}
+                                                </div>
+                                            </FormGroup>
+                                        </Col>
+                                        <Col sm={12} md={11} lg={3} key={qIndex+"c"}>
+                                            <FormGroup>
+                                                <div className="formSection">
+                                                    <Field
+                                                        name="B00011_description"
+                                                        type="text"
+                                                        placeholder="Trailer IDV"
+                                                        autoComplete="off"
+                                                        maxLength="28"
+                                                        onFocus={e => this.changePlaceHoldClassAdd(e)}
+                                                        onBlur={e => this.changePlaceHoldClassRemove(e)}
+                                                        onChange={(e) => {
+                                                            setFieldTouched('B00011_description')
+                                                            setFieldValue('B00011_description', e.target.value);
+                                                            this.handleChange()
+                                                        }}
+                                                    >                                     
+                                                    </Field>
+                                                    {errors.B00011_description ? (
+                                                        <span className="errorMsg">{errors.B00011_description}</span>
                                                     ) : null}
                                                 </div>
                                             </FormGroup>
@@ -1909,6 +1948,7 @@ class OtherComprehensiveGCV extends Component {
                                         </Col>
                                         </Fragment> : null
                                     }
+
                                     {values.ATC_flag == '1' && values[coverage.code] == 'ATC' ?
                                         <Fragment>
                                         <Col sm={12} md={11} lg={2} key={qIndex+"c"}>

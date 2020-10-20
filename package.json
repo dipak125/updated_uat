@@ -28,6 +28,7 @@
     "react-autosuggest": "^10.0.2",
     "react-beforeunload": "^1.0.4",
     "react-big-calendar": "^0.20.1",
+    "react-blink-text": "^1.0.5",
     "react-bootstrap": "^1.0.1",
     "react-bootstrap-table": "^4.3.1",
     "react-collapsible": "^2.8.0",
