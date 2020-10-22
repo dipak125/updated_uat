@@ -15,7 +15,7 @@ import moment from "moment";
 import Encryption from '../../shared/payload-encryption';
 import {  PersonAge } from "../../shared/dateFunctions";
 import Autosuggest from 'react-autosuggest';
-import { addDays } from 'date-fns';
+import fuel from "../common/FuelTypes";
 import {
     checkGreaterTimes,
     checkGreaterStartEndTimes
@@ -31,6 +31,7 @@ const maxDate = moment(moment().subtract(1, 'years').calendar()).add(30, 'day').
 const startRegnDate = moment().subtract(20, 'years').calendar();
 const minRegnDate = moment(startRegnDate).startOf('year').format('YYYY-MM-DD hh:mm');
 const maxRegnDate = new Date();
+const minRegnDateNew = moment(moment().subtract(1, 'months').calendar()).add(1, 'day').calendar();
 
 const initialValue = {
     registration_date: "",
@@ -46,7 +47,8 @@ const initialValue = {
     previous_policy_no: "",
     goodscarriedtypes_id: "",
     averagemonthlyusages_id: "",
-    permittypes_id: ""
+    permittypes_id: "",
+    valid_previous_policy: ""
 }
 const vehicleRegistrationValidation = Yup.object().shape({
     registration_date: Yup.string().required('Registration date is required')
@@ -79,7 +81,7 @@ const vehicleRegistrationValidation = Yup.object().shape({
         },
         function (value) {
             const ageObj = new PersonAge();
-            if (ageObj.whatIsCurrentMonth(this.parent.registration_date) > 0 && !value) {   
+            if (!value && this.parent.policy_type_id == '2' && this.parent.valid_previous_policy == '1'  && this.parent.valid_previous_policy == '1') {   
                 return false;    
             }
             return true;
@@ -88,7 +90,7 @@ const vehicleRegistrationValidation = Yup.object().shape({
         "checkGreaterTimes",
         "Start date must be less than end date",
         function (value) {
-            if (value) {
+            if (value && this.parent.policy_type_id == '2'  && this.parent.valid_previous_policy == '1'  && this.parent.valid_previous_policy == '1') {
                 return checkGreaterStartEndTimes(value, this.parent.previous_end_date);
             }
             return true;
@@ -97,7 +99,7 @@ const vehicleRegistrationValidation = Yup.object().shape({
       "checkStartDate",
       "Enter Start Date",
       function (value) {       
-          if ( this.parent.previous_end_date != undefined && value == undefined) {
+          if ( this.parent.previous_end_date != undefined && value == undefined && this.parent.policy_type_id == '2'  && this.parent.valid_previous_policy == '1') {
               return false;
           }
           return true;
@@ -112,7 +114,7 @@ const vehicleRegistrationValidation = Yup.object().shape({
         },
         function (value) {
             const ageObj = new PersonAge();
-            if (ageObj.whatIsCurrentMonth(this.parent.registration_date) > 0 && !value) {   
+            if ( !value && this.parent.policy_type_id == '2'  && this.parent.valid_previous_policy == '1') {   
                 return false;    
             }
             return true;
@@ -121,7 +123,7 @@ const vehicleRegistrationValidation = Yup.object().shape({
         "checkGreaterTimes",
         "End date must be greater than start date",
         function (value) {
-            if (value) {
+            if (value && this.parent.policy_type_id == '2'  && this.parent.valid_previous_policy == '1') {
                 return checkGreaterTimes(value, this.parent.previous_start_date);
             }
             return true;
@@ -130,7 +132,7 @@ const vehicleRegistrationValidation = Yup.object().shape({
         "checkEndDate",
         "Enter End Date",
         function (value) {     
-            if ( this.parent.previous_start_date != undefined && value == undefined) {
+            if ( this.parent.previous_start_date != undefined && value == undefined && this.parent.policy_type_id == '2'  && this.parent.valid_previous_policy == '1') {
                 return false;
             }
             return true;
@@ -144,8 +146,7 @@ const vehicleRegistrationValidation = Yup.object().shape({
             return "Please select Policy Type"
         },
         function (value) {
-            const ageObj = new PersonAge();
-            if (ageObj.whatIsCurrentMonth(this.parent.registration_date) > 0 && !value) {   
+            if (this.parent.policy_type_id == '2'  && !value  && this.parent.valid_previous_policy == '1') {   
                 return false;    
             }
             return true;
@@ -171,8 +172,7 @@ const vehicleRegistrationValidation = Yup.object().shape({
             return "Please enter previous insurance company"
         },
         function (value) {
-            const ageObj = new PersonAge();
-            if (ageObj.whatIsCurrentMonth(this.parent.registration_date) > 0 && !value) {   
+            if (this.parent.policy_type_id == '2' && !value  && this.parent.valid_previous_policy == '1') {   
                 return false;    
             }
             return true;
@@ -186,8 +186,7 @@ const vehicleRegistrationValidation = Yup.object().shape({
             return "Please enter previous insurance company city"
         },
         function (value) {
-            const ageObj = new PersonAge();
-            if (ageObj.whatIsCurrentMonth(this.parent.registration_date) > 0 && !value) {   
+            if (this.parent.policy_type_id == '2' && !value  && this.parent.valid_previous_policy == '1') {   
                 return false;    
             }
             return true;
@@ -206,8 +205,7 @@ const vehicleRegistrationValidation = Yup.object().shape({
             return "Please enter previous policy number"
         },
         function (value) {
-            const ageObj = new PersonAge();
-            if (ageObj.whatIsCurrentMonth(this.parent.registration_date) > 0 && !value) {   
+            if (this.parent.policy_type_id == '2'&& !value  && this.parent.valid_previous_policy == '1') {   
                 return false;    
             }
             return true;
@@ -247,13 +245,13 @@ const vehicleRegistrationValidation = Yup.object().shape({
     .required(function() {
         return "Please select type of permit"
     }),
+    valid_previous_policy: Yup.string()
+    .required(function() {
+        return "This field is required"
+    }),
+    
 });
 
-const fuel = {
-    1: 'Petrol',
-    2: 'Diesel',
-    3: 'CNG'
-}
 
 
 class VehicleDetailsGCV extends Component {
@@ -409,14 +407,14 @@ class VehicleDetailsGCV extends Component {
         const formData = new FormData(); 
         let encryption = new Encryption();
         let post_data = {}
-        if(ageObj.whatIsCurrentMonth(values.registration_date) > 0 && values.previous_policy_name == '1' ) {
+        if(values.policy_type_id == '2') {
             post_data = {
                 'policy_holder_id':localStorage.getItem('policyHolder_id'),
                 'menumaster_id':4,
                 'registration_date':moment(values.registration_date).format("YYYY-MM-DD"),
                 'location_id':values.location_id,
-                'previous_start_date':moment(values.previous_start_date).format("YYYY-MM-DD"),
-                'previous_end_date':moment(values.previous_end_date).format("YYYY-MM-DD"),
+                'previous_start_date': values.previous_start_date ? moment(values.previous_start_date).format("YYYY-MM-DD") : "",
+                'previous_end_date':values.previous_end_date ? moment(values.previous_end_date).format("YYYY-MM-DD") : "",
                 'previous_policy_name':values.previous_policy_name,
                 'insurance_company_id':values.insurance_company_id,
                 'previous_city':values.previous_city,
@@ -430,34 +428,11 @@ class VehicleDetailsGCV extends Component {
                 'averagemonthlyusage_id': values.averagemonthlyusages_id,
                 'goodscarriedtype_id': values.goodscarriedtypes_id,
                 'permittype_id': values.permittypes_id,
+                'valid_previous_policy': values.valid_previous_policy,
                 'page_name': `VehicleDetails/${productId}`          
             } 
         }
-
-        else if(ageObj.whatIsCurrentMonth(values.registration_date) > 0 && values.previous_policy_name == '2') {
-            post_data = {
-                'policy_holder_id':localStorage.getItem('policyHolder_id'),
-                'menumaster_id':4,
-                'registration_date':moment(values.registration_date).format("YYYY-MM-DD"),
-                'location_id':values.location_id,
-                'previous_start_date':moment(values.previous_start_date).format("YYYY-MM-DD"),
-                'previous_end_date':moment(values.previous_end_date).format("YYYY-MM-DD"),
-                'previous_policy_name':values.previous_policy_name,
-                'insurance_company_id':values.insurance_company_id,
-                'previous_city':values.previous_city,
-                'previous_policy_no': values.previous_policy_no,
-                'vehicleAge': vehicleAge,
-                'policy_type': policy_type,
-                'prev_policy_flag': 1,
-                'previous_is_claim':'0', 
-                'previous_claim_bonus': 1,
-                'averagemonthlyusage_id': values.averagemonthlyusages_id,
-                'goodscarriedtype_id': values.goodscarriedtypes_id,
-                'permittype_id': values.permittypes_id,
-                'page_name': `VehicleDetails/${productId}`          
-            } 
-        }
-        else if(ageObj.whatIsCurrentMonth(values.registration_date) <= 0)  {
+        else if(values.policy_type_id == '1')  {
             post_data = {
                 'policy_holder_id':localStorage.getItem('policyHolder_id'),
                 'menumaster_id':4,
@@ -471,6 +446,7 @@ class VehicleDetailsGCV extends Component {
                 'averagemonthlyusage_id': values.averagemonthlyusages_id,
                 'goodscarriedtype_id': values.goodscarriedtypes_id,
                 'permittype_id': values.permittypes_id,
+                'valid_previous_policy': 0,
                 'page_name': `VehicleDetails/${productId}`
             } 
         }
@@ -527,10 +503,12 @@ class VehicleDetailsGCV extends Component {
 
     getAllAddress() {
         let policyHolder_id = localStorage.getItem("policyHolder_id") ? localStorage.getItem("policyHolder_id") : 0;
-        axios.get(`location-list/${policyHolder_id}`)
+        let encryption = new Encryption();
+        axios.get(`gcv-tp/location-list/${policyHolder_id}`)
           .then(res => {
+            let decryptResp = JSON.parse(encryption.decrypt(res.data))
             this.setState({
-              customerDetails: res.data.data
+              customerDetails: decryptResp.data
             });
             this.props.loadingStop();
           })
@@ -550,7 +528,7 @@ class VehicleDetailsGCV extends Component {
                  let motorInsurance = decryptResp.data.policyHolder ? decryptResp.data.policyHolder.motorinsurance : {};
                  let previousPolicy = decryptResp.data.policyHolder ? decryptResp.data.policyHolder.previouspolicy : {};
                  let vehicleDetails = decryptResp.data.policyHolder ? decryptResp.data.policyHolder.vehiclebrandmodel : {};
-                 let RTO_location = motorInsurance && motorInsurance.location && motorInsurance.location.RTO_LOCATION ? motorInsurance.location.RTO_LOCATION : ""
+                 let RTO_location = motorInsurance && motorInsurance.rtolocation && motorInsurance.rtolocation.RTO_LOCATION ? motorInsurance.rtolocation.RTO_LOCATION : ""
                  let previous_is_claim= previousPolicy && (previousPolicy.is_claim == 0 || previousPolicy.is_claim == 1) ? previousPolicy.is_claim : ""
                 this.setState({
                     motorInsurance, previousPolicy, vehicleDetails,RTO_location, previous_is_claim
@@ -629,7 +607,8 @@ class VehicleDetailsGCV extends Component {
             goodscarriedtypes_id: motorInsurance && motorInsurance.goodscarriedtype_id ? motorInsurance.goodscarriedtype_id : "",
             averagemonthlyusages_id: motorInsurance && motorInsurance.averagemonthlyusage_id ? motorInsurance.averagemonthlyusage_id : "",
             permittypes_id: motorInsurance && motorInsurance.permittype_id ? motorInsurance.permittype_id : "",
-            policy_type_id: motorInsurance && motorInsurance.policytype_id ? motorInsurance.policytype_id : ""
+            policy_type_id: motorInsurance && motorInsurance.policytype_id ? motorInsurance.policytype_id : "",
+            valid_previous_policy: motorInsurance && (motorInsurance.valid_previous_policy == 0 || motorInsurance.valid_previous_policy == 1) ? motorInsurance.valid_previous_policy : ""
 
         });
 
@@ -677,7 +656,7 @@ class VehicleDetailsGCV extends Component {
                                                         <FormGroup>
                                                             <DatePicker
                                                                 name="registration_date"
-                                                                minDate={new Date(minRegnDate)}
+                                                                minDate={values.policy_type_id == '1' ? new Date(minRegnDateNew) : new Date(minRegnDate)}
                                                                 maxDate={new Date(maxRegnDate)}
                                                                 dateFormat="dd MMM yyyy"
                                                                 placeholderText="Registration Date"
@@ -808,8 +787,74 @@ class VehicleDetailsGCV extends Component {
                                                         </FormGroup>
                                                     </Col>
                                                 </Row>
+                                                <Row>
+                                                    <Col sm={12}>
+                                                        <FormGroup>
+                                                            <div className="carloan">
+                                                                <h4> &nbsp;</h4>
+                                                            </div>
+                                                        </FormGroup>
+                                                    </Col>
+                                                </Row>
+                                                {values.policy_type_id == '2' ?
+                                                <Fragment>
+                                                    <Row>
+                                                        <Col sm={12}>
+                                                            <FormGroup>
+                                                                <div className="carloan">
+                                                                    <h4> Do you have a valid Insurance policy ? </h4>
+                                                                </div>
+                                                            </FormGroup>
+                                                        </Col>
+                                                    </Row>
+                                                    <Row>
+                                                    <Col sm={4}>
+                                                        <FormGroup>
+                                                            <div className="d-inline-flex m-b-35">
+                                                                <div className="p-r-25">
+                                                                    <label className="customRadio3">
+                                                                    <Field
+                                                                        type="radio"
+                                                                        name='valid_previous_policy'                                            
+                                                                        value='0'
+                                                                        key='1'  
+                                                                        onChange={(e) => {
+                                                                            setFieldTouched('valid_previous_policy')
+                                                                            setFieldValue(`valid_previous_policy`, e.target.value);
+                                                                            
+                                                                        }}
+                                                                        checked={values.valid_previous_policy == '0' ? true : false}
+                                                                    />
+                                                                        <span className="checkmark " /><span className="fs-14"> No</span>
+                                                                    </label>
+                                                                </div>
 
-                                            {values.policy_type_id == '2' ?
+                                                                <div className="">
+                                                                    <label className="customRadio3">
+                                                                    <Field
+                                                                        type="radio"
+                                                                        name='valid_previous_policy'                                            
+                                                                        value='1'
+                                                                        key='1'  
+                                                                        onChange={(e) => {
+                                                                            setFieldTouched('valid_previous_policy')
+                                                                            setFieldValue(`valid_previous_policy`, e.target.value);
+                                                                        }}
+                                                                        checked={values.valid_previous_policy == '1' ? true : false}
+                                                                    />
+                                                                        <span className="checkmark" />
+                                                                        <span className="fs-14">Yes</span>
+                                                                    </label>
+                                                                    {errors.valid_previous_policy && touched.valid_previous_policy ? (
+                                                                    <span className="errorMsg">{errors.valid_previous_policy}</span>
+                                                                ) : null}
+                                                                </div>
+                                                            </div>
+                                                        </FormGroup>
+                                                    </Col>
+                                                </Row>
+                                            </Fragment> : null }
+                                            {values.policy_type_id == '2' && values.valid_previous_policy == '1' ?
                                                 <Fragment>
                                                 <Row>
                                                     <Col sm={12}>
@@ -971,20 +1016,17 @@ class VehicleDetailsGCV extends Component {
                                                         </FormGroup>
                                                     </Col>
                                                 </Row>
-                                                { values.previous_policy_name == '1' && Math.floor(moment().diff(values.previous_end_date, 'days', true)) <= 90 ?
-                                                    <Fragment>
-                                                    <Row>
-                                                        <Col sm={12}>
-                                                            <FormGroup>
-                                                                <div className="carloan">
-                                                                    <h4> </h4>
-                                                                </div>
-                                                            </FormGroup>
-                                                        </Col>
-                                                    </Row>
-                                                   
-                                                </Fragment> : null}
-                                                
+
+                                                <Row>
+                                                    <Col sm={12}>
+                                                        <FormGroup>
+                                                            <div className="carloan">
+                                                                <h4> </h4>
+                                                            </div>
+                                                        </FormGroup>
+                                                    </Col>
+                                                </Row>
+
                                             </Fragment> : null }
 
                                                 <div className="d-flex justify-content-left resmb">
@@ -1027,7 +1069,7 @@ class VehicleDetailsGCV extends Component {
 
                                                     <div className="d-flex justify-content-between flex-lg-row flex-md-column m-b-25">
                                                         <div className="txtRegistr">Fuel Type<br />
-                                                        <strong>{vehicleDetails && vehicleDetails.varientmodel && vehicleDetails.varientmodel.fuel_type ? fuel[vehicleDetails.varientmodel.fuel_type] : null} </strong></div>
+                                                        <strong>{vehicleDetails && vehicleDetails.varientmodel && vehicleDetails.varientmodel.fueltype ? fuel[vehicleDetails.varientmodel.fueltype.id] : null} </strong></div>
 
                                                     </div>
                                                 </div>

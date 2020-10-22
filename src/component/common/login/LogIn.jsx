@@ -212,7 +212,7 @@ class LogIn extends Component {
                 this.props.onFormSubmit(values,
                     () => {
                         this.props.loadingStop();
-                        this.props.history.push('/Products');
+                        this.props.history.push('/Dashboard');
                     },
                     (err) => {
                         this.props.loadingStop();

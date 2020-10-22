@@ -28,7 +28,7 @@ const ComprehensiveValidation = Yup.object().shape({
     registration_no: Yup.string().when("newRegistrationNo", {
         is: "NEW",       
         then: Yup.string(),
-        otherwise: Yup.string().required('Please provide registration number').matches(/^[A-Z]{2}[ -][0-9]{1,2}[ -][A-Z]{1,3}[ -][0-9]{4}$/, 'Invalid Registration number'),
+        otherwise: Yup.string().required('Please provide registration number').matches(/^[A-Z]{2}[ ][0-9]{1,2}(?: [A-Z])?(?: [A-Z]*)? [0-9]{4}$/, 'Invalid Registration number'),
     }),
 
     puc: Yup.string().required("Please verify pollution certificate to proceed"),
@@ -111,7 +111,20 @@ const ComprehensiveValidation = Yup.object().shape({
    
     B00018_value: Yup.string().when(['enhance_PA_OD_flag'], {
         is: enhance_PA_OD_flag => enhance_PA_OD_flag == '1',
-        then: Yup.string().required('Please provide enhance PA coverage'),
+        then: Yup.string().required('Please provide enhance PA coverage').test(
+                    "isLoanChecking",
+                    function() {
+                        return "Value should be 16L to 50L"
+                    },
+                    function (value) {
+                        if (parseInt(value) < 1600000 || value > 5000000) {   
+                            return false;    
+                        }
+                        return true;
+                    }
+                ).matches(/^[0-9]*$/, function() {
+                    return "Please enter valid IDV"
+                }),
         otherwise: Yup.string()
     }),
    
@@ -194,17 +207,19 @@ const ComprehensiveValidation = Yup.object().shape({
         then: Yup.string().required('Please provide trailer IDV').matches(/^[0-9]*$/, 'Please provide valid IDV'),
         otherwise: Yup.string()
     }),
-    B00011_value: Yup.string().when(['trailer_flag'], {
-        is: trailer_flag => trailer_flag == '1',
+    B00011_value: Yup.string().when(['trailer_flag_TP'], {
+        is: trailer_flag_TP => trailer_flag_TP == '1',
         then: Yup.string().required('Please provide No. of trailer').matches(/^[0-9]$/, 'Please provide valid No.'),
         otherwise: Yup.string()
     }),
 
-    B00011_description: Yup.string().when(['trailer_flag'], {
-        is: trailer_flag => trailer_flag == '1',
+    B00011_description: Yup.string().when(['trailer_flag_TP'], {
+        is: trailer_flag_TP => trailer_flag_TP == '1',
         then: Yup.string().required('Please provide trailer IDV').matches(/^[0-9]*$/, 'Please provide valid IDV'),
         otherwise: Yup.string()
     }),
+
+    fuel_type: Yup.string().required("Select fuel type"),
    
    
 });
@@ -277,6 +292,7 @@ class OtherComprehensiveGCV extends Component {
                 vahanVerify: false,
                 newRegistrationNo: "",
                 puc: '1',
+                fuel_type: ""
             },
             request_data: [],
             add_more_coverage_request_array: [],
@@ -882,7 +898,7 @@ class OtherComprehensiveGCV extends Component {
     }
 
     regnoFormat = (e, setFieldTouched, setFieldValue) => {
-        
+    
         let regno = e.target.value
         let formatVal = ""
         let regnoLength = regno.length
@@ -890,12 +906,12 @@ class OtherComprehensiveGCV extends Component {
         var number = /^[0-9]+$/;
         let subString = regno.substring(regnoLength-1, regnoLength)
         let preSubString = regno.substring(regnoLength-2, regnoLength-1)
-
+    
         if(subString.match(letter) && preSubString.match(letter)) {
             formatVal = regno
         }
-        else if(subString.match(number) && preSubString.match(number)) {
-            formatVal = regno
+        else if(subString.match(number) && preSubString.match(number) && regnoLength == 6) {
+            formatVal = formatVal = regno.substring(0, regnoLength-1) + " " +subString
         } 
         else if(subString.match(number) && preSubString.match(letter)) {        
             formatVal = regno.substring(0, regnoLength-1) + " " +subString      
@@ -903,11 +919,11 @@ class OtherComprehensiveGCV extends Component {
         else if(subString.match(letter) && preSubString.match(number)) {
             formatVal = regno.substring(0, regnoLength-1) + " " +subString   
         } 
-
+    
         else formatVal = regno.toUpperCase()
         
         e.target.value = formatVal.toUpperCase()
-
+    
     }
 
 
@@ -1742,7 +1758,7 @@ class OtherComprehensiveGCV extends Component {
                                                     type="text"
                                                     placeholder="Value should be 16L to 50L"
                                                     autoComplete="off"
-                                                    // maxLength="28"
+                                                    maxLength="7"
                                                     onFocus={e => this.changePlaceHoldClassAdd(e)}
                                                     onBlur={e => this.changePlaceHoldClassRemove(e)}
                                                     onChange={(e) => {

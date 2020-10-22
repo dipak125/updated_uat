@@ -240,7 +240,12 @@ const PremiumGCVTP = Loadable({
     loader: () => import(/*webpackChunkName: "Products" */"../GCV-TP/PremiumGCV_TP.jsx"),
     loading: () => loadingContent
 });
+//  =================================== Landing Page ==================================
 
+const Dashboard = Loadable({
+    loader: () => import(/*webpackChunkName: "Products" */"../landing_page/Dashboard"),
+    loading: () => loadingContent
+});
 
 
 
@@ -273,6 +278,10 @@ class Routes extends Component {
                         <PrivateRoute exact path="/Additional_details/:productId" component={AdditionalDetails} />
                         <PrivateRoute exact path="/Premium/:productId" component={Premium} />
                         {/* <PrivateRoute exact path="/ThankYou_motor/:policyId" component={ThankYou_motor} /> */}
+                        
+                        {/* ********************** LandingPage ***************  */}  RenewalPlanner                  
+                        <PrivateRoute exact path="/Dashboard" component={Dashboard} />  
+
 
                         {/************ TwoWheeler ******************/}
                         {/* <PrivateRoute exact path="/two_wheeler_Registration/:productId" component={TwoWheelerRegistration} />                     */}
@@ -336,7 +345,7 @@ class Routes extends Component {
 
 
                         <PrivateRoute exact path="/UnderMaintenance" component={UnderMaintenance} />
-                        <Redirect from="/" to="/Products" />
+                        <Redirect from="/" to="/Dashboard" />
                     </Switch>
                 </HashRouter>
             </>

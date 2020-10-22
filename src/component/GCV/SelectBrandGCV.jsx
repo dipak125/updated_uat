@@ -13,6 +13,7 @@ import { connect } from "react-redux";
 import swal from 'sweetalert';
 import ScrollArea from 'react-scrollbar';
 import Encryption from '../../shared/payload-encryption';
+import fuel from "../common/FuelTypes";
 
 
 
@@ -24,12 +25,6 @@ const initialValues = {
     selectedVarientId: ''
 
 };
-
-const fuel = {
-    1: 'Petrol',
-    2: 'Diesel',
-    3: 'CNG'
-}
 
 
 const vehicleValidation = Yup.object().shape({
@@ -429,7 +424,7 @@ class SelectBrandGCV extends Component {
 
                                                                     <div className="d-flex justify-content-between flex-lg-row flex-md-column m-b-25">
                                                                         <div className="txtRegistr">Fuel Type<br />
-                                                                            <strong>{fuel[fuelType] ? fuel[fuelType] : (vehicleDetails && vehicleDetails.varientmodel && vehicleDetails.varientmodel.fuel_type ? fuel[vehicleDetails.varientmodel.fuel_type] : null)} </strong></div>
+                                                                            <strong>{fuel[fuelType] ? fuel[fuelType] : (vehicleDetails && vehicleDetails.varientmodel && vehicleDetails.varientmodel.fueltype ? fuel[vehicleDetails.varientmodel.fueltype.id] : null)} </strong></div>
 
                                                                     </div>
                                                                 </div>

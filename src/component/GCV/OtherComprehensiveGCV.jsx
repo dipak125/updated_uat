@@ -28,7 +28,7 @@ const ComprehensiveValidation = Yup.object().shape({
     registration_no: Yup.string().when("newRegistrationNo", {
         is: "NEW",       
         then: Yup.string(),
-        otherwise: Yup.string().required('Please provide registration number').matches(/^[A-Z]{2}[ -][0-9]{1,2}[ -][A-Z]{1,3}[ -][0-9]{4}$/, 'Invalid Registration number'),
+        otherwise: Yup.string().required('Please provide registration number').matches(/^[A-Z]{2}[ ][0-9]{1,2}(?: [A-Z])?(?: [A-Z]*)? [0-9]{4}$/, 'Invalid Registration number'),
     }),
 
     puc: Yup.string().required("Please verify pollution certificate to proceed"),
@@ -100,6 +100,12 @@ const ComprehensiveValidation = Yup.object().shape({
     ATC_value: Yup.string().when(['ATC_flag'], {
         is: ATC_flag => ATC_flag == '1',
         then: Yup.string().required('Please select additional towing charges'),
+        otherwise: Yup.string()
+    }), 
+
+    B00070_value: Yup.string().when(['LL_workman_flag'], {
+        is: LL_workman_flag => LL_workman_flag == '1',
+        then: Yup.string().required('Please enter No. of workman').matches(/^[0-9]*$/, 'Please provide valid No.'),
         otherwise: Yup.string()
     }),
    
@@ -201,6 +207,19 @@ const ComprehensiveValidation = Yup.object().shape({
         then: Yup.string().required('Please provide trailer IDV').matches(/^[0-9]*$/, 'Please provide valid IDV'),
         otherwise: Yup.string()
     }),
+    B00011_value: Yup.string().when(['trailer_flag_TP'], {
+        is: trailer_flag_TP => trailer_flag_TP == '1',
+        then: Yup.string().required('Please provide No. of trailer').matches(/^[0-9]$/, 'Please provide valid No.'),
+        otherwise: Yup.string()
+    }),
+
+    B00011_description: Yup.string().when(['trailer_flag_TP'], {
+        is: trailer_flag_TP => trailer_flag_TP == '1',
+        then: Yup.string().required('Please provide trailer IDV').matches(/^[0-9]*$/, 'Please provide valid IDV'),
+        otherwise: Yup.string()
+    }),
+
+    fuel_type: Yup.string().required("Select fuel type"),
    
    
 });
@@ -381,6 +400,8 @@ class OtherComprehensiveGCV extends Component {
                 values.B00007_value = add_more_coverage_request_array.B00007 ? add_more_coverage_request_array.B00007.value : ""
                 values.B00007_description = add_more_coverage_request_array.B00007 ? add_more_coverage_request_array.B00007.description : ""
                 values.B00070_value = add_more_coverage_request_array.B00070 ? add_more_coverage_request_array.B00070.value : ""
+                values.B00007_value = add_more_coverage_request_array.B00011 ? add_more_coverage_request_array.B00011.value : ""
+                values.B00007_description = add_more_coverage_request_array.B00011 ? add_more_coverage_request_array.B00011.description : ""
 
                 this.setState({
                     motorInsurance, add_more_coverage,request_data, vehicleDetails, 
@@ -573,6 +594,7 @@ class OtherComprehensiveGCV extends Component {
                 'B00003' : {'value': values.B00003_value, 'description': values.B00003_description},
                 'B00073' : {'value': values.B00073_value, 'description': values.B00073_description},
                 'B00007' : {'value': values.B00007_value, 'description': values.B00007_description},
+                'B00011' : {'value': values.B00011_value, 'description': values.B00011_description},
                 'B00070' : {'value': values.B00070_value}
             }
         }
@@ -669,6 +691,7 @@ class OtherComprehensiveGCV extends Component {
                 'B00003' : {'value': values.B00003_value, 'description': values.B00003_description},
                 'B00073' : {'value': values.B00073_value, 'description': values.B00073_description},
                 'B00007' : {'value': values.B00007_value, 'description': values.B00007_description},
+                'B00011' : {'value': values.B00011_value, 'description': values.B00011_description},
                 'B00070' : {'value': values.B00070_value}
             }
         }
@@ -810,6 +833,10 @@ class OtherComprehensiveGCV extends Component {
                 setFieldTouched("ATC_flag");
                 setFieldValue("ATC_flag", '1');
             }
+            if(values == "B00011") {
+                setFieldTouched("trailer_flag_TP");
+                setFieldValue("trailer_flag_TP", '1');
+            }
 
         }
         else {
@@ -881,12 +908,16 @@ class OtherComprehensiveGCV extends Component {
                 setFieldTouched("ATC_flag");
                 setFieldValue("ATC_flag", '0');
             }
+            if(values == "B00011") {
+                setFieldTouched("trailer_flag_TP");
+                setFieldValue("trailer_flag_TP", '0');
+            }
         }
         
     }
 
     regnoFormat = (e, setFieldTouched, setFieldValue) => {
-        
+    
         let regno = e.target.value
         let formatVal = ""
         let regnoLength = regno.length
@@ -894,12 +925,12 @@ class OtherComprehensiveGCV extends Component {
         var number = /^[0-9]+$/;
         let subString = regno.substring(regnoLength-1, regnoLength)
         let preSubString = regno.substring(regnoLength-2, regnoLength-1)
-
+    
         if(subString.match(letter) && preSubString.match(letter)) {
             formatVal = regno
         }
-        else if(subString.match(number) && preSubString.match(number)) {
-            formatVal = regno
+        else if(subString.match(number) && preSubString.match(number) && regnoLength == 6) {
+            formatVal = formatVal = regno.substring(0, regnoLength-1) + " " +subString
         } 
         else if(subString.match(number) && preSubString.match(letter)) {        
             formatVal = regno.substring(0, regnoLength-1) + " " +subString      
@@ -907,11 +938,11 @@ class OtherComprehensiveGCV extends Component {
         else if(subString.match(letter) && preSubString.match(number)) {
             formatVal = regno.substring(0, regnoLength-1) + " " +subString   
         } 
-
+    
         else formatVal = regno.toUpperCase()
         
         e.target.value = formatVal.toUpperCase()
-
+    
     }
 
 
@@ -954,6 +985,8 @@ class OtherComprehensiveGCV extends Component {
         let enhance_PA_OD_flag= add_more_coverage_request_array.B00018 && add_more_coverage_request_array.B00018.value ? '1' : '0'
         let ATC_flag= add_more_coverage_request_array.ATC && add_more_coverage_request_array.ATC.value ? '1' : '0'
         let LL_workman_flag= add_more_coverage_request_array.B00070 && add_more_coverage_request_array.B00070.value ? '1' : '0'
+        let trailer_flag_TP = add_more_coverage_request_array.B00011 && add_more_coverage_request_array.B00011.value ? '1' : '0'
+        
 
         let newInitialValues = {}
 
@@ -982,7 +1015,8 @@ class OtherComprehensiveGCV extends Component {
                 enhance_PA_OD_flag: '0',
                 ATC_flag: '0',
                 LL_workman_flag: '0',
-                fuel_type: fuel_type
+                fuel_type: fuel_type,
+                trailer_flag_TP: '0'
 
             });
         }
@@ -1010,7 +1044,8 @@ class OtherComprehensiveGCV extends Component {
                     enhance_PA_OD_flag: '0',
                     ATC_flag: '0',
                     LL_workman_flag: '0',
-                    fuel_type: fuel_type
+                    fuel_type: fuel_type,
+                    trailer_flag_TP: '0'
                 });
         }
 
@@ -1034,6 +1069,8 @@ class OtherComprehensiveGCV extends Component {
         newInnitialArray.ATC_flag = ATC_flag
         newInnitialArray.LL_workman_flag = LL_workman_flag   
         newInnitialArray.PA_Cover = PA_Cover
+        newInnitialArray.trailer_flag_TP = trailer_flag_TP
+
         newInnitialArray.ATC_value = add_more_coverage_request_array.ATC ? add_more_coverage_request_array.ATC.value : ""
         newInnitialArray.B00018_value = add_more_coverage_request_array.B00018 ? add_more_coverage_request_array.B00018.value : ""
         newInnitialArray.B00069_value = add_more_coverage_request_array.B00069 ? add_more_coverage_request_array.B00069.value : ""
@@ -1049,7 +1086,9 @@ class OtherComprehensiveGCV extends Component {
         newInnitialArray.B00073_description = add_more_coverage_request_array.B00073 ? add_more_coverage_request_array.B00073.description : ""
         newInnitialArray.B00007_value = add_more_coverage_request_array.B00007 ? add_more_coverage_request_array.B00007.value : ""
         newInnitialArray.B00007_description = add_more_coverage_request_array.B00007 ? add_more_coverage_request_array.B00007.description : ""
-        newInnitialArray.B00070_value = add_more_coverage_request_array.B00070 ? add_more_coverage_request_array.B00070.value : ""
+        newInnitialArray.B00011_value = add_more_coverage_request_array.B00011 ? add_more_coverage_request_array.B00011.value : ""
+        newInnitialArray.B00011_description = add_more_coverage_request_array.B00011 ? add_more_coverage_request_array.B00011.description : ""
+        newInnitialArray.B00070_value = add_more_coverage_request_array.B00070 ? add_more_coverage_request_array.B00070.value : ""    
         newInitialValues = Object.assign(initialValue, newInnitialArray );
 
 // -------------------------------------------------------
@@ -1118,7 +1157,7 @@ class OtherComprehensiveGCV extends Component {
                     onSubmit={ serverResponse && serverResponse != "" ? (serverResponse.message ? this.getAccessToken : this.handleSubmit ) : this.getAccessToken} 
                     validationSchema={ComprehensiveValidation}>
                     {({ values, errors, setFieldValue, setFieldTouched, isValid, isSubmitting, touched }) => {
-
+console.log("errors---------- ", errors)
                     return (
                         <Form>
                         <Row>
@@ -1513,7 +1552,7 @@ class OtherComprehensiveGCV extends Component {
                                                         type="text"
                                                         placeholder="Trailer IDV"
                                                         autoComplete="off"
-                                                        maxLength="28"
+                                                        maxLength="8"
                                                         onFocus={e => this.changePlaceHoldClassAdd(e)}
                                                         onBlur={e => this.changePlaceHoldClassRemove(e)}
                                                         onChange={(e) => {
@@ -1531,7 +1570,7 @@ class OtherComprehensiveGCV extends Component {
                                         </Col>
                                         </Fragment> : null
                                     }
-                                    {values.trailer_flag == '1' && values[coverage.code] == 'B00011' ?
+                                    {values.trailer_flag_TP == '1' && values[coverage.code] == 'B00011' ?
                                      <Fragment>
                                         <Col sm={12} md={11} lg={2} key={qIndex+"b"}>
                                             <FormGroup>
@@ -1568,7 +1607,7 @@ class OtherComprehensiveGCV extends Component {
                                                         type="text"
                                                         placeholder="Trailer IDV"
                                                         autoComplete="off"
-                                                        maxLength="28"
+                                                        maxLength="8"
                                                         onFocus={e => this.changePlaceHoldClassAdd(e)}
                                                         onBlur={e => this.changePlaceHoldClassRemove(e)}
                                                         onChange={(e) => {
@@ -1578,8 +1617,8 @@ class OtherComprehensiveGCV extends Component {
                                                         }}
                                                     >                                     
                                                     </Field>
-                                                    {errors.B00011_description ? (
-                                                        <span className="errorMsg">{errors.B00011_description}</span>
+                                                    {errors.B00011_description   ? (
+                                                        <span className="errorMsg">{errors.B00011_description   }</span>
                                                     ) : null}
                                                 </div>
                                             </FormGroup>

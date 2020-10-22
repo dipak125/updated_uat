@@ -580,6 +580,24 @@ class PremiumGCV extends Component {
                                                                                                 </Col>
                                                                                             </Row>
 
+                                                                                            <Row>
+                                                                                                <Col sm={12} md={6}>
+                                                                                                    <FormGroup>Body Style</FormGroup>
+                                                                                                </Col>
+                                                                                                <Col sm={12} md={6}>
+                                                                                                    <FormGroup>{vehicleDetails && vehicleDetails.varientmodel && vehicleDetails.varientmodel.body_style ? vehicleDetails.varientmodel.body_style : null}</FormGroup>
+                                                                                                </Col>
+                                                                                            </Row>
+
+                                                                                            <Row>
+                                                                                                <Col sm={12} md={6}>
+                                                                                                    <FormGroup>Gross Vehicle Weight</FormGroup>
+                                                                                                </Col>
+                                                                                                <Col sm={12} md={6}>
+                                                                                                    <FormGroup>{vehicleDetails && vehicleDetails.varientmodel && vehicleDetails.varientmodel.gross_vechicle_weight ? vehicleDetails.varientmodel.gross_vechicle_weight : null}</FormGroup>
+                                                                                                </Col>
+                                                                                            </Row>
+
                                                                                         </Col>
                                                                                     </Row>
                                                                                     <Row>
@@ -616,21 +634,7 @@ class PremiumGCV extends Component {
                                                                 </Col>
                                                             </Row>
 
-                                                            {/* <Row>
-                                                                <Col sm={12}>
-                                                                    <label className="customCheckBox formGrp formGrp fscheck">I want to receive my Quote & Policy Details on Whatsapp
-                                                                        <Field
-                                                                            type="checkbox"
-                                                                            name='whatsapp'
-                                                                            value='1'
-                                                                            className="user-self"
-                                                                        // checked={values.consumables ? true : false}
-                                                                        />
-                                                                        <span className="checkmark mL-0"></span>
-                                                                        <span className="error-message"></span>
-                                                                    </label>
-                                                                </Col>
-                                                            </Row> */}
+                                                            
                                                             <div className="d-flex justify-content-left resmb">
                                                                 <Button className="backBtn" type="button" onClick={this.additionalDetails.bind(this, productId)}>Back</Button>
                                                                 {fulQuoteResp.QuotationNo && breakin_flag == 0 ?
