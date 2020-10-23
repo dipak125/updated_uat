@@ -1,5 +1,5 @@
 import React, { Component, Fragment } from 'react';
-import { Row, Col, Modal, Button, FormGroup, DropdownButton, Dropdown } from 'react-bootstrap';
+import { Row, Col, Modal, Button, FormGroup, OverlayTrigger, Tooltip  } from 'react-bootstrap';
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css"
 import 'react-datepicker/dist/react-datepicker-cssmodules.min.css'
@@ -23,6 +23,7 @@ const minDobNominee = moment(moment().subtract(100, 'years').calendar())
 const maxDobNominee = moment().subtract(3, 'months').calendar();
 const maxDoi = new Date()
 const minDoi = moment(moment().subtract(100, 'years').calendar())
+const eia_desc = "The e-Insurance account or Electronic Insurance Account offers policyholders online space to hold all their insurance policies electronically under one e-insurance account number. This allows the policyholder to access all their policies with a few clicks and no risk of losing the physical insurance policy"
 
 const initialValue = {
     first_name:"",
@@ -301,11 +302,11 @@ const ownerValidation = Yup.object().shape({
     }),
 
     is_carloan: Yup.mixed().required('This field is required'),
-    bank_name:Yup.string().notRequired('Bank Name is required')
+    bank_name:Yup.string().notRequired()
     .test(
         "isLoanChecking",
         function() {
-            return "Please enter bank name"
+            return "Please enter Bank Name"
         },
         function (value) {
             if (this.parent.is_carloan == 1 && !value) {   
@@ -314,13 +315,13 @@ const ownerValidation = Yup.object().shape({
             return true;
         }
     ).matches(/^[A-Za-z][A-Za-z\s]*$/, function() {
-        return "Please enter bank name"
+        return "Invalid Bank Name"
     }),
-    bank_branch: Yup.string().notRequired('Bank branch is required')
+    bank_branch: Yup.string().notRequired()
     .test(
         "isLoanChecking",
         function() {
-            return "Please enter bank branch"
+            return "Please enter Bank Branch"
         },
         function (value) {
             if (this.parent.is_carloan == 1 && !value) {   
@@ -329,7 +330,7 @@ const ownerValidation = Yup.object().shape({
             return true;
         }
     ).matches(/^[A-Za-z][A-Za-z\s]*$/, function() {
-        return "Please enter bank branch"
+        return "Invalid Bank Branch"
     }),
 })
 
@@ -676,7 +677,7 @@ class AdditionalDetailsGCV extends Component {
                             {quoteNumber}
                             </div>
                                 <div className="d-flex justify-content-left carloan">
-                                    <h4> Taken GCV Loan</h4>
+                                    <h4> Taken Vehicle Loan</h4>
                                 </div>
 
                                 <Row>
@@ -1233,7 +1234,11 @@ class AdditionalDetailsGCV extends Component {
                                     <Col sm={12} md={4} lg={4}>
                                         <FormGroup>
                                             <div className="insurerName">
-                                                <h4 className="fs-16">Do you have EIA account</h4>
+                                                <h4 className="fs-16">Do you have EIA account
+                                                    <OverlayTrigger overlay={<Tooltip id="tooltip-disabled">{eia_desc}</Tooltip>}>
+                                                        <a className="infoIcon"><img src={require('../../assets/images/i.svg')} alt="" className="premtool" /></a>
+                                                    </OverlayTrigger>
+                                                </h4>
                                             </div>
                                         </FormGroup>
                                     </Col>

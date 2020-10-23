@@ -497,6 +497,7 @@ regnoFormat = (e, setFieldTouched, setFieldValue) => {
                                                 ) : null}    
                                                 </div>
                                             </div>
+                                            {values.policy_type == '1' ?
                                             <div className="row formSection">
                                                     <label className="customCheckBox formGrp formGrp">
                                                     Continue Without Vehicle Registration Number
@@ -534,7 +535,7 @@ regnoFormat = (e, setFieldTouched, setFieldValue) => {
                                                             <span className="error-message">{errors.check_registration}</span> : ""
                                                         }
                                                     
-                                                </div> 
+                                                </div>  : null}
                                             <div className="cntrbtn">
                                             <Button className={`btnPrimary`} type="submit" >
                                                 Go

@@ -59,7 +59,9 @@ class SelectBrandGCV extends Component {
             brandName: '',
             modelName: '',
             fuelType: '',
-            vehicleDetails: []
+            vehicleDetails: [],
+            gross_vechicle_weight : '',
+            seating : ''
         };
     }
 
@@ -267,16 +269,18 @@ class SelectBrandGCV extends Component {
 
     }
 
-    setVarient = (varient, model_Id, modelName, fuelType) => {        
+    setVarient = (varient, model_Id, modelName, fuelType, seating, gross_vechicle_weight) => {        
         this.setState({
             selectedVarientId: varient,
             selectedModelId: model_Id,
             modelName: modelName,
-            fuelType: fuelType
+            fuelType: fuelType,
+            gross_vechicle_weight : gross_vechicle_weight,
+            seating : seating
         })
     }
 
-    setOtherVarient = (varient, model_Id, brand_Id, brandName, modelName, fuelType) => {
+    setOtherVarient = (varient, model_Id, brand_Id, brandName, modelName, fuelType, seating, gross_vechicle_weight) => {
         // brandEdit = 1 for model, 2 for other Varient
         this.setState({
             selectedVarientId: varient,
@@ -284,7 +288,9 @@ class SelectBrandGCV extends Component {
             selectedBrandId: brand_Id,
             brandName: brandName,
             modelName: modelName,
-            fuelType: fuelType
+            fuelType: fuelType,
+            gross_vechicle_weight : gross_vechicle_weight,
+            seating : seating
         })
     }
 
@@ -336,7 +342,7 @@ class SelectBrandGCV extends Component {
 
     render() {
         const { brandList, motorInsurance, selectedBrandDetails, brandModelList, selectedBrandId,
-             selectedModelId, selectedVarientId, otherBrands, brandName, modelName, fuelType, vehicleDetails } = this.state
+             selectedModelId, selectedVarientId, otherBrands, brandName, modelName, fuelType, vehicleDetails, gross_vechicle_weight, seating } = this.state
         const { productId } = this.props.match.params
         const newInitialValues = Object.assign(initialValues, {
             selectedBrandId: selectedBrandId ? selectedBrandId : (vehicleDetails && vehicleDetails.vehiclebrand_id ? vehicleDetails.vehiclebrand_id : ""),
@@ -423,6 +429,16 @@ class SelectBrandGCV extends Component {
                                                                     </div>
 
                                                                     <div className="d-flex justify-content-between flex-lg-row flex-md-column m-b-25">
+                                                                        <div className="txtRegistr">Seating<br />
+                                                                            <strong>{seating ? seating : (selectedBrandId ? "" : vehicleDetails && vehicleDetails.varientmodel && vehicleDetails.varientmodel.seating ? vehicleDetails.varientmodel.seating: "")}</strong></div>
+                                                                    </div>
+
+                                                                    <div className="d-flex justify-content-between flex-lg-row flex-md-column m-b-25">
+                                                                        <div className="txtRegistr">GVW<br />
+                                                                            <strong>{gross_vechicle_weight ? gross_vechicle_weight : (selectedBrandId ? "" : vehicleDetails && vehicleDetails.varientmodel && vehicleDetails.varientmodel.gross_vechicle_weight ? vehicleDetails.varientmodel.gross_vechicle_weight : "")}</strong></div>
+                                                                    </div>
+
+                                                                    <div className="d-flex justify-content-between flex-lg-row flex-md-column m-b-25">
                                                                         <div className="txtRegistr">Fuel Type<br />
                                                                             <strong>{fuel[fuelType] ? fuel[fuelType] : (vehicleDetails && vehicleDetails.varientmodel && vehicleDetails.varientmodel.fueltype ? fuel[vehicleDetails.varientmodel.fueltype.id] : null)} </strong></div>
 
@@ -496,8 +512,9 @@ class SelectBrandGCV extends Component {
                                                                     value={varient.id}
                                                                     aria-invalid="false"
                                                                     onClick={(e) =>
+                                                                        // console.log("varient--------------- ", varient)
                                                                         this.setVarient(e.target.value, brand.id, brand.name+" "+varient.varient, 
-                                                                            varient.fuel_type)
+                                                                            varient.fuel_type, varient.seating, varient.gross_vechicle_weight )
                                                                     }
                                                                 />
                                                                 <span className="checkmark mL-0"></span>
@@ -525,7 +542,7 @@ class SelectBrandGCV extends Component {
                                                                 aria-invalid="false"
                                                                 onClick={(e) =>
                                                                     this.setVarient(e.target.value, brand.id, brand.name+" "+varient.varient, 
-                                                                    varient.fuel_type)
+                                                                    varient.fuel_type, varient.seating, varient.gross_vechicle_weight)
                                                                 }
                                                             />
                                                             <span className="checkmark mL-0"></span>
@@ -565,7 +582,7 @@ class SelectBrandGCV extends Component {
                                                                 aria-invalid="false"
                                                                 onClick={(e) =>
                                                                     this.setOtherVarient(e.target.value, model.id, model.brand_id,
-                                                                        brand.name, model.name+" "+varient.varient, varient.fuel_type )
+                                                                        brand.name, model.name+" "+varient.varient, varient.fuel_type, varient.seating, varient.gross_vechicle_weight )
                                                                 }
                                                             />
                                                             <span className="checkmark mL-0"></span>
@@ -594,7 +611,7 @@ class SelectBrandGCV extends Component {
                                                             aria-invalid="false"
                                                             onClick={(e) =>
                                                                 this.setOtherVarient(e.target.value, model.id, model.brand_id,
-                                                                    brand.name, model.name+" "+varient.varient, varient.fuel_type )
+                                                                    brand.name, model.name+" "+varient.varient, varient.fuel_type, varient.seating, varient.gross_vechicle_weight )
                                                             }
                                                         />
                                                         <span className="checkmark mL-0"></span>

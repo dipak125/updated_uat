@@ -751,7 +751,7 @@ class VehicleDetailsGCV extends Component {
                                                                     value = {values.averagemonthlyusages_id}
                                                                     // value={ageObj.whatIsCurrentMonth(values.registration_date) < 7 ? 6 : values.previous_policy_name}
                                                                 >
-                                                                    <option value="">Select Avarage Monthly use of Vehicle</option>
+                                                                    <option value="">Average Monthly use of Vehicle</option>
                                                                     {averagemonthlyusages.map((monthlyusages, qIndex) => ( 
                                                                         <option value= {monthlyusages.id}>{monthlyusages.usage_description}</option>
                                                                     ))}
@@ -1065,6 +1065,16 @@ class VehicleDetailsGCV extends Component {
                                                         <strong>{vehicleDetails && vehicleDetails.vehiclemodel && vehicleDetails.vehiclemodel.description ? vehicleDetails.vehiclemodel.description+" "+vehicleDetails.varientmodel.varient : ""}</strong></div>
 
                                                         <div> <button type="button" className="rgistrBtn" onClick={this.selectVehicleBrand.bind(this, productId)}>Edit</button></div>
+                                                    </div>
+
+                                                    <div className="d-flex justify-content-between flex-lg-row flex-md-column m-b-25">
+                                                        <div className="txtRegistr">Seating<br />
+                                                            <strong>{ vehicleDetails && vehicleDetails.varientmodel && vehicleDetails.varientmodel.seating ? vehicleDetails.varientmodel.seating: ""}</strong></div>
+                                                    </div>
+
+                                                    <div className="d-flex justify-content-between flex-lg-row flex-md-column m-b-25">
+                                                        <div className="txtRegistr">GVW<br />
+                                                            <strong>{ vehicleDetails && vehicleDetails.varientmodel && vehicleDetails.varientmodel.gross_vechicle_weight ? vehicleDetails.varientmodel.gross_vechicle_weight : ""}</strong></div>
                                                     </div>
 
                                                     <div className="d-flex justify-content-between flex-lg-row flex-md-column m-b-25">

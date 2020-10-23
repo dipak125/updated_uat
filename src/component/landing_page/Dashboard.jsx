@@ -30,26 +30,19 @@ import axios from "../../shared/axios";
 // import Encryption from "../../shared/payload-encryption";
 // import * as Yup from "yup";
 // import swal from "sweetalert";
-// import { useState } from "react";
+import { useState } from "react";
 import moment from "moment";
 // var Component = React.Component;
-import "./style.css";
+// import "./style.css";
 // import Autosuggest from "react-autosuggest";
 
-var minDate = "";
-var maxDate = "";
 
 const initialValues = {
-  start_date: new Date(),
-  end_date: new Date(),
+  start_date: "",
+  end_date: "",
+  report_range: ""
 };
 
-minDate = moment().calendar();
-var max_date = moment().format("L");
-maxDate = moment().calendar();
-
-console.log(minDate);
-console.log(maxDate);
 
 const option = {
   title: {
@@ -57,23 +50,28 @@ const option = {
     // text: 'Line chart'
   },
   scales: {
-    yAxes: [
-      {
-        ticks: {
-          min: 0,
-          max: 100,
-          stepSize: 10,
-        },
-      },
-    ],
+    // yAxes: [
+    //   {
+    //     ticks: {
+    //       min: 0,
+    //       max: 100,
+    //       stepSize: 10,
+    //     },
+    //   },
+    // ],
   },
 };
+
+
+
 
 class Dashboard extends Component {
   state = {
     chartData: {},
     update_data: [],
     posts: [],
+    search_flag : 0,
+
   };
 
   handleSubmit = (values) => {
@@ -164,6 +162,51 @@ class Dashboard extends Component {
       });
   };
 
+  handleChange = (value) => {
+    
+    if(value == '1') {
+      this.setState({search_flag : 1})
+    }
+    else if(value == '2') {
+      this.setState({search_flag : 2})
+    }
+    else {
+      this.setState({search_flag : 3})
+    }
+  }
+
+  handleDateChange = (startDate, setFieldTouched, setFieldValue) => {
+    const {search_flag} = this.state
+   
+    if(search_flag == 1) {
+      let start_date = startDate
+      let end_date = startDate
+
+      setFieldTouched("start_date");
+      setFieldValue( "start_date",  start_date );
+      setFieldTouched("end_date");
+      setFieldValue( "end_date",  end_date );     
+    }
+    else if(search_flag == 2) {
+      let start_date = startDate
+      let end_date = new Date(moment(start_date).add(6, 'day').calendar())
+
+      setFieldTouched("start_date");
+      setFieldValue( "start_date",  start_date );
+      setFieldTouched("end_date");
+      setFieldValue( "end_date",  end_date );
+    }
+    else {
+      let start_date = startDate
+      let end_date = new Date(moment(start_date).add(29, 'day').calendar())
+
+      setFieldTouched("start_date");
+      setFieldValue( "start_date",  start_date );
+      setFieldTouched("end_date");
+      setFieldValue( "end_date",  end_date );
+    }
+  }
+
   componentDidMount() {
     this.fetchNotification();
   }
@@ -172,10 +215,9 @@ class Dashboard extends Component {
     // const {update_data} = this.state
 
     // let newInitialValues = Object.assign()
-    const { chartData, update_data } = this.state;
+    const { chartData, update_data , search_flag} = this.state;
 
-    console.log("Data----->", update_data);
-
+  
     const notificationData =
       update_data && update_data.length > 0
         ? update_data.map(
@@ -232,6 +274,7 @@ class Dashboard extends Component {
                       isSubmitting,
                       touched,
                     }) => {
+                      console.log("values-dashboard------------- ", values)
                       return (
                         <Form>
                           <Container fluid>
@@ -249,7 +292,7 @@ class Dashboard extends Component {
                                     ({ width: "30rem" }, { height: "30rem" })
                                   }
                                 >
-                                  <Card.Header>
+                                  <Card.Header className="card-header-custom">
                                   <h6><strong>Business Achievement</strong>
                                     <Button type="submit" className="ml-4">
                                       Fetch
@@ -261,53 +304,52 @@ class Dashboard extends Component {
                                     <Card.Title>
                                       <Row>
                                         <Col sm={6} md={5} lg={6}>
-                                          <FormGroup>
-                                            <DatePicker
-                                              name="start_date"
-                                              minDate={new Date(minDate)}
-                                              maxDate={new Date(max_date)}
-                                              dateFormat="yyyy MMM dd"
-                                              placeholderText="start date"
-                                              peekPreviousMonth
-                                              peekPreviousYear
-                                              showMonthDropdown
-                                              // showYearDropdown
-                                              scrollableMonthYearDropdown
-                                              dropdownMode="select"
-                                              className="datePckr inputfs12"
-                                              selected={values.start_date}
-                                              onChange={(val) => {
-                                                setFieldTouched("start_date");
-                                                setFieldValue(
-                                                  "start_date",
-                                                  val
-                                                );
-                                              }}
-                                            />
+                                          <FormGroup className="dashboard-date">
+                                            <div className="formSection">
+                                              <Field
+                                                  name='report_range'
+                                                  component="select"
+                                                  autoComplete="off"
+                                                  className="formGrp inputfs12"
+                                                  value = {values.report_range}
+                                                  onChange = {(e) =>{
+                                                    setFieldTouched("report_range");
+                                                    setFieldValue( "report_range",  e.target.value );
+                                                    this.handleChange(e.target.value)
+                                                  }}
+                                              >
+                                                  <option value="">Select Range</option>
+                                                  <option value="1">Daily</option>
+                                                  <option value="2">Weekly</option> 
+                                                  <option value="3">Monthly</option> 
+                                      
+                                              </Field>
+                                              {errors.report_range && touched.report_range ? (
+                                                  <span className="errorMsg">{errors.report_range}</span>
+                                              ) : null}
+                                            </div>
                                           </FormGroup>
                                         </Col>
+                                        {values.report_range != "" ?
                                         <Col sm={6} md={5} lg={6}>
-                                          <FormGroup>
-                                            <DatePicker
-                                              name="end_date"
-                                              minDate={values.start_date}
-                                              maxDate={new Date(maxDate)}
-                                              dateFormat="yyyy MMM dd"
-                                              placeholderText="end date"
-                                              peekPreviousMonth
-                                              peekPreviousYear
-                                              showMonthDropdown
-                                              // showYearDropdown
-                                              dropdownMode="select"
-                                              className="datePckr inputfs12"
-                                              selected={values.end_date}
-                                              onChange={(val) => {
-                                                setFieldTouched("end_date");
-                                                setFieldValue("end_date", val);
-                                              }}
-                                            />
+                                          <FormGroup className="dashboard-date">
+                                          <DatePicker
+                                            name = "start_date"
+                                            selected={values.start_date}
+                                            dateFormat="yyyy MMM dd"
+                                            dropdownMode="select"
+                                            showMonthDropdown = {search_flag == 3 ? true : false}
+                                            className="datePckr inputfs12"
+                                            startDate={values.start_date}
+                                            endDate={values.end_date}
+                                            selectsRange
+                                            // inline
+                                            onChange={(val) => {
+                                              this.handleDateChange(val, setFieldTouched, setFieldValue)
+                                          }}
+                                          />
                                           </FormGroup>
-                                        </Col>
+                                        </Col> : null }
                                       </Row>
                                     </Card.Title>
                                     <Card.Text>
@@ -317,17 +359,9 @@ class Dashboard extends Component {
                                       />
                                     </Card.Text>
                                   </Card.Body>
-                                </Card>
-                                {/* <h4 className="col-lm-5">
-                        Business Achievement <HiRefresh />
-                      </h4> */}
-
-                                {/* <a href="#/businessachivement">refresh1 </a> */}
-                                {/* <Link to="/#/businessAchivement">refresh</Link> */}
-                                {/* <Bar data={data} options={option} /> */}
+                                </Card>                      
                               </Col>
-                              {/* </Row>
-                  <Row className="show-grid contentTopPan"> */}
+
                               <Col sm={12} md={12} lg={6}>
                                 <Card
                                   border="info"
@@ -335,7 +369,7 @@ class Dashboard extends Component {
                                     ({ width: "30rem" }, { height: "30rem" })
                                   }
                                 >
-                                  <Card.Header>
+                                  <Card.Header className="card-header-custom">
                                     <h6 className="mt-1 mb-4"><strong>Updates and notification</strong></h6>
                                   </Card.Header>
                                   <Card.Body className="scrollable">

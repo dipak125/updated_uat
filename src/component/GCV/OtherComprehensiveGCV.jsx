@@ -160,29 +160,31 @@ const ComprehensiveValidation = Yup.object().shape({
 
     B00004_value: Yup.string().when(['electric_flag'], {
         is: electric_flag => electric_flag == '1',
-        then: Yup.string().required('Please provide electrical IDV').matches(/^[0-9]*$/, 'Please provide valid IDV'),
+        then: Yup.string().required('Please provide electrical IDV').matches(/^[0-9]*$/, 'Please provide valid IDV').max(8, function() {
+                return "Value should be maximum 8 characters"
+            }),
         otherwise: Yup.string()
     }),
 
     B00004_description: Yup.string().when(['electric_flag'], {
         is: electric_flag => electric_flag == '1',
-        then: Yup.string().required('Please provide accessory desription'),
+        then: Yup.string().required('Please provide accessory desription').matches(/^[a-zA-Z0-9]*$/, 'Please provide valid description'),
         otherwise: Yup.string()
     }),
 
     B00003_value: Yup.string().when(['nonElectric_flag'], {
         is: nonElectric_flag => nonElectric_flag == '1',
-        then: Yup.string().required('Please provide non-electrical IDV').matches(/^[0-9]*$/, 'Please provide valid IDV'),
+        then: Yup.string().required('Please provide non-electrical IDV').matches(/^[0-9]*$/, 'Please provide valid IDV').max(8, function() {
+                return "Value should be maximum 8 characters"
+            }),
         otherwise: Yup.string()
     }),
 
     B00003_description: Yup.string().when(['nonElectric_flag'], {
         is: nonElectric_flag => nonElectric_flag == '1',
-        then: Yup.string().required('Please provide accessory desription'),
+        then: Yup.string().required('Please provide accessory desription').matches(/^[a-zA-Z0-9]*$/, 'Please provide valid description'),
         otherwise: Yup.string()
     }),
-
-
 
     B00073_value: Yup.string().when(['pa_coolie_flag'], {
         is: pa_coolie_flag => pa_coolie_flag == '1',
@@ -376,7 +378,49 @@ class OtherComprehensiveGCV extends Component {
                 let request_data = decryptResp.data.policyHolder ? decryptResp.data.policyHolder.request_data : {};
                 let vehicleDetails = decryptResp.data.policyHolder ? decryptResp.data.policyHolder.vehiclebrandmodel : {};
                 let values = []
-                let add_more_coverage = motorInsurance && motorInsurance.policy_for == '1' && motorInsurance.add_more_coverage == null ? ['B00015']  :  (motorInsurance && motorInsurance.add_more_coverage != null ? motorInsurance.add_more_coverage.split(",") : [])
+                let add_more_coverage = []
+                if(vehicleDetails && vehicleDetails.varientmodel && (vehicleDetails.varientmodel.fueltype.id == 8 || vehicleDetails.varientmodel.fueltype.id == 9)) {
+                    if(motorInsurance && motorInsurance.policy_for == '1' && motorInsurance.add_more_coverage == null) {
+                        var cov_val = ['B00015', 'B00005']
+                        add_more_coverage.push(cov_val);
+                    }
+                    else if(motorInsurance && motorInsurance.policy_for == '2' && motorInsurance.add_more_coverage == null) {
+                        var cov_val = ['B00005']
+                        add_more_coverage.push(cov_val);
+                    }
+                    else {
+                        var cov_val = motorInsurance.add_more_coverage.split(",")
+                        add_more_coverage.push(cov_val);
+                    }             
+                }
+                else if(vehicleDetails && vehicleDetails.varientmodel && (vehicleDetails.varientmodel.fueltype.id == 3 || vehicleDetails.varientmodel.fueltype.id == 4)) {
+                    if(motorInsurance && motorInsurance.policy_for == '1' && motorInsurance.add_more_coverage == null) {
+                        var cov_val = ['B00015', 'B00006', 'B00010']
+                        add_more_coverage.push(cov_val);
+                    }
+                    else if(motorInsurance && motorInsurance.policy_for == '2' && motorInsurance.add_more_coverage == null) {
+                        var cov_val = ['B00006', 'B00010']
+                        add_more_coverage.push(cov_val);
+                    }
+                    else {
+                        var cov_val = motorInsurance.add_more_coverage.split(",")
+                        add_more_coverage.push(cov_val);
+                    }             
+                }
+                else {
+                    if(motorInsurance && motorInsurance.policy_for == '1' && motorInsurance.add_more_coverage == null) {
+                        var cov_val = ['B00015']
+                        add_more_coverage.push(cov_val);
+                    }
+                    else if(motorInsurance && motorInsurance.policy_for == '2' && motorInsurance.add_more_coverage == null) {
+                        var cov_val = []
+                        add_more_coverage.push(cov_val);
+                    }
+                    else {
+                        var cov_val = motorInsurance.add_more_coverage.split(",")
+                        add_more_coverage.push(cov_val);
+                    }             
+                }
                 add_more_coverage = add_more_coverage.flat()
                 values.PA_flag = motorInsurance && motorInsurance.pa_cover != "" ? '1' : '0'
                 values.PA_Cover = motorInsurance && motorInsurance.pa_cover != "" ? motorInsurance.pa_cover : '0'
@@ -400,8 +444,9 @@ class OtherComprehensiveGCV extends Component {
                 values.B00007_value = add_more_coverage_request_array.B00007 ? add_more_coverage_request_array.B00007.value : ""
                 values.B00007_description = add_more_coverage_request_array.B00007 ? add_more_coverage_request_array.B00007.description : ""
                 values.B00070_value = add_more_coverage_request_array.B00070 ? add_more_coverage_request_array.B00070.value : ""
-                values.B00007_value = add_more_coverage_request_array.B00011 ? add_more_coverage_request_array.B00011.value : ""
-                values.B00007_description = add_more_coverage_request_array.B00011 ? add_more_coverage_request_array.B00011.description : ""
+                values.B00011_value = add_more_coverage_request_array.B00011 ? add_more_coverage_request_array.B00011.value : ""
+                values.B00011_description = add_more_coverage_request_array.B00011 ? add_more_coverage_request_array.B00011.description : ""
+                
 
                 this.setState({
                     motorInsurance, add_more_coverage,request_data, vehicleDetails, 
@@ -559,7 +604,7 @@ class OtherComprehensiveGCV extends Component {
 
 
     fullQuote = (access_token, values) => {
-        const { PolicyArray, sliderVal, add_more_coverage, motorInsurance, bodySliderVal } = this.state
+        const { PolicyArray, sliderVal, add_more_coverage, motorInsurance, bodySliderVal ,vehicleDetails} = this.state
         // let cng_kit_flag = 0;
         // let cngKit_Cost = 0;
         // if(values.toString()) {            
@@ -608,7 +653,7 @@ class OtherComprehensiveGCV extends Component {
             'PA_Cover': values.PA_flag ? values.PA_Cover : "0",
             'coverage_data': JSON.stringify(coverage_data),
             'body_idv_value' : bodySliderVal ? bodySliderVal : defaultBodySliderValue,
-            'fuel_type' : values.fuel_type
+            'fuel_type' : values.fuel_type ? values.fuel_type : (vehicleDetails && vehicleDetails.varientmodel && vehicleDetails.varientmodel.fueltype  ? vehicleDetails.varientmodel.fueltype.id : "")
             // 'cng_kit': cng_kit_flag,
             // 'cngKit_Cost': cngKit_Cost
         }
@@ -703,7 +748,7 @@ class OtherComprehensiveGCV extends Component {
             post_data = {
                 'policy_holder_id': localStorage.getItem('policyHolder_id'),
                 'menumaster_id': 4,
-                'registration_no': motorInsurance.registration_no ? motorInsurance.registration_no : values.registration_no,
+                'registration_no': values.registration_no,
                 'chasis_no': values.chasis_no,
                 'chasis_no_last_part': values.chasis_no_last_part,
                 'cng_kit': values.cng_kit,
@@ -724,7 +769,7 @@ class OtherComprehensiveGCV extends Component {
             post_data = {
                 'policy_holder_id': localStorage.getItem('policyHolder_id'),
                 'menumaster_id': 4,
-                'registration_no':motorInsurance.registration_no ? motorInsurance.registration_no : values.registration_no,
+                'registration_no': values.registration_no,
                 'chasis_no': values.chasis_no,
                 'chasis_no_last_part': values.chasis_no_last_part,
                 'cng_kit': values.cng_kit,
@@ -1000,6 +1045,9 @@ class OtherComprehensiveGCV extends Component {
                 vahanVerify: vahanVerify,
                 newRegistrationNo: localStorage.getItem('registration_number') == "NEW" ? localStorage.getItem('registration_number') : "",
                 B00015: motorInsurance && motorInsurance.policy_for == '2' ? "" : "B00015",
+                B00005 : vehicleDetails && vehicleDetails.varientmodel && (vehicleDetails.varientmodel.fueltype.id == 8 || vehicleDetails.varientmodel.fueltype.id == 9) ? "B00005" : "",
+                B00006 : vehicleDetails && vehicleDetails.varientmodel && (vehicleDetails.varientmodel.fueltype.id == 3 || vehicleDetails.varientmodel.fueltype.id == 4) ? "B00006" : "",
+                B00010 : vehicleDetails && vehicleDetails.varientmodel && (vehicleDetails.varientmodel.fueltype.id == 3 || vehicleDetails.varientmodel.fueltype.id == 4) ? "B00010" : "",               
                 PA_Cover: "",
                 PA_cover_flag: motorInsurance && motorInsurance.policy_for == '2' ? '0' : '1',
                 PA_flag: '0',
@@ -1045,7 +1093,10 @@ class OtherComprehensiveGCV extends Component {
                     ATC_flag: '0',
                     LL_workman_flag: '0',
                     fuel_type: fuel_type,
-                    trailer_flag_TP: '0'
+                    trailer_flag_TP: '0',
+                    B00005 : "",
+                    B00005 : "",
+                    B00010 : ""
                 });
         }
 
@@ -1149,7 +1200,7 @@ class OtherComprehensiveGCV extends Component {
                 <section className="brand colpd m-b-25">
                     <div className="d-flex justify-content-left">
                         <div className="brandhead m-b-10">
-                            <h4 className="m-b-30">Covers your Car + Damage to Others (Comprehensive)</h4>
+                            <h4 className="m-b-30">Covers your Vehicle + Damage to Others (Comprehensive)</h4>
                             <h5>{errMsg}</h5>
                         </div>
                     </div>
@@ -1157,13 +1208,13 @@ class OtherComprehensiveGCV extends Component {
                     onSubmit={ serverResponse && serverResponse != "" ? (serverResponse.message ? this.getAccessToken : this.handleSubmit ) : this.getAccessToken} 
                     validationSchema={ComprehensiveValidation}>
                     {({ values, errors, setFieldValue, setFieldTouched, isValid, isSubmitting, touched }) => {
-console.log("errors---------- ", errors)
+
                     return (
                         <Form>
                         <Row>
                             <Col sm={12} md={9} lg={9}>
                                 <div className="rghtsideTrigr W-90 m-b-30">
-                                    <Collapsible trigger="Default Covered Coverages & Benefit" >
+                                    <Collapsible trigger="Default Covered Coverages & Benefit" open= {true}>
                                         <div className="listrghtsideTrigr">
                                             {policyCoverageList}
                                         </div>
@@ -1171,98 +1222,95 @@ console.log("errors---------- ", errors)
                                 </div>
 
                             <Row>
-                            <Col sm={12} md={6} lg={4}>
-                            <Row>
-                            <Col sm={12} md={5} lg={6}>
-                                <FormGroup>
-                                    <div className="insurerName">
-                                    Registration No:
-                                    </div>
-                                </FormGroup>
-                            </Col>
-                                
-                                <Col sm={12} md={5} lg={6}>
+                                <Col sm={12} md={6} lg={5}>
+                                <Row>
+                                <Col sm={12} md={5} lg={5}>
                                     <FormGroup>
                                         <div className="insurerName">
-                                        {values.newRegistrationNo != "NEW" ?
-                                            <Field
-                                                name="registration_no"
-                                                type="text"
-                                                placeholder=""
-                                                autoComplete="off"
-                                                onFocus={e => this.changePlaceHoldClassAdd(e)}
-                                                onBlur={e => this.changePlaceHoldClassRemove(e)}
-                                                value= {values.registration_no}   
-                                                maxLength={this.state.length}
-                                                onInput={e=>{
-                                                    this.regnoFormat(e, setFieldTouched, setFieldValue)
-                                                }}        
-    
-                                            /> : 
-                                            <Field
-                                                    type="text"
-                                                    name='registration_no' 
-                                                    autoComplete="off"
-                                                    className="premiumslid"   
-                                                    value= {values.newRegistrationNo}    
-                                                    disabled = {true}                                                 
-                                                />}
-
-                                            {errors.registration_no ? (
-                                                <span className="errorMsg">{errors.registration_no}</span>
-                                            ) : null}
+                                        Registration No:
                                         </div>
                                     </FormGroup>
                                 </Col>
-                                </Row>
-                                </Col>
-
-                                <Col sm={12} md={6} lg={5}>
-                                    <Row>
-                                        <Col sm={12} md={5} lg={6}>
-                                            <FormGroup>
-                                                <div className="insurerName">
-                                                Please Enter Last 5 digits of Chassis no.
-                                                </div>
-                                            </FormGroup>
-                                        </Col>
                                     
-                                        <Col sm={12} md={5} lg={6}>
-                                            <FormGroup>
-                                                <div className="insurerName">
-                                                        <Field
-                                                            type="text"
-                                                            name='chasis_no_last_part' 
-                                                            autoComplete="off"
-                                                            className="premiumslid"       
-                                                            value= {values.chasis_no_last_part}
-                                                            maxLength="5"       
-                                                            onChange = {(e) => {
-                                                                setFieldValue('vahanVerify', false)
+                                    <Col sm={12} md={5} lg={6}>
+                                        <FormGroup>
+                                            <div className="insurerName">
+                                            {values.newRegistrationNo != "NEW" ?
+                                                <Field
+                                                    name="registration_no"
+                                                    type="text"
+                                                    placeholder=""
+                                                    autoComplete="off"
+                                                    onFocus={e => this.changePlaceHoldClassAdd(e)}
+                                                    onBlur={e => this.changePlaceHoldClassRemove(e)}
+                                                    value= {values.registration_no}   
+                                                    maxLength={this.state.length}
+                                                    onInput={e=>{
+                                                        this.regnoFormat(e, setFieldTouched, setFieldValue)
+                                                    }}        
+        
+                                                /> : 
+                                                <Field
+                                                        type="text"
+                                                        name='registration_no' 
+                                                        autoComplete="off"
+                                                        className="premiumslid"   
+                                                        value= {values.newRegistrationNo}    
+                                                        disabled = {true}                                                 
+                                                    />}
 
-                                                                setFieldTouched('chasis_no_last_part')
-                                                                setFieldValue('chasis_no_last_part', e.target.value)                       
-                                                            }}                           
-                                                            
-                                                        />
-                                                        {errors.chasis_no_last_part && touched.chasis_no_last_part ? (
-                                                        <span className="errorMsg">{errors.chasis_no_last_part}</span>
-                                                    ) : null}
-                                                </div>
-                                            </FormGroup>
-                                        </Col>
+                                                {errors.registration_no ? (
+                                                    <span className="errorMsg">{errors.registration_no}</span>
+                                                ) : null}
+                                            </div>
+                                        </FormGroup>
+                                    </Col>
                                     </Row>
                                     </Col>
 
-                                    <Col sm={12} md={2} lg={2}>
-                                        <FormGroup>
+                                    <Col sm={12} md={6} lg={5}>
+                                        <Row>
+                                            <Col sm={12} md={5} lg={6}>
+                                                <FormGroup>
+                                                    <div className="insurerName">
+                                                    Please Enter Last 5 digits of Chassis no.
+                                                    </div>
+                                                </FormGroup>
+                                            </Col>
                                         
-                                            <Button className="btn btn-primary vrifyBtn" onClick= {!errors.chasis_no_last_part ? this.getVahanDetails.bind(this,values, setFieldTouched, setFieldValue, errors) : null}>Verify</Button>
-                                            {errors.vahanVerify ? (
-                                                    <span className="errorMsg">{errors.vahanVerify}</span>
-                                                ) : null}
-                                        </FormGroup>
-                                    </Col>
+                                            <Col sm={12} md={5} lg={4}>
+                                                <FormGroup>
+                                                    <div className="insurerName">
+                                                            <Field
+                                                                type="text"
+                                                                name='chasis_no_last_part' 
+                                                                autoComplete="off"
+                                                                className="premiumslid"       
+                                                                value= {values.chasis_no_last_part}
+                                                                maxLength="5"       
+                                                                onChange = {(e) => {
+                                                                    setFieldValue('vahanVerify', false)
+
+                                                                    setFieldTouched('chasis_no_last_part')
+                                                                    setFieldValue('chasis_no_last_part', e.target.value)                       
+                                                                }}                           
+                                                                
+                                                            />
+                                                            {errors.chasis_no_last_part && touched.chasis_no_last_part ? (
+                                                            <span className="errorMsg">{errors.chasis_no_last_part}</span>
+                                                        ) : null}
+                                                    </div>
+                                                </FormGroup>
+                                            </Col>
+                                            <Col sm={12} md={1} lg={2}>
+                                                <Button className="btn btn-primary vrifyBtn" onClick= {!errors.chasis_no_last_part ? this.getVahanDetails.bind(this,values, setFieldTouched, setFieldValue, errors) : null}>Verify</Button>
+                                                {errors.vahanVerify ? (
+                                                        <span className="errorMsg">{errors.vahanVerify}</span>
+                                                    ) : null}       
+                                            </Col>
+                                        </Row>
+                                        
+                                    </Col>   
                             </Row>
                             {values.vahanVerify && !errors.chasis_no_last_part ?
                             <Row>
@@ -1414,7 +1462,7 @@ console.log("errors---------- ", errors)
                             : null }
                             </Row>
 
-                            <Row>
+                            {/* <Row>
                                 <Col sm={12} md={5} lg={4}>
                                     <FormGroup>
                                         <div className="insurerName">
@@ -1450,6 +1498,7 @@ console.log("errors---------- ", errors)
                                     </FormGroup>
                                 </Col>
                             </Row>
+                             */}
                             <Row>
                                 <Col sm={12} md={12} lg={12}>
                                     <FormGroup>
@@ -1464,9 +1513,7 @@ console.log("errors---------- ", errors)
                                 {motorInsurance && motorInsurance.policy_for == '2' && coverage.code != 'B00015' && coverage.code != 'B00018' || motorInsurance && motorInsurance.policy_for == '1' ?
                                     <Col sm={12} md={11} lg={6} key={qIndex+"a"} >
                                         <label className="customCheckBox formGrp formGrp">{coverage.name}
-                                            <OverlayTrigger overlay={<Tooltip id="tooltip-disabled">{coverage.description}</Tooltip>}>
-                                                <a className="infoIcon"><img src={require('../../assets/images/i.svg')} alt="" className="premtool" /></a>
-                                            </OverlayTrigger>
+                                            
                                             <Field
                                                 type="checkbox"
                                                 // name={`moreCov_${qIndex}`}
@@ -1660,7 +1707,7 @@ console.log("errors---------- ", errors)
                                                     <Field
                                                         name="B00073_description"
                                                         type="text"
-                                                        placeholder="Please enter no of paid drivers"
+                                                        placeholder="No of paid drivers"
                                                         autoComplete="off"
                                                         maxLength="1"
                                                         onFocus={e => this.changePlaceHoldClassAdd(e)}
@@ -1689,7 +1736,7 @@ console.log("errors---------- ", errors)
                                                         type="text"
                                                         placeholder="Value of Accessory"
                                                         autoComplete="off"
-                                                        // maxLength="1"
+                                                        maxLength="8"
                                                         onFocus={e => this.changePlaceHoldClassAdd(e)}
                                                         onBlur={e => this.changePlaceHoldClassRemove(e)}
                                                         onChange={(e) => {
@@ -1740,7 +1787,7 @@ console.log("errors---------- ", errors)
                                                         type="text"
                                                         placeholder="Value of Accessory"
                                                         autoComplete="off"
-                                                        // maxLength="28"
+                                                        maxLength="8"
                                                         onFocus={e => this.changePlaceHoldClassAdd(e)}
                                                         onBlur={e => this.changePlaceHoldClassRemove(e)}
                                                         onChange={(e) => {
@@ -1845,7 +1892,7 @@ console.log("errors---------- ", errors)
                                     }
                                     {values.LL_PD_flag == '1' && values[coverage.code] == 'B00013' ?
                                         <Fragment>
-                                        <Col sm={12} md={11} lg={2} key={qIndex+"c"}>
+                                        <Col sm={12} md={11} lg={4} key={qIndex+"c"}>
                                             <FormGroup>
                                                 <div className="formSection">
                                                     <Field
@@ -1877,7 +1924,7 @@ console.log("errors---------- ", errors)
 
                                     {values.LL_Emp_flag == '1' && values[coverage.code] == 'B00012' ?
                                         <Fragment>
-                                        <Col sm={12} md={11} lg={2} key={qIndex+"b"}>
+                                        <Col sm={12} md={11} lg={4} key={qIndex+"b"}>
                                             <FormGroup>
                                                 <div className="formSection">
                                                 <Field

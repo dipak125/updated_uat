@@ -201,7 +201,11 @@ class PremiumGCV extends Component {
                         PolicyArray: res.data.PolicyObject.PolicyLobList,
                         error: [],
                     });
-                } else {
+                }
+                else if(res.data.ValidateResult) {
+                    swal(res.data.ValidateResult.message)
+                }
+                 else {
                     this.setState({
                         fulQuoteResp: [],
                         error: res.data,
@@ -343,7 +347,7 @@ class PremiumGCV extends Component {
                                                     <Row>
                                                         <Col sm={12} md={9} lg={9}>
                                                             <div className="rghtsideTrigr">
-                                                                <Collapsible trigger="Retail Motor Policy" >
+                                                                <Collapsible trigger="Retail Motor Policy" open= {true}>
                                                                     <div className="listrghtsideTrigr">
                                                                         <Row>
                                                                             <Col sm={12} md={3}>
@@ -414,7 +418,7 @@ class PremiumGCV extends Component {
                                                                                                     <FormGroup>Date Of Birth:</FormGroup>
                                                                                                 </Col>
                                                                                                 <Col sm={12} md={6}>
-                                                                                                    <FormGroup>{memberdetails.dob}</FormGroup>
+                                                                                                    <FormGroup>{moment(memberdetails.dob).format("DD-MM-YYYY")}</FormGroup>
                                                                                                 </Col>
                                                                                             </Row>
                                                                                             <Row>
@@ -450,7 +454,7 @@ class PremiumGCV extends Component {
                                                                                     </Row>
                                                                                 </div>
                                                                             : (<p></p>)}
-                                                                                   
+                                                                        {motorInsurance.policy_for == '1' && motorInsurance.pa_flag == '1' ?             
                                                                         <div>
                                                                         <strong>Nominee Details :</strong>
                                                                             <br/>
@@ -470,7 +474,7 @@ class PremiumGCV extends Component {
                                                                                             <FormGroup>Date Of Birth:</FormGroup>
                                                                                         </Col>
                                                                                         <Col sm={12} md={6}>
-                                                                                            <FormGroup>{nomineedetails.dob}</FormGroup>
+                                                                                            <FormGroup>{moment(nomineedetails.dob).format("DD-MM-YYYY")}</FormGroup>
                                                                                         </Col>
                                                                                     </Row>
 
@@ -499,7 +503,40 @@ class PremiumGCV extends Component {
                                                                             <Row>
                                                                                 <p></p>
                                                                             </Row>
-                                                                        </div>
+                                                                        </div>: null }
+
+                                                                        {motorInsurance.policy_for == '1' && nomineedetails && nomineedetails.is_appointee == '1' && motorInsurance.pa_flag == '1' ?      
+                                                                            <div>
+                                                                            <strong>Appointee Details :</strong>
+                                                                                <br/>
+                                                                                <Row>
+                                                                                    <Col sm={12} md={6}>
+                                                                                        <Row>
+                                                                                            <Col sm={12} md={6}>
+                                                                                                <FormGroup>Name:</FormGroup>
+                                                                                            </Col>
+                                                                                            <Col sm={12} md={6}>
+                                                                                                <FormGroup>{nomineedetails && nomineedetails.appointee_name ? nomineedetails.appointee_name : null}</FormGroup>
+                                                                                            </Col>
+                                                                                        </Row>
+
+                                                                                        <Row>
+                                                                                            <Col sm={12} md={6}>
+                                                                                                <FormGroup>Relation With Nominee:</FormGroup>
+                                                                                            </Col>
+                                                                                            <Col sm={12} md={6}>
+                                                                                            {nomineedetails && nomineedetails.appointee_relation_with && relation.map((relations, qIndex) => 
+                                                                                            relations.id == nomineedetails.appointee_relation_with ?
+                                                                                                <FormGroup>{relations.name}</FormGroup> : null
+                                                                                            )}
+                                                                                            </Col>
+                                                                                        </Row>
+                                                                                    </Col>
+                                                                                </Row>
+                                                                                <Row>
+                                                                                    <p></p>
+                                                                                </Row>
+                                                                            </div> : null }
                                                                     </div>
 
                                                                 </Collapsible>

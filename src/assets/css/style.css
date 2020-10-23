@@ -164,7 +164,7 @@ ul.navPan li a span{ margin-bottom:8px; display: block; }
 .proceedBtn {padding: 12px 50px; color: #ffffff; border: 1px solid #FF8000; border-radius: 23px; background-color: #FF8000 !important; outline: none !important;}
 .maxW {max-width: 500px !important; min-height: auto !important;}
 
-.vrifyBtn {padding: 10px 45px; color: #ffffff; border: none !important; border-radius: 23px; background-color: #0095da; margin-right: 15px; outline: none !important;}
+.vrifyBtn {padding: 10px 35px; color: #ffffff; border: none !important; border-radius: 23px; background-color: #0095da; margin-right: 15px; outline: none !important;}
 .bluesmalltrm a {color: #007bff !important;}
 .footerInfo {color: #92cee6; font-size: 12px; border: none; padding: 0px; width: 100%; height: auto;}
 
@@ -828,3 +828,29 @@ img.avatar {  border-radius: inherit;}
 .customInnerTable .react-bs-table .react-bs-container-body .table tbody tr:hover .table tbody tr:hover td .actionStyle a:hover{ color:#fff;}
 
 /* React Bootstrap Table End*/
+
+/* Dashboard Card Scroll */
+.scrollable {
+  height: 20px;
+  overflow-x: hidden ;
+  overflow-y: auto;
+  
+}
+.scrollable:hover{overflow-y:auto}
+
+/* Dashboard Card Scroll Ends */
+.formGrp.inputfs12, .datePckr.inputfs12{
+  font-size: 14px!important;
+}
+.dashboard-date.form-group .formGrp.inputfs12{
+  min-height: 24px;
+}
+.card-header-custom{
+  height: 60px!important;
+}
+.card-header-custom .btn{
+  padding: 2px 15px;
+}
+.chartjs-render-monitor{
+  height: 300px!important;
+}
