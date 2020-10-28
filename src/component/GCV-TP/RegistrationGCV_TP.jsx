@@ -37,7 +37,7 @@ const vehicleRegistrationValidation = Yup.object().shape({
             return true;
         }
     ),
-    policy_type: Yup.string().required("Please enter policy type"),
+    policy_type: Yup.string().required("Please select policy type"),
     policy_for: Yup.string().required("Please select policy for indivudal or corporate"),
     policy_for: Yup.string().required("Please select policy for indivudal or corporate"),
     subclass_id: Yup.string().required("Please select sub product"),

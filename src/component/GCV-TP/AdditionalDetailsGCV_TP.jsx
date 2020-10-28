@@ -66,6 +66,8 @@ const ownerValidation = Yup.object().shape({
         }),
         otherwise: Yup.string().required('Company name is required').min(3, function() {
             return "Company name must be min 3 chracters"
+        }).matches(/^[a-zA-Z]+([\s]?[a-zA-Z]+)([\s]?[a-zA-Z]+)$/, function() {
+            return "Please enter valid name"
         })
     }),
     
@@ -157,10 +159,10 @@ const ownerValidation = Yup.object().shape({
                         return true;
                 })
                 .min(3, function() {
-                    return "Name must be minimum 3 chracters"
+                    return "Name must be minimum 3 characters"
                 })
                 .max(40, function() {
-                    return "Name must be maximum 40 chracters"
+                    return "Name must be maximum 40 characters"
                 })
                 .matches(/^[a-zA-Z]+([\s]?[a-zA-Z]+)([\s]?[a-zA-Z]+)$/, function() {
                     return "Please enter valid name"
@@ -296,7 +298,7 @@ const ownerValidation = Yup.object().shape({
 
     gstn_no: Yup.string().when(['policy_for'], {
         is: policy_for => policy_for == '2',       
-        then: Yup.string().required('GSTIN is required')
+        then: Yup.string().notRequired('GSTIN is required')
             .matches(/^[0-9]{2}[A-Z]{3}[CPHFATBLJG]{1}[A-Z]{1}[0-9]{4}[A-Z]{1}[0-9]{1}[A-Z]{1}[0-9]{1}$/,'Invalid GSTIN'),
         otherwise: Yup.string().nullable()
     }),

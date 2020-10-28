@@ -221,6 +221,20 @@ const ComprehensiveValidation = Yup.object().shape({
         otherwise: Yup.string()
     }),
 
+    B00010: Yup.string().when(['fuel_type'], {
+        is: fuel_type => fuel_type == '3' || fuel_type == '4',
+        then: Yup.string().test(
+            "isLoanChecking",
+            function (value) {
+                if (value == "" || value == null || value == undefined) {   
+                    swal("If Fuel type is CNG/LPG ,then CNG/LPG Kit-Liability cover is mandatory.")
+                    return false;    
+                }
+                return true;
+            }) ,
+        otherwise: Yup.string()
+    }),
+
     fuel_type: Yup.string().required("Select fuel type"),
    
    
@@ -474,7 +488,6 @@ class OtherComprehensiveGCV extends Component {
         axios
           .get(`/fuel-list`)
           .then((res) => {
-              console.log("fuel list--------- ", res.data)
             this.setState({
               fuelList: res.data.data.fuellist,
             });
@@ -552,8 +565,6 @@ class OtherComprehensiveGCV extends Component {
 
                 setFieldTouched('vahanVerify')
                 setFieldValue('vahanVerify', true)
-                console.log('chasiNo', this.state.chasiNo)
-                console.log('engineNo', this.state.engineNo)
                 setFieldTouched('engine_no')
                 setFieldValue('engine_no', this.state.engineNo)
                 setFieldTouched('chasis_no')
@@ -779,7 +790,6 @@ class OtherComprehensiveGCV extends Component {
 
         const { add_more_coverage } = this.state;
         var drv = [];
-
 
         if (isSelect) {
             add_more_coverage.push(values);
@@ -1018,7 +1028,7 @@ class OtherComprehensiveGCV extends Component {
                 ATC_flag: '0',
                 LL_workman_flag: '0',
                 fuel_type: fuel_type,
-                trailer_flag_TP: '0'
+                trailer_flag_TP: '0',
 
             });
         }
@@ -1048,7 +1058,7 @@ class OtherComprehensiveGCV extends Component {
                     LL_workman_flag: '0',
                     fuel_type: fuel_type,
                     trailer_flag_TP: '0',
-                    B00010 : ""
+                    B00010 : "",
                 });
         }
 
@@ -1386,29 +1396,28 @@ class OtherComprehensiveGCV extends Component {
                                             <span className="error-message"></span>
                                         </label>
                                     </Col> : null }
-                                    {values.PA_flag == '1' && values[coverage.code] == 'B00016' ?
+
+                                    {values.PA_cover_flag == '1' && values[coverage.code] == 'B00015' ?
                                         <Col sm={12} md={11} lg={3} key={qIndex+"b"}>
                                             <FormGroup>
                                                 <div className="formSection">
                                                     <Field
-                                                        name='PA_Cover'
+                                                        name='PA_Cover_OD'
                                                         component="select"
                                                         autoComplete="off"
                                                         className="formGrp inputfs12"
-                                                        value = {values.PA_Cover}
+                                                        value = {values.PA_Cover_OD}
                                                         onChange={(e) => {
-                                                            setFieldTouched('PA_Cover')
-                                                            setFieldValue('PA_Cover', e.target.value);
+                                                            setFieldTouched('PA_Cover_OD')
+                                                            setFieldValue('PA_Cover_OD', e.target.value);
                                                             this.handleChange()
                                                         }}
                                                     >
-                                                        <option value="">Select Sum Insured</option>
-                                                        <option value="50000">50000</option>
-                                                        <option value="100000">100000</option>  
+                                                        <option value="1500000">1500000</option>  
                                             
                                                     </Field>
-                                                    {errors.PA_Cover ? (
-                                                        <span className="errorMsg">{errors.PA_Cover}</span>
+                                                    {errors.PA_Cover_OD ? (
+                                                        <span className="errorMsg">{errors.PA_Cover_OD}</span>
                                                     ) : null}
                                                 </div>
                                             </FormGroup>

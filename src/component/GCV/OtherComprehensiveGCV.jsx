@@ -221,6 +221,20 @@ const ComprehensiveValidation = Yup.object().shape({
         otherwise: Yup.string()
     }),
 
+    B00010: Yup.string().when(['fuel_type'], {
+        is: fuel_type => fuel_type == '3' || fuel_type == '4',
+        then: Yup.string().test(
+            "isLoanChecking",
+            function (value) {
+                if (value == "" || value == null || value == undefined) {   
+                    swal("If Fuel type is CNG/LPG ,then CNG/LPG Kit-Liability cover is mandatory.")
+                    return false;    
+                }
+                return true;
+            }) ,
+        otherwise: Yup.string()
+    }),
+
     fuel_type: Yup.string().required("Select fuel type"),
    
    
@@ -1162,6 +1176,18 @@ class OtherComprehensiveGCV extends Component {
                     </div>     
             ))
         )) : null 
+        const policyCoveragIMT =  fulQuoteResp && fulQuoteResp.PolicyLobList  && Math.round(fulQuoteResp.PolicyLobList[0].PolicyRiskList[0].imt23prem) > 0 ?
+                    <div>
+                        <Row>
+                            <Col sm={12} md={6}>
+                                <FormGroup>IMT 23</FormGroup>
+                            </Col>
+                            <Col sm={12} md={6}>
+                                <FormGroup>₹ {Math.round(fulQuoteResp.PolicyLobList[0].PolicyRiskList[0].imt23prem)}</FormGroup>
+                            </Col>
+                        </Row>
+                    </div>     
+         : null 
 
         const premiumBreakup = policyCoverage && policyCoverage.length > 0 ?
             policyCoverage.map((coverage, qIndex) => (
@@ -1172,6 +1198,13 @@ class OtherComprehensiveGCV extends Component {
                         </tr>  
                 ))
             )) : null
+
+        const premiumBreakupIMT = fulQuoteResp && fulQuoteResp.PolicyLobList  && Math.round(fulQuoteResp.PolicyLobList[0].PolicyRiskList[0].imt23prem) > 0 ?
+                        <tr>
+                            <td>IMT 23:</td>
+                            <td>₹ {Math.round(fulQuoteResp.PolicyLobList[0].PolicyRiskList[0].imt23prem)}</td>
+                        </tr>  
+             : null
         
 
         const errMsg =
@@ -1217,6 +1250,7 @@ class OtherComprehensiveGCV extends Component {
                                     <Collapsible trigger="Default Covered Coverages & Benefit" open= {true}>
                                         <div className="listrghtsideTrigr">
                                             {policyCoverageList}
+                                            {policyCoveragIMT}
                                         </div>
                                     </Collapsible>
                                 </div>
@@ -1534,29 +1568,28 @@ class OtherComprehensiveGCV extends Component {
                                             <span className="error-message"></span>
                                         </label>
                                     </Col> : null }
-                                    {values.PA_flag == '1' && values[coverage.code] == 'B00016' ?
+                                    {values.PA_cover_flag == '1' && values[coverage.code] == 'B00015' ?
                                         <Col sm={12} md={11} lg={3} key={qIndex+"b"}>
                                             <FormGroup>
                                                 <div className="formSection">
                                                     <Field
-                                                        name='PA_Cover'
+                                                        name='PA_Cover_OD'
                                                         component="select"
                                                         autoComplete="off"
                                                         className="formGrp inputfs12"
-                                                        value = {values.PA_Cover}
+                                                        value = {values.PA_Cover_OD}
                                                         onChange={(e) => {
-                                                            setFieldTouched('PA_Cover')
-                                                            setFieldValue('PA_Cover', e.target.value);
+                                                            setFieldTouched('PA_Cover_OD')
+                                                            setFieldValue('PA_Cover_OD', e.target.value);
                                                             this.handleChange()
                                                         }}
                                                     >
-                                                        <option value="">Select Sum Insured</option>
-                                                        <option value="50000">50000</option>
-                                                        <option value="100000">100000</option>  
+                                                        <option value="1500000">1500000</option>
+                                                       
                                             
                                                     </Field>
-                                                    {errors.PA_Cover ? (
-                                                        <span className="errorMsg">{errors.PA_Cover}</span>
+                                                    {errors.PA_Cover_OD ? (
+                                                        <span className="errorMsg">{errors.PA_Cover_OD}</span>
                                                     ) : null}
                                                 </div>
                                             </FormGroup>
@@ -2185,6 +2218,8 @@ class OtherComprehensiveGCV extends Component {
                             </thead>
                             <tbody>
                             {premiumBreakup}
+                            {premiumBreakupIMT}
+                            
                                 <tr>
                                     <td>Gross Premium:</td>
                                     <td>₹ {Math.round(fulQuoteResp.BeforeVatPremium)}</td>

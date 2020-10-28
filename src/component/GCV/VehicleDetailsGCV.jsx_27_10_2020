@@ -221,6 +221,53 @@ const vehicleRegistrationValidation = Yup.object().shape({
             return "Policy No. must be maximum 18 characters"
         }),
 
+    previous_claim_bonus:Yup.mixed()
+    .notRequired('No Claim bonus is required')
+    .test(
+        "currentMonthChecking",
+        function() {
+            return "Please enter previous claim bonus"
+        },
+        function (value) {
+            if (this.parent.previous_is_claim == '0' && this.parent.previous_policy_name == '1' && (!value || value == '1')) {   
+                return false;    
+            }
+            return true;
+        }
+    )
+    .test(
+        "previousClaimChecking",
+        function() {
+            return "Please enter previous claim bonus"
+        },
+        function (value) {
+            if (this.parent.previous_is_claim == '1' && !value && this.parent.previous_claim_for == '2') {   
+                return false;    
+            }
+            return true;
+        }
+    ),
+    previous_is_claim:Yup.string()
+    .notRequired('Please select one option')
+    .test(
+        "currentMonthChecking",
+        function() {
+            return "Please select if you have previous claim"
+        },
+        function (value) {
+            const ageObj = new PersonAge();
+            if (this.parent.policy_type_id == '2'  && this.parent.valid_previous_policy == '1' && this.parent.previous_policy_name == '1' &&
+            Math.floor(moment().diff(this.parent.previous_end_date, 'days', true)) <= 90 && !value) {   
+                return false;    
+            }
+            return true;
+        }
+    ),
+    previous_claim_for:Yup.string().when(['previous_is_claim'], {
+        is: previous_is_claim => previous_is_claim == '1',       
+        then: Yup.string().required('Please provide previous claim for'),
+        otherwise: Yup.string()
+    }),
 
     goodscarriedtypes_id: Yup.string()
     .required(function() {
@@ -251,7 +298,6 @@ const vehicleRegistrationValidation = Yup.object().shape({
     }),
     
 });
-
 
 
 class VehicleDetailsGCV extends Component {
@@ -298,11 +344,11 @@ class VehicleDetailsGCV extends Component {
         else if(localStorage.getItem('brandEdit') == '2') {
             localStorage.setItem('newBrandEdit', '2')
         }
-        this.props.history.push(`/SelectBrand_GCV_TP/${productId}`);
+        this.props.history.push(`/SelectBrand_GCV/${productId}`);
     }
 
     selectBrand = (productId) => {
-        this.props.history.push(`/SelectBrand_GCV_TP/${productId}`);
+        this.props.history.push(`/SelectBrand_GCV/${productId}`);
     }
 
 
@@ -361,7 +407,7 @@ class VehicleDetailsGCV extends Component {
     else return 0;
     
   }
-  
+
   SuggestionSelected = (setFieldTouched,setFieldValue,suggestion) => {
     this.setState({
       changeFlag: 0, 
@@ -369,7 +415,7 @@ class VehicleDetailsGCV extends Component {
   setFieldTouched('location_id')
   setFieldValue("location_id", suggestion.id)
 }
-
+  
   onSuggestionsFetchCustomerID = ({ value }) => {
     this.setState({
       suggestions: this.getCustomerIDSuggestions(value)
@@ -393,16 +439,16 @@ class VehicleDetailsGCV extends Component {
     handleSubmit = (values, actions) => {
         const {productId} = this.props.match.params 
         const {motorInsurance, changeFlag} = this.state
-        let policy_type = 2
+        let policy_type = ageObj.whatIsCurrentMonth(values.registration_date) < 7 ? 6 : 1
         // let vehicleAge = ageObj.whatIsMyVehicleAge(values.registration_date)
         let vehicleAge = Math.floor(moment().diff(values.registration_date, 'months', true))
         // let ageDiff = Math.floor(moment().diff(values.registration_date, 'days', true));
         let ageDiff = ageObj.whatIsCurrentMonth(values.registration_date);
-        
+
         if(changeFlag == 1) {
-            swal("Registration city is required")
-            return false
-            }
+        swal("Registration city is required")
+        return false
+        }
 
         const formData = new FormData(); 
         let encryption = new Encryption();
@@ -461,14 +507,14 @@ class VehicleDetailsGCV extends Component {
         formData.append('enc_data',encryption.encrypt(JSON.stringify(post_data)))
         this.props.loadingStart();
         axios
-        .post(`gcv-tp/insert-vehicle-details`, formData)
+        .post(`gcv/insert-vehicle-details`, formData)
         .then(res => { 
             let decryptResp = JSON.parse(encryption.decrypt(res.data))
             console.log("decrypt", decryptResp)
 
             this.props.loadingStop();
             if(decryptResp.error == false){
-                this.props.history.push(`/OtherComprehensive_GCV_TP/${productId}`);
+                this.props.history.push(`/OtherComprehensive_GCV/${productId}`);
             }
             else{
                 actions.setSubmitting(false)
@@ -504,7 +550,7 @@ class VehicleDetailsGCV extends Component {
     getAllAddress() {
         let policyHolder_id = localStorage.getItem("policyHolder_id") ? localStorage.getItem("policyHolder_id") : 0;
         let encryption = new Encryption();
-        axios.get(`gcv-tp/location-list/${policyHolder_id}`)
+        axios.get(`gcv/location-list/${policyHolder_id}`)
           .then(res => {
             let decryptResp = JSON.parse(encryption.decrypt(res.data))
             this.setState({
@@ -521,7 +567,7 @@ class VehicleDetailsGCV extends Component {
         const { productId } = this.props.match.params
         let policyHolder_id = localStorage.getItem("policyHolder_refNo") ? localStorage.getItem("policyHolder_refNo") : 0;
         let encryption = new Encryption();
-        axios.get(`gcv-tp/policy-holder/details/${policyHolder_id}`)
+        axios.get(`gcv/policy-holder/details/${policyHolder_id}`)
             .then(res => {
                  let decryptResp = JSON.parse(encryption.decrypt(res.data))
                  console.log("decrypt", decryptResp)
@@ -545,7 +591,7 @@ class VehicleDetailsGCV extends Component {
         const {productId } = this.props.match.params
         let encryption = new Encryption();
         this.props.loadingStart();
-        axios.get(`gcv-tp/carrying-capacity-list/4 `)
+        axios.get(`gcv/carrying-capacity-list/4 `)
             .then(res=>{
                 let decryptResp = JSON.parse(encryption.decrypt(res.data))
     
@@ -584,7 +630,7 @@ class VehicleDetailsGCV extends Component {
         
     }
     registration = (productId) => {
-        this.props.history.push(`/Registration_GCV_TP/${productId}`);
+        this.props.history.push(`/Registration_GCV/${productId}`);
     }
 
     render() {
@@ -791,12 +837,12 @@ class VehicleDetailsGCV extends Component {
                                                     <Col sm={12}>
                                                         <FormGroup>
                                                             <div className="carloan">
-                                                                <h4> &nbsp;</h4>
+                                                                <h4>&nbsp; </h4>
                                                             </div>
                                                         </FormGroup>
                                                     </Col>
                                                 </Row>
-                                                {values.policy_type_id == '2' ?
+                                            {values.policy_type_id == '2' ?
                                                 <Fragment>
                                                     <Row>
                                                         <Col sm={12}>
@@ -808,52 +854,53 @@ class VehicleDetailsGCV extends Component {
                                                         </Col>
                                                     </Row>
                                                     <Row>
-                                                    <Col sm={4}>
-                                                        <FormGroup>
-                                                            <div className="d-inline-flex m-b-35">
-                                                                <div className="p-r-25">
-                                                                    <label className="customRadio3">
-                                                                    <Field
-                                                                        type="radio"
-                                                                        name='valid_previous_policy'                                            
-                                                                        value='0'
-                                                                        key='1'  
-                                                                        onChange={(e) => {
-                                                                            setFieldTouched('valid_previous_policy')
-                                                                            setFieldValue(`valid_previous_policy`, e.target.value);
-                                                                            
-                                                                        }}
-                                                                        checked={values.valid_previous_policy == '0' ? true : false}
-                                                                    />
-                                                                        <span className="checkmark " /><span className="fs-14"> No</span>
-                                                                    </label>
-                                                                </div>
+                                                        <Col sm={4}>
+                                                            <FormGroup>
+                                                                <div className="d-inline-flex m-b-35">
+                                                                    <div className="p-r-25">
+                                                                        <label className="customRadio3">
+                                                                        <Field
+                                                                            type="radio"
+                                                                            name='valid_previous_policy'                                            
+                                                                            value='0'
+                                                                            key='1'  
+                                                                            onChange={(e) => {
+                                                                                setFieldTouched('valid_previous_policy')
+                                                                                setFieldValue(`valid_previous_policy`, e.target.value);
+                                                                                
+                                                                            }}
+                                                                            checked={values.valid_previous_policy == '0' ? true : false}
+                                                                        />
+                                                                            <span className="checkmark " /><span className="fs-14"> No</span>
+                                                                        </label>
+                                                                    </div>
 
-                                                                <div className="">
-                                                                    <label className="customRadio3">
-                                                                    <Field
-                                                                        type="radio"
-                                                                        name='valid_previous_policy'                                            
-                                                                        value='1'
-                                                                        key='1'  
-                                                                        onChange={(e) => {
-                                                                            setFieldTouched('valid_previous_policy')
-                                                                            setFieldValue(`valid_previous_policy`, e.target.value);
-                                                                        }}
-                                                                        checked={values.valid_previous_policy == '1' ? true : false}
-                                                                    />
-                                                                        <span className="checkmark" />
-                                                                        <span className="fs-14">Yes</span>
-                                                                    </label>
-                                                                    {errors.valid_previous_policy && touched.valid_previous_policy ? (
-                                                                    <span className="errorMsg">{errors.valid_previous_policy}</span>
-                                                                ) : null}
+                                                                    <div className="">
+                                                                        <label className="customRadio3">
+                                                                        <Field
+                                                                            type="radio"
+                                                                            name='valid_previous_policy'                                            
+                                                                            value='1'
+                                                                            key='1'  
+                                                                            onChange={(e) => {
+                                                                                setFieldTouched('valid_previous_policy')
+                                                                                setFieldValue(`valid_previous_policy`, e.target.value);
+                                                                            }}
+                                                                            checked={values.valid_previous_policy == '1' ? true : false}
+                                                                        />
+                                                                            <span className="checkmark" />
+                                                                            <span className="fs-14">Yes</span>
+                                                                        </label>
+                                                                        {errors.valid_previous_policy && touched.valid_previous_policy ? (
+                                                                        <span className="errorMsg">{errors.valid_previous_policy}</span>
+                                                                    ) : null}
+                                                                    </div>
                                                                 </div>
-                                                            </div>
-                                                        </FormGroup>
-                                                    </Col>
-                                                </Row>
-                                            </Fragment> : null }
+                                                            </FormGroup>
+                                                        </Col>
+                                                    </Row>
+                                                </Fragment> : null }
+
                                             {values.policy_type_id == '2' && values.valid_previous_policy == '1' ?
                                                 <Fragment>
                                                 <Row>
@@ -1016,17 +1063,152 @@ class VehicleDetailsGCV extends Component {
                                                         </FormGroup>
                                                     </Col>
                                                 </Row>
+                                                { values.previous_policy_name == '1' && Math.floor(moment().diff(values.previous_end_date, 'days', true)) <= 90 ?
+                                                    <Fragment>
+                                                    <Row>
+                                                        <Col sm={12}>
+                                                            <FormGroup>
+                                                                <div className="carloan">
+                                                                    <h4> </h4>
+                                                                </div>
+                                                            </FormGroup>
+                                                        </Col>
+                                                    </Row>
+                                                    <Row>
+                                                        <Col sm={12}>
+                                                            <FormGroup>
+                                                                <div className="carloan">
+                                                                    <h4>Have you made a claim in your existing Policy</h4>
+                                                                </div>
+                                                            </FormGroup>
+                                                        </Col>
+                                                    </Row>
 
-                                                <Row>
-                                                    <Col sm={12}>
-                                                        <FormGroup>
-                                                            <div className="carloan">
-                                                                <h4> </h4>
-                                                            </div>
-                                                        </FormGroup>
-                                                    </Col>
-                                                </Row>
+                                                    <Row>
+                                                        <Col sm={4}>
+                                                            <FormGroup>
+                                                                <div className="d-inline-flex m-b-35">
+                                                                    <div className="p-r-25">
+                                                                        <label className="customRadio3">
+                                                                        <Field
+                                                                            type="radio"
+                                                                            name='previous_is_claim'                                            
+                                                                            value='0'
+                                                                            key='1'  
+                                                                            onChange={(e) => {
+                                                                                setFieldTouched('previous_is_claim')
+                                                                                setFieldValue(`previous_is_claim`, e.target.value);
+                                                                                setFieldValue('previous_claim_for', "")
+                                                                                this.showClaimText(0);
+                                                                            }}
+                                                                            checked={values.previous_is_claim == '0' ? true : false}
+                                                                        />
+                                                                            <span className="checkmark " /><span className="fs-14"> No, I haven't</span>
+                                                                        </label>
+                                                                    </div>
 
+                                                                    <div className="">
+                                                                        <label className="customRadio3">
+                                                                        <Field
+                                                                            type="radio"
+                                                                            name='previous_is_claim'                                            
+                                                                            value='1'
+                                                                            key='1'  
+                                                                            onChange={(e) => {
+                                                                                setFieldTouched('previous_is_claim')
+                                                                                setFieldValue(`previous_is_claim`, e.target.value);
+                                                                                setFieldValue('previous_claim_for', "")
+                                                                                this.showClaimText(1);
+                                                                            }}
+                                                                            checked={values.previous_is_claim == '1' ? true : false}
+                                                                        />
+                                                                            <span className="checkmark" />
+                                                                            <span className="fs-14">Yes I have</span>
+                                                                        </label>
+                                                                        {errors.previous_is_claim && touched.previous_is_claim ? (
+                                                                        <span className="errorMsg">{errors.previous_is_claim}</span>
+                                                                    ) : null}
+                                                                    </div>
+                                                                </div>
+                                                            </FormGroup>
+                                                        </Col>
+                                                    </Row>
+                                                {showClaim || previous_is_claim == 1 ?
+                                                    <Row className="m-b-30">
+                                                        <Col sm={12} md={5} lg={5}>
+                                                            <FormGroup>
+                                                                <div className="fs-18">
+                                                                You have claimed for
+                                                        </div>
+                                                            </FormGroup>
+                                                        </Col>
+                                                        <Col sm={12} md={6} lg={6}>
+                                                            <FormGroup>
+                                                                <div className="formSection">
+                                                                    <Field
+                                                                        name='previous_claim_for'
+                                                                        component="select"
+                                                                        autoComplete="off"                                                                        
+                                                                        className="formGrp"
+                                                                        value = {values.previous_claim_for}
+                                                                        onChange = {(e) => {
+                                                                            setFieldTouched('previous_claim_for')
+                                                                            setFieldValue('previous_claim_for', e.target.value)
+                                                                            if(e.target.value == '1') {
+                                                                                setFieldValue('previous_claim_bonus', '1')
+                                                                            }      
+                                                                        }}
+                                                                    >
+                                                                        <option value="">--Select--</option>
+                                                                        <option value="1">Own Damage</option>
+                                                                        <option value="2">Liability</option>
+                                                                    </Field>     
+                                                                    {errors.previous_claim_for && touched.previous_claim_for ? (
+                                                                    <span className="errorMsg">{errors.previous_claim_for}</span>
+                                                                    ) : null}       
+                                                                </div>
+                                                            </FormGroup>
+                                                        </Col>
+                                                    </Row>
+                                                : null }
+                                                { values.previous_claim_for == "2" || previous_is_claim == "0" ?
+                                                    <Row className="m-b-30">
+                                                        <Col sm={12} md={5} lg={5}>
+                                                            <FormGroup>
+                                                                <div className="fs-18">
+                                                                Select NCB mentioned on last policy
+                                                        </div>
+                                                            </FormGroup>
+                                                        </Col>
+                                                        <Col sm={12} md={6} lg={6}>
+                                                            <FormGroup>
+                                                                <div className="formSection">
+                                                                    <Field
+                                                                        name='previous_claim_bonus'
+                                                                        component="select"
+                                                                        autoComplete="off"                                                                        
+                                                                        className="formGrp"
+                                                                        value = {values.previous_claim_bonus}
+                                                                        
+                                                                    >
+                                                                        <option value="">--Select--</option>
+                                                                        <option value="0">0</option>
+                                                                        <option value="20">20</option>
+                                                                        <option value="25">25</option>
+                                                                        <option value="35">35</option>
+                                                                        <option value="45">45</option>
+                                                                        <option value="50">50</option>
+                                                                    </Field>     
+                                                                    {errors.previous_claim_bonus && touched.previous_claim_bonus ? (
+                                                                    <span className="errorMsg">{errors.previous_claim_bonus}</span>
+                                                                    ) : null}       
+                                                                </div>
+                                                            </FormGroup>
+                                                        </Col>
+                                                    </Row>
+                                                : null} 
+                                                </Fragment> : null}
+                                                
                                             </Fragment> : null }
 
                                                 <div className="d-flex justify-content-left resmb">

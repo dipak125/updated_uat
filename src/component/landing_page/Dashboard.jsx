@@ -40,7 +40,8 @@ import moment from "moment";
 const initialValues = {
   start_date: "",
   end_date: "",
-  report_range: ""
+  report_range: "",
+  report_month: ""
 };
 
 
@@ -170,13 +171,17 @@ class Dashboard extends Component {
     else if(value == '2') {
       this.setState({search_flag : 2})
     }
-    else {
+    else if(value == '3') {
       this.setState({search_flag : 3})
+    }
+    else {
+      this.setState({search_flag : 4})
     }
   }
 
   handleDateChange = (startDate, setFieldTouched, setFieldValue) => {
     const {search_flag} = this.state
+    // var Date = new Date()
    
     if(search_flag == 1) {
       let start_date = startDate
@@ -196,9 +201,23 @@ class Dashboard extends Component {
       setFieldTouched("end_date");
       setFieldValue( "end_date",  end_date );
     }
-    else {
+    else if(search_flag == 3) {
       let start_date = startDate
       let end_date = new Date(moment(start_date).add(29, 'day').calendar())
+
+      setFieldTouched("start_date");
+      setFieldValue( "start_date",  start_date );
+      setFieldTouched("end_date");
+      setFieldValue( "end_date",  end_date );
+    }
+    
+    else {
+      let currentYear = new Date().getFullYear()
+      let start_date = new Date(`${currentYear} ${startDate} 01`)      
+      let end_date = new Date(start_date.getFullYear(), start_date.getMonth()+1, 0)
+      console.log("start date---------",start_date)
+      console.log("end date---------",end_date)
+
 
       setFieldTouched("start_date");
       setFieldValue( "start_date",  start_date );
@@ -229,10 +248,11 @@ class Dashboard extends Component {
                   <Row>
                     <Col sm={12} md={12}>
                       <FormGroup>
-                        <h8>&#10146;{id.description}</h8>
+                        <h8>• { id.description}</h8>
                       </FormGroup>
                     </Col>
-                    {/* <Col sm={12} md={6}>
+                    {/* &#10146;
+                    <Col sm={12} md={6}>
                       <FormGroup>
                         ₹ {Math.round(benefit.AnnualPremium)}
                       </FormGroup>
@@ -274,7 +294,7 @@ class Dashboard extends Component {
                       isSubmitting,
                       touched,
                     }) => {
-                      console.log("values-dashboard------------- ", values)
+                      console.log("values-dashboard-------------> ", values)
                       return (
                         <Form>
                           <Container fluid>
@@ -321,7 +341,8 @@ class Dashboard extends Component {
                                                   <option value="">Select Range</option>
                                                   <option value="1">Daily</option>
                                                   <option value="2">Weekly</option> 
-                                                  <option value="3">Monthly</option> 
+                                                  <option value="3">Monthly (date range)</option> 
+                                                  <option value="4">Monthly</option> 
                                       
                                               </Field>
                                               {errors.report_range && touched.report_range ? (
@@ -333,6 +354,7 @@ class Dashboard extends Component {
                                         {values.report_range != "" ?
                                         <Col sm={6} md={5} lg={6}>
                                           <FormGroup className="dashboard-date">
+                                            {values.report_range != "4" ? 
                                           <DatePicker
                                             name = "start_date"
                                             selected={values.start_date}
@@ -348,8 +370,43 @@ class Dashboard extends Component {
                                               this.handleDateChange(val, setFieldTouched, setFieldValue)
                                           }}
                                           />
+                                         : 
+                                         <div className="formSection">
+                                           <Field
+                                               name='report_month'
+                                               component="select"
+                                               autoComplete="off"
+                                               className="formGrp inputfs12"
+                                               value = {values.report_month}
+                                               onChange = {(e) =>{
+                                                 setFieldTouched("report_month");
+                                                 setFieldValue( "report_month",  e.target.value );
+                                                 this.handleDateChange(e.target.value, setFieldTouched, setFieldValue)
+                                               }}
+                                           >
+                                               <option value="">Select Month</option>
+                                               <option value="1">January</option>
+                                               <option value="2">February</option> 
+                                               <option value="3">March</option> 
+                                               <option value="4">April</option> 
+                                               <option value="5">May</option> 
+                                               <option value="6">June</option> 
+                                               <option value="7">July</option> 
+                                               <option value="8">August</option> 
+                                               <option value="9">September</option> 
+                                               <option value="10">October</option> 
+                                               <option value="11">November</option> 
+                                               <option value="12">December</option> 
+                                   
+                                           </Field>
+                                           {errors.report_month && touched.report_month ? (
+                                               <span className="errorMsg">{errors.report_month}</span>
+                                           ) 
+                                           : null}
+                                         </div>}
                                           </FormGroup>
-                                        </Col> : null }
+                                        </Col> 
+                                      : null }
                                       </Row>
                                     </Card.Title>
                                     <Card.Text>

@@ -286,7 +286,7 @@ const vehicleRegistrationValidation = Yup.object().shape({
     ),
     averagemonthlyusages_id: Yup.string()
     .required(function() {
-        return "Please select avarage monthly use"
+        return "Please select average monthly use"
     }),
     permittypes_id: Yup.string()
     .required(function() {
@@ -1078,7 +1078,7 @@ class VehicleDetailsGCV extends Component {
                                                         <Col sm={12}>
                                                             <FormGroup>
                                                                 <div className="carloan">
-                                                                    <h4>Have you made a claim in your existing Policy</h4>
+                                                                    <h4>Have you made OD claim in your existing Policy</h4>
                                                                 </div>
                                                             </FormGroup>
                                                         </Col>
