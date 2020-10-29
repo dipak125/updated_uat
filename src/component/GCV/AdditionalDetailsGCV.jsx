@@ -50,7 +50,7 @@ const initialValue = {
     pincode_id: "",
     org_level: "",
     net_premium: "0",
-    title: ""
+    salutation_id: ""
 }
 
 const ownerValidation = Yup.object().shape({
@@ -73,7 +73,7 @@ const ownerValidation = Yup.object().shape({
         })
     }),
 
-    title: Yup.string().required('Title is required'),
+    salutation_id: Yup.string().required('Title is required'),
     
     gender: Yup.string().when(['policy_for'], {
         is: policy_for => policy_for == '1',  
@@ -116,7 +116,7 @@ const ownerValidation = Yup.object().shape({
     }).matches(/^[A-Z]{3}[CPHFATBLJG]{1}[A-Z]{1}[0-9]{4}[A-Z]{1}$/, function() {
         return "Please enter valid Pan Number"
     }),
-
+    
     pincode_id:Yup.string().required('Location is required'),
 
     pincode:Yup.string().required('Pincode is required')
@@ -131,8 +131,8 @@ const ownerValidation = Yup.object().shape({
         return "Please enter valid address"
     }),
     phone: Yup.string()
-        .matches(/^[6-9][0-9]{9}$/,'Invalid Mobile number').required('Phone No. is required'),
-        
+    .matches(/^[6-9][0-9]{9}$/,'Invalid Mobile number').required('Phone No. is required'),
+    
     email:Yup.string().email().required('Email is required').min(8, function() {
             return "Email must be minimum 8 characters"
         })
@@ -367,7 +367,8 @@ class AdditionalDetailsGCV extends Component {
         step_completed: "0",
         appointeeFlag: false,
         is_appointee:0,
-        request_data: []
+        request_data: [],
+        titleList: []
     };
     
     ageCheck = (value) => {
@@ -455,7 +456,7 @@ class AdditionalDetailsGCV extends Component {
             'eia_no': values['eia_no'],
             'address': values['address'],          
             'gstn_no': values['gstn_no'],
-            'title': values['title']
+            'salutation_id': values['salutation_id']
         }
         if(motorInsurance.policy_for == '1'){
             post_data['dob'] = moment(values['dob']).format("YYYY-MM-DD")
@@ -530,7 +531,7 @@ class AdditionalDetailsGCV extends Component {
                     
                 })
                 this.props.loadingStop();
-                this.fetchPrevAreaDetails(addressDetails)
+                this.fetchSalutation(addressDetails, motorInsurance)
             })
             .catch(err => {
                 // handle error
@@ -618,6 +619,30 @@ class AdditionalDetailsGCV extends Component {
         
     }
 
+    fetchSalutation=(addressDetails, motorInsurance)=>{
+
+        const formData = new FormData();
+        let policy_for = motorInsurance && motorInsurance.policy_for ? motorInsurance.policy_for : "1"
+        this.props.loadingStart();
+        formData.append('policy_for_flag', policy_for)
+        axios.post('salutation-list', formData)
+        .then(res=>{
+            let titleList = res.data.data.salutationlist ? res.data.data.salutationlist : []                        
+            this.setState({
+                titleList
+            });
+            this.props.loadingStop();
+            this.fetchPrevAreaDetails(addressDetails)
+        }).
+        catch(err=>{
+            this.props.loadingStop();
+            this.setState({
+                titleList: []
+            });
+        })
+    
+}
+
     componentDidMount() {
         this.fetchRelationships();
     }
@@ -625,7 +650,7 @@ class AdditionalDetailsGCV extends Component {
    
 
     render() {
-        const {showLoan, is_eia_account, is_loan_account, nomineeDetails, motorInsurance,appointeeFlag, is_appointee,showEIA,
+        const {showLoan, is_eia_account, is_loan_account, nomineeDetails, motorInsurance,appointeeFlag, is_appointee, showEIA, titleList,
             bankDetails,policyHolder, stateName, pinDataArr, quoteId, addressDetails, relation,step_completed,vehicleDetails,request_data} = this.state
         const {productId} = this.props.match.params 
         
@@ -657,7 +682,8 @@ class AdditionalDetailsGCV extends Component {
             date_of_incorporation: policyHolder && policyHolder.date_of_incorporation ? new Date(policyHolder.date_of_incorporation) : "",
             org_level: policyHolder && policyHolder.org_level ? policyHolder.org_level : "",
             pa_flag: motorInsurance && motorInsurance.pa_flag ? motorInsurance.pa_flag : "",
-            net_premium: request_data && request_data.net_premium ? request_data.net_premium : "0"
+            net_premium: request_data && request_data.net_premium ? request_data.net_premium : "0",
+            salutation_id: policyHolder && policyHolder.salutation_id ? policyHolder.salutation_id : "",
         });
 
         const quoteNumber =
@@ -696,6 +722,7 @@ class AdditionalDetailsGCV extends Component {
                                 <div className="d-flex justify-content-left carloan">
                                     <h4> Taken Vehicle Loan</h4>
                                 </div>
+
                                 <Row>
                                     <Col sm={12} md={4} lg={4}>
                                         <div className="d-inline-flex m-b-35">
@@ -791,20 +818,18 @@ class AdditionalDetailsGCV extends Component {
                                         <FormGroup>
                                             <div className="formSection">
                                             <Field
-                                                name='title'
+                                                name='salutation_id'
                                                 component="select"
                                                 autoComplete="off"                                                                        
                                                 className="formGrp"
                                             >
                                                 <option value="">Title</option>
-                                                <option value="1">Mr</option>
-                                                <option value="2">Mrs</option>
-                                                <option value="3">Miss</option>
-                                                <option value="4">Master</option>
-                                                <option value="5">MS</option>
+                                                {titleList.map((title, qIndex) => ( 
+                                                <option value={title.id}>{title.displayvalue}</option>
+                                                ))}
                                             </Field>     
-                                            {errors.title && touched.title ? (
-                                            <span className="errorMsg">{errors.title}</span>
+                                            {errors.salutation_id && touched.salutation_id ? (
+                                            <span className="errorMsg">{errors.salutation_id}</span>
                                             ) : null}              
                                             </div>
                                         </FormGroup>
@@ -868,11 +893,11 @@ class AdditionalDetailsGCV extends Component {
                                             </div>
                                         </FormGroup>
                                     </Col> : null}
-                                    
+                                   
+
                                 </Row>
 
-                                <Row>
-                                    
+                                <Row>                                 
                                     {motorInsurance && motorInsurance.policy_for == '1' ?
                                     <Col sm={12} md={4} lg={4}>
                                         <FormGroup>
@@ -1209,7 +1234,7 @@ class AdditionalDetailsGCV extends Component {
                                             <option value="">Relation with Primary Insured</option>
                                            { relation.map((relations, qIndex) => 
                                            relations.id != 1 ?
-                                            <option value={relations.id}>{relations.name}</option> : null                                     
+                                            <option value={relations.id}>{relations.name}</option> : null                                
                                            )}
                                             </Field>     
                                             {errors.nominee_relation_with && touched.nominee_relation_with ? (
@@ -1276,16 +1301,15 @@ class AdditionalDetailsGCV extends Component {
                                     <h4> </h4>
                                 </div>
 
-                                <Row>
+                                 <Row>
                                     <Col sm={12} md={4} lg={4}>
                                         <FormGroup>
                                             <div className="insurerName">
                                                 <h4 className="fs-16">Do you have EIA account
-                                                        <OverlayTrigger overlay={<Tooltip id="tooltip-disabled">{eia_desc}</Tooltip>}>
-                                                            <a className="infoIcon"><img src={require('../../assets/images/i.svg')} alt="" className="premtool" /></a>
-                                                        </OverlayTrigger>
+                                                    <OverlayTrigger overlay={<Tooltip id="tooltip-disabled">{eia_desc}</Tooltip>}>
+                                                        <a className="infoIcon"><img src={require('../../assets/images/i.svg')} alt="" className="premtool" /></a>
+                                                    </OverlayTrigger>
                                                 </h4>
-                                                
                                             </div>
                                         </FormGroup>
                                     </Col>

@@ -5,7 +5,7 @@ import { Formik, Field, Form } from "formik";
 import BaseComponent from '.././BaseComponent';
 import SideNav from '../common/side-nav/SideNav';
 import Footer from '../common/footer/Footer';
-import Otp from "./Otp"
+// import Otp from "./Otp"
 import axios from "../../shared/axios";
 import { withRouter, Link, Route } from "react-router-dom";
 import { loaderStart, loaderStop } from "../../store/actions/loader";
@@ -49,8 +49,9 @@ class PremiumGCV extends Component {
             memberdetails: [],
             nomineedetails:[],
             relation: [],
-            policyHolder: [],
+            step_completed: "0",
             vehicleDetails: [],
+            policyHolder: [],
             policyHolder_refNo: queryString.parse(this.props.location.search).access_id ? 
                                 queryString.parse(this.props.location.search).access_id : 
                                 localStorage.getItem("policyHolder_refNo")
@@ -60,12 +61,6 @@ class PremiumGCV extends Component {
 
     handleClose(e) {
         this.setState({ show: false, });
-    }
-
-    handleOtp(e) {
-        console.log("otp", e)
-        this.setState({ show: false, });
-        this.props.history.push(`/ThankYou_motor`)
     }
 
     changePlaceHoldClassAdd(e) {
@@ -112,69 +107,22 @@ class PremiumGCV extends Component {
                 let vehicleDetails = decryptResp.data.policyHolder ? decryptResp.data.policyHolder.vehiclebrandmodel : {};
                 let previousPolicy = decryptResp.data.policyHolder ? decryptResp.data.policyHolder.previouspolicy : {};
                 let request_data = decryptResp.data.policyHolder ? decryptResp.data.policyHolder.request_data : {}
-                let dateDiff = 0
+                let step_completed = decryptResp.data.policyHolder ? decryptResp.data.policyHolder.step_no : "";
+		        let dateDiff = 0
                 this.setState({
-                    motorInsurance,policyHolder,vehicleDetails,
+                    motorInsurance,vehicleDetails,step_completed,policyHolder,
                     refNumber: decryptResp.data.policyHolder.reference_no,
                     paymentStatus: decryptResp.data.policyHolder.payment ? decryptResp.data.policyHolder.payment[0] : [],
                     memberdetails : decryptResp.data.policyHolder ? decryptResp.data.policyHolder : [],
                     nomineedetails: decryptResp.data.policyHolder ? decryptResp.data.policyHolder.request_data.nominee[0]:[]
                     
                 })
-                if(previousPolicy && policyHolder.break_in_status != "Vehicle Recommended and Reports Uploaded") {
-                    dateDiff = Math.floor(moment().diff(previousPolicy.end_date, 'days', true));
-                    if(dateDiff > 0 || previousPolicy.name == "2") {
-                        swal({
-                            title: "Breakin",
-                            text: `Your Quotation number is ${request_data.quote_id}. Your vehicle needs inspection. Do you want to raise inspection.`,
-                            icon: "warning",
-                            buttons: true,
-                            dangerMode: true,
-                        })
-                        .then((willCreate) => {
-                            if (willCreate) {
-                                this.callBreakin()
-                            }
-                            else {
-                                this.props.loadingStop();
-                            }
-                        })                     
-                    }
-                    else {
-                        this.getAccessToken(motorInsurance)
-                    }
-                }
-                else{
-                    this.getAccessToken(motorInsurance)
-                }           
+                this.getAccessToken(motorInsurance)          
             })
             .catch(err => {
                 // handle error
                 this.props.loadingStop();
             })
-    }
-
-    callBreakin=()=>{
-
-        const formData = new FormData();
-        let encryption = new Encryption();
-        let policyHolder_id = this.state.policyHolder_refNo ? this.state.policyHolder_refNo : '0'
-        let bc_data = sessionStorage.getItem('bcLoginData') ? sessionStorage.getItem('bcLoginData') : "";
-        if(bc_data) {
-            bc_data = JSON.parse(encryption.decrypt(bc_data));
-        }
-        formData.append('bcmaster_id', sessionStorage.getItem('csc_id') ? "5" : bc_data ? bc_data.agent_id : "" ) 
-        formData.append('ref_no', policyHolder_id) 
-
-        this.props.loadingStart();
-        axios.post('breakin/create',formData)
-        .then(res=>{
-            swal(`Your breakin request has been raised. Your inspection Number: ${res.data.data.inspection_no}`)
-            this.props.loadingStop();
-        }).
-        catch(err=>{
-            this.props.loadingStop();
-        })  
     }
 
     getAccessToken = (motorInsurance) => {
@@ -282,7 +230,7 @@ class PremiumGCV extends Component {
     }
 
     render() {
-        const { policyHolder, show, fulQuoteResp, motorInsurance, error, error1, refNumber, paymentStatus, relation, memberdetails,nomineedetails, vehicleDetails } = this.state
+        const { policyHolder, show, fulQuoteResp, motorInsurance, error, error1, refNumber, paymentStatus, relation, memberdetails,nomineedetails, vehicleDetails, step_completed } = this.state
         const { productId } = this.props.match.params
 
         const errMsg =
@@ -317,7 +265,7 @@ class PremiumGCV extends Component {
                             <div className="col-sm-12 col-md-12 col-lg-2 col-xl-2 pd-l-0">
                                 <SideNav />
                             </div>
-
+                            { step_completed >= '4' && vehicleDetails.vehicletype_id == '7' ?
                             <div className="col-sm-12 col-md-12 col-lg-10 col-xl-10 infobox">
                                 <h4 className="text-center mt-3 mb-3">SBI General Insurance Company Limited</h4>
                                 <Formik initialValues={initialValue} onSubmit={this.handleSubmit}
@@ -397,30 +345,38 @@ class PremiumGCV extends Component {
                                                                         {memberdetails ?
 
                                                                                 <div>
-                                                                                    <strong>Owner Details :</strong>
+                                                                                    <strong>Owner Details </strong>
                                                                                     <br/>
                                                                                        <Row>
                                                                                         <Col sm={12} md={6}>
                                                                                             <Row>
                                                                                                 <Col sm={12} md={6}>
-                                                                                                    <FormGroup>Name:</FormGroup>
+                                                                                                {motorInsurance.policy_for == '1' ?  <FormGroup>Name:</FormGroup> : <FormGroup>Company Name:</FormGroup> }
                                                                                                 </Col>
                                                                                                 <Col sm={12} md={6}>
                                                                                                     <FormGroup>{memberdetails.first_name }</FormGroup>
                                                                                                 </Col>
                                                                                             </Row>
-
-                                                                                            <Row>
+                                                                                            {motorInsurance.policy_for == '1' ?     
+                                                                                                <Row>
+                                                                                                    <Col sm={12} md={6}>
+                                                                                                        <FormGroup>Date Of Birth:</FormGroup>
+                                                                                                    </Col>
+                                                                                                    <Col sm={12} md={6}>
+                                                                                                        <FormGroup>{memberdetails.dob}</FormGroup>
+                                                                                                    </Col>
+                                                                                                </Row> : 
+                                                                                                <Row>
                                                                                                 <Col sm={12} md={6}>
-                                                                                                    <FormGroup>Date Of Birth:</FormGroup>
+                                                                                                    <FormGroup>Date Of Incorporation:</FormGroup>
                                                                                                 </Col>
                                                                                                 <Col sm={12} md={6}>
-                                                                                                    <FormGroup>{moment(memberdetails.dob).format("DD-MM-YYYY")}</FormGroup>
+                                                                                                    <FormGroup>{ memberdetails ? moment(memberdetails.date_of_incorporation).format("DD-MM-YYYY") : null}</FormGroup>
                                                                                                 </Col>
-                                                                                            </Row>
+                                                                                            </Row>}
                                                                                             <Row>
                                                                                                 <Col sm={12} md={6}>
-                                                                                                    <FormGroup>Mobile No</FormGroup>
+                                                                                                    <FormGroup>Mobile No:</FormGroup>
                                                                                                 </Col>
                                                                                                 <Col sm={12} md={6}>
                                                                                                     <FormGroup>{memberdetails.mobile}</FormGroup>
@@ -428,21 +384,29 @@ class PremiumGCV extends Component {
                                                                                             </Row>
                                                                                             <Row>
                                                                                                 <Col sm={12} md={6}>
-                                                                                                    <FormGroup>Email Id</FormGroup>
+                                                                                                    <FormGroup>Email Id:</FormGroup>
                                                                                                 </Col>
                                                                                                 <Col sm={12} md={6}>
                                                                                                     <FormGroup>{memberdetails.email_id}</FormGroup>
                                                                                                 </Col>
                                                                                             </Row>
-
-                                                                                            <Row>
-                                                                                                <Col sm={12} md={6}>
-                                                                                                    <FormGroup>Gender</FormGroup>
-                                                                                                </Col>
-                                                                                                <Col sm={12} md={6}>
-                                                                                                    <FormGroup>{memberdetails.gender == "m" ? "Male" : "Female"}</FormGroup>
-                                                                                                </Col>
-                                                                                            </Row>
+                                                                                            {motorInsurance.policy_for == '1' ?
+                                                                                                <Row>
+                                                                                                    <Col sm={12} md={6}>
+                                                                                                        <FormGroup>Gender</FormGroup>
+                                                                                                    </Col>
+                                                                                                    <Col sm={12} md={6}>
+                                                                                                        <FormGroup>{memberdetails.gender == "m" ? "Male" : "Female"}</FormGroup>
+                                                                                                    </Col>
+                                                                                                </Row> :
+                                                                                                <Row>
+                                                                                                    <Col sm={12} md={6}>
+                                                                                                        <FormGroup>GSTIN:</FormGroup>
+                                                                                                    </Col>
+                                                                                                    <Col sm={12} md={6}>
+                                                                                                        <FormGroup>{memberdetails.gstn_no}</FormGroup>
+                                                                                                    </Col>
+                                                                                                </Row> }
 
                                                                                         </Col>
                                                                                     </Row>
@@ -451,27 +415,27 @@ class PremiumGCV extends Component {
                                                                                     </Row>
                                                                                 </div>
                                                                             : (<p></p>)}
-                                                                        {motorInsurance.policy_for == '1' && motorInsurance.pa_flag == '1' ?             
-                                                                        <div>
-                                                                        <strong>Nominee Details :</strong>
-                                                                            <br/>
-                                                                            <Row>
-                                                                                <Col sm={12} md={6}>
-                                                                                    <Row>
-                                                                                        <Col sm={12} md={6}>
-                                                                                            <FormGroup>Name:</FormGroup>
-                                                                                        </Col>
-                                                                                        <Col sm={12} md={6}>
-                                                                                            <FormGroup>{nomineedetails.first_name}</FormGroup>
-                                                                                        </Col>
-                                                                                    </Row>
+                                                                        {motorInsurance.policy_for == '1'  && motorInsurance.pa_flag == '1' ?      
+                                                                            <div>
+                                                                            <strong>Nominee Details :</strong>
+                                                                                <br/>
+                                                                                <Row>
+                                                                                    <Col sm={12} md={6}>
+                                                                                        <Row>
+                                                                                            <Col sm={12} md={6}>
+                                                                                                <FormGroup>Name:</FormGroup>
+                                                                                            </Col>
+                                                                                            <Col sm={12} md={6}>
+                                                                                                <FormGroup>{nomineedetails ? nomineedetails.first_name : null}</FormGroup>
+                                                                                            </Col>
+                                                                                        </Row>
 
                                                                                     <Row>
                                                                                         <Col sm={12} md={6}>
                                                                                             <FormGroup>Date Of Birth:</FormGroup>
                                                                                         </Col>
                                                                                         <Col sm={12} md={6}>
-                                                                                            <FormGroup>{moment(nomineedetails.dob).format("DD-MM-YYYY")}</FormGroup>
+                                                                                            <FormGroup>{ nomineedetails ? moment(nomineedetails.dob).format("DD-MM-YYYY") : null}</FormGroup>
                                                                                         </Col>
                                                                                     </Row>
 
@@ -480,7 +444,7 @@ class PremiumGCV extends Component {
                                                                                             <FormGroup>Relation With Proposer:</FormGroup>
                                                                                         </Col>
                                                                                         <Col sm={12} md={6}>
-                                                                                        { relation.map((relations, qIndex) => 
+                                                                                        {nomineedetails && relation.map((relations, qIndex) => 
                                                                                         relations.id == nomineedetails.relation_with ?
                                                                                             <FormGroup>{relations.name}</FormGroup> : null
                                                                                         )}
@@ -492,7 +456,7 @@ class PremiumGCV extends Component {
                                                                                             <FormGroup>Gender</FormGroup>
                                                                                         </Col>
                                                                                         <Col sm={12} md={6}>
-                                                                                            <FormGroup>{nomineedetails.gender == "m" ? "Male" : "Female"}</FormGroup>
+                                                                                            <FormGroup>{nomineedetails && nomineedetails.gender == "m" ? "Male" : "Female"}</FormGroup>
                                                                                         </Col>
                                                                                     </Row>
                                                                                 </Col>
@@ -582,7 +546,7 @@ class PremiumGCV extends Component {
                                                                                             </Row>
                                                                                             <Row>
                                                                                                 <Col sm={12} md={6}>
-                                                                                                    <FormGroup>Chasis Number</FormGroup>
+                                                                                                    <FormGroup>Chassis Number</FormGroup>
                                                                                                 </Col>
                                                                                                 <Col sm={12} md={6}>
                                                                                                     <FormGroup>{motorInsurance && motorInsurance.chasis_no  ? motorInsurance.chasis_no : ""}</FormGroup>
@@ -707,11 +671,14 @@ class PremiumGCV extends Component {
                                     </div>
                                 </Modal> */}
 
-                            </div>
+
+
+                            </div> : step_completed == "" ? "Forbidden" : null }
                             <Footer />
                         </div>
                     </div>
                 </BaseComponent>
+                
             </>
         );
     }

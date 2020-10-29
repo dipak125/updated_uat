@@ -854,3 +854,22 @@ img.avatar {  border-radius: inherit;}
 .chartjs-render-monitor{
   height: 300px!important;
 }
+.border-cardbody-dash {
+  border: 1px solid #00B5EF;
+  display: flex;
+  flex-wrap: wrap;
+  margin: 0 0 15px 0;
+  border-radius: 5px;
+  Justify-content: space-between;
+}
+.border-cardbody-dash .col-lg-6,
+.border-cardbody-dash .col-md-12,
+.border-cardbody-dash .col-sm-12{
+  padding: 0!important;
+}
+@media (min-width: 992px){
+  .border-cardbody-dash .col-lg-6 {
+      flex: 0 0 49%;
+      max-width: 49%;
+  }
+}

@@ -1016,10 +1016,16 @@ class OtherComprehensiveGCV extends Component {
         const {productId} = this.props.match.params 
         let defaultSliderValue = PolicyArray.length > 0 ? Math.round(PolicyArray[0].PolicyRiskList[0].IDV_Suggested) : 0
         let sliderValue = sliderVal
-        let minIDV = PolicyArray.length > 0 ? Math.floor(PolicyArray[0].PolicyRiskList[0].MinIDV_Suggested) : null
-        let maxIDV = PolicyArray.length > 0 ? Math.floor(PolicyArray[0].PolicyRiskList[0].MaxIDV_Suggested) : null
-        minIDV = minIDV + 1;
-        maxIDV = maxIDV - 1;
+        let min_IDV_suggested = PolicyArray.length > 0 ? PolicyArray[0].PolicyRiskList[0].MinIDV_Suggested : 0
+        let max_IDV_suggested = PolicyArray.length > 0 ? PolicyArray[0].PolicyRiskList[0].MaxIDV_Suggested : 0
+        let minIDV = min_IDV_suggested
+        let maxIDV = PolicyArray.length > 0 ? Math.floor(max_IDV_suggested) : null
+
+        if(Number.isInteger(min_IDV_suggested) == false ) {
+            minIDV = PolicyArray.length > 0 ? Math.floor(PolicyArray[0].PolicyRiskList[0].MinIDV_Suggested) : null           
+            minIDV = minIDV + 1;
+            // maxIDV = maxIDV - 1;
+        }
         
         let minBodyIDV = 0
         let maxBodyIDV = PolicyArray.length > 0 ? Math.round(PolicyArray[0].PolicyRiskList[0].IDV_Suggested/2) : 0
@@ -1108,7 +1114,7 @@ class OtherComprehensiveGCV extends Component {
                     LL_workman_flag: '0',
                     fuel_type: fuel_type,
                     trailer_flag_TP: '0',
-                    B00005 : "",
+                    B00015 : "",
                     B00005 : "",
                     B00010 : ""
                 });
