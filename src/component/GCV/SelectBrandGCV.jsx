@@ -61,12 +61,13 @@ class SelectBrandGCV extends Component {
             fuelType: '',
             vehicleDetails: [],
             gross_vechicle_weight : '',
-            seating : ''
+            seating : '',
+            searchText: ""
         };
     }
 
     handleClose() {
-        this.setState({ show: false });
+        this.setState({ show: false, searchText: "", searchitem: [] });
     }
 
     handleShow() {
@@ -92,6 +93,7 @@ class SelectBrandGCV extends Component {
     change = (text) => {
 
         this.state.searchitem = [];
+        this.setState({ searchText: text });
         this.state.brandModelList.map((item, index) => {
 
             var rgxp = new RegExp(text.toUpperCase(), "g");
@@ -108,6 +110,7 @@ class SelectBrandGCV extends Component {
 
             });
         }
+
     }
 
     getBrands = () => {
@@ -296,7 +299,12 @@ class SelectBrandGCV extends Component {
 
     handleSubmit = (values) => {
         const { productId } = this.props.match.params
-        const { selectedVarientId, selectedModelId, selectedBrandId } = this.state
+        const { selectedVarientId, selectedModelId, selectedBrandId, modelName, vehicleDetails } = this.state
+        let vehicleModel = modelName ? modelName : (selectedBrandId ? "" : vehicleDetails && vehicleDetails.vehiclemodel && vehicleDetails.vehiclemodel.description ? vehicleDetails.vehiclemodel.description+" "+vehicleDetails.varientmodel.varient : "")
+        if(vehicleModel == "" || vehicleModel == null || vehicleModel == undefined) {
+            swal("Please select vehicle Brand Model")
+            return false
+        }
         const formData = new FormData();
         let encryption = new Encryption();
         const post_data = {
@@ -494,7 +502,7 @@ class SelectBrandGCV extends Component {
                                 contentClassName="content"
                                 horizontal={false}
                             >
-                                {this.state.searchitem && this.state.searchitem.length > 0 ?
+                                {this.state.searchitem && this.state.searchitem.length > 0 && this.state.searchText.length > 0 ?
 
                                     (
                                         this.state.searchitem && this.state.searchitem.length > 0 && this.state.searchitem.map((brand, brandIndex) => (
@@ -524,8 +532,16 @@ class SelectBrandGCV extends Component {
                                                 </div>
                                             )))
                                         ))
+                                    : (this.state.searchitem && this.state.searchitem.length == 0 && this.state.searchText.length > 0  ? 
+                                        <div key= "1" className="brdrbottom">
+                                            <label className="d-flex justify-content-between">
+                                                <div className="modalboxInfo">
+                                                    <span className="grey ml-5">No such variant found</span>
+                                                </div>       
+                                            </label>
+                                        </div>
                                     : 
-                                    (brandModelList && brandModelList.length > 0 && brandModelList.map((brand, brandIndex) => (
+                                    brandModelList && brandModelList.length > 0 && brandModelList.map((brand, brandIndex) => (
                                         brand.varientmodel && brand.varientmodel.length > 0 && brand.varientmodel.map((varient, varientIndex) => (
                                             
                                             <div key= {varientIndex} className="brdrbottom">
@@ -562,7 +578,7 @@ class SelectBrandGCV extends Component {
                             contentClassName="content"
                             horizontal={false}
                         >
-                            {this.state.searchitem && this.state.searchitem.length > 0 ?
+                            {this.state.searchitem && this.state.searchitem.length > 0 && this.state.searchText.length > 0 ?
 
                                 (
                                     this.state.searchitem && this.state.searchitem.length > 0 && this.state.searchitem.map((brand, brandIndex) => (
@@ -592,8 +608,16 @@ class SelectBrandGCV extends Component {
                                             </div>
                                         )))
                                     ))))
-                                :
-                                (this.state.brandModelList && this.state.brandModelList.length > 0 && this.state.brandModelList.map((brand, brandIndex) => (
+                                :  (this.state.searchitem && this.state.searchitem.length == 0 && this.state.searchText.length > 0  ? 
+                                    <div key= "1" className="brdrbottom">
+                                        <label className="d-flex justify-content-between">
+                                            <div className="modalboxInfo">
+                                                <span className="grey ml-5">No such variant found</span>
+                                            </div>       
+                                        </label>
+                                    </div>
+                                :  
+                                this.state.brandModelList && this.state.brandModelList.length > 0 && this.state.brandModelList.map((brand, brandIndex) => (
                                     brand.brand_models && brand.brand_models.length > 0 && brand.brand_models.map((model, modelIndex) => (
                                         model.varientmodel && model.varientmodel.length > 0 && model.varientmodel.map((varient, varientIndex) => (
 

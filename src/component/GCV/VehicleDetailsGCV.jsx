@@ -30,8 +30,8 @@ const minDate = moment(moment().subtract(20, 'years').calendar()).add(1, 'day').
 const maxDate = moment(moment().subtract(1, 'years').calendar()).add(30, 'day').calendar();
 const startRegnDate = moment().subtract(20, 'years').calendar();
 const minRegnDate = moment(startRegnDate).startOf('year').format('YYYY-MM-DD hh:mm');
-const maxRegnDate = new Date();
 const minRegnDateNew = moment(moment().subtract(1, 'months').calendar()).add(1, 'day').calendar();
+const maxDateForValidtion = moment(moment().subtract(1, 'years').calendar()).add(31, 'day').calendar();
 
 const initialValue = {
     registration_date: "",
@@ -52,6 +52,26 @@ const initialValue = {
 }
 const vehicleRegistrationValidation = Yup.object().shape({
     registration_date: Yup.string().required('Registration date is required')
+    .test(
+        "checkMaxDateRollover",
+        "Registration date must be one year old",
+        function (value) {
+            if (value && this.parent.policy_type_id == '2') {
+                return checkGreaterStartEndTimes(value, maxDateForValidtion);
+            }
+            return true;
+        }
+    )
+    .test(
+        "checkMinDate_MaxDate_NewPolicy",
+        "Registration date cannot be older than one month",
+        function (value) {
+            if (value && this.parent.policy_type_id == '1') {
+                return checkGreaterStartEndTimes(value, new Date()) && checkGreaterStartEndTimes(minRegnDateNew, value);
+            }
+            return true;
+        }
+    )
     .test(
         "checkGreaterTimes",
         "Registration date must be less than Previous policy start date",
@@ -703,7 +723,7 @@ class VehicleDetailsGCV extends Component {
                                                             <DatePicker
                                                                 name="registration_date"
                                                                 minDate={values.policy_type_id == '1' ? new Date(minRegnDateNew) : new Date(minRegnDate)}
-                                                                maxDate={new Date(maxRegnDate)}
+                                                                maxDate={values.policy_type_id == '1' ? new Date() : new Date(maxDate)}
                                                                 dateFormat="dd MMM yyyy"
                                                                 placeholderText="Registration Date"
                                                                 peekPreviousMonth

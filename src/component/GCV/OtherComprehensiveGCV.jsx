@@ -1157,7 +1157,6 @@ class OtherComprehensiveGCV extends Component {
         newInitialValues = Object.assign(initialValue, newInnitialArray );
 
 // -------------------------------------------------------
-
         let OD_TP_premium = serverResponse.PolicyLobList ? serverResponse.PolicyLobList[0].PolicyRiskList[0] : []
 
 

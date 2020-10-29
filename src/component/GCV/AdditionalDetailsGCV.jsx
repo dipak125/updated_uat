@@ -48,7 +48,9 @@ const initialValue = {
     stateName: "",
     pinDataArr: [],
     pincode_id: "",
-    org_level: ""
+    org_level: "",
+    net_premium: "0",
+    title: ""
 }
 
 const ownerValidation = Yup.object().shape({
@@ -56,20 +58,22 @@ const ownerValidation = Yup.object().shape({
         is: policy_for => policy_for == '1',       
         then: Yup.string().required('Name is required')
         .min(3, function() {
-            return "First name must be 3 chracters"
+            return "First name must be 3 characters"
         })
         .max(40, function() {
-            return "Full name must be maximum 40 chracters"
+            return "Full name must be maximum 40 characters"
         })
         .matches(/^[a-zA-Z]+([\s]?[a-zA-Z]+)([\s]?[a-zA-Z]+)$/, function() {
             return "Please enter valid name"
         }),
         otherwise: Yup.string().required('Company name is required').min(3, function() {
-            return "Company name must be min 3 chracters"
+            return "Company name must be min 3 characters"
         }).matches(/^[a-zA-Z]+([\s]?[a-zA-Z]+)([\s]?[a-zA-Z]+)$/, function() {
             return "Please enter valid name"
         })
     }),
+
+    title: Yup.string().required('Title is required'),
     
     gender: Yup.string().when(['policy_for'], {
         is: policy_for => policy_for == '1',  
@@ -99,11 +103,20 @@ const ownerValidation = Yup.object().shape({
     }),
 
     pancard: Yup.string()
-    .notRequired(function() {
-        return "Enter PAN number"
+    .notRequired().test(
+        "1LakhChecking",
+        function() {
+            return "Enter PAN number"
+        },
+        function (value) {
+            if (!value) {
+                return this.parent.net_premium <= 100000
+            }
+             return true;
     }).matches(/^[A-Z]{3}[CPHFATBLJG]{1}[A-Z]{1}[0-9]{4}[A-Z]{1}$/, function() {
         return "Please enter valid Pan Number"
     }),
+
     pincode_id:Yup.string().required('Location is required'),
 
     pincode:Yup.string().required('Pincode is required')
@@ -121,10 +134,10 @@ const ownerValidation = Yup.object().shape({
         .matches(/^[6-9][0-9]{9}$/,'Invalid Mobile number').required('Phone No. is required'),
         
     email:Yup.string().email().required('Email is required').min(8, function() {
-            return "Email must be minimum 8 chracters"
+            return "Email must be minimum 8 characters"
         })
         .max(75, function() {
-            return "Email must be maximum 75 chracters"
+            return "Email must be maximum 75 characters"
         }).matches(/^[a-zA-Z0-9]+([._\-]?[a-zA-Z0-9]+)*@\w+([-]?\w+)*(\.\w{2,3})+$/,'Invalid Email Id'),
         
     nominee_relation_with: Yup.string().when(['policy_for'], {
@@ -232,20 +245,20 @@ const ownerValidation = Yup.object().shape({
             }
         )
         .min(13, function() {
-            return "EIA no must be minimum 13 chracters"
+            return "EIA no must be minimum 13 characters"
         })
         .max(13, function() {
-            return "EIA no must be maximum 13 chracters"
+            return "EIA no must be maximum 13 characters"
         }).matches(/^[1245][0-9]{0,13}$/,'Please enter valid EIA no').notRequired('EIA no is required'),
 
     appointee_name: Yup.string().when(['policy_for'], {
         is: policy_for => policy_for == '1',       
         then: Yup.string().notRequired("Please enter appointee name")
                 .min(3, function() {
-                    return "Name must be minimum 3 chracters"
+                    return "Name must be minimum 3 characters"
                 })
                 .max(40, function() {
-                    return "Name must be maximum 40 chracters"
+                    return "Name must be maximum 40 characters"
                 })        
                 .matches(/^[a-zA-Z]+([\s]?[a-zA-Z]+)([\s]?[a-zA-Z]+)$/, function() {
                     return "Please enter valid name"
@@ -441,7 +454,8 @@ class AdditionalDetailsGCV extends Component {
             'is_eia_account': values['is_eia_account'],
             'eia_no': values['eia_no'],
             'address': values['address'],          
-            'gstn_no': values['gstn_no']
+            'gstn_no': values['gstn_no'],
+            'title': values['title']
         }
         if(motorInsurance.policy_for == '1'){
             post_data['dob'] = moment(values['dob']).format("YYYY-MM-DD")
@@ -612,7 +626,7 @@ class AdditionalDetailsGCV extends Component {
 
     render() {
         const {showLoan, is_eia_account, is_loan_account, nomineeDetails, motorInsurance,appointeeFlag, is_appointee,showEIA,
-            bankDetails,policyHolder, stateName, pinDataArr, quoteId, addressDetails, relation,step_completed,vehicleDetails} = this.state
+            bankDetails,policyHolder, stateName, pinDataArr, quoteId, addressDetails, relation,step_completed,vehicleDetails,request_data} = this.state
         const {productId} = this.props.match.params 
         
 
@@ -643,6 +657,7 @@ class AdditionalDetailsGCV extends Component {
             date_of_incorporation: policyHolder && policyHolder.date_of_incorporation ? new Date(policyHolder.date_of_incorporation) : "",
             org_level: policyHolder && policyHolder.org_level ? policyHolder.org_level : "",
             pa_flag: motorInsurance && motorInsurance.pa_flag ? motorInsurance.pa_flag : "",
+            net_premium: request_data && request_data.net_premium ? request_data.net_premium : "0"
         });
 
         const quoteNumber =
@@ -772,7 +787,30 @@ class AdditionalDetailsGCV extends Component {
                                 </div>
 
                                 <Row>
-                                    <Col sm={12} md={4} lg={4}>
+                                    <Col sm={12} md={4} lg={2}>
+                                        <FormGroup>
+                                            <div className="formSection">
+                                            <Field
+                                                name='title'
+                                                component="select"
+                                                autoComplete="off"                                                                        
+                                                className="formGrp"
+                                            >
+                                                <option value="">Title</option>
+                                                <option value="1">Mr</option>
+                                                <option value="2">Mrs</option>
+                                                <option value="3">Miss</option>
+                                                <option value="4">Master</option>
+                                                <option value="5">MS</option>
+                                            </Field>     
+                                            {errors.title && touched.title ? (
+                                            <span className="errorMsg">{errors.title}</span>
+                                            ) : null}              
+                                            </div>
+                                        </FormGroup>
+                                    </Col>
+
+                                    <Col sm={12} md={4} lg={6}>
                                         <FormGroup>
                                             <div className="insurerName">
                                             <Field
@@ -809,32 +847,7 @@ class AdditionalDetailsGCV extends Component {
                                                 </div>
                                             </FormGroup>
                                         </Col> : null }
-                                        {motorInsurance && motorInsurance.policy_for == '2' ?
-                                        <Col sm={12} md={4} lg={4}>
-                                            <FormGroup>
-                                            <DatePicker
-                                                name="date_of_incorporation"
-                                                dateFormat="dd MMM yyyy"
-                                                placeholderText="Incorporation Date"
-                                                peekPreviousMonth
-                                                peekPreviousYear
-                                                showMonthDropdown
-                                                showYearDropdown
-                                                dropdownMode="select"
-                                                maxDate={new Date(maxDoi)}
-                                                minDate={new Date(minDoi)}
-                                                className="datePckr"
-                                                selected={values.date_of_incorporation}
-                                                onChange={(val) => {
-                                                    setFieldTouched('date_of_incorporation');
-                                                    setFieldValue('date_of_incorporation', val);
-                                                    }}
-                                            />
-                                            {errors.date_of_incorporation && touched.date_of_incorporation ? (
-                                                <span className="errorMsg">{errors.date_of_incorporation}</span>
-                                            ) : null}  
-                                            </FormGroup>
-                                        </Col> : null }
+                                        
                                     {motorInsurance && motorInsurance.policy_for == '1' ?
                                     <Col sm={12} md={4} lg={4}>
                                         <FormGroup>
@@ -855,6 +868,11 @@ class AdditionalDetailsGCV extends Component {
                                             </div>
                                         </FormGroup>
                                     </Col> : null}
+                                    
+                                </Row>
+
+                                <Row>
+                                    
                                     {motorInsurance && motorInsurance.policy_for == '1' ?
                                     <Col sm={12} md={4} lg={4}>
                                         <FormGroup>
@@ -881,27 +899,34 @@ class AdditionalDetailsGCV extends Component {
                                         ) : null}  
                                         </FormGroup>
                                     </Col> : null }
-                                </Row>
 
-                                <Row>
+                                    {motorInsurance && motorInsurance.policy_for == '2' ?
                                     <Col sm={12} md={4} lg={4}>
                                         <FormGroup>
-                                            <div className="insurerName">
-                                            <Field
-                                                name='email'
-                                                type="email"
-                                                placeholder="Email "
-                                                autoComplete="off"
-                                                onFocus={e => this.changePlaceHoldClassAdd(e)}
-                                                onBlur={e => this.changePlaceHoldClassRemove(e)}
-                                                value = {values.email}                                                                            
-                                            />
-                                            {errors.email && touched.email ? (
-                                            <span className="errorMsg">{errors.email}</span>
-                                            ) : null}  
-                                            </div>
+                                        <DatePicker
+                                            name="date_of_incorporation"
+                                            dateFormat="dd MMM yyyy"
+                                            placeholderText="Incorporation Date"
+                                            peekPreviousMonth
+                                            peekPreviousYear
+                                            showMonthDropdown
+                                            showYearDropdown
+                                            dropdownMode="select"
+                                            maxDate={new Date(maxDoi)}
+                                            minDate={new Date(minDoi)}
+                                            className="datePckr"
+                                            selected={values.date_of_incorporation}
+                                            onChange={(val) => {
+                                                setFieldTouched('date_of_incorporation');
+                                                setFieldValue('date_of_incorporation', val);
+                                                }}
+                                        />
+                                        {errors.date_of_incorporation && touched.date_of_incorporation ? (
+                                            <span className="errorMsg">{errors.date_of_incorporation}</span>
+                                        ) : null}  
                                         </FormGroup>
-                                    </Col>
+                                    </Col> : null }
+
                                     <Col sm={12} md={4} lg={4}>
                                         <FormGroup className="m-b-25">
                                             <div className="insurerName nmbract">
@@ -1051,8 +1076,9 @@ class AdditionalDetailsGCV extends Component {
                                         </FormGroup>
                                     </Col>
                                 </Row> : null }
-                                {motorInsurance && motorInsurance.policy_for == '1' ?
+                                
                                 <Row>
+                                {motorInsurance && motorInsurance.policy_for == '1' ?
                                     <Col sm={12} md={4} lg={4}>
                                         <FormGroup>
                                             <div className="insurerName">
@@ -1073,8 +1099,26 @@ class AdditionalDetailsGCV extends Component {
                                             ) : null} 
                                             </div>
                                         </FormGroup>
+                                    </Col> : null }
+                                    <Col sm={12} md={4} lg={4}>
+                                        <FormGroup>
+                                            <div className="insurerName">
+                                            <Field
+                                                name='email'
+                                                type="email"
+                                                placeholder="Email "
+                                                autoComplete="off"
+                                                onFocus={e => this.changePlaceHoldClassAdd(e)}
+                                                onBlur={e => this.changePlaceHoldClassRemove(e)}
+                                                value = {values.email}                                                                            
+                                            />
+                                            {errors.email && touched.email ? (
+                                            <span className="errorMsg">{errors.email}</span>
+                                            ) : null}  
+                                            </div>
+                                        </FormGroup>
                                     </Col>
-                                </Row> : null }
+                                </Row> 
 
                                 <div className="d-flex justify-content-left carloan">
                                     <h4> </h4>
@@ -1164,7 +1208,8 @@ class AdditionalDetailsGCV extends Component {
                                             >
                                             <option value="">Relation with Primary Insured</option>
                                            { relation.map((relations, qIndex) => 
-                                            <option value={relations.id}>{relations.name}</option>                                        
+                                           relations.id != 1 ?
+                                            <option value={relations.id}>{relations.name}</option> : null                                     
                                            )}
                                             </Field>     
                                             {errors.nominee_relation_with && touched.nominee_relation_with ? (
