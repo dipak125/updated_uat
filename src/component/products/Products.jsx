@@ -8,6 +8,7 @@ import { loaderStart, loaderStop } from "../../store/actions/loader";
 
 import Motor from '../common/Motor';
 import Health from '../common/Health';
+import Others from '../common/Others';
 import Footer from '../common/footer/Footer';
 import { setData } from "../../store/actions/data";
 
@@ -54,7 +55,8 @@ class Products extends Component {
                                                 <Nav variant="pills" className="flex-column">
                                                     <div className="d-flex justify-content-left messageDeskTab">
                                                     <div><Nav.Item><Nav.Link eventKey="first">Motor</Nav.Link></Nav.Item></div>
-                                                    <div><Nav.Item><Nav.Link eventKey="second">Health</Nav.Link></Nav.Item></div>                                
+                                                    <div><Nav.Item><Nav.Link eventKey="second">Health</Nav.Link></Nav.Item></div>         
+                                                    <div><Nav.Item><Nav.Link eventKey="third">Others</Nav.Link></Nav.Item></div>                       
                                                     </div>
                                                 </Nav>
                                             </Col>
@@ -66,6 +68,10 @@ class Products extends Component {
                                                     </Tab.Pane>
                                                     <Tab.Pane eventKey="second">
                                                             <Health tabId='2'/>
+                                                            <Footer />
+                                                    </Tab.Pane>
+                                                    <Tab.Pane eventKey="third">
+                                                            <Others tabId='3'/>
                                                             <Footer />
                                                     </Tab.Pane>
                                                     
@@ -81,6 +87,7 @@ class Products extends Component {
                                                         <div className="d-flex justify-content-left messageDeskTab">
                                                         <div><Nav.Item><Nav.Link eventKey="first">Motor</Nav.Link></Nav.Item></div>
                                                         <div><Nav.Item><Nav.Link eventKey="second">Health</Nav.Link></Nav.Item></div>
+                                                        <div><Nav.Item><Nav.Link eventKey="third">Others</Nav.Link></Nav.Item></div>
                                                         
                                                         </div>
                                                     </Nav>
@@ -93,6 +100,10 @@ class Products extends Component {
                                                         </Tab.Pane>
                                                         <Tab.Pane eventKey="second">
                                                             <Health tabId='2'/>
+                                                            <Footer />
+                                                        </Tab.Pane>
+                                                        <Tab.Pane eventKey="third">
+                                                            <Others tabId='3'/>
                                                             <Footer />
                                                         </Tab.Pane>
                                                         
@@ -106,6 +117,7 @@ class Products extends Component {
                                                         <div className="d-flex justify-content-left messageDeskTab">
                                                         <div><Nav.Item><Nav.Link eventKey="first">Motor</Nav.Link></Nav.Item></div>
                                                         <div><Nav.Item><Nav.Link eventKey="second">Health</Nav.Link></Nav.Item></div>
+                                                        <div><Nav.Item><Nav.Link eventKey="third">Others</Nav.Link></Nav.Item></div>
                         
                                                         </div>
                                                     </Nav>
@@ -118,6 +130,10 @@ class Products extends Component {
                                                         </Tab.Pane>
                                                         <Tab.Pane eventKey="second">
                                                             <Health tabId='2'/>
+                                                            <Footer />
+                                                        </Tab.Pane>
+                                                        <Tab.Pane eventKey="third">
+                                                            <Others tabId='3'/>
                                                             <Footer />
                                                         </Tab.Pane>
                                                         

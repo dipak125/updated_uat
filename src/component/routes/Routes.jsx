@@ -240,6 +240,31 @@ const PremiumGCVTP = Loadable({
     loader: () => import(/*webpackChunkName: "Products" */"../GCV-TP/PremiumGCV_TP.jsx"),
     loading: () => loadingContent
 });
+
+// ======================== SME Fire ========================================
+
+const RegistrationSME = Loadable({
+    loader: () => import(/*webpackChunkName: "Products" */"../sme-fire/Registration_sme.jsx"),
+    loading: () => loadingContent
+});
+
+const RiskDetails = Loadable({
+    loader: () => import(/*webpackChunkName: "Products" */"../sme-fire/RiskDetails.jsx"),
+    loading: () => loadingContent
+});
+const OtherDetails = Loadable({
+    loader: () => import(/*webpackChunkName: "Products" */"../sme-fire/OtherDetails.jsx"),
+    loading: () => loadingContent
+});
+const AdditionalDetailsSME = Loadable({
+    loader: () => import(/*webpackChunkName: "Products" */"../sme-fire/AdditionalDetails_sme.jsx"),
+    loading: () => loadingContent
+});
+const PremiumSME = Loadable({
+    loader: () => import(/*webpackChunkName: "Products" */"../sme-fire/Premium_sme.jsx"),
+    loading: () => loadingContent
+});
+
 //  =================================== Landing Page ==================================
 
 const Dashboard = Loadable({
@@ -318,13 +343,20 @@ class Routes extends Component {
                         <PrivateRoute exact path="/AdditionalDetails_GCV/:productId" component={AdditionalDetailsGCV} />  
                         <PrivateRoute exact path="/Premium_GCV/:productId" component={PremiumGCV} />
 
-                        {/************ MotorGCV ******************/}
+                        {/************ MotorGCV - TP ******************/}
                         <PrivateRoute exact path="/Registration_GCV_TP/:productId" component={RegistrationGCVTP} />
                         <PrivateRoute exact path="/SelectBrand_GCV_TP/:productId" component={SelectBrandGCVTP} />
                         <PrivateRoute exact path="/VehicleDetails_GCV_TP/:productId" component={VehicleDetailsGCVTP} />
                         <PrivateRoute exact path="/OtherComprehensive_GCV_TP/:productId" component={OtherComprehensiveGCVTP} />
                         <PrivateRoute exact path="/AdditionalDetails_GCV_TP/:productId" component={AdditionalDetailsGCVTP} />  
                         <PrivateRoute exact path="/Premium_GCV_TP/:productId" component={PremiumGCVTP} />
+
+                        {/************ SME - Fire ******************/}
+                        <PrivateRoute exact path="/Registration_SME/:productId" component={RegistrationSME} />
+                        <PrivateRoute exact path="/RiskDetails/:productId" component={RiskDetails} />
+                        <PrivateRoute exact path="/OtherDetails/:productId" component={OtherDetails} />
+                        <PrivateRoute exact path="/AdditionalDetails_SME/:productId" component={AdditionalDetailsSME} />
+                        <PrivateRoute exact path="/Premium_SME/:productId" component={PremiumSME} />  
 
                         {/************ Support ******************/}
                         <PrivateRoute exact path="/Documents" component={Documents} />
