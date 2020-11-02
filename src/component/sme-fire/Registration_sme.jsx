@@ -71,9 +71,26 @@ fetchData=()=>{
 }
 
     handleSubmit=(values)=>{
-
-        const {productId} = this.props.match.params;
-        this.props.history.push(`/RiskDetails/${productId}`);
+        console.log('handleSubmit', values);
+        const formData = new FormData();
+        formData.append('menumaster_id','5')
+        formData.append('bcmaster_id','1')
+        let pol_start_date = moment(values.start_date).format('YYYY-MM-DD HH:MM:SS')
+        let pol_end_date = moment(values.end_date).format('YYYY-MM-DD HH:MM:SS')
+        formData.append('pol_start_date', pol_start_date)
+        formData.append('pol_end_date',pol_end_date)
+        this.props.loadingStart();
+        axios.post('sme/policy-info',
+        formData
+        ).then(res=>{       
+            console.log('res', res)
+            this.props.loadingStop();
+            const {productId} = this.props.match.params;
+            this.props.history.push(`/RiskDetails/${productId}`);
+        }).
+        catch(err=>{
+            this.props.loadingStop();
+        })
         
     }
 
@@ -115,13 +132,12 @@ fetchData=()=>{
                                                                     type="radio"
                                                                     name='policy_type'
                                                                     value='1'
-                                                                    disabled = {true}
                                                                     key='1'
                                                                     checked = {values.policy_type == '1' ? true : false}
                                                                     onChange = {() =>{
                                                                         setFieldTouched('policy_type')
                                                                         setFieldValue('policy_type', '1');
-                                                                        this.handleChange(values,setFieldTouched, setFieldValue)
+                                                                        //this.handleChange(values,setFieldTouched, setFieldValue)
                                                                     }  
                                                                     }
                                                                 />
@@ -135,7 +151,6 @@ fetchData=()=>{
                                                                     type="radio"
                                                                     name='policy_type'
                                                                     value='2'
-                                                                    disabled= {true}
                                                                     key='1'
                                                                     checked = {values.policy_type == '2' ? true : false}
                                                                     onChange = {() =>{
@@ -154,7 +169,7 @@ fetchData=()=>{
                                                     </div>
                                                 </div>
                                             </div>
-                                            <div className="row formSection">
+                                            {/* <div className="row formSection">
                                                 <label className="col-md-4">Sub Product:</label>
                                                 <div className="col-md-4">
                                                     
@@ -167,7 +182,7 @@ fetchData=()=>{
                                                             value = {values.subclass_id}
                                                             // value={ageObj.whatIsCurrentMonth(values.registration_date) < 7 ? 6 : values.previous_policy_name}
                                                         >
-                                                            <option value="">SME – Fire Pre UW</option>       
+                                                            <option value="1">SME – Fire Pre UW</option>       
                                                 
                                                         </Field>
                                                         {errors.subclass_id && touched.subclass_id ? (
@@ -175,7 +190,7 @@ fetchData=()=>{
                                                         ) : null}
                                                     </div>
                                                 </div>
-                                            </div>
+                                            </div> */}
                                             <div className="brandhead"> 
                                                 <h4 className="fs-18 m-b-30">QUICK POLICY INFORMATION</h4>
                                             </div>

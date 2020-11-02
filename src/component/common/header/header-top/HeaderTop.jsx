@@ -100,6 +100,11 @@ class HeaderTop extends Component {
                                 {sessionStorage.getItem("auth_token") && bc_data.user_info ?
                                     <div className="align-self-center userNameImg">
                                         Welcome {bc_data.user_info.data.user.name}
+                                        <p><a href={process.env.REACT_APP_PAYMENT_URL+'/core/public/pdf_files/RM-name-SBIG.xlsx'}>
+                                                <Blink color='blue' text='Download RM List' fontSize='14'>
+                                                    Download RM List
+                                                </Blink> 
+                                        </a></p>
                                     </div>
                                         :  
                                         sessionStorage.getItem("auth_token") && csc_data ?
@@ -110,7 +115,6 @@ class HeaderTop extends Component {
                                                     Download RM List
                                                 </Blink> 
                                             </a></p>
-                                                {/* <strong>Download RM List</strong></a></p> */}
                                         </div>
                                         : null }
                                     <div className="align-self-center">

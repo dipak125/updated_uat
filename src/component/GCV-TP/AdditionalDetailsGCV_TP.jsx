@@ -73,7 +73,13 @@ const ownerValidation = Yup.object().shape({
         })
     }),
 
-    salutation_id: Yup.string().required('Title is required'),
+    //salutation_id: Yup.string().required('Title is required'),
+
+    salutation_id: Yup.string().when(['policy_for'], {
+        is: policy_for => policy_for == '1',  
+        then: Yup.string().required('Title is required'),
+        otherwise: Yup.string().nullable()
+    }),
     
     gender: Yup.string().when(['policy_for'], {
         is: policy_for => policy_for == '1',  
@@ -476,6 +482,7 @@ class AdditionalDetailsGCV extends Component {
             post_data['gender']= "cc"
             post_data['date_of_incorporation'] = moment(values['date_of_incorporation']).format("YYYY-MM-DD")
             post_data['org_level'] = values['org_level']
+            post_data['salutation_id'] = '5'
         }
             
         console.log('post_data', post_data);
@@ -814,6 +821,7 @@ class AdditionalDetailsGCV extends Component {
                                 </div>
 
                                 <Row>
+                                {motorInsurance && motorInsurance.policy_for == '1' ?
                                     <Col sm={12} md={4} lg={2}>
                                         <FormGroup>
                                             <div className="formSection">
@@ -834,6 +842,7 @@ class AdditionalDetailsGCV extends Component {
                                             </div>
                                         </FormGroup>
                                     </Col>
+                                    :null}
 
                                     <Col sm={12} md={4} lg={6}>
                                         <FormGroup>
