@@ -1028,7 +1028,7 @@ class OtherComprehensiveGCV extends Component {
         }
         
         let minBodyIDV = 0
-        let maxBodyIDV = PolicyArray.length > 0 ? Math.round(PolicyArray[0].PolicyRiskList[0].IDV_Suggested/2) : 0
+        let maxBodyIDV = PolicyArray.length > 0 ? Math.round(PolicyArray[0].PolicyRiskList[0].IDV_Suggested/5) : 0
         let defaultBodySliderValue =  motorInsurance && motorInsurance.body_idv_value ? Math.round(motorInsurance.body_idv_value) : 0
         let bodySliderValue = bodySliderVal
 
