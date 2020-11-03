@@ -363,7 +363,7 @@ class PremiumGCV extends Component {
                                                                                                         <FormGroup>Date Of Birth:</FormGroup>
                                                                                                     </Col>
                                                                                                     <Col sm={12} md={6}>
-                                                                                                        <FormGroup>{memberdetails.dob}</FormGroup>
+                                                                                                        <FormGroup>{ memberdetails ? moment(memberdetails.dob).format("DD-MM-YYYY") : null}</FormGroup>
                                                                                                     </Col>
                                                                                                 </Row> : 
                                                                                                 <Row>

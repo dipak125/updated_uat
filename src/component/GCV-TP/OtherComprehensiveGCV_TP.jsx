@@ -209,17 +209,18 @@ const ComprehensiveValidation = Yup.object().shape({
         then: Yup.string().required('Please provide trailer IDV').matches(/^[0-9]*$/, 'Please provide valid IDV'),
         otherwise: Yup.string()
     }),
+
     B00011_value: Yup.string().when(['trailer_flag_TP'], {
         is: trailer_flag_TP => trailer_flag_TP == '1',
         then: Yup.string().required('Please provide No. of trailer').matches(/^[0-9]$/, 'Please provide valid No.'),
         otherwise: Yup.string()
     }),
 
-    B00011_description: Yup.string().when(['trailer_flag_TP'], {
-        is: trailer_flag_TP => trailer_flag_TP == '1',
-        then: Yup.string().required('Please provide trailer IDV').matches(/^[0-9]*$/, 'Please provide valid IDV'),
-        otherwise: Yup.string()
-    }),
+    // B00011_description: Yup.string().when(['trailer_flag_TP'], {
+    //     is: trailer_flag_TP => trailer_flag_TP == '1',
+    //     then: Yup.string().required('Please provide trailer IDV').matches(/^[0-9]*$/, 'Please provide valid IDV'),
+    //     otherwise: Yup.string()
+    // }),
 
     B00010: Yup.string().when(['fuel_type'], {
         is: fuel_type => fuel_type == '3' || fuel_type == '4',
@@ -229,6 +230,20 @@ const ComprehensiveValidation = Yup.object().shape({
                 if (value == "" || value == null || value == undefined) {   
                     swal("If Fuel type is CNG/LPG ,then CNG/LPG Kit-Liability cover is mandatory.")
                     return false;    
+                }
+                return true;
+            }) ,
+        otherwise: Yup.string()
+    }),
+
+    B00011: Yup.string().when(['fuel_type'], {
+        is: fuel_type => fuel_type == '3' || fuel_type == '4',
+        then: Yup.string().test(
+            "isLoanChecking",
+            function (value) {
+                if (value == "" || value == null || value == undefined) {   
+                    //swal("If Fuel type is CNG/LPG ,then Trailer TP cover is mandatory.")
+                    // return false;    
                 }
                 return true;
             }) ,
@@ -447,7 +462,7 @@ class OtherComprehensiveGCV extends Component {
                 values.B00007_description = add_more_coverage_request_array.B00007 ? add_more_coverage_request_array.B00007.description : ""
                 values.B00070_value = add_more_coverage_request_array.B00070 ? add_more_coverage_request_array.B00070.value : ""
                 values.B00011_value = add_more_coverage_request_array.B00011 ? add_more_coverage_request_array.B00011.value : ""
-                values.B00011_description = add_more_coverage_request_array.B00011 ? add_more_coverage_request_array.B00011.description : ""
+                // values.B00011_description = add_more_coverage_request_array.B00011 ? add_more_coverage_request_array.B00011.description : ""
 
                 this.setState({
                     motorInsurance, add_more_coverage,request_data, vehicleDetails,
@@ -637,7 +652,7 @@ class OtherComprehensiveGCV extends Component {
                 'B00003' : {'value': values.B00003_value, 'description': values.B00003_description},
                 'B00073' : {'value': values.B00073_value, 'description': values.B00073_description},
                 'B00007' : {'value': values.B00007_value, 'description': values.B00007_description},
-                'B00011' : {'value': values.B00011_value, 'description': values.B00011_description},
+                'B00011' : {'value': values.B00011_value},
                 'B00070' : {'value': values.B00070_value}
             }
         }
@@ -733,7 +748,7 @@ class OtherComprehensiveGCV extends Component {
                 'B00003' : {'value': values.B00003_value, 'description': values.B00003_description},
                 'B00073' : {'value': values.B00073_value, 'description': values.B00073_description},
                 'B00007' : {'value': values.B00007_value, 'description': values.B00007_description},
-                'B00011' : {'value': values.B00011_value, 'description': values.B00011_description},
+                'B00011' : {'value': values.B00011_value},
                 'B00070' : {'value': values.B00070_value}
             }
         }
@@ -1100,7 +1115,7 @@ class OtherComprehensiveGCV extends Component {
         newInnitialArray.B00007_value = add_more_coverage_request_array.B00007 ? add_more_coverage_request_array.B00007.value : ""
         newInnitialArray.B00007_description = add_more_coverage_request_array.B00007 ? add_more_coverage_request_array.B00007.description : ""
         newInnitialArray.B00011_value = add_more_coverage_request_array.B00011 ? add_more_coverage_request_array.B00011.value : ""
-        newInnitialArray.B00011_description = add_more_coverage_request_array.B00011 ? add_more_coverage_request_array.B00011.description : ""
+        // newInnitialArray.B00011_description = add_more_coverage_request_array.B00011 ? add_more_coverage_request_array.B00011.description : ""
         newInnitialArray.B00070_value = add_more_coverage_request_array.B00070 ? add_more_coverage_request_array.B00070.value : ""    
         newInitialValues = Object.assign(initialValue, newInnitialArray );
 
@@ -1452,7 +1467,7 @@ class OtherComprehensiveGCV extends Component {
                                                 </div>
                                             </FormGroup>
                                         </Col>
-                                        <Col sm={12} md={11} lg={3} key={qIndex+"c"}>
+                                        {/* <Col sm={12} md={11} lg={3} key={qIndex+"c"}>
                                             <FormGroup>
                                                 <div className="formSection">
                                                     <Field
@@ -1475,7 +1490,7 @@ class OtherComprehensiveGCV extends Component {
                                                     ) : null}
                                                 </div>
                                             </FormGroup>
-                                        </Col>
+                                        </Col> */}
                                         </Fragment> : null
                                     }
                                     {values.pa_coolie_flag == '1' && values[coverage.code] == 'B00073' ?

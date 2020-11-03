@@ -209,15 +209,26 @@ const ComprehensiveValidation = Yup.object().shape({
         then: Yup.string().required('Please provide trailer IDV').matches(/^[0-9]*$/, 'Please provide valid IDV'),
         otherwise: Yup.string()
     }),
-    B00011_value: Yup.string().when(['trailer_flag_TP'], {
+    // B00011_value: Yup.string().when(['trailer_flag_TP'], {
+    //     is: trailer_flag_TP => trailer_flag_TP == '1',
+    //     then: Yup.string().required('Please provide No. of trailer').matches(/^[0-9]$/, 'Please provide valid No.'),
+    //     otherwise: Yup.string()
+    // }),
+
+    // B00011_description: Yup.string().when(['trailer_flag_TP'], {
+    //     is: trailer_flag_TP => trailer_flag_TP == '1',
+    //     then: Yup.string().required('Please provide trailer IDV').matches(/^[0-9]*$/, 'Please provide valid IDV'),
+    //     otherwise: Yup.string()
+    // }),
+
+    B00007: Yup.string().when(['trailer_flag_TP'], {
         is: trailer_flag_TP => trailer_flag_TP == '1',
-        then: Yup.string().required('Please provide No. of trailer').matches(/^[0-9]$/, 'Please provide valid No.'),
+        then: Yup.string().required('Please select Trailer OD'),
         otherwise: Yup.string()
     }),
-
-    B00011_description: Yup.string().when(['trailer_flag_TP'], {
-        is: trailer_flag_TP => trailer_flag_TP == '1',
-        then: Yup.string().required('Please provide trailer IDV').matches(/^[0-9]*$/, 'Please provide valid IDV'),
+    B00011: Yup.string().when(['trailer_flag'], {
+        is: trailer_flag => trailer_flag == '1',
+        then:Yup.string().required('Please select Trailer TP'),
         otherwise: Yup.string()
     }),
 
@@ -232,6 +243,25 @@ const ComprehensiveValidation = Yup.object().shape({
                 }
                 return true;
             }) ,
+        otherwise: Yup.string()
+    }),
+
+    B00005_value: Yup.string().when(['CNG_OD_flag'], {
+        is: CNG_OD_flag => CNG_OD_flag == '1',
+        then: Yup.string().required('Please provide IDV').test(
+                "isLoanChecking",
+                function() {
+                    return "Value should be 1K to 5L"
+                },
+                function (value) {
+                    if (parseInt(value) < 1000 || value > 500000) {   
+                        return false;    
+                    }
+                    return true;
+                }
+            ).matches(/^[0-9]*$/, function() {
+                return "Please enter valid IDV"
+            }),
         otherwise: Yup.string()
     }),
 
@@ -395,11 +425,13 @@ class OtherComprehensiveGCV extends Component {
                 let add_more_coverage = []
                 if(vehicleDetails && vehicleDetails.varientmodel && (vehicleDetails.varientmodel.fueltype.id == 8 || vehicleDetails.varientmodel.fueltype.id == 9)) {
                     if(motorInsurance && motorInsurance.policy_for == '1' && motorInsurance.add_more_coverage == null) {
-                        var cov_val = ['B00015', 'B00005']
+                        // var cov_val = ['B00015', 'B00005']
+                        var cov_val = ['B00015']
                         add_more_coverage.push(cov_val);
                     }
                     else if(motorInsurance && motorInsurance.policy_for == '2' && motorInsurance.add_more_coverage == null) {
-                        var cov_val = ['B00005']
+                        // var cov_val = ['B00005']
+                        var cov_val = []
                         add_more_coverage.push(cov_val);
                     }
                     else {
@@ -458,8 +490,8 @@ class OtherComprehensiveGCV extends Component {
                 values.B00007_value = add_more_coverage_request_array.B00007 ? add_more_coverage_request_array.B00007.value : ""
                 values.B00007_description = add_more_coverage_request_array.B00007 ? add_more_coverage_request_array.B00007.description : ""
                 values.B00070_value = add_more_coverage_request_array.B00070 ? add_more_coverage_request_array.B00070.value : ""
-                values.B00011_value = add_more_coverage_request_array.B00011 ? add_more_coverage_request_array.B00011.value : ""
-                values.B00011_description = add_more_coverage_request_array.B00011 ? add_more_coverage_request_array.B00011.description : ""
+                // values.B00011_value = add_more_coverage_request_array.B00011 ? add_more_coverage_request_array.B00011.value : ""
+                // values.B00011_description = add_more_coverage_request_array.B00011 ? add_more_coverage_request_array.B00011.description : ""
                 
 
                 this.setState({
@@ -653,8 +685,9 @@ class OtherComprehensiveGCV extends Component {
                 'B00003' : {'value': values.B00003_value, 'description': values.B00003_description},
                 'B00073' : {'value': values.B00073_value, 'description': values.B00073_description},
                 'B00007' : {'value': values.B00007_value, 'description': values.B00007_description},
-                'B00011' : {'value': values.B00011_value, 'description': values.B00011_description},
-                'B00070' : {'value': values.B00070_value}
+                // 'B00011' : {'value': values.B00011_value, 'description': values.B00011_description},
+                'B00070' : {'value': values.B00070_value},
+                'B00005' : {'value': values.B00005_value}
             }
         }
 
@@ -750,8 +783,9 @@ class OtherComprehensiveGCV extends Component {
                 'B00003' : {'value': values.B00003_value, 'description': values.B00003_description},
                 'B00073' : {'value': values.B00073_value, 'description': values.B00073_description},
                 'B00007' : {'value': values.B00007_value, 'description': values.B00007_description},
-                'B00011' : {'value': values.B00011_value, 'description': values.B00011_description},
-                'B00070' : {'value': values.B00070_value}
+                // 'B00011' : {'value': values.B00011_value, 'description': values.B00011_description},
+                'B00070' : {'value': values.B00070_value},
+                'B00005' : {'value': values.B00005_value}
             }
         }
 
@@ -896,7 +930,11 @@ class OtherComprehensiveGCV extends Component {
                 setFieldTouched("trailer_flag_TP");
                 setFieldValue("trailer_flag_TP", '1');
             }
-
+            if(values == "B00005") {
+                setFieldTouched("CNG_OD_flag");
+                setFieldValue("CNG_OD_flag", '1');
+            }
+            
         }
         else {
             const index = add_more_coverage.indexOf(values);
@@ -970,6 +1008,10 @@ class OtherComprehensiveGCV extends Component {
             if(values == "B00011") {
                 setFieldTouched("trailer_flag_TP");
                 setFieldValue("trailer_flag_TP", '0');
+            }
+            if(values == "B00005") {
+                setFieldTouched("CNG_OD_flag");
+                setFieldValue("CNG_OD_flag", '0');
             }
         }
         
@@ -1051,6 +1093,7 @@ class OtherComprehensiveGCV extends Component {
         let ATC_flag= add_more_coverage_request_array.ATC && add_more_coverage_request_array.ATC.value ? '1' : '0'
         let LL_workman_flag= add_more_coverage_request_array.B00070 && add_more_coverage_request_array.B00070.value ? '1' : '0'
         let trailer_flag_TP = add_more_coverage_request_array.B00011 && add_more_coverage_request_array.B00011.value ? '1' : '0'
+        let CNG_OD_flag = add_more_coverage_request_array.B00005 && add_more_coverage_request_array.B00005.value ? '1' : '0'
         
 
         let newInitialValues = {}
@@ -1065,7 +1108,7 @@ class OtherComprehensiveGCV extends Component {
                 vahanVerify: vahanVerify,
                 newRegistrationNo: localStorage.getItem('registration_number') == "NEW" ? localStorage.getItem('registration_number') : "",
                 B00015: motorInsurance && motorInsurance.policy_for == '2' ? "" : "B00015",
-                B00005 : vehicleDetails && vehicleDetails.varientmodel && (vehicleDetails.varientmodel.fueltype.id == 8 || vehicleDetails.varientmodel.fueltype.id == 9) ? "B00005" : "",
+                // B00005 : vehicleDetails && vehicleDetails.varientmodel && (vehicleDetails.varientmodel.fueltype.id == 8 || vehicleDetails.varientmodel.fueltype.id == 9) ? "B00005" : "",
                 B00006 : vehicleDetails && vehicleDetails.varientmodel && (vehicleDetails.varientmodel.fueltype.id == 3 || vehicleDetails.varientmodel.fueltype.id == 4) ? "B00006" : "",
                 B00010 : vehicleDetails && vehicleDetails.varientmodel && (vehicleDetails.varientmodel.fueltype.id == 3 || vehicleDetails.varientmodel.fueltype.id == 4) ? "B00010" : "",               
                 PA_Cover: "",
@@ -1084,7 +1127,7 @@ class OtherComprehensiveGCV extends Component {
                 ATC_flag: '0',
                 LL_workman_flag: '0',
                 fuel_type: fuel_type,
-                trailer_flag_TP: '0'
+                trailer_flag_TP: '0',
 
             });
         }
@@ -1115,10 +1158,10 @@ class OtherComprehensiveGCV extends Component {
                     fuel_type: fuel_type,
                     trailer_flag_TP: '0',
                     B00015 : "",
-                    B00005 : "",
-                    B00010 : ""
-                });
-        }
+                    // B00005 : "",
+                    B00010 : "",
+                }
+            )}
 
        
 // For setting up updated value from database----------
@@ -1141,6 +1184,7 @@ class OtherComprehensiveGCV extends Component {
         newInnitialArray.LL_workman_flag = LL_workman_flag   
         newInnitialArray.PA_Cover = PA_Cover
         newInnitialArray.trailer_flag_TP = trailer_flag_TP
+        newInnitialArray.CNG_OD_flag = CNG_OD_flag
 
         newInnitialArray.ATC_value = add_more_coverage_request_array.ATC ? add_more_coverage_request_array.ATC.value : ""
         newInnitialArray.B00018_value = add_more_coverage_request_array.B00018 ? add_more_coverage_request_array.B00018.value : ""
@@ -1157,9 +1201,10 @@ class OtherComprehensiveGCV extends Component {
         newInnitialArray.B00073_description = add_more_coverage_request_array.B00073 ? add_more_coverage_request_array.B00073.description : ""
         newInnitialArray.B00007_value = add_more_coverage_request_array.B00007 ? add_more_coverage_request_array.B00007.value : ""
         newInnitialArray.B00007_description = add_more_coverage_request_array.B00007 ? add_more_coverage_request_array.B00007.description : ""
-        newInnitialArray.B00011_value = add_more_coverage_request_array.B00011 ? add_more_coverage_request_array.B00011.value : ""
-        newInnitialArray.B00011_description = add_more_coverage_request_array.B00011 ? add_more_coverage_request_array.B00011.description : ""
+        // newInnitialArray.B00011_value = add_more_coverage_request_array.B00011 ? add_more_coverage_request_array.B00011.value : ""
+        // newInnitialArray.B00011_description = add_more_coverage_request_array.B00011 ? add_more_coverage_request_array.B00011.description : ""
         newInnitialArray.B00070_value = add_more_coverage_request_array.B00070 ? add_more_coverage_request_array.B00070.value : ""    
+        newInnitialArray.B00005_value = add_more_coverage_request_array.B00005 ? add_more_coverage_request_array.B00005.value : ""
         newInitialValues = Object.assign(initialValue, newInnitialArray );
 
 // -------------------------------------------------------
@@ -1545,7 +1590,9 @@ class OtherComprehensiveGCV extends Component {
                                     </FormGroup>
                                 </Col>
                             </Row>
-  
+                                    {errors.B00007 ||  errors.B00011? (
+                                            <span className="errorMsg">{errors.B00007} &nbsp; &nbsp;{errors.B00011}</span>
+                                        ) : null}
 
                                 {moreCoverage && moreCoverage.length > 0 ? moreCoverage.map((coverage, qIndex) => (
                                 <Row key={qIndex}>   
@@ -1655,7 +1702,7 @@ class OtherComprehensiveGCV extends Component {
                                         </Col>
                                         </Fragment> : null
                                     }
-                                    {values.trailer_flag_TP == '1' && values[coverage.code] == 'B00011' ?
+                                    {/* {values.trailer_flag_TP == '1' && values[coverage.code] == 'B00011' ?
                                      <Fragment>
                                         <Col sm={12} md={11} lg={2} key={qIndex+"b"}>
                                             <FormGroup>
@@ -1709,7 +1756,7 @@ class OtherComprehensiveGCV extends Component {
                                             </FormGroup>
                                         </Col>
                                         </Fragment> : null
-                                    }
+                                    } */}
                                     {values.pa_coolie_flag == '1' && values[coverage.code] == 'B00073' ?
                                      <Fragment>
                                         <Col sm={12} md={11} lg={2} key={qIndex+"b"}>
@@ -1865,6 +1912,34 @@ class OtherComprehensiveGCV extends Component {
                                                 </div>
                                             </FormGroup>
                                         </Col> </Fragment> : null
+                                    }
+                                    {values.CNG_OD_flag == '1' && values[coverage.code] == 'B00005' ?
+                                        <Fragment>
+                                        <Col sm={12} md={11} lg={2} key={qIndex+"b"}>
+                                            <FormGroup>
+                                                <div className="formSection">
+                                                    <Field
+                                                        name="B00005_value"
+                                                        type="text"
+                                                        placeholder="IDV"
+                                                        autoComplete="off"
+                                                        maxLength="6"
+                                                        onFocus={e => this.changePlaceHoldClassAdd(e)}
+                                                        onBlur={e => this.changePlaceHoldClassRemove(e)}
+                                                        onChange={(e) => {
+                                                            setFieldTouched('B00005_value')
+                                                            setFieldValue('B00005_value', e.target.value);
+                                                            this.handleChange()
+                                                        }}
+                                                        >                                     
+                                                    </Field>
+                                                    {errors.B00005_value ? (
+                                                        <span className="errorMsg">{errors.B00005_value}</span>
+                                                    ) : null}
+                                                </div>
+                                            </FormGroup>
+                                        </Col>
+                                        </Fragment> : null
                                     }
                                     {values.hospital_cash_OD_flag == '1' && values[coverage.code] == 'B00020' ?
                                         <Fragment>
