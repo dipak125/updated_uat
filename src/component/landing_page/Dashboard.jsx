@@ -67,6 +67,7 @@ class Dashboard extends Component {
     update_data: [],
     posts: [],
     search_flag: 1,
+    flag: 1
   };
 
   handleSubmit = (values) => {
@@ -92,9 +93,17 @@ class Dashboard extends Component {
       .catch((err) => {
         this.props.loadingStop();
       });
-  };
+  };  
 
-  fetchChartData = (rawData, flag) => {
+  handleChangeChart = (value) => {
+    if (value == "1") {
+      this.setState({ flag: 1 });
+    } else if (value == "2") {
+      this.setState({ flag: 2 });
+  };
+}
+
+  fetchChartData = (rawData) => {
     let motor_policy_count = 0;
     let health_policy_count = 0;
     let motor_premium_count = 0;
@@ -121,8 +130,10 @@ class Dashboard extends Component {
 
     let total_premium_count =
       parseInt(motor_premium_count) + parseInt(health_premium_count);
-
+    
     let chartData = {};
+    const { flag } = this.state;
+    console.log("flag-----",flag)
     if (flag == 1) {
       chartData = {
         labels: ["Motor", "Health", "Total"],
@@ -202,7 +213,7 @@ class Dashboard extends Component {
       setFieldValue("end_date", end_date);
     } else if (search_flag == 3) {
       let start_date = startDate;
-      let end_date = new Date(moment(start_date).add(29, "day").calendar());
+      let end_date = new Date(moment(start_date).add(30, "day").calendar());
 
       setFieldTouched("start_date");
       setFieldValue("start_date", start_date);
@@ -234,7 +245,8 @@ class Dashboard extends Component {
     // const {update_data} = this.state
 
     // let newInitialValues = Object.assign()
-    const { chartData, rawData, update_data, search_flag } = this.state;
+    const { chartData, rawData, update_data, search_flag, report_chart, flag } = this.state;
+    console.log("Stateflag------",flag)
     // console.log("raw-data----------",rawData)
     let healthList =
       rawData && rawData.health && rawData.health.length > 0
@@ -390,12 +402,12 @@ class Dashboard extends Component {
                                                     className="formGrp inputfs12"
                                                     value={values.report_chart}
                                                     onChange={(e) => {
+                                                      this.handleChangeChart(e.target.value)
                                                       setFieldTouched(
                                                         "report_chart"
                                                       );
                                                       setFieldValue(
-                                                        "report_chart",
-                                                        e.target.value
+                                                        "report_chart"
                                                       );
                                                       this.fetchChartData(
                                                         rawData,
@@ -416,7 +428,7 @@ class Dashboard extends Component {
                                               </FormGroup>
                                             </Col>
                                             {/* {values.report_range != "" ? ( */}
-                                              <Col sm={12} md={5} lg={6}>
+                                              <Col sm={6} md={5} lg={6}>
                                                 <FormGroup className="dashboard-date">
                                                   {values.report_range !=
                                                   "4" ? (

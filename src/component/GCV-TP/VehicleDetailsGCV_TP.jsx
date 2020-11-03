@@ -67,7 +67,8 @@ const vehicleRegistrationValidation = Yup.object().shape({
         "Registration date cannot be older than one month",
         function (value) {
             if (value && this.parent.policy_type_id == '1') {
-                return checkGreaterStartEndTimes(value, new Date()) && checkGreaterStartEndTimes(minRegnDateNew, value);
+                // return checkGreaterStartEndTimes(value, new Date()) && checkGreaterStartEndTimes(minRegnDateNew, value);
+                return checkGreaterStartEndTimes(value, new Date()) && Math.floor(moment(minRegnDateNew).diff(value, 'days', true)<0); 
             }
             return true;
         }
@@ -471,7 +472,7 @@ class VehicleDetailsGCV extends Component {
             } 
         }
 
-        if(ageDiff < 1 && motorInsurance && motorInsurance.registration_no == "") {
+        if(motorInsurance && motorInsurance.policytype_id == '1' && motorInsurance && motorInsurance.registration_no == "") {
             localStorage.setItem('registration_number', "NEW");
         }
         else {

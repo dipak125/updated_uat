@@ -221,16 +221,16 @@ const ComprehensiveValidation = Yup.object().shape({
     //     otherwise: Yup.string()
     // }),
 
-    B00007: Yup.string().when(['trailer_flag_TP'], {
-        is: trailer_flag_TP => trailer_flag_TP == '1',
-        then: Yup.string().required('Please select Trailer OD'),
-        otherwise: Yup.string()
-    }),
-    B00011: Yup.string().when(['trailer_flag'], {
-        is: trailer_flag => trailer_flag == '1',
-        then:Yup.string().required('Please select Trailer TP'),
-        otherwise: Yup.string()
-    }),
+    // B00007: Yup.string().when(['trailer_flag_TP'], {
+    //     is: trailer_flag_TP => trailer_flag_TP == '1',
+    //     then: Yup.string().required('Please select Trailer OD'),
+    //     otherwise: Yup.string()
+    // }),
+    // B00011: Yup.string().when(['trailer_flag'], {
+    //     is: trailer_flag => trailer_flag == '1',
+    //     then:Yup.string().required('Please select Trailer TP'),
+    //     otherwise: Yup.string()
+    // }),
 
     B00010: Yup.string().when(['fuel_type'], {
         is: fuel_type => fuel_type == '3' || fuel_type == '4',
