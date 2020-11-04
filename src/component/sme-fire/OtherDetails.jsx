@@ -14,6 +14,7 @@ import axios from "../../shared/axios"
 import moment from "moment";
 import Encryption from '../../shared/payload-encryption';
 import {  PersonAge } from "../../shared/dateFunctions";
+import { setSmeOthersDetailsData } from '../../store/actions/sme_fire';
 
 
 const ageObj = new PersonAge();
@@ -39,7 +40,11 @@ const initialValue = {
     previous_policy_no: ""
 }
 const vehicleRegistrationValidation = Yup.object().shape({
-
+    previous_start_date : Yup.date().required("Please select previous policy start date").nullable(),
+    previous_end_date : Yup.date().required("Please select previous policy end date").nullable(),
+    Previous_Policy_No : Yup.string().required("Please select previous policy number").nullable(),
+    // insurance_company_id : Yup.number().required("Please select insurance company name").nullable(),
+    // previous_city : Yup.string().required("Please select policy start date").nullable()
 });
 
 
@@ -58,7 +63,11 @@ class OtherDetails extends Component {
         selectedCustomerRecords: [],
         CustIdkeyword: "",
         RTO_location: "",
-        previous_is_claim: ""
+        previous_is_claim: "",
+
+        content_sum_insured:"",
+        stock_sum_insured:"",
+        consequence_response:""
     };
 
     changePlaceHoldClassAdd(e) {
@@ -75,11 +84,58 @@ class OtherDetails extends Component {
     }
 
 
-    handleSubmit = (values, actions) => {
-        const {productId} = this.props.match.params 
-        const {motorInsurance} = this.state
-        this.props.history.push(`/AdditionalDetails_SME/${productId}`);
+    // handleSubmit = (values, actions) => {
+    //     const {productId} = this.props.match.params 
+    //     const {motorInsurance} = this.state
+    //     this.props.history.push(`/AdditionalDetails_SME/${productId}`);
       
+    // }
+
+    handleSubmit=(values)=>{
+        const formData = new FormData();
+        let previous_start_date = moment(values.previous_start_date).format('YYYY-MM-DD')
+        let previous_end_date = moment(values.previous_end_date).format('YYYY-MM-DD')
+
+        formData.append('policy_holder_id',this.props.policy_holder_id)
+        formData.append('menumaster_id',this.props.menumaster_id)
+        
+        formData.append('previous_start_date', previous_start_date)
+        formData.append('previous_end_date',previous_end_date)
+
+
+        formData.append('previous_policy_no',values.Previous_Policy_No)
+        formData.append('insurance_company_id','5')
+        // values.insurance_company_id
+        formData.append('address',"kolkata")
+        // values.previous_city
+
+        this.props.loadingStart();
+
+        axios.post('sme/previous-policy-details',
+        formData
+        ).then(res=>{       
+ 
+            this.props.loadingStop();
+            this.props.setSmeOthersDetails({
+                
+                previous_start_date:values.previous_start_date,
+                previous_end_date:values.previous_end_date,
+                Previous_Policy_No:values.Previous_Policy_No,
+                insurance_company_id:'5',
+                previous_city:'kolkata'
+
+            });
+            const {productId} = this.props.match.params;
+            this.props.history.push(`/AdditionalDetails_SME/${productId}`);
+        }).
+        catch(err=>{
+            // let decryptErr = JSON.parse(encryption.decrypt(err.data));
+            // console.log('decryptResp--err---', decryptErr)
+            // if(decryptErr && err.data){
+            //     swal('Registration number required...');
+            // }
+        this.props.loadingStop();
+        })
     }
 
 
@@ -98,34 +154,26 @@ class OtherDetails extends Component {
       }
 
     fetchData = () => {
-        const { productId } = this.props.match.params
-        let policyHolder_id = localStorage.getItem("policyHolder_refNo") ? localStorage.getItem("policyHolder_refNo") : 0;
-        let encryption = new Encryption();
         this.props.loadingStart();
-        axios.get(`policy-holder/motor/${policyHolder_id}`)
-            .then(res => {
-                 let decryptResp = JSON.parse(encryption.decrypt(res.data))
-                 console.log("decrypt", decryptResp)
-                 let motorInsurance = decryptResp.data.policyHolder ? decryptResp.data.policyHolder.motorinsurance : {};
-                 let previousPolicy = decryptResp.data.policyHolder ? decryptResp.data.policyHolder.previouspolicy : {};
-                 let vehicleDetails = decryptResp.data.policyHolder ? decryptResp.data.policyHolder.vehiclebrandmodel : {};
-                 let RTO_location = motorInsurance && motorInsurance.location && motorInsurance.location.RTO_LOCATION ? motorInsurance.location.RTO_LOCATION : ""
-                 let previous_is_claim= previousPolicy && (previousPolicy.is_claim == 0 || previousPolicy.is_claim == 1) ? previousPolicy.is_claim : ""
-                this.setState({
-                    motorInsurance, previousPolicy, vehicleDetails,RTO_location, previous_is_claim
-                })
-                this.props.loadingStop();
-            })
-            .catch(err => {
-                // handle error
-                this.props.loadingStop();
-            })
+        axios.get(`sme/details/${this.props.policy_holder_ref_no}`)
+        .then(res => {
+            console.log('fetch_data',res.data.data); 
+            this.setState({
+                content_sum_insured:res.data.data.policyHolder.smeinfo.content_sum_insured,
+                stock_sum_insured:res.data.data.policyHolder.smeinfo.stock_sum_insured
+            });
+            this.props.loadingStop();
+        })
+        .catch(err => {
+            // handle error
+            this.props.loadingStop();
+        })
     }
 
 
     componentDidMount() {
         // this.getInsurerList();
-        // this.fetchData();
+        this.fetchData();
         
     }
     RiskDetails = (productId) => {
@@ -137,7 +185,13 @@ class OtherDetails extends Component {
         const {insurerList, showClaim, previous_is_claim, motorInsurance, previousPolicy,
             CustomerID,suggestions, vehicleDetails, RTO_location} = this.state
 
-        let newInitialValues = Object.assign(initialValue);
+        let newInitialValues = Object.assign(initialValue,{
+            previous_start_date:this.props.previous_start_date != null?new Date(this.props.previous_start_date):this.props.previous_start_date,
+            previous_end_date:this.props.previous_end_date != null?new Date(this.props.previous_end_date):this.props.previous_end_date,
+            Previous_Policy_No:this.props.Previous_Policy_No,
+            insurance_company_id:this.props.insurance_company_id,
+            previous_city:this.props.previous_city
+        });
 
         return (
             <>
@@ -175,7 +229,8 @@ class OtherDetails extends Component {
                                                                 autoComplete="off"
                                                                 onFocus={e => this.changePlaceHoldClassAdd(e)}
                                                                 onBlur={e => this.changePlaceHoldClassRemove(e)}
-                                                                value = {values.Contents_Sum_Insured}                                                                            
+                                                                value = {this.state.content_sum_insured}     
+                                                                disabled={true}                                                                       
                                                             />
                                                             {errors.Contents_Sum_Insured && touched.Contents_Sum_Insured ? (
                                                             <span className="errorMsg">{errors.Contents_Sum_Insured}</span>
@@ -193,7 +248,8 @@ class OtherDetails extends Component {
                                                                 autoComplete="off"
                                                                 onFocus={e => this.changePlaceHoldClassAdd(e)}
                                                                 onBlur={e => this.changePlaceHoldClassRemove(e)}
-                                                                value = {values.Stocks_Sum_Insured}                                                                            
+                                                                value = {this.state.stock_sum_insured}
+                                                                disabled={true}                                                                              
                                                             />
                                                             {errors.Stocks_Sum_Insured && touched.Stocks_Sum_Insured ? (
                                                             <span className="errorMsg">{errors.Stocks_Sum_Insured}</span>
@@ -217,7 +273,7 @@ class OtherDetails extends Component {
                                                     </div>
                                                 </div>   
                                                 <Row> 
-                                                    <Col sm={12} md={4} lg={4}>
+                                                    {/* <Col sm={12} md={4} lg={4}>
                                                         <FormGroup>
                                                             <div className="formSection">
                                                                 <Field
@@ -235,7 +291,7 @@ class OtherDetails extends Component {
                                                                 ) : null}     
                                                             </div>
                                                         </FormGroup>   
-                                                    </Col>
+                                                    </Col> */}
                                                     <Col sm={12} md={4} lg={4}>
                                                         <FormGroup>
                                                             <div className="insurerName">
@@ -246,7 +302,8 @@ class OtherDetails extends Component {
                                                                 autoComplete="off"
                                                                 onFocus={e => this.changePlaceHoldClassAdd(e)}
                                                                 onBlur={e => this.changePlaceHoldClassRemove(e)}
-                                                                value = {values.Commercial_consideration}                                                                            
+                                                                value = {this.state.consequence_response}
+                                                                // disabled={true}                                                                       
                                                             />
                                                             {errors.Commercial_consideration && touched.Commercial_consideration ? (
                                                             <span className="errorMsg">{errors.Commercial_consideration}</span>
@@ -254,7 +311,7 @@ class OtherDetails extends Component {
                                                             </div>
                                                         </FormGroup>
                                                     </Col>
-                                                    <Col sm={12} md={4} lg={4}>
+                                                    {/* <Col sm={12} md={4} lg={4}>
                                                         <FormGroup>
                                                             <div className="insurerName">
                                                             <Field
@@ -271,7 +328,7 @@ class OtherDetails extends Component {
                                                             ) : null}  
                                                             </div>
                                                         </FormGroup>
-                                                    </Col>                
+                                                    </Col>                 */}
                                                 </Row> 
                                             </Col>
                                         </Row> 
@@ -305,7 +362,8 @@ class OtherDetails extends Component {
                                                                 className="datePckr inputfs12"
                                                                 selected={values.previous_start_date}
                                                                 onChange={(val) => {
-                                                                   
+                                                                    setFieldTouched('previous_start_date')
+                                                                    setFieldValue('previous_start_date', val);
                                                                 }}
                                                             />
                                                             {errors.previous_start_date && touched.previous_start_date ? (
@@ -320,7 +378,7 @@ class OtherDetails extends Component {
                                                                 name="previous_end_date"
                                                                 dateFormat="dd MMM yyyy"
                                                                 placeholderText="Policy end date"
-                                                                disabled = {true}
+                                                                // disabled = {true}
                                                                 dropdownMode="select"
                                                                 className="datePckr inputfs12"
                                                                 selected={values.previous_end_date}
@@ -400,7 +458,7 @@ class OtherDetails extends Component {
                                         </div>
                                     
                                         <div className="d-flex justify-content-left resmb">
-                                        <Button className={`backBtn`} type="button"  disabled={isSubmitting ? true : false} onClick= {this.RiskDetails.bind(this,productId)} >
+                                        <Button className={`backBtn`} type="button"  onClick= {this.RiskDetails.bind(this,productId)} >
                                             {isSubmitting ? 'Wait..' : 'Back'}
                                         </Button> 
                                         <Button className={`proceedBtn`} type="submit"  disabled={isSubmitting ? true : false}>
@@ -427,14 +485,23 @@ class OtherDetails extends Component {
 
 const mapStateToProps = state => {
     return {
-      loading: state.loader.loading
+      loading: state.loader.loading,
+      policy_holder_ref_no:state.sme_fire.policy_holder_ref_no,
+      previous_start_date:state.sme_fire.previous_start_date,
+      previous_end_date:state.sme_fire.previous_end_date,
+      Previous_Policy_No:state.sme_fire.Previous_Policy_No,
+      insurance_company_id:state.sme_fire.insurance_company_id,
+      previous_city:state.sme_fire.previous_city,
+      menumaster_id:state.sme_fire.menumaster_id,
+      policy_holder_id:state.sme_fire.policy_holder_id
     };
   };
   
   const mapDispatchToProps = dispatch => {
     return {
       loadingStart: () => dispatch(loaderStart()),
-      loadingStop: () => dispatch(loaderStop())
+      loadingStop: () => dispatch(loaderStop()),
+      setSmeOthersDetails:(data) => dispatch(setSmeOthersDetailsData(data))
     };
   };
 

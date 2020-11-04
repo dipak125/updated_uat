@@ -14,6 +14,7 @@ import axios from "../../shared/axios"
 import moment from "moment";
 import Encryption from '../../shared/payload-encryption';
 import {  PersonAge } from "../../shared/dateFunctions";
+import { setSmeRiskData } from '../../store/actions/sme_fire';
 
 
 const ageObj = new PersonAge();
@@ -41,19 +42,7 @@ const initialValue = {
     pinDataArr: [],
 }
 
-const vehicleRegistrationValidation = Yup.object().shape({
-    house_building_name: Yup.string().required("Please enter building name"),
-    block_no: Yup.string().required("Please enter block no."),
-    house_flat_no: Yup.string().required("Please enter house/flat no."),
-    pincode: Yup.string().required('Pincode is required')
-    .matches(/^[0-9]{6}$/, function() {
-        return "Please enter valid pin code"
-    }),
-    pincode_id: Yup.string().required("Please select area"),
-    buildings_sum_insured: Yup.string().required("Please enter building sum insured"),
-    content_sum_insured: Yup.string().required("Please enter content sum insured"),
-    stock_sum_insured: Yup.string().required("Please enter stock sum insured"),
-})
+
 
 
 
@@ -164,15 +153,45 @@ class RiskDetails extends Component {
             })          
         }       
     }
+
+    fetchAreadetailsBack=()=>{
+        if(this.props.pincode != null && this.props.pincode != '' && this.props.pincode.length==6){
+            let pinCode = this.props.pincode;      
+
+            if(pinCode.length==6){
+                const formData = new FormData();
+                this.props.loadingStart();
+                let encryption = new Encryption();
+                const post_data_obj = {
+                    'pincode':pinCode
+                };
+                formData.append('enc_data',encryption.encrypt(JSON.stringify(post_data_obj)))
+                formData.append('pincode',pinCode)
+                axios.post('pincode-details',
+                formData
+                ).then(res=>{       
+                    let stateName = res.data.data && res.data.data[0] && res.data.data[0].pinstate.STATE_NM ? res.data.data[0].pinstate.STATE_NM : ""                        
+                    this.setState({
+                        pinDataArr: res.data.data,
+                        stateName,
+                    });
+                    this.props.loadingStop();
+                }).
+                catch(err=>{
+                    this.props.loadingStop();
+                })          
+            }
+        }       
+    }
     
     handleSubmit=(values)=>{
         console.log('handleSubmit', values);
         // console.log("policyHolder_id-------->",policyHolder_id)
         const formData = new FormData();
         
-        formData.append('policy_holder_id','3229')
-        formData.append('menumaster_id','5')
-        formData.append('street_name','NH-34')
+        formData.append('policy_holder_id',this.props.policy_holder_id)
+        formData.append('menumaster_id',this.props.menumaster_id)
+        formData.append('street_name',values.street_name)
         // formData.append('bcmaster_id','1')house_flat_no salutation
         // let pol_start_date = moment(values.start_date).format('YYYY-MM-DD HH:MM:SS')
         // let pol_end_date = moment(values.end_date).format('YYYY-MM-DD HH:MM:SS')
@@ -192,6 +211,21 @@ class RiskDetails extends Component {
         ).then(res=>{       
             console.log('res', res)
             this.props.loadingStop();
+            this.props.setRiskData(
+                {
+
+                    house_building_name:values.house_building_name,
+                    block_no:values.block_no,
+                    street_name:values.street_name,
+                    content_sum_insured:values.content_sum_insured,
+                    house_flat_no:values.house_flat_no,
+                    pincode:values.pincode,
+                    pincode_id:values.pincode_id,
+                    buildings_sum_insured:values.buildings_sum_insured,
+                    content_sum_insured:values.content_sum_insured,
+                    stock_sum_insured:values.stock_sum_insured
+                }
+            );
             const {productId} = this.props.match.params;
             this.props.history.push(`/OtherDetails/${productId}`);
         }).
@@ -204,6 +238,7 @@ class RiskDetails extends Component {
     componentDidMount() {
         // this.getInsurerList();
         this.fetchData();
+        this.fetchAreadetailsBack();
         
     }
     Registration_SME = (productId) => {
@@ -215,7 +250,32 @@ class RiskDetails extends Component {
         const {insurerList, showClaim, previous_is_claim, motorInsurance, previousPolicy,
             stateName,pinDataArr,CustomerID,suggestions, vehicleDetails, RTO_location} = this.state
 
-        let newInitialValues = Object.assign(initialValue);
+        let newInitialValues = Object.assign(initialValue,{
+            house_building_name:this.props.house_building_name,
+            block_no:this.props.block_no,
+            street_name:'5H',
+            content_sum_insured:this.props.content_sum_insured,
+            house_flat_no:this.props.house_flat_no,
+            pincode:this.props.pincode,
+            pincode_id:this.props.pincode_id,
+            buildings_sum_insured:this.props.buildings_sum_insured,
+            content_sum_insured:this.props.content_sum_insured,
+            stock_sum_insured:this.props.stock_sum_insured
+        });
+
+        const vehicleRegistrationValidation = Yup.object().shape({
+            house_building_name: Yup.string().required("Please enter building name").nullable(),
+            block_no: Yup.string().required("Please enter block no.").nullable(),
+            house_flat_no: Yup.string().required("Please enter house/flat no.").nullable(),
+            pincode: Yup.string().required('Pincode is required')
+            .matches(/^[0-9]{6}$/, function() {
+                return "Please enter valid pin code"
+            }).nullable(),
+            pincode_id: Yup.string().required("Please select area").nullable(),
+            buildings_sum_insured: Yup.number().required("Please enter building sum insured").nullable(),
+            content_sum_insured: Yup.number().required("Please enter content sum insured").nullable(),
+            stock_sum_insured: Yup.number().required("Please enter stock sum insured").nullable(),
+        })
 
         return (
             <>
@@ -410,6 +470,7 @@ class RiskDetails extends Component {
                                                                 name='buildings_sum_insured'
                                                                 type="text"
                                                                 placeholder="Fire-Building-Sum Insured"
+                                                                maxLength='6'
                                                                 autoComplete="off"
                                                                 onFocus={e => this.changePlaceHoldClassAdd(e)}
                                                                 onBlur={e => this.changePlaceHoldClassRemove(e)}
@@ -429,12 +490,11 @@ class RiskDetails extends Component {
                                                                 type="text"
                                                                 placeholder="Fire-Contents Sum Insured"
                                                                 autoComplete="off"
-                                                                // maxlength = "6"
+                                                                maxlength = '6'
                                                                 onFocus={e => this.changePlaceHoldClassAdd(e)}
                                                                 onBlur={e => this.changePlaceHoldClassRemove(e)}
                                                                 onKeyUp={e=> this.fetchAreadetails(e)}
                                                                 value={values.content_sum_insured}
-                                                                maxLength="6"
                                                                 onInput= {(e)=> {
                                                                     setFieldTouched("content_sum_insured");
                                                                     setFieldValue("content_sum_insured", e.target.value);  
@@ -453,6 +513,7 @@ class RiskDetails extends Component {
                                                                 name='stock_sum_insured'
                                                                 type="text"
                                                                 placeholder="Fire-Stock Sum Insured"
+                                                                maxlength='6'
                                                                 autoComplete="off"
                                                                 onFocus={e => this.changePlaceHoldClassAdd(e)}
                                                                 onBlur={e => this.changePlaceHoldClassRemove(e)}
@@ -471,10 +532,13 @@ class RiskDetails extends Component {
                                                 </div>
                                             
                                                 <div className="d-flex justify-content-left resmb">
-                                                <Button className={`backBtn`} type="button"  disabled={isSubmitting ? true : false} onClick= {this.Registration_SME.bind(this,productId)} >
+                                                <a href="javascript:void(0);" className={`backBtn`} onClick= {this.Registration_SME.bind(this,productId)} >
                                                     {isSubmitting ? 'Wait..' : 'Back'}
-                                                </Button> 
-                                                <Button className={`proceedBtn`} type="submit"  disabled={isSubmitting ? true : false}>
+                                                </a>
+                                                {/* <Button className={`backBtn`} type="button" onClick= {this.Registration_SME.bind(this,productId)} >
+                                                    {isSubmitting ? 'Wait..' : 'Back'}
+                                                </Button>  */}
+                                                <Button className={`proceedBtn`} type="submit" disabled={isValid ? false : true} >
                                                     {isSubmitting ? 'Wait..' : 'Next'}
                                                 </Button> 
                                                 </div>
@@ -501,14 +565,27 @@ class RiskDetails extends Component {
 
 const mapStateToProps = state => {
     return {
-      loading: state.loader.loading
+      loading: state.loader.loading,
+      house_building_name: state.sme_fire.house_building_name,
+      block_no: state.sme_fire.block_no,
+      street_name: state.sme_fire.street_name,
+      content_sum_insured: state.sme_fire.content_sum_insured,
+      house_flat_no: state.sme_fire.house_flat_no,
+      pincode: state.sme_fire.pincode,
+      pincode_id: state.sme_fire.pincode_id,
+      buildings_sum_insured: state.sme_fire.buildings_sum_insured,
+      content_sum_insured: state.sme_fire.content_sum_insured,
+      stock_sum_insured: state.sme_fire.stock_sum_insured,
+      policy_holder_id:state.sme_fire.policy_holder_id,
+      menumaster_id:state.sme_fire.menumaster_id
     };
   };
   
   const mapDispatchToProps = dispatch => {
     return {
       loadingStart: () => dispatch(loaderStart()),
-      loadingStop: () => dispatch(loaderStop())
+      loadingStop: () => dispatch(loaderStop()),
+      setRiskData:(data) => dispatch(setSmeRiskData(data))
     };
   };
 

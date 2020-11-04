@@ -7,7 +7,7 @@ import Footer from '../common/footer/Footer';
 import axios from "../../shared/axios";
 import { withRouter } from 'react-router-dom';
 import { loaderStart, loaderStop } from "../../store/actions/loader";
-import { setSmeData } from "../../store/actions/sme_fire";
+import { setSmeData,setSmeUpdateData } from "../../store/actions/sme_fire";
 import { connect } from "react-redux";
 import moment from "moment";
 import * as Yup from 'yup';
@@ -85,51 +85,93 @@ fetchData=()=>{
         const formData = new FormData();
         formData.append('menumaster_id','5')
         formData.append('bcmaster_id','1')
-        formData.append('vehicle_type_id','5')
+        formData.append('vehicle_type_id','9')
         let pol_start_date = moment(values.pol_start_date).format('YYYY-MM-DD HH:mm:ss')
         let pol_end_date = moment(values.pol_end_date).format('YYYY-MM-DD HH:mm:ss')
         formData.append('pol_start_date', pol_start_date)
         formData.append('pol_end_date',pol_end_date)
         this.props.loadingStart();
-        axios.post('sme/policy-info',
-        formData
-        ).then(res=>{       
-            console.log('res', res.data.data.policyHolder_id)
-            // localStorage.setItem(res.data.data.policyHolder_id)
-            // this.props.loadingStop();
-            // let decrypryption.decrypt(res.data))
-            // console.log("decrypt", decryptResp)
 
-            // if(decryptResp.error == false) {
-            //     this.props.history.push(`/RiskDetails/${productId}`);
-            // }
-            // else{
-            //     // swal(decryptResp.msg)
-            // }   
+        if(this.props.policy_holder_id != null){
+            formData.append('policy_holder_id',this.props.policy_holder_id);
+            axios.post('sme/update-policy-info',
+            formData
+            ).then(res=>{       
+                console.log('res', res.data.data.policyHolder_id)
+                // localStorage.setItem(res.data.data.policyHolder_id)
+                // this.props.loadingStop();
+                // let decrypryption.decrypt(res.data))
+                // console.log("decrypt", decryptResp)
+
+                // if(decryptResp.error == false) {
+                //     this.props.history.push(`/RiskDetails/${productId}`);
+                // }
+                // else{
+                //     // swal(decryptResp.msg)
+                // }   
+                this.props.loadingStop();
+                this.props.setDataUpdate({
+                    start_date:values.pol_start_date,
+                    end_date:values.pol_end_date
+                });
+                const {productId} = this.props.match.params;
+                this.props.history.push(`/RiskDetails/${productId}`);
+            }).
+            catch(err=>{
+                // let decryptErr = JSON.parse(encryption.decrypt(err.data));
+                // console.log('decryptResp--err---', decryptErr)
+                // if(decryptErr && err.data){
+                //     swal('Registration number required...');
+                // }
             this.props.loadingStop();
-            this.props.setData({start_date:values.pol_start_date,end_date:values.pol_end_date});
-            const {productId} = this.props.match.params;
-            this.props.history.push(`/RiskDetails/${productId}`);
-        }).
-        catch(err=>{
-            // let decryptErr = JSON.parse(encryption.decrypt(err.data));
-            // console.log('decryptResp--err---', decryptErr)
-            // if(decryptErr && err.data){
-            //     swal('Registration number required...');
-            // }
-        this.props.loadingStop();
-        })
-        
+            })
+        }else{
+            axios.post('sme/policy-info',
+            formData
+            ).then(res=>{       
+                console.log('res', res.data.data.policyHolder_id)
+                // localStorage.setItem(res.data.data.policyHolder_id)
+                // this.props.loadingStop();
+                // let decrypryption.decrypt(res.data))
+                // console.log("decrypt", decryptResp)
+
+                // if(decryptResp.error == false) {
+                //     this.props.history.push(`/RiskDetails/${productId}`);
+                // }
+                // else{
+                //     // swal(decryptResp.msg)
+                // }   
+                this.props.loadingStop();
+                this.props.setData({
+                    start_date:values.pol_start_date,
+                    end_date:values.pol_end_date,
+                    
+                    policy_holder_id:res.data.data.policyHolder_id,
+                    policy_holder_ref_no:res.data.data.policyHolder_refNo,
+                    request_data_id:res.data.data.request_data_id,
+                    completed_step:res.data.data.completedStep,
+                    menumaster_id:res.data.data.menumaster_id
+                });
+                const {productId} = this.props.match.params;
+                this.props.history.push(`/RiskDetails/${productId}`);
+            }).
+            catch(err=>{
+                // let decryptErr = JSON.parse(encryption.decrypt(err.data));
+                // console.log('decryptResp--err---', decryptErr)
+                // if(decryptErr && err.data){
+                //     swal('Registration number required...');
+                // }
+            this.props.loadingStop();
+            })
+        }
     }
 
 
-
     render() {
-        console.log('sme_data',this.props.sme_data);
         const {motorInsurance} = this.state
         const newInitialValues = Object.assign(initialValues,{
-            pol_start_date:this.props.sme_data.start_date != null?new Date(this.props.sme_data.start_date):this.props.sme_data.start_date,
-            pol_end_date:this.props.sme_data.end_date != null?new Date(this.props.sme_data.end_date):this.props.sme_data.end_date
+            pol_start_date:this.props.start_date != null?new Date(this.props.start_date):this.props.start_date,
+            pol_end_date:this.props.end_date != null?new Date(this.props.end_date):this.props.end_date
         })
 
         return (
@@ -376,7 +418,9 @@ fetchData=()=>{
 const mapStateToProps = state => {
     return {
       loading: state.loader.loading,
-      sme_data: state.sme_fire.sme_data
+      start_date: state.sme_fire.start_date,
+      end_date: state.sme_fire.end_date,
+      policy_holder_id: state.sme_fire.policy_holder_id
     };
   };
   
@@ -384,7 +428,8 @@ const mapStateToProps = state => {
     return {
       loadingStart: () => dispatch(loaderStart()),
       loadingStop: () => dispatch(loaderStop()),
-      setData:(data) => dispatch(setSmeData(data))
+      setData:(data) => dispatch(setSmeData(data)),
+      setDataUpdate:(data) => dispatch(setSmeUpdateData(data))
     };
   };
 

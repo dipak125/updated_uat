@@ -15,6 +15,7 @@ import axios from "../../shared/axios"
 import moment from "moment";
 import {  PersonAge } from "../../shared/dateFunctions";
 import Encryption from '../../shared/payload-encryption';
+import { setSmeProposerDetailsData } from '../../store/actions/sme_fire';
 
 
 const minDobAdult = moment(moment().subtract(100, 'years').calendar())
@@ -29,8 +30,8 @@ const initialValue = {
     first_name:"",
     last_name:"",
     gender:"",
-    dob: "",
-    pancard:"",
+    date_of_birth: "",
+    pan_no:"",
     pincode:"",
     is_carloan:"",
     bank_name:"",
@@ -40,8 +41,8 @@ const initialValue = {
     nominee_last_name:"test",
     gender:"",
     nominee_dob: "",
-    phone: "",
-    email: "",
+    mobile: "",
+    email_id: "",
     address: "",
     is_eia_account: "0",
     eia_no: "",
@@ -54,42 +55,31 @@ const initialValue = {
 }
 
 const vehicleRegistrationValidation = Yup.object().shape({
-    first_name: Yup.string().required('Name is required')
-    .min(3, function() {
-        return "First name must be 3 characters"
-    })
-    .max(40, function() {
-        return "First name must be maximum 40 characters"
-    }),
-    last_name: Yup.string().required('Name is required')
-    .min(3, function() {
-        return "Last name must be 3 characters"
-    })
-    .max(40, function() {
-        return "Last name must be maximum 40 characters"
-    }),
-    date_of_birth: Yup.string().required("Please enter date of birth"),
-    email: Yup.string().email().required('Email is required').min(8, function() {
+    first_name: Yup.string().required('Name is required').nullable(),
+    last_name: Yup.string().required('Name is required').nullable(),
+    date_of_birth: Yup.date().required("Please enter date of birth").nullable(),
+    email_id: Yup.string().email().required('Email is required').min(8, function() {
         return "Email must be minimum 8 characters"
     })
     .max(75, function() {
         return "Email must be maximum 75 characters"
-    }).matches(/^[a-zA-Z0-9]+([._\-]?[a-zA-Z0-9]+)*@\w+([-]?\w+)*(\.\w{2,3})+$/,'Invalid Email Id'),
-    phone: Yup.string()
-    .matches(/^[6-9][0-9]{9}$/,'Invalid Mobile number').required('Phone No. is required'),
-    gender: Yup.string().required("Please select gender"),
-    pancard: Yup.string().notRequired(function() {
+    }).matches(/^[a-zA-Z0-9]+([._\-]?[a-zA-Z0-9]+)*@\w+([-]?\w+)*(\.\w{2,3})+$/,'Invalid Email Id').nullable(),
+    mobile: Yup.string()
+    .matches(/^[6-9][0-9]{9}$/,'Invalid Mobile number').required('mobile No. is required').nullable(),
+    gender: Yup.string().required("Please select gender").nullable(),
+    pan_no: Yup.string().notRequired(function() {
         return "Enter PAN number"
     }).matches(/^[A-Z]{3}[CPHFATBLJG]{1}[A-Z]{1}[0-9]{4}[A-Z]{1}$/, function() {
         return "Please enter valid Pan Number"
-    }),
+    }).nullable(),
     gstn_no: Yup.string().required("Please enter GSTN number")
     .matches(/^[0-9]{2}[A-Z]{3}[CPHFATBLJG]{1}[A-Z]{1}[0-9]{4}[A-Z]{1}[0-9]{1}[A-Z]{1}[0-9]{1}$/,'Invalid GSTIN'),
-    building_name: Yup.string().required("Please enter building name"),
-    plot_no: Yup.string().required("Please enter plot number"),
-    street_name: Yup.string().required("Please enter street name"),
-    pincode: Yup.string().required("Please enter pincode"),
-    pincode_id: Yup.string().required("Please select area"),
+    //11AAACC7777A7A7
+    building_name: Yup.string().required("Please enter building name").nullable(),
+    plot_no: Yup.string().required("Please enter plot number").nullable(),
+    street_name: Yup.string().required("Please enter street name").nullable(),
+    pincode: Yup.string().required("Please enter pincode").nullable(),
+    pincode_id: Yup.string().required("Please select area").nullable(),
 })
 
 class AdditionalDetails_sme extends Component {
@@ -210,21 +200,22 @@ class AdditionalDetails_sme extends Component {
         // this.props.history.push(`/Premium_SME/${productId}`);
         console.log('handleSubmit', values);
         const formData = new FormData();
-        formData.append('menumaster_id','5')
+        let date_of_birth = moment(values.date_of_birth).format('YYYY-MM-DD')
         formData.append('bcmaster_id','1')
-        formData.append('policy_holder_id','2908')
+        formData.append('policy_holder_id',this.props.policy_holder_id)
+        formData.append('menumaster_id',this.props.menumaster_id)
         formData.append('first_name',values.first_name)
         formData.append('last_name',values.last_name)
         formData.append('salutation_id',values.salutation_id)
-        let date_of_birth = moment(values.dob).format('YYYY-MM-DD')
         formData.append('date_of_birth', date_of_birth)
-        formData.append('email_id',values.email)
-        formData.append('mobile',values.phone)
-        // formData.append('email_id',values.email)
+        formData.append('email_id',values.email_id)
+        formData.append('mobile',values.mobile)
         formData.append('gender',values.gender)
-        formData.append('pan_no',values.pancard)
+        formData.append('pan_no',values.pan_no)
         formData.append('gstn_no',values.gstn_no)
-        formData.append('building_name',values.building_name)
+        formData.append('house_building_name',values.building_name)
+        formData.append('block_no',values.block_no)
+        formData.append('house_flat_no',values.flat_no)
         formData.append('plot_no',values.plot_no)
         formData.append('street_name',values.street_name)
         formData.append('pincode',values.pincode)
@@ -232,55 +223,115 @@ class AdditionalDetails_sme extends Component {
         this.props.loadingStart();
         axios.post('sme/proposer-details',
         formData
-        ).then(res=>{       
-            console.log('res', res)
-            this.props.loadingStop();
-            const {productId} = this.props.match.params;
-            this.props.history.push(`/Premium_SME/${productId}`);
+        ).then(res=>{
+            
+            this.props.setSmeProposerDetails(
+                {
+                    first_name:values.first_name,
+                    last_name:values.last_name,
+                    salutation_id:values.salutation_id,
+                    date_of_birth:values.date_of_birth,
+                    email_id:values.email_id,
+                    mobile:values.mobile,
+                    gender:values.gender,
+                    pan_no:values.pan_no,
+                    gstn_no:values.gstn_no,
+                    com_street_name:values.street_name,
+                    plot_no:values.plot_no,
+                    com_building_name:values.building_name,
+                    com_block_no:values.block_no,
+                    com_house_flat_no:values.flat_no,
+                    com_pincode:values.pincode,
+                    com_pincode_id:values.pincode_id,
+                }
+            );
+
+            let formDataNew = new FormData(); 
+            formDataNew.append('menumaster_id',this.props.menumaster_id)
+            formDataNew.append('policy_ref_no',this.props.policy_holder_ref_no)    
+
+            axios.post('/sme/mdm-party',
+            formDataNew
+            ).then(res=>{
+                axios.post('/sme/calculate-premium/phase-one',
+                formDataNew
+                ).then(res=>{
+                    axios.post('/sme/calculate-premium/phase-two',
+                    formDataNew
+                    ).then(res=>{
+                        axios.post('/sme/create-quote',
+                        formDataNew
+                        ).then(res=>{
+                            axios.post('/sme/con-sequence',
+                            formDataNew
+                            ).then(res=>{
+                                const {productId} = this.props.match.params;
+                                this.props.loadingStop();
+                                this.props.history.push(`/Premium_SME/${productId}`);
+                            }).
+                            catch(err=>{
+                                this.props.loadingStop();
+                            });
+                        }).
+                        catch(err=>{
+                            this.props.loadingStop();
+                        });
+                    }).
+                    catch(err=>{
+                        this.props.loadingStop();
+                    });
+                }).
+                catch(err=>{
+                    this.props.loadingStop();
+                });
+            }).
+            catch(err=>{
+                this.props.loadingStop();
+            });
         }).
         catch(err=>{
             this.props.loadingStop();
-        })
+        });
     }
 
-    fetchData = () => {
-        const { productId } = this.props.match.params
-        let policyHolder_id = localStorage.getItem("policyHolder_refNo") ? localStorage.getItem("policyHolder_refNo") : 0;
-        let encryption = new Encryption();
-        this.props.loadingStart();
-        axios.get(`gcv-tp/policy-holder/details/${policyHolder_id}`)
-            .then(res => {
-                 let decryptResp = JSON.parse(encryption.decrypt(res.data))
-                 console.log("decrypt---", decryptResp)
-                 let motorInsurance = decryptResp.data.policyHolder ? decryptResp.data.policyHolder.motorinsurance : {};
-                 let previousPolicy = decryptResp.data.policyHolder ? decryptResp.data.policyHolder.previouspolicy : {};
-                 let vehicleDetails = decryptResp.data.policyHolder ? decryptResp.data.policyHolder.vehiclebrandmodel : {};
-                 let policyHolder = decryptResp.data.policyHolder ? decryptResp.data.policyHolder : {};
-                 let nomineeDetails = decryptResp.data.policyHolder ? decryptResp.data.policyHolder.request_data.nominee[0] : {}
-                 let is_loan_account = decryptResp.data.policyHolder ? decryptResp.data.policyHolder.is_carloan : 0
-                 let quoteId = decryptResp.data.policyHolder ? decryptResp.data.policyHolder.request_data.quote_id : ""
-                 let is_eia_account=  policyHolder && (policyHolder.is_eia_account == 0 || policyHolder.is_eia_account == 1) ? policyHolder.is_eia_account : ""
-                 let bankDetails = decryptResp.data.policyHolder && decryptResp.data.policyHolder.bankdetail ? decryptResp.data.policyHolder.bankdetail[0] : {};
-                 let addressDetails = JSON.parse(decryptResp.data.policyHolder.pincode_response)
-                 let step_completed = decryptResp.data.policyHolder ? decryptResp.data.policyHolder.step_no : "";
-                 let request_data = decryptResp.data.policyHolder ? decryptResp.data.policyHolder.request_data : {};
+    // fetchData = () => {
+    //     const { productId } = this.props.match.params
+    //     let policyHolder_id = localStorage.getItem("policyHolder_refNo") ? localStorage.getItem("policyHolder_refNo") : 0;
+    //     let encryption = new Encryption();
+    //     this.props.loadingStart();
+    //     axios.get(`gcv-tp/policy-holder/details/${policyHolder_id}`)
+    //         .then(res => {
+    //              let decryptResp = JSON.parse(encryption.decrypt(res.data))
+    //              console.log("decrypt---", decryptResp)
+    //              let motorInsurance = decryptResp.data.policyHolder ? decryptResp.data.policyHolder.motorinsurance : {};
+    //              let previousPolicy = decryptResp.data.policyHolder ? decryptResp.data.policyHolder.previouspolicy : {};
+    //              let vehicleDetails = decryptResp.data.policyHolder ? decryptResp.data.policyHolder.vehiclebrandmodel : {};
+    //              let policyHolder = decryptResp.data.policyHolder ? decryptResp.data.policyHolder : {};
+    //              let nomineeDetails = decryptResp.data.policyHolder ? decryptResp.data.policyHolder.request_data.nominee[0] : {}
+    //              let is_loan_account = decryptResp.data.policyHolder ? decryptResp.data.policyHolder.is_carloan : 0
+    //              let quoteId = decryptResp.data.policyHolder ? decryptResp.data.policyHolder.request_data.quote_id : ""
+    //              let is_eia_account=  policyHolder && (policyHolder.is_eia_account == 0 || policyHolder.is_eia_account == 1) ? policyHolder.is_eia_account : ""
+    //              let bankDetails = decryptResp.data.policyHolder && decryptResp.data.policyHolder.bankdetail ? decryptResp.data.policyHolder.bankdetail[0] : {};
+    //              let addressDetails = JSON.parse(decryptResp.data.policyHolder.pincode_response)
+    //              let step_completed = decryptResp.data.policyHolder ? decryptResp.data.policyHolder.step_no : "";
+    //              let request_data = decryptResp.data.policyHolder ? decryptResp.data.policyHolder.request_data : {};
             
-                 console.log('is_appointee', nomineeDetails ? nomineeDetails.is_appointee : "efg")
-                //  return false;
-                 this.setState({
-                    quoteId, motorInsurance, previousPolicy, vehicleDetails, policyHolder, nomineeDetails, is_loan_account, 
-                    is_eia_account, bankDetails, addressDetails, step_completed, request_data,
-                    is_appointee: nomineeDetails ? nomineeDetails.is_appointee : ""
+    //              console.log('is_appointee', nomineeDetails ? nomineeDetails.is_appointee : "efg")
+    //             //  return false;
+    //              this.setState({
+    //                 quoteId, motorInsurance, previousPolicy, vehicleDetails, policyHolder, nomineeDetails, is_loan_account, 
+    //                 is_eia_account, bankDetails, addressDetails, step_completed, request_data,
+    //                 is_appointee: nomineeDetails ? nomineeDetails.is_appointee : ""
                     
-                })
-                this.props.loadingStop();
-                this.fetchSalutation(addressDetails, motorInsurance)
-            })
-            .catch(err => {
-                // handle error
-                this.props.loadingStop();
-            })
-    }
+    //             })
+    //             this.props.loadingStop();
+    //             this.fetchSalutation(addressDetails, motorInsurance)
+    //         })
+    //         .catch(err => {
+    //             // handle error
+    //             this.props.loadingStop();
+    //         })
+    // }
 
     fetchAreadetails=(e)=>{
         let pinCode = e.target.value;      
@@ -307,6 +358,37 @@ class AdditionalDetails_sme extends Component {
             catch(err=>{
                 this.props.loadingStop();
             })          
+        }       
+    }
+
+    
+    fetchAreadetailsBack=()=>{
+        if(this.props.com_pincode != null && this.props.com_pincode != '' && this.props.com_pincode.length==6){
+            let pinCode = this.props.com_pincode;      
+
+            if(pinCode.length==6){
+                const formData = new FormData();
+                this.props.loadingStart();
+                let encryption = new Encryption();
+                const post_data_obj = {
+                    'pincode':pinCode
+                };
+                formData.append('enc_data',encryption.encrypt(JSON.stringify(post_data_obj)))
+                formData.append('pincode',pinCode)
+                axios.post('pincode-details',
+                formData
+                ).then(res=>{       
+                    let stateName = res.data.data && res.data.data[0] && res.data.data[0].pinstate.STATE_NM ? res.data.data[0].pinstate.STATE_NM : ""                        
+                    this.setState({
+                        pinDataArr: res.data.data,
+                        stateName,
+                    });
+                    this.props.loadingStop();
+                }).
+                catch(err=>{
+                    this.props.loadingStop();
+                })          
+            }
         }       
     }
 
@@ -342,25 +424,25 @@ class AdditionalDetails_sme extends Component {
         
     }
 
-    fetchRelationships=()=>{
+    // fetchRelationships=()=>{
 
-            this.props.loadingStart();
-            axios.get('relations')
-            .then(res=>{
-                let relation = res.data.data ? res.data.data : []                        
-                this.setState({
-                    relation
-                });
-                this.fetchData();
-            }).
-            catch(err=>{
-                this.props.loadingStop();
-                this.setState({
-                    relation: []
-                });
-            })
+    //         this.props.loadingStart();
+    //         axios.get('relations')
+    //         .then(res=>{
+    //             let relation = res.data.data ? res.data.data : []                        
+    //             this.setState({
+    //                 relation
+    //             });
+    //             this.fetchData();
+    //         }).
+    //         catch(err=>{
+    //             this.props.loadingStop();
+    //             this.setState({
+    //                 relation: []
+    //             });
+    //         })
         
-    }
+    // }
 
     fetchSalutation=(addressDetails, motorInsurance)=>{
 
@@ -387,7 +469,8 @@ class AdditionalDetails_sme extends Component {
 }
 
     componentDidMount() {
-        this.fetchRelationships();
+        // this.fetchRelationships();
+        this.fetchAreadetailsBack();
     }
 
    
@@ -398,7 +481,26 @@ class AdditionalDetails_sme extends Component {
         const {productId} = this.props.match.params 
         
 
-        let newInitialValues = Object.assign(initialValue);
+        let newInitialValues = Object.assign(initialValue,{
+      first_name:this.props.first_name,
+      last_name:this.props.last_name,
+      salutation_id:this.props.salutation_id,
+      date_of_birth:this.props.date_of_birth,
+      email_id:this.props.email_id,
+      mobile:this.props.mobile,
+      gender:this.props.gender,
+      pan_no:this.props.pan_no,
+      gstn_no:this.props.gstn_no,
+      street_name:this.props.com_street_name,
+      plot_no:this.props.plot_no,
+      building_name:this.props.com_building_name,
+      block_no:this.props.com_block_no,
+      flat_no:this.props.com_house_flat_no,
+      pincode:this.props.com_pincode,
+      pincode_id:this.props.com_pincode_id,
+    //   policy_holder_id:this.props.sme_fire.policy_holder_id,
+    //   menumaster_id:this.props.sme_fire.menumaster_id
+        });
 
         // const quoteNumber =
         // quoteId ? (
@@ -428,8 +530,7 @@ class AdditionalDetails_sme extends Component {
                         validationSchema={vehicleRegistrationValidation}
                         >
                         {({ values, errors, setFieldValue, setFieldTouched, isValid, isSubmitting, touched }) => {
-                             let value = values.nominee_first_name;
-                            // console.log("errors", errors)
+                             
                         return (
                         <Form>
                         <Row>
@@ -458,8 +559,8 @@ class AdditionalDetails_sme extends Component {
                                                 className="formGrp"
                                             >
                                                 <option value="">Title</option>
-                                                {/* <option value="1">Mr</option>
-                                                <option value="2">Mrs</option> */}
+                                                <option value="1">Mr</option>
+                                                <option value="2">Mrs</option>
                                                 {titleList.map((title, qIndex) => ( 
                                                 <option value={title.id}>{title.displayvalue}</option>
                                                 ))}
@@ -534,7 +635,7 @@ class AdditionalDetails_sme extends Component {
                                     <Col sm={12} md={4} lg={4}>
                                         <FormGroup>
                                         <DatePicker
-                                            name="dob"
+                                            name="date_of_birth"
                                             dateFormat="dd MMM yyyy"
                                             placeholderText="DOB"
                                             peekPreviousMonth
@@ -545,14 +646,14 @@ class AdditionalDetails_sme extends Component {
                                             maxDate={new Date(maxDobAdult)}
                                             minDate={new Date(minDobAdult)}
                                             className="datePckr"
-                                            selected={values.dob}
+                                            selected={values.date_of_birth}
                                             onChange={(val) => {
-                                                setFieldTouched('dob');
-                                                setFieldValue('dob', val);
+                                                setFieldTouched('date_of_birth');
+                                                setFieldValue('date_of_birth', val);
                                                 }}
                                         />
-                                        {errors.dob && touched.dob ? (
-                                            <span className="errorMsg">{errors.dob}</span>
+                                        {errors.date_of_birth && touched.dodate_of_birthb ? (
+                                            <span className="errorMsg">{errors.date_of_birth}</span>
                                         ) : null}  
                                         </FormGroup>
                                     </Col>
@@ -583,18 +684,18 @@ class AdditionalDetails_sme extends Component {
                                             <div className="insurerName nmbract">
                                                 <span>+91</span>
                                             <Field
-                                                name='phone'
+                                                name='mobile'
                                                 type="text"
                                                 placeholder="Mobile No. "
                                                 autoComplete="off"
                                                 onFocus={e => this.changePlaceHoldClassAdd(e)}
                                                 onBlur={e => this.changePlaceHoldClassRemove(e)}
-                                                value = {values.phone}
+                                                value = {values.mobile}
                                                 maxLength="10" 
                                                 className="phoneinput pd-l-25"                                                                          
                                             />
-                                            {errors.phone && touched.phone ? (
-                                            <span className="errorMsg msgpositn">{errors.phone}</span>
+                                            {errors.mobile && touched.mobile ? (
+                                            <span className="errorMsg msgpositn">{errors.mobile}</span>
                                             ) : null}  
                                             </div>
                                         </FormGroup>
@@ -603,19 +704,19 @@ class AdditionalDetails_sme extends Component {
                                         <FormGroup>
                                             <div className="insurerName">
                                             <Field
-                                                name='pancard'
+                                                name='pan_no'
                                                 type="text"
                                                 placeholder="PAN Card No. "
                                                 autoComplete="off"
                                                 onFocus={e => this.changePlaceHoldClassAdd(e)}
                                                 onBlur={e => this.changePlaceHoldClassRemove(e)}
-                                                value = {values.pancard.toUpperCase()} 
+                                                value = {values.pan_no} 
                                                 onChange= {(e)=> 
-                                                    setFieldValue('pancard', e.target.value.toUpperCase())
+                                                    setFieldValue('pan_no', e.target.value.toUpperCase())
                                                     }                                                                           
                                             />
-                                            {errors.pancard && touched.pancard ? (
-                                            <span className="errorMsg">{errors.pancard}</span>
+                                            {errors.pan_no && touched.pan_no ? (
+                                            <span className="errorMsg">{errors.pan_no}</span>
                                             ) : null} 
                                             </div>
                                         </FormGroup>
@@ -624,16 +725,16 @@ class AdditionalDetails_sme extends Component {
                                         <FormGroup>
                                             <div className="insurerName">
                                             <Field
-                                                name='email'
+                                                name='email_id'
                                                 type="email"
                                                 placeholder="Email "
                                                 autoComplete="off"
                                                 onFocus={e => this.changePlaceHoldClassAdd(e)}
                                                 onBlur={e => this.changePlaceHoldClassRemove(e)}
-                                                value = {values.email}                                                                            
+                                                value = {values.email_id}                                                                            
                                             />
-                                            {errors.email && touched.email ? (
-                                            <span className="errorMsg">{errors.email}</span>
+                                            {errors.email_id && touched.email_id ? (
+                                            <span className="errorMsg">{errors.email_id}</span>
                                             ) : null}  
                                             </div>
                                         </FormGroup>
@@ -706,7 +807,62 @@ class AdditionalDetails_sme extends Component {
                                         <FormGroup>
                                             <div className="insurerName">
                                             <Field
-                                                name='address'
+                                                name='block_no'
+                                                type="text"
+                                                placeholder="Block No. "
+                                                autoComplete="off"
+                                                onFocus={e => this.changePlaceHoldClassAdd(e)}
+                                                onBlur={e => this.changePlaceHoldClassRemove(e)}
+                                                value = {values.block_no}                                                                            
+                                            />
+                                            {errors.block_no && touched.block_no ? (
+                                            <span className="errorMsg">{errors.block_no}</span>
+                                            ) : null}  
+                                            </div>
+                                        </FormGroup>
+                                    </Col>
+                                    <Col sm={12} md={4} lg={4}>
+                                        <FormGroup>
+                                            <div className="insurerName">
+                                            <Field
+                                                name='building_name'
+                                                type="text"
+                                                placeholder="Building/House Name"
+                                                autoComplete="off"
+                                                onFocus={e => this.changePlaceHoldClassAdd(e)}
+                                                onBlur={e => this.changePlaceHoldClassRemove(e)}
+                                                value = {values.building_name}                                                                            
+                                            />
+                                            {errors.building_name && touched.building_name ? (
+                                            <span className="errorMsg">{errors.building_name}</span>
+                                            ) : null}  
+                                            </div>
+                                        </FormGroup>
+                                    </Col>
+                                    <Col sm={12} md={4} lg={4}>
+                                        <FormGroup>
+                                            <div className="insurerName">
+                                            <Field
+                                                name='flat_no'
+                                                type="text"
+                                                placeholder="House/Flat No"
+                                                autoComplete="off"
+                                                onFocus={e => this.changePlaceHoldClassAdd(e)}
+                                                onBlur={e => this.changePlaceHoldClassRemove(e)}
+                                                value = {values.flat_no}                                                                            
+                                            />
+                                            {errors.flat_no && touched.flat_no ? (
+                                            <span className="errorMsg">{errors.flat_no}</span>
+                                            ) : null}  
+                                            </div>
+                                        </FormGroup>
+                                    </Col>
+                                </Row><Row>
+                                    <Col sm={12} md={4} lg={4}>
+                                        <FormGroup>
+                                            <div className="insurerName">
+                                            <Field
+                                                name='plot_no'
                                                 type="text"
                                                 placeholder="Plot No. "
                                                 autoComplete="off"
@@ -724,25 +880,7 @@ class AdditionalDetails_sme extends Component {
                                         <FormGroup>
                                             <div className="insurerName">
                                             <Field
-                                                name='Building_Name'
-                                                type="text"
-                                                placeholder="Building Name"
-                                                autoComplete="off"
-                                                onFocus={e => this.changePlaceHoldClassAdd(e)}
-                                                onBlur={e => this.changePlaceHoldClassRemove(e)}
-                                                value = {values.building_name}                                                                            
-                                            />
-                                            {errors.building_name && touched.building_name ? (
-                                            <span className="errorMsg">{errors.building_name}</span>
-                                            ) : null}  
-                                            </div>
-                                        </FormGroup>
-                                    </Col>
-                                    <Col sm={12} md={4} lg={4}>
-                                        <FormGroup>
-                                            <div className="insurerName">
-                                            <Field
-                                                name='Street_Name'
+                                                name='street_name'
                                                 type="text"
                                                 placeholder="Street Name"
                                                 autoComplete="off"
@@ -762,7 +900,7 @@ class AdditionalDetails_sme extends Component {
                                     <h4> </h4>
                                 </div>
                                 <div className="d-flex justify-content-left resmb">
-                                <Button className={`backBtn`} type="button"  disabled={isSubmitting ? true : false} onClick= {this.otherDetails.bind(this,productId)}>
+                                <Button className={`backBtn`} type="button" onClick= {this.otherDetails.bind(this,productId)}>
                                     {isSubmitting ? 'Wait..' : 'Back'}
                                 </Button> 
                                 <Button className={`proceedBtn`} type="submit"  disabled={isSubmitting ? true : false}>
@@ -790,17 +928,36 @@ class AdditionalDetails_sme extends Component {
     }
 }
 
-
 const mapStateToProps = state => {
     return {
-      loading: state.loader.loading
+      loading: state.loader.loading,
+      first_name:state.sme_fire.first_name,
+      last_name:state.sme_fire.last_name,
+      salutation_id:state.sme_fire.salutation_id,
+      date_of_birth:state.sme_fire.date_of_birth,
+      email_id:state.sme_fire.email_id,
+      mobile:state.sme_fire.mobile,
+      gender:state.sme_fire.gender,
+      pan_no:state.sme_fire.pan_no,
+      gstn_no:state.sme_fire.gstn_no,
+      com_street_name:state.sme_fire.com_street_name,
+      plot_no:state.sme_fire.plot_no,
+      com_building_name:state.sme_fire.com_building_name,
+      com_block_no:state.sme_fire.com_block_no,
+      com_house_flat_no:state.sme_fire.com_house_flat_no,
+      com_pincode:state.sme_fire.com_pincode,
+      com_pincode_id:state.sme_fire.com_pincode_id,
+      policy_holder_id:state.sme_fire.policy_holder_id,
+      policy_holder_ref_no:state.sme_fire.policy_holder_ref_no,
+      menumaster_id:state.sme_fire.menumaster_id
     };
   };
   
   const mapDispatchToProps = dispatch => {
     return {
       loadingStart: () => dispatch(loaderStart()),
-      loadingStop: () => dispatch(loaderStop())
+      loadingStop: () => dispatch(loaderStop()),
+      setSmeProposerDetails:(data) => dispatch(setSmeProposerDetailsData(data))
     };
   };
 

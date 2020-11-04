@@ -15,3 +15,8 @@ export const SET_DATA = 'SET_DATA';
 //SVJT
 
 export const SME_FIRE = 'SME_FIRE';
+export const SME_FIRE_UPDATE = 'SME_FIRE_UPDATE';
+
+export const SME_FIRE_RISK = 'SME_FIRE_RISK';
+export const SME_FIRE_OTHER_DETAILS = 'SME_FIRE_OTHER_DETAILS';
+export const SME_FIRE_PROPOSER_DETAILS = 'SME_FIRE_PROPOSER_DETAILS';

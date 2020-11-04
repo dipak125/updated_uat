@@ -1138,7 +1138,13 @@ class OtherComprehensiveGCV extends Component {
                             />
                             {errors.trailer_array && errors.trailer_array[i] && errors.trailer_array[i].regNo ? (
                             <span className="errorMsg">{errors.trailer_array[i].regNo}</span>
-                            ) : null}
+                            ) : null}    
+                        </div>
+                    </FormGroup>
+                </Col>
+                <Col sm={12} md={6} lg={10}>
+                    <FormGroup>
+                        <div className="formSection">
                             <Field
                                 name={`trailer_array[${i}].chassisNo`}
                                 type="text"
@@ -1151,7 +1157,7 @@ class OtherComprehensiveGCV extends Component {
                             />
                             {errors.trailer_array && errors.trailer_array[i] && errors.trailer_array[i].chassisNo ? (
                             <span className="errorMsg">{errors.trailer_array[i].chassisNo}</span>
-                            ) : null}       
+                            ) : null}   
                         </div>
                     </FormGroup>
                 </Col>
@@ -1827,9 +1833,7 @@ console.log("errors------------------ ", errors)
                                     }
 
 
-                                    {values.trailer_flag == '1' && values[coverage.code] == 'B00007' && values.B00007_value != "" ?
-                                      this.handleClaims(values, errors, touched, setFieldTouched, setFieldValue) : null
-                                    }
+                                   
                                     {/* {values.trailer_flag_TP == '1' && values[coverage.code] == 'B00011' ?
                                      <Fragment>
                                         <Col sm={12} md={11} lg={2} key={qIndex+"b"}>
@@ -2307,10 +2311,11 @@ console.log("errors------------------ ", errors)
                                         </Col>
                                         </Fragment> : null
                                     }
-                                    
+{values.trailer_flag == '1' && values[coverage.code] == 'B00007' && values.B00007_value != "" ?
+                                      this.handleClaims(values, errors, touched, setFieldTouched, setFieldValue) : null
+                                    }
                                 </Row>
                                 )) : null}
-                                
                                 <Row>
                                     <Col sm={12}>
                                         <FormGroup>
