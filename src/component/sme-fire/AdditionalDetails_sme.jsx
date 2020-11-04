@@ -38,7 +38,7 @@ const initialValue = {
     nominee_relation_with:"",
     nominee_first_name:"",
     nominee_last_name:"test",
-    nominee_gender:"",
+    gender:"",
     nominee_dob: "",
     phone: "",
     email: "",
@@ -53,8 +53,43 @@ const initialValue = {
     salutation_id: ""
 }
 
-const ownerValidation = Yup.object().shape({
-   
+const vehicleRegistrationValidation = Yup.object().shape({
+    first_name: Yup.string().required('Name is required')
+    .min(3, function() {
+        return "First name must be 3 characters"
+    })
+    .max(40, function() {
+        return "First name must be maximum 40 characters"
+    }),
+    last_name: Yup.string().required('Name is required')
+    .min(3, function() {
+        return "Last name must be 3 characters"
+    })
+    .max(40, function() {
+        return "Last name must be maximum 40 characters"
+    }),
+    date_of_birth: Yup.string().required("Please enter date of birth"),
+    email: Yup.string().email().required('Email is required').min(8, function() {
+        return "Email must be minimum 8 characters"
+    })
+    .max(75, function() {
+        return "Email must be maximum 75 characters"
+    }).matches(/^[a-zA-Z0-9]+([._\-]?[a-zA-Z0-9]+)*@\w+([-]?\w+)*(\.\w{2,3})+$/,'Invalid Email Id'),
+    phone: Yup.string()
+    .matches(/^[6-9][0-9]{9}$/,'Invalid Mobile number').required('Phone No. is required'),
+    gender: Yup.string().required("Please select gender"),
+    pancard: Yup.string().notRequired(function() {
+        return "Enter PAN number"
+    }).matches(/^[A-Z]{3}[CPHFATBLJG]{1}[A-Z]{1}[0-9]{4}[A-Z]{1}$/, function() {
+        return "Please enter valid Pan Number"
+    }),
+    gstn_no: Yup.string().required("Please enter GSTN number")
+    .matches(/^[0-9]{2}[A-Z]{3}[CPHFATBLJG]{1}[A-Z]{1}[0-9]{4}[A-Z]{1}[0-9]{1}[A-Z]{1}[0-9]{1}$/,'Invalid GSTIN'),
+    building_name: Yup.string().required("Please enter building name"),
+    plot_no: Yup.string().required("Please enter plot number"),
+    street_name: Yup.string().required("Please enter street name"),
+    pincode: Yup.string().required("Please enter pincode"),
+    pincode_id: Yup.string().required("Please select area"),
 })
 
 class AdditionalDetails_sme extends Component {
@@ -136,15 +171,76 @@ class AdditionalDetails_sme extends Component {
         }
     }
 
+    fetchSalutationdetails=(e)=>{
+        let salutation = e.target.value;      
+
+        if(salutation.length>0){
+            const formData = new FormData();
+            this.props.loadingStart();
+            let encryption = new Encryption();
+            const post_data_obj = {
+                'salutation':salutation
+            };
+           formData.append('enc_data',encryption.encrypt(JSON.stringify(post_data_obj)))
+           formData.append('salutation',salutation)
+           axios.post('salutation-list',
+            formData
+            ).then(res=>{       
+                let stateName = res.data.data && res.data.data[0] && res.data.data[0].pinstate.STATE_NM ? res.data.data[0].pinstate.STATE_NM : ""                        
+                this.setState({
+                    pinDataArr: res.data.data,
+                    stateName,
+                });
+                this.props.loadingStop();
+            }).
+            catch(err=>{
+                this.props.loadingStop();
+            })          
+        }       
+    }
+
     otherDetails = (productId) => {
         this.props.history.push(`/OtherDetails/${productId}`);
     }
 
 
     handleSubmit = (values, actions) => {
-        const {productId} = this.props.match.params 
-        const {motorInsurance, request_data} = this.state
-        this.props.history.push(`/Premium_SME/${productId}`);
+        // const {productId} = this.props.match.params 
+        // const {motorInsurance, request_data} = this.state  
+        // this.props.history.push(`/Premium_SME/${productId}`);
+        console.log('handleSubmit', values);
+        const formData = new FormData();
+        formData.append('menumaster_id','5')
+        formData.append('bcmaster_id','1')
+        formData.append('policy_holder_id','2908')
+        formData.append('first_name',values.first_name)
+        formData.append('last_name',values.last_name)
+        formData.append('salutation_id',values.salutation_id)
+        let date_of_birth = moment(values.dob).format('YYYY-MM-DD')
+        formData.append('date_of_birth', date_of_birth)
+        formData.append('email_id',values.email)
+        formData.append('mobile',values.phone)
+        // formData.append('email_id',values.email)
+        formData.append('gender',values.gender)
+        formData.append('pan_no',values.pancard)
+        formData.append('gstn_no',values.gstn_no)
+        formData.append('building_name',values.building_name)
+        formData.append('plot_no',values.plot_no)
+        formData.append('street_name',values.street_name)
+        formData.append('pincode',values.pincode)
+        formData.append('pincode_id',values.pincode_id)
+        this.props.loadingStart();
+        axios.post('sme/proposer-details',
+        formData
+        ).then(res=>{       
+            console.log('res', res)
+            this.props.loadingStop();
+            const {productId} = this.props.match.params;
+            this.props.history.push(`/Premium_SME/${productId}`);
+        }).
+        catch(err=>{
+            this.props.loadingStop();
+        })
     }
 
     fetchData = () => {
@@ -291,7 +387,7 @@ class AdditionalDetails_sme extends Component {
 }
 
     componentDidMount() {
-        // this.fetchRelationships();
+        this.fetchRelationships();
     }
 
    
@@ -327,8 +423,9 @@ class AdditionalDetails_sme extends Component {
                 <section className="brand m-b-25">
                     <div className="brand-bg">
 
-                        <Formik initialValues={newInitialValues} onSubmit={this.handleSubmit}
-                        validationSchema={ownerValidation}
+                        <Formik initialValues={newInitialValues} 
+                        onSubmit={this.handleSubmit}
+                        validationSchema={vehicleRegistrationValidation}
                         >
                         {({ values, errors, setFieldValue, setFieldTouched, isValid, isSubmitting, touched }) => {
                              let value = values.nominee_first_name;
@@ -361,6 +458,8 @@ class AdditionalDetails_sme extends Component {
                                                 className="formGrp"
                                             >
                                                 <option value="">Title</option>
+                                                {/* <option value="1">Mr</option>
+                                                <option value="2">Mrs</option> */}
                                                 {titleList.map((title, qIndex) => ( 
                                                 <option value={title.id}>{title.displayvalue}</option>
                                                 ))}
@@ -372,13 +471,13 @@ class AdditionalDetails_sme extends Component {
                                         </FormGroup>
                                     </Col>
 
-                                    <Col sm={12} md={4} lg={6}>
+                                    <Col sm={12} md={4} lg={5}>
                                         <FormGroup>
                                             <div className="insurerName">
                                             <Field
                                                 name='first_name'
                                                 type="text"
-                                                placeholder= "Full Name"
+                                                placeholder= "First Name"
                                                 autoComplete="off"
                                                 onFocus={e => this.changePlaceHoldClassAdd(e)}
                                                 onBlur={e => this.changePlaceHoldClassRemove(e)}
@@ -390,28 +489,48 @@ class AdditionalDetails_sme extends Component {
                                             </div>
                                         </FormGroup>
                                     </Col>
- 
-                                        <Col sm={12} md={4} lg={4}>
-                                            <FormGroup>
-                                                <div className="insurerName">
-                                                <Field
-                                                    name='gstn_no'
-                                                    type="text"
-                                                    placeholder= "GSTIN"
-                                                    autoComplete="off"
-                                                    onFocus={e => this.changePlaceHoldClassAdd(e)}
-                                                    onBlur={e => this.changePlaceHoldClassRemove(e)}
-                                                    value = {values.gstn_no}                                                                            
-                                                />
-                                                    {errors.gstn_no && touched.gstn_no ? (
-                                                <span className="errorMsg">{errors.gstn_no}</span>
-                                                ) : null} 
-                                                </div>
-                                            </FormGroup>
-                                        </Col> 
-                                </Row>
 
-                                <Row>                                 
+                                    <Col sm={12} md={4} lg={5}>
+                                        <FormGroup>
+                                            <div className="insurerName">
+                                            <Field
+                                                name='last_name'
+                                                type="text"
+                                                placeholder= "Last Name"
+                                                autoComplete="off"
+                                                onFocus={e => this.changePlaceHoldClassAdd(e)}
+                                                onBlur={e => this.changePlaceHoldClassRemove(e)}
+                                                value = {values.last_name}                                                                            
+                                            />
+                                                {errors.last_name && touched.last_name ? (
+                                            <span className="errorMsg">{errors.last_name}</span>
+                                            ) : null} 
+                                            </div>
+                                        </FormGroup>
+                                    </Col>
+                                    </Row>
+
+                                    <Row>
+                                    <Col sm={12} md={4} lg={4}>
+                                        <FormGroup>
+                                            <div className="formSection">
+                                            <Field
+                                                name='gender'
+                                                component="select"
+                                                autoComplete="off"                                                                        
+                                                className="formGrp"
+                                            >
+                                                <option value="">Select Gender</option>
+                                                <option value="m">Male</option>
+                                                <option value="f">Female</option>
+                                            </Field>     
+                                            {errors.gender && touched.gender ? (
+                                            <span className="errorMsg">{errors.gender}</span>
+                                            ) : null}              
+                                            </div>
+                                        </FormGroup>
+                                    </Col> 
+
                                     <Col sm={12} md={4} lg={4}>
                                         <FormGroup>
                                         <DatePicker
@@ -437,7 +556,28 @@ class AdditionalDetails_sme extends Component {
                                         ) : null}  
                                         </FormGroup>
                                     </Col>
+ 
+                                        <Col sm={12} md={4} lg={4}>
+                                            <FormGroup>
+                                                <div className="insurerName">
+                                                <Field
+                                                    name='gstn_no'
+                                                    type="text"
+                                                    placeholder= "GSTIN"
+                                                    autoComplete="off"
+                                                    onFocus={e => this.changePlaceHoldClassAdd(e)}
+                                                    onBlur={e => this.changePlaceHoldClassRemove(e)}
+                                                    value = {values.gstn_no}                                                                            
+                                                />
+                                                    {errors.gstn_no && touched.gstn_no ? (
+                                                <span className="errorMsg">{errors.gstn_no}</span>
+                                                ) : null} 
+                                                </div>
+                                            </FormGroup>
+                                        </Col> 
+                                </Row>
 
+                                <Row>
                                     <Col sm={12} md={4} lg={4}>
                                         <FormGroup className="m-b-25">
                                             <div className="insurerName nmbract">
@@ -479,10 +619,7 @@ class AdditionalDetails_sme extends Component {
                                             ) : null} 
                                             </div>
                                         </FormGroup>
-                                    </Col>                               
-                                </Row>
-                                
-                                <Row> 
+                                    </Col>       
                                     <Col sm={12} md={4} lg={4}>
                                         <FormGroup>
                                             <div className="insurerName">
@@ -500,160 +637,9 @@ class AdditionalDetails_sme extends Component {
                                             ) : null}  
                                             </div>
                                         </FormGroup>
-                                    </Col>
-                                </Row> 
-
-                                <div className="d-flex justify-content-left carloan">
-                                    <h4> </h4>
-                                </div>
-                                {motorInsurance && motorInsurance.policy_for == '1' && motorInsurance.pa_flag == '1' ?
-                                <Fragment>
-                                <div className="d-flex justify-content-left carloan">
-                                    <h4> Nominee Details</h4>
-                                </div>
-
-                                <Row>
-                                    <Col sm={12} md={4} lg={4}>
-                                        <FormGroup>
-                                            <div className="insurerName">
-                                            <Field
-                                                name='nominee_first_name'
-                                                type="text"
-                                                placeholder="Nominee Name"
-                                                autoComplete="off"
-                                                onFocus={e => this.changePlaceHoldClassAdd(e)}
-                                                onBlur={e => this.changePlaceHoldClassRemove(e)}
-                                                value = {values.nominee_first_name}                                                                            
-                                            />
-                                            {errors.nominee_first_name && touched.nominee_first_name ? (
-                                            <span className="errorMsg">{errors.nominee_first_name}</span>
-                                            ) : null}  
-                                            </div>
-                                        </FormGroup>
-                                    </Col>
-                                    <Col sm={12} md={4} lg={4}>
-                                        <FormGroup>
-                                            <div className="formSection">
-                                            <Field
-                                                name='nominee_gender'
-                                                component="select"
-                                                autoComplete="off"                                                                        
-                                                className="formGrp"
-                                            >
-                                            <option value="">Select gender</option>
-                                                <option value="m">Male</option>
-                                                <option value="f">Female</option>
-                                            </Field>     
-                                            {errors.nominee_gender && touched.nominee_gender ? (
-                                            <span className="errorMsg">{errors.nominee_gender}</span>
-                                            ) : null}              
-                                            </div>
-                                        </FormGroup>
-                                    </Col>
-                                    <Col sm={12} md={4} lg={4}>
-                                        <FormGroup>
-                                        <DatePicker
-                                            name="nominee_dob"
-                                            dateFormat="dd MMM yyyy"
-                                            placeholderText="DOB"
-                                            peekPreviousMonth
-                                            peekPreviousYear
-                                            showMonthDropdown
-                                            showYearDropdown
-                                            dropdownMode="select"
-                                            maxDate={new Date(maxDobNominee)}
-                                            minDate={new Date(minDobNominee)}
-                                            className="datePckr"
-                                            selected={values.nominee_dob}
-                                            onChange={(val) => {
-                                                this.ageCheck(val)
-                                                setFieldTouched('nominee_dob');
-                                                setFieldValue('nominee_dob', val);
-                                                }}
-                                        />
-                                        {errors.nominee_dob && touched.nominee_dob ? (
-                                            <span className="errorMsg">{errors.nominee_dob}</span>
-                                        ) : null}  
-                                        </FormGroup>
-                                    </Col>
+                                    </Col>                        
                                 </Row>
-
-                                <Row>
-                                    <Col sm={12} md={4} lg={4}>
-                                        <FormGroup>
-                                            <div className="formSection">
-                                            <Field
-                                                name="nominee_relation_with"
-                                                component="select"
-                                                autoComplete="off"
-                                                value={values.nominee_relation_with}
-                                                className="formGrp"
-                                            >
-                                            <option value="">Relation with Primary Insured</option>
-                                           { relation.map((relations, qIndex) => 
-                                           relations.id != 1 ?
-                                            <option value={relations.id}>{relations.name}</option> : null                                
-                                           )}
-                                            </Field>     
-                                            {errors.nominee_relation_with && touched.nominee_relation_with ? (
-                                                <span className="errorMsg">{errors.nominee_relation_with}</span>
-                                            ) : null}        
-                                            </div>
-                                        </FormGroup>
-                                    </Col>
-                                </Row>
-                                {appointeeFlag || is_appointee == '1' ? 
-                                    <div>
-                                        <div className="d-flex justify-content-left carloan">
-                                            <h4> </h4>
-                                        </div>
-                                        <div className="d-flex justify-content-left carloan">
-                                            <h4> Appointee  Details</h4>
-                                        </div>
-                                        <Row className="m-b-45">
-                                            <Col sm={12} md={4} lg={4}>
-                                                <FormGroup>
-                                                    <div className="insurerName">
-                                                        <Field
-                                                            name="appointee_name"
-                                                            type="text"
-                                                            placeholder="Appointee Name"
-                                                            autoComplete="off"
-                                                            onFocus={e => this.changePlaceHoldClassAdd(e)}
-                                                            onBlur={e => this.changePlaceHoldClassRemove(e)}
-                                                            value={values.appointee_name}
-                                                        />
-                                                        {errors.appointee_name && touched.appointee_name ? (
-                                                        <span className="errorMsg">{errors.appointee_name}</span>
-                                                        ) : null}
-                                                        
-                                                    </div>
-                                                </FormGroup>
-                                            </Col>
-                                            <Col sm={12} md={4} lg={6}>
-                                                <FormGroup>
-                                                    <div className="formSection">                                                           
-                                                        <Field
-                                                            name="appointee_relation_with"
-                                                            component="select"
-                                                            autoComplete="off"
-                                                            value={values.appointee_relation_with}
-                                                            className="formGrp"
-                                                        >
-                                                        <option value="">Relation with Nominee</option>
-                                                        { relation.map((relations, qIndex) => 
-                                                            <option value={relations.id}>{relations.name}</option>                                        
-                                                        )}
-                                                        </Field>     
-                                                        {errors.appointee_relation_with && touched.appointee_relation_with ? (
-                                                            <span className="errorMsg">{errors.appointee_relation_with}</span>
-                                                        ) : null}        
-                                                    </div>
-                                                </FormGroup>
-                                            </Col>
-                                        </Row>
-                                </div>  : null } 
-                                </Fragment> : null }
+                                
 
                                 <div className="d-flex justify-content-left carloan">
                                     <h4> </h4>
@@ -701,9 +687,9 @@ class AdditionalDetails_sme extends Component {
                                                     className="formGrp"
                                                 >
                                                 <option value="">Select Area</option>
-                                                {/* {pinDataArr && pinDataArr.length > 0 && pinDataArr.map((resource,rindex)=>
+                                                {pinDataArr && pinDataArr.length > 0 && pinDataArr.map((resource,rindex)=>
                                                     <option value={resource.id}>{resource.LCLTY_SUBRB_TALUK_TEHSL_NM}</option>
-                                                )} */}
+                                                )}
                                                     
                                                     {/*<option value="area2">Area 2</option>*/}
                                                 </Field>     
@@ -726,10 +712,10 @@ class AdditionalDetails_sme extends Component {
                                                 autoComplete="off"
                                                 onFocus={e => this.changePlaceHoldClassAdd(e)}
                                                 onBlur={e => this.changePlaceHoldClassRemove(e)}
-                                                value = {values.address}                                                                            
+                                                value = {values.plot_no}                                                                            
                                             />
-                                            {errors.address && touched.address ? (
-                                            <span className="errorMsg">{errors.address}</span>
+                                            {errors.plot_no && touched.plot_no ? (
+                                            <span className="errorMsg">{errors.plot_no}</span>
                                             ) : null}  
                                             </div>
                                         </FormGroup>
@@ -744,10 +730,10 @@ class AdditionalDetails_sme extends Component {
                                                 autoComplete="off"
                                                 onFocus={e => this.changePlaceHoldClassAdd(e)}
                                                 onBlur={e => this.changePlaceHoldClassRemove(e)}
-                                                value = {values.address}                                                                            
+                                                value = {values.building_name}                                                                            
                                             />
-                                            {errors.address && touched.address ? (
-                                            <span className="errorMsg">{errors.address}</span>
+                                            {errors.building_name && touched.building_name ? (
+                                            <span className="errorMsg">{errors.building_name}</span>
                                             ) : null}  
                                             </div>
                                         </FormGroup>
@@ -762,10 +748,10 @@ class AdditionalDetails_sme extends Component {
                                                 autoComplete="off"
                                                 onFocus={e => this.changePlaceHoldClassAdd(e)}
                                                 onBlur={e => this.changePlaceHoldClassRemove(e)}
-                                                value = {values.address}                                                                            
+                                                value = {values.street_name}                                                                            
                                             />
-                                            {errors.address && touched.address ? (
-                                            <span className="errorMsg">{errors.address}</span>
+                                            {errors.street_name && touched.street_name ? (
+                                            <span className="errorMsg">{errors.street_name}</span>
                                             ) : null}  
                                             </div>
                                         </FormGroup>

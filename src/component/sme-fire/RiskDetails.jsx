@@ -36,11 +36,24 @@ const initialValue = {
     previous_start_date: "",
     previous_claim_bonus: 1,
     previous_claim_for: "",
-    previous_policy_no: ""
+    previous_policy_no: "",
+    stateName: "",
+    pinDataArr: [],
 }
-const vehicleRegistrationValidation = Yup.object().shape({
 
-});
+const vehicleRegistrationValidation = Yup.object().shape({
+    house_building_name: Yup.string().required("Please enter building name"),
+    block_no: Yup.string().required("Please enter block no."),
+    house_flat_no: Yup.string().required("Please enter house/flat no."),
+    pincode: Yup.string().required('Pincode is required')
+    .matches(/^[0-9]{6}$/, function() {
+        return "Please enter valid pin code"
+    }),
+    pincode_id: Yup.string().required("Please select area"),
+    buildings_sum_insured: Yup.string().required("Please enter building sum insured"),
+    content_sum_insured: Yup.string().required("Please enter content sum insured"),
+    stock_sum_insured: Yup.string().required("Please enter stock sum insured"),
+})
 
 
 
@@ -75,12 +88,12 @@ class RiskDetails extends Component {
     }
 
 
-    handleSubmit = (values, actions) => {
-        const {productId} = this.props.match.params 
-        const {motorInsurance} = this.state
-        this.props.history.push(`/OtherDetails/${productId}`);
+    // handleSubmit = (values, actions) => {
+    //     const {productId} = this.props.match.params 
+    //     const {motorInsurance} = this.state
+    //     this.props.history.push(`/OtherDetails/${productId}`);
       
-    }
+    // }
 
 
     getAllAddress() {
@@ -102,8 +115,10 @@ class RiskDetails extends Component {
         let policyHolder_id = localStorage.getItem("policyHolder_refNo") ? localStorage.getItem("policyHolder_refNo") : 0;
         let encryption = new Encryption();
         this.props.loadingStart();
-        axios.get(`policy-holder/motor/${policyHolder_id}`)
+        axios.get(`sme/details/${policyHolder_id}`)
             .then(res => {
+                let data = res
+                console.log("responce-----",data)
                  let decryptResp = JSON.parse(encryption.decrypt(res.data))
                  console.log("decrypt", decryptResp)
                  let motorInsurance = decryptResp.data.policyHolder ? decryptResp.data.policyHolder.motorinsurance : {};
@@ -122,10 +137,73 @@ class RiskDetails extends Component {
             })
     }
 
+    fetchAreadetails=(e)=>{
+        let pinCode = e.target.value;      
+
+        if(pinCode.length==6){
+            const formData = new FormData();
+            this.props.loadingStart();
+            let encryption = new Encryption();
+            const post_data_obj = {
+                'pincode':pinCode
+            };
+           formData.append('enc_data',encryption.encrypt(JSON.stringify(post_data_obj)))
+           formData.append('pincode',pinCode)
+           axios.post('pincode-details',
+            formData
+            ).then(res=>{       
+                let stateName = res.data.data && res.data.data[0] && res.data.data[0].pinstate.STATE_NM ? res.data.data[0].pinstate.STATE_NM : ""                        
+                this.setState({
+                    pinDataArr: res.data.data,
+                    stateName,
+                });
+                this.props.loadingStop();
+            }).
+            catch(err=>{
+                this.props.loadingStop();
+            })          
+        }       
+    }
+    
+    handleSubmit=(values)=>{
+        console.log('handleSubmit', values);
+        // console.log("policyHolder_id-------->",policyHolder_id)
+        const formData = new FormData();
+        
+        formData.append('policy_holder_id','3229')
+        formData.append('menumaster_id','5')
+        formData.append('street_name','NH-34')
+        // formData.append('bcmaster_id','1')house_flat_no salutation
+        // let pol_start_date = moment(values.start_date).format('YYYY-MM-DD HH:MM:SS')
+        // let pol_end_date = moment(values.end_date).format('YYYY-MM-DD HH:MM:SS')
+        formData.append('house_building_name', values.house_building_name)
+        formData.append('block_no',values.block_no)
+        formData.append('house_flat_no',values.house_flat_no)
+        formData.append('pincode',values.pincode)
+        formData.append('pincode_id',values.pincode_id)
+        formData.append('buildings_sum_insured',values.buildings_sum_insured)
+        formData.append('content_sum_insured',values.content_sum_insured)
+        formData.append('stock_sum_insured',values.stock_sum_insured)
+        console.log("formdata---",values.formData)
+        console.log("formData---",formData)
+        this.props.loadingStart();
+        axios.post('sme/policy-details',
+        formData
+        ).then(res=>{       
+            console.log('res', res)
+            this.props.loadingStop();
+            const {productId} = this.props.match.params;
+            this.props.history.push(`/OtherDetails/${productId}`);
+        }).
+        catch(err=>{
+            this.props.loadingStop();
+        })
+        
+    }
 
     componentDidMount() {
         // this.getInsurerList();
-        // this.fetchData();
+        this.fetchData();
         
     }
     Registration_SME = (productId) => {
@@ -135,7 +213,7 @@ class RiskDetails extends Component {
     render() {
         const {productId} = this.props.match.params  
         const {insurerList, showClaim, previous_is_claim, motorInsurance, previousPolicy,
-            CustomerID,suggestions, vehicleDetails, RTO_location} = this.state
+            stateName,pinDataArr,CustomerID,suggestions, vehicleDetails, RTO_location} = this.state
 
         let newInitialValues = Object.assign(initialValue);
 
@@ -165,7 +243,7 @@ class RiskDetails extends Component {
                                                 </div>
                                                 </div>    
                                                 <Row>
-                                                    <Col sm={12} md={4} lg={4}>
+                                                    {/* <Col sm={12} md={4} lg={4}>
                                                         <FormGroup>
                                                             <div className="formSection">
                                                             <Field
@@ -183,21 +261,21 @@ class RiskDetails extends Component {
                                                             ) : null}              
                                                             </div>
                                                         </FormGroup>
-                                                    </Col>
+                                                    </Col> */}
                                                     <Col sm={12} md={4} lg={4}>
                                                         <FormGroup>
                                                             <div className="formSection">
                                                             <Field
-                                                                name='Building_Name'
+                                                                name='house_building_name'
                                                                 type="text"
                                                                 placeholder="House/Building Name"
                                                                 autoComplete="off"
                                                                 onFocus={e => this.changePlaceHoldClassAdd(e)}
                                                                 onBlur={e => this.changePlaceHoldClassRemove(e)}
-                                                                value = {values.Building_Name}                                                                            
+                                                                value = {values.house_building_name}                                                                            
                                                             />
-                                                            {errors.Building_Name && touched.Building_Name ? (
-                                                            <span className="errorMsg">{errors.Building_Name}</span>
+                                                            {errors.house_building_name && touched.house_building_name ? (
+                                                            <span className="errorMsg">{errors.house_building_name}</span>
                                                             ) : null}              
                                                             </div>
                                                         </FormGroup>
@@ -206,36 +284,34 @@ class RiskDetails extends Component {
                                                         <FormGroup>
                                                             <div className="insurerName">
                                                             <Field
-                                                                name='Block_No'
+                                                                name='block_no'
                                                                 type="text"
                                                                 placeholder="Block No."
                                                                 autoComplete="off"
                                                                 onFocus={e => this.changePlaceHoldClassAdd(e)}
                                                                 onBlur={e => this.changePlaceHoldClassRemove(e)}
-                                                                value = {values.Block_No}                                                                            
+                                                                value = {values.block_no}                                                                            
                                                             />
-                                                            {errors.Block_No && touched.Block_No ? (
-                                                            <span className="errorMsg">{errors.Block_No}</span>
+                                                            {errors.block_no && touched.block_no ? (
+                                                            <span className="errorMsg">{errors.block_no}</span>
                                                             ) : null}  
                                                             </div>
                                                         </FormGroup>
                                                     </Col>
-                                                </Row>
-                                                <Row>  
                                                     <Col sm={12} md={4} lg={4}>
                                                         <FormGroup>
                                                             <div className="insurerName">
                                                             <Field
-                                                                name='Flat_No'
+                                                                name='house_flat_no'
                                                                 type="text"
                                                                 placeholder="House/Flat No"
                                                                 autoComplete="off"
                                                                 onFocus={e => this.changePlaceHoldClassAdd(e)}
                                                                 onBlur={e => this.changePlaceHoldClassRemove(e)}
-                                                                value = {values.Flat_No}                                                                            
+                                                                value = {values.house_flat_no}                                                                            
                                                             />
-                                                            {errors.Flat_No && touched.Flat_No ? (
-                                                            <span className="errorMsg">{errors.Flat_No}</span>
+                                                            {errors.house_flat_no && touched.house_flat_no ? (
+                                                            <span className="errorMsg">{errors.house_flat_no}</span>
                                                             ) : null}  
                                                             </div>
                                                         </FormGroup>
@@ -279,9 +355,9 @@ class RiskDetails extends Component {
                                                                     className="formGrp"
                                                                 >
                                                                 <option value="">Select Location</option>
-                                                                {/* {pinDataArr && pinDataArr.length > 0 && pinDataArr.map((resource,rindex)=>
+                                                                {pinDataArr && pinDataArr.length > 0 && pinDataArr.map((resource,rindex)=>
                                                                     <option value={resource.id}>{resource.LCLTY_SUBRB_TALUK_TEHSL_NM}</option>
-                                                                )} */}
+                                                                )}
                                                                     
                                                                     {/*<option value="area2">Area 2</option>*/}
                                                                 </Field>     
@@ -304,7 +380,7 @@ class RiskDetails extends Component {
                                                     </div>
                                                 </div>   
                                                 <Row>  
-                                                    <Col sm={12} md={4} lg={4}>
+                                                    {/* <Col sm={12} md={4} lg={4}>
                                                         <FormGroup>
                                                             <div className="formSection">
                                                                 <Field
@@ -315,33 +391,32 @@ class RiskDetails extends Component {
                                                                     className="formGrp"
                                                                 >
                                                                 <option value="">Basis of SI-Building/Contents</option>
-                                                                {/* {pinDataArr && pinDataArr.length > 0 && pinDataArr.map((resource,rindex)=>
+                                                                {pinDataArr && pinDataArr.length > 0 && pinDataArr.map((resource,rindex)=>
                                                                     <option value={resource.id}>{resource.LCLTY_SUBRB_TALUK_TEHSL_NM}</option>
-                                                                )} */}
+                                                                )}
                                                                     
-                                                                    {/*<option value="area2">Area 2</option>*/}
+                                                                    <option value="area2">Area 2</option>
                                                                 </Field>     
                                                                 {errors.SI_Building && touched.SI_Building ? (
                                                                     <span className="errorMsg">{errors.SI_Building}</span>
                                                                 ) : null}     
                                                             </div>
-                                                        </FormGroup>
-                                                        
-                                                    </Col>
+                                                        </FormGroup>                                                        
+                                                    </Col> */}
                                                     <Col sm={12} md={4} lg={4}>
                                                         <FormGroup>
                                                             <div className="insurerName">
                                                             <Field
-                                                                name='Building_Sum_Insured'
+                                                                name='buildings_sum_insured'
                                                                 type="text"
                                                                 placeholder="Fire-Building-Sum Insured"
                                                                 autoComplete="off"
                                                                 onFocus={e => this.changePlaceHoldClassAdd(e)}
                                                                 onBlur={e => this.changePlaceHoldClassRemove(e)}
-                                                                value = {values.Building_Sum_Insured}                                                                            
+                                                                value = {values.buildings_sum_insured}                                                                            
                                                             />
-                                                            {errors.Building_Sum_Insured && touched.Building_Sum_Insured ? (
-                                                            <span className="errorMsg">{errors.Building_Sum_Insured}</span>
+                                                            {errors.buildings_sum_insured && touched.buildings_sum_insured ? (
+                                                            <span className="errorMsg">{errors.buildings_sum_insured}</span>
                                                             ) : null}  
                                                             </div>
                                                         </FormGroup>
@@ -350,7 +425,7 @@ class RiskDetails extends Component {
                                                     <FormGroup>
                                                         <div className="insurerName">
                                                             <Field
-                                                                name="Fire_Sum_Insured"
+                                                                name="content_sum_insured"
                                                                 type="text"
                                                                 placeholder="Fire-Contents Sum Insured"
                                                                 autoComplete="off"
@@ -358,36 +433,33 @@ class RiskDetails extends Component {
                                                                 onFocus={e => this.changePlaceHoldClassAdd(e)}
                                                                 onBlur={e => this.changePlaceHoldClassRemove(e)}
                                                                 onKeyUp={e=> this.fetchAreadetails(e)}
-                                                                value={values.Fire_Sum_Insured}
+                                                                value={values.content_sum_insured}
                                                                 maxLength="6"
                                                                 onInput= {(e)=> {
-                                                                    setFieldTouched("Fire_Sum_Insured");
-                                                                    setFieldValue("Fire_Sum_Insured", e.target.value);  
+                                                                    setFieldTouched("content_sum_insured");
+                                                                    setFieldValue("content_sum_insured", e.target.value);  
                                                                 }}
                                                             />
-                                                            {errors.Fire_Sum_Insured && touched.Fire_Sum_Insured ? (
-                                                            <span className="errorMsg">{errors.Fire_Sum_Insured}</span>
+                                                            {errors.content_sum_insured && touched.content_sum_insured ? (
+                                                            <span className="errorMsg">{errors.content_sum_insured}</span>
                                                             ) : null}                                                   
                                                         </div>
                                                     </FormGroup>
                                                     </Col>
-                                                   
-                                                </Row>
-                                                <Row>  
                                                     <Col sm={12} md={4} lg={4}>
                                                         <FormGroup>
                                                             <div className="insurerName">
                                                             <Field
-                                                                name='Fire_Stock'
+                                                                name='stock_sum_insured'
                                                                 type="text"
                                                                 placeholder="Fire-Stock Sum Insured"
                                                                 autoComplete="off"
                                                                 onFocus={e => this.changePlaceHoldClassAdd(e)}
                                                                 onBlur={e => this.changePlaceHoldClassRemove(e)}
-                                                                value = {values.Fire_Stock}                                                                            
+                                                                value = {values.stock_sum_insured}                                                                            
                                                             />
-                                                            {errors.Fire_Stock && touched.Fire_Stock ? (
-                                                            <span className="errorMsg">{errors.Fire_Stock}</span>
+                                                            {errors.stock_sum_insured && touched.stock_sum_insured ? (
+                                                            <span className="errorMsg">{errors.stock_sum_insured}</span>
                                                             ) : null}  
                                                             </div>
                                                         </FormGroup>

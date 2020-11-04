@@ -266,6 +266,30 @@ const ComprehensiveValidation = Yup.object().shape({
     }),
 
     fuel_type: Yup.string().required("Select fuel type"),
+
+    trailer_array: Yup.array().of(
+        Yup.object().shape({
+            regNo : Yup.string().required('Registration no is required')
+            .matches(/^[a-zA-Z0-9]*$/, function() {
+                return "Invalid Registration No"
+            }).min(5, function() {
+                return "Registration no. should be minimum 5 characters"
+            })
+            .max(17, function() {
+                return "Registration no. should be maximum 17 characters"
+            }),
+
+            chassisNo : Yup.string().required('Chassis no is required')
+            .matches(/^[a-zA-Z0-9]*$/, function() {
+                return "Invalid chassis No"
+            }).min(5, function() {
+                return "Chassis no. should be minimum 5 characters"
+            })
+            .max(17, function() {
+                return "Chassis no. should be maximum 17 characters"
+            })
+        })
+    ),
    
    
 });
@@ -344,7 +368,9 @@ class OtherComprehensiveGCV extends Component {
             add_more_coverage_request_array: [],
             bodySliderVal: '',
             fuelList: [],
-            vehicleDetails: []
+            vehicleDetails: [],
+            no_of_claim: [],
+            trailer_array: []
         };
     }
 
@@ -421,6 +447,10 @@ class OtherComprehensiveGCV extends Component {
                 let motorInsurance = decryptResp.data.policyHolder ? decryptResp.data.policyHolder.motorinsurance : {}
                 let request_data = decryptResp.data.policyHolder ? decryptResp.data.policyHolder.request_data : {};
                 let vehicleDetails = decryptResp.data.policyHolder ? decryptResp.data.policyHolder.vehiclebrandmodel : {};
+                console.log('motorInsurance.trailers',motorInsurance.trailers)
+                let trailer_array = motorInsurance.trailers && motorInsurance.trailers!=null ? motorInsurance.trailers : null
+                
+                trailer_array = trailer_array!=null ? JSON.parse(trailer_array) : []
                 let values = []
                 let add_more_coverage = []
                 if(vehicleDetails && vehicleDetails.varientmodel && (vehicleDetails.varientmodel.fueltype.id == 8 || vehicleDetails.varientmodel.fueltype.id == 9)) {
@@ -492,6 +522,7 @@ class OtherComprehensiveGCV extends Component {
                 values.B00070_value = add_more_coverage_request_array.B00070 ? add_more_coverage_request_array.B00070.value : ""
                 // values.B00011_value = add_more_coverage_request_array.B00011 ? add_more_coverage_request_array.B00011.value : ""
                 // values.B00011_description = add_more_coverage_request_array.B00011 ? add_more_coverage_request_array.B00011.description : ""
+                values.trailer_array = trailer_array
                 
 
                 this.setState({
@@ -499,7 +530,8 @@ class OtherComprehensiveGCV extends Component {
                     showCNG: motorInsurance.cng_kit == 1 ? true : false,
                     vahanVerify: motorInsurance.chasis_no && motorInsurance.engine_no ? true : false,
                     selectFlag: motorInsurance && motorInsurance.add_more_coverage != null ? '0' : '1',
-                    add_more_coverage_request_array
+                    no_of_claim: add_more_coverage_request_array.B00007 ? add_more_coverage_request_array.B00007.value : "",
+                    add_more_coverage_request_array,trailer_array
                 })
                 this.props.loadingStop();
                 this.getAccessToken(values)
@@ -611,8 +643,6 @@ class OtherComprehensiveGCV extends Component {
 
                 setFieldTouched('vahanVerify')
                 setFieldValue('vahanVerify', true)
-                console.log('chasiNo', this.state.chasiNo)
-                console.log('engineNo', this.state.engineNo)
                 setFieldTouched('engine_no')
                 setFieldValue('engine_no', this.state.engineNo)
                 setFieldTouched('chasis_no')
@@ -700,6 +730,7 @@ class OtherComprehensiveGCV extends Component {
             'PA_Cover': values.PA_flag ? values.PA_Cover : "0",
             'coverage_data': JSON.stringify(coverage_data),
             'body_idv_value' : bodySliderVal ? bodySliderVal : defaultBodySliderValue,
+            'trailer_array' : values.trailer_array,
             'fuel_type' : values.fuel_type ? values.fuel_type : (vehicleDetails && vehicleDetails.varientmodel && vehicleDetails.varientmodel.fueltype  ? vehicleDetails.varientmodel.fueltype.id : "")
             // 'cng_kit': cng_kit_flag,
             // 'cngKit_Cost': cngKit_Cost
@@ -810,7 +841,8 @@ class OtherComprehensiveGCV extends Component {
                 'page_name': `OtherComprehensive/${productId}`,
                 'coverage_data': JSON.stringify(coverage_data),
                 'body_idv_value' : bodySliderVal ? bodySliderVal : defaultBodySliderValue,
-                'fuel_type' : values.fuel_type
+                'fuel_type' : values.fuel_type,
+                'trailer_array' : values.trailer_array,
             }
         }
         else {
@@ -856,88 +888,88 @@ class OtherComprehensiveGCV extends Component {
             })
     }
 
-    onRowSelect = (values, isSelect, setFieldTouched, setFieldValue) => {
+    onRowSelect = (value, values, isSelect, setFieldTouched, setFieldValue) => {
 
         const { add_more_coverage } = this.state;
         var drv = [];
 
 
         if (isSelect) {
-            add_more_coverage.push(values);
+            add_more_coverage.push(value);
             this.setState({
                 add_more_coverage: add_more_coverage,
                 serverResponse: [],
                 error: []
             });
-            if(values == "B00016") {
+            if(value == "B00016") {
                 setFieldTouched("PA_flag");
                 setFieldValue("PA_flag", '1');
             }  
-            if(values == "B00015") {
+            if(value == "B00015") {
                 setFieldTouched("PA_cover_flag");
                 setFieldValue("PA_cover_flag", '1');
             }  
-            if(values == "B00007") {
+            if(value == "B00007") {
                 setFieldTouched("trailer_flag");
                 setFieldValue("trailer_flag", '1');
             }     
-            if(values == "B00073") {
+            if(value == "B00073") {
                 setFieldTouched("pa_coolie_flag");
                 setFieldValue("pa_coolie_flag", '1');
             }     
-            if(values == "B00003") {
+            if(value == "B00003") {
                 setFieldTouched("nonElectric_flag");
                 setFieldValue("nonElectric_flag", '1');
                 
             }
-            if(values == "B00004") {
+            if(value == "B00004") {
                 setFieldTouched("electric_flag");
                 setFieldValue("electric_flag", '1');
             }
-            if(values == "B00020") {
+            if(value == "B00020") {
                 setFieldTouched("hospital_cash_OD_flag");
                 setFieldValue("hospital_cash_OD_flag", '1');
             }
-            if(values == "B00022") {
+            if(value == "B00022") {
                 setFieldTouched("hospital_cash_PD_flag");
                 setFieldValue("hospital_cash_PD_flag", '1');
             }
-            if(values == "B00013") {
+            if(value == "B00013") {
                 setFieldTouched("LL_PD_flag");
                 setFieldValue("LL_PD_flag", '1');
             }
-            if(values == "B00012") {
+            if(value == "B00012") {
                 setFieldTouched("LL_Emp_flag");
                 setFieldValue("LL_Emp_flag", '1');
             }
-            if(values == "B00069") {
+            if(value == "B00069") {
                 setFieldTouched("LL_Coolie_flag");
                 setFieldValue("LL_Coolie_flag", '1');
             }
-            if(values == "B00018") {
+            if(value == "B00018") {
                 setFieldTouched("enhance_PA_OD_flag");
                 setFieldValue("enhance_PA_OD_flag", '1');
             }
-            if(values == "B00070") {
+            if(value == "B00070") {
                 setFieldTouched("LL_workman_flag");
                 setFieldValue("LL_workman_flag", '1');
             }
-            if(values == "ATC") {
+            if(value == "ATC") {
                 setFieldTouched("ATC_flag");
                 setFieldValue("ATC_flag", '1');
             }
-            if(values == "B00011") {
+            if(value == "B00011") {
                 setFieldTouched("trailer_flag_TP");
                 setFieldValue("trailer_flag_TP", '1');
             }
-            if(values == "B00005") {
+            if(value == "B00005") {
                 setFieldTouched("CNG_OD_flag");
                 setFieldValue("CNG_OD_flag", '1');
             }
             
         }
         else {
-            const index = add_more_coverage.indexOf(values);
+            const index = add_more_coverage.indexOf(value);
             if (index !== -1) {
                 add_more_coverage.splice(index, 1);
                 this.setState({
@@ -946,70 +978,70 @@ class OtherComprehensiveGCV extends Component {
                 });
             }
 
-            if(values == "B00016") {
+            if(value == "B00016") {
                 setFieldTouched("PA_flag");
                 setFieldValue("PA_flag", '0');
                 setFieldTouched("PA_Cover");
                 setFieldValue("PA_Cover", '');
             } 
-            if(values == "B00015") {
+            if(value == "B00015") {
                 setFieldTouched("PA_cover_flag");
                 setFieldValue("PA_cover_flag", '0');
             }      
-            if(values == "B00007") {
+            if(value == "B00007") {
                 setFieldTouched("trailer_flag");
                 setFieldValue("trailer_flag", '0');
             } 
-            if(values == "B00073") {
+            if(value == "B00073") {
                 setFieldTouched("pa_coolie_flag");
                 setFieldValue("pa_coolie_flag", '0');
             }
-            if(values == "B00003") {
+            if(value == "B00003") {
                 setFieldTouched("nonElectric_flag");
                 setFieldValue("nonElectric_flag", '0');
                 
             }
-            if(values == "B00004") {
+            if(value == "B00004") {
                 setFieldTouched("electric_flag");
                 setFieldValue("electric_flag", '0');
             }
-            if(values == "B00020") {
+            if(value == "B00020") {
                 setFieldTouched("hospital_cash_OD_flag");
                 setFieldValue("hospital_cash_OD_flag", '0');
             }
-            if(values == "B00022") {
+            if(value == "B00022") {
                 setFieldTouched("hospital_cash_PD_flag");
                 setFieldValue("hospital_cash_PD_flag", '0');
             }
-            if(values == "B00013") {
+            if(value == "B00013") {
                 setFieldTouched("LL_PD_flag");
                 setFieldValue("LL_PD_flag", '0');
             }
-            if(values == "B00012") {
+            if(value == "B00012") {
                 setFieldTouched("LL_Emp_flag");
                 setFieldValue("LL_Emp_flag", '0');
             }
-            if(values == "B00069") {
+            if(value == "B00069") {
                 setFieldTouched("LL_Coolie_flag");
                 setFieldValue("LL_Coolie_flag", '0');
             }
-            if(values == "B00018") {
+            if(value == "B00018") {
                 setFieldTouched("enhance_PA_OD_flag");
                 setFieldValue("enhance_PA_OD_flag", '0');
             }
-            if(values == "B00070") {
+            if(value == "B00070") {
                 setFieldTouched("LL_workman_flag");
                 setFieldValue("LL_workman_flag", '0');
             }
-            if(values == "ATC") {
+            if(value == "ATC") {
                 setFieldTouched("ATC_flag");
                 setFieldValue("ATC_flag", '0');
             }
-            if(values == "B00011") {
+            if(value == "B00011") {
                 setFieldTouched("trailer_flag_TP");
                 setFieldValue("trailer_flag_TP", '0');
             }
-            if(values == "B00005") {
+            if(value == "B00005") {
                 setFieldTouched("CNG_OD_flag");
                 setFieldValue("CNG_OD_flag", '0');
             }
@@ -1046,6 +1078,89 @@ class OtherComprehensiveGCV extends Component {
     
     }
 
+    
+    handleNoOfClaims = (values, value) => {
+        var claimLnt = values.trailer_array.length
+        if(values.trailer_array.length > value) {
+            for(var i = claimLnt ; i >= value ; i--) {
+                    values.trailer_array.splice(i,1)
+            }
+        }
+        else if(values.trailer_array.length < value) {
+            for(var i = values.trailer_array.length ; i < value ; i++) {
+                values.trailer_array.push(
+                        {
+                        chassisNo : "",
+                        regNo : ""
+                    } )
+            }
+        }
+    this.setState({no_of_claim : value, serverResponse: [], error: [] }) 
+
+    }
+
+
+    initClaimDetailsList = () => {
+        let innicialClaimList = []
+        const {trailer_array} = this.state
+            for (var i = 0; i < this.state.no_of_claim ; i++) {
+                innicialClaimList.push(
+                    {
+                        chassisNo :  trailer_array && trailer_array[i] && trailer_array[i].chassisNo ? trailer_array[i].chassisNo : "",
+                        regNo :  trailer_array && trailer_array[i] && trailer_array[i].regNo ? trailer_array[i].regNo : ""
+                    }
+                )
+            }   
+
+    return innicialClaimList
+    
+    };
+
+
+    handleClaims = (values, errors, touched, setFieldTouched, setFieldValue) => {
+        let field_array = []
+        
+        for (var i = 0; i < values.B00007_value ; i++) {
+            field_array.push(
+                <Row className="m-b-30">
+                <Col sm={12} md={6} lg={10}>
+                    <FormGroup>
+                        <div className="formSection">
+                        <Field
+                                name={`trailer_array[${i}].regNo`}
+                                type="text"
+                                placeholder="Registration No"
+                                autoComplete="off"
+                                onFocus={e => this.changePlaceHoldClassAdd(e)}
+                                onBlur={e => this.changePlaceHoldClassRemove(e)}
+                                // value = {values[`trailer_array[${i}].chassisNo`]}
+
+                            />
+                            {errors.trailer_array && errors.trailer_array[i] && errors.trailer_array[i].regNo ? (
+                            <span className="errorMsg">{errors.trailer_array[i].regNo}</span>
+                            ) : null}
+                            <Field
+                                name={`trailer_array[${i}].chassisNo`}
+                                type="text"
+                                placeholder="Chassis No"
+                                autoComplete="off"
+                                onFocus={e => this.changePlaceHoldClassAdd(e)}
+                                onBlur={e => this.changePlaceHoldClassRemove(e)}
+                                // value = {values[`trailer_array[${i}].chassisNo`]}
+
+                            />
+                            {errors.trailer_array && errors.trailer_array[i] && errors.trailer_array[i].chassisNo ? (
+                            <span className="errorMsg">{errors.trailer_array[i].chassisNo}</span>
+                            ) : null}       
+                        </div>
+                    </FormGroup>
+                </Col>
+            </Row>
+            )
+            } 
+        return field_array
+
+    }
 
     componentDidMount() {
         this.getMoreCoverage()
@@ -1128,6 +1243,7 @@ class OtherComprehensiveGCV extends Component {
                 LL_workman_flag: '0',
                 fuel_type: fuel_type,
                 trailer_flag_TP: '0',
+                trailer_array:  this.initClaimDetailsList()
 
             });
         }
@@ -1160,6 +1276,7 @@ class OtherComprehensiveGCV extends Component {
                     B00015 : "",
                     // B00005 : "",
                     B00010 : "",
+                    trailer_array:  this.initClaimDetailsList()
                 }
             )}
 
@@ -1291,7 +1408,8 @@ class OtherComprehensiveGCV extends Component {
                     onSubmit={ serverResponse && serverResponse != "" ? (serverResponse.message ? this.getAccessToken : this.handleSubmit ) : this.getAccessToken} 
                     validationSchema={ComprehensiveValidation}>
                     {({ values, errors, setFieldValue, setFieldTouched, isValid, isSubmitting, touched }) => {
-
+console.log("values------------------ ", values)
+console.log("errors------------------ ", errors)
                     return (
                         <Form>
                         <Row>
@@ -1611,7 +1729,7 @@ class OtherComprehensiveGCV extends Component {
                                                     if( e.target.checked == false && values[coverage.code] == 'B00015') {
                                                         swal("This cover is mandated by IRDAI, it is compulsory for Owner-Driver to possess a PA cover of minimum Rs 15 Lacs, except in certain conditions. By not choosing this cover, you confirm that you hold an existing PA cover or you do not possess a valid driving license.")
                                                     }
-                                                    this.onRowSelect(e.target.value, e.target.checked, setFieldTouched, setFieldValue)         
+                                                    this.onRowSelect(e.target.value, values, e.target.checked, setFieldTouched, setFieldValue)         
                                                 }
                                                 }
                                                 checked = {values[coverage.code] == coverage.code ? true : false}
@@ -1647,6 +1765,11 @@ class OtherComprehensiveGCV extends Component {
                                             </FormGroup>
                                         </Col> : null
                                     }
+                                     {values.trailer_flag == '0' ?
+                                        values.trailer_array = [] : null }
+                                    {values.trailer_flag == '0' ?
+                                        values.B00007_value = "" : null }
+                                        
                                      {values.trailer_flag == '1' && values[coverage.code] == 'B00007' ?
                                      <Fragment>
                                         <Col sm={12} md={11} lg={2} key={qIndex+"b"}>
@@ -1661,7 +1784,7 @@ class OtherComprehensiveGCV extends Component {
                                                         onChange={(e) => {
                                                             setFieldTouched('B00007_value')
                                                             setFieldValue('B00007_value', e.target.value);
-                                                            this.handleChange()
+                                                            this.handleNoOfClaims(values, e.target.value)
                                                         }}
                                                     >
                                                         <option value="">No of Trailer</option>
@@ -1701,6 +1824,11 @@ class OtherComprehensiveGCV extends Component {
                                             </FormGroup>
                                         </Col>
                                         </Fragment> : null
+                                    }
+
+
+                                    {values.trailer_flag == '1' && values[coverage.code] == 'B00007' && values.B00007_value != "" ?
+                                      this.handleClaims(values, errors, touched, setFieldTouched, setFieldValue) : null
                                     }
                                     {/* {values.trailer_flag_TP == '1' && values[coverage.code] == 'B00011' ?
                                      <Fragment>

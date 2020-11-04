@@ -179,7 +179,8 @@ class PremiumGCV extends Component {
         let encryption = new Encryption();
         let dateDiff = 0
         const {previousPolicy, request_data, policyHolder} = this.state
-
+        let trailer_array = motorInsurance.trailers ? motorInsurance.trailers : []
+        trailer_array = trailer_array ? JSON.parse(trailer_array) : []
         const post_data = {
             'ref_no':this.state.policyHolder_refNo ? this.state.policyHolder_refNo : '0',
             'access_token':access_token,
@@ -191,6 +192,7 @@ class PremiumGCV extends Component {
             'PA_Cover': motorInsurance && motorInsurance.pa_cover ? motorInsurance.pa_cover : '0',
             'coverage_data': motorInsurance && motorInsurance.add_more_coverage_request_json != null ? motorInsurance.add_more_coverage_request_json : "",
             'body_idv_value' : motorInsurance && motorInsurance.body_idv_value ? motorInsurance.body_idv_value : '0',
+            'trailer_array' : trailer_array,
         }
 
         formData.append('enc_data',encryption.encrypt(JSON.stringify(post_data)))
