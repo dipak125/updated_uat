@@ -510,7 +510,7 @@ class VehicleDetailsGCV extends Component {
             return false
         }
 
-        if(values.no_of_claim != values.claim_array.length) {
+        if(values.no_of_claim != values.claim_array.length && values.previous_is_claim == 1) {
             swal("Please fill all claim details")
             return false
         }
