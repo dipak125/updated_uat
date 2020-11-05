@@ -56,8 +56,9 @@ class Encryption {
 
         var orgStr = JSON.parse(CryptoJS.enc.Utf8.stringify(CryptoJS.enc.Base64.parse(decodeURIComponent(encryptedString))));
         
-        if(!key) key = 'eTJmS3F6UlM5SVlSRG5sa1owOUF4dEpk';
+        // if(!key) key = 'eTJmS3F6UlM5SVlSRG5sa1owOUF4dEpk';
        // if(!key) key = 'ABFE538E1664B722899673B1BB466E282A5700FA298D3549';
+       if(!key) key = 'C496F11C96DCCDD373DA1478E2D086E93E1AB006C0D322783CE7BDC34AA8D52B';
 
         
         /* var salt = CryptoJS.enc.Hex.parse(json.salt);
@@ -92,8 +93,9 @@ class Encryption {
      */
     encrypt(string, key) {
         
-        if(!key) key = 'eTJmS3F6UlM5SVlSRG5sa1owOUF4dEpk';
+        // if(!key) key = 'eTJmS3F6UlM5SVlSRG5sa1owOUF4dEpk';
        // if(!key) key = 'ABFE538E1664B722899673B1BB466E282A5700FA298D3549';
+       if(!key) key = 'C496F11C96DCCDD373DA1478E2D086E93E1AB006C0D322783CE7BDC34AA8D52B';
         var iv = CryptoJS.lib.WordArray.random(16);// the reason to be 16, please read on `encryptMethod` property.
 
         var salt = CryptoJS.lib.WordArray.random(256);

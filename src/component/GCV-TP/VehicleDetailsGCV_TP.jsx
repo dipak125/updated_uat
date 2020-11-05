@@ -28,6 +28,7 @@ const ageObj = new PersonAge();
 // const maxDate = moment(minDate).add(30, 'day').calendar();
 const minDate = moment(moment().subtract(20, 'years').calendar()).add(1, 'day').calendar();
 const maxDate = moment(moment().subtract(1, 'years').calendar()).add(0, 'day').calendar();
+const maxDatePYP = moment(moment().subtract(1, 'years').calendar()).add(30, 'day').calendar();
 const startRegnDate = moment().subtract(20, 'years').calendar();
 const minRegnDate = moment(startRegnDate).startOf('year').format('YYYY-MM-DD hh:mm');
 const minRegnDateNew = moment(moment().subtract(1, 'months').calendar()).add(1, 'day').calendar();
@@ -553,6 +554,7 @@ class VehicleDetailsGCV extends Component {
                  let decryptResp = JSON.parse(encryption.decrypt(res.data))
                  console.log("decrypt", decryptResp)
                  let motorInsurance = decryptResp.data.policyHolder ? decryptResp.data.policyHolder.motorinsurance : {};
+                 motorInsurance.valid_previous_policy = motorInsurance.policytype_id && motorInsurance.policytype_id == '1' ? '0' : motorInsurance.valid_previous_policy;
                  let previousPolicy = decryptResp.data.policyHolder ? decryptResp.data.policyHolder.previouspolicy : {};
                  let vehicleDetails = decryptResp.data.policyHolder ? decryptResp.data.policyHolder.vehiclebrandmodel : {};
                  let RTO_location = motorInsurance && motorInsurance.rtolocation && motorInsurance.rtolocation.RTO_LOCATION ? motorInsurance.rtolocation.RTO_LOCATION : ""
@@ -909,7 +911,7 @@ class VehicleDetailsGCV extends Component {
                                                             <DatePicker
                                                                 name="previous_start_date"
                                                                 minDate={new Date(minDate)}
-                                                                maxDate={new Date(maxDate)}
+                                                                maxDate={new Date(maxDatePYP)}
                                                                 dateFormat="dd MMM yyyy"
                                                                 placeholderText="Previous policy start date"
                                                                 peekPreviousMonth
