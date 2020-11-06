@@ -3,7 +3,8 @@ import {
     SME_FIRE_UPDATE,
     SME_FIRE_RISK,
     SME_FIRE_OTHER_DETAILS,
-    SME_FIRE_PROPOSER_DETAILS
+    SME_FIRE_PROPOSER_DETAILS,
+    COMM_ADDRESS
 } from "../actions/actionTypes";
 
 const initialState = {
@@ -66,17 +67,13 @@ const sme = ( state = initialState, action) => {
 
         case SME_FIRE_UPDATE: return {...state, 
             start_date:action.payload.start_date,
-            end_date:action.payload.end_date,
-            policy_holder_id:action.payload.policy_holder_id,
-            policy_holder_ref_no:action.payload.policy_holder_ref_no,
-            request_data_id:action.payload.request_data_id,
-            completed_step:action.payload.completed_step,
-            menumaster_id:action.payload.menumaster_id}
+            end_date:action.payload.end_date}
 
         case SME_FIRE_RISK: return {...state, 
             house_building_name:action.payload.house_building_name,
             block_no:action.payload.block_no,
             street_name:action.payload.street_name,
+            plot_no:action.payload.plot_no,
             content_sum_insured:action.payload.content_sum_insured,
             house_flat_no:action.payload.house_flat_no,
             pincode:action.payload.pincode,
@@ -92,24 +89,34 @@ const sme = ( state = initialState, action) => {
             insurance_company_id:action.payload.insurance_company_id,
             previous_city:action.payload.previous_city}
             
-            case SME_FIRE_PROPOSER_DETAILS: return {...state, 
-                first_name:action.payload.first_name,
-                last_name:action.payload.last_name,
-                salutation_id:action.payload.salutation_id,
-                date_of_birth:action.payload.date_of_birth,
-                email_id:action.payload.email_id,
-                mobile:action.payload.mobile,
-                gender:action.payload.gender,
-                pan_no:action.payload.pan_no,
-                gstn_no:action.payload.gstn_no,
-                com_building_name:action.payload.com_building_name,
-                com_pincode:action.payload.com_pincode,
-                com_pincode_id:action.payload.com_pincode_id,
-                com_block_no:action.payload.com_block_no,
-                com_house_flat_no:action.payload.com_house_flat_no,
-                com_street_name:action.payload.com_street_name,
-                plot_no:action.payload.plot_no,
-            }
+        case SME_FIRE_PROPOSER_DETAILS: return {...state, 
+            first_name:action.payload.first_name,
+            last_name:action.payload.last_name,
+            salutation_id:action.payload.salutation_id,
+            date_of_birth:action.payload.date_of_birth,
+            email_id:action.payload.email_id,
+            mobile:action.payload.mobile,
+            gender:action.payload.gender,
+            pan_no:action.payload.pan_no,
+            gstn_no:action.payload.gstn_no,
+            com_building_name:action.payload.com_building_name,
+            com_pincode:action.payload.com_pincode,
+            com_pincode_id:action.payload.com_pincode_id,
+            com_block_no:action.payload.com_block_no,
+            com_house_flat_no:action.payload.com_house_flat_no,
+            com_street_name:action.payload.com_street_name,
+            com_plot_no:action.payload.com_plot_no,
+        }
+
+        case COMM_ADDRESS: return {...state, 
+            com_building_name:action.payload.com_building_name,
+            com_pincode:action.payload.com_pincode,
+            com_pincode_id:action.payload.com_pincode_id,
+            com_block_no:action.payload.com_block_no,
+            com_house_flat_no:action.payload.com_house_flat_no,
+            com_street_name:action.payload.com_street_name,
+            com_plot_no:action.payload.com_plot_no
+        }
 
         default: return state;
     }

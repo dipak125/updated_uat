@@ -14,17 +14,19 @@ import axios from "../../shared/axios"
 import moment from "moment";
 import Encryption from '../../shared/payload-encryption';
 import {  PersonAge } from "../../shared/dateFunctions";
-import { setSmeOthersDetailsData } from '../../store/actions/sme_fire';
+import { setSmeRiskData,setSmeData,setSmeOthersDetailsData,setSmeProposerDetailsData } from '../../store/actions/sme_fire';
 
 
-const ageObj = new PersonAge();
+//const ageObj = new PersonAge();
 // const minDate = moment(moment().subtract(1, 'years').calendar()).add(1, 'day').calendar();
 // const maxDate = moment(minDate).add(30, 'day').calendar();
-const minDate = moment(moment().subtract(20, 'years').calendar()).add(1, 'day').calendar();
-const maxDate = moment(moment().subtract(1, 'years').calendar()).add(30, 'day').calendar();
-const startRegnDate = moment().subtract(20, 'years').calendar();
-const minRegnDate = moment(startRegnDate).startOf('year').format('YYYY-MM-DD hh:mm');
-const maxRegnDate = new Date();
+//const minDate = moment(moment().subtract(20, 'years').calendar()).add(1, 'day').calendar();
+const maxDate = moment().subtract(1, 'day');
+const minDate = moment().subtract(10, 'years');
+let endMinDate = moment();
+//const startRegnDate = moment().subtract(20, 'years').calendar();
+//const minRegnDate = moment(startRegnDate).startOf('year').format('YYYY-MM-DD hh:mm');
+//const maxRegnDate = new Date();
 
 const initialValue = {
     registration_date: "",
@@ -43,7 +45,7 @@ const vehicleRegistrationValidation = Yup.object().shape({
     previous_start_date : Yup.date().required("Please select previous policy start date").nullable(),
     previous_end_date : Yup.date().required("Please select previous policy end date").nullable(),
     Previous_Policy_No : Yup.string().required("Please select previous policy number").nullable(),
-    // insurance_company_id : Yup.number().required("Please select insurance company name").nullable(),
+    insurance_company_id : Yup.number().required("Please select insurance company name").nullable(),
     // previous_city : Yup.string().required("Please select policy start date").nullable()
 });
 
@@ -64,10 +66,7 @@ class OtherDetails extends Component {
         CustIdkeyword: "",
         RTO_location: "",
         previous_is_claim: "",
-
-        content_sum_insured:"",
-        stock_sum_insured:"",
-        consequence_response:""
+        disable_end_date:true
     };
 
     changePlaceHoldClassAdd(e) {
@@ -104,7 +103,7 @@ class OtherDetails extends Component {
 
 
         formData.append('previous_policy_no',values.Previous_Policy_No)
-        formData.append('insurance_company_id','5')
+        formData.append('insurance_company_id',values.insurance_company_id)
         // values.insurance_company_id
         formData.append('address',"kolkata")
         // values.previous_city
@@ -121,7 +120,7 @@ class OtherDetails extends Component {
                 previous_start_date:values.previous_start_date,
                 previous_end_date:values.previous_end_date,
                 Previous_Policy_No:values.Previous_Policy_No,
-                insurance_company_id:'5',
+                insurance_company_id:values.insurance_company_id,
                 previous_city:'kolkata'
 
             });
@@ -158,10 +157,6 @@ class OtherDetails extends Component {
         axios.get(`sme/details/${this.props.policy_holder_ref_no}`)
         .then(res => {
             console.log('fetch_data',res.data.data); 
-            this.setState({
-                content_sum_insured:res.data.data.policyHolder.smeinfo.content_sum_insured,
-                stock_sum_insured:res.data.data.policyHolder.smeinfo.stock_sum_insured
-            });
             this.props.loadingStop();
         })
         .catch(err => {
@@ -170,10 +165,123 @@ class OtherDetails extends Component {
         })
     }
 
+    fetchInsurance = () => {
+        // this.props.loaderStart();
+        axios.get('company')
+        .then(res => {
+            console.log('fetch_data_insurance',res);
+            this.setState({insurerList:res.data.data});
+            this.props.loadingStop();
+        })
+        .catch(err => {
+            this.props.loadingStop();
+        })
+    }
+
+    fetchPolicyDetails=()=>{
+        let policy_holder_ref_no = localStorage.getItem("policy_holder_ref_no") ? localStorage.getItem("policy_holder_ref_no"):0;
+        console.log('this.props.policy_holder_ref_no',this.props.policy_holder_ref_no);
+
+        if(this.props.policy_holder_ref_no == null && policy_holder_ref_no != ''){
+            
+            this.props.loadingStart();
+            axios.get(`sme/details/${policy_holder_ref_no}`)
+            .then(res=>{
+                
+                if(res.data.data.policyHolder.step_no > 0){
+
+                    this.props.setData({
+                        start_date:res.data.data.policyHolder.request_data.start_date,
+                        end_date:res.data.data.policyHolder.request_data.end_date,
+                        
+                        policy_holder_id:res.data.data.policyHolder.id,
+                        policy_holder_ref_no:policy_holder_ref_no,
+                        request_data_id:res.data.data.policyHolder.request_data.id,
+                        completed_step:res.data.data.policyHolder.step_no,
+                        menumaster_id:res.data.data.policyHolder.menumaster_id
+                    });
+                
+                }
+
+                if(res.data.data.policyHolder.step_no == 1 || res.data.data.policyHolder.step_no > 1){
+
+                    let risk_arr = JSON.parse(res.data.data.policyHolder.smeinfo.risk_address);
+
+                    this.props.setRiskData(
+                        {
+                            house_building_name:risk_arr.house_building_name,
+                            block_no:risk_arr.block_no,
+                            street_name:risk_arr.street_name,
+                            plot_no:risk_arr.plot_no,
+                            house_flat_no:risk_arr.house_flat_no,
+                            pincode:res.data.data.policyHolder.smeinfo.pincode,
+                            pincode_id:res.data.data.policyHolder.smeinfo.pincode_id,
+
+                            buildings_sum_insured:res.data.data.policyHolder.smeinfo.buildings_sum_insured,
+                            content_sum_insured:res.data.data.policyHolder.smeinfo.content_sum_insured,
+                            stock_sum_insured:res.data.data.policyHolder.smeinfo.stock_sum_insured
+                        }
+                    );
+
+                }
+
+                if(res.data.data.policyHolder.step_no == 2 || res.data.data.policyHolder.step_no > 2){
+
+                    this.props.setSmeOthersDetails({
+                    
+                        previous_start_date:res.data.data.policyHolder.previouspolicy.start_date,
+                        previous_end_date:res.data.data.policyHolder.previouspolicy.end_date,
+                        Previous_Policy_No:res.data.data.policyHolder.previouspolicy.policy_no,
+                        insurance_company_id:res.data.data.policyHolder.previouspolicy.insurancecompany_id,
+                        previous_city:res.data.data.policyHolder.previouspolicy.address
+        
+                    });
+                }
+
+                if(res.data.data.policyHolder.step_no == 3 || res.data.data.policyHolder.step_no > 3){
+                    
+                    let address = '';
+                    if(res.data.data.policyHolder.address == null){
+                        
+                    }else{
+                        address = JSON.parse(res.data.data.policyHolder.address);
+
+                        this.props.setSmeProposerDetails(
+                            {
+                                first_name:res.data.data.policyHolder.first_name,
+                                last_name:res.data.data.policyHolder.last_name,
+                                salutation_id:res.data.data.policyHolder.salutation_id,
+                                date_of_birth:res.data.data.policyHolder.dob,
+                                email_id:res.data.data.policyHolder.email_id,
+                                mobile:res.data.data.policyHolder.mobile,
+                                gender:res.data.data.policyHolder.gender,
+                                pan_no:res.data.data.policyHolder.pancard,
+                                gstn_no:res.data.data.policyHolder.gstn_no,
+
+                                com_street_name:address.street_name,
+                                com_plot_no:address.plot_no,
+                                com_building_name:address.house_building_name,
+                                com_block_no:address.block_no,
+                                com_house_flat_no:address.house_flat_no,
+                                com_pincode:res.data.data.policyHolder.pincode,
+                                com_pincode_id:res.data.data.policyHolder.pincode_id
+                            }
+                        );
+                    }
+                }
+
+                this.props.loadingStop();
+            })
+            .catch(err => {
+                this.props.loadingStop();
+            })
+        }
+        
+    }
 
     componentDidMount() {
-        // this.getInsurerList();
-        this.fetchData();
+        this.fetchPolicyDetails();
+        this.fetchInsurance();
         
     }
     RiskDetails = (productId) => {
@@ -229,7 +337,7 @@ class OtherDetails extends Component {
                                                                 autoComplete="off"
                                                                 onFocus={e => this.changePlaceHoldClassAdd(e)}
                                                                 onBlur={e => this.changePlaceHoldClassRemove(e)}
-                                                                value = {this.state.content_sum_insured}     
+                                                                value = {this.props.content_sum_insured}     
                                                                 disabled={true}                                                                       
                                                             />
                                                             {errors.Contents_Sum_Insured && touched.Contents_Sum_Insured ? (
@@ -248,7 +356,7 @@ class OtherDetails extends Component {
                                                                 autoComplete="off"
                                                                 onFocus={e => this.changePlaceHoldClassAdd(e)}
                                                                 onBlur={e => this.changePlaceHoldClassRemove(e)}
-                                                                value = {this.state.stock_sum_insured}
+                                                                value = {this.props.stock_sum_insured}
                                                                 disabled={true}                                                                              
                                                             />
                                                             {errors.Stocks_Sum_Insured && touched.Stocks_Sum_Insured ? (
@@ -302,7 +410,7 @@ class OtherDetails extends Component {
                                                                 autoComplete="off"
                                                                 onFocus={e => this.changePlaceHoldClassAdd(e)}
                                                                 onBlur={e => this.changePlaceHoldClassRemove(e)}
-                                                                value = {this.state.consequence_response}
+                                                                value = {5}
                                                                 // disabled={true}                                                                       
                                                             />
                                                             {errors.Commercial_consideration && touched.Commercial_consideration ? (
@@ -353,9 +461,7 @@ class OtherDetails extends Component {
                                                                 maxDate={new Date(maxDate)}
                                                                 dateFormat="dd MMM yyyy"
                                                                 placeholderText="policy start date"
-                                                                peekPreviousMonth
                                                                 autoComplete="off"
-                                                                peekPreviousYear
                                                                 showMonthDropdown
                                                                 showYearDropdown
                                                                 dropdownMode="select"
@@ -364,6 +470,8 @@ class OtherDetails extends Component {
                                                                 onChange={(val) => {
                                                                     setFieldTouched('previous_start_date')
                                                                     setFieldValue('previous_start_date', val);
+                                                                    this.setState({disable_end_date:false});
+                                                                    endMinDate = moment(val).add(1, 'day');
                                                                 }}
                                                             />
                                                             {errors.previous_start_date && touched.previous_start_date ? (
@@ -378,7 +486,8 @@ class OtherDetails extends Component {
                                                                 name="previous_end_date"
                                                                 dateFormat="dd MMM yyyy"
                                                                 placeholderText="Policy end date"
-                                                                // disabled = {true}
+                                                                disabled = {this.state.disable_end_date}
+                                                                minDate={new Date(endMinDate)}
                                                                 dropdownMode="select"
                                                                 className="datePckr inputfs12"
                                                                 selected={values.previous_end_date}
@@ -486,14 +595,24 @@ class OtherDetails extends Component {
 const mapStateToProps = state => {
     return {
       loading: state.loader.loading,
-      policy_holder_ref_no:state.sme_fire.policy_holder_ref_no,
+
+
       previous_start_date:state.sme_fire.previous_start_date,
       previous_end_date:state.sme_fire.previous_end_date,
       Previous_Policy_No:state.sme_fire.Previous_Policy_No,
       insurance_company_id:state.sme_fire.insurance_company_id,
       previous_city:state.sme_fire.previous_city,
+
+      policy_holder_id: state.sme_fire.policy_holder_id,
+      policy_holder_ref_no:state.sme_fire.policy_holder_ref_no,
+      request_data_id:state.sme_fire.request_data_id,
+      completed_step:state.sme_fire.completed_step,
       menumaster_id:state.sme_fire.menumaster_id,
-      policy_holder_id:state.sme_fire.policy_holder_id
+
+
+      content_sum_insured: state.sme_fire.content_sum_insured,
+      stock_sum_insured: state.sme_fire.stock_sum_insured
+
     };
   };
   
@@ -501,6 +620,9 @@ const mapStateToProps = state => {
     return {
       loadingStart: () => dispatch(loaderStart()),
       loadingStop: () => dispatch(loaderStop()),
+      setData:(data) => dispatch(setSmeData(data)),
+      setRiskData:(data) => dispatch(setSmeRiskData(data)),
+      setSmeProposerDetails:(data) => dispatch(setSmeProposerDetailsData(data)),
       setSmeOthersDetails:(data) => dispatch(setSmeOthersDetailsData(data))
     };
   };

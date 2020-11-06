@@ -9,6 +9,7 @@ import axios from "../../shared/axios";
 import { withRouter, Link, Route } from "react-router-dom";
 import { loaderStart, loaderStop } from "../../store/actions/loader";
 import { connect } from "react-redux";
+import { setSmeRiskData,setSmeData,setSmeOthersDetailsData,setSmeProposerDetailsData } from "../../store/actions/sme_fire";
 import * as Yup from "yup";
 import Encryption from '../../shared/payload-encryption';
 import queryString from 'query-string';
@@ -77,7 +78,7 @@ class Premium_sme extends Component {
     }
 
     additionalDetails = (productId) => {
-        this.props.history.push(`/AdditionalDetails_SME/${productId}`);
+        this.props.history.push(`/Summary_SME/${productId}`);
     }
 
     handleSubmit = (values) => {
@@ -95,38 +96,6 @@ class Premium_sme extends Component {
             }
         }
     }
-
-    fetchData = () => {
-        const { productId } = this.props.match.params
-        let policyHolder_id = this.state.policyHolder_refNo ? this.state.policyHolder_refNo : '0'
-        let encryption = new Encryption();
-    
-        axios.get(`policy-holder/motor/${policyHolder_id}`)
-            .then(res => {
-                let decryptResp = JSON.parse(encryption.decrypt(res.data))
-                console.log("decrypt", decryptResp)
-                let motorInsurance = decryptResp.data.policyHolder ? decryptResp.data.policyHolder.motorinsurance : {}
-                let policyHolder = decryptResp.data.policyHolder ? decryptResp.data.policyHolder : [];
-                let vehicleDetails = decryptResp.data.policyHolder ? decryptResp.data.policyHolder.vehiclebrandmodel : {};
-                let previousPolicy = decryptResp.data.policyHolder ? decryptResp.data.policyHolder.previouspolicy : {};
-                let request_data = decryptResp.data.policyHolder ? decryptResp.data.policyHolder.request_data : {}
-                
-                this.setState({
-                    motorInsurance,policyHolder,vehicleDetails, previousPolicy, request_data,
-                    refNumber: decryptResp.data.policyHolder.reference_no,
-                    paymentStatus: decryptResp.data.policyHolder.payment ? decryptResp.data.policyHolder.payment[0] : [],
-                    memberdetails : decryptResp.data.policyHolder ? decryptResp.data.policyHolder : [],
-                    nomineedetails: decryptResp.data.policyHolder ? decryptResp.data.policyHolder.request_data.nominee[0]:[]
-                    
-                })
-                this.getAccessToken(motorInsurance)
-            })
-            .catch(err => {
-                // handle error
-                this.props.loadingStop();
-            })
-    }
-
 
     getAccessToken = (motorInsurance) => {
         axios
@@ -187,10 +156,10 @@ class Premium_sme extends Component {
                 this.props.loadingStop();
             })
     }
-
+// http://14.140.119.44/sbig-csc/ConnectPG/payment_sme_fire.php?refrence_no=5919d14a1fe65f1b62437ce0221a4419
     payment = () => {
         const { refNumber } = this.state;
-        window.location = `${process.env.REACT_APP_PAYMENT_URL}/ConnectPG/payment_motor.php?refrence_no=${refNumber}`
+        window.location = `${process.env.REACT_APP_PAYMENT_URL}/ConnectPG/payment_sme_fire.php?refrence_no=${refNumber}`
     }
 
     Razor_payment = () => {
@@ -203,30 +172,131 @@ class Premium_sme extends Component {
         window.location = `${process.env.REACT_APP_PAYMENT_URL}/ppinl/pay.php?refrence_no=${refNumber}`
     }
 
-    fetchRelationships=()=>{
-
-        this.props.loadingStart();
-        axios.get('relations')
-        .then(res=>{
-            let relation = res.data.data ? res.data.data : []                        
-            this.setState({
-                relation
-            });
-            this.fetchData()
-        }).
-        catch(err=>{
-            this.props.loadingStop();
-            this.setState({
-                relation: []
-            });
-        })
-    
-}
-
-
     componentDidMount() {
-        // this.fetchData()
-        // this.fetchRelationships()
+        this.fetchPolicyDetails()
+    }
+
+    getGender = (gender) => {
+
+        if(gender == 'm'){
+            return 'Male';
+        }else if(gender == 'f'){
+            return 'Female';
+        }
+
+    }
+
+    fetchPolicyDetails=()=>{
+        let policy_holder_ref_no = localStorage.getItem("policy_holder_ref_no") ? localStorage.getItem("policy_holder_ref_no"):0;
+        console.log('this.props.policy_holder_ref_no',this.props.policy_holder_ref_no);
+
+            
+            this.props.loadingStart();
+            axios.get(`sme/details/${policy_holder_ref_no}`)
+            .then(res=>{
+                
+
+                if(res.data.data.policyHolder.step_no > 0){
+
+                    this.props.setData({
+                        start_date:res.data.data.policyHolder.request_data.start_date,
+                        end_date:res.data.data.policyHolder.request_data.end_date,
+                        
+                        policy_holder_id:res.data.data.policyHolder.id,
+                        policy_holder_ref_no:policy_holder_ref_no,
+                        request_data_id:res.data.data.policyHolder.request_data.id,
+                        completed_step:res.data.data.policyHolder.step_no,
+                        menumaster_id:res.data.data.policyHolder.menumaster_id
+                    });
+
+                    
+
+                }
+
+                if(res.data.data.policyHolder.step_no == 1 || res.data.data.policyHolder.step_no > 1){
+
+                    let risk_arr = JSON.parse(res.data.data.policyHolder.smeinfo.risk_address);
+
+                    this.props.setRiskData(
+                        {
+                            house_building_name:risk_arr.house_building_name,
+                            block_no:risk_arr.block_no,
+                            street_name:risk_arr.street_name,
+                            plot_no:risk_arr.plot_no,
+                            house_flat_no:risk_arr.house_flat_no,
+                            pincode:res.data.data.policyHolder.smeinfo.pincode,
+                            pincode_id:res.data.data.policyHolder.smeinfo.pincode_id,
+
+                            buildings_sum_insured:res.data.data.policyHolder.smeinfo.buildings_sum_insured,
+                            content_sum_insured:res.data.data.policyHolder.smeinfo.content_sum_insured,
+                            stock_sum_insured:res.data.data.policyHolder.smeinfo.stock_sum_insured
+                        }
+                    );
+                }
+
+                if(res.data.data.policyHolder.step_no == 2 || res.data.data.policyHolder.step_no > 2){
+
+                    this.props.setSmeOthersDetails({
+                    
+                        previous_start_date:res.data.data.policyHolder.previouspolicy.start_date,
+                        previous_end_date:res.data.data.policyHolder.previouspolicy.end_date,
+                        Previous_Policy_No:res.data.data.policyHolder.previouspolicy.policy_no,
+                        insurance_company_id:res.data.data.policyHolder.previouspolicy.insurancecompany_id,
+                        previous_city:res.data.data.policyHolder.previouspolicy.address
+        
+                    });
+
+                }
+
+                if(res.data.data.policyHolder.step_no == 3 || res.data.data.policyHolder.step_no > 3){
+
+                    let address = JSON.parse(res.data.data.policyHolder.address);
+
+                    this.props.setSmeProposerDetails(
+                        {
+                            first_name:res.data.data.policyHolder.first_name,
+                            last_name:res.data.data.policyHolder.last_name,
+                            salutation_id:res.data.data.policyHolder.salutation_id,
+                            date_of_birth:res.data.data.policyHolder.dob,
+                            email_id:res.data.data.policyHolder.email_id,
+                            mobile:res.data.data.policyHolder.mobile,
+                            gender:res.data.data.policyHolder.gender,
+                            pan_no:res.data.data.policyHolder.pancard,
+                            gstn_no:res.data.data.policyHolder.gstn_no,
+
+                            com_street_name:address.street_name,
+                            com_plot_no:address.plot_no,
+                            com_building_name:address.house_building_name,
+                            com_block_no:address.block_no,
+                            com_house_flat_no:address.house_flat_no,
+                            com_pincode:res.data.data.policyHolder.pincode,
+                            com_pincode_id:res.data.data.policyHolder.pincode_id
+                        }
+                    );
+                }
+
+                let pincode_area_arr = JSON.parse(res.data.data.policyHolder.pincode_response);
+                
+                this.setState(
+                    {
+                        salutationName:res.data.data.policyHolder.salutation.displayvalue,
+                        pincodeArea:pincode_area_arr.LCLTY_SUBRB_TALUK_TEHSL_NM,
+                        quoteId:res.data.data.policyHolder.request_data.quote_id,
+                        grossPremium:res.data.data.policyHolder.request_data.gross_premium,
+                        payablePremium:res.data.data.policyHolder.request_data.payable_premium,
+                        refNumber:res.data.data.policyHolder.reference_no,
+                        logo:res.data.data.policyHolder.bcmaster.paymentgateway.logo,
+                        policyHolder:res.data.data.policyHolder
+                    }
+                );
+
+                this.props.loadingStop();
+            })
+            .catch(err => {
+                this.props.loadingStop();
+            })
+        
+        
     }
 
     render() {
@@ -278,21 +348,21 @@ class Premium_sme extends Component {
                                                 <section className="brand m-t-11 m-b-25">
                                                     <div className="d-flex justify-content-left">
                                                         <div className="brandhead m-b-10">
-                                                            <h4>The Summary of your Policy Premium Details is as below </h4>
+                                                            <h4>SME FIRE </h4>
                                                         </div>
                                                     </div>
                                                     <div className="brandhead m-b-30">
                                                         <h5>{errMsg}</h5>
                                                         <h5>{paymentErrMsg}</h5>
                                                         <h4>
-                                                            Policy Reference Number {fulQuoteResp.QuotationNo}
+                                                            {/* Policy Reference Number {fulQuoteResp.QuotationNo} */}
                                                         </h4>
                                                     </div>
 
                                                     <Row>
                                                         <Col sm={12} md={9} lg={9}>
                                                             <div className="rghtsideTrigr">
-                                                                <Collapsible trigger="Retail SME Policy" >
+                                                                <Collapsible trigger="Proposal Details" >
                                                                     <div className="listrghtsideTrigr">
                                                                         <Row>
                                                                             <Col sm={12} md={3}>
@@ -301,30 +371,29 @@ class Premium_sme extends Component {
                                                                                 </div>
                                                                             </Col>
 
-
                                                                             <Col sm={12} md={3}>
                                                                                 <div className="premamount">
-                                                                                    ₹ {fulQuoteResp.DuePremium}
+                                                                                    ₹ {this.state.payablePremium}
                                                                                 </div>
                                                                             </Col>
 
                                                                             <Col sm={12} md={3}>
                                                                                 <div className="motopremium">
                                                                                     Gross Premium:
-                                                                    </div>
+                                                                                </div>
                                                                             </Col>
 
 
                                                                             <Col sm={12} md={3}>
                                                                                 <div className="premamount">
-                                                                                    ₹ {Math.round(fulQuoteResp.BeforeVatPremium)}
+                                                                                    ₹ {this.state.grossPremium}
                                                                                 </div>
                                                                             </Col>
 
-                                                                            <Col sm={12} md={3}>
+                                                                            {/* <Col sm={12} md={3}>
                                                                                 <div className="motopremium">
                                                                                     GST:
-                                                                    </div>
+                                                                                </div>
                                                                             </Col>
 
 
@@ -332,7 +401,7 @@ class Premium_sme extends Component {
                                                                                 <div className="premamount">
                                                                                     ₹ {Math.round(fulQuoteResp.TGST)}
                                                                                 </div>
-                                                                            </Col>
+                                                                            </Col> */}
                                                                         </Row>
                                                                     </div>
 
@@ -342,53 +411,123 @@ class Premium_sme extends Component {
                                                             <div className="rghtsideTrigr m-b-30">
                                                                 <Collapsible trigger="Member Details" >
                                                                     <div className="listrghtsideTrigr">
-                                                                        {memberdetails ?
+                                                                        
 
                                                                                 <div>
                                                                                     <strong>Owner Details :</strong>
                                                                                     <br/>
-                                                                                       <Row>
+                                                                                    <Row>
                                                                                         <Col sm={12} md={6}>
                                                                                             <Row>
                                                                                                 <Col sm={12} md={6}>
-                                                                                                    <FormGroup>Name:</FormGroup>
+                                                                                                    <FormGroup>Title:</FormGroup>
                                                                                                 </Col>
                                                                                                 <Col sm={12} md={6}>
-                                                                                                    <FormGroup>{memberdetails.first_name }</FormGroup>
+                                                                                                    <FormGroup>{this.state.salutationName}</FormGroup>
                                                                                                 </Col>
                                                                                             </Row>
 
+                                                                                        </Col>
+                                                                                    </Row>
+                                                                                    <Row>
+                                                                                        <Col sm={12} md={6}>
+                                                                                            <Row>
+                                                                                                <Col sm={12} md={6}>
+                                                                                                    <FormGroup>First Name:</FormGroup>
+                                                                                                </Col>
+                                                                                                <Col sm={12} md={6}>
+                                                                                                    <FormGroup>{this.props.first_name}</FormGroup>
+                                                                                                </Col>
+                                                                                            </Row>
+
+                                                                                        </Col>
+                                                                                    </Row>
+                                                                                    <Row>
+                                                                                        <Col sm={12} md={6}>
+                                                                                            <Row>
+                                                                                                <Col sm={12} md={6}>
+                                                                                                    <FormGroup>Last Name:</FormGroup>
+                                                                                                </Col>
+                                                                                                <Col sm={12} md={6}>
+                                                                                                    <FormGroup>{this.props.last_name}</FormGroup>
+                                                                                                </Col>
+                                                                                            </Row>
+
+                                                                                        </Col>
+                                                                                    </Row>
+                                                                                    <Row>
+                                                                                        <Col sm={12} md={6}>
+                                                                                            <Row>
+                                                                                                <Col sm={12} md={6}>
+                                                                                                    <FormGroup>Email:</FormGroup>
+                                                                                                </Col>
+                                                                                                <Col sm={12} md={6}>
+                                                                                                    <FormGroup>{this.props.email_id}</FormGroup>
+                                                                                                </Col>
+                                                                                            </Row>
+
+                                                                                        </Col>
+                                                                                    </Row>
+                                                                                    <Row>
+                                                                                        <Col sm={12} md={6}>
                                                                                             <Row>
                                                                                                 <Col sm={12} md={6}>
                                                                                                     <FormGroup>Date Of Birth:</FormGroup>
                                                                                                 </Col>
                                                                                                 <Col sm={12} md={6}>
-                                                                                                    <FormGroup>{memberdetails.dob}</FormGroup>
-                                                                                                </Col>
-                                                                                            </Row>
-                                                                                            <Row>
-                                                                                                <Col sm={12} md={6}>
-                                                                                                    <FormGroup>Mobile No</FormGroup>
-                                                                                                </Col>
-                                                                                                <Col sm={12} md={6}>
-                                                                                                    <FormGroup>{memberdetails.mobile}</FormGroup>
-                                                                                                </Col>
-                                                                                            </Row>
-                                                                                            <Row>
-                                                                                                <Col sm={12} md={6}>
-                                                                                                    <FormGroup>Email Id</FormGroup>
-                                                                                                </Col>
-                                                                                                <Col sm={12} md={6}>
-                                                                                                    <FormGroup>{memberdetails.email_id}</FormGroup>
+                                                                                                    <FormGroup>{moment(new Date(this.props.date_of_birth)).format('LL')}</FormGroup>
                                                                                                 </Col>
                                                                                             </Row>
 
+                                                                                        </Col>
+                                                                                    </Row>
+                                                                                    <Row>
+                                                                                        <Col sm={12} md={6}>
                                                                                             <Row>
                                                                                                 <Col sm={12} md={6}>
-                                                                                                    <FormGroup>Gender</FormGroup>
+                                                                                                    <FormGroup>Mobile Number:</FormGroup>
                                                                                                 </Col>
                                                                                                 <Col sm={12} md={6}>
-                                                                                                    <FormGroup>{memberdetails.gender == "m" ? "Male" : "Female"}</FormGroup>
+                                                                                                    <FormGroup>{this.props.mobile}</FormGroup>
+                                                                                                </Col>
+                                                                                            </Row>
+
+                                                                                        </Col>
+                                                                                    </Row>
+                                                                                    <Row>
+                                                                                        <Col sm={12} md={6}>
+                                                                                            <Row>
+                                                                                                <Col sm={12} md={6}>
+                                                                                                    <FormGroup>Gender:</FormGroup>
+                                                                                                </Col>
+                                                                                                <Col sm={12} md={6}>
+                                                                                                    <FormGroup>{this.getGender(this.props.gender)}</FormGroup>
+                                                                                                </Col>
+                                                                                            </Row>
+
+                                                                                        </Col>
+                                                                                    </Row>
+                                                                                    <Row>
+                                                                                        <Col sm={12} md={6}>
+                                                                                            <Row>
+                                                                                                <Col sm={12} md={6}>
+                                                                                                    <FormGroup>GSTN:</FormGroup>
+                                                                                                </Col>
+                                                                                                <Col sm={12} md={6}>
+                                                                                                    <FormGroup>{this.props.gstn_no}</FormGroup>
+                                                                                                </Col>
+                                                                                            </Row>
+
+                                                                                        </Col>
+                                                                                    </Row>
+                                                                                    <Row>
+                                                                                        <Col sm={12} md={6}>
+                                                                                            <Row>
+                                                                                                <Col sm={12} md={6}>
+                                                                                                    <FormGroup>Pan No.:</FormGroup>
+                                                                                                </Col>
+                                                                                                <Col sm={12} md={6}>
+                                                                                                    <FormGroup>{this.props.pan_no}</FormGroup>
                                                                                                 </Col>
                                                                                             </Row>
 
@@ -398,154 +537,10 @@ class Premium_sme extends Component {
                                                                                         <p></p>
                                                                                     </Row>
                                                                                 </div>
-                                                                            : (<p></p>)}
-                                                                                   
-                                                                        {/* <div>
-                                                                        <strong>Nominee Details :</strong>
-                                                                            <br/>
-                                                                            <Row>
-                                                                                <Col sm={12} md={6}>
-                                                                                    <Row>
-                                                                                        <Col sm={12} md={6}>
-                                                                                            <FormGroup>Name:</FormGroup>
-                                                                                        </Col>
-                                                                                        <Col sm={12} md={6}>
-                                                                                            <FormGroup>{nomineedetails.first_name}</FormGroup>
-                                                                                        </Col>
-                                                                                    </Row>
-
-                                                                                    <Row>
-                                                                                        <Col sm={12} md={6}>
-                                                                                            <FormGroup>Date Of Birth:</FormGroup>
-                                                                                        </Col>
-                                                                                        <Col sm={12} md={6}>
-                                                                                            <FormGroup>{nomineedetails.dob}</FormGroup>
-                                                                                        </Col>
-                                                                                    </Row>
-
-                                                                                    <Row>
-                                                                                        <Col sm={12} md={6}>
-                                                                                            <FormGroup>Relation With Proposer:</FormGroup>
-                                                                                        </Col>
-                                                                                        <Col sm={12} md={6}>
-                                                                                        { relation.map((relations, qIndex) => 
-                                                                                        relations.id == nomineedetails.relation_with ?
-                                                                                            <FormGroup>{relations.name}</FormGroup> : null
-                                                                                        )}
-                                                                                        </Col>
-                                                                                    </Row>
-
-                                                                                    <Row>
-                                                                                        <Col sm={12} md={6}>
-                                                                                            <FormGroup>Gender</FormGroup>
-                                                                                        </Col>
-                                                                                        <Col sm={12} md={6}>
-                                                                                            <FormGroup>{nomineedetails.gender == "m" ? "Male" : "Female"}</FormGroup>
-                                                                                        </Col>
-                                                                                    </Row>
-                                                                                </Col>
-                                                                            </Row>
-                                                                            <Row>
-                                                                                <p></p>
-                                                                            </Row>
-                                                                        </div> */}
                                                                     </div>
 
                                                                 </Collapsible>
                                                             </div>
-
-                                                            {/* <div className="rghtsideTrigr m-b-30">
-                                                                <Collapsible trigger="Vehicle Details" >
-                                                                    <div className="listrghtsideTrigr">
-                                                                        {memberdetails ?
-
-                                                                                <div>
-                                                                                    <Row>
-                                                                                        <Col sm={12} md={6}>
-                                                                                            <Row>
-                                                                                                <Col sm={12} md={6}>
-                                                                                                    <FormGroup>Registration No:</FormGroup>
-                                                                                                </Col>
-                                                                                                <Col sm={12} md={6}>
-                                                                                                    <FormGroup>{motorInsurance && motorInsurance.registration_no}</FormGroup>
-                                                                                                </Col>
-                                                                                            </Row>
-
-                                                                                            <Row>
-                                                                                                <Col sm={12} md={6}>
-                                                                                                    <FormGroup>Car Brand:</FormGroup>
-                                                                                                </Col>
-                                                                                                <Col sm={12} md={6}>
-                                                                                                    <FormGroup>{vehicleDetails && vehicleDetails.vehiclebrand && vehicleDetails.vehiclebrand.name ? vehicleDetails.vehiclebrand.name : ""}</FormGroup>
-                                                                                                </Col>
-                                                                                            </Row>
-                                                                                            <Row>
-                                                                                                <Col sm={12} md={6}>
-                                                                                                    <FormGroup>Car Model</FormGroup>
-                                                                                                </Col>
-                                                                                                <Col sm={12} md={6}>
-                                                                                                    <FormGroup>{vehicleDetails && vehicleDetails.vehiclemodel && vehicleDetails.vehiclemodel.description ? vehicleDetails.vehiclemodel.description+" "+vehicleDetails.varientmodel.varient : ""}</FormGroup>
-                                                                                                </Col>
-                                                                                            </Row>
-                                                                                            <Row>
-                                                                                                <Col sm={12} md={6}>
-                                                                                                    <FormGroup>Variant</FormGroup>
-                                                                                                </Col>
-                                                                                                <Col sm={12} md={6}>
-                                                                                                    <FormGroup>{vehicleDetails && vehicleDetails.varientmodel && vehicleDetails.varientmodel.varient ? vehicleDetails.varientmodel.varient : ""}</FormGroup>
-                                                                                                </Col>
-                                                                                            </Row>
-                                                                                            <Row>
-                                                                                                <Col sm={12} md={6}>
-                                                                                                    <FormGroup>Chasis Number</FormGroup>
-                                                                                                </Col>
-                                                                                                <Col sm={12} md={6}>
-                                                                                                    <FormGroup>{motorInsurance && motorInsurance.chasis_no  ? motorInsurance.chasis_no : ""}</FormGroup>
-                                                                                                </Col>
-                                                                                            </Row>
-                                                                                            <Row>
-                                                                                                <Col sm={12} md={6}>
-                                                                                                    <FormGroup>Engine Number</FormGroup>
-                                                                                                </Col>
-                                                                                                <Col sm={12} md={6}>
-                                                                                                <FormGroup>{motorInsurance && motorInsurance.engine_no  ? motorInsurance.engine_no : ""}</FormGroup>
-                                                                                                </Col>
-                                                                                            </Row>
-                                                                                            <Row>
-                                                                                                <Col sm={12} md={6}>
-                                                                                                    <FormGroup>Fuel Type</FormGroup>
-                                                                                                </Col>
-                                                                                                <Col sm={12} md={6}>
-                                                                                                    <FormGroup>{vehicleDetails && vehicleDetails.varientmodel && vehicleDetails.varientmodel.fuel_type ? fuel[parseInt(vehicleDetails.varientmodel.fuel_type)] : null}</FormGroup>
-                                                                                                </Col>
-                                                                                            </Row>
-
-                                                                                            <Row>
-                                                                                                <Col sm={12} md={6}>
-                                                                                                    <FormGroup>Seating</FormGroup>
-                                                                                                </Col>
-                                                                                                <Col sm={12} md={6}>
-                                                                                                    <FormGroup>{vehicleDetails && vehicleDetails.varientmodel && vehicleDetails.varientmodel.seating ? vehicleDetails.varientmodel.seating : null}</FormGroup>
-                                                                                                </Col>
-                                                                                            </Row>
-
-                                                                                        </Col>
-                                                                                    </Row>
-                                                                                    <Row>
-                                                                                        <p></p>
-                                                                                    </Row>
-                                                                                </div>
-                                                                            : (<p></p>)}
-                                                                                   
-                                                                        <div>
-                                                                            <Row>
-                                                                                <p></p>
-                                                                            </Row>
-                                                                        </div>
-                                                                    </div>
-
-                                                                </Collapsible>
-                                                            </div> */}
 
                                                             <Row>
                                                             <Col sm={12} md={6}>
@@ -556,7 +551,8 @@ class Premium_sme extends Component {
                                                                         Select Payment Gateway
                                                                         <div>
                                                                         <img src={require('../../assets/images/green-check.svg')} alt="" className="m-r-10" />
-                                                                        { policyHolder && policyHolder.bcmaster && policyHolder.bcmaster.paymentgateway && policyHolder.bcmaster.paymentgateway.logo ? <img src={require('../../assets/images/'+ policyHolder.bcmaster.paymentgateway.logo)} alt="" /> :
+
+                                                                        { this.state.quoteId && this.state.quoteId != '' ? <img src={require('../../assets/images/'+ this.state.logo)} alt="" /> :
                                                                         null
                                                                         }
                                                                         </div>
@@ -567,7 +563,7 @@ class Premium_sme extends Component {
 
                                                             <div className="d-flex justify-content-left resmb">
                                                                 <Button className="backBtn" type="button" onClick={this.additionalDetails.bind(this, productId)}>Back</Button>
-                                                                {fulQuoteResp.QuotationNo && breakin_flag == 0 ?
+                                                                {this.state.quoteId && this.state.quoteId != '' ?
                                                                     <Button type="submit"
                                                                         className="proceedBtn"
                                                                     >
@@ -596,6 +592,50 @@ class Premium_sme extends Component {
 const mapStateToProps = (state) => {
     return {
         loading: state.loader.loading,
+
+        policy_holder_ref_no:state.sme_fire.policy_holder_ref_no,
+        menumaster_id:state.sme_fire.menumaster_id,
+        policy_holder_id:state.sme_fire.policy_holder_id,
+
+        start_date: state.sme_fire.start_date,
+        end_date: state.sme_fire.end_date,
+
+
+        house_building_name: state.sme_fire.house_building_name,
+        block_no: state.sme_fire.block_no,
+        street_name: state.sme_fire.street_name,
+        content_sum_insured: state.sme_fire.content_sum_insured,
+        house_flat_no: state.sme_fire.house_flat_no,
+        pincode: state.sme_fire.pincode,
+        pincode_id: state.sme_fire.pincode_id,
+        buildings_sum_insured: state.sme_fire.buildings_sum_insured,
+        content_sum_insured: state.sme_fire.content_sum_insured,
+        stock_sum_insured: state.sme_fire.stock_sum_insured,
+
+        first_name:state.sme_fire.first_name,
+        last_name:state.sme_fire.last_name,
+        salutation_id:state.sme_fire.salutation_id,
+        date_of_birth:state.sme_fire.date_of_birth,
+        email_id:state.sme_fire.email_id,
+        mobile:state.sme_fire.mobile,
+        gender:state.sme_fire.gender,
+        pan_no:state.sme_fire.pan_no,
+        gstn_no:state.sme_fire.gstn_no,
+
+        com_street_name:state.sme_fire.com_street_name,
+        com_plot_no:state.sme_fire.com_plot_no,
+        com_building_name:state.sme_fire.com_building_name,
+        com_block_no:state.sme_fire.com_block_no,
+        com_house_flat_no:state.sme_fire.com_house_flat_no,
+        com_pincode:state.sme_fire.com_pincode,
+        com_pincode_id:state.sme_fire.com_pincode_id,
+
+        
+        previous_start_date:state.sme_fire.previous_start_date,
+        previous_end_date:state.sme_fire.previous_end_date,
+        Previous_Policy_No:state.sme_fire.Previous_Policy_No,
+        insurance_company_id:state.sme_fire.insurance_company_id,
+        previous_city:state.sme_fire.previous_city,
     };
 };
 
@@ -603,6 +643,10 @@ const mapDispatchToProps = (dispatch) => {
     return {
         loadingStart: () => dispatch(loaderStart()),
         loadingStop: () => dispatch(loaderStop()),
+        setData:(data) => dispatch(setSmeData(data)),
+        setRiskData:(data) => dispatch(setSmeRiskData(data)),
+        setSmeProposerDetails:(data) => dispatch(setSmeProposerDetailsData(data)),
+        setSmeOthersDetails:(data) => dispatch(setSmeOthersDetailsData(data))
     };
 };
 

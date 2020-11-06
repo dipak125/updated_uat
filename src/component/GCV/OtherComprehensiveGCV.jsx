@@ -370,7 +370,8 @@ class OtherComprehensiveGCV extends Component {
             fuelList: [],
             vehicleDetails: [],
             no_of_claim: [],
-            trailer_array: []
+            trailer_array: [],
+            ncbDiscount:0
         };
     }
 
@@ -749,10 +750,12 @@ class OtherComprehensiveGCV extends Component {
             .then(res => {
 
                 if (res.data.PolicyObject && res.data.UnderwritingResult && res.data.UnderwritingResult.Status == "Success") {
+                    let ncbDiscount= res.data.PolicyObject.PolicyLobList ? res.data.PolicyObject.PolicyLobList[0].PolicyRiskList[0].OD_NCBAmount : 0
                     this.setState({
                         fulQuoteResp: res.data.PolicyObject,
                         PolicyArray: res.data.PolicyObject.PolicyLobList,
                         error: [],
+                        ncbDiscount,
                         serverResponse: res.data.PolicyObject,
                         policyCoverage: res.data.PolicyObject.PolicyLobList ? res.data.PolicyObject.PolicyLobList[0].PolicyRiskList[0].PolicyCoverageList : [],
                     });
@@ -1175,7 +1178,7 @@ class OtherComprehensiveGCV extends Component {
 
     render() {
         const {showCNG, is_CNG_account, vahanDetails,error, policyCoverage, vahanVerify, selectFlag, fulQuoteResp, PolicyArray, fuelList, vehicleDetails,
-            moreCoverage, sliderVal, bodySliderVal, motorInsurance, serverResponse, engine_no, chasis_no, initialValue, add_more_coverage_request_array} = this.state
+            moreCoverage, sliderVal, bodySliderVal, motorInsurance, serverResponse, engine_no, chasis_no, initialValue, add_more_coverage_request_array,ncbDiscount} = this.state
         const {productId} = this.props.match.params 
         let defaultSliderValue = PolicyArray.length > 0 ? Math.round(PolicyArray[0].PolicyRiskList[0].IDV_Suggested) : 0
         let sliderValue = sliderVal
@@ -1332,21 +1335,38 @@ class OtherComprehensiveGCV extends Component {
 
 // -------------------------------------------------------
         let OD_TP_premium = serverResponse.PolicyLobList ? serverResponse.PolicyLobList[0].PolicyRiskList[0] : []
-
-
+        let TRAILOR_OD_PREMIUM = 0
+        console.log('ncbDiscount', ncbDiscount);
+        policyCoverage.map((coverage, qIndex) => (
+            coverage.PolicyBenefitList && coverage.PolicyBenefitList.map((benefit, bIndex) => (
+                benefit.ProductElementCode == 'B00007' ? TRAILOR_OD_PREMIUM+=benefit.AnnualPremium : 0
+            ))
+        ))
+        console.log('TRAILOR_OD_PREMIUM -- ', TRAILOR_OD_PREMIUM)
+        let productCount = 1;
         const policyCoverageList =  policyCoverage && policyCoverage.length > 0 ?
             policyCoverage.map((coverage, qIndex) => (
                 coverage.PolicyBenefitList && coverage.PolicyBenefitList.map((benefit, bIndex) => (
                     <div>
-                        <Row>
-                            <Col sm={12} md={6}>
+                        {(benefit.ProductElementCode != 'B00007') ?
+                            <Row><Col sm={12} md={6}>
                                 <FormGroup>{Coverage[benefit.ProductElementCode]}</FormGroup>
                             </Col>
                             <Col sm={12} md={6}>
                                 <FormGroup>₹ {Math.round(benefit.AnnualPremium)}</FormGroup>
-                            </Col>
-                        </Row>
-                    </div>     
+                            </Col></Row>
+                            : (benefit.ProductElementCode == 'B00007' && productCount==1) ? <Row><Col sm={12} md={6}>
+                            <FormGroup>{Coverage[benefit.ProductElementCode]}</FormGroup>
+                        </Col>
+                        <Col sm={12} md={6} data={productCount+=1}>
+                            <FormGroup>₹ {Math.round(TRAILOR_OD_PREMIUM)}</FormGroup>
+                        </Col></Row> : (ncbDiscount && ncbDiscount!=0) ? <Row><Col sm={12} md={6}>
+                            <FormGroup>NCB Discount</FormGroup>
+                        </Col>
+                        <Col sm={12} md={6} data={productCount+=1}>
+                            <FormGroup>₹ - {Math.round(ncbDiscount)}</FormGroup>
+                        </Col></Row> : null}
+                   </div>     
             ))
         )) : null 
         const policyCoveragIMT =  fulQuoteResp && fulQuoteResp.PolicyLobList  && Math.round(fulQuoteResp.PolicyLobList[0].PolicyRiskList[0].imt23prem) > 0 ?
@@ -1362,13 +1382,22 @@ class OtherComprehensiveGCV extends Component {
                     </div>     
          : null 
 
-        const premiumBreakup = policyCoverage && policyCoverage.length > 0 ?
+        productCount=1
+         const premiumBreakup = policyCoverage && policyCoverage.length > 0 ?
             policyCoverage.map((coverage, qIndex) => (
                 coverage.PolicyBenefitList && coverage.PolicyBenefitList.map((benefit, bIndex) => (
+                        (benefit.ProductElementCode != 'B00007') ?
                         <tr>
                             <td>{Coverage[benefit.ProductElementCode]}:</td>
                             <td>₹ {Math.round(benefit.AnnualPremium)}</td>
-                        </tr>  
+                        </tr> : (benefit.ProductElementCode == 'B00007' && productCount==1) ? <tr label={productCount+=1}>
+                        <td >{Coverage[benefit.ProductElementCode]}:</td>
+                        <td>₹ {Math.round(TRAILOR_OD_PREMIUM)}</td>
+                    </tr> : (ncbDiscount && ncbDiscount!=0) ? <tr label={productCount+=1}>
+                        <td >NCB Discount:</td>
+                        <td>₹ - {Math.round(ncbDiscount)}</td>
+                    </tr> : null
+                         
                 ))
             )) : null
 

@@ -265,6 +265,11 @@ const PremiumSME = Loadable({
     loading: () => loadingContent
 });
 
+const SummarySME = Loadable({
+    loader: () => import(/*webpackChunkName: "Products" */"../sme-fire/Summary_sme.jsx"),
+    loading: () => loadingContent
+});
+
 //  =================================== Landing Page ==================================
 
 const Dashboard = Loadable({
@@ -356,6 +361,7 @@ class Routes extends Component {
                         <PrivateRoute exact path="/RiskDetails/:productId" component={RiskDetails} />
                         <PrivateRoute exact path="/OtherDetails/:productId" component={OtherDetails} />
                         <PrivateRoute exact path="/AdditionalDetails_SME/:productId" component={AdditionalDetailsSME} />
+                        <PrivateRoute exact path="/Summary_SME/:productId" component={SummarySME} />  
                         <PrivateRoute exact path="/Premium_SME/:productId" component={PremiumSME} />  
 
                         {/************ Support ******************/}

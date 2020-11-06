@@ -3,7 +3,8 @@ import {
     SME_FIRE_RISK,
     SME_FIRE_UPDATE,
     SME_FIRE_OTHER_DETAILS,
-    SME_FIRE_PROPOSER_DETAILS
+    SME_FIRE_PROPOSER_DETAILS,
+    COMM_ADDRESS
 } from "../actions/actionTypes";
 
 
@@ -46,6 +47,7 @@ export const setSmeRiskData = ( request ) => {
                 house_building_name:request.house_building_name,
                 block_no:request.block_no,
                 street_name:request.street_name,
+                plot_no:request.plot_no,
                 content_sum_insured:request.content_sum_insured,
                 house_flat_no:request.house_flat_no,
                 pincode:request.pincode,
@@ -85,10 +87,10 @@ export const setSmeProposerDetailsData = ( request ) => {
                 email_id:request.email_id,
                 mobile:request.mobile,
                 gender:request.gender,
-                pan_no:request.pan_no,
                 gstn_no:request.gstn_no,
+                pan_no:request.pan_no,
                 com_street_name:request.com_street_name,
-                plot_no:request.plot_no,
+                com_plot_no:request.com_plot_no,
                 com_building_name:request.com_building_name,
                 com_pincode:request.com_pincode,
                 com_pincode_id:request.com_pincode_id,
@@ -98,3 +100,21 @@ export const setSmeProposerDetailsData = ( request ) => {
         });
     }
 }
+
+export const setCommunicationAddress = ( request ) => {
+    return dispatch => {
+        dispatch({
+            type: COMM_ADDRESS,
+            payload: {
+                com_street_name:request.street_name,
+                com_plot_no:request.plot_no,
+                com_building_name:request.building_name,
+                com_pincode:request.pincode,
+                com_pincode_id:request.pincode_id,
+                com_block_no:request.block_no,
+                com_house_flat_no:request.house_flat_no,
+            }
+        });
+    }
+}
+

@@ -14,7 +14,7 @@ import axios from "../../shared/axios"
 import moment from "moment";
 import Encryption from '../../shared/payload-encryption';
 import {  PersonAge } from "../../shared/dateFunctions";
-import { setSmeRiskData } from '../../store/actions/sme_fire';
+import { setSmeRiskData,setSmeData,setSmeOthersDetailsData,setSmeProposerDetailsData } from '../../store/actions/sme_fire';
 
 
 const ageObj = new PersonAge();
@@ -154,34 +154,39 @@ class RiskDetails extends Component {
         }       
     }
 
-    fetchAreadetailsBack=()=>{
-        if(this.props.pincode != null && this.props.pincode != '' && this.props.pincode.length==6){
-            let pinCode = this.props.pincode;      
+    fetchAreadetailsBack=(pincode_input='')=>{
 
-            if(pinCode.length==6){
-                const formData = new FormData();
-                this.props.loadingStart();
-                let encryption = new Encryption();
-                const post_data_obj = {
-                    'pincode':pinCode
-                };
-                formData.append('enc_data',encryption.encrypt(JSON.stringify(post_data_obj)))
-                formData.append('pincode',pinCode)
-                axios.post('pincode-details',
-                formData
-                ).then(res=>{       
-                    let stateName = res.data.data && res.data.data[0] && res.data.data[0].pinstate.STATE_NM ? res.data.data[0].pinstate.STATE_NM : ""                        
-                    this.setState({
-                        pinDataArr: res.data.data,
-                        stateName,
-                    });
-                    this.props.loadingStop();
-                }).
-                catch(err=>{
-                    this.props.loadingStop();
-                })          
-            }
-        }       
+        let pinCode = '';
+
+        if(this.props.pincode != null && this.props.pincode != '' && this.props.pincode.length==6){
+            pinCode = this.props.pincode;
+        }else if(pincode_input != ''){
+            pinCode = pincode_input;
+        }
+
+        if(pinCode != null && pinCode != '' && pinCode.length==6){
+            const formData = new FormData();
+            this.props.loadingStart();
+            let encryption = new Encryption();
+            const post_data_obj = {
+                'pincode':pinCode
+            };
+            formData.append('enc_data',encryption.encrypt(JSON.stringify(post_data_obj)))
+            formData.append('pincode',pinCode)
+            axios.post('pincode-details',
+            formData
+            ).then(res=>{       
+                let stateName = res.data.data && res.data.data[0] && res.data.data[0].pinstate.STATE_NM ? res.data.data[0].pinstate.STATE_NM : ""                        
+                this.setState({
+                    pinDataArr: res.data.data,
+                    stateName,
+                });
+                this.props.loadingStop();
+            }).
+            catch(err=>{
+                this.props.loadingStop();
+            })          
+        }     
     }
     
     handleSubmit=(values)=>{
@@ -192,6 +197,7 @@ class RiskDetails extends Component {
         formData.append('policy_holder_id',this.props.policy_holder_id)
         formData.append('menumaster_id',this.props.menumaster_id)
         formData.append('street_name',values.street_name)
+        formData.append('plot_no',values.plot_no)
         // formData.append('bcmaster_id','1')house_flat_no salutation
         // let pol_start_date = moment(values.start_date).format('YYYY-MM-DD HH:MM:SS')
         // let pol_end_date = moment(values.end_date).format('YYYY-MM-DD HH:MM:SS')
@@ -217,6 +223,7 @@ class RiskDetails extends Component {
                     house_building_name:values.house_building_name,
                     block_no:values.block_no,
                     street_name:values.street_name,
+                    plot_no:values.plot_no,
                     content_sum_insured:values.content_sum_insured,
                     house_flat_no:values.house_flat_no,
                     pincode:values.pincode,
@@ -235,9 +242,111 @@ class RiskDetails extends Component {
         
     }
 
+    fetchPolicyDetails=()=>{
+        let policy_holder_ref_no = localStorage.getItem("policy_holder_ref_no") ? localStorage.getItem("policy_holder_ref_no"):0;
+        console.log('this.props.policy_holder_ref_no',this.props.policy_holder_ref_no);
+
+        if(this.props.policy_holder_ref_no == null && policy_holder_ref_no != ''){
+            
+            this.props.loadingStart();
+            axios.get(`sme/details/${policy_holder_ref_no}`)
+            .then(res=>{
+                
+                if(res.data.data.policyHolder.step_no > 0){
+                    this.props.setData({
+                        start_date:res.data.data.policyHolder.request_data.start_date,
+                        end_date:res.data.data.policyHolder.request_data.end_date,
+                        
+                        policy_holder_id:res.data.data.policyHolder.id,
+                        policy_holder_ref_no:policy_holder_ref_no,
+                        request_data_id:res.data.data.policyHolder.request_data.id,
+                        completed_step:res.data.data.policyHolder.step_no,
+                        menumaster_id:res.data.data.policyHolder.menumaster_id
+                    });
+                }
+
+                if(res.data.data.policyHolder.step_no == 1 || res.data.data.policyHolder.step_no > 1){
+
+                    let risk_arr = JSON.parse(res.data.data.policyHolder.smeinfo.risk_address);
+
+                    this.props.setRiskData(
+                        {
+                            house_building_name:risk_arr.house_building_name,
+                            block_no:risk_arr.block_no,
+                            street_name:risk_arr.street_name,
+                            plot_no:risk_arr.plot_no,
+                            house_flat_no:risk_arr.house_flat_no,
+                            pincode:res.data.data.policyHolder.smeinfo.pincode,
+                            pincode_id:res.data.data.policyHolder.smeinfo.pincode_id,
+
+                            buildings_sum_insured:res.data.data.policyHolder.smeinfo.buildings_sum_insured,
+                            content_sum_insured:res.data.data.policyHolder.smeinfo.content_sum_insured,
+                            stock_sum_insured:res.data.data.policyHolder.smeinfo.stock_sum_insured
+                        }
+                    );
+                }
+
+                if(res.data.data.policyHolder.step_no == 2 || res.data.data.policyHolder.step_no > 2){
+
+                    this.props.setSmeOthersDetails({
+                    
+                        previous_start_date:res.data.data.policyHolder.previouspolicy.start_date,
+                        previous_end_date:res.data.data.policyHolder.previouspolicy.end_date,
+                        Previous_Policy_No:res.data.data.policyHolder.previouspolicy.policy_no,
+                        insurance_company_id:res.data.data.policyHolder.previouspolicy.insurancecompany_id,
+                        previous_city:res.data.data.policyHolder.previouspolicy.address
+        
+                    });
+
+                    this.fetchAreadetailsBack(res.data.data.policyHolder.smeinfo.pincode);
+                
+                }
+
+                if(res.data.data.policyHolder.step_no == 3 || res.data.data.policyHolder.step_no > 3){
+
+                    let address = '';
+                    if(res.data.data.policyHolder.address == null){
+                        
+                    }else{
+                        address = JSON.parse(res.data.data.policyHolder.address);
+
+                        this.props.setSmeProposerDetails(
+                            {
+                                first_name:res.data.data.policyHolder.first_name,
+                                last_name:res.data.data.policyHolder.last_name,
+                                salutation_id:res.data.data.policyHolder.salutation_id,
+                                date_of_birth:res.data.data.policyHolder.dob,
+                                email_id:res.data.data.policyHolder.email_id,
+                                mobile:res.data.data.policyHolder.mobile,
+                                gender:res.data.data.policyHolder.gender,
+                                pan_no:res.data.data.policyHolder.pancard,
+                                gstn_no:res.data.data.policyHolder.gstn_no,
+
+                                com_street_name:address.street_name,
+                                com_plot_no:address.plot_no,
+                                com_building_name:address.house_building_name,
+                                com_block_no:address.block_no,
+                                com_house_flat_no:address.house_flat_no,
+                                com_pincode:res.data.data.policyHolder.pincode,
+                                com_pincode_id:res.data.data.policyHolder.pincode_id
+                            }
+                        );
+                    }
+                }
+
+                this.props.loadingStop();
+            })
+            .catch(err => {
+                this.props.loadingStop();
+            })
+        }
+        
+    }
+
     componentDidMount() {
         // this.getInsurerList();
-        this.fetchData();
+        //this.fetchData();
+        this.fetchPolicyDetails();
         this.fetchAreadetailsBack();
         
     }
@@ -253,7 +362,8 @@ class RiskDetails extends Component {
         let newInitialValues = Object.assign(initialValue,{
             house_building_name:this.props.house_building_name,
             block_no:this.props.block_no,
-            street_name:'5H',
+            street_name:this.props.street_name,
+            plot_no:this.props.plot_no,
             content_sum_insured:this.props.content_sum_insured,
             house_flat_no:this.props.house_flat_no,
             pincode:this.props.pincode,
@@ -303,25 +413,6 @@ class RiskDetails extends Component {
                                                 </div>
                                                 </div>    
                                                 <Row>
-                                                    {/* <Col sm={12} md={4} lg={4}>
-                                                        <FormGroup>
-                                                            <div className="formSection">
-                                                            <Field
-                                                                name='gender'
-                                                                component="select"
-                                                                autoComplete="off"                                                                        
-                                                                className="formGrp"
-                                                            >
-                                                            <option value="">Shops dealing with hazardous goods</option>
-                                                                <option value="m">Male</option>
-                                                                <option value="f">Female</option>
-                                                            </Field>     
-                                                            {errors.gender && touched.gender ? (
-                                                            <span className="errorMsg">{errors.gender}</span>
-                                                            ) : null}              
-                                                            </div>
-                                                        </FormGroup>
-                                                    </Col> */}
                                                     <Col sm={12} md={4} lg={4}>
                                                         <FormGroup>
                                                             <div className="formSection">
@@ -376,6 +467,48 @@ class RiskDetails extends Component {
                                                             </div>
                                                         </FormGroup>
                                                     </Col>
+                                                    </Row>
+                                                    
+                                                    <Row>
+                                                    <Col sm={12} md={4} lg={4}>
+                                                        <FormGroup>
+                                                            <div className="formSection">
+                                                            <Field
+                                                                name='street_name'
+                                                                type="text"
+                                                                placeholder="Street Name"
+                                                                autoComplete="off"
+                                                                onFocus={e => this.changePlaceHoldClassAdd(e)}
+                                                                onBlur={e => this.changePlaceHoldClassRemove(e)}
+                                                                value = {values.street_name}                                                                            
+                                                            />
+                                                            {errors.street_name && touched.street_name ? (
+                                                            <span className="errorMsg">{errors.street_name}</span>
+                                                            ) : null}              
+                                                            </div>
+                                                        </FormGroup>
+                                                    </Col>
+                                                    <Col sm={12} md={4} lg={4}>
+                                                        <FormGroup>
+                                                            <div className="formSection">
+                                                            <Field
+                                                                name='plot_no'
+                                                                type="text"
+                                                                placeholder="Plot No."
+                                                                autoComplete="off"
+                                                                onFocus={e => this.changePlaceHoldClassAdd(e)}
+                                                                onBlur={e => this.changePlaceHoldClassRemove(e)}
+                                                                value = {values.plot_no}                                                                            
+                                                            />
+                                                            {errors.plot_no && touched.plot_no ? (
+                                                            <span className="errorMsg">{errors.plot_no}</span>
+                                                            ) : null}              
+                                                            </div>
+                                                        </FormGroup>
+                                                    </Col>
+                                                    </Row>
+                                                    <Row>
+
                                                     <Col sm={12} md={4} lg={4}>
                                                     <FormGroup>
                                                         <div className="insurerName">
@@ -566,10 +699,19 @@ class RiskDetails extends Component {
 const mapStateToProps = state => {
     return {
       loading: state.loader.loading,
+
+      start_date: state.sme_fire.start_date,
+      end_date: state.sme_fire.end_date,
+      policy_holder_id: state.sme_fire.policy_holder_id,
+      policy_holder_ref_no:state.sme_fire.policy_holder_ref_no,
+      request_data_id:state.sme_fire.request_data_id,
+      completed_step:state.sme_fire.completed_step,
+      menumaster_id:state.sme_fire.menumaster_id,
+
       house_building_name: state.sme_fire.house_building_name,
       block_no: state.sme_fire.block_no,
       street_name: state.sme_fire.street_name,
-      content_sum_insured: state.sme_fire.content_sum_insured,
+      plot_no: state.sme_fire.plot_no,
       house_flat_no: state.sme_fire.house_flat_no,
       pincode: state.sme_fire.pincode,
       pincode_id: state.sme_fire.pincode_id,
@@ -585,7 +727,10 @@ const mapStateToProps = state => {
     return {
       loadingStart: () => dispatch(loaderStart()),
       loadingStop: () => dispatch(loaderStop()),
-      setRiskData:(data) => dispatch(setSmeRiskData(data))
+      setData:(data) => dispatch(setSmeData(data)),
+      setRiskData:(data) => dispatch(setSmeRiskData(data)),
+      setSmeProposerDetails:(data) => dispatch(setSmeProposerDetailsData(data)),
+      setSmeOthersDetails:(data) => dispatch(setSmeOthersDetailsData(data))
     };
   };
 
