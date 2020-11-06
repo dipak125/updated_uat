@@ -1384,6 +1384,8 @@ class OtherComprehensiveGCV extends Component {
          : null 
 
         productCount=1
+        ncbCount=1
+        console.log('ncbDiscount_breakup', ncbDiscount);
          const premiumBreakup = policyCoverage && policyCoverage.length > 0 ?
             policyCoverage.map((coverage, qIndex) => (
                 coverage.PolicyBenefitList && coverage.PolicyBenefitList.map((benefit, bIndex) => (
@@ -1394,13 +1396,14 @@ class OtherComprehensiveGCV extends Component {
                         </tr> : (benefit.ProductElementCode == 'B00007' && productCount==1) ? <tr label={productCount+=1}>
                         <td >{Coverage[benefit.ProductElementCode]}:</td>
                         <td>₹ {Math.round(TRAILOR_OD_PREMIUM)}</td>
-                    </tr> : (ncbDiscount && ncbDiscount!=0) ? <tr label={productCount+=1}>
-                        <td >NCB Discount:</td>
-                        <td>₹ - {Math.round(ncbDiscount)}</td>
-                    </tr> : null
-                         
+                    </tr> : null                         
                 ))
             )) : null
+        
+        const ncbBreakup = (ncbDiscount && ncbDiscount!=0 && ncbCount==1) ? <tr label={ncbCount+=1}>
+        <td >NCB Discount:</td>
+        <td>₹ - {Math.round(ncbDiscount)}</td>
+    </tr> : null
 
         const premiumBreakupIMT = fulQuoteResp && fulQuoteResp.PolicyLobList  && Math.round(fulQuoteResp.PolicyLobList[0].PolicyRiskList[0].imt23prem) > 0 ?
                         <tr>
@@ -2461,6 +2464,7 @@ console.log("errors------------------ ", errors)
                             </thead>
                             <tbody>
                             {premiumBreakup}
+                            {ncbBreakup}
                             {premiumBreakupIMT}
                             
                                 <tr>
