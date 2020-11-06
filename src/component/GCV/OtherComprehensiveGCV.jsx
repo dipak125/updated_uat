@@ -1344,6 +1344,7 @@ class OtherComprehensiveGCV extends Component {
         ))
         console.log('TRAILOR_OD_PREMIUM -- ', TRAILOR_OD_PREMIUM)
         let productCount = 1;
+        let ncbCount = 1;
         const policyCoverageList =  policyCoverage && policyCoverage.length > 0 ?
             policyCoverage.map((coverage, qIndex) => (
                 coverage.PolicyBenefitList && coverage.PolicyBenefitList.map((benefit, bIndex) => (
@@ -1354,19 +1355,19 @@ class OtherComprehensiveGCV extends Component {
                             </Col>
                             <Col sm={12} md={6}>
                                 <FormGroup>₹ {Math.round(benefit.AnnualPremium)}</FormGroup>
-                            </Col></Row>
-                            : (benefit.ProductElementCode == 'B00007' && productCount==1) ? <Row><Col sm={12} md={6}>
-                            <FormGroup>{Coverage[benefit.ProductElementCode]}</FormGroup>
-                        </Col>
-                        <Col sm={12} md={6} data={productCount+=1}>
-                            <FormGroup>₹ {Math.round(TRAILOR_OD_PREMIUM)}</FormGroup>
-                        </Col></Row> : (ncbDiscount && ncbDiscount!=0) ? <Row><Col sm={12} md={6}>
+                            </Col></Row> : (benefit.ProductElementCode == 'B00007' && productCount==1) ? <Row><Col sm={12} md={6}>
+                                <FormGroup>{Coverage[benefit.ProductElementCode]}</FormGroup>
+                            </Col>
+                            <Col sm={12} md={6} data={productCount+=1}>
+                                <FormGroup>₹ {Math.round(TRAILOR_OD_PREMIUM)}</FormGroup>
+                            </Col></Row> : null}
+                            {(ncbDiscount && ncbDiscount!=0 && ncbCount==1) ? <Row><Col sm={12} md={6}>
                             <FormGroup>NCB Discount</FormGroup>
-                        </Col>
-                        <Col sm={12} md={6} data={productCount+=1}>
-                            <FormGroup>₹ - {Math.round(ncbDiscount)}</FormGroup>
-                        </Col></Row> : null}
-                   </div>     
+                            </Col>
+                            <Col sm={12} md={6} data={ncbCount+=1}>
+                                <FormGroup>₹ - {Math.round(ncbDiscount)}</FormGroup>
+                            </Col></Row> : null}
+                   </div>
             ))
         )) : null 
         const policyCoveragIMT =  fulQuoteResp && fulQuoteResp.PolicyLobList  && Math.round(fulQuoteResp.PolicyLobList[0].PolicyRiskList[0].imt23prem) > 0 ?
