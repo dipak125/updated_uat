@@ -1361,15 +1361,15 @@ class OtherComprehensiveGCV extends Component {
                             <Col sm={12} md={6} data={productCount+=1}>
                                 <FormGroup>₹ {Math.round(TRAILOR_OD_PREMIUM)}</FormGroup>
                             </Col></Row> : null}
-                            {(ncbDiscount && ncbDiscount!=0 && ncbCount==1) ? <Row><Col sm={12} md={6}>
-                            <FormGroup>NCB Discount</FormGroup>
-                            </Col>
-                            <Col sm={12} md={6} data={ncbCount+=1}>
-                                <FormGroup>₹ - {Math.round(ncbDiscount)}</FormGroup>
-                            </Col></Row> : null}
                    </div>
             ))
-        )) : null 
+        )) : null
+        const ncbStr = (ncbDiscount && ncbDiscount!=0 && ncbCount==1) ? <Row><Col sm={12} md={6}>
+        <FormGroup>NCB Discount</FormGroup>
+        </Col>
+        <Col sm={12} md={6} data={ncbCount+=1}>
+            <FormGroup>₹ - {Math.round(ncbDiscount)}</FormGroup>
+        </Col></Row> : null
         const policyCoveragIMT =  fulQuoteResp && fulQuoteResp.PolicyLobList  && Math.round(fulQuoteResp.PolicyLobList[0].PolicyRiskList[0].imt23prem) > 0 ?
                     <div>
                         <Row>
@@ -1457,6 +1457,7 @@ console.log("errors------------------ ", errors)
                                     <Collapsible trigger="Default Covered Coverages & Benefit" open= {true}>
                                         <div className="listrghtsideTrigr">
                                             {policyCoverageList}
+                                            {/* {ncbStr} */}
                                             {policyCoveragIMT}
                                         </div>
                                     </Collapsible>
@@ -2464,7 +2465,7 @@ console.log("errors------------------ ", errors)
                             </thead>
                             <tbody>
                             {premiumBreakup}
-                            {ncbBreakup}
+                            {/* {ncbBreakup} */}
                             {premiumBreakupIMT}
                             
                                 <tr>
