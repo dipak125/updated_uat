@@ -426,7 +426,7 @@ class VehicleDetailsGCV extends Component {
             return false
             }
 
-        if((values.valid_previous_policy == "0" || Math.floor(moment().diff(values.previous_end_date, 'days', true)) >0 ) && values.policy_type_id == "2") {
+        if(values.valid_previous_policy == "0" && values.policy_type_id == "2") {
             swal("Thank you for showing your interest for buying product.Due to some reasons, we are not able to issue the policy online.Please call 1800 22 1111")
             return false
         }

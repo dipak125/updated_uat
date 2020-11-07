@@ -40,7 +40,7 @@ const initialValues = {
   start_date: new Date(),
   end_date: new Date(),
   report_range: 1,
-  report_chart: 1,
+  report_chart: '',
 };
 
 const option = {
@@ -78,6 +78,7 @@ class Dashboard extends Component {
       moment(values.start_date).format("YYYY-MM-DD")
     );
     formData.append("end_date", moment(values.end_date).format("YYYY-MM-DD"));
+    this.props.loadingStart();
 
     axios
       .post(`policy-master`, formData)
@@ -89,6 +90,7 @@ class Dashboard extends Component {
         this.setState({
           rawData: rawData,
         });
+        this.props.loadingStop()
       })
       .catch((err) => {
         this.props.loadingStop();
@@ -402,13 +404,13 @@ class Dashboard extends Component {
                                                     className="formGrp inputfs12"
                                                     value={values.report_chart}
                                                     onChange={(e) => {
-                                                      this.handleChangeChart(e.target.value)
                                                       setFieldTouched(
                                                         "report_chart"
                                                       );
                                                       setFieldValue(
                                                         "report_chart"
                                                       );
+                                                      this.handleChangeChart(e.target.value)
                                                       this.fetchChartData(
                                                         rawData,
                                                         e.target.value
