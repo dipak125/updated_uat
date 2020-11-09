@@ -83,7 +83,7 @@ class Summary_sme extends Component {
         let formDataNew = new FormData(); 
         formDataNew.append('menumaster_id',this.props.menumaster_id)
         formDataNew.append('policy_ref_no',this.props.policy_holder_ref_no)
-
+        this.props.loadingStart();
         axios.post('/sme/create-quote',
         formDataNew
         ).then(res=>{
@@ -285,7 +285,7 @@ class Summary_sme extends Component {
                                                     <div className="d-flex justify-content-left">
                                                         <div className="brandhead m-b-10">
                                                             <h4>SME FIRE </h4>
-                                                            <span>You are just one steps away in getting your policy ready and your Quotation Number: {this.state.quoteId}. </span>
+                                                            <p>You are just one steps away in getting your policy ready.</p> <p>Your Quotation Number is: <span><strong>{this.state.quoteId}</strong></span></p>
                                                         </div>
                                                     </div>
                                                     <div className="brandhead m-b-30">
@@ -302,8 +302,8 @@ class Summary_sme extends Component {
                                                                 <Collapsible trigger="Proposer Details" >
                                                                     <div className="listrghtsideTrigr">
                                                                         <div>
-                                                                            <strong>Proposer Details:</strong>
-                                                                            <br/>
+                                                                            {/* <strong>Proposer Details:</strong>
+                                                                            <br/> */}
                                                                             <Row>
                                                                                 <Col sm={12} md={6}>
                                                                                     <Row>
@@ -433,8 +433,8 @@ class Summary_sme extends Component {
                                                                 <Collapsible trigger="Communication Details" >
                                                                     <div className="listrghtsideTrigr">
                                                                         <div>
-                                                                            <strong>Communication Details:</strong>
-                                                                            <br/>
+                                                                            {/* <strong>Communication Details:</strong>
+                                                                            <br/> */}
                                                                             <Row>
                                                                                 <Col sm={12} md={6}>
                                                                                     <Row>
@@ -531,8 +531,8 @@ class Summary_sme extends Component {
                                                                 <Collapsible trigger="Policy Summary" >
                                                                     <div className="listrghtsideTrigr">
                                                                         <div>
-                                                                            <strong>Policy Summary:</strong>
-                                                                            <br/>
+                                                                            {/* <strong>Policy Summary:</strong>
+                                                                            <br/> */}
                                                                             <Row>
                                                                                 <Col sm={12} md={6}>
                                                                                     <Row>

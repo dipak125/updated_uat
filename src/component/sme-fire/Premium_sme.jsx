@@ -162,10 +162,10 @@ class Premium_sme extends Component {
         const { refNumber } = this.state;
         window.location = `${process.env.REACT_APP_PAYMENT_URL}/ConnectPG/payment_sme_fire.php?refrence_no=${refNumber}`
     }
-
+    // http://14.140.119.44/sbig-csc/razorpay/smefire_pay.php?refrence_no=b6682aa3f5bc9003623cdee5506dfb2d
     Razor_payment = () => {
         const { refNumber } = this.state;
-        window.location = `${process.env.REACT_APP_PAYMENT_URL}/razorpay/pay.php?refrence_no=${refNumber}`
+        window.location = `${process.env.REACT_APP_PAYMENT_URL}/razorpay/smefire_pay.php?refrence_no=${refNumber}`
     }
 
     paypoint_payment = () => {
@@ -415,8 +415,8 @@ class Premium_sme extends Component {
                                                                         
 
                                                                                 <div>
-                                                                                    <strong>Owner Details :</strong>
-                                                                                    <br/>
+                                                                                    {/* <strong>Owner Details :</strong>
+                                                                                    <br/> */}
                                                                                     <Row>
                                                                                         <Col sm={12} md={6}>
                                                                                             <Row>
