@@ -121,7 +121,7 @@ class OtherDetails extends Component {
                 previous_end_date:values.previous_end_date,
                 Previous_Policy_No:values.Previous_Policy_No,
                 insurance_company_id:values.insurance_company_id,
-                previous_city:'kolkata'
+                previous_city:values.previous_city
 
             });
             const {productId} = this.props.match.params;
@@ -377,7 +377,7 @@ class OtherDetails extends Component {
                                             <Col sm={12} md={9} lg={9}>
                                                 <div className="d-flex justify-content-left">
                                                     <div className="brandhead">
-                                                        <h4>OTHER DETAILS</h4>
+                                                        <h4>Commercial consideration in %</h4>
                                                     </div>
                                                 </div>   
                                                 <Row> 
@@ -468,10 +468,11 @@ class OtherDetails extends Component {
                                                                 className="datePckr inputfs12"
                                                                 selected={values.previous_start_date}
                                                                 onChange={(val) => {
-                                                                    setFieldTouched('previous_start_date')
+                                                                    //setFieldTouched('previous_start_date')
                                                                     setFieldValue('previous_start_date', val);
-                                                                    this.setState({disable_end_date:false});
-                                                                    endMinDate = moment(val).add(1, 'day');
+                                                                    setFieldValue('previous_end_date', new Date(moment(val).add(364, 'day').calendar()));
+                                                                    //this.setState({disable_end_date:false});
+                                                                    //endMinDate = moment(val).add(364, 'day');
                                                                 }}
                                                             />
                                                             {errors.previous_start_date && touched.previous_start_date ? (

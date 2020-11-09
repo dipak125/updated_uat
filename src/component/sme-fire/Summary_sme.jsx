@@ -111,7 +111,7 @@ class Summary_sme extends Component {
             this.props.loadingStart();
             axios.get(`sme/details/${policy_holder_ref_no}`)
             .then(res=>{
-                
+                console.log("gross_premium-----",res.data.data.policyHolder.request_data.gross_premium)
 
                 if(res.data.data.policyHolder.step_no > 0){
 
@@ -236,9 +236,9 @@ class Summary_sme extends Component {
     }
 
     render() {
-        const { policyHolder, show, fulQuoteResp, motorInsurance, error, error1, refNumber, paymentStatus, relation, memberdetails,nomineedetails, vehicleDetails, breakin_flag } = this.state
+        const { policyHolder, show, fulQuoteResp, motorInsurance, error, error1, refNumber, paymentStatus, relation, memberdetails,nomineedetails, vehicleDetails, breakin_flag} = this.state
         const { productId } = this.props.match.params
-
+        console.log("salutationID-----",this.state.salutationName)
         const errMsg =
             error && error.message ? (
                 <span className="errorMsg">
@@ -596,7 +596,7 @@ class Summary_sme extends Component {
                                                                     {isSubmitting ? 'Wait..' : 'Back'}
                                                                 </Button> 
                                                                 <Button className={`proceedBtn`} type="submit"  disabled={isSubmitting ? true : false}>
-                                                                    Generate Quote
+                                                                    Generate Policy
                                                                 </Button> 
 
                                                             </div>

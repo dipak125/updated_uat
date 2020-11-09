@@ -82,6 +82,7 @@ class Premium_sme extends Component {
     }
 
     handleSubmit = (values) => {
+        console.log("values-----",values)
         // this.setState({ show: true, refNo: values.refNo, whatsapp: values.whatsapp });
         const {policyHolder} = this.state
         if(policyHolder && policyHolder.bcmaster && policyHolder.bcmaster.paymentgateway && policyHolder.bcmaster.paymentgateway.slug) {
