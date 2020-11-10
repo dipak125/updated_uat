@@ -16,17 +16,17 @@ import moment from "moment";
 
 const actionFormatter = (refObj) => (cell, row, enumObject) => {
     return (
-        <LinkWithTooltip
-            tooltip="Download PDF"
-            href="#"
-            clicked={() => refObj.openPage(cell)
-            }
-            id="tooltip-1"
-        >
-            <a >
-            {polNumFormatter(cell)}
-            </a> 
-        </LinkWithTooltip>
+        // <LinkWithTooltip
+        //     tooltip="Download PDF"
+        //     href="#"
+        //     clicked={() => refObj.openPage(cell)
+        //     }
+        //     id="tooltip-1"
+        // >
+        //     <a >
+            <div>{polNumFormatter(cell)}</div>
+        //     </a> 
+        // </LinkWithTooltip>
     )
 }
 
@@ -43,8 +43,18 @@ function productFormatter(cell) {
     return (cell ? (cell.vehicletype ? cell.vehicletype.name : null): null);
 } 
 
-function statusFormatter(cell) {
-    return (cell ? (cell.policy_note ? cell.policy_note.status : null): null);
+const statusFormatter = (refObj) => (cell,row) => {
+    return (
+        <LinkWithTooltip
+        tooltip="Click to proceed"
+        href="#"
+        clicked={() => refObj.redirectLink(cell,row)
+        }
+        id="tooltip-1"
+        >               
+        Continue Journey
+        </LinkWithTooltip>
+    )
 }
 
 const newInitialValues = {}
@@ -57,6 +67,43 @@ class QuoteSearch extends Component {
         searchValues: {},
         products: []
 
+    }
+
+    redirectLink = (cell,row) => {
+        localStorage.setItem("policyHolder_refNo", row.reference_no)
+        console.log('vehicletype_id---', row.vehiclebrandmodel.vehicletype_id)
+        // console.log('cell---', cell)
+        let page_name = 'Products'
+        let vehicletype_id = row.vehiclebrandmodel.vehicletype_id;
+        switch(vehicletype_id) {
+            case 2:
+              page_name = 'OtherComprehensive/2';
+              break;    
+            case 3:
+              page_name = 'two_wheeler_OtherComprehensiveTP/3';
+              break;
+            case 4:
+              page_name = 'two_wheeler_OtherComprehensive/4';
+              break;
+            case 5:
+              page_name = 'SelectDuration/5';
+              break;
+            case 6:
+              page_name = 'four_wheeler_OtherComprehensiveTP/6';
+              break;
+            case 7:
+              page_name = 'OtherComprehensive_GCV_TP/7'; 
+              break;
+            case 8:
+              page_name = 'OtherComprehensive_GCV/8'; 
+              break; 
+            default:
+              page_name = 'Products';
+        }
+        console.log('page_name---', page_name)
+        
+        localStorage.setItem("policyHolder_id", cell.policyholder_id)
+        this.props.history.push(`/${page_name}`);
     }
 
     changePlaceHoldClassAdd(e) {
@@ -162,7 +209,7 @@ class QuoteSearch extends Component {
                         <div className="col-sm-12 col-md-12 col-lg-10 col-xl-10 infobox">
                         <h4 className="text-center mt-3 mb-3">SBI General Insurance Company Limited</h4>
                             <div className="contBox m-b-45 tickedTable">
-                            <h4 className="text-center mt-3 mb-3">Quote Search</h4>                           
+                            <h4 className="text-center mt-3 mb-3">Quote History</h4>                           
 
                                 {policyHolder ? 
                                 <div className="customInnerTable">
@@ -177,12 +224,12 @@ class QuoteSearch extends Component {
                                     wrapperClasses="table-responsive"
                                 >
 
-                                    <TableHeaderColumn width='150px'  dataField="request_data"  dataFormat={ actionFormatter(this)} isKey >Quote Number</TableHeaderColumn>
-                                    <TableHeaderColumn width='100px'  dataField="first_name" >Proposer Name</TableHeaderColumn>
-                                    <TableHeaderColumn width='100px'  dataField="vehiclebrandmodel" dataFormat={productFormatter} >Product</TableHeaderColumn>
-                                    <TableHeaderColumn width='100px'  dataField='created_at' dataFormat={(cell) => (cell !== '0000-00-00 00:00:00' ? moment(cell).format("MM-DD-YYYY") : '')} dataSort>Quote Issue Date</TableHeaderColumn>
-                                    <TableHeaderColumn width='100px' tdStyle={{ whiteSpace: 'normal', width: '120px'}} dataField="request_data" dataFormat={premiumFormatter} > Premium</TableHeaderColumn>
-                                    <TableHeaderColumn width='100px'  dataField="request_data" dataFormat={statusFormatter} >Status</TableHeaderColumn>
+                                    <TableHeaderColumn width='195px'  dataField="request_data" dataAlign="center" dataFormat={ actionFormatter(this)} isKey >Quote Number</TableHeaderColumn>
+                                    <TableHeaderColumn width='100px'  dataField="first_name" dataAlign="center">Proposer Name</TableHeaderColumn>
+                                    <TableHeaderColumn width='100px'  dataField="vehiclebrandmodel" dataAlign="center" dataFormat={productFormatter} >Product</TableHeaderColumn>
+                                    <TableHeaderColumn width='95px'  dataField='created_at' dataFormat={(cell) => (cell !== '0000-00-00 00:00:00' ? moment(cell).format("DD-MM-YYYY") : '')} dataAlign="center" dataSort>Quote Issue Date</TableHeaderColumn>
+                                    <TableHeaderColumn width='100px' dataAlign="center" dataField="request_data" dataFormat={premiumFormatter} > Premium</TableHeaderColumn>
+                                    <TableHeaderColumn width='100px'  dataField="request_data" dataAlign="center" dataFormat={statusFormatter(this)} >Action</TableHeaderColumn>
 
                                     
 

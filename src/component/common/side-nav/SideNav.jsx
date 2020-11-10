@@ -65,9 +65,9 @@ class SideNav extends Component {
                 Policy Search
               </Link>
             </li>
-            {/* <li>
-							<Link to="/QuoteSearch" activeClassName="active"><span className="leftIcon01"><img src={require('../../../assets/images/document.png')} alt="" /></span>Quote Search</Link>
-                        </li> */}
+            <li>
+							<Link to="/QuoteHistory" activeClassName="active"><span className="leftIcon01"><img src={require('../../../assets/images/document.png')} alt="" /></span>Quote History</Link>
+            </li>
             <li>
               <Link to="/Products" activeClassName="active">
                 <span className="leftIcon01">

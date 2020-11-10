@@ -111,6 +111,7 @@ class Summary_sme extends Component {
             this.props.loadingStart();
             axios.get(`sme/details/${policy_holder_ref_no}`)
             .then(res=>{
+                let rawData = res.data.data
                 console.log("gross_premium-----",res.data.data.policyHolder.request_data.gross_premium)
 
                 if(res.data.data.policyHolder.step_no > 0){
@@ -199,8 +200,10 @@ class Summary_sme extends Component {
                         salutationName:res.data.data.policyHolder.salutation.displayvalue,
                         pincodeArea:pincode_area_arr.LCLTY_SUBRB_TALUK_TEHSL_NM,
                         quoteId:res.data.data.policyHolder.request_data.quote_id,
-                        grossPremium:res.data.data.policyHolder.request_data.gross_premium,
-                        payablePremium:res.data.data.policyHolder.request_data.payable_premium
+                        gst:res.data.data.policyHolder.request_data.service_tax,
+                        netPremium:res.data.data.policyHolder.request_data.net_premium,
+                        finalPremium:res.data.data.policyHolder.request_data.payable_premium,
+                        rawData: rawData.policyHolder.smeinfo.smecoverages,
                     }
                 );
 
@@ -236,9 +239,10 @@ class Summary_sme extends Component {
     }
 
     render() {
-        const { policyHolder, show, fulQuoteResp, motorInsurance, error, error1, refNumber, paymentStatus, relation, memberdetails,nomineedetails, vehicleDetails, breakin_flag} = this.state
+        const { policyHolder, show, fulQuoteResp, motorInsurance, error, error1, refNumber, paymentStatus, relation, memberdetails,nomineedetails, vehicleDetails, breakin_flag, rawData} = this.state
         const { productId } = this.props.match.params
-        console.log("salutationID-----",this.state.salutationName)
+        console.log("rawData-----",rawData)
+        // console.log("data------",rawData.policyHolder.smeinfo)
         const errMsg =
             error && error.message ? (
                 <span className="errorMsg">
@@ -262,6 +266,17 @@ class Summary_sme extends Component {
                     </h6>
                 </span>
             ) : null;
+
+            const sme_Coverages =
+            rawData && rawData.length > 0
+              ? rawData.map((listing, qIndex) => (                   
+                  <tr>
+                  <td>{listing.coverage.description} :</td>
+                  <td>{listing.sum_insured == null ? 0 : listing.sum_insured}</td>
+                  <td>{listing.premium}</td>
+                </tr>
+                ))
+              : null;
 
         return (
             <>
@@ -537,19 +552,18 @@ class Summary_sme extends Component {
                                                                                 <Col sm={12} md={6}>
                                                                                     <Row>
                                                                                         <Col sm={12} md={6}>
-                                                                                            <FormGroup>Policy Start Date:</FormGroup>
+                                                                                            <FormGroup>
+                                                                                                <strong>Policy Start Date :</strong></FormGroup>
                                                                                         </Col>
                                                                                         <Col sm={12} md={6}>
                                                                                             <FormGroup>{moment(new Date(this.props.start_date)).format('LL')}</FormGroup>
                                                                                         </Col>
                                                                                     </Row>
                                                                                 </Col>
-                                                                            </Row>
-                                                                            <Row>
                                                                                 <Col sm={12} md={6}>
                                                                                     <Row>
                                                                                         <Col sm={12} md={6}>
-                                                                                            <FormGroup>Policy End Date:</FormGroup>
+                                                                                            <FormGroup><strong>Policy End Date :</strong></FormGroup>
                                                                                         </Col>
                                                                                         <Col sm={12} md={6}>
                                                                                             <FormGroup>{moment(new Date(this.props.end_date)).format('LL')}</FormGroup>
@@ -559,28 +573,59 @@ class Summary_sme extends Component {
                                                                             </Row>
                                                                             <Row>
                                                                                 <Col sm={12} md={6}>
-                                                                                    <Row>
-                                                                                        <Col sm={12} md={6}>
-                                                                                            <FormGroup>Gross Premium:</FormGroup>
-                                                                                        </Col>
-                                                                                        <Col sm={12} md={6}>
-                                                                                            <FormGroup>{this.state.grossPremium}</FormGroup>
-                                                                                        </Col>
-                                                                                    </Row>
+                                                                                <table  style={({width: "45rem"})}>
+                                                                                <thead>
+                                                                                    <tr>
+                                                                                    <th>Cover Type</th>
+                                                                                    <th>Sum Insured(₹)</th>
+                                                                                    <th>Premium(₹)</th>
+                                                                                    </tr>
+                                                                                </thead>
+                                                                                <tbody>
+                                                                                {sme_Coverages}
+                                                                                </tbody>
+                                                                                </table>
                                                                                 </Col>
-                                                                            </Row>
-                                                                            <Row>
-                                                                                <Col sm={12} md={6}>
-                                                                                    <Row>
-                                                                                        <Col sm={12} md={6}>
-                                                                                            <FormGroup>Payable Premium:</FormGroup>
-                                                                                        </Col>
-                                                                                        <Col sm={12} md={6}>
-                                                                                            <FormGroup>{this.state.payablePremium}</FormGroup>
-                                                                                        </Col>
-                                                                                    </Row>
-                                                                                </Col>
-                                                                            </Row>
+                                                                                </Row>
+                                                                                <Row>
+                                                                                    <p></p>
+                                                                                </Row>
+                                                                                <Row>
+                                                                                    <Col sm={12} md={6}>
+                                                                                        <Row>
+                                                                                            <Col sm={12} md={6}>
+                                                                                                <FormGroup><strong>Net Premium(₹) :</strong></FormGroup>
+                                                                                            </Col>
+                                                                                            <Col sm={12} md={6}>
+                                                                                                <FormGroup>{this.state.netPremium}</FormGroup>
+                                                                                            </Col>
+                                                                                        </Row>
+                                                                                    </Col>
+                                                                                </Row>
+                                                                                <Row>
+                                                                                    <Col sm={12} md={6}>
+                                                                                        <Row>
+                                                                                            <Col sm={12} md={6}>
+                                                                                                <FormGroup><strong>GST(₹) :</strong></FormGroup>
+                                                                                            </Col>
+                                                                                            <Col sm={12} md={6}>
+                                                                                                <FormGroup>{this.state.gst}</FormGroup>
+                                                                                            </Col>
+                                                                                        </Row>
+                                                                                    </Col>
+                                                                                </Row>
+                                                                                <Row>
+                                                                                    <Col sm={12} md={6}>
+                                                                                        <Row>
+                                                                                            <Col sm={12} md={6}>
+                                                                                                <FormGroup><strong>Final Premium(₹) :</strong></FormGroup>
+                                                                                            </Col>
+                                                                                            <Col sm={12} md={6}>
+                                                                                                <FormGroup>{this.state.finalPremium}</FormGroup>
+                                                                                            </Col>
+                                                                                        </Row>
+                                                                                    </Col>
+                                                                                </Row>
                                                                             <Row>
                                                                                 <p></p>
                                                                             </Row>

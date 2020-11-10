@@ -30,7 +30,8 @@ import axios from "../../shared/axios";
 // import Encryption from "../../shared/payload-encryption";
 // import * as Yup from "yup";
 // import swal from "sweetalert";
-import { useState } from "react";
+import { useState } from "react"
+import Encryption from '../../shared/payload-encryption';
 import moment from "moment";
 // var Component = React.Component;
 // import "./style.css";
@@ -71,13 +72,38 @@ class Dashboard extends Component {
   };
 
   handleSubmit = (values) => {
-    console.log("submit_values------ ", values.start_date);
+    console.log("start_date------ ", values.start_date);
+    console.log("end_date------ ", values.end_date);
+    console.log("bcmaster_id------ ", values.bcmaster_id);
+    console.log("bc_agent_id------ ", values.bc_agent_id);
     const formData = new FormData();
+    let encryption = new Encryption();
+
+    if(sessionStorage.getItem('csc_id')) {
+        formData.append('bcmaster_id', '5');
+        formData.append('user_id',sessionStorage.getItem('csc_id') ? sessionStorage.getItem('csc_id') : "");
+        formData.append('agent_name',sessionStorage.getItem('agent_name') ? sessionStorage.getItem('agent_name') : "");
+        // formData.append('product_id',pr);
+            formData.append('page_name', `Dashboard`);
+    }else{
+        let bc_data = sessionStorage.getItem('bcLoginData') ? sessionStorage.getItem('bcLoginData') : "";
+        if(bc_data) {
+            bc_data = JSON.parse(encryption.decrypt(bc_data));
+
+            formData.append('bcmaster_id', bc_data ? bc_data.agent_id : "");
+            formData.append('bc_token', bc_data ? bc_data.token : "");
+            formData.append('user_id', bc_data ? bc_data.user_info.data.user.username : "");
+            // formData.append('product_id',productId);
+            formData.append('page_name', `Dashboard`);
+        }
+
+    }
     formData.append(
       "start_date",
       moment(values.start_date).format("YYYY-MM-DD")
     );
     formData.append("end_date", moment(values.end_date).format("YYYY-MM-DD"));
+    // formData.append('bcmaster_id', '1');
     this.props.loadingStart();
 
     axios
@@ -207,7 +233,7 @@ class Dashboard extends Component {
       setFieldValue("end_date", end_date);
     } else if (search_flag == 2) {
       let start_date = startDate;
-      let end_date = new Date(moment(start_date).add(6, "day").calendar());
+      let end_date = new Date(moment(start_date).add(6, "day"));
 
       setFieldTouched("start_date");
       setFieldValue("start_date", start_date);
@@ -215,7 +241,7 @@ class Dashboard extends Component {
       setFieldValue("end_date", end_date);
     } else if (search_flag == 3) {
       let start_date = startDate;
-      let end_date = new Date(moment(start_date).add(30, "day").calendar());
+      let end_date = new Date(moment(start_date).add(29, "day").calendar());
 
       setFieldTouched("start_date");
       setFieldValue("start_date", start_date);

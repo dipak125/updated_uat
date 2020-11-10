@@ -375,7 +375,7 @@ class Routes extends Component {
 
                         {/************ Dashboard ******************/}
                         <PrivateRoute exact path="/PolicySearch" component={PolicySearch} />   
-                        <PrivateRoute exact path="/QuoteSearch" component={QuoteSearch} />
+                        <PrivateRoute exact path="/QuoteHistory" component={QuoteSearch} />
 
                         {/************ Services ******************/}
                         <PrivateRoute exact path="/Services" component={Services} />
