@@ -95,7 +95,9 @@ class QuoteSearch extends Component {
               page_name = 'OtherComprehensive_GCV_TP/7'; 
               break;
             case 8:
-              page_name = 'OtherComprehensive_GCV/8'; 
+              page_name = 'OtherComprehensive_GCV/8';
+            case 9:
+              page_name = 'RiskDetails/5';
               break; 
             default:
               page_name = 'Products';
