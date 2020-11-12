@@ -33,6 +33,7 @@ const initialState = {
         Previous_Policy_No:null,
         insurance_company_id:null,
         previous_city:null,
+        Commercial_consideration:null,
 
         first_name:null,
         last_name:null,
@@ -44,7 +45,7 @@ const initialState = {
         com_building_name:null,
         com_street_name:null,
         plot_no:null,
-        pan_no:null,
+        pan_no:'',
         gstn_no:null,
         com_block_no:null,
         com_house_flat_no:null,
@@ -72,8 +73,8 @@ const sme = ( state = initialState, action) => {
         case SME_FIRE_RISK: return {...state, 
             house_building_name:action.payload.house_building_name,
             block_no:action.payload.block_no,
-            street_name:action.payload.street_name,
-            plot_no:action.payload.plot_no,
+            // street_name:action.payload.street_name,
+            // plot_no:action.payload.plot_no,
             content_sum_insured:action.payload.content_sum_insured,
             house_flat_no:action.payload.house_flat_no,
             pincode:action.payload.pincode,
@@ -87,7 +88,8 @@ const sme = ( state = initialState, action) => {
             previous_end_date:action.payload.previous_end_date,
             Previous_Policy_No:action.payload.Previous_Policy_No,
             insurance_company_id:action.payload.insurance_company_id,
-            previous_city:action.payload.previous_city}
+            previous_city:action.payload.previous_city,
+            Commercial_consideration:action.payload.Commercial_consideration}
             
         case SME_FIRE_PROPOSER_DETAILS: return {...state, 
             first_name:action.payload.first_name,

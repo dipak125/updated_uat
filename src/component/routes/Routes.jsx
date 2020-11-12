@@ -127,6 +127,10 @@ const ThankYou = Loadable({
     loader: () => import(/*webpackChunkName: "Products" */"../health/ThankYou.jsx"),
     loading: () => loadingContent
 });
+const ThankYouCCM = Loadable({
+    loader: () => import(/*webpackChunkName: "Products" */"../health/ThankYouCCM.jsx"),
+    loading: () => loadingContent
+});
 const SelectBrand = Loadable({
     loader: () => import(/*webpackChunkName: "Products" */"../motor/SelectBrand.jsx"),
     loading: () => loadingContent
@@ -299,6 +303,7 @@ class Routes extends Component {
                         <PrivateRoute exact path="/PolicyDetails/:productId" component={PolicyDetails} />
                         {/* <PrivateRoute exact path="/PolicySummery/:productId" component={PolicySummery} />                  */}
                         <PrivateRoute exact path="/ThankYou/:policyId" component={ThankYou} />
+                        <PrivateRoute exact path="/ThankYouCCM/:policyId" component={ThankYouCCM} />
                     
                         
                         <PrivateRoute exact path="/Registration/:productId" component={Registration} />                    

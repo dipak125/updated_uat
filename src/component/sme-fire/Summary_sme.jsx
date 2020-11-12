@@ -156,6 +156,7 @@ class Summary_sme extends Component {
 
                     this.props.setSmeOthersDetails({
                     
+                        Commercial_consideration:res.data.data.policyHolder.previouspolicy.Commercial_consideration,
                         previous_start_date:res.data.data.policyHolder.previouspolicy.start_date,
                         previous_end_date:res.data.data.policyHolder.previouspolicy.end_date,
                         Previous_Policy_No:res.data.data.policyHolder.previouspolicy.policy_no,
@@ -273,7 +274,7 @@ class Summary_sme extends Component {
                   <tr>
                   <td>{listing.coverage.description} :</td>
                   <td>{listing.sum_insured == null ? 0 : listing.sum_insured}</td>
-                  <td>{listing.premium}</td>
+                  <td>{listing.premium == null ? 0 : listing.premium}</td>
                 </tr>
                 ))
               : null;

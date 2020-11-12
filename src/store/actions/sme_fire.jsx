@@ -46,8 +46,8 @@ export const setSmeRiskData = ( request ) => {
             payload: {
                 house_building_name:request.house_building_name,
                 block_no:request.block_no,
-                street_name:request.street_name,
-                plot_no:request.plot_no,
+                // street_name:request.street_name,
+                // plot_no:request.plot_no,
                 content_sum_insured:request.content_sum_insured,
                 house_flat_no:request.house_flat_no,
                 pincode:request.pincode,
@@ -65,6 +65,7 @@ export const setSmeOthersDetailsData = ( request ) => {
         dispatch({
             type: SME_FIRE_OTHER_DETAILS,
             payload: {
+            Commercial_consideration:request.Commercial_consideration,
             previous_start_date:request.previous_start_date,
             previous_end_date:request.previous_end_date,
             Previous_Policy_No:request.Previous_Policy_No,

@@ -239,6 +239,7 @@ class Premium_sme extends Component {
 
                     this.props.setSmeOthersDetails({
                     
+                        Commercial_consideration:res.data.data.policyHolder.previouspolicy.Commercial_consideration,
                         previous_start_date:res.data.data.policyHolder.previouspolicy.start_date,
                         previous_end_date:res.data.data.policyHolder.previouspolicy.end_date,
                         Previous_Policy_No:res.data.data.policyHolder.previouspolicy.policy_no,

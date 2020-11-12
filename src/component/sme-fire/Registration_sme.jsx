@@ -15,10 +15,10 @@ import swal from 'sweetalert';
 import Encryption from '../../shared/payload-encryption';
 import { Formik, Form, Field, ErrorMessage } from 'formik';
 
-const minDate = moment().add(1, 'day');
+const minDate = moment().format();
 // alert(new Date(minDate));
-const maxDate = moment().add(30, 'day');
-const maxDateEnd = moment().add(30, 'day').calendar();
+const maxDate = moment().add(15, 'day');
+const maxDateEnd = moment().add(15, 'day').calendar();
 
 const initialValues = {
     policy_type: '1',
@@ -26,8 +26,8 @@ const initialValues = {
 }
 
 const vehicleRegistrationValidation = Yup.object().shape({
-    pol_start_date: Yup.date().required("Please select policy start date").nullable(),
-    pol_end_date: Yup.date().required("Please select policy end date").nullable(),
+    pol_start_date: Yup.date().required("Please select both policy start date & time").nullable(),
+    pol_end_date: Yup.date().required("Please select both policy end date & time").nullable(),
 })
 
 
@@ -136,6 +136,7 @@ class Registration_sme extends Component {
 
                     this.props.setSmeOthersDetails({
                     
+                        Commercial_consideration:res.data.data.policyHolder.previouspolicy.Commercial_consideration,
                         previous_start_date:res.data.data.policyHolder.previouspolicy.start_date,
                         previous_end_date:res.data.data.policyHolder.previouspolicy.end_date,
                         Previous_Policy_No:res.data.data.policyHolder.previouspolicy.policy_no,
@@ -216,7 +217,7 @@ class Registration_sme extends Component {
 
 
         let pol_start_date = moment(values.pol_start_date).format('YYYY-MM-DD HH:mm:ss')
-        let pol_end_date = moment(values.pol_end_date).format('YYYY-MM-DD HH:mm:ss')
+        let pol_end_date = moment(values.pol_end_date).format('YYYY-MM-DD hh:mm:ss')
         formData.append('pol_start_date', pol_start_date)
         formData.append('pol_end_date',pol_end_date)
         this.props.loadingStart();

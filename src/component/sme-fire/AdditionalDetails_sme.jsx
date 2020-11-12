@@ -54,9 +54,16 @@ const initialValue = {
     salutation_id: ""
 }
 
+// VALIDATION :-----------------------
 const vehicleRegistrationValidation = Yup.object().shape({
     salutation_id: Yup.string().required('Title is required').nullable(),
-    first_name: Yup.string().required('Name is required').nullable(),
+    first_name: Yup.string().required('First Name is required').min(3, function() {return "First name must be 3 characters"}).max(40,function() {
+        return "Full name must be maximum 40 characters"
+    }).matches(/^[a-zA-Z]+([\s]?[a-zA-Z]+)([\s]?[a-zA-Z]+)$/, function() {return "Please enter valid name"}).nullable(),
+    last_name: Yup.string().required('Name is required').min(1, function() {return "First name must be 1 characters"}).max(40, function() {return "Full name must be maximum 40 characters"})
+    .matches(/^[a-zA-Z]+([\s]?[a-zA-Z]+)([\s]?[a-zA-Z]+)$/, function() {
+        return "Please enter valid name"
+    }).nullable(),
     last_name: Yup.string().required('Name is required').nullable(),
     date_of_birth: Yup.date().required("Please enter date of birth").nullable(),
     email_id: Yup.string().email().required('Email is required').min(8, function() {
@@ -66,20 +73,20 @@ const vehicleRegistrationValidation = Yup.object().shape({
         return "Email must be maximum 75 characters"
     }).matches(/^[a-zA-Z0-9]+([._\-]?[a-zA-Z0-9]+)*@\w+([-]?\w+)*(\.\w{2,3})+$/,'Invalid Email Id').nullable(),
     mobile: Yup.string()
-    .matches(/^[6-9][0-9]{9}$/,'Invalid Mobile number').required('mobile No. is required').nullable(),
+    .matches(/^[6-9][0-9]{9}$/,'Invalid Mobile number').required('Mobile No. is required').nullable(),
     gender: Yup.string().required("Please select gender").nullable(),
-    pan_no: Yup.string().required("Enter PAN number")
+    pan_no: Yup.string()
     .matches(/^[A-Z]{3}[CPHFATBLJG]{1}[A-Z]{1}[0-9]{4}[A-Z]{1}$/,'Invalid PAN number') .nullable(),
     gstn_no: Yup.string().required("Please enter GSTN number")
     .matches(/^[0-9]{2}[A-Z]{3}[CPHFATBLJG]{1}[A-Z]{1}[0-9]{4}[A-Z]{1}[0-9]{1}[A-Z]{1}[0-9]{1}$/,'Invalid GSTIN').nullable(),
     //11AAACC7777A7A7
-    building_name: Yup.string().required("Please enter building name").nullable(),
-    block_no: Yup.string().required("Please enter plot number").nullable(),
-    plot_no: Yup.string().required("Please enter block number").nullable(),
-    flat_no: Yup.string().required("Please enter flat number").nullable(),
-    street_name: Yup.string().required("Please enter street name").nullable(),
-    pincode: Yup.string().required("Please enter pincode").nullable(),
-    pincode_id: Yup.string().required("Please select area").nullable(),
+    building_name: Yup.string().required("Please enter Building name").nullable(),
+    block_no: Yup.string().required("Please enter Plot number").nullable(),
+    plot_no: Yup.string().required("Please enter Block number").nullable(),
+    flat_no: Yup.string().required("Please enter Flat number").nullable(),
+    street_name: Yup.string().required("Please enter Dtreet name").nullable(),
+    pincode: Yup.string().required("Please enter Pincode").nullable(),
+    pincode_id: Yup.string().required("Please select Area").nullable(),
 })
 
 class AdditionalDetails_sme extends Component {
@@ -265,14 +272,18 @@ class AdditionalDetails_sme extends Component {
                     }).
                     catch(err=>{
                         this.props.loadingStop();
+                        this.props.history.push(`/Error`);
+                        
                     });
                 }).
                 catch(err=>{
                     this.props.loadingStop();
+                    this.props.history.push(`/Error`);
                 });
             }).
             catch(err=>{
                 this.props.loadingStop();
+                this.props.history.push(`/Error`);
             });
         }).
         catch(err=>{
@@ -399,29 +410,29 @@ class AdditionalDetails_sme extends Component {
     
     }
 
-    autoPopulateAddress = () => {
-        if(this.props.com_pincode === null){
-            console.log('this.props.pincode_id',this.props.pincode_id);
-            this.props.setAddress({
-                building_name:this.props.house_building_name,
-                block_no:this.props.block_no,
-                street_name:this.props.street_name,
-                plot_no:this.props.plot_no,
-                house_flat_no:this.props.house_flat_no,
-                pincode:this.props.pincode,
-                pincode_id:this.props.pincode_id
-            });
-            this.fetchAreadetailsBack(this.props.pincode);
-        }else{
-            this.fetchAreadetailsBack();
-        }
-    }
+    // autoPopulateAddress = () => {
+    //     if(this.props.com_pincode === null){
+    //         console.log('this.props.pincode_id',this.props.pincode_id);
+    //         this.props.setAddress({
+    //             building_name:this.props.house_building_name,
+    //             block_no:this.props.block_no,
+    //             street_name:this.props.street_name,
+    //             plot_no:this.props.plot_no,
+    //             house_flat_no:this.props.house_flat_no,
+    //             pincode:this.props.pincode,
+    //             pincode_id:this.props.pincode_id
+    //         });
+    //         this.fetchAreadetailsBack(this.props.pincode);
+    //     }else{
+    //         this.fetchAreadetailsBack();
+    //     }
+    // }
 
     componentDidMount() {
         this.fetchSalutation()
         this.fetchPolicyDetails();
         //this.autoPopulateAddress();
-        //this.fetchAreadetailsBack();
+        this.fetchAreadetailsBack();
     }
 
     fetchPolicyDetails=()=>{
@@ -473,6 +484,7 @@ class AdditionalDetails_sme extends Component {
 
                     this.props.setSmeOthersDetails({
                     
+                        Commercial_consideration:res.data.data.policyHolder.previouspolicy.Commercial_consideration,
                         previous_start_date:res.data.data.policyHolder.previouspolicy.start_date,
                         previous_end_date:res.data.data.policyHolder.previouspolicy.end_date,
                         Previous_Policy_No:res.data.data.policyHolder.previouspolicy.policy_no,
@@ -485,7 +497,7 @@ class AdditionalDetails_sme extends Component {
                 if(res.data.data.policyHolder.step_no == 3 || res.data.data.policyHolder.step_no > 3){
                     let address = '';
                     if(res.data.data.policyHolder.address == null){
-                        this.autoPopulateAddress();
+                        // this.autoPopulateAddress();
                     }else{
                         address = JSON.parse(res.data.data.policyHolder.address);
 
@@ -522,7 +534,7 @@ class AdditionalDetails_sme extends Component {
                 this.props.loadingStop();
             })
         }else{
-            this.autoPopulateAddress();
+            // this.autoPopulateAddress();
         }
         
     }
@@ -720,7 +732,10 @@ class AdditionalDetails_sme extends Component {
                                                     autoComplete="off"
                                                     onFocus={e => this.changePlaceHoldClassAdd(e)}
                                                     onBlur={e => this.changePlaceHoldClassRemove(e)}
-                                                    value = {values.gstn_no}                                                                            
+                                                    value = {values.gstn_no} 
+                                                    onChange= {(e)=> 
+                                                        setFieldValue('gstn_no', e.target.value.toUpperCase())
+                                                        }                                                                                             
                                                 />
                                                     {errors.gstn_no && touched.gstn_no ? (
                                                 <span className="errorMsg">{errors.gstn_no}</span>

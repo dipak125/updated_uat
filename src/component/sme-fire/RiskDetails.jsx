@@ -154,7 +154,7 @@ class RiskDetails extends Component {
         }       
     }
 
-    fetchAreadetailsBack=(pincode_input='')=>{
+    fetchAreadetailsBack=(pincode_input=null)=>{
 
         let pinCode = '';
 
@@ -196,8 +196,8 @@ class RiskDetails extends Component {
         
         formData.append('policy_holder_id',this.props.policy_holder_id)
         formData.append('menumaster_id',this.props.menumaster_id)
-        formData.append('street_name',values.street_name)
-        formData.append('plot_no',values.plot_no)
+        // formData.append('street_name','g6')
+        // formData.append('plot_no','g6')
         // formData.append('bcmaster_id','1')house_flat_no salutation
         // let pol_start_date = moment(values.start_date).format('YYYY-MM-DD HH:MM:SS')
         // let pol_end_date = moment(values.end_date).format('YYYY-MM-DD HH:MM:SS')
@@ -222,9 +222,9 @@ class RiskDetails extends Component {
 
                     house_building_name:values.house_building_name,
                     block_no:values.block_no,
-                    street_name:values.street_name,
-                    plot_no:values.plot_no,
-                    content_sum_insured:values.content_sum_insured,
+                    // street_name:values.street_name,
+                    // plot_no:values.plot_no,
+                    // content_sum_insured:values.content_sum_insured,
                     house_flat_no:values.house_flat_no,
                     pincode:values.pincode,
                     pincode_id:values.pincode_id,
@@ -273,8 +273,8 @@ class RiskDetails extends Component {
                         {
                             house_building_name:risk_arr.house_building_name,
                             block_no:risk_arr.block_no,
-                            street_name:risk_arr.street_name,
-                            plot_no:risk_arr.plot_no,
+                            // street_name:risk_arr.street_name,
+                            // plot_no:risk_arr.plot_no,
                             house_flat_no:risk_arr.house_flat_no,
                             pincode:res.data.data.policyHolder.smeinfo.pincode,
                             pincode_id:res.data.data.policyHolder.smeinfo.pincode_id,
@@ -290,6 +290,7 @@ class RiskDetails extends Component {
 
                     this.props.setSmeOthersDetails({
                     
+                        Commercial_consideration:res.data.data.policyHolder.previouspolicy.Commercial_consideration,
                         previous_start_date:res.data.data.policyHolder.previouspolicy.start_date,
                         previous_end_date:res.data.data.policyHolder.previouspolicy.end_date,
                         Previous_Policy_No:res.data.data.policyHolder.previouspolicy.policy_no,
@@ -362,9 +363,9 @@ class RiskDetails extends Component {
         let newInitialValues = Object.assign(initialValue,{
             house_building_name:this.props.house_building_name,
             block_no:this.props.block_no,
-            street_name:this.props.street_name,
-            plot_no:this.props.plot_no,
-            content_sum_insured:this.props.content_sum_insured,
+            // street_name:this.props.street_name,
+            // plot_no:this.props.plot_no,
+            // content_sum_insured:this.props.content_sum_insured,
             house_flat_no:this.props.house_flat_no,
             pincode:this.props.pincode,
             pincode_id:this.props.pincode_id,
@@ -373,6 +374,7 @@ class RiskDetails extends Component {
             stock_sum_insured:this.props.stock_sum_insured
         });
 
+        // VALIDATION :----------------------------------------///////////////////////////
         const vehicleRegistrationValidation = Yup.object().shape({
             house_building_name: Yup.string().required("Please enter building name").nullable(),
             block_no: Yup.string().required("Please enter block no.").nullable(),
@@ -469,7 +471,7 @@ class RiskDetails extends Component {
                                                     </Col>
                                                     </Row>
                                                     
-                                                    <Row>
+                                                    {/* <Row>
                                                     <Col sm={12} md={4} lg={4}>
                                                         <FormGroup>
                                                             <div className="formSection">
@@ -506,7 +508,7 @@ class RiskDetails extends Component {
                                                             </div>
                                                         </FormGroup>
                                                     </Col>
-                                                    </Row>
+                                                    </Row> */}
                                                     <Row>
 
                                                     <Col sm={12} md={4} lg={4}>
@@ -607,7 +609,11 @@ class RiskDetails extends Component {
                                                                 autoComplete="off"
                                                                 onFocus={e => this.changePlaceHoldClassAdd(e)}
                                                                 onBlur={e => this.changePlaceHoldClassRemove(e)}
-                                                                value = {values.buildings_sum_insured}                                                                            
+                                                                value = {values.buildings_sum_insured} 
+                                                                onInput= {(e)=> {
+                                                                    setFieldTouched("buildings_sum_insured");
+                                                                    setFieldValue("buildings_sum_insured", e.target.value);  
+                                                                }}                                                                           
                                                             />
                                                             {errors.buildings_sum_insured && touched.buildings_sum_insured ? (
                                                             <span className="errorMsg">{errors.buildings_sum_insured}</span>
@@ -650,7 +656,11 @@ class RiskDetails extends Component {
                                                                 autoComplete="off"
                                                                 onFocus={e => this.changePlaceHoldClassAdd(e)}
                                                                 onBlur={e => this.changePlaceHoldClassRemove(e)}
-                                                                value = {values.stock_sum_insured}                                                                            
+                                                                value = {values.stock_sum_insured} 
+                                                                onInput= {(e)=> {
+                                                                    setFieldTouched("stock_sum_insured");
+                                                                    setFieldValue("stock_sum_insured", e.target.value);  
+                                                                }}                                                                           
                                                             />
                                                             {errors.stock_sum_insured && touched.stock_sum_insured ? (
                                                             <span className="errorMsg">{errors.stock_sum_insured}</span>
@@ -710,8 +720,8 @@ const mapStateToProps = state => {
 
       house_building_name: state.sme_fire.house_building_name,
       block_no: state.sme_fire.block_no,
-      street_name: state.sme_fire.street_name,
-      plot_no: state.sme_fire.plot_no,
+    //   street_name: state.sme_fire.street_name,
+    //   plot_no: state.sme_fire.plot_no,
       house_flat_no: state.sme_fire.house_flat_no,
       pincode: state.sme_fire.pincode,
       pincode_id: state.sme_fire.pincode_id,
