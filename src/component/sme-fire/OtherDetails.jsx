@@ -12,6 +12,7 @@ import * as Yup from 'yup';
 import { Formik, Field, Form, FieldArray } from "formik";
 import axios from "../../shared/axios"
 import moment from "moment";
+import swal from 'sweetalert';
 import Encryption from '../../shared/payload-encryption';
 import {  PersonAge } from "../../shared/dateFunctions";
 import { setSmeRiskData,setSmeData,setSmeOthersDetailsData,setSmeProposerDetailsData } from '../../store/actions/sme_fire';
@@ -47,18 +48,18 @@ const initialValue = {
 const vehicleRegistrationValidation = Yup.object().shape({
     // previous_start_date : Yup.date().required("Please select previous policy start date").nullable(),
     // previous_end_date : Yup.date().required("Please select previous policy end date").nullable(),
-    Commercial_consideration : Yup.number()
-    .min(1, 'Commercial consideration not less than 1%')
-    .max(100, 'Commercial consideration not greater than 100%').nullable(),
+    Commercial_consideration : Yup.string().matches(/^[0-9]*$/, function() {
+        return "Please enter commercial consideration % in number"
+    }).nullable(),
     Previous_Policy_No : Yup.string()
     .matches(/^[a-zA-Z0-9][a-zA-Z0-9\s-/]*$/, 
         function() {
             return "Please enter valid policy number"
         }).min(6, function() {
-            return "Policy No. must be minimum 6 chracters"
+            return "Policy No. must be minimum 6 characters"
         })
         .max(28, function() {
-            return "Policy No. must be maximum 28 chracters"
+            return "Policy No. must be maximum 28 characters"
         }).nullable(),
     insurance_company_id : Yup.number().nullable(),
     previous_city : Yup.string()
@@ -134,7 +135,15 @@ class OtherDetails extends Component {
         // values.previous_city
 
         this.props.loadingStart();
-
+        if(values.Commercial_consideration < 1) {
+            this.props.loadingStop();
+            swal("Commercial consideration % should not be less than 1%")
+            return false
+        } else if(values.Commercial_consideration > 100) {
+            this.props.loadingStop();
+            swal("Commercial consideration % should not be greater than 100%")
+            return false
+        } else {
         axios.post('sme/previous-policy-details',
         formData
         ).then(res=>{       
@@ -148,6 +157,7 @@ class OtherDetails extends Component {
                 Previous_Policy_No:values.Previous_Policy_No,
                 insurance_company_id:values.insurance_company_id,
                 previous_city:values.previous_city
+                
 
             });
             const {productId} = this.props.match.params;
@@ -161,6 +171,7 @@ class OtherDetails extends Component {
             // }
         this.props.loadingStop();
         })
+    }
     }
 
 
@@ -600,12 +611,18 @@ class OtherDetails extends Component {
                                         </div>
                                     
                                         <div className="d-flex justify-content-left resmb">
-                                        <Button className={`backBtn`} type="button"  onClick= {this.RiskDetails.bind(this,productId)} >
+                                        {/* <Button className={`backBtn`} type="button"  onClick= {this.RiskDetails.bind(this,productId)} >
                                             {isSubmitting ? 'Wait..' : 'Back'}
                                         </Button> 
                                         <Button className={`proceedBtn`} type="submit"  disabled={isSubmitting ? true : false}>
                                             {isSubmitting ? 'Wait..' : 'Next'}
-                                        </Button> 
+                                        </Button>  */}
+                                        <Button className={`backBtn`} type="button"  disabled={isSubmitting ? true : false} onClick= {this.RiskDetails.bind(this.productId)}>
+                                                    {isSubmitting ? 'Wait..' : 'Back'}
+                                                </Button> 
+                                                <Button className={`proceedBtn`} type="submit"  disabled={isSubmitting ? true : false}>
+                                                    {isSubmitting ? 'Wait..' : 'Next'}
+                                                </Button>
                                         </div>
 
                                     </Form>

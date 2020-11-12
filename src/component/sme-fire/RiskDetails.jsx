@@ -12,6 +12,7 @@ import * as Yup from 'yup';
 import { Formik, Field, Form, FieldArray } from "formik";
 import axios from "../../shared/axios"
 import moment from "moment";
+import swal from 'sweetalert';
 import Encryption from '../../shared/payload-encryption';
 import {  PersonAge } from "../../shared/dateFunctions";
 import { setSmeRiskData,setSmeData,setSmeOthersDetailsData,setSmeProposerDetailsData } from '../../store/actions/sme_fire';
@@ -189,7 +190,7 @@ class RiskDetails extends Component {
         }     
     }
     
-    handleSubmit=(values)=>{
+    handleSubmit=(values, )=>{
         console.log('handleSubmit', values);
         // console.log("policyHolder_id-------->",policyHolder_id)
         const formData = new FormData();
@@ -211,6 +212,16 @@ class RiskDetails extends Component {
         formData.append('stock_sum_insured',values.stock_sum_insured)
         console.log("formdata---",values.formData)
         console.log("formData---",formData)
+        const Fire_sum_insured = parseInt(values.buildings_sum_insured) + parseInt(values.content_sum_insured) + parseInt(values.stock_sum_insured);
+        if (Fire_sum_insured < 500000) {
+            this.props.loadingStop();
+            swal("Sum total of fire buildings sum insured,contents sum insured and stock sum insured should be more than 5 Lakhs")
+            return false;
+        } else if(Fire_sum_insured > 10000000) {
+             this.props.loadingStop();
+            swal("Sum total of fire buildings sum insured,contents sum insured and stock sum insured should be less than 50 Lakhs")
+            return false;
+        } else {
         this.props.loadingStart();
         axios.post('sme/policy-details',
         formData
@@ -234,12 +245,15 @@ class RiskDetails extends Component {
                 }
             );
             const {productId} = this.props.match.params;
+            console.log("Fire_sum_insured-------",Fire_sum_insured)
+            this.props.loadingStop()
+            
             this.props.history.push(`/OtherDetails/${productId}`);
         }).
         catch(err=>{
             this.props.loadingStop();
         })
-        
+    }
     }
 
     fetchPolicyDetails=()=>{
@@ -384,9 +398,15 @@ class RiskDetails extends Component {
                 return "Please enter valid pin code"
             }).nullable(),
             pincode_id: Yup.string().required("Please select area").nullable(),
-            buildings_sum_insured: Yup.number().required("Please enter building sum insured").nullable(),
-            content_sum_insured: Yup.number().required("Please enter content sum insured").nullable(),
-            stock_sum_insured: Yup.number().required("Please enter stock sum insured").nullable(),
+            buildings_sum_insured: Yup.string().required("Please enter building sum insured").matches(/^[0-9]*$/, function() {
+                return "Please enter only numbers"
+            }).nullable(),
+            content_sum_insured: Yup.string().required("Please enter content sum insured").matches(/^[0-9]*$/, function() {
+                return "Please enter only numbers"
+            }).nullable(),
+            stock_sum_insured: Yup.string().required("Please enter stock sum insured").matches(/^[0-9]*$/, function() {
+                return "Please enter only numbers"
+            }).nullable(),
         })
 
         return (
@@ -605,7 +625,7 @@ class RiskDetails extends Component {
                                                                 name='buildings_sum_insured'
                                                                 type="text"
                                                                 placeholder="Fire-Building-Sum Insured"
-                                                                maxLength='6'
+                                                                maxLength='7'
                                                                 autoComplete="off"
                                                                 onFocus={e => this.changePlaceHoldClassAdd(e)}
                                                                 onBlur={e => this.changePlaceHoldClassRemove(e)}
@@ -629,10 +649,9 @@ class RiskDetails extends Component {
                                                                 type="text"
                                                                 placeholder="Fire-Contents Sum Insured"
                                                                 autoComplete="off"
-                                                                maxlength = '6'
+                                                                maxlength = '7'
                                                                 onFocus={e => this.changePlaceHoldClassAdd(e)}
                                                                 onBlur={e => this.changePlaceHoldClassRemove(e)}
-                                                                onKeyUp={e=> this.fetchAreadetails(e)}
                                                                 value={values.content_sum_insured}
                                                                 onInput= {(e)=> {
                                                                     setFieldTouched("content_sum_insured");
@@ -652,7 +671,7 @@ class RiskDetails extends Component {
                                                                 name='stock_sum_insured'
                                                                 type="text"
                                                                 placeholder="Fire-Stock Sum Insured"
-                                                                maxlength='6'
+                                                                maxlength='7'
                                                                 autoComplete="off"
                                                                 onFocus={e => this.changePlaceHoldClassAdd(e)}
                                                                 onBlur={e => this.changePlaceHoldClassRemove(e)}
@@ -674,14 +693,22 @@ class RiskDetails extends Component {
                                                     <p>&nbsp;</p>
                                                 </div>
                                             
-                                                <div className="d-flex justify-content-left resmb">
+                                                {/* <div className="d-flex justify-content-left resmb">
                                                 <a href="javascript:void(0);" className={`backBtn`} onClick= {this.Registration_SME.bind(this,productId)} >
                                                     {isSubmitting ? 'Wait..' : 'Back'}
-                                                </a>
+                                                </a> */}
                                                 {/* <Button className={`backBtn`} type="button" onClick= {this.Registration_SME.bind(this,productId)} >
                                                     {isSubmitting ? 'Wait..' : 'Back'}
                                                 </Button>  */}
-                                                <Button className={`proceedBtn`} type="submit" disabled={isValid ? false : true} >
+                                                {/* <Button className={`proceedBtn`} type="submit" disabled={isValid ? false : true} >
+                                                    {isSubmitting ? 'Wait..' : 'Next'}
+                                                </Button> 
+                                                </div> */}
+                                                <div className="d-flex justify-content-left resmb">
+                                                <Button className={`backBtn`} type="button"  disabled={isSubmitting ? true : false} onClick= {this.Registration_SME.bind(this.productId)}>
+                                                    {isSubmitting ? 'Wait..' : 'Back'}
+                                                </Button> 
+                                                <Button className={`proceedBtn`} type="submit"  disabled={isSubmitting ? true : false}>
                                                     {isSubmitting ? 'Wait..' : 'Next'}
                                                 </Button> 
                                                 </div>

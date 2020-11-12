@@ -112,7 +112,17 @@ class Summary_sme extends Component {
             axios.get(`sme/details/${policy_holder_ref_no}`)
             .then(res=>{
                 let rawData = res.data.data
-                console.log("gross_premium-----",res.data.data.policyHolder.request_data.gross_premium)
+                console.log("res----------",res)
+                console.log("rawData-------",res.data.data)
+                
+                // console.log("gross_premium-----",res.data.data.policyHolder.request_data.gross_premium)
+                // console.log("quoteId-------",res.data.data.policyHolder.request_data.quote_id)
+                // console.log("salutationName-------",res.data.data.policyHolder.salutation.displayvalue)
+                // console.log("pincodeArea-------",pincode_area_arr.LCLTY_SUBRB_TALUK_TEHSL_NM)
+                // console.log("gst-------",res.data.data.policyHolder.request_data.service_tax)
+                // console.log("finalPremium-------",res.data.data.policyHolder.request_data.payable_premium)
+                // console.log("rawData-------",res)
+                // console.log("gross_premium-----",res.data.data.policyHolder.request_data.gross_premium)
 
                 if(res.data.data.policyHolder.step_no > 0){
 
@@ -242,7 +252,7 @@ class Summary_sme extends Component {
     render() {
         const { policyHolder, show, fulQuoteResp, motorInsurance, error, error1, refNumber, paymentStatus, relation, memberdetails,nomineedetails, vehicleDetails, breakin_flag, rawData} = this.state
         const { productId } = this.props.match.params
-        console.log("rawData-----",rawData)
+        // console.log("rawData-----",rawData)
         // console.log("data------",rawData.policyHolder.smeinfo)
         const errMsg =
             error && error.message ? (

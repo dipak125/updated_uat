@@ -71,6 +71,7 @@ class QuoteSearch extends Component {
 
     redirectLink = (cell,row) => {
         localStorage.setItem("policyHolder_refNo", row.reference_no)
+        localStorage.setItem("policy_holder_ref_no", row.reference_no)
         console.log('vehicletype_id---', row.vehiclebrandmodel.vehicletype_id)
         // console.log('cell---', cell)
         let page_name = 'Products'

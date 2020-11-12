@@ -77,13 +77,13 @@ const vehicleRegistrationValidation = Yup.object().shape({
     gender: Yup.string().required("Please select gender").nullable(),
     pan_no: Yup.string()
     .matches(/^[A-Z]{3}[CPHFATBLJG]{1}[A-Z]{1}[0-9]{4}[A-Z]{1}$/,'Invalid PAN number') .nullable(),
-    gstn_no: Yup.string().required("Please enter GSTN number")
+    gstn_no: Yup.string()
     .matches(/^[0-9]{2}[A-Z]{3}[CPHFATBLJG]{1}[A-Z]{1}[0-9]{4}[A-Z]{1}[0-9]{1}[A-Z]{1}[0-9]{1}$/,'Invalid GSTIN').nullable(),
     //11AAACC7777A7A7
     building_name: Yup.string().required("Please enter Building name").nullable(),
-    block_no: Yup.string().required("Please enter Plot number").nullable(),
-    plot_no: Yup.string().required("Please enter Block number").nullable(),
-    flat_no: Yup.string().required("Please enter Flat number").nullable(),
+    // block_no: Yup.string().required("Please enter Plot number").nullable(),
+    plot_no: Yup.string().required("Please enter Plot number").nullable(),
+    // flat_no: Yup.string().required("Please enter Flat number").nullable(),
     street_name: Yup.string().required("Please enter Dtreet name").nullable(),
     pincode: Yup.string().required("Please enter Pincode").nullable(),
     pincode_id: Yup.string().required("Please select Area").nullable(),
@@ -221,8 +221,8 @@ class AdditionalDetails_sme extends Component {
         formData.append('pan_no',values.pan_no)
         formData.append('gstn_no',values.gstn_no)
         formData.append('house_building_name',values.building_name)
-        formData.append('block_no',values.block_no)
-        formData.append('house_flat_no',values.flat_no)
+        formData.append('block_no','')
+        formData.append('house_flat_no','')
         formData.append('plot_no',values.plot_no)
         formData.append('street_name',values.street_name)
         formData.append('pincode',values.pincode)
@@ -868,26 +868,7 @@ class AdditionalDetails_sme extends Component {
                                         </FormGroup>
                                         
                                     </Col>
-                                </Row> 
-                                <Row>
-                                    <Col sm={12} md={4} lg={4}>
-                                        <FormGroup>
-                                            <div className="insurerName">
-                                            <Field
-                                                name='block_no'
-                                                type="text"
-                                                placeholder="Block No. "
-                                                autoComplete="off"
-                                                onFocus={e => this.changePlaceHoldClassAdd(e)}
-                                                onBlur={e => this.changePlaceHoldClassRemove(e)}
-                                                value = {values.block_no}                                                                            
-                                            />
-                                            {errors.block_no && touched.block_no ? (
-                                            <span className="errorMsg">{errors.block_no}</span>
-                                            ) : null}  
-                                            </div>
-                                        </FormGroup>
-                                    </Col>
+                                    
                                     <Col sm={12} md={4} lg={4}>
                                         <FormGroup>
                                             <div className="insurerName">
@@ -906,7 +887,27 @@ class AdditionalDetails_sme extends Component {
                                             </div>
                                         </FormGroup>
                                     </Col>
-                                    <Col sm={12} md={4} lg={4}>
+                                </Row> 
+                                <Row>
+                                    {/* <Col sm={12} md={4} lg={4}>
+                                        <FormGroup>
+                                            <div className="insurerName">
+                                            <Field
+                                                name='block_no'
+                                                type="text"
+                                                placeholder="Block No. "
+                                                autoComplete="off"
+                                                onFocus={e => this.changePlaceHoldClassAdd(e)}
+                                                onBlur={e => this.changePlaceHoldClassRemove(e)}
+                                                value = {values.block_no}                                                                            
+                                            />
+                                            {errors.block_no && touched.block_no ? (
+                                            <span className="errorMsg">{errors.block_no}</span>
+                                            ) : null}  
+                                            </div>
+                                        </FormGroup>
+                                    </Col> */}
+                                    {/* <Col sm={12} md={4} lg={4}>
                                         <FormGroup>
                                             <div className="insurerName">
                                             <Field
@@ -923,7 +924,7 @@ class AdditionalDetails_sme extends Component {
                                             ) : null}  
                                             </div>
                                         </FormGroup>
-                                    </Col>
+                                    </Col> */}
                                 </Row><Row>
                                     <Col sm={12} md={4} lg={4}>
                                         <FormGroup>

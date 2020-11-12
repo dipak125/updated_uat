@@ -226,7 +226,8 @@ class Dashboard extends Component {
       let start_date = startDate;
       let end_date = startDate;
       console.log("start_date------",start_date)
-
+      
+      // todayHighlight(true),
       setFieldTouched("start_date");
       setFieldValue("start_date", start_date);
       setFieldTouched("end_date");
@@ -241,7 +242,7 @@ class Dashboard extends Component {
       setFieldValue("end_date", end_date);
     } else if (search_flag == 3) {
       let start_date = startDate;
-      let end_date = new Date(moment(start_date).add(29, "day").calendar());
+      let end_date = new Date(moment(start_date).add(29, "day"));
 
       setFieldTouched("start_date");
       setFieldValue("start_date", start_date);
@@ -352,6 +353,7 @@ class Dashboard extends Component {
                     {({
                       values,
                       errors,
+                      todayHighlight,
                       setFieldValue,
                       setFieldTouched,
                       isValid,
@@ -470,7 +472,7 @@ class Dashboard extends Component {
                                                       startDate={values.start_date}
                                                       endDate={values.end_date}
                                                       selectsRange
-                                                      // inline
+                                                      disabledKeyboardNavigation
                                                       onChange={(val) => {
                                                         this.handleDateChange(
                                                           val,

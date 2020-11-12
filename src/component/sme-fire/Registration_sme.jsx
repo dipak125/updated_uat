@@ -53,6 +53,7 @@ class Registration_sme extends Component {
 
     componentDidMount(){
         this.fetchPolicyDetails();
+        console.log("product_id",this.props.match.params)
 
         // let encryption = new Encryption();
         // let bc_data = sessionStorage.getItem('bcLoginData') ? sessionStorage.getItem('bcLoginData') : "";
@@ -221,6 +222,7 @@ class Registration_sme extends Component {
         formData.append('pol_start_date', pol_start_date)
         formData.append('pol_end_date',pol_end_date)
         this.props.loadingStart();
+        // console.log
 
         if(this.props.policy_holder_id != null){
             formData.append('policy_holder_id',this.props.policy_holder_id);
@@ -309,8 +311,11 @@ class Registration_sme extends Component {
                                                                 name="pol_start_date"
                                                                 minDate={new Date(minDate)}
                                                                 maxDate={new Date(maxDate)}
-                                                                dateFormat="Pp"
+                                                                dateFormat="yyyy-MM-dd HH:mm"
                                                                 showTimeSelect
+                                                                // timeFormat="p"
+                                                                timeFormat="HH:mm"
+                                                                // timeIntervals={15}
                                                                 placeholderText="Policy Start Date & Time"
                                                                 peekPreviousMonth
                                                                 autoComplete="off"
@@ -345,8 +350,10 @@ class Registration_sme extends Component {
                                                                 name="pol_end_date"
                                                                 minDate={new Date(values.pol_start_date)}
                                                                 maxDate={new Date(maxDate)}
+                                                                dateFormat="yyyy-MM-dd HH:mm"
                                                                 showTimeSelect
-                                                                dateFormat="Pp"
+                                                                // dateFormat="Pp"
+                                                                timeFormat="HH:mm"
                                                                 placeholderText="Policy End Date & Time"
                                                                 peekPreviousMonth
                                                                 autoComplete="off"

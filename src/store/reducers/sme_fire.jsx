@@ -46,7 +46,7 @@ const initialState = {
         com_street_name:null,
         plot_no:null,
         pan_no:'',
-        gstn_no:null,
+        gstn_no:'',
         com_block_no:null,
         com_house_flat_no:null,
         com_pincode:null,
