@@ -81,6 +81,10 @@ class Premium_sme extends Component {
         this.props.history.push(`/Summary_SME/${productId}`);
     }
 
+    removeLocalStorage = (productId) => {
+        localStorage.removeItem('policy_holder_ref_no')
+    }
+
     handleSubmit = (values) => {
         console.log("values-----",values)
         // this.setState({ show: true, refNo: values.refNo, whatsapp: values.whatsapp });
@@ -235,20 +239,20 @@ class Premium_sme extends Component {
                     );
                 }
 
-                if(res.data.data.policyHolder.step_no == 2 || res.data.data.policyHolder.step_no > 2){
+                // if(res.data.data.policyHolder.step_no == 2 || res.data.data.policyHolder.step_no > 2){
 
-                    this.props.setSmeOthersDetails({
+                //     this.props.setSmeOthersDetails({
                     
-                        Commercial_consideration:res.data.data.policyHolder.previouspolicy.Commercial_consideration,
-                        previous_start_date:res.data.data.policyHolder.previouspolicy.start_date,
-                        previous_end_date:res.data.data.policyHolder.previouspolicy.end_date,
-                        Previous_Policy_No:res.data.data.policyHolder.previouspolicy.policy_no,
-                        insurance_company_id:res.data.data.policyHolder.previouspolicy.insurancecompany_id,
-                        previous_city:res.data.data.policyHolder.previouspolicy.address
+                //         Commercial_consideration:res.data.data.policyHolder.previouspolicy.Commercial_consideration,
+                //         previous_start_date:res.data.data.policyHolder.previouspolicy.start_date,
+                //         previous_end_date:res.data.data.policyHolder.previouspolicy.end_date,
+                //         Previous_Policy_No:res.data.data.policyHolder.previouspolicy.policy_no,
+                //         insurance_company_id:res.data.data.policyHolder.previouspolicy.insurancecompany_id,
+                //         previous_city:res.data.data.policyHolder.previouspolicy.address
         
-                    });
+                //     });
 
-                }
+                // }
 
                 if(res.data.data.policyHolder.step_no == 3 || res.data.data.policyHolder.step_no > 3){
 
@@ -296,6 +300,8 @@ class Premium_sme extends Component {
             })
             .catch(err => {
                 this.props.loadingStop();
+                swal("Thank you for showing your interest for buying product.Due to some reasons, we are not able to issue the policy online.Please call 1800 22 1111")
+                return false;
             })
         
         
@@ -364,7 +370,7 @@ class Premium_sme extends Component {
                                                     <Row>
                                                         <Col sm={12} md={9} lg={9}>
                                                             <div className="rghtsideTrigr">
-                                                                <Collapsible trigger="Proposal Details" >
+                                                                <Collapsible trigger="Proposal Details"  open= {true}>
                                                                     <div className="listrghtsideTrigr">
                                                                         <Row>
                                                                             <Col sm={12} md={3}>
@@ -564,10 +570,10 @@ class Premium_sme extends Component {
                                                             </Row>
 
                                                             <div className="d-flex justify-content-left resmb">
-                                                                <Button className="backBtn" type="button" onClick={this.additionalDetails.bind(this, productId)}>Back</Button>
+                                                                <Button className="backBtn" type="button" onClick={this.additionalDetails.bind(this.productId)}>Back</Button>
                                                                 {this.state.quoteId && this.state.quoteId != '' ?
                                                                     <Button type="submit"
-                                                                        className="proceedBtn"
+                                                                        className="proceedBtn" onClick={this.removeLocalStorage.bind(this.productId)}
                                                                     >
                                                                         Make Payment
                                                                 </Button> 

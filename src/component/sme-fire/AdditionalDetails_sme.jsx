@@ -13,6 +13,7 @@ import { loaderStart, loaderStop } from "../../store/actions/loader";
 import { connect } from "react-redux";
 import axios from "../../shared/axios"
 import moment from "moment";
+import swal from 'sweetalert';
 import {  PersonAge } from "../../shared/dateFunctions";
 import Encryption from '../../shared/payload-encryption';
 import { setSmeRiskData,setSmeData,setSmeOthersDetailsData,setSmeProposerDetailsData,setCommunicationAddress } from '../../store/actions/sme_fire';
@@ -59,12 +60,12 @@ const vehicleRegistrationValidation = Yup.object().shape({
     salutation_id: Yup.string().required('Title is required').nullable(),
     first_name: Yup.string().required('First Name is required').min(3, function() {return "First name must be 3 characters"}).max(40,function() {
         return "Full name must be maximum 40 characters"
-    }).matches(/^[a-zA-Z]+([\s]?[a-zA-Z]+)([\s]?[a-zA-Z]+)$/, function() {return "Please enter valid name"}).nullable(),
-    last_name: Yup.string().required('Name is required').min(1, function() {return "First name must be 1 characters"}).max(40, function() {return "Full name must be maximum 40 characters"})
-    .matches(/^[a-zA-Z]+([\s]?[a-zA-Z]+)([\s]?[a-zA-Z]+)$/, function() {
-        return "Please enter valid name"
+    }).matches(/^[a-zA-Z]+([\s]?[a-zA-Z]+)([\s]?[a-zA-Z]+)$/, function() {return "Please enter valid first name"}).nullable(),
+    last_name: Yup.string().required('Last Name is required').min(1, function() {return "Last name must be 1 characters"}).max(40, function() {return "Full name must be maximum 40 characters"})
+    .matches(/^[A-Za-z]+$/, function() {
+        return "Please enter valid last name"
     }).nullable(),
-    last_name: Yup.string().required('Name is required').nullable(),
+    // last_name: Yup.string().required('Name is required').nullable(),
     date_of_birth: Yup.date().required("Please enter date of birth").nullable(),
     email_id: Yup.string().email().required('Email is required').min(8, function() {
         return "Email must be minimum 8 characters"
@@ -80,12 +81,24 @@ const vehicleRegistrationValidation = Yup.object().shape({
     gstn_no: Yup.string()
     .matches(/^[0-9]{2}[A-Z]{3}[CPHFATBLJG]{1}[A-Z]{1}[0-9]{4}[A-Z]{1}[0-9]{1}[A-Z]{1}[0-9]{1}$/,'Invalid GSTIN').nullable(),
     //11AAACC7777A7A7
-    building_name: Yup.string().required("Please enter Building name").nullable(),
+    building_name: Yup.string().required("Please enter Building name").matches(/^[a-zA-Z0-9][a-zA-Z0-9-/.,-\s]*$/, 
+        function() {
+            return "Please enter valid building name"
+        }).nullable(),
     // block_no: Yup.string().required("Please enter Plot number").nullable(),
-    plot_no: Yup.string().required("Please enter Plot number").nullable(),
+    plot_no: Yup.string().required("Please enter Plot number").matches(/^[a-zA-Z0-9][a-zA-Z0-9-/.,-\s]*$/, 
+        function() {
+            return "Please enter valid plot number"
+        }).nullable(),
     // flat_no: Yup.string().required("Please enter Flat number").nullable(),
-    street_name: Yup.string().required("Please enter Dtreet name").nullable(),
-    pincode: Yup.string().required("Please enter Pincode").nullable(),
+    street_name: Yup.string().required("Please enter Dtreet name").matches(/^[a-zA-Z0-9][a-zA-Z0-9-/.,-\s]*$/, 
+        function() {
+            return "Please enter valid street name"
+        }).nullable(),
+    pincode: Yup.string().required('Pincode is required')
+    .matches(/^[0-9]{6}$/, function() {
+        return "Please enter valid 6 digit pin code"
+    }).nullable(),
     pincode_id: Yup.string().required("Please select Area").nullable(),
 })
 
@@ -270,20 +283,19 @@ class AdditionalDetails_sme extends Component {
                         this.props.loadingStop();
                         this.props.history.push(`/Summary_SME/${productId}`);
                     }).
-                    catch(err=>{
-                        this.props.loadingStop();
-                        this.props.history.push(`/Error`);
+                    catch(err=>
+                        {this.props.loadingStop();
+                        swal("Thank you for showing your interest for buying product.Due to some reasons, we are not able to issue the policy online.Please call 1800 22 1111")
+                        return false;
                         
                     });
                 }).
                 catch(err=>{
                     this.props.loadingStop();
-                    this.props.history.push(`/Error`);
                 });
             }).
             catch(err=>{
                 this.props.loadingStop();
-                this.props.history.push(`/Error`);
             });
         }).
         catch(err=>{

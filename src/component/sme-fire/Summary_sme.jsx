@@ -162,20 +162,20 @@ class Summary_sme extends Component {
                     );
                 }
 
-                if(res.data.data.policyHolder.step_no == 2 || res.data.data.policyHolder.step_no > 2){
+                // if(res.data.data.policyHolder.step_no == 2 || res.data.data.policyHolder.step_no > 2){
 
-                    this.props.setSmeOthersDetails({
+                //     this.props.setSmeOthersDetails({
                     
-                        Commercial_consideration:res.data.data.policyHolder.previouspolicy.Commercial_consideration,
-                        previous_start_date:res.data.data.policyHolder.previouspolicy.start_date,
-                        previous_end_date:res.data.data.policyHolder.previouspolicy.end_date,
-                        Previous_Policy_No:res.data.data.policyHolder.previouspolicy.policy_no,
-                        insurance_company_id:res.data.data.policyHolder.previouspolicy.insurancecompany_id,
-                        previous_city:res.data.data.policyHolder.previouspolicy.address
+                //         Commercial_consideration:res.data.data.policyHolder.previouspolicy.Commercial_consideration,
+                //         previous_start_date:res.data.data.policyHolder.previouspolicy.start_date,
+                //         previous_end_date:res.data.data.policyHolder.previouspolicy.end_date,
+                //         Previous_Policy_No:res.data.data.policyHolder.previouspolicy.policy_no,
+                //         insurance_company_id:res.data.data.policyHolder.previouspolicy.insurancecompany_id,
+                //         previous_city:res.data.data.policyHolder.previouspolicy.address
         
-                    });
+                //     });
 
-                }
+                // }
 
                 if(res.data.data.policyHolder.step_no == 3 || res.data.data.policyHolder.step_no > 3){
 
@@ -206,22 +206,23 @@ class Summary_sme extends Component {
 
                 let pincode_area_arr = JSON.parse(res.data.data.policyHolder.pincode_response);
                 
-                this.setState(
+                this.setState( 
                     {
-                        salutationName:res.data.data.policyHolder.salutation.displayvalue,
-                        pincodeArea:pincode_area_arr.LCLTY_SUBRB_TALUK_TEHSL_NM,
-                        quoteId:res.data.data.policyHolder.request_data.quote_id,
-                        gst:res.data.data.policyHolder.request_data.service_tax,
-                        netPremium:res.data.data.policyHolder.request_data.net_premium,
-                        finalPremium:res.data.data.policyHolder.request_data.payable_premium,
-                        rawData: rawData.policyHolder.smeinfo.smecoverages,
+                        salutationName:res.data.data.policyHolder.salutation.displayvalue ,
+                        pincodeArea:pincode_area_arr.LCLTY_SUBRB_TALUK_TEHSL_NM != null ? pincode_area_arr.LCLTY_SUBRB_TALUK_TEHSL_NM : 0,
+                        quoteId:res.data.data.policyHolder.request_data.quote_id != null ? res.data.data.policyHolder.request_data.quote_id : 0,
+                        gst:res.data.data.policyHolder.request_data.service_tax != null ? res.data.data.policyHolder.request_data.service_tax : 0,
+                        netPremium:res.data.data.policyHolder.request_data.net_premium != null ? res.data.data.policyHolder.request_data.net_premium : 0,
+                        finalPremium:res.data.data.policyHolder.request_data.payable_premium != null ? res.data.data.policyHolder.request_data.payable_premium : 0,
+                        rawData: rawData.policyHolder.smeinfo.smecoverages != null ? rawData.policyHolder.smeinfo.smecoverages : 0,
                     }
                 );
-
-                this.props.loadingStop();
+                    this.props.loadingStop();
             })
             .catch(err => {
                 this.props.loadingStop();
+                swal("Thank you for showing your interest for buying product.Due to some reasons, we are not able to issue the policy online.Please call 1800 22 1111")
+                return false;
             })
         
         
@@ -554,7 +555,7 @@ class Summary_sme extends Component {
                                                             </div>
 
                                                             <div className="rghtsideTrigr m-b-30">
-                                                                <Collapsible trigger="Policy Summary" >
+                                                                <Collapsible trigger="Policy Summary"  open= {true}>
                                                                     <div className="listrghtsideTrigr">
                                                                         <div>
                                                                             {/* <strong>Policy Summary:</strong>
@@ -652,7 +653,7 @@ class Summary_sme extends Component {
                                                                     {isSubmitting ? 'Wait..' : 'Back'}
                                                                 </Button> 
                                                                 <Button className={`proceedBtn`} type="submit"  disabled={isSubmitting ? true : false}>
-                                                                    Generate Policy
+                                                                    Continue
                                                                 </Button> 
 
                                                             </div>

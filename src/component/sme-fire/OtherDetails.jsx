@@ -22,8 +22,8 @@ import { setSmeRiskData,setSmeData,setSmeOthersDetailsData,setSmeProposerDetails
 // const minDate = moment(moment().subtract(1, 'years').calendar()).add(1, 'day').calendar();
 // const maxDate = moment(minDate).add(30, 'day').calendar();
 //const minDate = moment(moment().subtract(20, 'years').calendar()).add(1, 'day').calendar();
-const maxDate = moment().subtract(1, 'day');
-const minDate = moment().subtract(10, 'years');
+const maxDate = moment().subtract(1, 'years');
+const minDate = moment().subtract(2, 'years');
 let endMinDate = moment();
 //const startRegnDate = moment().subtract(20, 'years').calendar();
 //const minRegnDate = moment(startRegnDate).startOf('year').format('YYYY-MM-DD hh:mm');
@@ -41,7 +41,7 @@ const initialValue = {
     previous_claim_bonus: 1,
     previous_claim_for: "",
     previous_policy_no: "",
-    Commercial_consideration: "",
+    // Commercial_consideration: "",
 }
 
 // VALIDATION :---------------------------------
@@ -86,7 +86,8 @@ class OtherDetails extends Component {
         CustIdkeyword: "",
         RTO_location: "",
         previous_is_claim: "",
-        disable_end_date:true
+        disable_end_date:true,
+        previous_policy_check:"0"
     };
 
     changePlaceHoldClassAdd(e) {
@@ -135,7 +136,7 @@ class OtherDetails extends Component {
         // values.previous_city
 
         this.props.loadingStart();
-        if(values.Commercial_consideration < 1) {
+        if(values.Commercial_consideration < 0) {
             this.props.loadingStop();
             swal("Commercial consideration % should not be less than 1%")
             return false
@@ -170,6 +171,7 @@ class OtherDetails extends Component {
             //     swal('Registration number required...');
             // }
         this.props.loadingStop();
+        return false
         })
     }
     }
@@ -338,7 +340,8 @@ class OtherDetails extends Component {
             Commercial_consideration:this.props.Commercial_consideration,
             Previous_Policy_No:this.props.Previous_Policy_No,
             insurance_company_id:this.props.insurance_company_id,
-            previous_city:this.props.previous_city
+            previous_city:this.props.previous_city,
+            previous_policy_check:"0"
         });
 
         return (
@@ -488,6 +491,56 @@ class OtherDetails extends Component {
                                     
                                         <Row>
                                             <Col sm={12} md={9} lg={9}>
+                                                <FormGroup>
+                                                <div className="d-flex justify-content-left">
+                                                <div className="brandhead">
+                                                 <h4 className="fs-18 m-b-32"> Do you have any previous policy ? </h4>
+                                                 </div>
+                                                </div>
+                                                <div className="d-inline-flex m-b-35">
+                                                 <div className="p-r-25">
+                                                    <label className="customRadio3">
+                                                        <Field
+                                                        type="radio"
+                                                        name='previous_policy_check'                                            
+                                                        value='0'
+                                                        key='1'  
+                                                        onChange={(e) => {
+                                                            setFieldTouched('previous_policy_check')
+                                                            setFieldValue(`previous_policy_check`, e.target.value);
+                                                                                
+                                                        }}
+                                                            checked={values.previous_policy_check == '0' ? true : false}
+                                                        />
+                                                            <span className="checkmark " /><span className="fs-14"> No</span>
+                                                    </label>
+                                                 </div>
+
+                                                 <div className="">
+                                                     <label className="customRadio3">
+                                                     <Field
+                                                     type="radio"
+                                                     name='previous_policy_check'                                            
+                                                     value='1'
+                                                     key='1'  
+                                                     onChange={(e) => {
+                                                     setFieldTouched('previous_policy_check')
+                                                     setFieldValue(`previous_policy_check`, e.target.value);
+                                                 }}
+                                                     checked={values.previous_policy_check == '1' ? true : false}
+                                                     />
+                                                     <span className="checkmark" />
+                                                     <span className="fs-14">Yes</span>
+                                                     </label>
+                                                     {errors.previous_policy_check && touched.previous_policy_check ? (
+                                                     <span className="errorMsg">{errors.previous_policy_check}</span>
+                                                 ) : null}
+                                                     </div>
+                                                 </div>
+                                                </FormGroup>
+                                             </Col> 
+                                             { values.previous_policy_check == '1' ?
+                                            <Col sm={12} md={9} lg={9}>
                                                 <div className="d-flex justify-content-left">
                                                     <div className="brandhead">
                                                         <h4 >PREVIOUS INSURANCE DETAILS</h4>
@@ -511,9 +564,9 @@ class OtherDetails extends Component {
                                                                 onChange={(val) => {
                                                                     //setFieldTouched('previous_start_date')
                                                                     setFieldValue('previous_start_date', val);
-                                                                    setFieldValue('previous_end_date', new Date(moment(val).add(364, 'day').calendar()));
+                                                                    setFieldValue('previous_end_date', new Date(moment(val).add(365, 'day')));
                                                                     //this.setState({disable_end_date:false});
-                                                                    //endMinDate = moment(val).add(364, 'day');
+                                                                    // endMinDate = moment(val).add(364, 'day');
                                                                 }}
                                                             />
                                                             {errors.previous_start_date && touched.previous_start_date ? (
@@ -604,6 +657,7 @@ class OtherDetails extends Component {
                                                     </Col>
                                                 </Row>                    
                                             </Col>  
+                                            : null}
                                         </Row>
                                                 
                                         <div className="brandhead"> 

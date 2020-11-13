@@ -17,7 +17,7 @@ import { Formik, Form, Field, ErrorMessage } from 'formik';
 
 const minDate = moment().format();
 // alert(new Date(minDate));
-const maxDate = moment().add(15, 'day');
+const maxDate = moment().add(14, 'day');
 const maxDateEnd = moment().add(15, 'day').calendar();
 
 const initialValues = {
@@ -311,7 +311,7 @@ class Registration_sme extends Component {
                                                                 name="pol_start_date"
                                                                 minDate={new Date(minDate)}
                                                                 maxDate={new Date(maxDate)}
-                                                                dateFormat="yyyy-MM-dd HH:mm"
+                                                                dateFormat="dd-MM-yyyy HH:mm"
                                                                 showTimeSelect
                                                                 // timeFormat="p"
                                                                 timeFormat="HH:mm"
@@ -350,7 +350,7 @@ class Registration_sme extends Component {
                                                                 name="pol_end_date"
                                                                 minDate={new Date(values.pol_start_date)}
                                                                 maxDate={new Date(maxDate)}
-                                                                dateFormat="yyyy-MM-dd HH:mm"
+                                                                dateFormat="dd-MM-yyyy HH:mm"
                                                                 showTimeSelect
                                                                 // dateFormat="Pp"
                                                                 timeFormat="HH:mm"

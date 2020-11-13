@@ -219,7 +219,7 @@ class RiskDetails extends Component {
             return false;
         } else if(Fire_sum_insured > 10000000) {
              this.props.loadingStop();
-            swal("Sum total of fire buildings sum insured,contents sum insured and stock sum insured should be less than 50 Lakhs")
+            swal("Sum total of fire buildings sum insured,contents sum insured and stock sum insured should be less than 1 crore")
             return false;
         } else {
         this.props.loadingStart();
@@ -366,6 +366,7 @@ class RiskDetails extends Component {
         
     }
     Registration_SME = (productId) => {
+        console.log('Product-----id',productId)
         this.props.history.push(`/Registration_SME/${productId}`);
     }
 
@@ -390,12 +391,21 @@ class RiskDetails extends Component {
 
         // VALIDATION :----------------------------------------///////////////////////////
         const vehicleRegistrationValidation = Yup.object().shape({
-            house_building_name: Yup.string().required("Please enter building name").nullable(),
-            block_no: Yup.string().required("Please enter block no.").nullable(),
-            house_flat_no: Yup.string().required("Please enter house/flat no.").nullable(),
+            house_building_name: Yup.string().required("Please enter building name").matches(/^[a-zA-Z0-9][a-zA-Z0-9-/.,-\s]*$/, 
+                function() {
+                    return "Please enter valid building name"
+                }).nullable(),
+            block_no: Yup.string().required("Please enter block no.").matches(/^[a-zA-Z0-9][a-zA-Z0-9-/.,-\s]*$/, 
+                function() {
+                    return "Please enter valid block no."
+                }).nullable(),
+            house_flat_no: Yup.string().required("Please enter house/flat no.").matches(/^[a-zA-Z0-9][a-zA-Z0-9-/.,-\s]*$/, 
+                function() {
+                    return "Please enter valid house/flat no,"
+                }).nullable(),
             pincode: Yup.string().required('Pincode is required')
             .matches(/^[0-9]{6}$/, function() {
-                return "Please enter valid pin code"
+                return "Please enter valid 6 digit pin code"
             }).nullable(),
             pincode_id: Yup.string().required("Please select area").nullable(),
             buildings_sum_insured: Yup.string().required("Please enter building sum insured").matches(/^[0-9]*$/, function() {
@@ -441,7 +451,7 @@ class RiskDetails extends Component {
                                                             <Field
                                                                 name='house_building_name'
                                                                 type="text"
-                                                                placeholder="House/Building Name"
+                                                                placeholder="Shop/Building Name"
                                                                 autoComplete="off"
                                                                 onFocus={e => this.changePlaceHoldClassAdd(e)}
                                                                 onBlur={e => this.changePlaceHoldClassRemove(e)}

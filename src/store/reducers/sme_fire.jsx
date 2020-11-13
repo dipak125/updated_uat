@@ -32,7 +32,7 @@ const initialState = {
         previous_end_date:null,
         Previous_Policy_No:null,
         insurance_company_id:null,
-        previous_city:null,
+        previous_city:'',
         Commercial_consideration:null,
 
         first_name:null,

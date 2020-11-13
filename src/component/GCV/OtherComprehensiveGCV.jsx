@@ -738,7 +738,7 @@ class OtherComprehensiveGCV extends Component {
         }
         console.log('fullQuote_post_data', post_data)
 
-        if(post_data.idv_value > 5000000 && csc_user_type == "POSP" ) {
+        if((post_data.idv_value > 5000000 || post_data.body_idv_value > 5000000) && csc_user_type == "POSP" ) {
             swal("Quote cannot proceed with IDV greater than 5000000")
             this.props.loadingStop();
             return false

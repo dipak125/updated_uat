@@ -32,9 +32,12 @@ class Others extends Component {
       };
 
     buy_policy = (productId) => {
-        if(productId == '5')
+        this.props.loadingStart();
+        if(productId == '5'){
+        localStorage.removeItem('policy_holder_ref_no')
         this.props.history.push(`/Registration_SME/${productId}`);
-    }   
+        window.location.reload(false);
+    }   }
 
     // getPolicyList = () => {
     //     let encryption = new Encryption();
