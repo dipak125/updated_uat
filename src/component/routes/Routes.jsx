@@ -282,6 +282,34 @@ const Dashboard = Loadable({
 });
 
 
+// ======================== Motor MISC-D ========================================
+
+const RegistrationMISCD = Loadable({
+    loader: () => import(/*webpackChunkName: "Products" */"../MISC-D/RegistrationMISCD.jsx"),
+    loading: () => loadingContent
+});
+const SelectBrandMISCD = Loadable({
+    loader: () => import(/*webpackChunkName: "Products" */"../MISC-D/SelectBrandMISCD.jsx"),
+    loading: () => loadingContent
+});
+const VehicleDetailsMISCD = Loadable({
+    loader: () => import(/*webpackChunkName: "Products" */"../MISC-D/VehicleDetailsMISCD.jsx"),
+    loading: () => loadingContent
+});
+const OtherComprehensiveMISCD = Loadable({
+    loader: () => import(/*webpackChunkName: "Products" */"../MISC-D/OtherComprehensiveMISCD.jsx"),
+    loading: () => loadingContent
+});
+const AdditionalDetailsMISCD = Loadable({
+    loader: () => import(/*webpackChunkName: "Products" */"../MISC-D/AdditionalDetailsMISCD.jsx"),
+    loading: () => loadingContent
+});
+const PremiumMISCD = Loadable({
+    loader: () => import(/*webpackChunkName: "Products" */"../MISC-D/PremiumMISCD.jsx"),
+    loading: () => loadingContent
+});
+
+
 
 class Routes extends Component {
     render() {
@@ -345,7 +373,7 @@ class Routes extends Component {
                         <PrivateRoute exact path="/four_wheeler_additional_detailsTP/:productId" component={FourWheelerAdditionalDetailsTP} />  
                         <PrivateRoute exact path="/four_wheeler_policy_premium_detailsTP/:productId" component={FourWheelerPolicyPremiumDetailsTP} />
 
-                         {/************ MotorGCV ******************/}
+                        {/************ MotorGCV ******************/}
                          <PrivateRoute exact path="/Registration_GCV/:productId" component={RegistrationGCV} />
                         <PrivateRoute exact path="/SelectBrand_GCV/:productId" component={SelectBrandGCV} />
                         <PrivateRoute exact path="/VehicleDetails_GCV/:productId" component={VehicleDetailsGCV} />
@@ -384,6 +412,14 @@ class Routes extends Component {
 
                         {/************ Services ******************/}
                         <PrivateRoute exact path="/Services" component={Services} />
+
+                        {/************ Motor MISC-D ******************/}
+                        <PrivateRoute exact path="/Registration_MISCD/:productId" component={RegistrationMISCD} />
+                        <PrivateRoute exact path="/SelectBrand_MISCD/:productId" component={SelectBrandMISCD} />
+                        <PrivateRoute exact path="/VehicleDetails_MISCD/:productId" component={VehicleDetailsMISCD} />
+                        <PrivateRoute exact path="/OtherComprehensive_MISCD/:productId" component={OtherComprehensiveMISCD} />
+                        <PrivateRoute exact path="/AdditionalDetails_MISCD/:productId" component={AdditionalDetailsMISCD} />  
+                        <PrivateRoute exact path="/Premium_MISCD/:productId" component={PremiumMISCD} />
 
 
 

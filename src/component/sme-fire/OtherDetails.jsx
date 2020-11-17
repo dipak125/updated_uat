@@ -1,5 +1,5 @@
 import React, { Component, Fragment } from 'react';
-import { Row, Col, Modal, Button, FormGroup, OverlayTrigger, Tooltip } from 'react-bootstrap';
+import { Row, Col, Modal, Button, FormGroup, OverlayTrigger, Tooltip,Label } from 'react-bootstrap';
 import DatePicker from "react-datepicker";
 import BaseComponent from '.././BaseComponent';
 import SideNav from '../common/side-nav/SideNav';
@@ -135,16 +135,16 @@ class OtherDetails extends Component {
         formData.append('Commercial_consideration',values.Commercial_consideration)
         // values.previous_city
 
-        this.props.loadingStart();
-        if(values.Commercial_consideration < 0) {
-            this.props.loadingStop();
-            swal("Commercial consideration % should not be less than 1%")
-            return false
-        } else if(values.Commercial_consideration > 100) {
-            this.props.loadingStop();
-            swal("Commercial consideration % should not be greater than 100%")
-            return false
-        } else {
+        // this.props.loadingStart();
+        // if(values.Commercial_consideration < 0) {
+        //     this.props.loadingStop();
+        //     swal("Commercial consideration % should not be less than 1%")
+        //     return false
+        // } else if(values.Commercial_consideration > 100) {
+        //     this.props.loadingStop();
+        //     swal("Commercial consideration % should not be greater than 100%")
+        //     return false
+        // } else {
         axios.post('sme/previous-policy-details',
         formData
         ).then(res=>{       
@@ -154,7 +154,7 @@ class OtherDetails extends Component {
                 
                 previous_start_date:values.previous_start_date,
                 previous_end_date:values.previous_end_date,
-                Commercial_consideration:values.Commercial_consideration,
+                Commercial_consideration:'5',
                 Previous_Policy_No:values.Previous_Policy_No,
                 insurance_company_id:values.insurance_company_id,
                 previous_city:values.previous_city
@@ -173,7 +173,7 @@ class OtherDetails extends Component {
         this.props.loadingStop();
         return false
         })
-    }
+    // }
     }
 
 
@@ -371,8 +371,13 @@ class OtherDetails extends Component {
                                                     </div>
                                                 </div>   
                                                 <Row>  
+                                                            <Col sm={6} md={4} lg={4}>
+                                                        <label>
+                                                        Burglary: Contents Sum Insured
+                                                        </label>
+                                                        </Col>
                                                    
-                                                    <Col sm={12} md={4} lg={4}>
+                                                    <Col sm={6} md={1} lg={4}>
                                                         <FormGroup>
                                                             <div className="insurerName">
                                                             <Field
@@ -391,6 +396,13 @@ class OtherDetails extends Component {
                                                             </div>
                                                         </FormGroup>
                                                     </Col>
+                                                    </Row>
+                                                    <Row>
+                                                            <Col sm={6} md={4} lg={4}>
+                                                        <label>
+                                                        Burglary: Stocks Sum Insured
+                                                        </label>
+                                                        </Col>
                                                     <Col sm={12} md={4} lg={4}>
                                                         <FormGroup>
                                                             <div className="insurerName">
@@ -418,14 +430,14 @@ class OtherDetails extends Component {
                                             <p>&nbsp;</p>
                                         </div>
                                     
-                                        <Row>
+                                        {/* <Row>
                                             <Col sm={12} md={9} lg={9}>
                                                 <div className="d-flex justify-content-left">
                                                     <div className="brandhead">
                                                         <h4>Commercial consideration in %</h4>
                                                     </div>
                                                 </div>   
-                                                <Row> 
+                                                <Row>  */}
                                                     {/* <Col sm={12} md={4} lg={4}>
                                                         <FormGroup>
                                                             <div className="formSection">
@@ -445,7 +457,7 @@ class OtherDetails extends Component {
                                                             </div>
                                                         </FormGroup>   
                                                     </Col> */}
-                                                    <Col sm={12} md={4} lg={4}><FormGroup>
+                                                    {/* <Col sm={12} md={4} lg={4}><FormGroup>
                                                             <div className="insurerName">
                                                                 <Field
                                                                     name="Commercial_consideration"
@@ -462,7 +474,7 @@ class OtherDetails extends Component {
                                                                 ) : null}
                                                             </div>
                                                         </FormGroup>
-                                                    </Col>
+                                                    </Col> */}
                                                     {/* <Col sm={12} md={4} lg={4}>
                                                         <FormGroup>
                                                             <div className="insurerName">
@@ -481,9 +493,9 @@ class OtherDetails extends Component {
                                                             </div>
                                                         </FormGroup>
                                                     </Col>                 */}
-                                                </Row> 
+                                                {/* </Row> 
                                             </Col>
-                                        </Row> 
+                                        </Row>  */}
 
                                         <div className="brandhead"> 
                                             <p>&nbsp;</p>

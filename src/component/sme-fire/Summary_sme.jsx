@@ -478,30 +478,6 @@ class Summary_sme extends Component {
                                                                                 <Col sm={12} md={6}>
                                                                                     <Row>
                                                                                         <Col sm={12} md={6}>
-                                                                                            <FormGroup>Block No.:</FormGroup>
-                                                                                        </Col>
-                                                                                        <Col sm={12} md={6}>
-                                                                                            <FormGroup>{this.props.com_block_no}</FormGroup>
-                                                                                        </Col>
-                                                                                    </Row>
-                                                                                </Col>
-                                                                            </Row>
-                                                                            <Row>
-                                                                                <Col sm={12} md={6}>
-                                                                                    <Row>
-                                                                                        <Col sm={12} md={6}>
-                                                                                            <FormGroup>House/Flat No:</FormGroup>
-                                                                                        </Col>
-                                                                                        <Col sm={12} md={6}>
-                                                                                            <FormGroup>{this.props.com_house_flat_no}</FormGroup>
-                                                                                        </Col>
-                                                                                    </Row>
-                                                                                </Col>
-                                                                            </Row>
-                                                                            <Row>
-                                                                                <Col sm={12} md={6}>
-                                                                                    <Row>
-                                                                                        <Col sm={12} md={6}>
                                                                                             <FormGroup>Street Name:</FormGroup>
                                                                                         </Col>
                                                                                         <Col sm={12} md={6}>

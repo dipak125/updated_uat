@@ -47,6 +47,9 @@ class Motor extends Component {
         else if(productId == '8') {
             this.props.history.push(`/Registration_GCV/${productId}`)
         }
+        else if(productId == '11') {
+            this.props.history.push(`/Registration_MISCD/${productId}`)
+        }
     }   
 
     getPolicyList = () => {

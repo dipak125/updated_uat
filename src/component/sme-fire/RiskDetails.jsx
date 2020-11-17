@@ -247,6 +247,7 @@ class RiskDetails extends Component {
             const {productId} = this.props.match.params;
             console.log("Fire_sum_insured-------",Fire_sum_insured)
             this.props.loadingStop()
+            this.setState({ Fire_sum_insured : Fire_sum_insured })
             
             this.props.history.push(`/OtherDetails/${productId}`);
         }).
@@ -358,11 +359,16 @@ class RiskDetails extends Component {
         
     }
 
+    fireSumCalculate (){
+        const fire_Sum = this.state.Fire_sum_insured
+    }
+
     componentDidMount() {
         // this.getInsurerList();
         //this.fetchData();
         this.fetchPolicyDetails();
         this.fetchAreadetailsBack();
+        this.fireSumCalculate();
         
     }
     Registration_SME = (productId) => {
@@ -443,7 +449,10 @@ class RiskDetails extends Component {
                                                 <div className="brandhead">
                                                     <h4 className="fs-18 m-b-30">RISK DETAILS</h4>
                                                 </div>
-                                                </div>    
+                                                </div> 
+                                                <div className="d-flex justify-content-left">
+                                                    <h4 className="fs-18 m-b-30">Type of occupancy at risk location : Shop Risk</h4>
+                                                </div> 
                                                 <Row>
                                                     <Col sm={12} md={4} lg={4}>
                                                         <FormGroup>
@@ -603,8 +612,10 @@ class RiskDetails extends Component {
                                                     <div className="brandhead">
                                                         <h4 className="fs-18 m-b-30">COVERAGE DETAILS: &nbsp;&nbsp;&nbsp; SECTION 1 - FIRE</h4>
                                                     </div>
-                                                </div>   
-                                                <Row>  
+                                                </div>                                                   
+                                                <div className="d-flex justify-content-left">
+                                                    <h4 className="fs-18 m-b-30">Please enter Sum Insured below :</h4>
+                                                </div>  
                                                     {/* <Col sm={12} md={4} lg={4}>
                                                         <FormGroup>
                                                             <div className="formSection">
@@ -628,7 +639,16 @@ class RiskDetails extends Component {
                                                             </div>
                                                         </FormGroup>                                                        
                                                     </Col> */}
-                                                    <Col sm={12} md={4} lg={4}>
+                                                    <Row> 
+                                                            <Col sm={6} md={4} lg={4}>
+                                                        <label>
+                                                        Fire-Building-Sum Insured:
+                                                        </label>
+                                                        <OverlayTrigger overlay={<Tooltip id="tooltip-disabled">{"Building Structure including Plinth and Foundation"}</Tooltip>}>
+                                                            <a className="infoIcon"><img src={require('../../assets/images/i.svg')} alt="" className="premtool" /></a>
+                                                        </OverlayTrigger>
+                                                        </Col>
+                                                        <Col sm={12} md={4} lg={4}>
                                                         <FormGroup>
                                                             <div className="insurerName">
                                                             <Field
@@ -643,14 +663,30 @@ class RiskDetails extends Component {
                                                                 onInput= {(e)=> {
                                                                     setFieldTouched("buildings_sum_insured");
                                                                     setFieldValue("buildings_sum_insured", e.target.value);  
-                                                                }}                                                                           
+                                                                }}   
+                                                                // onClick={(e) =>{
+                                                                //      {
+                                                                //         swal("This cover is mandated by IRDAI, it is compulsory for Owner-Driver to possess a PA cover of minimum Rs 15 Lacs, except in certain conditions. By not choosing this cover, you confirm that you hold an existing PA cover or you do not possess a valid driving license.")
+                                                                //     }
+                                                                           
+                                                                // }       }                                                                 
                                                             />
                                                             {errors.buildings_sum_insured && touched.buildings_sum_insured ? (
                                                             <span className="errorMsg">{errors.buildings_sum_insured}</span>
                                                             ) : null}  
                                                             </div>
                                                         </FormGroup>
-                                                    </Col>
+                                                        </Col>
+                                                    </Row>
+                                                    <Row>
+                                                            <Col sm={6} md={4} lg={4}>
+                                                        <label>
+                                                        Fire-Contents Sum Insured:
+                                                        </label>
+                                                        <OverlayTrigger overlay={<Tooltip id="tooltip-disabled">{"coverage.description"}</Tooltip>}>
+                                                            <a className="infoIcon"><img src={require('../../assets/images/i.svg')} alt="" className="premtool" /></a>
+                                                        </OverlayTrigger>
+                                                        </Col>
                                                     <Col sm={12} md={4} lg={4}>
                                                     <FormGroup>
                                                         <div className="insurerName">
@@ -674,6 +710,16 @@ class RiskDetails extends Component {
                                                         </div>
                                                     </FormGroup>
                                                     </Col>
+                                                    </Row>
+                                                    <Row>
+                                                            <Col sm={6} md={4} lg={4}>
+                                                        <label>
+                                                        Fire-Stock Sum Insured:
+                                                        </label>
+                                                        <OverlayTrigger overlay={<Tooltip id="tooltip-disabled">{"Building Structure including Plinth and Foundation"}</Tooltip>}>
+                                                            <a className="infoIcon"><img src={require('../../assets/images/i.svg')} alt="" className="premtool" /></a>
+                                                        </OverlayTrigger>
+                                                        </Col>
                                                     <Col sm={12} md={4} lg={4}>
                                                         <FormGroup>
                                                             <div className="insurerName">
@@ -693,6 +739,41 @@ class RiskDetails extends Component {
                                                             />
                                                             {errors.stock_sum_insured && touched.stock_sum_insured ? (
                                                             <span className="errorMsg">{errors.stock_sum_insured}</span>
+                                                            ) : null}  
+                                                            </div>
+                                                        </FormGroup>
+                                                    </Col>                         
+                                                </Row>
+                                                
+                                                <Row>
+                                                            <Col sm={6} md={4} lg={4}>
+                                                        <label>
+                                                        Fire-Fire Sum Insured:
+                                                        </label>
+                                                        <OverlayTrigger overlay={<Tooltip id="tooltip-disabled">{"coverage.description"}</Tooltip>}>
+                                                            <a className="infoIcon"><img src={require('../../assets/images/i.svg')} alt="" className="premtool" /></a>
+                                                        </OverlayTrigger>
+                                                        </Col>
+                                                    <Col sm={12} md={4} lg={4}>
+                                                        <FormGroup>
+                                                            <div className="insurerName">
+                                                            <Field
+                                                                name='stock_sum_insured'
+                                                                type="text"
+                                                                placeholder="Fire-Stock Sum Insured"
+                                                                maxlength='7'
+                                                                autoComplete="off"
+                                                                onFocus={e => this.changePlaceHoldClassAdd(e)}
+                                                                onBlur={e => this.changePlaceHoldClassRemove(e)}
+                                                                value = {this.Fire_sum_insured} 
+                                                                disabled={true}
+                                                                onInput= {(e)=> {
+                                                                    setFieldTouched("Fire_sum_insured");
+                                                                    setFieldValue("Fire_sum_insured", e.target.value);  
+                                                                }}                                                                           
+                                                            />
+                                                            {errors.Fire_sum_insured && touched.Fire_sum_insured ? (
+                                                            <span className="errorMsg">{errors.Fire_sum_insured}</span>
                                                             ) : null}  
                                                             </div>
                                                         </FormGroup>
