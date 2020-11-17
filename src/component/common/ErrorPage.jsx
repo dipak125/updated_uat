@@ -8,11 +8,16 @@ import { withRouter } from 'react-router-dom';
 import { loaderStart, loaderStop } from "../../store/actions/loader";
 import { connect } from "react-redux";
 import Footer from '../common/footer/Footer';
+import { Button } from 'react-bootstrap';
 
 class ErrorPage extends Component {
 
     state = {
         errorDetails: [],
+        httpCode: "",
+        retry_url: "",
+        retry: "",
+        policyHolder: [],
         refNumber:  queryString.parse(this.props.location.search).access_id ? 
                     queryString.parse(this.props.location.search).access_id : 
                     localStorage.getItem("policyHolder_refNo")
@@ -27,9 +32,26 @@ class ErrorPage extends Component {
         formData.append('policy_ref_no', this.state.refNumber)
         axios.post(`policy-error-msg`, formData)
           .then(res => {
-            this.setState({
-              errorDetails: res.data.data.message.ValidateResult
-            });
+            if(res.data.data.message.httpCode == "404") {
+              this.setState({
+                errorDetails: res.data.data.message.moreInformation,
+                httpCode: res.data.data.message.httpCode
+              });
+
+              if(res.data.data.message && res.data.data.message.retry && res.data.data.message.retry ==  1) {
+                this.setState({
+                  retry_url:  `${process.env.REACT_APP_PAYMENT_URL}/${res.data.data.message.payment_url}`,
+                  retry: res.data.data.message.retry
+                });
+              }
+            }
+            else {
+              this.setState({
+                errorDetails: res.data.data.message.ValidateResult,
+                httpCode: res.data.data.message.httpCode
+              });
+            }
+            
             this.props.loadingStop();
           })
           .catch(err => {
@@ -37,9 +59,13 @@ class ErrorPage extends Component {
           });
       }
 
+      Retry_payment = () => {
+        const { refNumber,retry_url } = this.state;
+        window.location = retry_url
+    }
 
     render() {
-        const { errorDetails } = this.state
+        const { errorDetails, httpCode,retry } = this.state
         return (
             <>
              <BaseComponent>
@@ -53,12 +79,12 @@ class ErrorPage extends Component {
                         <div className="text-center custtxt">
                         <p className="fs-16 m-b-30"><span className="lghtBlue">&nbsp;</span></p>
                           <img src={require('../../assets/images/Error.png')} alt="" className="m-b-30" />
-                          <p className="fs-16 m-b-30">&nbsp;&nbsp;&nbsp;&nbsp;<span className="lghtBlue">{errorDetails.message}</span></p>
-                          <p className="fs-16 m-b-30"><span className="lghtBlue">&nbsp;</span></p>
-                            
+                          <p className="fs-16 m-b-30"><span className="lghtBlue"><strong>{httpCode == "404" && errorDetails ? errorDetails : errorDetails && errorDetails.message ? errorDetails.message : null}</strong></span></p>
+                          <p className="fs-16 m-b-30"><span className="lghtBlue">&nbsp;</span></p>                            
                         </div>
                       </section>
-                      {/* <div className="dashbrd"><a href="#">Go to Dashboard</a></div> */}
+                      {retry == 1 ? <div className="dashbrd"><Button className="buy" type="button" onClick = {this.Retry_payment} >Retry Payment</Button></div> : null}
+                      <br/>
                       <Footer />
                     </div>
                   </div>

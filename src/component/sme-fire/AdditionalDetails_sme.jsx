@@ -60,7 +60,7 @@ const vehicleRegistrationValidation = Yup.object().shape({
     salutation_id: Yup.string().required('Title is required').nullable(),
     first_name: Yup.string().required('First Name is required').min(3, function() {return "First name must be 3 characters"}).max(40,function() {
         return "Full name must be maximum 40 characters"
-    }).matches(/^[a-zA-Z]+([\s]?[a-zA-Z]+)([\s]?[a-zA-Z]+)$/, function() {return "Please enter valid first name"}).nullable(),
+    }).matches(/^[A-Za-z]+$/, function() {return "Please enter valid first name"}).nullable(),
     last_name: Yup.string().required('Last Name is required').min(1, function() {return "Last name must be 1 characters"}).max(40, function() {return "Full name must be maximum 40 characters"})
     .matches(/^[A-Za-z]+$/, function() {
         return "Please enter valid last name"
@@ -209,13 +209,14 @@ class AdditionalDetails_sme extends Component {
         }       
     }
 
-    otherDetails = (productId) => {
-        this.props.history.push(`/OtherDetails/${productId}`);
+    summary_SME = (productId) => {
+        // productId === 5
+        this.props.history.push(`/Summary_SME/${productId}`);
     }
 
 
     handleSubmit = (values, actions) => {
-        // const {productId} = this.props.match.params 
+        const {productId} = this.props.match.params 
         // const {motorInsurance, request_data} = this.state  
         // this.props.history.push(`/Premium_SME/${productId}`);
         console.log('handleSubmit', values);
@@ -273,15 +274,22 @@ class AdditionalDetails_sme extends Component {
             axios.post('/sme/mdm-party',
             formDataNew
             ).then(res=>{
-                axios.post('/sme/calculate-premium/phase-one',
+                axios.post('/sme/create-quote',
                 formDataNew
                 ).then(res=>{
-                    axios.post('/sme/calculate-premium/phase-two',
+                   if( res.data.error === false) {
+                       axios.post('/sme/con-sequence',
                     formDataNew
                     ).then(res=>{
                         const {productId} = this.props.match.params;
                         this.props.loadingStop();
-                        this.props.history.push(`/Summary_SME/${productId}`);
+                        if( res.data.error === false) {
+                            this.props.history.push(`/Premium_SME/${productId}`);
+                        } else {
+                            this.props.loadingStop();
+                            swal("Thank you for showing your interest for buying product.Due to some reasons, we are not able to issue the policy online.Please call 1800 22 1111")
+                            actions.setSubmitting(false)
+                        }
                     }).
                     catch(err=>
                         {this.props.loadingStop();
@@ -289,17 +297,25 @@ class AdditionalDetails_sme extends Component {
                         return false;
                         
                     });
+                }
+                else { this.props.loadingStop()
+                    swal(res.data.msg)
+                    actions.setSubmitting(false)
+                }
                 }).
                 catch(err=>{
                     this.props.loadingStop();
+                    return false;
                 });
             }).
             catch(err=>{
                 this.props.loadingStop();
+                return false;
             });
         }).
         catch(err=>{
             this.props.loadingStop();
+            return false;
         });
     }
 
@@ -980,7 +996,7 @@ class AdditionalDetails_sme extends Component {
                                     <h4> </h4>
                                 </div>
                                 <div className="d-flex justify-content-left resmb">
-                                <Button className={`backBtn`} type="button" onClick= {this.otherDetails.bind(this,productId)}>
+                                <Button className={`backBtn`} type="button" onClick= {this.summary_SME.bind(this,productId)}>
                                     {isSubmitting ? 'Wait..' : 'Back'}
                                 </Button> 
                                 <Button className={`proceedBtn`} type="submit"  disabled={isSubmitting ? true : false}>

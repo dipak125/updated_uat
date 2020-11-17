@@ -20,6 +20,7 @@ const minDate = moment().format();
 const maxDate = moment().add(14, 'day');
 const maxDateEnd = moment().add(15, 'day').calendar();
 
+
 const initialValues = {
     policy_type: '1',
     pol_start_date:null
@@ -39,6 +40,9 @@ class Registration_sme extends Component {
         fastlanelog: []
     }
    
+     handleChange = date => {    
+        // this.setState({ startDate: date });  
+    }
 
     changePlaceHoldClassAdd(e) {
         let element = e.target.parentElement;
@@ -262,14 +266,15 @@ class Registration_sme extends Component {
             })
         }
     }
-
+    
 
     render() {
         const {motorInsurance} = this.state
         const newInitialValues = Object.assign(initialValues,{
-            pol_start_date:this.props.start_date != null?new Date(this.props.start_date):this.props.start_date,
-            pol_end_date:this.props.end_date != null?new Date(this.props.end_date):this.props.end_date
+            pol_start_date:this.props.start_date != null?new Date(this.props.start_date):new Date(),
+            pol_end_date:this.props.end_date != null?new Date(this.props.end_date):new Date(new Date(moment().add(364, 'day').calendar()).setHours(23, 59, 0, 0) )
         })
+
 
         return (
             <>
@@ -311,25 +316,28 @@ class Registration_sme extends Component {
                                                                 name="pol_start_date"
                                                                 minDate={new Date(minDate)}
                                                                 maxDate={new Date(maxDate)}
+                                                                excludeOutOfBoundsTimes
                                                                 dateFormat="dd-MM-yyyy HH:mm"
-                                                                showTimeSelect
+                                                                // showTimeSelect
                                                                 // timeFormat="p"
-                                                                timeFormat="HH:mm"
+                                                                // timeFormat="HH:mm"
                                                                 // timeIntervals={15}
                                                                 placeholderText="Policy Start Date & Time"
                                                                 peekPreviousMonth
                                                                 autoComplete="off"
                                                                 peekPreviousYear
-                                                                showMonthDropdown
-                                                                showYearDropdown
+                                                                // showMonthDropdown
+                                                                // showYearDropdown
                                                                 dropdownMode="select"
                                                                 className="datePckr inputfs12"
-                                                                selected={values.pol_start_date}    
-                                                                onChange={(val) => {                                                                   
+                                                                selected={values.pol_start_date}
+                                                                onSelect={(val) => {       
+                                                                    Math.floor(moment().diff(val, 'days', true)) == 0 ? val.setHours(moment().format("HH"),moment().format("mm"),0,0) : val.setHours(0, 0, 0, 0)                                                                                                            
                                                                     setFieldTouched('pol_start_date')
-                                                                    setFieldValue('pol_start_date', val);
+                                                                    setFieldValue('pol_start_date', val)
                                                                     //console.log('here',val);
-                                                                    setFieldValue('pol_end_date', new Date(moment(val).add(364, 'day').calendar()));
+                                                                    setFieldTouched('pol_end_date')
+                                                                    setFieldValue('pol_end_date', new Date(new Date(moment(val).add(364, 'day').calendar()).setHours(23, 59, 0, 0) ) );
                                                                 }}                            
                                                             />
                                                             {errors.pol_start_date && touched.pol_start_date ? (
@@ -363,8 +371,9 @@ class Registration_sme extends Component {
                                                                 showYearDropdown
                                                                 dropdownMode="select"
                                                                 className="datePckr inputfs12"
-                                                                selected={values.pol_end_date}    
-                                                                onChange={(val) => {                                                                   
+                                                                // selected={values.pol_end_date}    
+                                                                selected={values.pol_end_date}
+                                                                onChange={(val) => {                                                            
                                                                     setFieldTouched('pol_end_date')
                                                                     setFieldValue('pol_end_date', val);
                                                                 }}   

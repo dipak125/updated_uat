@@ -212,7 +212,7 @@ class RiskDetails extends Component {
         formData.append('stock_sum_insured',values.stock_sum_insured)
         console.log("formdata---",values.formData)
         console.log("formData---",formData)
-        const Fire_sum_insured = parseInt(values.buildings_sum_insured) + parseInt(values.content_sum_insured) + parseInt(values.stock_sum_insured);
+        const Fire_sum_insured = parseInt(values.buildings_sum_insured) + parseInt(values.content_sum_insured) + parseInt(values.stock_sum_insured) ;
         if (Fire_sum_insured < 500000) {
             this.props.loadingStop();
             swal("Sum total of fire buildings sum insured,contents sum insured and stock sum insured should be more than 5 Lakhs")
@@ -414,13 +414,13 @@ class RiskDetails extends Component {
                 return "Please enter valid 6 digit pin code"
             }).nullable(),
             pincode_id: Yup.string().required("Please select area").nullable(),
-            buildings_sum_insured: Yup.string().required("Please enter building sum insured").matches(/^[0-9]*$/, function() {
+            buildings_sum_insured: Yup.string().required("Please enter building sum insured").max(8).matches(/^[0-9]*$/, function() {
                 return "Please enter only numbers"
             }).nullable(),
-            content_sum_insured: Yup.string().required("Please enter content sum insured").matches(/^[0-9]*$/, function() {
+            content_sum_insured: Yup.string().required("Please enter content sum insured").max(8).matches(/^[0-9]*$/, function() {
                 return "Please enter only numbers"
             }).nullable(),
-            stock_sum_insured: Yup.string().required("Please enter stock sum insured").matches(/^[0-9]*$/, function() {
+            stock_sum_insured: Yup.string().required("Please enter stock sum insured").max(8).matches(/^[0-9]*$/, function() {
                 return "Please enter only numbers"
             }).nullable(),
         })
@@ -683,7 +683,7 @@ class RiskDetails extends Component {
                                                         <label>
                                                         Fire-Contents Sum Insured:
                                                         </label>
-                                                        <OverlayTrigger overlay={<Tooltip id="tooltip-disabled">{"coverage.description"}</Tooltip>}>
+                                                        <OverlayTrigger overlay={<Tooltip id="tooltip-disabled">{"Building Structure including Plinth and Foundation"}</Tooltip>}>
                                                             <a className="infoIcon"><img src={require('../../assets/images/i.svg')} alt="" className="premtool" /></a>
                                                         </OverlayTrigger>
                                                         </Col>
@@ -695,7 +695,7 @@ class RiskDetails extends Component {
                                                                 type="text"
                                                                 placeholder="Fire-Contents Sum Insured"
                                                                 autoComplete="off"
-                                                                maxlength = '7'
+                                                                maxlength = '8'
                                                                 onFocus={e => this.changePlaceHoldClassAdd(e)}
                                                                 onBlur={e => this.changePlaceHoldClassRemove(e)}
                                                                 value={values.content_sum_insured}
@@ -727,7 +727,7 @@ class RiskDetails extends Component {
                                                                 name='stock_sum_insured'
                                                                 type="text"
                                                                 placeholder="Fire-Stock Sum Insured"
-                                                                maxlength='7'
+                                                                maxlength='8'
                                                                 autoComplete="off"
                                                                 onFocus={e => this.changePlaceHoldClassAdd(e)}
                                                                 onBlur={e => this.changePlaceHoldClassRemove(e)}
@@ -748,9 +748,9 @@ class RiskDetails extends Component {
                                                 <Row>
                                                             <Col sm={6} md={4} lg={4}>
                                                         <label>
-                                                        Fire-Fire Sum Insured:
+                                                        Fire-Total Sum Insured:
                                                         </label>
-                                                        <OverlayTrigger overlay={<Tooltip id="tooltip-disabled">{"coverage.description"}</Tooltip>}>
+                                                        <OverlayTrigger overlay={<Tooltip id="tooltip-disabled">{"Building Structure including Plinth and Foundation"}</Tooltip>}>
                                                             <a className="infoIcon"><img src={require('../../assets/images/i.svg')} alt="" className="premtool" /></a>
                                                         </OverlayTrigger>
                                                         </Col>
@@ -760,12 +760,12 @@ class RiskDetails extends Component {
                                                             <Field
                                                                 name='stock_sum_insured'
                                                                 type="text"
-                                                                placeholder="Fire-Stock Sum Insured"
-                                                                maxlength='7'
+                                                                placeholder="Fire-Total Sum Insured"
+                                                                maxlength='8'
                                                                 autoComplete="off"
                                                                 onFocus={e => this.changePlaceHoldClassAdd(e)}
                                                                 onBlur={e => this.changePlaceHoldClassRemove(e)}
-                                                                value = {this.Fire_sum_insured} 
+                                                                value = {parseInt(values.buildings_sum_insured) + parseInt(values.content_sum_insured) + parseInt(values.stock_sum_insured)} 
                                                                 disabled={true}
                                                                 onInput= {(e)=> {
                                                                     setFieldTouched("Fire_sum_insured");
@@ -796,7 +796,7 @@ class RiskDetails extends Component {
                                                 </Button> 
                                                 </div> */}
                                                 <div className="d-flex justify-content-left resmb">
-                                                <Button className={`backBtn`} type="button"  disabled={isSubmitting ? true : false} onClick= {this.Registration_SME.bind(this.productId)}>
+                                                <Button className={`backBtn`} type="button"  disabled={isSubmitting ? true : false} onClick= {this.Registration_SME.bind(this,productId)}>
                                                     {isSubmitting ? 'Wait..' : 'Back'}
                                                 </Button> 
                                                 <Button className={`proceedBtn`} type="submit"  disabled={isSubmitting ? true : false}>

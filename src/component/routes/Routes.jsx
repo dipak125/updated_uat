@@ -331,7 +331,7 @@ class Routes extends Component {
                         <PrivateRoute exact path="/PolicyDetails/:productId" component={PolicyDetails} />
                         {/* <PrivateRoute exact path="/PolicySummery/:productId" component={PolicySummery} />                  */}
                         <PrivateRoute exact path="/ThankYou/:policyId" component={ThankYou} />
-                        <PrivateRoute exact path="/ThankYouCCM/:policyId" component={ThankYouCCM} />
+                        <PrivateRoute exact path="/ThankYouCCM" component={ThankYouCCM} />
                     
                         
                         <PrivateRoute exact path="/Registration/:productId" component={Registration} />                    

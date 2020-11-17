@@ -80,27 +80,27 @@ class Summary_sme extends Component {
     }
 
     handleSubmit = (values) => {
-        let formDataNew = new FormData(); 
-        formDataNew.append('menumaster_id',this.props.menumaster_id)
-        formDataNew.append('policy_ref_no',this.props.policy_holder_ref_no)
-        this.props.loadingStart();
-        axios.post('/sme/create-quote',
-        formDataNew
-        ).then(res=>{
-            axios.post('/sme/con-sequence',
-            formDataNew
-            ).then(res=>{
+        // let formDataNew = new FormData(); 
+        // formDataNew.append('menumaster_id',this.props.menumaster_id)
+        // formDataNew.append('policy_ref_no',this.props.policy_holder_ref_no)
+        // this.props.loadingStart();
+        // axios.post('/sme/create-quote',
+        // formDataNew
+        // ).then(res=>{
+        //     axios.post('/sme/con-sequence',
+        //     formDataNew
+        //     ).then(res=>{
                 const {productId} = this.props.match.params;
                 this.props.loadingStop();
-                this.props.history.push(`/Premium_SME/${productId}`);
-            }).
-            catch(err=>{
-                this.props.loadingStop();
-            });
-        }).
-        catch(err=>{
-            this.props.loadingStop();
-        });
+                this.props.history.push(`/AdditionalDetails_SME/${productId}`);
+        //     }).
+        //     catch(err=>{
+        //         this.props.loadingStop();
+        //     });
+        // }).
+        // catch(err=>{
+        //     this.props.loadingStop();
+        // });
     }
 
     fetchPolicyDetails=()=>{
@@ -242,8 +242,9 @@ class Summary_sme extends Component {
 
     }
 
-    additionalDetails = (productId) => {
-        this.props.history.push(`/AdditionalDetails_SME/${productId}`);
+    otherDetails = (productId) => {
+        // productId === 5
+        this.props.history.push(`/OtherDetails/${productId}`);
     }
 
     getPostcodeArea = (com_pincode_id) => {
@@ -325,12 +326,10 @@ class Summary_sme extends Component {
 
                                                     <Row>
                                                         <Col sm={12} md={9} lg={9}>
-                                                            <div className="rghtsideTrigr">
+                                                            {/* <div className="rghtsideTrigr">
                                                                 <Collapsible trigger="Proposer Details" >
                                                                     <div className="listrghtsideTrigr">
                                                                         <div>
-                                                                            {/* <strong>Proposer Details:</strong>
-                                                                            <br/> */}
                                                                             <Row>
                                                                                 <Col sm={12} md={6}>
                                                                                     <Row>
@@ -460,8 +459,6 @@ class Summary_sme extends Component {
                                                                 <Collapsible trigger="Communication Details" >
                                                                     <div className="listrghtsideTrigr">
                                                                         <div>
-                                                                            {/* <strong>Communication Details:</strong>
-                                                                            <br/> */}
                                                                             <Row>
                                                                                 <Col sm={12} md={6}>
                                                                                     <Row>
@@ -528,7 +525,7 @@ class Summary_sme extends Component {
                                                                         </div>
                                                                     </div>
                                                                 </Collapsible>    
-                                                            </div>
+                                                            </div> */}
 
                                                             <div className="rghtsideTrigr m-b-30">
                                                                 <Collapsible trigger="Policy Summary"  open= {true}>
@@ -544,7 +541,7 @@ class Summary_sme extends Component {
                                                                                                 <strong>Policy Start Date :</strong></FormGroup>
                                                                                         </Col>
                                                                                         <Col sm={12} md={6}>
-                                                                                            <FormGroup>{moment(new Date(this.props.start_date)).format('LL')}</FormGroup>
+                                                                                            <FormGroup>{moment(new Date(this.props.start_date)).format('DD MMM yyyy')}</FormGroup>
                                                                                         </Col>
                                                                                     </Row>
                                                                                 </Col>
@@ -554,7 +551,7 @@ class Summary_sme extends Component {
                                                                                             <FormGroup><strong>Policy End Date :</strong></FormGroup>
                                                                                         </Col>
                                                                                         <Col sm={12} md={6}>
-                                                                                            <FormGroup>{moment(new Date(this.props.end_date)).format('LL')}</FormGroup>
+                                                                                            <FormGroup>{moment(new Date(this.props.end_date)).format('DD MMM yyyy')}</FormGroup>
                                                                                         </Col>
                                                                                     </Row>
                                                                                 </Col>
@@ -625,7 +622,7 @@ class Summary_sme extends Component {
 
                                                             <div className="d-flex justify-content-left resmb">
                                                                 
-                                                                <Button className={`backBtn`} type="button" onClick= {this.additionalDetails.bind(this,productId)}>
+                                                                <Button className={`backBtn`} type="button" onClick= {this.otherDetails.bind(this,productId)}>
                                                                     {isSubmitting ? 'Wait..' : 'Back'}
                                                                 </Button> 
                                                                 <Button className={`proceedBtn`} type="submit"  disabled={isSubmitting ? true : false}>

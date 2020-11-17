@@ -41,33 +41,52 @@ const initialValue = {
     previous_claim_bonus: 1,
     previous_claim_for: "",
     previous_policy_no: "",
+    previous_policy_check : 0
     // Commercial_consideration: "",
-}
+} 
 
 // VALIDATION :---------------------------------
-const vehicleRegistrationValidation = Yup.object().shape({
-    // previous_start_date : Yup.date().required("Please select previous policy start date").nullable(),
-    // previous_end_date : Yup.date().required("Please select previous policy end date").nullable(),
-    Commercial_consideration : Yup.string().matches(/^[0-9]*$/, function() {
-        return "Please enter commercial consideration % in number"
-    }).nullable(),
-    Previous_Policy_No : Yup.string()
-    .matches(/^[a-zA-Z0-9][a-zA-Z0-9\s-/]*$/, 
-        function() {
-            return "Please enter valid policy number"
-        }).min(6, function() {
-            return "Policy No. must be minimum 6 characters"
-        })
-        .max(28, function() {
-            return "Policy No. must be maximum 28 characters"
-        }).nullable(),
-    insurance_company_id : Yup.number().nullable(),
-    previous_city : Yup.string()
-    .matches(/^[a-zA-Z0-9][a-zA-Z0-9-/.,\s]*$/, 
-        function() {
-            return "Please enter valid address"
-        }).nullable()
-});
+const vehicleRegistrationValidation = 
+Yup.object().shape({
+previous_start_date : Yup.date().when(['previous_policy_check'], {
+    is: previous_policy_check => previous_policy_check == '1',       
+    then: Yup.date().required("Please select previous policy start date"),
+    otherwise: Yup.date().nullable()}),
+    
+previous_end_date : Yup.date().when(['previous_policy_check'], {
+    is: previous_policy_check => previous_policy_check == '1',       
+    then: Yup.date().required("Please select previous policy end date"),
+    otherwise: Yup.date().nullable()}),
+
+Commercial_consideration : Yup.string().matches(/^[0-9]*$/, function() {
+    return "Please enter commercial consideration % in number"
+}).nullable(),
+
+Previous_Policy_No : Yup.string().when(['previous_policy_check'], {
+    is: previous_policy_check => previous_policy_check == '1',       
+    then: Yup.string().required("Previous policy number is required")
+.matches(/^[a-zA-Z0-9][a-zA-Z0-9\s-/]*$/, 
+    function() {
+        return "Please enter valid policy number"
+    }).min(6, function() {
+        return "Policy No. must be minimum 6 characters"
+    })
+    .max(28, function() {
+        return "Policy No. must be maximum 28 characters"
+    }),
+    otherwise: Yup.string().nullable()}),
+
+insurance_company_id : Yup.number().when(['previous_policy_check'], {
+    is: previous_policy_check => previous_policy_check == '1',       
+    then: Yup.number().required("Previous insurance company name is required"),
+    otherwise: Yup.number().nullable()}),
+
+previous_city : Yup.string()
+.matches(/^[a-zA-Z0-9][a-zA-Z0-9-/.,\s]*$/, 
+    function() {
+        return "Please enter valid address"
+    }).nullable()
+})
 
 
 
@@ -110,8 +129,9 @@ class OtherDetails extends Component {
     //     this.props.history.push(`/AdditionalDetails_SME/${productId}`);
       
     // }
+    
 
-    handleSubmit=(values)=>{
+    handleSubmit=(values, actions)=>{
         const formData = new FormData();
         let previous_start_date = moment(values.previous_start_date).format('YYYY-MM-DD')
         let previous_end_date = moment(values.previous_end_date).format('YYYY-MM-DD')
@@ -161,8 +181,46 @@ class OtherDetails extends Component {
                 
 
             });
-            const {productId} = this.props.match.params;
-            this.props.history.push(`/AdditionalDetails_SME/${productId}`);
+            
+            let formDataNew = new FormData(); 
+            formDataNew.append('menumaster_id',this.props.menumaster_id)
+            formDataNew.append('policy_ref_no',this.props.policy_holder_ref_no)    
+
+            axios.post('/sme/calculate-premium/phase-one',
+            formDataNew
+            ).then(res=>{
+                   if( res.data.error === false) {
+                       axios.post('/sme/calculate-premium/phase-two',
+                    formDataNew
+                    ).then(res=>{
+                        const {productId} = this.props.match.params;
+                        this.props.loadingStop();
+                        if( res.data.error === false) {
+                            this.props.history.push(`/Summary_SME/${productId}`);
+                        } else {
+                            this.props.loadingStop();
+                            swal("Thank you for showing your interest for buying product.Due to some reasons, we are not able to issue the policy online.Please call 1800 22 1111")
+                            actions.setSubmitting(false)
+                        }
+                    }).
+                    catch(err=>
+                        {this.props.loadingStop();
+                        swal("Thank you for showing your interest for buying product.Due to some reasons, we are not able to issue the policy online.Please call 1800 22 1111")
+                        actions.setSubmitting(false)
+                        
+                    });
+                }
+                else { this.props.loadingStop()
+                    swal("Thank you for showing your interest for buying product.Due to some reasons, we are not able to issue the policy online.Please call 1800 22 1111")
+                    actions.setSubmitting(false)
+                }
+                }).
+            catch(err=>{
+                this.props.loadingStop();
+                return false;
+            });
+            // const {productId} = this.props.match.params;
+            // this.props.history.push(`/AdditionalDetails_SME/${productId}`);
         }).
         catch(err=>{
             // let decryptErr = JSON.parse(encryption.decrypt(err.data));
@@ -216,6 +274,7 @@ class OtherDetails extends Component {
             this.props.loadingStop();
         })
     }
+    
 
     fetchPolicyDetails=()=>{
         let policy_holder_ref_no = localStorage.getItem("policy_holder_ref_no") ? localStorage.getItem("policy_holder_ref_no"):0;
@@ -330,20 +389,26 @@ class OtherDetails extends Component {
     }
 
     render() {
+        let newInitialValues = Object.assign(initialValue,{
+            previous_start_date:this.props.previous_start_date != null?new Date(this.props.previous_start_date):"",
+            previous_end_date:this.props.previous_end_date != null?new Date(this.props.previous_end_date):"",
+            Commercial_consideration: this.props.Commercial_consideration,
+            Previous_Policy_No:this.props.Previous_Policy_No != null ? this.props.Previous_Policy_No : "",
+            insurance_company_id:this.props.insurance_company_id != null ? this.props.insurance_company_id : "",
+            previous_city:this.props.previous_city,
+            // previous_policy_check:"0"
+        });
+        
         const {productId} = this.props.match.params  
         const {insurerList, showClaim, previous_is_claim, motorInsurance, previousPolicy,
             CustomerID,suggestions, vehicleDetails, RTO_location} = this.state
 
-        let newInitialValues = Object.assign(initialValue,{
-            previous_start_date:this.props.previous_start_date != null?new Date(this.props.previous_start_date):this.props.previous_start_date,
-            previous_end_date:this.props.previous_end_date != null?new Date(this.props.previous_end_date):this.props.previous_end_date,
-            Commercial_consideration:this.props.Commercial_consideration,
-            Previous_Policy_No:this.props.Previous_Policy_No,
-            insurance_company_id:this.props.insurance_company_id,
-            previous_city:this.props.previous_city,
-            previous_policy_check:"0"
-        });
+        // console.log("previous_policy_check-----",this.values.previous_policy_check)
 
+       
+        
+
+        
         return (
             <>
                 <BaseComponent>
@@ -377,7 +442,7 @@ class OtherDetails extends Component {
                                                         </label>
                                                         </Col>
                                                    
-                                                    <Col sm={6} md={1} lg={4}>
+                                                    <Col sm={6} md={4} lg={4}>
                                                         <FormGroup>
                                                             <div className="insurerName">
                                                             <Field
@@ -683,7 +748,7 @@ class OtherDetails extends Component {
                                         <Button className={`proceedBtn`} type="submit"  disabled={isSubmitting ? true : false}>
                                             {isSubmitting ? 'Wait..' : 'Next'}
                                         </Button>  */}
-                                        <Button className={`backBtn`} type="button"  disabled={isSubmitting ? true : false} onClick= {this.RiskDetails.bind(this.productId)}>
+                                        <Button className={`backBtn`} type="button"  disabled={isSubmitting ? true : false} onClick= {this.RiskDetails.bind(this,productId)}>
                                                     {isSubmitting ? 'Wait..' : 'Back'}
                                                 </Button> 
                                                 <Button className={`proceedBtn`} type="submit"  disabled={isSubmitting ? true : false}>

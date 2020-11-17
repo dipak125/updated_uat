@@ -285,6 +285,13 @@ class Premium_sme extends Component {
                 
                 this.setState(
                     {
+                        // salutationName:res.data.data.policyHolder.salutation.displayvalue ,
+                        // pincodeArea:pincode_area_arr.LCLTY_SUBRB_TALUK_TEHSL_NM != null ? pincode_area_arr.LCLTY_SUBRB_TALUK_TEHSL_NM : 0,
+                        // quoteId:res.data.data.policyHolder.request_data.quote_id != null ? res.data.data.policyHolder.request_data.quote_id : 0,
+                        // gst:res.data.data.policyHolder.request_data.service_tax != null ? res.data.data.policyHolder.request_data.service_tax : 0,
+                        // netPremium:res.data.data.policyHolder.request_data.net_premium != null ? res.data.data.policyHolder.request_data.net_premium : 0,
+                        // finalPremium:res.data.data.policyHolder.request_data.payable_premium != null ? res.data.data.policyHolder.request_data.payable_premium : 0,
+
                         salutationName:res.data.data.policyHolder.salutation.displayvalue,
                         pincodeArea:pincode_area_arr.LCLTY_SUBRB_TALUK_TEHSL_NM,
                         quoteId:res.data.data.policyHolder.request_data.quote_id,
@@ -369,8 +376,213 @@ class Premium_sme extends Component {
 
                                                     <Row>
                                                         <Col sm={12} md={9} lg={9}>
+                                                        <div className="rghtsideTrigr">
+                                                                <Collapsible trigger="Proposer Details" >
+                                                                    <div className="listrghtsideTrigr">
+                                                                        <div>
+                                                                            {/* <strong>Proposer Details:</strong>
+                                                                            <br/> */}
+                                                                            <Row>
+                                                                                <Col sm={12} md={6}>
+                                                                                    <Row>
+                                                                                        <Col sm={12} md={6}>
+                                                                                            <FormGroup>Title:</FormGroup>
+                                                                                        </Col>
+                                                                                        <Col sm={12} md={6}>
+                                                                                            <FormGroup>{this.state.salutationName}</FormGroup>
+                                                                                        </Col>
+                                                                                    </Row>
+
+                                                                                </Col>
+                                                                            </Row>
+                                                                            <Row>
+                                                                                <Col sm={12} md={6}>
+                                                                                    <Row>
+                                                                                        <Col sm={12} md={6}>
+                                                                                            <FormGroup>First Name:</FormGroup>
+                                                                                        </Col>
+                                                                                        <Col sm={12} md={6}>
+                                                                                            <FormGroup>{this.props.first_name}</FormGroup>
+                                                                                        </Col>
+                                                                                    </Row>
+
+                                                                                </Col>
+                                                                            </Row>
+                                                                            <Row>
+                                                                                <Col sm={12} md={6}>
+                                                                                    <Row>
+                                                                                        <Col sm={12} md={6}>
+                                                                                            <FormGroup>Last Name:</FormGroup>
+                                                                                        </Col>
+                                                                                        <Col sm={12} md={6}>
+                                                                                            <FormGroup>{this.props.last_name}</FormGroup>
+                                                                                        </Col>
+                                                                                    </Row>
+
+                                                                                </Col>
+                                                                            </Row>
+                                                                            <Row>
+                                                                                <Col sm={12} md={6}>
+                                                                                    <Row>
+                                                                                        <Col sm={12} md={6}>
+                                                                                            <FormGroup>Email:</FormGroup>
+                                                                                        </Col>
+                                                                                        <Col sm={12} md={6}>
+                                                                                            <FormGroup>{this.props.email_id}</FormGroup>
+                                                                                        </Col>
+                                                                                    </Row>
+
+                                                                                </Col>
+                                                                            </Row>
+                                                                            <Row>
+                                                                                <Col sm={12} md={6}>
+                                                                                    <Row>
+                                                                                        <Col sm={12} md={6}>
+                                                                                            <FormGroup>Date Of Birth:</FormGroup>
+                                                                                        </Col>
+                                                                                        <Col sm={12} md={6}>
+                                                                                            <FormGroup>{moment(new Date(this.props.date_of_birth)).format('LL')}</FormGroup>
+                                                                                        </Col>
+                                                                                    </Row>
+
+                                                                                </Col>
+                                                                            </Row>
+                                                                            <Row>
+                                                                                <Col sm={12} md={6}>
+                                                                                    <Row>
+                                                                                        <Col sm={12} md={6}>
+                                                                                            <FormGroup>Mobile Number:</FormGroup>
+                                                                                        </Col>
+                                                                                        <Col sm={12} md={6}>
+                                                                                            <FormGroup>{this.props.mobile}</FormGroup>
+                                                                                        </Col>
+                                                                                    </Row>
+
+                                                                                </Col>
+                                                                            </Row>
+                                                                            <Row>
+                                                                                <Col sm={12} md={6}>
+                                                                                    <Row>
+                                                                                        <Col sm={12} md={6}>
+                                                                                            <FormGroup>Gender:</FormGroup>
+                                                                                        </Col>
+                                                                                        <Col sm={12} md={6}>
+                                                                                            <FormGroup>{this.getGender(this.props.gender)}</FormGroup>
+                                                                                        </Col>
+                                                                                    </Row>
+
+                                                                                </Col>
+                                                                            </Row>
+                                                                            <Row>
+                                                                                <Col sm={12} md={6}>
+                                                                                    <Row>
+                                                                                        <Col sm={12} md={6}>
+                                                                                            <FormGroup>GSTN:</FormGroup>
+                                                                                        </Col>
+                                                                                        <Col sm={12} md={6}>
+                                                                                            <FormGroup>{this.props.gstn_no}</FormGroup>
+                                                                                        </Col>
+                                                                                    </Row>
+
+                                                                                </Col>
+                                                                            </Row>
+                                                                            <Row>
+                                                                                <Col sm={12} md={6}>
+                                                                                    <Row>
+                                                                                        <Col sm={12} md={6}>
+                                                                                            <FormGroup>Pan No.:</FormGroup>
+                                                                                        </Col>
+                                                                                        <Col sm={12} md={6}>
+                                                                                            <FormGroup>{this.props.pan_no}</FormGroup>
+                                                                                        </Col>
+                                                                                    </Row>
+
+                                                                                </Col>
+                                                                            </Row>
+                                                                            <Row>
+                                                                                <p></p>
+                                                                            </Row>
+                                                                        </div>
+                                                                    </div>
+                                                                </Collapsible>
+                                                            </div>
+
+                                                            <div className="rghtsideTrigr m-b-30">
+                                                                <Collapsible trigger="Communication Details" >
+                                                                    <div className="listrghtsideTrigr">
+                                                                        <div>
+                                                                            {/* <strong>Communication Details:</strong>
+                                                                            <br/> */}
+                                                                            <Row>
+                                                                                <Col sm={12} md={6}>
+                                                                                    <Row>
+                                                                                        <Col sm={12} md={6}>
+                                                                                            <FormGroup>House/Building Name:</FormGroup>
+                                                                                        </Col>
+                                                                                        <Col sm={12} md={6}>
+                                                                                            <FormGroup>{this.props.com_building_name}</FormGroup>
+                                                                                        </Col>
+                                                                                    </Row>
+                                                                                </Col>
+                                                                            </Row>
+                                                                            <Row>
+                                                                                <Col sm={12} md={6}>
+                                                                                    <Row>
+                                                                                        <Col sm={12} md={6}>
+                                                                                            <FormGroup>Street Name:</FormGroup>
+                                                                                        </Col>
+                                                                                        <Col sm={12} md={6}>
+                                                                                            <FormGroup>{this.props.com_street_name}</FormGroup>
+                                                                                        </Col>
+                                                                                    </Row>
+                                                                                </Col>
+                                                                            </Row>
+                                                                            <Row>
+                                                                                <Col sm={12} md={6}>
+                                                                                    <Row>
+                                                                                        <Col sm={12} md={6}>
+                                                                                            <FormGroup>Plot No.:</FormGroup>
+                                                                                        </Col>
+                                                                                        <Col sm={12} md={6}>
+                                                                                            <FormGroup>{this.props.com_plot_no}</FormGroup>
+                                                                                        </Col>
+                                                                                    </Row>
+                                                                                </Col>
+                                                                            </Row>
+                                                                            <Row>
+                                                                                <Col sm={12} md={6}>
+                                                                                    <Row>
+                                                                                        <Col sm={12} md={6}>
+                                                                                            <FormGroup>Pincode:</FormGroup>
+                                                                                        </Col>
+                                                                                        <Col sm={12} md={6}>
+                                                                                            <FormGroup>{this.props.com_pincode}</FormGroup>
+                                                                                        </Col>
+                                                                                    </Row>
+                                                                                </Col>
+                                                                            </Row>
+                                                                            <Row>
+                                                                                <Col sm={12} md={6}>
+                                                                                    <Row>
+                                                                                        <Col sm={12} md={6}>
+                                                                                            <FormGroup>Pincode Area:</FormGroup>
+                                                                                        </Col>
+                                                                                        <Col sm={12} md={6}>
+                                                                                            <FormGroup>{this.state.pincodeArea}</FormGroup>
+                                                                                        </Col>
+                                                                                    </Row>
+                                                                                </Col>
+                                                                            </Row>
+                                                                            <Row>
+                                                                                <p></p>
+                                                                            </Row>
+                                                                        </div>
+                                                                    </div>
+                                                                </Collapsible>    
+                                                            </div>
+
                                                             <div className="rghtsideTrigr">
-                                                                <Collapsible trigger="Proposal Details"  open= {true}>
+                                                                <Collapsible trigger="Premium Details"  open= {true}>
                                                                     <div className="listrghtsideTrigr">
                                                                         <Row>
                                                                             <Col sm={12} md={3}>
@@ -438,7 +650,7 @@ class Premium_sme extends Component {
                                                             </Row>
 
                                                             <div className="d-flex justify-content-left resmb">
-                                                                <Button className="backBtn" type="button" onClick={this.additionalDetails.bind(this.productId)}>Back</Button>
+                                                                <Button className="backBtn" type="button" onClick={this.additionalDetails.bind(this,productId)}>Back</Button>
                                                                 {this.state.quoteId && this.state.quoteId != '' ?
                                                                     <Button type="submit"
                                                                         className="proceedBtn" onClick={this.removeLocalStorage.bind(this.productId)}

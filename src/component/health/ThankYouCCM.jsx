@@ -8,6 +8,7 @@ import { loaderStart, loaderStop } from "../../store/actions/loader";
 import { connect } from "react-redux";
 import swal from 'sweetalert';
 import Encryption from '../../shared/payload-encryption';
+import queryString from 'query-string';
 
 // const refNumber = localStorage.getItem("policyHolder_id")
 
@@ -17,9 +18,46 @@ class ThankYouCCM extends Component {
     accessToken: "",
     response_text: [],
     policy_holder_id: localStorage.getItem("policyHolder_id"),
-    refNumber: localStorage.getItem("policyHolder_refNo") ? localStorage.getItem("policyHolder_refNo") : 0
+    refNumber:  queryString.parse(this.props.location.search).access_id ? 
+                queryString.parse(this.props.location.search).access_id : 
+                localStorage.getItem("policyHolder_refNo")
   };
 
+
+  getAgentReceipt = () => {
+    this.props.loadingStart();
+    const formData = new FormData();
+    formData.append('policy_ref_no', this.state.refNumber);
+    axios
+      .post(`/sme/agent-receipt`, formData)
+      .then(res => {
+        this.issuePolicy()
+      })
+      .catch(err => {
+        this.setState({
+          accessToken: []
+        });
+        this.props.loadingStop();
+      });
+  }
+
+  issuePolicy = () => {
+    this.props.loadingStart();
+    const formData = new FormData();
+    formData.append('policy_ref_no', this.state.refNumber);
+    axios
+      .post(`/sme/issue-policy`, formData)
+      .then(res => {
+       
+        
+      })
+      .catch(err => {
+        this.setState({
+          accessToken: []
+        });
+        this.props.loadingStop();
+      });
+  }
 
   getAccessToken = () => {
     this.props.loadingStart();
@@ -281,7 +319,7 @@ class ThankYouCCM extends Component {
     window.onpopstate = function () {
       window.history.go(1);
     };
-
+    this.getAgentReceipt()
     // this.getPolicyHolderDetails();
   }
   render() {
