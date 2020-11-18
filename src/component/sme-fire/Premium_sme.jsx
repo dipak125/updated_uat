@@ -81,9 +81,9 @@ class Premium_sme extends Component {
         this.props.history.push(`/Summary_SME/${productId}`);
     }
 
-    removeLocalStorage = (productId) => {
-        localStorage.removeItem('policy_holder_ref_no')
-    }
+    // removeLocalStorage = (productId) => {
+    //     localStorage.removeItem('policy_holder_ref_no')
+    // }
 
     handleSubmit = (values) => {
         console.log("values-----",values)
@@ -295,6 +295,7 @@ class Premium_sme extends Component {
                         salutationName:res.data.data.policyHolder.salutation.displayvalue,
                         pincodeArea:pincode_area_arr.LCLTY_SUBRB_TALUK_TEHSL_NM,
                         quoteId:res.data.data.policyHolder.request_data.quote_id,
+                        gst:res.data.data.policyHolder.request_data.service_tax,
                         grossPremium:res.data.data.policyHolder.request_data.gross_premium,
                         payablePremium:res.data.data.policyHolder.request_data.payable_premium,
                         refNumber:res.data.data.policyHolder.reference_no,
@@ -596,6 +597,18 @@ class Premium_sme extends Component {
                                                                                     ₹ {this.state.payablePremium}
                                                                                 </div>
                                                                             </Col>
+                                                                            
+                                                                            <Col sm={12} md={3}>
+                                                                                <div className="motopremium">
+                                                                                    GST:
+                                                                                </div>
+                                                                            </Col>
+
+                                                                            <Col sm={12} md={3}>
+                                                                                <div className="premamount">
+                                                                                    ₹ {this.state.gst}
+                                                                                </div>
+                                                                            </Col>
 
                                                                             <Col sm={12} md={3}>
                                                                                 <div className="motopremium">
@@ -653,9 +666,8 @@ class Premium_sme extends Component {
                                                                 <Button className="backBtn" type="button" onClick={this.additionalDetails.bind(this,productId)}>Back</Button>
                                                                 {this.state.quoteId && this.state.quoteId != '' ?
                                                                     <Button type="submit"
-                                                                        className="proceedBtn" onClick={this.removeLocalStorage.bind(this.productId)}
-                                                                    >
-                                                                        Make Payment
+                                                                        className="proceedBtn"  type="submit"  disabled={isSubmitting ? true : false}>
+                                                                        Generate Policy
                                                                 </Button> 
                                                             : null}
                                                             </div>

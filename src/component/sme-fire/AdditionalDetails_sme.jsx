@@ -91,7 +91,7 @@ const vehicleRegistrationValidation = Yup.object().shape({
             return "Please enter valid plot number"
         }).nullable(),
     // flat_no: Yup.string().required("Please enter Flat number").nullable(),
-    street_name: Yup.string().required("Please enter street name").matches(/^[a-zA-Z0-9][a-zA-Z0-9-/.,-\s]*$/, 
+    street_name: Yup.string().required("Please enter Dtreet name").matches(/^[a-zA-Z0-9][a-zA-Z0-9-/.,-\s]*$/, 
         function() {
             return "Please enter valid street name"
         }).nullable(),

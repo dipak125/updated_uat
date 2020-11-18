@@ -37,7 +37,8 @@ const vehicleValidation = Yup.object().shape({
         is: "1",       
         then: Yup.string(),
         otherwise: Yup.string().required('Please provide registration number')
-        .matches(/^[A-Z]{2}[0-9]{2}(?:[A-Z])?(?:[A-Z])?(?:[A-Z])?[0-9]{4}$/, 'Invalid Registration number')
+        // .matches(/^[A-Z]{2}[0-9]{2}(?:[A-Z])?(?:[A-Z])?(?:[A-Z])?[0-9]{4}$/, 'Invalid Registration number')
+        .matches(/^[A-Z]{2}(?: [A-Z])?(?: [0-9]{1,2})?(?: [A-Z])?(?: [A-Z]*)? [0-9]{4}$/, 'Invalid Registration number')
         .test(
             "last4digitcheck",
             function() {
@@ -518,30 +519,36 @@ class TwoWheelerSelectBrand extends Component {
         let regno = e.target.value
         this.setState({fastLaneData: [], brandView: '0', vehicleDetails: []})
         let brandEdit = {'brandEdit' : 1}
-            this.props.setData(brandEdit)
-        // let formatVal = ""
-        // let regnoLength = regno.length
-        // var letter = /^[a-zA-Z]+$/;
-        // var number = /^[0-9]+$/;
-        // let subString = regno.substring(regnoLength-1, regnoLength)
-        // let preSubString = regno.substring(regnoLength-2, regnoLength-1)
-
-        // if(subString.match(letter) && preSubString.match(letter)) {
-        //     formatVal = regno
-        // }
-        // else if(subString.match(number) && preSubString.match(number)) {
-        //     formatVal = regno
-        // } 
-        // else if(subString.match(number) && preSubString.match(letter)) {        
-        //     formatVal = regno.substring(0, regnoLength-1) + " " +subString      
-        // } 
-        // else if(subString.match(letter) && preSubString.match(number)) {
-        //     formatVal = regno.substring(0, regnoLength-1) + " " +subString   
-        // } 
-
-        // else formatVal = regno.toUpperCase()
+        this.props.setData(brandEdit)
+        let formatVal = ""
+        let regnoLength = regno.length
+        var letter = /^[a-zA-Z]+$/;
+        var number = /^[0-9]+$/;
+        let subString = regno.substring(regnoLength-1, regnoLength)
+        let preSubString = regno.substring(regnoLength-2, regnoLength-1)
+    
+        if(subString.match(letter) && preSubString.match(letter) && regnoLength == 3) {        
+            formatVal = formatVal = regno.substring(0, regnoLength-1) + " " +subString
+        }
+        else if(subString.match(letter) && preSubString.match(letter)) {
+            formatVal = regno
+        }
+        else if(subString.match(number) && preSubString.match(number) && regnoLength == 6) {
+            formatVal = formatVal = regno.substring(0, regnoLength-1) + " " +subString
+        } 
+        else if(subString.match(number) && preSubString.match(number) && regnoLength == 11 && regno.substring(3, 4).match(letter) && regno.substring(5, 7).match(number) ) {
+            formatVal = formatVal = regno.substring(0, 7) + " " +regno.substring(7, 11)
+        } 
+        else if(subString.match(number) && preSubString.match(letter)) {        
+            formatVal = regno.substring(0, regnoLength-1) + " " +subString      
+        } 
+        else if(subString.match(letter) && preSubString.match(number)) {
+            formatVal = regno.substring(0, regnoLength-1) + " " +subString   
+        } 
         
-        e.target.value = regno.toUpperCase()
+        else formatVal = regno.toUpperCase()
+        
+        e.target.value = formatVal.toUpperCase()
 
     }
 

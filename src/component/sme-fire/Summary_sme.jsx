@@ -177,39 +177,39 @@ class Summary_sme extends Component {
 
                 // }
 
-                if(res.data.data.policyHolder.step_no == 3 || res.data.data.policyHolder.step_no > 3){
+                // if(res.data.data.policyHolder.step_no == 3 || res.data.data.policyHolder.step_no > 3){
 
-                    let address = JSON.parse(res.data.data.policyHolder.address);
+                //     let address = JSON.parse(res.data.data.policyHolder.address);
 
-                    this.props.setSmeProposerDetails(
-                        {
-                            first_name:res.data.data.policyHolder.first_name,
-                            last_name:res.data.data.policyHolder.last_name,
-                            salutation_id:res.data.data.policyHolder.salutation_id,
-                            date_of_birth:res.data.data.policyHolder.dob,
-                            email_id:res.data.data.policyHolder.email_id,
-                            mobile:res.data.data.policyHolder.mobile,
-                            gender:res.data.data.policyHolder.gender,
-                            pan_no:res.data.data.policyHolder.pancard,
-                            gstn_no:res.data.data.policyHolder.gstn_no,
+                //     this.props.setSmeProposerDetails(
+                //         {
+                //             first_name:res.data.data.policyHolder.first_name,
+                //             last_name:res.data.data.policyHolder.last_name,
+                //             salutation_id:res.data.data.policyHolder.salutation_id,
+                //             date_of_birth:res.data.data.policyHolder.dob,
+                //             email_id:res.data.data.policyHolder.email_id,
+                //             mobile:res.data.data.policyHolder.mobile,
+                //             gender:res.data.data.policyHolder.gender,
+                //             pan_no:res.data.data.policyHolder.pancard,
+                //             gstn_no:res.data.data.policyHolder.gstn_no,
 
-                            com_street_name:address.street_name,
-                            com_plot_no:address.plot_no,
-                            com_building_name:address.house_building_name,
-                            com_block_no:address.block_no,
-                            com_house_flat_no:address.house_flat_no,
-                            com_pincode:res.data.data.policyHolder.pincode,
-                            com_pincode_id:res.data.data.policyHolder.pincode_id
-                        }
-                    );
-                }
+                //             com_street_name:address.street_name,
+                //             com_plot_no:address.plot_no,
+                //             com_building_name:address.house_building_name,
+                //             com_block_no:address.block_no,
+                //             com_house_flat_no:address.house_flat_no,
+                //             com_pincode:res.data.data.policyHolder.pincode,
+                //             com_pincode_id:res.data.data.policyHolder.pincode_id
+                //         }
+                //     );
+                // }
 
                 let pincode_area_arr = JSON.parse(res.data.data.policyHolder.pincode_response);
                 
                 this.setState( 
                     {
-                        salutationName:res.data.data.policyHolder.salutation.displayvalue ,
-                        pincodeArea:pincode_area_arr.LCLTY_SUBRB_TALUK_TEHSL_NM != null ? pincode_area_arr.LCLTY_SUBRB_TALUK_TEHSL_NM : 0,
+                        // salutationName:res.data.data.policyHolder.salutation.displayvalue ,
+                        // pincodeArea:pincode_area_arr.LCLTY_SUBRB_TALUK_TEHSL_NM != null ? pincode_area_arr.LCLTY_SUBRB_TALUK_TEHSL_NM : 0,
                         quoteId:res.data.data.policyHolder.request_data.quote_id != null ? res.data.data.policyHolder.request_data.quote_id : 0,
                         gst:res.data.data.policyHolder.request_data.service_tax != null ? res.data.data.policyHolder.request_data.service_tax : 0,
                         netPremium:res.data.data.policyHolder.request_data.net_premium != null ? res.data.data.policyHolder.request_data.net_premium : 0,
@@ -285,7 +285,8 @@ class Summary_sme extends Component {
               ? rawData.map((listing, qIndex) => (                   
                   <tr>
                   <td>{listing.coverage.description} :</td>
-                  <td>{listing.sum_insured == null ? 0 : listing.sum_insured}</td>
+                  <td>{ listing.coverage.description == "Architecture and Surveyor Fee (Upto 3% of Claim Amount)" || listing.coverage.description == "Removal of Debris (Upto 1% claim amount)" ? '   ----' : listing.sum_insured}
+                  {/* <td>{listing.sum_insured == null ? 0 : listing.sum_insured}</td> */}</td>
                   <td>{listing.premium == null ? 0 : listing.premium}</td>
                 </tr>
                 ))
@@ -626,7 +627,7 @@ class Summary_sme extends Component {
                                                                     {isSubmitting ? 'Wait..' : 'Back'}
                                                                 </Button> 
                                                                 <Button className={`proceedBtn`} type="submit"  disabled={isSubmitting ? true : false}>
-                                                                    Continue
+                                                                    Next
                                                                 </Button> 
 
                                                             </div>

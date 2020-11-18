@@ -186,16 +186,17 @@ class OtherDetails extends Component {
             let formDataNew = new FormData(); 
             formDataNew.append('menumaster_id',this.props.menumaster_id)
             formDataNew.append('policy_ref_no',this.props.policy_holder_ref_no)    
-
+            
+            this.props.loadingStart();
             axios.post('/sme/calculate-premium/phase-one',
             formDataNew
             ).then(res=>{
                    if( res.data.error === false) {
+                       this.props.loadingStart();
                        axios.post('/sme/calculate-premium/phase-two',
                     formDataNew
                     ).then(res=>{
                         const {productId} = this.props.match.params;
-                        this.props.loadingStop();
                         if( res.data.error === false) {
                             this.props.history.push(`/Summary_SME/${productId}`);
                         } else {
