@@ -17,6 +17,10 @@ class ThankYouCCM extends Component {
   state = {
     accessToken: "",
     response_text: [],
+    policyNo : "",
+    quoteNo : "",
+    retry : 2,
+    retryCount: 0,
     policy_holder_id: localStorage.getItem("policyHolder_id"),
     refNumber:  queryString.parse(this.props.location.search).access_id ? 
                 queryString.parse(this.props.location.search).access_id : 
@@ -28,10 +32,19 @@ class ThankYouCCM extends Component {
     this.props.loadingStart();
     const formData = new FormData();
     formData.append('policy_ref_no', this.state.refNumber);
+    if(this.state.retryCount <= 3){
+      this.setState({
+        retryCount: this.state.retryCount + 1
+      });
     axios
       .post(`/sme/agent-receipt`, formData)
       .then(res => {
-        this.issuePolicy()
+        if(res.data.error === false) {
+          this.setState({
+            quoteNo: res.data.data.quoteNo
+          });
+          this.issuePolicy()
+        }       
       })
       .catch(err => {
         this.setState({
@@ -39,6 +52,10 @@ class ThankYouCCM extends Component {
         });
         this.props.loadingStop();
       });
+    }
+    else {
+      swal("Maximum Retry attempt limit is crossed.")
+    }
   }
 
   issuePolicy = () => {
@@ -48,7 +65,18 @@ class ThankYouCCM extends Component {
     axios
       .post(`/sme/issue-policy`, formData)
       .then(res => {
-       
+        if(res.data.error === false) {
+          this.setState({
+            policyNo: res.data.data.PolicyNo, retry: 0
+          });
+        }
+        else {
+          this.setState({
+            retry: 1
+          });  
+          swal("Due to some reason, policy could not be created at this moment. Please retry in some time.")
+        }
+        this.props.loadingStop();    
         
       })
       .catch(err => {
@@ -84,13 +112,13 @@ class ThankYouCCM extends Component {
 
   getPolicyDoc = (access_token) => {
 
-    const { policyId } = this.props.match.params
+    const { policyNo } = this.state
     const formData = new FormData();
     //formData.append('access_token', access_token);
-    //formData.append('policyNo', policyId)
+    //formData.append('policyNo', policyNo)
     const post_data_obj = {
       'access_token': access_token,
-      'policyNo': policyId,
+      'policyNo': policyNo,
       'policyHolder_Id':  this.state.policy_holder_id
     }
     let encryption = new Encryption();
@@ -142,15 +170,15 @@ class ThankYouCCM extends Component {
     // const {response_text, policy_holder_id, res_error} = this.state
     console.log('policy_holder_id', policy_holder_id)
     console.log("response_text", response_text)
-    const { policyId } = this.props.match.params
+    const { policyNo } = this.state
     if (response_text && policy_holder_id) {
       const formData = new FormData();
       //  formData.append('policy_holder_id', policy_holder_id);
-      // formData.append('policy_no', policyId);
+      // formData.append('policy_no', policyNo);
       //formData.append('response_text', JSON.stringify(response_text))
       const post_data_obj = {
         'policy_holder_id': policy_holder_id,
-        'policy_no': policyId,
+        'policy_no': policyNo,
         'response_text': JSON.stringify(response_text)
       }
 
@@ -188,7 +216,7 @@ class ThankYouCCM extends Component {
   downloadDoc = () => {
     let file_path = `${process.env.REACT_APP_PAYMENT_URL}/ConnectPG/policy_pdf_download.php?refrence_no=${this.state.refNumber}`
     console.log(file_path);
-    const { policyId } = this.props.match.params
+    const { policyNo } = this.state
     const url = file_path;
     const pom = document.createElement('a');
 
@@ -210,7 +238,7 @@ class ThankYouCCM extends Component {
     //     a.href = url;
     //     // the filename you want
     //     // a.download = 'b7b98d12c9da4f44b7f5e372945fbf7f.pdf';
-    //     a.download = policyId+'.pdf';
+    //     a.download = policyNo+'.pdf';
     //     document.body.appendChild(a);
     //     a.click();
     //     window.URL.revokeObjectURL(url);
@@ -252,18 +280,18 @@ class ThankYouCCM extends Component {
 
   alternateDload = (access_token) => {
 
-    const { policyId } = this.props.match.params
+    const { policyNo } = this.state
     const formData = new FormData();
     //formData.append('access_token', access_token);
-    //formData.append('policyNo', policyId)
+    //formData.append('policyNo', policyNo)
     const post_data_obj = {
       // 'access_token': access_token,
-      'policyNo': policyId,
+      'policyNo': policyNo,
       // 'policyHolder_Id':  this.state.policy_holder_id
     }
     let encryption = new Encryption();
     // formData.append('enc_data', encryption.encrypt(JSON.stringify(post_data_obj)))
-    formData.append('policyNo', policyId)
+    formData.append('policyNo', policyNo)
     this.props.loadingStart();
     axios
       .post(`/policy-download/external`, formData)
@@ -283,7 +311,7 @@ class ThankYouCCM extends Component {
               a.href = url;
               // the filename you want
               // a.download = 'b7b98d12c9da4f44b7f5e372945fbf7f.pdf';
-              a.download = policyId+'.pdf';
+              a.download = policyNo+'.pdf';
               document.body.appendChild(a);
               a.click();
               window.URL.revokeObjectURL(url);
@@ -305,9 +333,9 @@ class ThankYouCCM extends Component {
 
   componentDidMount() {
     // this.getAccessToken();       
-    const { policyId } = this.props.match.params
+    const { policyNo } = this.state
     // window.addEventListener("popstate", (e) => {
-    // this.props.history.go(`/ThankYou/${policyId}`);
+    // this.props.history.go(`/ThankYou/${policyNo}`);
     //   });
 
     // window.history.pushState(null, document.title, window.location.href);
@@ -323,7 +351,7 @@ class ThankYouCCM extends Component {
     // this.getPolicyHolderDetails();
   }
   render() {
-    const { policyId } = this.props.match.params
+    const { policyNo, quoteNo, retry } = this.state
     return (
       <>
         <BaseComponent>
@@ -338,14 +366,19 @@ class ThankYouCCM extends Component {
                     <div className="text-center custtxt">
                       <img src={require('../../assets/images/like.svg')} alt="" className="m-b-30" />
                       <p>Thank you for choosing SBI General Insurance</p>
-                      <p className="fs-16 m-b-30">Policy No <span className="lghtBlue"> {policyId}</span></p>
+                      <p className="fs-16 m-b-30">{policyNo ? "Policy No" : "Quote No"} <span className="lghtBlue"> {policyNo ? policyNo : quoteNo}</span></p>
+                      
+                      {retry === 1 ?
+                        <div className="d-flex justify-content-center align-items-center">
+                          <button className="policy m-l-20" onClick={this.getAgentReceipt}>Retry Policy Creation</button>
+                        </div> : retry === 0 ?
+                        <div className="d-flex justify-content-center align-items-center">
+                          <button className="policy m-l-20" onClick={this.getAccessToken}>Policy Copy</button>
+                        </div> : null
+                      }
                       {/* <div className="d-flex justify-content-center align-items-center">
-                        <button className="policy m-l-20" onClick={this.getAccessToken}>Policy Copy</button>
-                      </div> */}
-
-                      <div className="d-flex justify-content-center align-items-center">
                         <button className="policy m-l-20" onClick={this.getAlternateAccessToken}>Policy Copy </button>
-                      </div>
+                      </div> */}
                     </div>
                   </div>
                 </section>
