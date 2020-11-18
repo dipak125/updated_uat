@@ -558,7 +558,7 @@ class RiskDetails extends Component {
                                                                 type="test"
                                                                 placeholder="Pincode"
                                                                 autoComplete="off"
-                                                                maxlength = "6"
+                                                                maxLength = "6"
                                                                 onFocus={e => this.changePlaceHoldClassAdd(e)}
                                                                 onBlur={e => this.changePlaceHoldClassRemove(e)}
                                                                 onKeyUp={e=> this.fetchAreadetails(e)}
@@ -695,7 +695,7 @@ class RiskDetails extends Component {
                                                                 type="text"
                                                                 placeholder="Fire-Contents Sum Insured"
                                                                 autoComplete="off"
-                                                                maxlength = '8'
+                                                                maxLength = '7'
                                                                 onFocus={e => this.changePlaceHoldClassAdd(e)}
                                                                 onBlur={e => this.changePlaceHoldClassRemove(e)}
                                                                 value={values.content_sum_insured}
@@ -727,7 +727,7 @@ class RiskDetails extends Component {
                                                                 name='stock_sum_insured'
                                                                 type="text"
                                                                 placeholder="Fire-Stock Sum Insured"
-                                                                maxlength='8'
+                                                                maxLength='7'
                                                                 autoComplete="off"
                                                                 onFocus={e => this.changePlaceHoldClassAdd(e)}
                                                                 onBlur={e => this.changePlaceHoldClassRemove(e)}
@@ -758,10 +758,10 @@ class RiskDetails extends Component {
                                                         <FormGroup>
                                                             <div className="insurerName">
                                                             <Field
-                                                                name='stock_sum_insured'
-                                                                type="text"
+                                                                name='fire_sum_insured'
+                                                                type="number"
                                                                 placeholder="Fire-Total Sum Insured"
-                                                                maxlength='8'
+                                                                maxLength='10'
                                                                 autoComplete="off"
                                                                 onFocus={e => this.changePlaceHoldClassAdd(e)}
                                                                 onBlur={e => this.changePlaceHoldClassRemove(e)}

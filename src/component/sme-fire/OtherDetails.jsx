@@ -41,7 +41,7 @@ const initialValue = {
     previous_claim_bonus: 1,
     previous_claim_for: "",
     previous_policy_no: "",
-    previous_policy_check : 0
+    previous_policy_check : '0'
     // Commercial_consideration: "",
 } 
 
@@ -106,7 +106,7 @@ class OtherDetails extends Component {
         RTO_location: "",
         previous_is_claim: "",
         disable_end_date:true,
-        previous_policy_check:"0"
+        // previous_policy_check:'0'
     };
 
     changePlaceHoldClassAdd(e) {
@@ -133,10 +133,11 @@ class OtherDetails extends Component {
 
     handleSubmit=(values, actions)=>{
         const formData = new FormData();
-        let previous_start_date = moment(values.previous_start_date).format('YYYY-MM-DD')
-        let previous_end_date = moment(values.previous_end_date).format('YYYY-MM-DD')
-        console.log('previous_start_date---------',values.previous_start_date)
-        console.log('previous_end_date---------',previous_end_date)
+        let previous_start_date = values.previous_start_date == "" ? '' : moment(values.previous_start_date).format('YYYY-MM-DD')
+        let previous_end_date = values.previous_end_date == "" ? '' : moment(values.previous_end_date).format('YYYY-MM-DD')
+        let previous_Policy_No = values.Previous_Policy_No == '' ? null : values.Previous_Policy_No
+        // console.log('previous_start_date---------',values.previous_start_date)
+        // console.log('previous_end_date---------',previous_end_date)
         // if(values.previous_start_date !== null ) {
 
         
@@ -144,7 +145,7 @@ class OtherDetails extends Component {
         formData.append('previous_end_date',previous_end_date)
 
 
-        formData.append('previous_policy_no',values.Previous_Policy_No)
+        formData.append('previous_policy_no',previous_Policy_No)
         formData.append('insurance_company_id',values.insurance_company_id)
         // values.insurance_company_id
         formData.append('address',values.previous_city)
@@ -152,7 +153,7 @@ class OtherDetails extends Component {
         
         formData.append('menumaster_id',this.props.menumaster_id)
         formData.append('policy_holder_id',this.props.policy_holder_id)
-        formData.append('Commercial_consideration',values.Commercial_consideration)
+        formData.append('Commercial_consideration','5')
         // values.previous_city
 
         // this.props.loadingStart();
@@ -229,7 +230,7 @@ class OtherDetails extends Component {
             //     swal('Registration number required...');
             // }
         this.props.loadingStop();
-        return false
+        actions.setSubmitting(false)
         })
     // }
     }
@@ -390,23 +391,18 @@ class OtherDetails extends Component {
 
     render() {
         let newInitialValues = Object.assign(initialValue,{
-            previous_start_date:this.props.previous_start_date != null?new Date(this.props.previous_start_date):"",
-            previous_end_date:this.props.previous_end_date != null?new Date(this.props.previous_end_date):"",
+            previous_start_date:this.props.previous_start_date == null || this.props.previous_start_date == '' ? "" : new Date(this.props.previous_start_date),
+            previous_end_date:this.props.previous_end_date == null || this.props.previous_end_date == '' ? "" : new Date(this.props.previous_end_date),
             Commercial_consideration: this.props.Commercial_consideration,
             Previous_Policy_No:this.props.Previous_Policy_No != null ? this.props.Previous_Policy_No : "",
             insurance_company_id:this.props.insurance_company_id != null ? this.props.insurance_company_id : "",
             previous_city:this.props.previous_city,
-            // previous_policy_check:"0"
+            previous_policy_check: 0
         });
         
         const {productId} = this.props.match.params  
         const {insurerList, showClaim, previous_is_claim, motorInsurance, previousPolicy,
             CustomerID,suggestions, vehicleDetails, RTO_location} = this.state
-
-        // console.log("previous_policy_check-----",this.values.previous_policy_check)
-
-       
-        
 
         
         return (
@@ -752,7 +748,7 @@ class OtherDetails extends Component {
                                                     {isSubmitting ? 'Wait..' : 'Back'}
                                                 </Button> 
                                                 <Button className={`proceedBtn`} type="submit"  disabled={isSubmitting ? true : false}>
-                                                    {isSubmitting ? 'Wait..' : 'Next'}
+                                                    {isSubmitting ? 'Wait..' : 'Calculate Premium'}
                                                 </Button>
                                         </div>
 
