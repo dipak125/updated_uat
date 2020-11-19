@@ -288,19 +288,19 @@ class AdditionalDetails_sme extends Component {
                         } else {
                             this.props.loadingStop();
                             swal("Thank you for showing your interest for buying product.Due to some reasons, we are not able to issue the policy online.Please call 1800 22 1111")
-                            actions.setSubmitting(false)
-                        }
+                            actions.setSubmitting(false);
+                        };
                     }).
                     catch(err=>
                         {this.props.loadingStop();
-                        swal("Thank you for showing your interest for buying product.Due to some reasons, we are not able to issue the policy online.Please call 1800 22 1111")
-                        return false;
+                        swal("Thank you for showing your interest for buying product.Due to some reasons, we are not able to issue the policy online.Please call 1800 22 1111");
+                        actions.setSubmitting(false);
                         
                     });
                 }
                 else { this.props.loadingStop()
-                    swal(res.data.msg)
-                    actions.setSubmitting(false)
+                    swal("Thank you for showing your interest for buying product.Due to some reasons, we are not able to issue the policy online.Please call 1800 22 1111");
+                    actions.setSubmitting(false);
                 }
                 }).
                 catch(err=>{
@@ -333,13 +333,19 @@ class AdditionalDetails_sme extends Component {
            formData.append('pincode',pinCode)
            axios.post('pincode-details',
             formData
-            ).then(res=>{       
+            ).then(res=>{           
+            if (res.data.error === false )  
+            {
                 let stateName = res.data.data && res.data.data[0] && res.data.data[0].pinstate.STATE_NM ? res.data.data[0].pinstate.STATE_NM : ""                        
                 this.setState({
                     pinDataArr: res.data.data,
                     stateName,
                 });
                 this.props.loadingStop();
+            } else {
+                this.props.loadingStop();
+                swal("Plese enter a valid pincode");
+            }
             }).
             catch(err=>{
                 this.props.loadingStop();

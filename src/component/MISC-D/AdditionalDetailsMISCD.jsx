@@ -17,6 +17,7 @@ import {  PersonAge } from "../../shared/dateFunctions";
 import Encryption from '../../shared/payload-encryption';
 
 
+const menumaster_id = 7
 const minDobAdult = moment(moment().subtract(100, 'years').calendar())
 const maxDobAdult = moment().subtract(18, 'years').calendar();
 const minDobNominee = moment(moment().subtract(100, 'years').calendar())
@@ -446,7 +447,7 @@ class AdditionalDetailsMISCD extends Component {
         let encryption = new Encryption();
         let post_data = {
             'policy_holder_id':request_data.policyholder_id,
-            'menumaster_id':4,
+            'menumaster_id':menumaster_id,
             'first_name':values['first_name'],
             'last_name':values['last_name'],
             'pancard':values['pancard'],
@@ -489,7 +490,7 @@ class AdditionalDetailsMISCD extends Component {
         formData.append('enc_data',encryption.encrypt(JSON.stringify(post_data)))
         this.props.loadingStart();
         axios
-        .post(`gcv/owner-details`, formData)
+        .post(`miscd/owner-details`, formData)
         .then(res => { 
             let decryptResp = JSON.parse(encryption.decrypt(res.data));
             console.log('decryptResp-----', decryptResp)
@@ -512,7 +513,7 @@ class AdditionalDetailsMISCD extends Component {
         let policyHolder_id = localStorage.getItem("policyHolder_refNo") ? localStorage.getItem("policyHolder_refNo") : 0;
         let encryption = new Encryption();
         this.props.loadingStart();
-        axios.get(`gcv/policy-holder/details/${policyHolder_id}`)
+        axios.get(`miscd/policy-holder/details/${policyHolder_id}`)
             .then(res => {
                  let decryptResp = JSON.parse(encryption.decrypt(res.data))
                  console.log("decrypt---", decryptResp)

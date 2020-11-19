@@ -11,8 +11,9 @@ import * as Yup from 'yup';
 import swal from 'sweetalert';
 import Encryption from '../../shared/payload-encryption';
 import { Formik, Form, Field, ErrorMessage } from 'formik';
+import { setData } from "../../store/actions/data";
 
-
+const menumaster_id = 7
 const initialValues = {
     regNumber:'',
     check_registration: 2
@@ -37,6 +38,7 @@ const vehicleRegistrationValidation = Yup.object().shape({
             return true;
         }
     ),
+
     policy_type: Yup.string().required("Please select policy type"),
     policy_for: Yup.string().required("Please select policy for indivudal or corporate"),
     subclass_id: Yup.string().required("Please select sub product"),
@@ -95,7 +97,7 @@ fetchData=()=>{
     const {productId } = this.props.match.params
     let policyHolder_id = localStorage.getItem("policyHolder_refNo") ? localStorage.getItem("policyHolder_refNo"):0;
     let encryption = new Encryption();
-    axios.get(`gcv/policy-holder/details/${policyHolder_id}`)
+    axios.get(`miscd/policy-holder/details/${policyHolder_id}`)
         .then(res=>{
             let decryptResp = JSON.parse(encryption.decrypt(res.data))
             console.log("decrypt", decryptResp)
@@ -116,7 +118,7 @@ fetchSubVehicle=()=>{
     const {productId } = this.props.match.params
     let encryption = new Encryption();
     this.props.loadingStart();
-    axios.get(`gcv/sub-vehical-list/4`)
+    axios.get(`miscd/sub-vehical-list/${menumaster_id}`)
         .then(res=>{
             let decryptResp = JSON.parse(encryption.decrypt(res.data))
             console.log("decrypt--fetchSubVehicle------ ", decryptResp)
@@ -148,13 +150,23 @@ handleSubmit=(values)=>{
         bc_data = JSON.parse(encryption.decrypt(bc_data));
     }
 
+    if(values.check_registration && values.check_registration == 1) {
+        let check_registration = {'check_registration' : 1}
+        this.props.setData(check_registration)
+    }
+    else {
+        let check_registration = {'check_registration' : 2}
+        this.props.setData(check_registration)
+    }
+   
+
     if(policyHolder_id > 0){
         if(sessionStorage.getItem('csc_id')) {
             post_data = {
                 'policy_holder_id': policyHolder_id,
                 'registration_no':values.regNumber,
                 'check_registration': values.check_registration,
-                'menumaster_id':4,
+                'menumaster_id':menumaster_id,
                 'vehicle_type_id':productId,
                 'csc_id':sessionStorage.getItem('csc_id') ? sessionStorage.getItem('csc_id') : "",
                 'agent_name':sessionStorage.getItem('agent_name') ? sessionStorage.getItem('agent_name') : "",
@@ -173,7 +185,7 @@ handleSubmit=(values)=>{
                 'policy_holder_id': policyHolder_id,
                 'registration_no':values.regNumber,
                 'check_registration': values.check_registration,
-                'menumaster_id':4,
+                'menumaster_id':menumaster_id,
                 'vehicle_type_id':productId,
                 'bcmaster_id': bc_data ? bc_data.agent_id : "",
                 'bc_token': bc_data ? bc_data.token : "",
@@ -191,7 +203,7 @@ handleSubmit=(values)=>{
     
         this.props.loadingStart();
         axios
-        .post(`gcv/update-registration`, formData)
+        .post(`miscd/update-registration`, formData)
         .then(res => {
             let decryptResp = JSON.parse(encryption.decrypt(res.data))
             console.log("decrypt", decryptResp)
@@ -219,7 +231,7 @@ handleSubmit=(values)=>{
             post_data = {
                 'registration_no':values.regNumber,
                 'check_registration': values.check_registration,
-                'menumaster_id':4,
+                'menumaster_id':menumaster_id,
                 'vehicle_type_id':productId,
                 'csc_id':sessionStorage.getItem('csc_id') ? sessionStorage.getItem('csc_id') : "",
                 'agent_name':sessionStorage.getItem('agent_name') ? sessionStorage.getItem('agent_name') : "",
@@ -236,7 +248,7 @@ handleSubmit=(values)=>{
             post_data = {
                 'registration_no':values.regNumber,
                 'check_registration': values.check_registration,
-                'menumaster_id':4,
+                'menumaster_id':menumaster_id,
                 'vehicle_type_id':productId,
                 'bcmaster_id': bc_data ? bc_data.agent_id : "",
                 'bc_token': bc_data ? bc_data.token : "",
@@ -252,7 +264,7 @@ handleSubmit=(values)=>{
         formData.append('enc_data',encryption.encrypt(JSON.stringify(post_data)))
         this.props.loadingStart();
         axios
-        .post(`gcv/registration`, formData)
+        .post(`miscd/registration`, formData)
         .then(res => {
             let decryptResp = JSON.parse(encryption.decrypt(res.data))
             console.log("decrypt", decryptResp)
@@ -330,7 +342,10 @@ regnoFormat = (e, setFieldTouched, setFieldValue) => {
             policy_type: motorInsurance && motorInsurance.policytype_id ? motorInsurance.policytype_id : "",
             policy_for: motorInsurance && motorInsurance.policy_for ? motorInsurance.policy_for : "",
             subclass_id : motorInsurance && motorInsurance.subclass_id ? motorInsurance.subclass_id : "",
+            check_registration : this.props.data && this.props.data.check_registration ? this.props.data.check_registration : ""
         })
+
+        console.log("this.props.data.check_registration--- ", this.props.data && this.props.data.check_registration ? this.props.data.check_registration : "")
 
         return (
             <>
@@ -462,7 +477,7 @@ regnoFormat = (e, setFieldTouched, setFieldValue) => {
                                                         >
                                                             <option value="">Select Sub Product</option>
                                                             {subVehicleList.map((subVehicle, qIndex) => ( 
-                                                                <option value= {subVehicle.subclass_id}>{subVehicle.subclass_title}</option>
+                                                                <option disabled = {subVehicle.status == 1 ? false : true } value= {subVehicle.subclass_id}>{subVehicle.subclass_title}</option>
                                                             ))}
                                                 
                                                         </Field>
@@ -514,7 +529,7 @@ regnoFormat = (e, setFieldTouched, setFieldValue) => {
                                                                 setFieldValue('check_registration', e.target.value);
         
                                                             } else {
-                                                                setFieldValue('check_registration', '2');                                                            
+                                                                setFieldValue('check_registration', '2');                                                          
                                                             }
                                                             if(this.setValueData()){
                                                                 this.setState({
@@ -562,14 +577,16 @@ regnoFormat = (e, setFieldTouched, setFieldValue) => {
 
 const mapStateToProps = state => {
     return {
-      loading: state.loader.loading
+      loading: state.loader.loading,
+      data: state.processData.data
     };
   };
   
   const mapDispatchToProps = dispatch => {
     return {
       loadingStart: () => dispatch(loaderStart()),
-      loadingStop: () => dispatch(loaderStop())
+      loadingStop: () => dispatch(loaderStop()),
+      setData: (data) => dispatch(setData(data))
     };
   };
 

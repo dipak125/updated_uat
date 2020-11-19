@@ -16,7 +16,7 @@ import Encryption from '../../shared/payload-encryption';
 import fuel from "../common/FuelTypes";
 
 
-
+const menumaster_id = 7
 const initialValues = {
     selectedBrandId: '',
     selectedBrandName: '',
@@ -60,8 +60,8 @@ class SelectBrandMISCD extends Component {
             modelName: '',
             fuelType: '',
             vehicleDetails: [],
-            gross_vechicle_weight : '',
-            seating : '',
+            horse_power : '',
+            body_style : '',
             searchText: ""
         };
     }
@@ -120,7 +120,7 @@ class SelectBrandMISCD extends Component {
         let policyHolder_id = localStorage.getItem("policyHolder_refNo") ? localStorage.getItem("policyHolder_refNo") : 0;
         let encryption = new Encryption();
         return new Promise(resolve => {
-            axios.get(`gcv/vehicle/brand-with-image/4/${policyHolder_id}`)
+            axios.get(`miscd/vehicle/brand-with-image/${menumaster_id}/${policyHolder_id}`)
                 .then(res => {
                     let decryptResp = JSON.parse(encryption.decrypt(res.data));
                     console.log('decryptResp', decryptResp)
@@ -153,7 +153,7 @@ class SelectBrandMISCD extends Component {
         let policyHolder_id = localStorage.getItem("policyHolder_id") ? localStorage.getItem("policyHolder_id") : 0;
         this.props.loadingStart();
         let encryption = new Encryption();
-        axios.get(`gcv/vehicle/brand-without-image/${policyHolder_id}`).then(res => {
+        axios.get(`miscd/vehicle/brand-without-image/${policyHolder_id}`).then(res => {
             let decryptResp = JSON.parse(encryption.decrypt(res.data));
             console.log('decryptResp', decryptResp)
 
@@ -192,7 +192,7 @@ class SelectBrandMISCD extends Component {
         let policyHolder_id = localStorage.getItem("policyHolder_refNo") ? localStorage.getItem("policyHolder_refNo") : 0;
         let encryption = new Encryption();
         this.props.loadingStart();
-        axios.get(`gcv/policy-holder/details/${policyHolder_id}`)
+        axios.get(`miscd/policy-holder/details/${policyHolder_id}`)
             .then(res => {
                 let decryptResp = JSON.parse(encryption.decrypt(res.data));
                 console.log("decrypt", decryptResp)
@@ -243,7 +243,7 @@ class SelectBrandMISCD extends Component {
         const formData = new FormData();
         let encryption = new Encryption();
         this.props.loadingStart();
-        axios.get(`gcv/vehicle/model-with-varient/${brand_id}/${policyHolder_id}`).then(res => {
+        axios.get(`miscd/vehicle/model-with-varient/${brand_id}/${policyHolder_id}`).then(res => {
             let decryptResp = JSON.parse(encryption.decrypt(res.data));
             console.log('decryptResp', decryptResp)
 
@@ -272,18 +272,18 @@ class SelectBrandMISCD extends Component {
 
     }
 
-    setVarient = (varient, model_Id, modelName, fuelType, seating, gross_vechicle_weight) => {        
+    setVarient = (varient, model_Id, modelName, fuelType, body_style, horse_power) => {        
         this.setState({
             selectedVarientId: varient,
             selectedModelId: model_Id,
             modelName: modelName,
             fuelType: fuelType,
-            gross_vechicle_weight : gross_vechicle_weight,
-            seating : seating
+            horse_power : horse_power,
+            body_style : body_style
         })
     }
 
-    setOtherVarient = (varient, model_Id, brand_Id, brandName, modelName, fuelType, seating, gross_vechicle_weight) => {
+    setOtherVarient = (varient, model_Id, brand_Id, brandName, modelName, fuelType, body_style, horse_power) => {
         // brandEdit = 1 for model, 2 for other Varient
         this.setState({
             selectedVarientId: varient,
@@ -292,8 +292,8 @@ class SelectBrandMISCD extends Component {
             brandName: brandName,
             modelName: modelName,
             fuelType: fuelType,
-            gross_vechicle_weight : gross_vechicle_weight,
-            seating : seating
+            horse_power : horse_power,
+            body_style : body_style
         })
     }
 
@@ -309,7 +309,7 @@ class SelectBrandMISCD extends Component {
         let encryption = new Encryption();
         const post_data = {
             'policy_holder_id': localStorage.getItem('policyHolder_id'),
-            'menumaster_id': 4,
+            'menumaster_id': menumaster_id,
             'brand_id': values.selectedBrandId,
             'brand_model_id': values.selectedModelId,
             'model_varient_id': values.selectedVarientId,
@@ -318,7 +318,7 @@ class SelectBrandMISCD extends Component {
         formData.append('enc_data', encryption.encrypt(JSON.stringify(post_data)))
         console.log("Post Date---------- ", post_data) 
         this.props.loadingStart();
-        axios.post('gcv/insert-brand-model-varient', formData).then(res => {
+        axios.post('miscd/insert-brand-model-varient', formData).then(res => {
             this.props.loadingStop();
             let decryptResp = JSON.parse(encryption.decrypt(res.data))
             console.log("decrypt", decryptResp)
@@ -350,7 +350,7 @@ class SelectBrandMISCD extends Component {
 
     render() {
         const { brandList, motorInsurance, selectedBrandDetails, brandModelList, selectedBrandId,
-             selectedModelId, selectedVarientId, otherBrands, brandName, modelName, fuelType, vehicleDetails, gross_vechicle_weight, seating } = this.state
+             selectedModelId, selectedVarientId, otherBrands, brandName, modelName, fuelType, vehicleDetails, horse_power, body_style } = this.state
         const { productId } = this.props.match.params
         const newInitialValues = Object.assign(initialValues, {
             selectedBrandId: selectedBrandId ? selectedBrandId : (vehicleDetails && vehicleDetails.vehiclebrand_id ? vehicleDetails.vehiclebrand_id : ""),
@@ -437,13 +437,13 @@ class SelectBrandMISCD extends Component {
                                                                     </div>
 
                                                                     <div className="d-flex justify-content-between flex-lg-row flex-md-column m-b-25">
-                                                                        <div className="txtRegistr">Seating<br />
-                                                                            <strong>{seating ? seating : (selectedBrandId ? "" : vehicleDetails && vehicleDetails.varientmodel && vehicleDetails.varientmodel.seating ? vehicleDetails.varientmodel.seating: "")}</strong></div>
+                                                                        <div className="txtRegistr">Body Style<br />
+                                                                            <strong>{body_style ? body_style : (selectedBrandId ? "" : vehicleDetails && vehicleDetails.varientmodel && vehicleDetails.varientmodel.body_style ? vehicleDetails.varientmodel.body_style: "")}</strong></div>
                                                                     </div>
 
                                                                     <div className="d-flex justify-content-between flex-lg-row flex-md-column m-b-25">
-                                                                        <div className="txtRegistr">GVW<br />
-                                                                            <strong>{gross_vechicle_weight ? gross_vechicle_weight : (selectedBrandId ? "" : vehicleDetails && vehicleDetails.varientmodel && vehicleDetails.varientmodel.gross_vechicle_weight ? vehicleDetails.varientmodel.gross_vechicle_weight : "")}</strong></div>
+                                                                        <div className="txtRegistr">Power<br />
+                                                                            <strong>{horse_power ? horse_power+" BHP" : (selectedBrandId ? "" : vehicleDetails && vehicleDetails.varientmodel && vehicleDetails.varientmodel.horse_power ? vehicleDetails.varientmodel.horse_power+" BHP" : "")} </strong></div>
                                                                     </div>
 
                                                                     <div className="d-flex justify-content-between flex-lg-row flex-md-column m-b-25">
@@ -522,7 +522,7 @@ class SelectBrandMISCD extends Component {
                                                                     onClick={(e) =>
                                                                         // console.log("varient--------------- ", varient)
                                                                         this.setVarient(e.target.value, brand.id, brand.name+" "+varient.varient, 
-                                                                            varient.fuel_type, varient.seating, varient.gross_vechicle_weight )
+                                                                            varient.fuel_type, varient.body_style, varient.horse_power )
                                                                     }
                                                                 />
                                                                 <span className="checkmark mL-0"></span>
@@ -558,7 +558,7 @@ class SelectBrandMISCD extends Component {
                                                                 aria-invalid="false"
                                                                 onClick={(e) =>
                                                                     this.setVarient(e.target.value, brand.id, brand.name+" "+varient.varient, 
-                                                                    varient.fuel_type, varient.seating, varient.gross_vechicle_weight)
+                                                                    varient.fuel_type, varient.body_style, varient.horse_power)
                                                                 }
                                                             />
                                                             <span className="checkmark mL-0"></span>
@@ -598,7 +598,7 @@ class SelectBrandMISCD extends Component {
                                                                 aria-invalid="false"
                                                                 onClick={(e) =>
                                                                     this.setOtherVarient(e.target.value, model.id, model.brand_id,
-                                                                        brand.name, model.name+" "+varient.varient, varient.fuel_type, varient.seating, varient.gross_vechicle_weight )
+                                                                        brand.name, model.name+" "+varient.varient, varient.fuel_type, varient.body_style, varient.horse_power )
                                                                 }
                                                             />
                                                             <span className="checkmark mL-0"></span>
@@ -635,7 +635,7 @@ class SelectBrandMISCD extends Component {
                                                             aria-invalid="false"
                                                             onClick={(e) =>
                                                                 this.setOtherVarient(e.target.value, model.id, model.brand_id,
-                                                                    brand.name, model.name+" "+varient.varient, varient.fuel_type, varient.seating, varient.gross_vechicle_weight )
+                                                                    brand.name, model.name+" "+varient.varient, varient.fuel_type, varient.body_style, varient.horse_power )
                                                             }
                                                         />
                                                         <span className="checkmark mL-0"></span>

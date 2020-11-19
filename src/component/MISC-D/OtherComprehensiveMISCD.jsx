@@ -18,7 +18,7 @@ import * as Yup from "yup";
 import swal from 'sweetalert';
 import moment from "moment";
 
-
+const menumaster_id = 7
 const ComprehensiveValidation = Yup.object().shape({
     // is_carloan: Yup.number().required('Please select one option')
 
@@ -168,7 +168,7 @@ const ComprehensiveValidation = Yup.object().shape({
 
     B00004_description: Yup.string().when(['electric_flag'], {
         is: electric_flag => electric_flag == '1',
-        then: Yup.string().required('Please provide accessory desription').matches(/^[a-zA-Z0-9]*$/, 'Please provide valid description'),
+        then: Yup.string().required('Please provide accessory desription').matches(/^[a-zA-Z0-9]+[a-zA-Z0-9\s]*$/, 'Please provide valid description'),
         otherwise: Yup.string()
     }),
 
@@ -182,7 +182,7 @@ const ComprehensiveValidation = Yup.object().shape({
 
     B00003_description: Yup.string().when(['nonElectric_flag'], {
         is: nonElectric_flag => nonElectric_flag == '1',
-        then: Yup.string().required('Please provide accessory desription').matches(/^[a-zA-Z0-9]*$/, 'Please provide valid description'),
+        then: Yup.string().required('Please provide accessory desription').matches(/^[a-zA-Z0-9]+[a-zA-Z0-9\s]*$/, 'Please provide valid description'),
         otherwise: Yup.string()
     }),
 
@@ -371,7 +371,8 @@ class OtherComprehensiveMISCD extends Component {
             vehicleDetails: [],
             no_of_claim: [],
             trailer_array: [],
-            ncbDiscount:0
+            ncbDiscount:0,
+            validation_error: []
         };
     }
 
@@ -441,7 +442,7 @@ class OtherComprehensiveMISCD extends Component {
         const { productId } = this.props.match.params
         let policyHolder_id = localStorage.getItem("policyHolder_refNo") ? localStorage.getItem("policyHolder_refNo") : 0;
         let encryption = new Encryption();
-        axios.get(`gcv/policy-holder/details/${policyHolder_id}`)
+        axios.get(`miscd/policy-holder/details/${policyHolder_id}`)
             .then(res => {
                 let decryptResp = JSON.parse(encryption.decrypt(res.data))
                 console.log("decrypt--fetchData-- ", decryptResp)
@@ -584,7 +585,7 @@ class OtherComprehensiveMISCD extends Component {
         this.props.loadingStart();
         let encryption = new Encryption();
         axios
-          .get(`gcv/coverage-list/${localStorage.getItem('policyHolder_id')}`)
+          .get(`miscd/coverage-list/${localStorage.getItem('policyHolder_id')}`)
           .then((res) => {
             let decryptResp = JSON.parse(encryption.decrypt(res.data))
             let Coverage = []
@@ -746,7 +747,7 @@ class OtherComprehensiveMISCD extends Component {
 
         let encryption = new Encryption();
         formData.append('enc_data',encryption.encrypt(JSON.stringify(post_data)))
-        axios.post('fullQuotePMGCV',formData)
+        axios.post('fullQuoteMISCD',formData)
             .then(res => {
 
                 if (res.data.PolicyObject && res.data.UnderwritingResult && res.data.UnderwritingResult.Status == "Success") {
@@ -755,6 +756,7 @@ class OtherComprehensiveMISCD extends Component {
                         fulQuoteResp: res.data.PolicyObject,
                         PolicyArray: res.data.PolicyObject.PolicyLobList,
                         error: [],
+                        validation_error: [],
                         ncbDiscount,
                         serverResponse: res.data.PolicyObject,
                         policyCoverage: res.data.PolicyObject.PolicyLobList ? res.data.PolicyObject.PolicyLobList[0].PolicyRiskList[0].PolicyCoverageList : [],
@@ -764,15 +766,29 @@ class OtherComprehensiveMISCD extends Component {
                     this.setState({
                         fulQuoteResp: res.data.PolicyObject,
                         error: {"message": 1},
+                        validation_error: [],
                         serverResponse: [],
                         policyCoverage: res.data.PolicyObject.PolicyLobList ? res.data.PolicyObject.PolicyLobList[0].PolicyRiskList[0].PolicyCoverageList : [],
                     });
+                }
+                else if (res.data.code && res.data.message && res.data.code == "validation failed" && res.data.message == "validation failed") {
+                    var validationErrors = []
+                    for (const x in res.data.messages) {
+                        validationErrors.push(res.data.messages[x].message)
+                       }
+                       this.setState({
+                        fulQuoteResp: [], add_more_coverage,
+                        validation_error: validationErrors,
+                        serverResponse: []
+                    });
+                    // swal(res.data.messages[0].message)
                 }
                 else {
                     this.setState({
                         fulQuoteResp: [], add_more_coverage,
                         error: res.data,
-                        serverResponse: []
+                        serverResponse: [],
+                        validation_error: []
                     });
                 }
                 this.props.loadingStop();
@@ -829,7 +845,7 @@ class OtherComprehensiveMISCD extends Component {
         if(add_more_coverage.length > 0){
             post_data = {
                 'policy_holder_id': localStorage.getItem('policyHolder_id'),
-                'menumaster_id': 4,
+                'menumaster_id': menumaster_id,
                 'registration_no': values.registration_no,
                 'chasis_no': values.chasis_no,
                 'chasis_no_last_part': values.chasis_no_last_part,
@@ -851,7 +867,7 @@ class OtherComprehensiveMISCD extends Component {
         else {
             post_data = {
                 'policy_holder_id': localStorage.getItem('policyHolder_id'),
-                'menumaster_id': 4,
+                'menumaster_id': menumaster_id,
                 'registration_no': values.registration_no,
                 'chasis_no': values.chasis_no,
                 'chasis_no_last_part': values.chasis_no_last_part,
@@ -874,7 +890,7 @@ class OtherComprehensiveMISCD extends Component {
 
         formData.append('enc_data', encryption.encrypt(JSON.stringify(post_data)))
         this.props.loadingStart();
-        axios.post('gcv/update-insured-value', formData).then(res => {
+        axios.post('miscd/update-insured-value', formData).then(res => {
             this.props.loadingStop();
             let decryptResp = JSON.parse(encryption.decrypt(res.data))
             console.log("decrypt--fetchData-- ", decryptResp)
@@ -1177,7 +1193,7 @@ class OtherComprehensiveMISCD extends Component {
 
 
     render() {
-        const {showCNG, is_CNG_account, vahanDetails,error, policyCoverage, vahanVerify, selectFlag, fulQuoteResp, PolicyArray, fuelList, vehicleDetails,
+        const {showCNG, is_CNG_account, vahanDetails,error, policyCoverage, vahanVerify, selectFlag, fulQuoteResp, PolicyArray, fuelList, vehicleDetails,validation_error,
             moreCoverage, sliderVal, bodySliderVal, motorInsurance, serverResponse, engine_no, chasis_no, initialValue, add_more_coverage_request_array,ncbDiscount} = this.state
         const {productId} = this.props.match.params 
         let defaultSliderValue = PolicyArray.length > 0 ? Math.round(PolicyArray[0].PolicyRiskList[0].IDV_Suggested) : 0
@@ -1406,11 +1422,11 @@ class OtherComprehensiveMISCD extends Component {
     </tr> : null
 
         const premiumBreakupIMT = fulQuoteResp && fulQuoteResp.PolicyLobList  && Math.round(fulQuoteResp.PolicyLobList[0].PolicyRiskList[0].imt23prem) > 0 ?
-                        <tr>
-                            <td>IMT 23:</td>
-                            <td>₹ {Math.round(fulQuoteResp.PolicyLobList[0].PolicyRiskList[0].imt23prem)}</td>
-                        </tr>  
-             : null
+                <tr>
+                    <td>IMT 23:</td>
+                    <td>₹ {Math.round(fulQuoteResp.PolicyLobList[0].PolicyRiskList[0].imt23prem)}</td>
+                </tr>  
+        : null
         
 
         const errMsg =
@@ -1425,6 +1441,20 @@ class OtherComprehensiveMISCD extends Component {
                 </h6>
                 </span>
             ) : null;
+
+        const validationErrors = 
+            validation_error ? (
+                validation_error.map((errors, qIndex) => (
+                    <span className="errorMsg">
+                        <li>
+                            <strong>
+                            {errors}
+                            </strong>
+                        </li>
+                    </span>
+                ))        
+            ): null;
+
 
         return (
             <>
@@ -1441,6 +1471,7 @@ class OtherComprehensiveMISCD extends Component {
                         <div className="brandhead m-b-10">
                             <h4 className="m-b-30">Covers your Vehicle + Damage to Others (Comprehensive)</h4>
                             <h5>{errMsg}</h5>
+                            <h5>{validationErrors}</h5>
                         </div>
                     </div>
                     <Formik initialValues={newInitialValues} 
@@ -2345,9 +2376,9 @@ console.log("errors------------------ ", errors)
                                         </Col>
                                         </Fragment> : null
                                     }
-{values.trailer_flag == '1' && values[coverage.code] == 'B00007' && values.B00007_value != "" ?
-                                      this.handleClaims(values, errors, touched, setFieldTouched, setFieldValue) : null
-                                    }
+                                    {values.trailer_flag == '1' && values[coverage.code] == 'B00007' && values.B00007_value != "" ?
+                                    this.handleClaims(values, errors, touched, setFieldTouched, setFieldValue): null
+                                    } 
                                 </Row>
                                 )) : null}
                                 <Row>

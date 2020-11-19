@@ -78,7 +78,7 @@ class Premium_sme extends Component {
     }
 
     additionalDetails = (productId) => {
-        this.props.history.push(`/Summary_SME/${productId}`);
+        this.props.history.push(`/AdditionalDetails_SME/${productId}`);
     }
 
     // removeLocalStorage = (productId) => {

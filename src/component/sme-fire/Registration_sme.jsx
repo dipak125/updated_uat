@@ -193,7 +193,7 @@ class Registration_sme extends Component {
         
     }
 
-    handleSubmit=(values)=>{
+    handleSubmit=(values, actions)=>{
         const {productId} = this.props.match.params;
         const formData = new FormData();
         let encryption = new Encryption();
@@ -233,12 +233,19 @@ class Registration_sme extends Component {
             axios.post('sme/update-policy-info',
             formData
             ).then(res=>{
+                if (res.data.error === false )
+                {
                 this.props.loadingStop();
                 this.props.setDataUpdate({
                     start_date:values.pol_start_date,
                     end_date:values.pol_end_date
                 });
                 this.props.history.push(`/RiskDetails/${productId}`);
+            } else {
+                this.props.loadingStop();
+                swal("Thank you for showing your interest for buying product.Due to some reasons, we are not able to issue the policy online.Please call 1800 22 1111");
+                actions.setSubmitting(false);
+            }
             }).
             catch(err=>{
                 this.props.loadingStop();
@@ -271,8 +278,8 @@ class Registration_sme extends Component {
     render() {
         const {motorInsurance} = this.state
         const newInitialValues = Object.assign(initialValues,{
-            pol_start_date:this.props.start_date != null?new Date(this.props.start_date):new Date(),
-            pol_end_date:this.props.end_date != null?new Date(this.props.end_date):new Date(new Date(moment().add(364, 'day').calendar()).setHours(23, 59, 0, 0) )
+            pol_start_date:this.props.start_date != null? new Date(this.props.start_date): null,
+            pol_end_date:this.props.end_date != null? new Date(this.props.end_date): null
         })
 
 
@@ -320,7 +327,7 @@ class Registration_sme extends Component {
                                                                 dateFormat="dd-MM-yyyy HH:mm"
                                                                 // showTimeSelect
                                                                 // timeFormat="p"
-                                                                // timeFormat="HH:mm"
+                                                                timeFormat="HH:mm"
                                                                 // timeIntervals={15}
                                                                 placeholderText="Policy Start Date & Time"
                                                                 peekPreviousMonth
@@ -333,7 +340,7 @@ class Registration_sme extends Component {
                                                                 selected={values.pol_start_date}
                                                                 onSelect={(val) => {       
                                                                     Math.floor(moment().diff(val, 'days', true)) == 0 ? val.setHours(moment().format("HH"),moment().format("mm"),0,0) : val.setHours(0, 0, 0, 0)                                                                                                            
-                                                                    setFieldTouched('pol_start_date')
+                                                                    // setFieldTouched('pol_start_date')
                                                                     setFieldValue('pol_start_date', val)
                                                                     //console.log('here',val);
                                                                     setFieldTouched('pol_end_date')

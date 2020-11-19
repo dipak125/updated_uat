@@ -18,6 +18,7 @@ import swal from 'sweetalert';
 import moment from "moment";
 
 const initialValue = {}
+const menumaster_id = 7
 
 const validatePremium = Yup.object().shape({
     refNo: Yup.string().notRequired('Reference number is required')
@@ -107,7 +108,7 @@ class PremiumMISCD extends Component {
         let policyHolder_id = this.state.policyHolder_refNo ? this.state.policyHolder_refNo : '0'
         let encryption = new Encryption();
     
-        axios.get(`gcv/policy-holder/details/${policyHolder_id}`)
+        axios.get(`miscd/policy-holder/details/${policyHolder_id}`)
             .then(res => {
                 let decryptResp = JSON.parse(encryption.decrypt(res.data))
                 console.log("decrypt", decryptResp)
@@ -196,8 +197,8 @@ class PremiumMISCD extends Component {
         }
 
         formData.append('enc_data',encryption.encrypt(JSON.stringify(post_data)))
-        console.log("post_data--fullQuotePMGCV- ", post_data)
-        axios.post('fullQuotePMGCV', formData)
+        console.log("post_data--fullQuoteMISCD- ", post_data)
+        axios.post('fullQuoteMISCD', formData)
             .then(res => {
                 if (res.data.PolicyObject) {
                     this.setState({
@@ -324,7 +325,7 @@ class PremiumMISCD extends Component {
                             <div className="col-sm-12 col-md-12 col-lg-2 col-xl-2 pd-l-0">
                                 <SideNav />
                             </div>
-                            { step_completed >= '4' && vehicleDetails.vehicletype_id == '8' ?
+                            { step_completed >= '4' && vehicleDetails.vehicletype_id == '11' ?
                             <div className="col-sm-12 col-md-12 col-lg-10 col-xl-10 infobox">
                                 <h4 className="text-center mt-3 mb-3">SBI General Insurance Company Limited</h4>
                                 <Formik initialValues={initialValue} onSubmit={this.handleSubmit}
@@ -648,10 +649,10 @@ class PremiumMISCD extends Component {
 
                                                                                             <Row>
                                                                                                 <Col sm={12} md={6}>
-                                                                                                    <FormGroup>Gross Vehicle Weight</FormGroup>
+                                                                                                    <FormGroup>Horse Power</FormGroup>
                                                                                                 </Col>
                                                                                                 <Col sm={12} md={6}>
-                                                                                                    <FormGroup>{vehicleDetails && vehicleDetails.varientmodel && vehicleDetails.varientmodel.gross_vechicle_weight ? vehicleDetails.varientmodel.gross_vechicle_weight : null}</FormGroup>
+                                                                                                    <FormGroup>{vehicleDetails && vehicleDetails.varientmodel && vehicleDetails.varientmodel.horse_power ? vehicleDetails.varientmodel.horse_power+" BHP" : null}</FormGroup>
                                                                                                 </Col>
                                                                                             </Row>
 

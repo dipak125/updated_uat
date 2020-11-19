@@ -22,6 +22,8 @@ import {
   } from "../../shared/validationFunctions";
 import swal from 'sweetalert';
 
+
+const menumaster_id = 7
 const year = new Date('Y')
 const ageObj = new PersonAge();
 // const minDate = moment(moment().subtract(1, 'years').calendar()).add(1, 'day').calendar();
@@ -293,29 +295,29 @@ const vehicleRegistrationValidation = Yup.object().shape({
         otherwise: Yup.string()
     }),
 
-    goodscarriedtypes_id: Yup.string()
-    .required(function() {
-        return "Please select type of goods"
-    }).test(
-        "currentMonthChecking",
-        function() {
-            return "Hazardous goods not allowed"
-        },
-        function (value) {
-            if (value == '1' ) {   
-                return false;    
-            }
-            return true;
-        }
-    ),
-    averagemonthlyusages_id: Yup.string()
-    .required(function() {
-        return "Please select average monthly use"
-    }),
-    permittypes_id: Yup.string()
-    .required(function() {
-        return "Please select type of permit"
-    }),
+    // goodscarriedtypes_id: Yup.string()
+    // .required(function() {
+    //     return "Please select type of goods"
+    // }).test(
+    //     "currentMonthChecking",
+    //     function() {
+    //         return "Hazardous goods not allowed"
+    //     },
+    //     function (value) {
+    //         if (value == '1' ) {   
+    //             return false;    
+    //         }
+    //         return true;
+    //     }
+    // ),
+    // averagemonthlyusages_id: Yup.string()
+    // .required(function() {
+    //     return "Please select average monthly use"
+    // }),
+    // permittypes_id: Yup.string()
+    // .required(function() {
+    //     return "Please select type of permit"
+    // }),
     valid_previous_policy: Yup.string()
     .required(function() {
         return "This field is required"
@@ -528,7 +530,7 @@ class VehicleDetailsMISCD extends Component {
         if(values.policy_type_id == '2') {
             post_data = {
                 'policy_holder_id':localStorage.getItem('policyHolder_id'),
-                'menumaster_id':4,
+                'menumaster_id':menumaster_id,
                 'registration_date':moment(values.registration_date).format("YYYY-MM-DD"),
                 'location_id':values.location_id,
                 'previous_start_date': values.previous_start_date ? moment(values.previous_start_date).format("YYYY-MM-DD") : "",
@@ -543,9 +545,9 @@ class VehicleDetailsMISCD extends Component {
                 'vehicleAge': vehicleAge,
                 'policy_type': policy_type,
                 'prev_policy_flag': 1,
-                'averagemonthlyusage_id': values.averagemonthlyusages_id,
-                'goodscarriedtype_id': values.goodscarriedtypes_id,
-                'permittype_id': values.permittypes_id,
+                // 'averagemonthlyusage_id': values.averagemonthlyusages_id,
+                // 'goodscarriedtype_id': values.goodscarriedtypes_id,
+                // 'permittype_id': values.permittypes_id,
                 'valid_previous_policy': values.valid_previous_policy,
                 'page_name': `VehicleDetails/${productId}`,
                 'claim_array': JSON.stringify(values.claim_array),
@@ -555,7 +557,7 @@ class VehicleDetailsMISCD extends Component {
         else if(values.policy_type_id == '1')  {
             post_data = {
                 'policy_holder_id':localStorage.getItem('policyHolder_id'),
-                'menumaster_id':4,
+                'menumaster_id':menumaster_id,
                 'registration_date':moment(values.registration_date).format("YYYY-MM-DD"),
                 'location_id':values.location_id,    
                 'previous_is_claim':'0', 
@@ -563,9 +565,9 @@ class VehicleDetailsMISCD extends Component {
                 'vehicleAge': vehicleAge ,
                 'policy_type': policy_type,
                 'prev_policy_flag': 0,
-                'averagemonthlyusage_id': values.averagemonthlyusages_id,
-                'goodscarriedtype_id': values.goodscarriedtypes_id,
-                'permittype_id': values.permittypes_id,
+                // 'averagemonthlyusage_id': values.averagemonthlyusages_id,
+                // 'goodscarriedtype_id': values.goodscarriedtypes_id,
+                // 'permittype_id': values.permittypes_id,
                 'valid_previous_policy': 0,
                 'page_name': `VehicleDetails/${productId}`,
                 'claim_array': JSON.stringify(values.claim_array),
@@ -583,7 +585,7 @@ class VehicleDetailsMISCD extends Component {
         formData.append('enc_data',encryption.encrypt(JSON.stringify(post_data)))
         this.props.loadingStart();
         axios
-        .post(`gcv/insert-vehicle-details`, formData)
+        .post(`miscd/insert-vehicle-details`, formData)
         .then(res => { 
             let decryptResp = JSON.parse(encryption.decrypt(res.data))
             console.log("decrypt", decryptResp)
@@ -626,7 +628,7 @@ class VehicleDetailsMISCD extends Component {
     getAllAddress() {
         let policyHolder_id = localStorage.getItem("policyHolder_id") ? localStorage.getItem("policyHolder_id") : 0;
         let encryption = new Encryption();
-        axios.get(`gcv/location-list/${policyHolder_id}`)
+        axios.get(`miscd/location-list/${policyHolder_id}`)
           .then(res => {
             let decryptResp = JSON.parse(encryption.decrypt(res.data))
             this.setState({
@@ -643,7 +645,7 @@ class VehicleDetailsMISCD extends Component {
         const { productId } = this.props.match.params
         let policyHolder_id = localStorage.getItem("policyHolder_refNo") ? localStorage.getItem("policyHolder_refNo") : 0;
         let encryption = new Encryption();
-        axios.get(`gcv/policy-holder/details/${policyHolder_id}`)
+        axios.get(`miscd/policy-holder/details/${policyHolder_id}`)
             .then(res => {
                  let decryptResp = JSON.parse(encryption.decrypt(res.data))
                  console.log("decrypt", decryptResp)
@@ -669,7 +671,7 @@ class VehicleDetailsMISCD extends Component {
         const {productId } = this.props.match.params
         let encryption = new Encryption();
         this.props.loadingStart();
-        axios.get(`gcv/carrying-capacity-list/4 `)
+        axios.get(`miscd/carrying-capacity-list/${menumaster_id}`)
             .then(res=>{
                 let decryptResp = JSON.parse(encryption.decrypt(res.data))
     
@@ -848,9 +850,9 @@ class VehicleDetailsMISCD extends Component {
             previous_is_claim: previous_is_claim,
             previous_claim_bonus: previousPolicy && previousPolicy.claim_bonus ? Math.floor(previousPolicy.claim_bonus) : "1",
             no_of_claim: previousPolicy && previousPolicy.previouspoliciesclaims ? previousPolicy.previouspoliciesclaims.length : "",
-            goodscarriedtypes_id: motorInsurance && motorInsurance.goodscarriedtype_id ? motorInsurance.goodscarriedtype_id : "",
-            averagemonthlyusages_id: motorInsurance && motorInsurance.averagemonthlyusage_id ? motorInsurance.averagemonthlyusage_id : "",
-            permittypes_id: motorInsurance && motorInsurance.permittype_id ? motorInsurance.permittype_id : "",
+            // goodscarriedtypes_id: motorInsurance && motorInsurance.goodscarriedtype_id ? motorInsurance.goodscarriedtype_id : "",
+            // averagemonthlyusages_id: motorInsurance && motorInsurance.averagemonthlyusage_id ? motorInsurance.averagemonthlyusage_id : "",
+            // permittypes_id: motorInsurance && motorInsurance.permittype_id ? motorInsurance.permittype_id : "",
             policy_type_id: motorInsurance && motorInsurance.policytype_id ? motorInsurance.policytype_id : "",
             valid_previous_policy: motorInsurance && (motorInsurance.valid_previous_policy == 0 || motorInsurance.valid_previous_policy == 1) ? motorInsurance.valid_previous_policy : "",           
             
@@ -964,6 +966,7 @@ console.log("values-------------------------- ", values)
                                                         </FormGroup>
                                                     </Col>
                                                 </Row>
+{/*                                                 
                                                 <Row>
                                                     <Col sm={12} md={11} lg={4}>
                                                         <FormGroup>
@@ -1036,6 +1039,7 @@ console.log("values-------------------------- ", values)
                                                         </FormGroup>
                                                     </Col>
                                                 </Row>
+                                                 */}
                                                 <Row>
                                                     <Col sm={12}>
                                                         <FormGroup>
@@ -1457,13 +1461,13 @@ console.log("values-------------------------- ", values)
                                                     </div>
 
                                                     <div className="d-flex justify-content-between flex-lg-row flex-md-column m-b-25">
-                                                        <div className="txtRegistr">Seating<br />
-                                                            <strong>{ vehicleDetails && vehicleDetails.varientmodel && vehicleDetails.varientmodel.seating ? vehicleDetails.varientmodel.seating: ""}</strong></div>
+                                                        <div className="txtRegistr">Body Style<br />
+                                                            <strong>{ vehicleDetails && vehicleDetails.varientmodel && vehicleDetails.varientmodel.body_style ? vehicleDetails.varientmodel.body_style: ""}</strong></div>
                                                     </div>
 
                                                     <div className="d-flex justify-content-between flex-lg-row flex-md-column m-b-25">
-                                                        <div className="txtRegistr">GVW<br />
-                                                            <strong>{ vehicleDetails && vehicleDetails.varientmodel && vehicleDetails.varientmodel.gross_vechicle_weight ? vehicleDetails.varientmodel.gross_vechicle_weight : ""}</strong></div>
+                                                        <div className="txtRegistr">Power<br />
+                                                            <strong>{ vehicleDetails && vehicleDetails.varientmodel && vehicleDetails.varientmodel.horse_power ? vehicleDetails.varientmodel.horse_power+" BHP" : ""}</strong></div>
                                                     </div>
 
                                                     <div className="d-flex justify-content-between flex-lg-row flex-md-column m-b-25">

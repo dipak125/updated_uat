@@ -29,13 +29,13 @@ class ThankYouCCM extends Component {
 
 
   getAgentReceipt = () => {
-    this.props.loadingStart();
     const formData = new FormData();
     formData.append('policy_ref_no', this.state.refNumber);
     if(this.state.retryCount <= 3){
       this.setState({
         retryCount: this.state.retryCount + 1
       });
+      this.props.loadingStart();
     axios
       .post(`/sme/agent-receipt`, formData)
       .then(res => {
@@ -54,12 +54,12 @@ class ThankYouCCM extends Component {
       });
     }
     else {
+      this.props.loadingStop();
       swal("Maximum Retry attempt limit is crossed.")
     }
   }
 
   issuePolicy = () => {
-    this.props.loadingStart();
     const formData = new FormData();
     formData.append('policy_ref_no', this.state.refNumber);
     axios

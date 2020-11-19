@@ -141,17 +141,23 @@ class RiskDetails extends Component {
            formData.append('pincode',pinCode)
            axios.post('pincode-details',
             formData
-            ).then(res=>{       
+            ).then(res=>{
+                if( res.data.error === false)
+                {       
                 let stateName = res.data.data && res.data.data[0] && res.data.data[0].pinstate.STATE_NM ? res.data.data[0].pinstate.STATE_NM : ""                        
                 this.setState({
                     pinDataArr: res.data.data,
                     stateName,
                 });
                 this.props.loadingStop();
+            } else {
+                swal("Plese enter a valid pincode")
+                this.props.loadingStop();
+            }
             }).
             catch(err=>{
                 this.props.loadingStop();
-            })          
+            })  
         }       
     }
 
@@ -190,7 +196,7 @@ class RiskDetails extends Component {
         }     
     }
     
-    handleSubmit=(values, )=>{
+    handleSubmit=(values, actions)=>{
         console.log('handleSubmit', values);
         // console.log("policyHolder_id-------->",policyHolder_id)
         const formData = new FormData();
@@ -225,7 +231,9 @@ class RiskDetails extends Component {
         this.props.loadingStart();
         axios.post('sme/policy-details',
         formData
-        ).then(res=>{       
+        ).then(res=>{     
+            if (res.data.error === false )  
+           {
             console.log('res', res)
             this.props.loadingStop();
             this.props.setRiskData(
@@ -250,6 +258,11 @@ class RiskDetails extends Component {
             this.setState({ Fire_sum_insured : Fire_sum_insured })
             
             this.props.history.push(`/OtherDetails/${productId}`);
+        } else {
+            this.props.loadingStop();
+            swal("Thank you for showing your interest for buying product.Due to some reasons, we are not able to issue the policy online.Please call 1800 22 1111");
+            actions.setSubmitting(false);
+        }
         }).
         catch(err=>{
             this.props.loadingStop();
@@ -683,7 +696,7 @@ class RiskDetails extends Component {
                                                         <label>
                                                         Fire-Contents Sum Insured:
                                                         </label>
-                                                        <OverlayTrigger overlay={<Tooltip id="tooltip-disabled">{"Building Structure including Plinth and Foundation"}</Tooltip>}>
+                                                        <OverlayTrigger overlay={<Tooltip id="tooltip-disabled">{"Furniture, Fixtures, Fittings and Electrical Installations."}</Tooltip>}>
                                                             <a className="infoIcon"><img src={require('../../assets/images/i.svg')} alt="" className="premtool" /></a>
                                                         </OverlayTrigger>
                                                         </Col>
@@ -716,7 +729,7 @@ class RiskDetails extends Component {
                                                         <label>
                                                         Fire-Stock Sum Insured:
                                                         </label>
-                                                        <OverlayTrigger overlay={<Tooltip id="tooltip-disabled">{"Building Structure including Plinth and Foundation"}</Tooltip>}>
+                                                        <OverlayTrigger overlay={<Tooltip id="tooltip-disabled">{"Commodity stored inside shops for sale."}</Tooltip>}>
                                                             <a className="infoIcon"><img src={require('../../assets/images/i.svg')} alt="" className="premtool" /></a>
                                                         </OverlayTrigger>
                                                         </Col>
@@ -750,7 +763,7 @@ class RiskDetails extends Component {
                                                         <label>
                                                         Fire-Total Sum Insured:
                                                         </label>
-                                                        <OverlayTrigger overlay={<Tooltip id="tooltip-disabled">{"Building Structure including Plinth and Foundation"}</Tooltip>}>
+                                                        <OverlayTrigger overlay={<Tooltip id="tooltip-disabled">{"Sum total of fire building sum insured, fire content sum insured and fire stock sum insured"}</Tooltip>}>
                                                             <a className="infoIcon"><img src={require('../../assets/images/i.svg')} alt="" className="premtool" /></a>
                                                         </OverlayTrigger>
                                                         </Col>
