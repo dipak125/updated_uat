@@ -133,11 +133,11 @@ class RiskDetails extends Component {
         if(pinCode.length==6){
             const formData = new FormData();
             this.props.loadingStart();
-            let encryption = new Encryption();
+            // let encryption = new Encryption();
             const post_data_obj = {
                 'pincode':pinCode
             };
-           formData.append('enc_data',encryption.encrypt(JSON.stringify(post_data_obj)))
+        //    formData.append('enc_data',encryption.encrypt(JSON.stringify(post_data_obj)))
            formData.append('pincode',pinCode)
            axios.post('pincode-details',
             formData
@@ -174,11 +174,11 @@ class RiskDetails extends Component {
         if(pinCode != null && pinCode != '' && pinCode.length==6){
             const formData = new FormData();
             this.props.loadingStart();
-            let encryption = new Encryption();
+            // let encryption = new Encryption();
             const post_data_obj = {
                 'pincode':pinCode
             };
-            formData.append('enc_data',encryption.encrypt(JSON.stringify(post_data_obj)))
+            // formData.append('enc_data',encryption.encrypt(JSON.stringify(post_data_obj)))
             formData.append('pincode',pinCode)
             axios.post('pincode-details',
             formData

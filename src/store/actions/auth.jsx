@@ -96,6 +96,9 @@ export const authProcess = (data, onSuccess, onFailure) => {
             .post('/login', formData)
             .then(response => {
                 dispatch(authSuccess(response.data));
+                if(!!sessionStorage.getItem('type')){
+                    response.data.user_data.type=sessionStorage.getItem('type')
+                }
                 let loginData;
                 if(data.rememberMe == '1') {
                     loginData = {email: data.emailAddress, pass: data.password, rememberMe: data.rememberMe};
@@ -110,6 +113,9 @@ export const authProcess = (data, onSuccess, onFailure) => {
                 // localStorage.setItem('csc_id', cscData["csc_id"]);
                 // localStorage.setItem('agent_name', cscData["fullname"]);
                 // localStorage.setItem('product_id', cscData["productId"]);
+
+
+                console.log('user_data',response.data.user_data)
                 onSuccess && onSuccess();
             })
             .catch(error => {
