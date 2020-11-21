@@ -510,29 +510,32 @@ class TwoWheelerOtherComprehensive extends Component {
                                                             {motorInsurance && motorInsurance.policy_for == '1' && moreCoverage.map((coverage, qIndex) => (
                                                             <Row key={qIndex}>   
                                                                 <Col sm={12} md={11} lg={6} key={qIndex+"a"} >
+                                                                <div id={coverage.code+"_d"} onClick={(e) =>{if(localStorage.getItem('declinedModel')>0 && sessionStorage.getItem('csc_id') && values[coverage.code] == 'B00015'){
+                                                                                    swal('PA cover for owner driver with Sum Insured: Rs. 15,00,000 is mandatory for selected Model or Location')
+                                                                                }}}>
                                                                     <label className="customCheckBox formGrp formGrp">{coverage.name}
                                                                         <OverlayTrigger overlay={<Tooltip id="tooltip-disabled">{coverage.description}</Tooltip>}>
                                                                             <a className="infoIcon"><img src={require('../../assets/images/i.svg')} alt="" className="premtool" /></a>
                                                                         </OverlayTrigger>
+                                                                        
                                                                         <Field
                                                                             type="checkbox"
-                                                                            // name={`moreCov_${qIndex}`}
                                                                             name={coverage.code}
                                                                             value={coverage.code}
                                                                             className="user-self"
-                                                                            // checked={values.roadsideAssistance ? true : false}
+                                                                            disabled={(localStorage.getItem('declinedModel')>0 && sessionStorage.getItem('csc_id') && values[coverage.code] == 'B00015') ? true : false}
                                                                             onClick={(e) =>{
                                                                                 if( e.target.checked == false && values[coverage.code] == 'B00015') {
                                                                                     swal("This cover is mandated by IRDAI, it is compulsory for Owner-Driver to possess a PA cover of minimum Rs 15 Lacs, except in certain conditions. By not choosing this cover, you confirm that you hold an existing PA cover or you do not possess a valid driving license.")
                                                                                 }
-                                                                                this.onRowSelect(e.target.value, e.target.checked, setFieldTouched, setFieldValue)         
+                                                                                this.onRowSelect(e.target.value, e.target.checked, setFieldTouched, setFieldValue)     
                                                                             }
                                                                             }
                                                                             checked = {values[coverage.code] == coverage.code ? true : false}
                                                                         />
                                                                         <span className="checkmark mL-0"></span>
                                                                         <span className="error-message"></span>
-                                                                    </label>
+                                                                    </label></div>
                                                                 </Col>
                                                                 {values.PA_flag == '1' && values[coverage.code] == 'B00075' ?
                                                                     <Col sm={12} md={11} lg={3} key={qIndex+"b"}>

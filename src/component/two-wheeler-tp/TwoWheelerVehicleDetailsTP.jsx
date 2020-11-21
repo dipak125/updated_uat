@@ -204,6 +204,7 @@ class TwoWheelerVehicleDetails extends Component {
 
         console.log('post_data', post_data)
         formData.append('enc_data',encryption.encrypt(JSON.stringify(post_data)))
+        localStorage.removeItem("declinedModel");
         this.props.loadingStart();
         axios
         .post(`/two-wh/vehicle-details`, formData)
@@ -211,6 +212,8 @@ class TwoWheelerVehicleDetails extends Component {
             this.props.loadingStop();
             let decryptResp = JSON.parse(encryption.decrypt(res.data));
             console.log('decryptResp-----', decryptResp)
+            const declinedModel=decryptResp.data.check_cancel_model
+            localStorage.setItem('declinedModel', declinedModel)
             if(decryptResp.error == false){
                 this.props.history.push(`/two_wheeler_OtherComprehensiveTP/${productId}`);
             }
@@ -295,8 +298,7 @@ class TwoWheelerVehicleDetails extends Component {
 
     componentDidMount() {
         this.getInsurerList();
-        this.fetchData();
-        
+        this.fetchData();       
     }
 
 
