@@ -862,6 +862,7 @@ class OtherComprehensiveMISCD extends Component {
                 'body_idv_value' : bodySliderVal ? bodySliderVal : defaultBodySliderValue,
                 'fuel_type' : values.fuel_type,
                 'trailer_array' : values.trailer_array,
+                'page_name': `OtherComprehensive_MISCD/${productId}`,
             }
         }
         else {
@@ -878,7 +879,8 @@ class OtherComprehensiveMISCD extends Component {
                 'puc': values.puc,
                 'page_name': `OtherComprehensive/${productId}`,
                 'body_idv_value' : bodySliderVal ? bodySliderVal : defaultBodySliderValue,
-                'fuel_type' : values.fuel_type
+                'fuel_type' : values.fuel_type,
+                'page_name': `OtherComprehensive_MISCD/${productId}`,
             }
         }
         console.log('post_data',post_data)

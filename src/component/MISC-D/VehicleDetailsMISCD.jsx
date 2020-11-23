@@ -551,7 +551,8 @@ class VehicleDetailsMISCD extends Component {
                 'valid_previous_policy': values.valid_previous_policy,
                 'page_name': `VehicleDetails/${productId}`,
                 'claim_array': JSON.stringify(values.claim_array),
-                'no_of_claim': values.no_of_claim
+                'no_of_claim': values.no_of_claim,
+                'page_name': `VehicleDetails_MISCD/${productId}`,
             } 
         }
         else if(values.policy_type_id == '1')  {
@@ -571,7 +572,8 @@ class VehicleDetailsMISCD extends Component {
                 'valid_previous_policy': 0,
                 'page_name': `VehicleDetails/${productId}`,
                 'claim_array': JSON.stringify(values.claim_array),
-                'no_of_claim': values.no_of_claim
+                'no_of_claim': values.no_of_claim,
+                'page_name': `VehicleDetails_MISCD/${productId}`,
             } 
         }
 

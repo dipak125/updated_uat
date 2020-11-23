@@ -463,7 +463,8 @@ class AdditionalDetailsMISCD extends Component {
             'eia_no': values['eia_no'],
             'address': values['address'],          
             'gstn_no': values['gstn_no'],
-            'salutation_id': values['salutation_id']
+            'salutation_id': values['salutation_id'],
+            'page_name': `AdditionalDetails_MISCD/${productId}`,
         }
         if(motorInsurance.policy_for == '1'){
             post_data['dob'] = moment(values['dob']).format("YYYY-MM-DD")

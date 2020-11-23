@@ -695,6 +695,8 @@ class OtherComprehensiveGCV extends Component {
 
         let csc_data = localStorage.getItem('users') ? localStorage.getItem('users') : "";
         let csc_user_type = "";
+        let total_idv=0
+        let other_idv=0
 
         if(csc_data && sessionStorage.getItem('csc_id')) {
             let encryption = new Encryption();
@@ -720,6 +722,13 @@ class OtherComprehensiveGCV extends Component {
                 'B00070' : {'value': values.B00070_value},
                 'B00005' : {'value': values.B00005_value}
             }
+            if(values.B00004_value){
+                other_idv = other_idv + parseInt(values.B00004_value)
+            }
+            if(values.B00003_value){
+                other_idv = other_idv + parseInt(values.B00003_value)
+            }
+            
         }
 
         const post_data = {
@@ -736,10 +745,13 @@ class OtherComprehensiveGCV extends Component {
             // 'cng_kit': cng_kit_flag,
             // 'cngKit_Cost': cngKit_Cost
         }
+        console.log('other_idv', other_idv)
+        total_idv = parseInt(other_idv) + parseInt(post_data.idv_value)+parseInt(post_data.body_idv_value)
         console.log('fullQuote_post_data', post_data)
+        console.log('total_idv', total_idv)
 
-        if((post_data.idv_value > 5000000 || post_data.body_idv_value > 5000000) && csc_user_type == "POSP" ) {
-            swal("Quote cannot proceed with IDV greater than 5000000")
+        if(( total_idv> 5000000) && csc_user_type == "POSP" ) {
+            swal("Quote cannot proceed with total IDV (including IDV, Body IDV, Electrical and Non-Electrical IDV) greater than 5000000")
             this.props.loadingStop();
             return false
         }
@@ -825,6 +837,8 @@ class OtherComprehensiveGCV extends Component {
 
         const formData = new FormData();
         let encryption = new Encryption();
+        let total_idv = 0
+        let other_idv = 0
         let post_data = {}
         if(add_more_coverage.length > 0){
             post_data = {
@@ -847,6 +861,13 @@ class OtherComprehensiveGCV extends Component {
                 'fuel_type' : values.fuel_type,
                 'trailer_array' : values.trailer_array,
             }
+            if(values.B00004_value){
+                other_idv = other_idv + parseInt(values.B00004_value)
+            }
+            if(values.B00003_value){
+                other_idv = other_idv + parseInt(values.B00003_value)
+            }
+            total_idv=parseInt(post_data.idv_value)+parseInt(post_data.body_idv_value)+other_idv
         }
         else {
             post_data = {
@@ -864,10 +885,13 @@ class OtherComprehensiveGCV extends Component {
                 'body_idv_value' : bodySliderVal ? bodySliderVal : defaultBodySliderValue,
                 'fuel_type' : values.fuel_type
             }
+            total_idv=parseInt(post_data.idv_value)+parseInt(post_data.body_idv_value)
         }
         console.log('post_data',post_data)
-        if(post_data.idv_value > 5000000 && csc_user_type == "POSP" ) {
-            swal("Quote cannot proceed with IDV greater than 5000000")
+        console.log('other_idv', other_idv)
+        console.log('total_idv', total_idv)
+        if((total_idv > 5000000) && csc_user_type == "POSP" ) {
+            swal("Quote cannot proceed with total IDV (including IDV, Body IDV, Electrical and Non-Electrical IDV) greater than 5000000")
             this.props.loadingStop();
             return false
         }

@@ -260,7 +260,7 @@ class RiskDetails extends Component {
             this.props.history.push(`/OtherDetails/${productId}`);
         } else {
             this.props.loadingStop();
-            swal("Thank you for showing your interest for buying product.Due to some reasons, we are not able to issue the policy online.Please call 1800 22 1111");
+            swal(res.data.msg);
             actions.setSubmitting(false);
         }
         }).

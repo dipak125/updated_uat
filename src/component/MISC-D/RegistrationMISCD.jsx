@@ -177,7 +177,7 @@ handleSubmit=(values)=>{
                 'policy_for': values.policy_for,
                 'subclass_id' : values.subclass_id,
                 'fastlaneLog_id': this.state.fastLaneData && this.state.fastLaneData.fastlaneLog_id ? this.state.fastLaneData.fastlaneLog_id : fastlanelog && fastlanelog.id ? fastlanelog.id : "",
-
+                'page_name': `Registration_MISCD/${productId}`
             } 
         }
         else {
@@ -194,7 +194,8 @@ handleSubmit=(values)=>{
                 'policy_type_id':values.policy_type,
                 'policy_for': values.policy_for,
                 'subclass_id' : values.subclass_id,
-                'fastlaneLog_id': this.state.fastLaneData && this.state.fastLaneData.fastlaneLog_id ? this.state.fastLaneData.fastlaneLog_id : fastlanelog && fastlanelog.id ? fastlanelog.id : ""
+                'fastlaneLog_id': this.state.fastLaneData && this.state.fastLaneData.fastlaneLog_id ? this.state.fastLaneData.fastlaneLog_id : fastlanelog && fastlanelog.id ? fastlanelog.id : "",
+                'page_name': `Registration_MISCD/${productId}`
             } 
         }
 
