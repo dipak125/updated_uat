@@ -310,6 +310,14 @@ const PremiumMISCD = Loadable({
 });
 
 
+//  ************ Vedvag Payment Gateway ******************
+
+const VedvagGateway = Loadable({
+    loader: () => import(/*webpackChunkName: "Products" */"../common/Vedvag_gateway.jsx"),
+    loading: () => loadingContent
+});
+
+
 
 class Routes extends Component {
     render() {
@@ -420,6 +428,9 @@ class Routes extends Component {
                         <PrivateRoute exact path="/OtherComprehensive_MISCD/:productId" component={OtherComprehensiveMISCD} />
                         <PrivateRoute exact path="/AdditionalDetails_MISCD/:productId" component={AdditionalDetailsMISCD} />  
                         <PrivateRoute exact path="/Premium_MISCD/:productId" component={PremiumMISCD} />
+
+                        {/************ Vedvag Payment Gateway ******************/}
+                        <PrivateRoute exact path="/Vedvag_gateway/:productId" component={VedvagGateway} />
 
 
 

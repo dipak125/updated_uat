@@ -17,7 +17,10 @@ import fuel from '../common/FuelTypes';
 import swal from 'sweetalert';
 import moment from "moment";
 
-const initialValue = {}
+const initialValue = {
+    gateway : ""
+}
+const menumaster_id = 7
 
 const validatePremium = Yup.object().shape({
     refNo: Yup.string().notRequired('Reference number is required')
@@ -56,7 +59,7 @@ class Premium_sme extends Component {
             breakin_flag: 0,
             policyHolder_refNo: queryString.parse(this.props.location.search).access_id ? 
                                 queryString.parse(this.props.location.search).access_id : 
-                                localStorage.getItem("policyHolder_refNo")
+                                localStorage.getItem("policy_holder_ref_no")
         };
     }
 
@@ -89,7 +92,8 @@ class Premium_sme extends Component {
         console.log("values-----",values)
         // this.setState({ show: true, refNo: values.refNo, whatsapp: values.whatsapp });
         const {policyHolder} = this.state
-        if(policyHolder && policyHolder.bcmaster && policyHolder.bcmaster.paymentgateway && policyHolder.bcmaster.paymentgateway.slug) {
+        
+        if(policyHolder && policyHolder.bcmaster && policyHolder.bcmaster.paymentgateway && policyHolder.bcmaster.paymentgateway.slug && values.gateway == 1) {
             if(policyHolder.bcmaster.paymentgateway.slug == "csc_wallet") {
                 this.payment()
             }
@@ -100,6 +104,33 @@ class Premium_sme extends Component {
                 this.paypoint_payment()
             }
         }
+        else if (policyHolder && policyHolder.bcmaster && policyHolder.bcmaster.paymentgateway && policyHolder.bcmaster.paymentgateway.slug && values.gateway == 2) {
+            this.props.history.push(`/Vedvag_gateway/${this.props.match.params.productId}?access_id=${this.state.policyHolder_refNo}`);
+        }
+    }
+
+
+    callBreakin=()=>{
+
+        const formData = new FormData();
+        let encryption = new Encryption();
+        let policyHolder_id = this.state.policyHolder_refNo ? this.state.policyHolder_refNo : '0'
+        let bc_data = sessionStorage.getItem('bcLoginData') ? sessionStorage.getItem('bcLoginData') : "";
+        if(bc_data) {
+            bc_data = JSON.parse(encryption.decrypt(bc_data));
+        }
+        formData.append('bcmaster_id', sessionStorage.getItem('csc_id') ? "5" : bc_data ? bc_data.agent_id : "" ) 
+        formData.append('ref_no', policyHolder_id) 
+
+        this.props.loadingStart();
+        axios.post('breakin/create',formData)
+        .then(res=>{
+            swal(`Your breakin request has been raised. Your inspection Number: ${res.data.data.inspection_no}`)
+            this.props.loadingStop();
+        }).
+        catch(err=>{
+            this.props.loadingStop();
+        })  
     }
 
     getAccessToken = (motorInsurance) => {
@@ -318,6 +349,10 @@ class Premium_sme extends Component {
     render() {
         const { policyHolder, show, fulQuoteResp, motorInsurance, error, error1, refNumber, paymentStatus, relation, memberdetails,nomineedetails, vehicleDetails, breakin_flag } = this.state
         const { productId } = this.props.match.params
+
+        const policyHolder_refNo = queryString.parse(this.props.location.search).access_id ? 
+        queryString.parse(this.props.location.search).access_id : 
+        localStorage.getItem("policyHolder_refNo")
 
         const errMsg =
             error && error.message ? (
@@ -648,15 +683,60 @@ class Premium_sme extends Component {
                                                             </Col>
                                                                 <Col sm={12} md={6}>
                                                                     <FormGroup>
-                                                                    <div className="paymntgatway">
+                                                                    {/* <div className="paymntgatway">
                                                                         Select Payment Gateway
                                                                         <div>
                                                                         <img src={require('../../assets/images/green-check.svg')} alt="" className="m-r-10" />
-
-                                                                        { this.state.quoteId && this.state.quoteId != '' ? <img src={require('../../assets/images/'+ this.state.logo)} alt="" /> :
+                                                                        { policyHolder && policyHolder.bcmaster && policyHolder.bcmaster.paymentgateway && policyHolder.bcmaster.paymentgateway.logo ? <img src={require('../../assets/images/'+ policyHolder.bcmaster.paymentgateway.logo)} alt="" /> :
                                                                         null
                                                                         }
                                                                         </div>
+                                                                    </div> */}
+                                                                     <div className="paymntgatway">
+                                                                        Select Payment Gateway
+                                                                        <div>
+                                                                        {/* <img src={require('../../assets/images/green-check.svg')} alt="" className="m-r-10" /> */}
+                                                                        <label className="customRadio3">
+                                                                        <Field
+                                                                            type="radio"
+                                                                            name='gateway'                                            
+                                                                            value='1'
+                                                                            key='1'  
+                                                                            onChange={(e) => {
+                                                                                setFieldValue(`gateway`, e.target.value);
+                                                                            }}
+                                                                            checked={values.gateway == '1' ? true : false}
+                                                                        />
+                                                                            <span className="checkmark " /><span className="fs-14"> 
+                                                                        
+                                                                                { policyHolder && policyHolder.bcmaster && policyHolder.bcmaster.paymentgateway && policyHolder.bcmaster.paymentgateway.logo ? <img src={require('../../assets/images/'+ policyHolder.bcmaster.paymentgateway.logo)} alt="" /> :
+                                                                                null
+                                                                                }
+                                                                            </span>
+                                                                        </label>
+                                                                        </div>
+
+                                                                        {policyHolder.bcmaster && policyHolder.bcmaster.id === 2 ?
+                                                                        <div>
+                                                                        <label className="customRadio3">
+                                                                        <Field
+                                                                            type="radio"
+                                                                            name='gateway'                                            
+                                                                            value='2'
+                                                                            key='1'  
+                                                                            onChange={(e) => {
+                                                                                setFieldValue(`gateway`, e.target.value);
+                                                                            }}
+                                                                            checked={values.gateway == '2' ? true : false}
+                                                                        />
+                                                                            <span className="checkmark " /><span className="fs-14"> 
+                                                                        
+                                                                                { policyHolder.bcmaster && policyHolder.bcmaster.id === 2 ? <img src={require('../../assets/images/vedavaag.png')} alt="" /> :
+                                                                                null
+                                                                                }
+                                                                            </span>
+                                                                        </label>
+                                                                        </div> : null }
                                                                     </div>
                                                                     </FormGroup>
                                                                 </Col>
@@ -664,7 +744,7 @@ class Premium_sme extends Component {
 
                                                             <div className="d-flex justify-content-left resmb">
                                                                 <Button className="backBtn" type="button" onClick={this.additionalDetails.bind(this,productId)}>Back</Button>
-                                                                {this.state.quoteId && this.state.quoteId != '' ?
+                                                                {this.state.quoteId && this.state.quoteId != '' && values.gateway != "" ?
                                                                     <Button type="submit"
                                                                         className="proceedBtn"  type="submit"  disabled={isSubmitting ? true : false}>
                                                                         Generate Policy

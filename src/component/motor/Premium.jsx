@@ -17,7 +17,10 @@ import fuel from '../common/FuelTypes';
 import swal from 'sweetalert';
 import moment from "moment";
 
-const initialValue = {}
+const initialValue = {
+    gateway : ""
+}
+const menumaster_id = 7
 
 const validatePremium = Yup.object().shape({
     refNo: Yup.string().notRequired('Reference number is required')
@@ -50,6 +53,7 @@ class Premium extends Component {
             nomineedetails:[],
             relation: [],
             policyHolder: [],
+	    step_completed: "0",
             vehicleDetails: [],
             previousPolicy: [],
             request_data: [],
@@ -88,7 +92,8 @@ class Premium extends Component {
     handleSubmit = (values) => {
         // this.setState({ show: true, refNo: values.refNo, whatsapp: values.whatsapp });
         const {policyHolder} = this.state
-        if(policyHolder && policyHolder.bcmaster && policyHolder.bcmaster.paymentgateway && policyHolder.bcmaster.paymentgateway.slug) {
+        
+        if(policyHolder && policyHolder.bcmaster && policyHolder.bcmaster.paymentgateway && policyHolder.bcmaster.paymentgateway.slug && values.gateway == 1) {
             if(policyHolder.bcmaster.paymentgateway.slug == "csc_wallet") {
                 this.payment()
             }
@@ -98,6 +103,9 @@ class Premium extends Component {
             if(policyHolder.bcmaster.paymentgateway.slug == "PPINL") {
                 this.paypoint_payment()
             }
+        }
+        else if (policyHolder && policyHolder.bcmaster && policyHolder.bcmaster.paymentgateway && policyHolder.bcmaster.paymentgateway.slug && values.gateway == 2) {
+            this.props.history.push(`/Vedvag_gateway/${this.props.match.params.productId}?access_id=${this.state.policyHolder_refNo}`);
         }
     }
 
@@ -115,9 +123,10 @@ class Premium extends Component {
                 let vehicleDetails = decryptResp.data.policyHolder ? decryptResp.data.policyHolder.vehiclebrandmodel : {};
                 let previousPolicy = decryptResp.data.policyHolder ? decryptResp.data.policyHolder.previouspolicy : {};
                 let request_data = decryptResp.data.policyHolder ? decryptResp.data.policyHolder.request_data : {}
-                
+                let step_completed = decryptResp.data.policyHolder ? decryptResp.data.policyHolder.step_no : "";
+		let dateDiff = 0
                 this.setState({
-                    motorInsurance,policyHolder,vehicleDetails, previousPolicy, request_data,
+                    motorInsurance,policyHolder,vehicleDetails,previousPolicy,request_data,step_completed,
                     refNumber: decryptResp.data.policyHolder.reference_no,
                     paymentStatus: decryptResp.data.policyHolder.payment ? decryptResp.data.policyHolder.payment[0] : [],
                     memberdetails : decryptResp.data.policyHolder ? decryptResp.data.policyHolder : [],
@@ -320,7 +329,7 @@ class Premium extends Component {
     render() {
         const { policyHolder, show, fulQuoteResp, motorInsurance, error, error1, refNumber, paymentStatus, relation, memberdetails,nomineedetails, vehicleDetails, breakin_flag } = this.state
         const { productId } = this.props.match.params
-console.log('nomineedetails', nomineedetails)
+
         const errMsg =
             error && error.message ? (
                 <span className="errorMsg">
@@ -640,7 +649,7 @@ console.log('nomineedetails', nomineedetails)
                                                             </Col>
                                                                 <Col sm={12} md={6}>
                                                                     <FormGroup>
-                                                                    <div className="paymntgatway">
+                                                                    {/* <div className="paymntgatway">
                                                                         Select Payment Gateway
                                                                         <div>
                                                                         <img src={require('../../assets/images/green-check.svg')} alt="" className="m-r-10" />
@@ -648,29 +657,61 @@ console.log('nomineedetails', nomineedetails)
                                                                         null
                                                                         }
                                                                         </div>
+                                                                    </div> */}
+                                                                     <div className="paymntgatway">
+                                                                        Select Payment Gateway
+                                                                        <div>
+                                                                        {/* <img src={require('../../assets/images/green-check.svg')} alt="" className="m-r-10" /> */}
+                                                                        <label className="customRadio3">
+                                                                        <Field
+                                                                            type="radio"
+                                                                            name='gateway'                                            
+                                                                            value='1'
+                                                                            key='1'  
+                                                                            onChange={(e) => {
+                                                                                setFieldValue(`gateway`, e.target.value);
+                                                                            }}
+                                                                            checked={values.gateway == '1' ? true : false}
+                                                                        />
+                                                                            <span className="checkmark " /><span className="fs-14"> 
+                                                                        
+                                                                                { policyHolder && policyHolder.bcmaster && policyHolder.bcmaster.paymentgateway && policyHolder.bcmaster.paymentgateway.logo ? <img src={require('../../assets/images/'+ policyHolder.bcmaster.paymentgateway.logo)} alt="" /> :
+                                                                                null
+                                                                                }
+                                                                            </span>
+                                                                        </label>
+                                                                        </div>
+
+                                                                        {policyHolder.bcmaster && policyHolder.bcmaster.id === 2 ?
+                                                                        <div>
+                                                                        <label className="customRadio3">
+                                                                        <Field
+                                                                            type="radio"
+                                                                            name='gateway'                                            
+                                                                            value='2'
+                                                                            key='1'  
+                                                                            onChange={(e) => {
+                                                                                setFieldValue(`gateway`, e.target.value);
+                                                                            }}
+                                                                            checked={values.gateway == '2' ? true : false}
+                                                                        />
+                                                                            <span className="checkmark " /><span className="fs-14"> 
+                                                                        
+                                                                                { policyHolder.bcmaster && policyHolder.bcmaster.id === 2 ? <img src={require('../../assets/images/vedavaag.png')} alt="" /> :
+                                                                                null
+                                                                                }
+                                                                            </span>
+                                                                        </label>
+                                                                        </div> : null }
                                                                     </div>
                                                                     </FormGroup>
                                                                 </Col>
                                                             </Row>
 
-                                                            {/* <Row>
-                                                                <Col sm={12}>
-                                                                    <label className="customCheckBox formGrp formGrp fscheck">I want to receive my Quote & Policy Details on Whatsapp
-                                                                        <Field
-                                                                            type="checkbox"
-                                                                            name='whatsapp'
-                                                                            value='1'
-                                                                            className="user-self"
-                                                                        // checked={values.consumables ? true : false}
-                                                                        />
-                                                                        <span className="checkmark mL-0"></span>
-                                                                        <span className="error-message"></span>
-                                                                    </label>
-                                                                </Col>
-                                                            </Row> */}
+                                                            
                                                             <div className="d-flex justify-content-left resmb">
                                                                 <Button className="backBtn" type="button" onClick={this.additionalDetails.bind(this, productId)}>Back</Button>
-                                                                {fulQuoteResp.QuotationNo && breakin_flag == 0 ?
+                                                                {fulQuoteResp.QuotationNo && breakin_flag == 0 && values.gateway != "" ?
                                                                     <Button type="submit"
                                                                         className="proceedBtn"
                                                                     >
