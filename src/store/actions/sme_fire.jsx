@@ -4,7 +4,8 @@ import {
     SME_FIRE_UPDATE,
     SME_FIRE_OTHER_DETAILS,
     SME_FIRE_PROPOSER_DETAILS,
-    COMM_ADDRESS
+    COMM_ADDRESS,
+    TRANSACTION_ID
 } from "../actions/actionTypes";
 
 
@@ -114,6 +115,18 @@ export const setCommunicationAddress = ( request ) => {
                 com_pincode_id:request.pincode_id,
                 com_block_no:request.block_no,
                 com_house_flat_no:request.house_flat_no,
+            }
+        });
+    }
+}
+
+export const setTransactionId = ( request ) => {
+    return dispatch => {
+        dispatch({
+            type: TRANSACTION_ID,
+            payload: {
+                receipt_no:request.receipt_no, 
+                quoteNo: request.quoteNo
             }
         });
     }

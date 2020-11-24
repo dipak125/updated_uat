@@ -9,6 +9,7 @@ import { connect } from "react-redux";
 import swal from 'sweetalert';
 import Encryption from '../../shared/payload-encryption';
 import queryString from 'query-string';
+import { setSmeRiskData,setSmeData,setSmeOthersDetailsData,setSmeProposerDetailsData,setCommunicationAddress,setTransactionId } from '../../store/actions/sme_fire';
 
 // const refNumber = localStorage.getItem("policyHolder_id")
 
@@ -18,7 +19,6 @@ class ThankYouCCM extends Component {
     accessToken: "",
     response_text: [],
     policyNo : "",
-    quoteNo : "",
     retry : 2,
     retryCount: 0,
     policy_holder_id: localStorage.getItem("policyHolder_id"),
@@ -36,22 +36,36 @@ class ThankYouCCM extends Component {
         retryCount: this.state.retryCount + 1
       });
       this.props.loadingStart();
-    axios
-      .post(`/sme/agent-receipt`, formData)
-      .then(res => {
-        if(res.data.error === false) {
-          this.setState({
-            quoteNo: res.data.data.quoteNo
+        if(this.props.receipt_no === null || this.props.receipt_no == "") {
+          axios
+          .post(`/sme/agent-receipt`, formData)
+          .then(res => {
+            if(res.data.error === false ) {
+              this.props.setTransactionId(
+                {
+                  receipt_no:res.data.data.receipt_no,
+                  quoteNo:res.data.data.quoteNo,
+                }
+              )
+              this.issuePolicy()
+            }    
+            else {         
+    
+              this.props.loadingStop()
+              swal(res.data.msg)
+            }   
+          })
+          .catch(err => {
+            this.setState({
+              accessToken: []
+            });
+            this.props.loadingStop();
           });
+        }
+        else {
           this.issuePolicy()
-        }       
-      })
-      .catch(err => {
-        this.setState({
-          accessToken: []
-        });
-        this.props.loadingStop();
-      });
+        }
+    
     }
     else {
       this.props.loadingStop();
@@ -330,6 +344,122 @@ class ThankYouCCM extends Component {
       });
   }
 
+  fetchPolicyDetails=()=>{
+    let policy_holder_ref_no = localStorage.getItem("policy_holder_ref_no") ? localStorage.getItem("policy_holder_ref_no"):0;
+    console.log('this.props.policy_holder_ref_no',this.props.policy_holder_ref_no);
+
+    if(this.props.policy_holder_ref_no == null && policy_holder_ref_no != ''){
+        
+        this.props.loadingStart();
+        axios.get(`sme/details/${policy_holder_ref_no}`)
+        .then(res=>{
+          
+          
+          if(res.data.data.policyHolder.step_no > 0){
+
+            this.props.setData({
+                start_date:res.data.data.policyHolder.request_data.start_date,
+                end_date:res.data.data.policyHolder.request_data.end_date,
+                
+                policy_holder_id:res.data.data.policyHolder.id,
+                policy_holder_ref_no:policy_holder_ref_no,
+                request_data_id:res.data.data.policyHolder.request_data.id,
+                completed_step:res.data.data.policyHolder.step_no,
+                menumaster_id:res.data.data.policyHolder.menumaster_id
+            });
+        }
+        
+        if(res.data.data.policyHolder.step_no == 1 || res.data.data.policyHolder.step_no > 1){
+
+            let risk_arr = JSON.parse(res.data.data.policyHolder.smeinfo.risk_address);
+
+            this.props.setRiskData(
+                {
+                    house_building_name:risk_arr.house_building_name,
+                    block_no:risk_arr.block_no,
+                    street_name:risk_arr.street_name,
+                    plot_no:risk_arr.plot_no,
+                    house_flat_no:risk_arr.house_flat_no,
+                    pincode:res.data.data.policyHolder.smeinfo.pincode,
+                    pincode_id:res.data.data.policyHolder.smeinfo.pincode_id,
+
+                    buildings_sum_insured:res.data.data.policyHolder.smeinfo.buildings_sum_insured,
+                    content_sum_insured:res.data.data.policyHolder.smeinfo.content_sum_insured,
+                    stock_sum_insured:res.data.data.policyHolder.smeinfo.stock_sum_insured
+                }
+            );
+        }
+        
+        if(res.data.data.policyHolder.step_no == 2 || res.data.data.policyHolder.step_no > 2){
+
+            this.props.setSmeOthersDetails({
+            
+                Commercial_consideration: res.data.data.policyHolder.previouspolicy ? res.data.data.policyHolder.previouspolicy.Commercial_consideration : null,
+                previous_start_date: res.data.data.policyHolder.previouspolicy ? res.data.data.policyHolder.previouspolicy.start_date : null,
+                previous_end_date: res.data.data.policyHolder.previouspolicy ? res.data.data.policyHolder.previouspolicy.end_date : null,
+                Previous_Policy_No: res.data.data.policyHolder.previouspolicy ? res.data.data.policyHolder.previouspolicy.policy_no : null,
+                insurance_company_id: res.data.data.policyHolder.previouspolicy ? res.data.data.policyHolder.previouspolicy.insurancecompany_id : null,
+                previous_city: res.data.data.policyHolder.previouspolicy ? res.data.data.policyHolder.previouspolicy.address : null
+
+            });
+        }
+        
+        if(res.data.data.policyHolder.step_no == 3 || res.data.data.policyHolder.step_no > 3){
+            let address = '';
+            if(res.data.data.policyHolder.address == null){
+                // this.autoPopulateAddress();
+            }else{
+                address = JSON.parse(res.data.data.policyHolder.address);
+
+                this.props.setSmeProposerDetails(
+                    {
+                        first_name:res.data.data.policyHolder.first_name,
+                        last_name:res.data.data.policyHolder.last_name,
+                        salutation_id:res.data.data.policyHolder.salutation_id,
+                        date_of_birth:res.data.data.policyHolder.dob,
+                        email_id:res.data.data.policyHolder.email_id,
+                        mobile:res.data.data.policyHolder.mobile,
+                        gender:res.data.data.policyHolder.gender,
+                        pan_no:res.data.data.policyHolder.pancard,
+                        gstn_no:res.data.data.policyHolder.gstn_no,
+
+                        com_street_name:address.street_name,
+                        com_plot_no:address.plot_no,
+                        com_building_name:address.house_building_name,
+                        com_block_no:address.block_no,
+                        com_house_flat_no:address.house_flat_no,
+                        com_pincode:res.data.data.policyHolder.pincode,
+                        com_pincode_id:res.data.data.policyHolder.pincode_id
+                    }
+                );
+            }        
+        }
+
+        if(res.data.data.policyHolder.step_no > 3 ){
+
+          this.props.setTransactionId({
+          
+            // receipt_no: res.data.data.policyHolder.smeinfo ? res.data.data.policyHolder.smeinfo.receipt_no : null,
+            // quoteNo: res.res.data.data.policyHolder.request_data ? res.data.data.policyHolder.request_data.quote_id : null
+            receipt_no: res.data.data.policyHolder.smeinfo.receipt_no,
+            quoteNo: res.data.data.policyHolder.request_data.quote_id
+
+          });
+      }
+      this.getAgentReceipt()
+      console.log("hello------------ ", res.data.data.policyHolder.smeinfo ? res.data.data.policyHolder.smeinfo.receipt_no : null)
+
+        })
+        .catch(err => {
+            this.props.loadingStop();
+        })
+    }else{
+      this.getAgentReceipt()
+        // this.autoPopulateAddress();
+    }
+    
+}
+
 
   componentDidMount() {
     // this.getAccessToken();       
@@ -347,11 +477,13 @@ class ThankYouCCM extends Component {
     window.onpopstate = function () {
       window.history.go(1);
     };
-    this.getAgentReceipt()
+    // this.getAgentReceipt()
+    this.fetchPolicyDetails()
     // this.getPolicyHolderDetails();
   }
   render() {
-    const { policyNo, quoteNo, retry } = this.state
+    const { policyNo, retry } = this.state
+    const {quoteNo} = this.props
     return (
       <>
         <BaseComponent>
@@ -395,14 +527,52 @@ class ThankYouCCM extends Component {
 
 const mapStateToProps = state => {
   return {
-    loading: state.loader.loading
+    loading: state.loader.loading,
+    
+    first_name:state.sme_fire.first_name,
+    last_name:state.sme_fire.last_name,
+    salutation_id:state.sme_fire.salutation_id,
+    date_of_birth:state.sme_fire.date_of_birth,
+    email_id:state.sme_fire.email_id,
+    mobile:state.sme_fire.mobile,
+    gender:state.sme_fire.gender,
+    pan_no:state.sme_fire.pan_no,
+    gstn_no:state.sme_fire.gstn_no,
+    com_street_name:state.sme_fire.com_street_name,
+    com_plot_no:state.sme_fire.com_plot_no,
+    com_building_name:state.sme_fire.com_building_name,
+    com_block_no:state.sme_fire.com_block_no,
+    com_house_flat_no:state.sme_fire.com_house_flat_no,
+    com_pincode:state.sme_fire.com_pincode,
+    com_pincode_id:state.sme_fire.com_pincode_id,
+
+    house_building_name: state.sme_fire.house_building_name,
+    block_no: state.sme_fire.block_no,
+    street_name: state.sme_fire.street_name,
+    plot_no: state.sme_fire.plot_no,
+    house_flat_no: state.sme_fire.house_flat_no,
+    pincode: state.sme_fire.pincode,
+    pincode_id: state.sme_fire.pincode_id,
+
+    policy_holder_id:state.sme_fire.policy_holder_id,
+    policy_holder_ref_no:state.sme_fire.policy_holder_ref_no,
+    menumaster_id:state.sme_fire.menumaster_id,
+
+    quoteNo: state.sme_fire.quoteNo,
+    receipt_no: state.sme_fire.receipt_no,
   };
 };
 
 const mapDispatchToProps = dispatch => {
   return {
     loadingStart: () => dispatch(loaderStart()),
-    loadingStop: () => dispatch(loaderStop())
+    loadingStop: () => dispatch(loaderStop()),
+    setData:(data) => dispatch(setSmeData(data)),
+    setRiskData:(data) => dispatch(setSmeRiskData(data)),
+    setSmeOthersDetails:(data) => dispatch(setSmeOthersDetailsData(data)),
+    setSmeProposerDetails:(data) => dispatch(setSmeProposerDetailsData(data)),
+    setAddress:(data) => dispatch(setCommunicationAddress(data)),
+    setTransactionId:(data) => dispatch(setTransactionId(data)),
   };
 };
 

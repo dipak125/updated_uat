@@ -4,7 +4,8 @@ import {
     SME_FIRE_RISK,
     SME_FIRE_OTHER_DETAILS,
     SME_FIRE_PROPOSER_DETAILS,
-    COMM_ADDRESS
+    COMM_ADDRESS,
+    TRANSACTION_ID
 } from "../actions/actionTypes";
 
 const initialState = {
@@ -50,7 +51,9 @@ const initialState = {
         com_block_no:null,
         com_house_flat_no:null,
         com_pincode:null,
-        com_pincode_id:null
+        com_pincode_id:null,
+        receipt_no:null,
+        quoteNo:null
 
     
 }
@@ -118,6 +121,11 @@ const sme = ( state = initialState, action) => {
             com_house_flat_no:action.payload.com_house_flat_no,
             com_street_name:action.payload.com_street_name,
             com_plot_no:action.payload.com_plot_no
+        }
+
+        case TRANSACTION_ID: return {...state, 
+            receipt_no:action.payload.receipt_no,
+            quoteNo: action.payload.quoteNo
         }
 
         default: return state;
