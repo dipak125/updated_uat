@@ -460,7 +460,6 @@ class VehicleDetailsGCV extends Component {
     }  
     // const regex = new RegExp('^' + escapedValue, 'i');
     const regex = new RegExp( escapedValue, 'i');
-    console.log('newValue', regex)
     if(this.state.customerDetails && escapedValue.length >1) {
       return this.state.customerDetails.filter(language => regex.test(language.RTO_LOCATION));
     }
@@ -497,7 +496,7 @@ class VehicleDetailsGCV extends Component {
   //--------------------------------------------------------
 
     handleSubmit = (values, actions) => {
-        console.log('handleSubmit')
+
         const {productId} = this.props.match.params 
         const {motorInsurance, changeFlag} = this.state
         let policy_type = ageObj.whatIsCurrentMonth(values.registration_date) < 7 ? 6 : 1
@@ -526,6 +525,9 @@ class VehicleDetailsGCV extends Component {
             return false
         }
 
+        if(Math.floor(moment().diff(values.previous_end_date, 'days', true)) > 90) {
+            values.previous_claim_bonus = 1
+        }
 
         const formData = new FormData(); 
         let encryption = new Encryption();
@@ -733,7 +735,6 @@ class VehicleDetailsGCV extends Component {
     initClaimDetailsList = () => {
         const {previousPolicy} = this.state
         let previous_claims = previousPolicy && previousPolicy.previouspoliciesclaims ? previousPolicy.previouspoliciesclaims : []
-        console.log("previous_claims---------------- ", previous_claims)
         let innicialClaimList = []
             for (var i = 0; i < this.state.no_of_claim ; i++) {
                 innicialClaimList.push(
@@ -893,7 +894,7 @@ class VehicleDetailsGCV extends Component {
                             onSubmit={this.handleSubmit} 
                             validationSchema={vehicleRegistrationValidation}>
                             {({ values, errors, setFieldValue, setFieldTouched, isValid, isSubmitting, touched }) => {
-console.log("values-------------------------- ", values)
+
                                 return (
                                     <Form enableReinitialize = {true}>
                                         <Row>
