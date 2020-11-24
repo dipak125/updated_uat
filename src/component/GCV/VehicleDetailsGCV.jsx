@@ -253,7 +253,7 @@ const vehicleRegistrationValidation = Yup.object().shape({
             return "Please enter previous claim bonus"
         },
         function (value) {
-            if (this.parent.previous_is_claim == '0' && this.parent.previous_policy_name == '1' && (!value || value == '1')) {   
+            if (this.parent.previous_is_claim == '0' && this.parent.valid_previous_policy == '1' && Math.floor(moment().diff(this.parent.previous_end_date, 'days', true)) <= 90 && this.parent.previous_policy_name == '1' && (!value || value == '1')) {   
                 return false;    
             }
             return true;
@@ -894,7 +894,8 @@ class VehicleDetailsGCV extends Component {
                             onSubmit={this.handleSubmit} 
                             validationSchema={vehicleRegistrationValidation}>
                             {({ values, errors, setFieldValue, setFieldTouched, isValid, isSubmitting, touched }) => {
-
+// console.log("values------------ ", values)
+// console.log("errors------------ ", errors)
                                 return (
                                     <Form enableReinitialize = {true}>
                                         <Row>
