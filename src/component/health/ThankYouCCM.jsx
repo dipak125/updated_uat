@@ -19,7 +19,7 @@ class ThankYouCCM extends Component {
     accessToken: "",
     response_text: [],
     policyNo : "",
-    retry : 2,
+    retry : 1,
     retryCount: 0,
     policy_holder_id: localStorage.getItem("policyHolder_id"),
     refNumber:  queryString.parse(this.props.location.search).access_id ? 

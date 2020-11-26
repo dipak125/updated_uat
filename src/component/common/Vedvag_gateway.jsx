@@ -129,6 +129,7 @@ class Vedvag_gateway extends Component {
             }
             else {
                 swal("Payment failed")
+                this.props.loadingStop();
             }
 
         })
