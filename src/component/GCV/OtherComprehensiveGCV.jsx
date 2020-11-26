@@ -855,7 +855,7 @@ class OtherComprehensiveGCV extends Component {
                 'puc': values.puc,
                 'pa_cover': values.PA_flag ? values.PA_Cover : "0",
                 'pa_flag' : values.PA_cover_flag,
-                'page_name': `OtherComprehensive/${productId}`,
+                'page_name': `OtherComprehensive_GCV/${productId}`,
                 'coverage_data': JSON.stringify(coverage_data),
                 'body_idv_value' : bodySliderVal ? bodySliderVal : defaultBodySliderValue,
                 'fuel_type' : values.fuel_type,
@@ -881,15 +881,15 @@ class OtherComprehensiveGCV extends Component {
                 'engine_no': values.engine_no,
                 'idv_value': sliderVal ? sliderVal : defaultSliderValue.toString(),
                 'puc': values.puc,
-                'page_name': `OtherComprehensive/${productId}`,
+                'page_name': `OtherComprehensive_GCV/${productId}`,
                 'body_idv_value' : bodySliderVal ? bodySliderVal : defaultBodySliderValue,
                 'fuel_type' : values.fuel_type
             }
             total_idv=parseInt(post_data.idv_value)+parseInt(post_data.body_idv_value)
         }
-        console.log('post_data',post_data)
-        console.log('other_idv', other_idv)
-        console.log('total_idv', total_idv)
+        // console.log('post_data',post_data)
+        // console.log('other_idv', other_idv)
+        // console.log('total_idv', total_idv)
         if((total_idv > 5000000) && csc_user_type == "POSP" ) {
             swal("Quote cannot proceed with total IDV (including IDV, Body IDV, Electrical and Non-Electrical IDV) greater than 5000000")
             this.props.loadingStop();

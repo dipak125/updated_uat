@@ -213,8 +213,9 @@ class TwoWheelerVehicleDetails extends Component {
         let newPolStartDate = addDays(new Date(), 1)           
         let newPolEndDate = addDays(new Date(newPolStartDate), 364) 
         let vehicleAge = Math.floor(moment(newPolStartDate).diff(values.registration_date, 'months', true))
-        let policy_type = vehicleAge < 6 ? 6 : 1
-        console.log("vehicleAge===", vehicleAge)
+        let vehicleAgeDays = Math.floor(moment(newPolStartDate).diff(values.registration_date, 'days', true))
+        let policy_type = vehicleAgeDays < 181 ? 6 : 1
+        console.log("vehicleAge===", vehicleAgeDays)
         const formData = new FormData(); 
         let post_data = {}
         if(motorInsurance && motorInsurance.policytype_id && motorInsurance.policytype_id == '1') {

@@ -20,7 +20,7 @@ import Encryption from '../../shared/payload-encryption';
 const minDobAdult = moment(moment().subtract(100, 'years').calendar())
 const maxDobAdult = moment().subtract(18, 'years').calendar();
 const minDobNominee = moment(moment().subtract(100, 'years').calendar())
-const maxDobNominee = moment().subtract(18, 'years').calendar();
+const maxDobNominee = moment().subtract(3, 'months').calendar();
 
 const initialValue = {
     first_name:"",
@@ -138,36 +138,88 @@ const ownerValidation = Yup.object().shape({
         return "Please enter bank branch"
     }),
 
-    nominee_relation_with:Yup.string().required('Nominee relation is required'),
-    nominee_first_name: Yup.string().required('Nominee name is required')
-        .min(3, function() {
-            return "Name must be minimum 3 chracters"
-        })
-        .max(40, function() {
-            return "Name must be maximum 40 chracters"
-        })
-        .matches(/^[A-Za-z]{3,20}[\s][A-Za-z]{1,20}$/, function() {
-            return "Please enter valid name"
-        }),
-    // nominee_last_name:Yup.string().required('Nominee last name is required'), 
-    nominee_gender: Yup.string().required('Nominee gender is required')
-        .matches(/^[MmFf]$/, function() {
-            return "Please select valid gender"
+    nominee_relation_with: Yup.string().when(['pa_flag'], {
+        is: pa_flag => pa_flag == '1',       
+        then:  Yup.string().required("Please select nominee relation"),
+        otherwise: Yup.string().nullable()
     }),
-    nominee_dob:Yup.date().required('Nominee DOB is required')
-        .test(
-        "3monthsChecking",
-        function() {
-            return "Age should be minium 3 months"
-        },
-        function (value) {
-            if (value) {
-                const ageObj = new PersonAge();
-                return ageObj.whatIsMyAge(value) <= 100 && ageObj.whatIsMyAge(value) >= 18;
-            }
-            return true;
-        }
-    ),
+    nominee_first_name: Yup.string().when(['pa_flag'], {
+        is: pa_flag => pa_flag == '1',       
+        then: Yup.string().required("Nominee name is required")
+                .min(3, function() {
+                    return "Name must be minimum 3 chracters"
+                })
+                .max(40, function() {
+                    return "Name must be maximum 40 chracters"
+                })
+                .matches(/^[a-zA-Z]+([\s]?[a-zA-Z]+)([\s]?[a-zA-Z]+)$/, function() {
+                    return "Please enter valid name"
+                }),
+        otherwise: Yup.string().nullable()
+    }),
+    nominee_gender: Yup.string().when(['pa_flag'], {
+        is: pa_flag => pa_flag == '1',       
+        then: Yup.string().required("Nominee gender is required"),
+        otherwise: Yup.string()
+    }),
+    nominee_dob: Yup.date().when(['pa_flag'], {
+        is: pa_flag => pa_flag == '1',       
+        then: Yup.date()
+                .test(
+                    "3monthsChecking",
+                    function() {
+                        return "Age should be minium 3 months"
+                    },
+                    function (value) {
+                        if (value) {
+                            const ageObj = new PersonAge();
+                            return ageObj.whatIsMyAge(value) <= 100 && ageObj.whatIsMyAgeMonth(value) >= 3;
+                        }
+                        return true;
+                    }
+                ),
+        otherwise: Yup.date()   
+    }),
+
+    appointee_name: Yup.string().notRequired("Please enter appointee name")
+                .min(3, function() {
+                    return "Name must be minimum 3 chracters"
+                })
+                .max(40, function() {
+                    return "Name must be maximum 40 chracters"
+                })        
+                .matches(/^[a-zA-Z]+([\s]?[a-zA-Z]+)([\s]?[a-zA-Z]+)$/, function() {
+                    return "Please enter valid name"
+                }).test(
+                    "18YearsChecking",
+                    function() {
+                        return "Please enter appointee name"
+                    },
+                    function (value) {
+                        const ageObj = new PersonAge();
+                        if (ageObj.whatIsMyAge(this.parent.nominee_dob) < 18 && this.parent.pa_flag == 1 && !value) {   
+                            return false  
+                        }
+                        return true;
+                    }
+                ),
+
+
+    appointee_relation_with: Yup.string().notRequired("Please select relation")
+                .test(
+                    "18YearsChecking",
+                    function() {
+                        return 'Apppointee relation is required'
+                    },
+                    function (value) {
+                        const ageObj = new PersonAge();
+                        if (ageObj.whatIsMyAge(this.parent.nominee_dob) < 18 && this.parent.pa_flag == 1 && !value) {   
+                            return false;    
+                        }
+                        return true;
+                    }
+                ),
+
    
     is_eia_account: Yup.string().required('This field is required'),
     eia_no: Yup.string()
@@ -205,8 +257,28 @@ class AdditionalDetails extends Component {
         quoteId: "",
         bankDetails: {},
         addressDetails: [],
-        relation: []
+        relation: [],
+        is_appointee:0,
+        appointeeFlag: false,
+        motorInsurance: []
     };
+
+    ageCheck = (value) => {
+        const ageObj = new PersonAge();
+        let age = ageObj.whatIsMyAge(value)
+        if(age < 18){
+            this.setState({
+                appointeeFlag: true,
+                is_appointee:1
+            })
+        }
+        else {
+            this.setState({
+                appointeeFlag: false,
+                is_appointee:0
+            })
+        } 
+    }
     
 
     changePlaceHoldClassAdd(e) {
@@ -282,6 +354,9 @@ class AdditionalDetails extends Component {
             'is_eia_account': values['is_eia_account'],
             'eia_no': values['eia_no'],
             'address': values['address'],
+            'appointee_name': values['appointee_name'],
+            'appointee_relation_with': values['appointee_relation_with'],
+            'is_appointee': this.state.is_appointee,
             'page_name': `Additional_details/${productId}`,
         }
 console.log('post_data', post_data);
@@ -320,7 +395,8 @@ console.log('post_data', post_data);
                  let bankDetails = decryptResp.data.policyHolder && decryptResp.data.policyHolder.bankdetail ? decryptResp.data.policyHolder.bankdetail[0] : {};
                  let addressDetails = JSON.parse(decryptResp.data.policyHolder.pincode_response)
                  this.setState({
-                    quoteId, motorInsurance, previousPolicy, vehicleDetails, policyHolder, nomineeDetails, is_loan_account, is_eia_account, bankDetails, addressDetails
+                    quoteId, motorInsurance, previousPolicy, vehicleDetails, policyHolder, nomineeDetails, is_loan_account, is_eia_account, bankDetails, addressDetails,
+                    is_appointee: nomineeDetails ? nomineeDetails.is_appointee : ""
                 })
                 this.props.loadingStop();
                 this.fetchPrevAreaDetails(addressDetails)
@@ -419,8 +495,8 @@ console.log('post_data', post_data);
    
 
     render() {
-        const {showEIA, is_eia_account, showLoan, is_loan_account, nomineeDetails, 
-            bankDetails,policyHolder, stateName, pinDataArr, quoteId, addressDetails, relation} = this.state
+        const {showEIA, is_eia_account, showLoan, is_loan_account, nomineeDetails, is_appointee,appointeeFlag,
+            bankDetails,policyHolder, stateName, pinDataArr, quoteId, addressDetails, relation, motorInsurance} = this.state
         const {productId} = this.props.match.params 
         
 
@@ -439,12 +515,15 @@ console.log('post_data', post_data);
             nominee_first_name: nomineeDetails && nomineeDetails.first_name ? nomineeDetails.first_name : "",
             nominee_gender: nomineeDetails && nomineeDetails.gender ? nomineeDetails.gender : "",
             nominee_dob: nomineeDetails && nomineeDetails.dob ? new Date(nomineeDetails.dob) : "",
+            pa_flag : motorInsurance ? motorInsurance.pa_flag : 0,
             
             phone: policyHolder && policyHolder.mobile ? policyHolder.mobile : "",
             email:  policyHolder && policyHolder.email_id ? policyHolder.email_id : "",
             address: policyHolder && policyHolder.address ? policyHolder.address : "",
             is_eia_account:  is_eia_account,
             eia_no: policyHolder && policyHolder.eia_no ? policyHolder.eia_no : "",
+            appointee_relation_with: nomineeDetails && nomineeDetails.appointee_relation_with ? nomineeDetails.appointee_relation_with : "",
+            appointee_name: nomineeDetails && nomineeDetails.appointee_name ? nomineeDetails.appointee_name : "",
 
         });
 
@@ -801,6 +880,8 @@ console.log('post_data', post_data);
                                     </Col>
                                 </Row>
 
+                                {motorInsurance && motorInsurance.pa_flag == '1' ?
+                                <Fragment>
                                 <div className="d-flex justify-content-left carloan">
                                     <h4> Nominee Details</h4>
                                 </div>
@@ -859,6 +940,7 @@ console.log('post_data', post_data);
                                             className="datePckr"
                                             selected={values.nominee_dob}
                                             onChange={(val) => {
+                                                this.ageCheck(val)
                                                 setFieldTouched('nominee_dob');
                                                 setFieldValue('nominee_dob', val);
                                                 }}
@@ -893,6 +975,59 @@ console.log('post_data', post_data);
                                         </FormGroup>
                                     </Col>
                                 </Row>
+
+                                {appointeeFlag || is_appointee == '1' ? 
+                                    <div>
+                                        <div className="d-flex justify-content-left carloan">
+                                            <h4> </h4>
+                                        </div>
+                                        <div className="d-flex justify-content-left carloan">
+                                            <h4> Appointee  Details</h4>
+                                        </div>
+                                        <Row className="m-b-45">
+                                            <Col sm={12} md={4} lg={4}>
+                                                <FormGroup>
+                                                    <div className="insurerName">
+                                                        <Field
+                                                            name="appointee_name"
+                                                            type="text"
+                                                            placeholder="Appointee Name"
+                                                            autoComplete="off"
+                                                            onFocus={e => this.changePlaceHoldClassAdd(e)}
+                                                            onBlur={e => this.changePlaceHoldClassRemove(e)}
+                                                            value={values.appointee_name}
+                                                        />
+                                                        {errors.appointee_name && touched.appointee_name ? (
+                                                        <span className="errorMsg">{errors.appointee_name}</span>
+                                                        ) : null}
+                                                        
+                                                    </div>
+                                                </FormGroup>
+                                            </Col>
+                                            <Col sm={12} md={4} lg={6}>
+                                                <FormGroup>
+                                                    <div className="formSection">                                                           
+                                                        <Field
+                                                            name="appointee_relation_with"
+                                                            component="select"
+                                                            autoComplete="off"
+                                                            value={values.appointee_relation_with}
+                                                            className="formGrp"
+                                                        >
+                                                        <option value="">Relation with Nominee</option>
+                                                        { relation.map((relations, qIndex) => 
+                                                            <option value={relations.id}>{relations.name}</option>                                        
+                                                        )}
+                                                        </Field>     
+                                                        {errors.appointee_relation_with && touched.appointee_relation_with ? (
+                                                            <span className="errorMsg">{errors.appointee_relation_with}</span>
+                                                        ) : null}        
+                                                    </div>
+                                                </FormGroup>
+                                            </Col>
+                                        </Row>
+                                    </div>  : null } 
+                                </Fragment> : null }
 
                                 <Row>
                                     <Col sm={12} md={4} lg={4}>

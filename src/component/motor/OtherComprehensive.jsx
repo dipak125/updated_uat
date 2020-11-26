@@ -325,8 +325,6 @@ class OtherComprehensive extends Component {
 
                 setFieldTouched('vahanVerify')
                 setFieldValue('vahanVerify', true)
-                console.log('chasiNo', this.state.chasiNo)
-                console.log('engineNo', this.state.engineNo)
                 setFieldTouched('engine_no')
                 setFieldValue('engine_no', this.state.engineNo)
                 setFieldTouched('chasis_no')
@@ -746,7 +744,7 @@ class OtherComprehensive extends Component {
                     onSubmit={ serverResponse && serverResponse != "" ? (serverResponse.message ? this.getAccessToken : this.handleSubmit ) : this.getAccessToken} 
                     validationSchema={ComprehensiveValidation}>
                     {({ values, errors, setFieldValue, setFieldTouched, isValid, isSubmitting, touched }) => {
-console.log("errors---- ", errors)
+
                     return (
                         <Form>
                         <Row>

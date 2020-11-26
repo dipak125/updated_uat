@@ -520,7 +520,7 @@ class VehicleDetailsGCV extends Component {
         //     return false
         // }
 
-        if(values.valid_previous_policy == "0") {
+        if(values.valid_previous_policy == "0" && motorInsurance.policytype_id == 2) {
             swal("Thank you for showing your interest for buying product.Due to some reasons, we are not able to issue the policy online.Please call 1800 22 1111")
             return false
         }
@@ -554,7 +554,7 @@ class VehicleDetailsGCV extends Component {
                 'goodscarriedtype_id': values.goodscarriedtypes_id,
                 'permittype_id': values.permittypes_id,
                 'valid_previous_policy': values.valid_previous_policy,
-                'page_name': `VehicleDetails/${productId}`,
+                'page_name': `VehicleDetails_GCV/${productId}`,
                 'claim_array': JSON.stringify(values.claim_array),
                 'no_of_claim': values.no_of_claim
             } 
@@ -574,7 +574,7 @@ class VehicleDetailsGCV extends Component {
                 'goodscarriedtype_id': values.goodscarriedtypes_id,
                 'permittype_id': values.permittypes_id,
                 'valid_previous_policy': 0,
-                'page_name': `VehicleDetails/${productId}`,
+                'page_name': `VehicleDetails_GCV/${productId}`,
                 'claim_array': JSON.stringify(values.claim_array),
                 'no_of_claim': values.no_of_claim
             } 

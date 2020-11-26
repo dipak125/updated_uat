@@ -498,6 +498,8 @@ class Premium extends Component {
                                                                             : (<p></p>)}
                                                                                    
                                                                         <div>
+                                                                        {motorInsurance && motorInsurance.pa_flag == '1' ? 
+                                                                        <div>
                                                                         <strong>Nominee Details :</strong>
                                                                             <br/>
                                                                             <Row>
@@ -545,6 +547,40 @@ class Premium extends Component {
                                                                             <Row>
                                                                                 <p></p>
                                                                             </Row>
+                                                                            </div> : null }
+                                                                            {nomineedetails && nomineedetails.is_appointee == '1' && motorInsurance.pa_flag == '1' ?      
+                                                                            <div>
+                                                                            <strong>Appointee Details :</strong>
+                                                                                <br/>
+                                                                                <Row>
+                                                                                    <Col sm={12} md={6}>
+                                                                                        <Row>
+                                                                                            <Col sm={12} md={6}>
+                                                                                                <FormGroup>Name:</FormGroup>
+                                                                                            </Col>
+                                                                                            <Col sm={12} md={6}>
+                                                                                                <FormGroup>{nomineedetails && nomineedetails.appointee_name ? nomineedetails.appointee_name : null}</FormGroup>
+                                                                                            </Col>
+                                                                                        </Row>
+
+                                                                                        <Row>
+                                                                                            <Col sm={12} md={6}>
+                                                                                                <FormGroup>Relation With Nominee:</FormGroup>
+                                                                                            </Col>
+                                                                                            <Col sm={12} md={6}>
+                                                                                            {nomineedetails && nomineedetails.appointee_relation_with && relation.map((relations, qIndex) => 
+                                                                                            relations.id == nomineedetails.appointee_relation_with ?
+                                                                                                <FormGroup>{relations.name}</FormGroup> : null
+                                                                                            )}
+                                                                                            </Col>
+                                                                                        </Row>
+                                                                                    </Col>
+                                                                                </Row>
+                                                                                <Row>
+                                                                                    <p></p>
+                                                                                </Row>
+                                                                            </div> 
+                                                                            : null }
                                                                         </div>
                                                                     </div>
 
@@ -649,15 +685,6 @@ class Premium extends Component {
                                                             </Col>
                                                                 <Col sm={12} md={6}>
                                                                     <FormGroup>
-                                                                    {/* <div className="paymntgatway">
-                                                                        Select Payment Gateway
-                                                                        <div>
-                                                                        <img src={require('../../assets/images/green-check.svg')} alt="" className="m-r-10" />
-                                                                        { policyHolder && policyHolder.bcmaster && policyHolder.bcmaster.paymentgateway && policyHolder.bcmaster.paymentgateway.logo ? <img src={require('../../assets/images/'+ policyHolder.bcmaster.paymentgateway.logo)} alt="" /> :
-                                                                        null
-                                                                        }
-                                                                        </div>
-                                                                    </div> */}
                                                                      <div className="paymntgatway">
                                                                         Select Payment Gateway
                                                                         <div>
