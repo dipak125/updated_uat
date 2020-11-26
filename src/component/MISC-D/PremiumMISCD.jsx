@@ -5,7 +5,7 @@ import { Formik, Field, Form } from "formik";
 import BaseComponent from '.././BaseComponent';
 import SideNav from '../common/side-nav/SideNav';
 import Footer from '../common/footer/Footer';
-// import Otp from "./Otp"
+import Otp from "./Otp"
 import axios from "../../shared/axios";
 import { withRouter, Link, Route } from "react-router-dom";
 import { loaderStart, loaderStop } from "../../store/actions/loader";
@@ -22,12 +22,12 @@ const initialValue = {
 }
 const menumaster_id = 7
 
-const validatePremium = Yup.object().shape({
-    refNo: Yup.string().notRequired('Reference number is required')
-    .matches(/^[a-zA-Z0-9]*$/, function() {
-        return "Please enter valid reference number"
-    }),
-    })
+// const validatePremium = Yup.object().shape({
+//     refNo: Yup.string().notRequired('Reference number is required')
+//     .matches(/^[a-zA-Z0-9]*$/, function() {
+//         return "Please enter valid reference number"
+//     }),
+//     })
 
 class PremiumMISCD extends Component {
 
@@ -38,8 +38,10 @@ class PremiumMISCD extends Component {
 
         this.state = {
             show: false,
-            refNo: "",
-            whatsapp: "",
+            // refNo: "",
+            // whatsapp: "",
+            paymentButton: false,
+            smsButton: true,
             fulQuoteResp: [],
             motorInsurance: [],
             error: [],
@@ -53,7 +55,7 @@ class PremiumMISCD extends Component {
             nomineedetails:[],
             relation: [],
             policyHolder: [],
-	    step_completed: "0",
+	        step_completed: "0",
             vehicleDetails: [],
             previousPolicy: [],
             request_data: [],
@@ -70,9 +72,13 @@ class PremiumMISCD extends Component {
     }
 
     handleOtp(e) {
-        console.log("otp", e)
-        this.setState({ show: false, });
-        this.props.history.push(`/ThankYou_motor`)
+        if(e === true) {
+            this.setState({ show: false, paymentButton: true, smsButton: false});
+        }
+        else {
+            this.setState({ show: false, paymentButton: false, smsButton: true});
+        }
+        
     }
 
     changePlaceHoldClassAdd(e) {
@@ -87,6 +93,10 @@ class PremiumMISCD extends Component {
 
     additionalDetails = (productId) => {
         this.props.history.push(`/AdditionalDetails_MISCD/${productId}`);
+    }
+
+    handleModal = () => {
+        this.setState({ show: true});
     }
 
     handleSubmit = (values) => {
@@ -296,7 +306,8 @@ class PremiumMISCD extends Component {
     }
 
     render() {
-        const { policyHolder, show, fulQuoteResp, motorInsurance, error, error1, refNumber, paymentStatus, relation, memberdetails,nomineedetails, vehicleDetails, breakin_flag, step_completed } = this.state
+        const { policyHolder, show, fulQuoteResp, motorInsurance, error, error1, refNumber, paymentStatus, relation, memberdetails,
+            nomineedetails, vehicleDetails, breakin_flag, step_completed, paymentButton, smsButton } = this.state
         const { productId } = this.props.match.params
 
         const errMsg =
@@ -335,7 +346,7 @@ class PremiumMISCD extends Component {
                             <div className="col-sm-12 col-md-12 col-lg-10 col-xl-10 infobox">
                                 <h4 className="text-center mt-3 mb-3">SBI General Insurance Company Limited</h4>
                                 <Formik initialValues={initialValue} onSubmit={this.handleSubmit}
-                                validationSchema={validatePremium}
+                                // validationSchema={validatePremium}
                                 >
                                     {({ values, errors, setFieldValue, setFieldTouched, isValid, isSubmitting, touched }) => {
 
@@ -739,7 +750,12 @@ class PremiumMISCD extends Component {
                                                             
                                                             <div className="d-flex justify-content-left resmb">
                                                                 <Button className="backBtn" type="button" onClick={this.additionalDetails.bind(this, productId)}>Back</Button>
-                                                                {fulQuoteResp.QuotationNo && breakin_flag == 0 && values.gateway != "" ?
+                                                                
+                                                                {smsButton === true ?
+                                                                <Button className="backBtn" type="button" onClick={this.handleModal.bind(this)}>Send consent SMS & e-mail</Button>
+                                                                : null}
+
+                                                                {fulQuoteResp.QuotationNo && breakin_flag == 0 && values.gateway != "" && paymentButton === true ?
                                                                     <Button type="submit"
                                                                         className="proceedBtn"
                                                                     >
@@ -759,6 +775,21 @@ class PremiumMISCD extends Component {
                                         );
                                     }}
                                 </Formik>
+                                <Modal className="" bsSize="md"
+                                    show={show}
+                                    onHide={this.handleClose}>
+                                    <div className="otpmodal">
+                                        <Modal.Body>
+                                            <Otp
+                                                quoteNo={fulQuoteResp.QuotationNo}
+                                                duePremium={fulQuoteResp.DuePremium}
+                                                refNumber={refNumber}
+                                                // whatsapp={whatsapp}
+                                                reloadPage={(e) => this.handleOtp(e)}
+                                            />
+                                        </Modal.Body>
+                                    </div>
+                                </Modal>
                             </div> : step_completed == "" ? "Forbidden" : null }
                             <Footer />
                         </div>
