@@ -866,13 +866,14 @@ class TwoWheelerVerify extends Component {
 
                                             <DatePicker
                                                 name="previous_start_date"
-                                                minDate={new Date(minDate)}
+                                                
                                                 maxDate={new Date(maxDate)}
+                                                minDate={new Date(minDate)}
                                                 autoComplete="off"
                                                 dateFormat="dd MMM yyyy"
+                                                disabledKeyboardNavigation
+                                                openToDate={new Date(minDate)}
                                                 placeholderText="Previous policy start date"
-                                                peekPreviousMonth
-                                                peekPreviousYear
                                                 showMonthDropdown
                                                 showYearDropdown
                                                 dropdownMode="select"

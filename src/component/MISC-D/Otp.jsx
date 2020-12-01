@@ -178,9 +178,9 @@ class Otp extends Component {
                     return (
                     <Form>
                         <div className="text-center boxotpmodl">
-                            <img src={require('../../assets/images/desk.svg')} alt="" className="m-b-25" />
-                            <div className="verfy">Verify OTP</div>
-                            <div className="mobotp">Your one time password (OTP)  is sent to your registered mobile number XXXXXXX 445.</div>
+                            {/* <img src={require('../../assets/images/desk.svg')} alt="" className="m-b-25" /> */}
+                            <div className="verfy">Digital consent form</div>
+                            <div className="mobotp">An automated SMS & e-mail has been sent to customer with a Policy App code and Proposal link.</div>
                             <span className="errorMsg">{otp}</span>
 
                             <div className="d-flex justify-content-center otpInputWrap mx-auto m-b-25">
@@ -273,8 +273,8 @@ class Otp extends Component {
                                 </div>
                             </div>
                             <div className="m-b-25">
-                            <div className="sndSms">Resend OTP via SMS</div>
-                            <div>You can resend OTP in {seconds >= 0 ? seconds : 0} seconds</div>
+                            {/* <div className="sndSms">Resend Policy App code via SMS & e-mail</div> */}
+                            <div>You can resend Policy App code in {seconds >= 0 ? seconds : 0} seconds</div>
                             {errorMsg ? 
                             <span className="errorMsg">{errorMsg}</span> : null }
 
@@ -282,9 +282,9 @@ class Otp extends Component {
                            
                             <div className="text-center">
                             <Button className={`proceedBtn`} type="button" onClick={this.generateOtp} >
-                            Resend OTP
+                            Resend App code
                             </Button>
-
+                            &nbsp;&nbsp;
                             <Button className={`proceedBtn`} type="submit" disabled = {this.state.disable?true:false}>
                                 {isSubmitting ? 'Wait..' : 'Continue'}                            
                             </Button> 

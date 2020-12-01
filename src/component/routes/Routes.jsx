@@ -99,6 +99,8 @@ const TicketCount = Loadable({
     loading: () => loadingContent
 });
 
+// ========== HEALTH =============================================
+
 const Health = Loadable({
     loader: () => import(/*webpackChunkName: "Products" */"../health/InformationYourself.jsx"),
     loading: () => loadingContent
@@ -123,6 +125,9 @@ const PolicyDetails = Loadable({
     loader: () => import(/*webpackChunkName: "Products" */"../health/PolicyDetails.jsx"),
     loading: () => loadingContent
 });
+
+// =======================================================
+
 const ThankYou = Loadable({
     loader: () => import(/*webpackChunkName: "Products" */"../health/ThankYou.jsx"),
     loading: () => loadingContent
@@ -131,10 +136,12 @@ const ThankYouCCM = Loadable({
     loader: () => import(/*webpackChunkName: "Products" */"../health/ThankYouCCM.jsx"),
     loading: () => loadingContent
 });
+//============================ Motor Comprehensive=============================
 const SelectBrand = Loadable({
     loader: () => import(/*webpackChunkName: "Products" */"../motor/SelectBrand.jsx"),
     loading: () => loadingContent
 });
+//=====================================================================================
 
 // ========== Two-Wheeler TP =============================================
 
@@ -309,6 +316,35 @@ const PremiumMISCD = Loadable({
     loading: () => loadingContent
 });
 
+// ======================KSB Retail =============================================
+
+const Health_KSB = Loadable({
+    loader: () => import(/*webpackChunkName: "Products" */"../KSB-retail/InformationYourself_KSB.jsx"),
+    loading: () => loadingContent
+});
+// const MedicalDetails_KSB = Loadable({
+//     loader: () => import(/*webpackChunkName: "Products" */"../KSB-retail/MedicalDetails_KSB.jsx"),
+//     loading: () => loadingContent
+// });
+const SelectDuration_KSB = Loadable({
+    loader: () => import(/*webpackChunkName: "Products" */"../KSB-retail/SelectDuration_KSB.jsx"),
+    loading: () => loadingContent
+});
+const Address_KSB = Loadable({
+    loader: () => import(/*webpackChunkName: "Products" */"../KSB-retail/Address_KSB.jsx"),
+    loading: () => loadingContent
+});
+const NomineeDetails_KSB = Loadable({
+    loader: () => import(/*webpackChunkName: "Products" */"../KSB-retail/NomineeDetails_KSB.jsx"),
+    loading: () => loadingContent
+});
+const PolicyDetails_KSB = Loadable({
+    loader: () => import(/*webpackChunkName: "Products" */"../KSB-retail/PolicyDetails_KSB.jsx"),
+    loading: () => loadingContent
+});
+
+// ====================================================================
+
 
 //  ************ Vedvag Payment Gateway ******************
 
@@ -331,6 +367,7 @@ class Routes extends Component {
                         <PrivateRoute exact path="/Error" component={Error} />
 
                         <PrivateRoute exact path="/Products" component={Products} />
+
                         <PrivateRoute exact path="/Health/:productId" component={Health} />
                         <PrivateRoute exact path="/MedicalDetails/:productId" component={MedicalDetails} />
                         <PrivateRoute exact path="/SelectDuration/:productId" component={SelectDuration} />
@@ -429,9 +466,16 @@ class Routes extends Component {
                         <PrivateRoute exact path="/AdditionalDetails_MISCD/:productId" component={AdditionalDetailsMISCD} />  
                         <PrivateRoute exact path="/Premium_MISCD/:productId" component={PremiumMISCD} />
 
+                        {/************ KSB-Retail ******************/}
+                        <PrivateRoute exact path="/Health_KSB/:productId" component={Health_KSB} />
+                        {/* <PrivateRoute exact path="/MedicalDetails_KSB/:productId" component={MedicalDetails_KSB} /> */}
+                        <PrivateRoute exact path="/SelectDuration_KSB/:productId" component={SelectDuration_KSB} />
+                        <PrivateRoute exact path="/Address_KSB/:productId" component={Address_KSB} />    
+                        <PrivateRoute exact path="/NomineeDetails_KSB/:productId" component={NomineeDetails_KSB} /> 
+                        <PrivateRoute exact path="/PolicyDetails_KSB/:productId" component={PolicyDetails_KSB} />
+
                         {/************ Vedvag Payment Gateway ******************/}
                         <PrivateRoute exact path="/Vedvag_gateway/:productId" component={VedvagGateway} />
-
 
 
                         <PrivateRoute exact path="/UnderMaintenance" component={UnderMaintenance} />

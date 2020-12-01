@@ -227,6 +227,20 @@ class ThankYouCCM extends Component {
 
   }
 
+  downloadWording = () => {
+    let file_path = `${process.env.REACT_APP_PAYMENT_URL}/policy_pdf_download.php?wording=1`
+    console.log(file_path);
+    const url = file_path;
+    const pom = document.createElement('a');
+
+    pom.style.display = 'none';
+    pom.href = url;
+
+    document.body.appendChild(pom);
+    pom.click(); 
+    window.URL.revokeObjectURL(url);
+  }
+
   downloadDoc = () => {
     let file_path = `${process.env.REACT_APP_PAYMENT_URL}/ConnectPG/policy_pdf_download.php?refrence_no=${this.state.refNumber}`
     console.log(file_path);
@@ -506,6 +520,7 @@ class ThankYouCCM extends Component {
                         </div> : retry === 0 ?
                         <div className="d-flex justify-content-center align-items-center">
                           <button className="policy m-l-20" onClick={this.getAccessToken}>Policy Copy</button>
+                          <button className="policy m-l-20" onClick={this.downloadWording}>Policy Wording</button>
                         </div> : null
                       }
                       {/* <div className="d-flex justify-content-center align-items-center">
