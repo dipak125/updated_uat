@@ -1,5 +1,5 @@
-import React, { Component, Fragment } from 'react';
-import BaseComponent from '.././BaseComponent';
+import React, { Component } from 'react';
+import BaseComponent from '../BaseComponent';
 import SideNav from '../common/side-nav/SideNav';
 import { Row, Col, Modal, Button, FormGroup } from 'react-bootstrap';
 import DatePicker from "react-datepicker";
@@ -28,10 +28,7 @@ import Encryption from '../../shared/payload-encryption';
 const initialValues = {
 polStartDate: "",
 polEndDate: "",
-insureValue: "5",
-ksbperiod_id: "3",
-installment_premium_payment: "0",
-ksbplan_id: "1"
+insureValue: "5"    
 }
 
 const today = moment().add(30, 'days');;
@@ -39,16 +36,18 @@ const today = moment().add(30, 'days');;
     return current.isBefore(today)
   }
 
-  const Coverage = {
-
-    "TELECO": "Tele Consultation",
-    "HO_BEN": "Hospitalization Benefit",
-    "GPA_SC": "Personal Accident",
-    "HOSP_CASH": "Hospital Daily Cash",
-    "CONVEY_ALLOW": "Conveyance Allowance Benefit",
-    "GPA_SC_AD": "Accidental Death",
-    "GPA_SC_PTD": "Permanent Total Disablement",
+const sum_assured = {
+    "100000.00" : 1,
+    "150000.00" : 2,
+    "200000.00" : 3,
+    "250000.00" : 4,
+    "300000.00" : 5,
+    "350000.00" : 6,
+    "400000.00" : 7,
+    "450000.00" : 8,
+    "500000.00" : 9
 }
+
 const validateDuration =  Yup.object().shape({
     polStartDate: Yup.date().required("Please enter start date").test(
         "checkGreaterTimes",
@@ -90,13 +89,10 @@ const validateDuration =  Yup.object().shape({
     ),
     insureValue: Yup.string().required(function() {
         return "Please enter sum insured"
-    }),
-    ksbplan_id: Yup.string().required('Please select Plan'),
-    // ksbperiod_id: Yup.string().required('Please select payment type'),
-    // installment_premium_payment: Yup.string().required('Please select instalment facility'),
+    })
 })
 
-class SelectDuration extends Component {
+class arogya_SelectDuration extends Component {
 
     state = {
         accessToken: "",
@@ -107,12 +103,8 @@ class SelectDuration extends Component {
         error: [],
         endDateFlag: false,
         serverResponse: [],
-        insurePlan: [],
-        ksbinfo: [],
-        insurePeriod: [],
-        fulQuoteResp: [],
-        showInstallment:false,
-        installment_premium_payment:'',
+        bodySliderVal: '',
+        sliderVal: '',
       };
 
 
@@ -128,55 +120,96 @@ class SelectDuration extends Component {
 
 
     medicalQuestions = (productId) => {
-        this.props.history.push(`/Health_KSB/${productId}`);
+        this.props.history.push(`/arogya_MedicalDetails/${productId}`);
     }
 
     handleSubmit = (values) => {
+        let defaultSliderValue =  0
+        let defaultBodySliderValue =  0
         const {productId} = this.props.match.params
-        const {serverResponse} = this.state
+        const {serverResponse, bodySliderVal} = this.state
         const formData = new FormData(); 
         let encryption = new Encryption();
+
+       // formData.append('policy_holder_id', localStorage.getItem('policyHolder_id'));
         let policy_holder_id = localStorage.getItem('policyHolder_id') ? localStorage.getItem('policyHolder_id') : 0
+
+       /* formData.append('start_date', serverResponse.EffectiveDate);
+        formData.append('end_date', serverResponse.ExpiryDate);
+        formData.append('gross_premium', serverResponse.GrossPremium);
+        formData.append('service_tax', serverResponse.TGST);
+        formData.append('swatch_bharat_cess', '0');
+        formData.append('krishi_kalayan_cess', '0');
+        formData.append('net_premium', serverResponse.DuePremium);
+        formData.append('sum_insured', values.insureValue);
+        */
+
 
         const post_data = {
             'policy_holder_id':policy_holder_id,
             'start_date':serverResponse.EffectiveDate,
-            'end_date': moment(serverResponse.ExpiryDate).format("YYYY-MM-DD"),
-            'ksbplan_id': values.ksbplan_id,
-            'ksbperiod_id': values.ksbperiod_id,
-            'installment_premium_payment': values.installment_premium_payment,
-            'page_name': `SelectDuration_KSB/${productId}`,
-        
+            'end_date':serverResponse.ExpiryDate,
+            'gross_premium':serverResponse.GrossPremium,
+            'service_tax':serverResponse.TGST,
+            'swatch_bharat_cess':0,
+            'krishi_kalayan_cess':0,
+            'net_premium':serverResponse.DuePremium,
+            'sum_insured':values.insureValue,
+            'select_sum_insured': bodySliderVal ? bodySliderVal : defaultSliderValue.toString(),
         }
-        console.log("post_data---------- ", post_data)
         formData.append('enc_data',encryption.encrypt(JSON.stringify(post_data)))
+
 
         this.props.loadingStart();
         axios
-        .post(`ksb/duration-premium`, formData)
+        .post(`/duration-premium`, formData)
         .then(res => { 
-            this.props.loadingStop();
-            this.props.history.push(`/Address_KSB/${productId}`);
+            this.props.history.push(`/arogya_Address/${productId}`);
         })
         .catch(err => {
+    
           this.props.loadingStop();
         });     
+        this.props.loadingStop();
 
     }
 
+    getAccessToken = () => {
+        axios
+          .post(`/callTokenService`)
+          .then(res => {
+            if(res.data.access_token){ 
+                this.setState({
+                    accessToken: res.data.access_token
+                }) 
+                let value = []
+                value['polStartDate'] = new Date()
+                value['polEndDate'] = new Date(moment(value['polStartDate']).add(1, 'years').format("YYYY-MM-DD"))
+                this.props.loadingStop();
+                this.quote(value)
+            }
+            else {
+                swal("Thank you for showing your interest for buying product.Due to some reasons, we are not able to issue the policy online.Please call 180 22 1111");
+                this.props.loadingStop();
+            }
+          })
+          .catch(err => {
+            this.setState({
+                accessToken: []
+            });
+            this.props.loadingStop();
+          });
+      }
 
       getPolicyHolderDetails = () => {
         this.props.loadingStart();
-        let policyHolder_refNo = localStorage.getItem("policyHolder_refNo");
         axios
-          .get(`ksb/details/${policyHolder_refNo}`)
+          .get(`/policy-holder/${localStorage.getItem('policyHolder_id')}`)
           .then(res => { 
-            let ksbinfo =  res.data.data.policyHolder && res.data.data.policyHolder.ksbinfo  ? res.data.data.policyHolder.ksbinfo: []
-            let installment_premium_payment = res.data.data.policyHolder.ksbinfo && res.data.data.policyHolder.ksbinfo.installment_premium_payment == 0 ? "0" : res.data.data.policyHolder.ksbinfo.installment_premium_payment
             this.setState({
-                policyHolderDetails: res.data.data.policyHolder, ksbinfo, installment_premium_payment
+                policyHolderDetails: res.data.data.policyHolder
             }) 
-            this.fetchInsurePlan()
+            this.getAccessToken()
           })
           .catch(err => {
             this.setState({
@@ -186,59 +219,87 @@ class SelectDuration extends Component {
           });
       }
 
+    bodySliderValue = (value) => {
+        this.setState({
+            bodySliderVal: value,
+            serverResponse: [],
+            error: []
+        })
+    }
+
       quote = (value) => {
       const {accessToken} = this.state
-      if(value == "") {
-        value['polStartDate'] = new Date()
-        value['polEndDate'] = new Date(moment(value['polStartDate']).add(1, 'years').format("YYYY-MM-DD")) 
-        value['ksbplan_id'] = '1'
-        value['ksbperiod_id'] = '3'
-      }
-
+      if(accessToken)
+      {   
+        let si = '';
+        switch (this.state.policyHolderDetails['request_data']['sum_insured']) {
+            case "100000.00":
+                si = '1';
+                break;
+            case "150000.00":
+                si = '2';
+                break;
+            case "200000.00":
+                si = '3';
+                break;
+            case "250000.00":
+                si = '4';
+                break;
+            case "300000.00":
+                si = '5';
+                break;
+            case "350000.00":
+                si = '6';
+                break;
+            case "400000.00":
+                si = '7';
+                break;
+            case "450000.00":
+                si = '8';
+                break;
+            case "500000.00":
+                si = '9';
+                break;
+            default:
+                si = '5';
+        }
+        // console.log('sum_insured', si);
         let polStartDate = moment(value.polStartDate).format("YYYY-MM-DD");
         let polEndDate = moment(value.polEndDate).format("YYYY-MM-DD");
+        let insureValue = value.insureValue ? value.insureValue : si;
         const formData = new FormData(); 
         this.props.loadingStart();
+      /*formData.append('id', localStorage.getItem('policyHolder_id'));
+        formData.append('policyStartDate', polStartDate);
+      formData.append('policyEndDate', polEndDate);
+      formData.append('insureValue', insureValue);
+      formData.append('access_token', accessToken);*/
+      console.log('insureValue', insureValue);
 
-        const post_data = {
-            'id':localStorage.getItem('policyHolder_id'),
-            'policyStartDate':polStartDate,
-            'policyEndDate':polEndDate,
-            'ksbplan_id': value.ksbplan_id ,
-            'ksbperiod_id': value.ksbperiod_id 
-        }
-        let encryption = new Encryption();
-        // formData.append('enc_data',encryption.encrypt(JSON.stringify(post_data)))
-        formData.append('id',localStorage.getItem('policyHolder_id'))
-        formData.append('policyStartDate',polStartDate)
-        formData.append('policyEndDate',polEndDate)
-        formData.append('ksbplan_id',value.ksbplan_id)
-        formData.append('ksbperiod_id',value.ksbperiod_id) 
-        formData.append('insureValue',1)
+
+      const post_data = {
+        'id':localStorage.getItem('policyHolder_id'),
+        'policyStartDate':polStartDate,
+        'policyEndDate':polEndDate,
+        'insureValue':insureValue,
+        'access_token':accessToken
+    }
+    let encryption = new Encryption();
+        formData.append('enc_data',encryption.encrypt(JSON.stringify(post_data)))
         axios
-          .post(`/fullQuoteServiceKSBRetail`, formData)
+          .post(`/quickQuoteService`, formData)
           .then(res => { 
-            if (res.data.PolicyObject && res.data.UnderwritingResult && res.data.UnderwritingResult.Status == "Success") {
+          if(res.data.AdjustedPremium){
               this.setState({
-                  fulQuoteResp: res.data.PolicyObject,
-                  serverResponse: res.data.PolicyObject,
+                  serverResponse: res.data,
                   error: []
               }) 
-          }
-          else if (res.data.PolicyObject && res.data.UnderwritingResult && res.data.UnderwritingResult.Status == "Fail") {
+          }else {
               this.setState({
-                  fulQuoteResp: res.data.PolicyObject,
-                  serverResponse: [],
-                  error: {"message": 1}
+                  serverResponse: res.data,
+                  error: res.data
               }) 
           }
-          else {
-            this.setState({
-                fulQuoteResp: [],
-                error: res.data,
-                serverResponse: []
-            });
-        }
           this.props.loadingStop();
           })
           .catch(err => {
@@ -247,6 +308,10 @@ class SelectDuration extends Component {
             });
             this.props.loadingStop();
           });
+      }
+      else {
+        swal("Thank you for showing your interest for buying product.Due to some reasons, we are not able to issue the policy online.Please call 180 22 1111");
+    }
       
     }
 
@@ -259,7 +324,6 @@ class SelectDuration extends Component {
             error: []
         }) 
     }
-
     handleAmountChange =(e) => {
         this.setState({
             serverResponse: [],
@@ -267,51 +331,7 @@ class SelectDuration extends Component {
         }) 
     }
 
-    fetchInsurePlan = () => {
-        axios.get(`ksbplan`)
-        .then(res=>{
-            var insurePlan = res.data && res.data.data ? res.data.data : []
-            this.setState({
-                insurePlan            
-            })
-            this.fetchPaymentPeriod()
-        })
-        .catch(err => {
-            // handle error
-            this.props.loadingStop();
-        })
-    }
 
-    fetchPaymentPeriod = () => {
-        axios.get(`ksbperiod`)
-        .then(res=>{
-            var insurePeriod = res.data && res.data.data ? res.data.data : []
-            this.setState({
-                insurePeriod            
-            })
-            let value = []
-            this.quote(value)
-        })
-        .catch(err => {
-            // handle error
-            this.props.loadingStop();
-        })
-    }
-
-    showInstalmentText = (value) =>{
-        if(value == 1){
-            this.setState({
-                showInstallment:true,
-                installment_premium_payment:1
-            })
-        }
-        else{
-            this.setState({
-                showInstallment:false,
-                installment_premium_payment:0
-            })
-        }
-    }
 
 
     componentDidMount() {
@@ -321,20 +341,34 @@ class SelectDuration extends Component {
 
     render() {
         const {productId} = this.props.match.params
-        const {policyHolderDetails, serverResponse, error, EndDate, endDateFlag, fulQuoteResp, insurePlan, ksbinfo, insurePeriod, showInstallment, installment_premium_payment } = this.state
+        const {policyHolderDetails, serverResponse, error, EndDate, endDateFlag} = this.state
         const request_data = policyHolderDetails ? policyHolderDetails.request_data:null;
         let start_date = request_data && request_data.start_date ? new Date(request_data.start_date): '';
+        const {bodySliderVal} = this.state
+        let minBodyIDV = 0;
+        let maxBodyIDV = 10000000;
+
+        // let end_date = endDateFlag ? ( EndDate ? new Date(EndDate) : (request_data && request_data.end_date ? new Date(request_data.end_date) : "") ) 
+        // : (request_data && request_data.end_date ? new Date(request_data.end_date) : "");
 
         let end_date = request_data && request_data.end_date ? new Date(request_data.end_date) : "";
+        let defaultBodySliderValue = 0;
+        let defaultSliderValue = 0;
+        let bodySliderValue = bodySliderVal;
           
+
         const newInitialValues = Object.assign(initialValues, {
             polStartDate: start_date ? start_date : new Date,
             polEndDate: end_date  ? end_date : new Date(moment().add(1, 'years').format("YYYY-MM-DD")),
-            ksbplan_id: ksbinfo && ksbinfo.ksbplan_id ? ksbinfo.ksbplan_id : "1",
-            // ksbperiod_id: ksbinfo && ksbinfo.ksbperiod_id ? ksbinfo.ksbperiod_id : "3",
-            // installment_premium_payment: installment_premium_payment,
+            // insureValue: policyHolderDetails && policyHolderDetails.request_data && policyHolderDetails.request_data.sum_insured ? Math.floor(policyHolderDetails.request_data.sum_insured) : initialValues.insureValue
+            insureValue: policyHolderDetails && policyHolderDetails.request_data && policyHolderDetails.request_data.sum_insured ? sum_assured[policyHolderDetails.request_data.sum_insured] : initialValues.insureValue
         })
 
+        // const errMsg =  error && error.messages && error.messages.length > 0 ? error.messages.map((msg, qIndex)=>{  
+        //     return(
+        //         <h5> {msg.message}</h5>                   
+        //     )                                                
+        // }) : null
         const errMsg =  error && error.message ? (            
             <span className="errorMsg"><h6><strong>Thank you for showing your interest for buying product.Due to some reasons, we are not able to issue the policy online.Please call 1800 22 1111</strong></h6></span>                                
         ) : null 
@@ -349,7 +383,7 @@ class SelectDuration extends Component {
                                 <SideNav />
                             </div>
                             <div className="col-sm-12 col-md-12 col-lg-10 col-xl-10 infobox">
-                                <h4 className="text-center mt-3 mb-3">KSB Retail Policy</h4>
+                                <h4 className="text-center mt-3 mb-3">Arogya Sanjeevani Policy</h4>
                                 <section className="brand">
                                     <div className="boxpd">
                                         <div className="d-flex justify-content-left carloan m-b-25">
@@ -360,8 +394,7 @@ class SelectDuration extends Component {
                                         validationSchema={validateDuration}
                                         >
                                         {({ values, errors, setFieldValue, setFieldTouched, isValid, isSubmitting, touched }) => {
-                                            
-                                        return (   
+                                        return (
                                         <Form>
                                         <Row>
                                             <Col sm={12} md={9} lg={9}>
@@ -422,150 +455,99 @@ class SelectDuration extends Component {
 
                                                     <Col sm={12} md={3} lg={3}>
                                                         <FormGroup>
-                                                        Plan Name
+                                                            Select Sum Insured
                                                         </FormGroup>
                                                     </Col>
                                                     <Col sm={12} md={8} lg={8}>
                                                         <FormGroup>
                                                             <div className="formSection">
+                                                                <Field
+                                                                    name="insureValue"
+                                                                    component="select"
+                                                                    autoComplete="off"
+                                                                    value={values.insureValue}                                                                    
+                                                                    className="formGrp"
+                                                                    onChange = {(e) => {
+                                                                    setFieldTouched("insureValue")
+                                                                    setFieldValue("insureValue", e.target.value);
+                                                                    this.handleAmountChange(e)
+                                                                    }
+                                                                }
+                                                                >
+                                                                <option value="">Select sum insured</option>
+                                                                    <option value="1" >100 000</option>
+                                                                    <option value="2" >150 000</option>
+                                                                    <option value="3" >200 000</option>
+                                                                    <option value="4" >250 000</option>
+                                                                    <option value="5" >300 000</option>
+                                                                    <option value="6" >350 000</option>
+                                                                    <option value="7" >400 000</option>
+                                                                    <option value="8" >450 000</option>
+                                                                    <option value="9" >500 000</option>
+                                                                </Field>    
+                                                                {errors.insureValue && touched.insureValue ? (
+                                                                <span className="errorMsg">{errors.insureValue}</span>
+                                                                ) : null} 
+                                                            </div>
+                                                        </FormGroup>
+                                                    </Col>
+                                                </Row>
+                                                <Row>
+                                                    <Col sm={12} md={4} lg={4}>
+                                                        <FormGroup>
+                                                            <div className="insurerName">
+                                                            select_sum_insured
+                                                            </div>
+                                                        </FormGroup>
+                                                    </Col>
+                                                    <Col sm={12} md={3} lg={2}>
+                                                        <FormGroup>
+                                                            <div className="insurerName">
                                                             <Field
-                                                            name="ksbplan_id"
-                                                            component="select"
-                                                            autoComplete="off"
-                                                            value={values.ksbplan_id}
-                                                            className="formGrp"
-                                                            onChange={(e) => {
-                                                                setFieldValue('ksbplan_id', e.target.value);
-                                                                this.handleAmountChange(e)
-                                                            }}
-                                                        >
-                                                        <option value="">Select Plan</option> 
-                                                        {insurePlan.map((plan, qIndex) => ( 
-                                                            <option value={plan.id}>{plan.descriptions}</option>
-                                                        ))}
-                                                        </Field>  
-                                                        {errors.ksbplan_id && touched.ksbplan_id ? (
-                                                            <span className="errorMsg">{errors.ksbplan_id}</span>
-                                                        ) : null}    
+                                                                name="select_sum_insured"
+                                                                type="text"
+                                                                placeholder=""
+                                                                autoComplete="off"
+                                                                className="premiumslid"
+                                                                onFocus={e => this.changePlaceHoldClassAdd(e)}
+                                                                onBlur={e => this.changePlaceHoldClassRemove(e)}
+                                                                value={bodySliderValue ? bodySliderValue : defaultBodySliderValue}  
+                                                            />
+                                                            {errors.body_idv_value && touched.body_idv_value ? (
+                                                                <span className="errorMsg">{errors.body_idv_value}</span>
+                                                            ) : null}
                                                             </div>
                                                         </FormGroup>
                                                     </Col>
                                                     
-                                                    {/* <Col sm={12} md={3} lg={3}>
+                                                {defaultSliderValue ?
+                                                    <Col sm={12} md={12} lg={6}>
                                                         <FormGroup>
-                                                        Installment Premium Payment
+                                                        <input type="range" className="W-90" 
+                                                        name= 'slider'
+                                                        defaultValue= {defaultBodySliderValue}
+                                                        min= {minBodyIDV}
+                                                        max= {maxBodyIDV}
+                                                        step= '1'
+                                                        value={values.slider}
+                                                        onChange= {(e) =>{
+                                                        setFieldTouched("slider1");
+                                                        setFieldValue("slider1",values.slider);
+                                                        this.bodySliderValue(e.target.value)
+                                                    }}
+                                                        />
                                                         </FormGroup>
                                                     </Col>
-                                                    <Col sm={12} md={8} lg={2}>
-                                                        <FormGroup>
-                                                            <div className="p-r-25">
-                                                            <label className="customRadio3">
-                                                            <Field
-                                                                type="radio"
-                                                                name='installment_premium_payment'                                            
-                                                                value='1'
-                                                                key='1'  
-                                                                onChange={(e) => {
-                                                                    setFieldValue(`installment_premium_payment`, e.target.value);
-                                                                    this.showInstalmentText(1);
-                                                                }}
-                                                                checked={values.installment_premium_payment == '1' ? true : false}
-                                                            />
-                                                                <span className="checkmark " /><span className="fs-14"> Yes</span>
-                                                            </label>
-                                                            </div>
-                                                        </FormGroup>
-                                                    </Col>
-                                                    <Col sm={12} md={8} lg={2}>
-                                                        <FormGroup>
-                                                            <div className="p-r-25">
-                                                            <label className="customRadio3">
-                                                            <Field
-                                                                type="radio"
-                                                                name='installment_premium_payment'                                            
-                                                                value='0'
-                                                                key='1'  
-                                                                onChange={(e) => {
-                                                                    setFieldValue(`installment_premium_payment`, e.target.value);
-                                                                    this.showInstalmentText(0);
-                                                                }}
-                                                                checked={values.installment_premium_payment == '0' ? true : false}
-                                                            />
-                                                                <span className="checkmark " /><span className="fs-14"> No</span>
-                                                                {errors.installment_premium_payment && touched.installment_premium_payment ? (
-                                                                    <span className="errorMsg">{errors.installment_premium_payment}</span>
-                                                                ) : null}
-                                                            </label>
-                                                            </div>
-                                                        </FormGroup>
-                                                    </Col>
-                                                    <Col sm={12} md={8} lg={4}>
-                                                        <FormGroup>
-                                                            <div className="p-r-25">
-                                                            
-                                                            </div>
-                                                        </FormGroup>
-                                                    </Col>
-                                                    { showInstallment || installment_premium_payment == 1 ?  
-                                                    <Fragment>
-                                                    <Col sm={12} md={3} lg={3}>
-                                                        <FormGroup>
-                                                        Payment Type
-                                                        </FormGroup>
-                                                    </Col>
-                                                    <Col sm={12} md={8} lg={8}>
-                                                        <FormGroup>
-                                                            <div className="formSection">
-                                                            <Field
-                                                            name="ksbperiod_id"
-                                                            component="select"
-                                                            autoComplete="off"
-                                                            value={values.ksbperiod_id}
-                                                            className="formGrp"
-                                                            onChange={(e) => {
-                                                                setFieldValue('ksbperiod_id', e.target.value);
-                                                                this.handleAmountChange(e)
-                                                            }}
-                                                        >
-                                                        <option value="">Select Plan</option> 
-                                                        {insurePeriod.map((plan, qIndex) => ( 
-                                                            <option value={plan.id}>{plan.descriptions}</option>
-                                                        ))}
-                                                        </Field>  
-                                                        {errors.ksbperiod_id && touched.ksbperiod_id ? (
-                                                            <span className="errorMsg">{errors.ksbperiod_id}</span>
-                                                        ) : null}    
-                                                            </div>
-                                                        </FormGroup>
-                                                    </Col>
-                                                    </Fragment> : null } */}
-
+                                                : null }
                                                 </Row>
-                                                
-                                                {fulQuoteResp && fulQuoteResp.SumInsured ?
-                                                <Fragment>
-                                                    <div className="d-flex justify-content-left carloan m-b-25">
-                                                        <h4> Sum Insured</h4>
-                                                    </div>
-                                                    <Row>
-                                                        <Col sm={12}>
-                                                            <div className="d-flex justify-content-between align-items-center premium m-b-25">
-                                                                <p>Your Total Sum Insured for One Year : </p>
-                                                                <p><strong>Rs:</strong> {fulQuoteResp ? fulQuoteResp.SumInsured : 0}</p>
-                                                            </div>
-                                                        </Col>
-                                                    </Row>
-                                                </Fragment>
-                                                : "" }  
-
                                                 <div className="d-flex justify-content-left carloan m-b-25">
                                                     <h4> Premium</h4>
                                                 </div>
-                                                <Row>  
+                                                <Row>
                                                     <Col sm={12}>
                                                         <div className="d-flex justify-content-between align-items-center premium m-b-25">
-                                                            <p>Your Total Premium for One Year : </p>
-                                                            <p><strong>Rs:</strong> { fulQuoteResp ? (fulQuoteResp.message ? 0 : fulQuoteResp.DuePremium ) : 0}</p>
+                                                            <p>Your Total Premium for One Year :</p>
+                                                            <p><strong>Rs:</strong> { serverResponse ? (serverResponse.message ? 0 : serverResponse.DuePremium ) : 0}</p>
                                                         </div>
                                                     </Col>
 
@@ -602,7 +584,27 @@ class SelectDuration extends Component {
 
                                             <Col sm={12} md={3}>
                                                 <div className="regisBox">
-                                                    <h3 className="medihead">6000+ Network Hospitals for you to avail cashless facility</h3>
+                                                    <h8 className="medihead">
+                                                        <p3>Gross Premium :Rs: { serverResponse ? (serverResponse.message ? 0 : serverResponse.DuePremium ) : 0}</p3>
+                                                        </h8>
+                                                        <table class="table table-bordered">
+                                                        <thead>
+                                                            <tr>
+                                                                <td><p>Gross Premium:</p></td>
+                                                                <td>₹{Math.round( serverResponse ? (serverResponse.message ? 0 : serverResponse.BeforeVatPremium ) : 0)}</td>
+                                                            </tr>
+                                                            <tr>
+                                                                <td>GST:</td>
+                                                                <td>₹{Math.round( serverResponse ? (serverResponse.message ? 0 : serverResponse.TGST ) : 0)}</td>
+                                                            </tr>
+                                                        </thead>
+                                                        <tbody>
+                                                            <tr>
+                                                                <th>Net Premium:</th>
+                                                                <th>₹{ serverResponse ? (serverResponse.message ? 0 : serverResponse.DuePremium ) : 0}</th>
+                                                            </tr> 
+                                                        </tbody>
+                                                    </table>
                                                 </div>
                                             </Col>
 
@@ -637,4 +639,4 @@ const mapStateToProps = state => {
     };
   };
 
-export default withRouter (connect( mapStateToProps, mapDispatchToProps)(SelectDuration));
+export default withRouter (connect( mapStateToProps, mapDispatchToProps)(arogya_SelectDuration));

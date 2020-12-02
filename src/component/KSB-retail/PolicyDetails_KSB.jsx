@@ -84,11 +84,11 @@ class PolicyDetails extends Component {
   };
 
   getPolicyHolderDetails = () => {
-    let policyHolder_id = 0
+    const policyHolder_refNo = this.state.policyHolder_refNo
     
     this.props.loadingStart();
     axios
-      .get(`/policy-holder/${localStorage.getItem("policyHolder_id")}`)
+      .get(`ksb/details/${policyHolder_refNo}`)
       .then((res) => {
 
         this.setState({
@@ -97,64 +97,7 @@ class PolicyDetails extends Component {
           refNumber: res.data.data.policyHolder.reference_no,
           paymentStatus: res.data.data.policyHolder.payment ? res.data.data.policyHolder.payment[0] : []
         });
-        this.getAccessToken(
-          res.data.data.policyHolder,
-          res.data.data.policyHolder.request_data.family_members
-        );
-      })
-      .catch((err) => {
-        if(err.status == 401) {
-          swal("Session out. Please login")
-        }
-        else swal("Something wrong happened. Please try after some")
-
-        this.setState({
-          policyHolderDetails: [],
-        });
-        this.props.loadingStop();
-      });
-  };
-
-  getAccessToken = (policyHolderDetails, familyMember) => {
-    axios
-      .post(`/callTokenService`)
-      .then((res) => {
-        this.setState({
-          accessToken: res.data.access_token,
-        });
-        this.fullQuote(
-          res.data.access_token,
-          policyHolderDetails,
-          familyMember
-        );
-      })
-      .catch((err) => {
-        this.setState({
-          accessToken: [],
-        });
-        this.props.loadingStop();
-      });
-  };
-
-
-  getPolicyHolderId = (ref_no) => {
-    let policyHolder_id = 0
-    
-    this.props.loadingStart();
-    axios
-      .get(`/health-policy/${ref_no}`)
-      .then((res) => {
-
-        this.setState({
-          policyHolderDetails: res.data.data.policyHolder ? res.data.data.policyHolder : [],
-          familyMember: res.data.data.policyHolder.request_data.family_members,
-          refNumber: res.data.data.policyHolder.reference_no,
-          paymentStatus: res.data.data.policyHolder.payment ? res.data.data.policyHolder.payment[0] : []
-        });
-        this.getAccessToken(
-          res.data.data.policyHolder,
-          res.data.data.policyHolder.request_data.family_members
-        );
+        this.fullQuote( res.data.data.policyHolder );
       })
       .catch((err) => {
         if(err.status == 401) {
@@ -170,27 +113,24 @@ class PolicyDetails extends Component {
   };
 
 
-  fullQuote = (access_token, policyHolderDetails) => {
+  fullQuote = (policyHolderDetails) => {
     let id = policyHolderDetails.id;
     let insureValue = Math.floor(policyHolderDetails.request_data.sum_insured);
 
     const formData = new FormData();
     let encryption = new Encryption();
 
-    //formData.append("id", id);
-    //formData.append("insureValue", insureValue);
-    //formData.append("access_token", access_token);
-   const post_data = {
-      "id":id,
-      "insureValue":insureValue,
-      "access_token":access_token
-    }
-    formData.append('enc_data',encryption.encrypt(JSON.stringify(post_data)))    
+    formData.append("id", id);
+    formData.append("insureValue", insureValue);
 
-
+  //  const post_data = {
+  //     "id":id,
+  //     "insureValue":insureValue,
+  //   }
+  //   formData.append('enc_data',encryption.encrypt(JSON.stringify(post_data)))    
 
     axios
-      .post(`/fullQuoteServiceArogyaSeries`, formData)
+      .post(`/fullQuoteServiceKSBRetail`, formData)
       .then((res) => {
         if (res.data.PolicyObject) {
           this.setState({
@@ -240,18 +180,15 @@ class PolicyDetails extends Component {
   Razor_payment = () => {
     const { refNumber } = this.state;
     window.location = `${process.env.REACT_APP_PAYMENT_URL}/razorpay/pay.php?refrence_no=${refNumber}`
-}
+  }
 
-paypoint_payment = () => {
-  const { refNumber } = this.state;
-  window.location = `${process.env.REACT_APP_PAYMENT_URL}/ppinl/pay.php?refrence_no=${refNumber}`
-}
+  paypoint_payment = () => {
+    const { refNumber } = this.state;
+    window.location = `${process.env.REACT_APP_PAYMENT_URL}/ppinl/pay.php?refrence_no=${refNumber}`
+  }
 
   componentDidMount() {
-    if(queryString.parse(this.props.location.search).access_id) {
-       this.getPolicyHolderId(queryString.parse(this.props.location.search).access_id)
-    }
-    else this.getPolicyHolderDetails();
+     this.getPolicyHolderDetails();
   }
 
   render() {
@@ -401,7 +338,7 @@ paypoint_payment = () => {
                                                   <Col sm={12} md={3}>
                                                     <FormGroup>
                                                       <strong>Rs:</strong>{" "}
-                                                      {Math.round(fulQuoteResp.GrossPremium+fulQuoteResp.AlcoholLoadingAmount+fulQuoteResp.SmokerLoadingAmount+fulQuoteResp.TobaccoLoadingAmount)}
+                                                      {Math.round(fulQuoteResp.BeforeVatPremium)}
                                                     </FormGroup>
                                                   </Col>
                                                   <Col sm={12} md={3}>

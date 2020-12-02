@@ -1,9 +1,9 @@
-import React, { Component, Fragment } from 'react';
-import { Row, Col, Modal, Button, FormGroup } from 'react-bootstrap';
+import React, { Component } from 'react';
+import { Row, Col, Modal, Button, FormGroup, OverlayTrigger, Tooltip } from 'react-bootstrap';
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css"
 import 'react-datepicker/dist/react-datepicker-cssmodules.min.css'
-import BaseComponent from '.././BaseComponent';
+import BaseComponent from '../BaseComponent';
 import SideNav from '../common/side-nav/SideNav';
 import Footer from '../common/footer/Footer';
 import axios from "../../shared/axios";
@@ -49,9 +49,6 @@ const initialValues = {
 
 const vehicleInspectionValidation = Yup.object().shape({
     gender: Yup.string().required('Please select gender'),
-    varient_type_id: Yup.string().required('Please select product type'),
-    ksbbusniessplan_id: Yup.string().required('Please select business plan'),
-    insurrepostry_id: Yup.string().required('Please select repository'),
    
    
 });
@@ -70,14 +67,10 @@ const validateFamilyMembers  = Yup.object().shape({
         is: looking_for_4 => looking_for_4 == 'child3',       
         then: Yup.string().required('Please agree to the terms'),
         othewise: Yup.string()
-    }).when(['looking_for_5'], {
-        is: looking_for_5 => looking_for_5 == 'child4',       
-        then: Yup.string().required('Please agree to the terms'),
-        othewise: Yup.string()
     }),
     
     looking_for_1 : Yup.string(),
-    looking_for_6 : Yup.string(),
+    looking_for_5 : Yup.string(),
     looking_for_0: Yup.string().when(['looking_for_2'], {
         is: looking_for_2 => looking_for_2 == 'child1',       
         then: Yup.string().required('Please select self'),
@@ -90,48 +83,44 @@ const validateFamilyMembers  = Yup.object().shape({
         is: looking_for_4 => looking_for_4 == 'child3',       
         then: Yup.string().required('Please select self'),
         othewise: Yup.string()
-    }).when(['looking_for_5'], {
-        is: looking_for_5 => looking_for_5 == 'child4',       
+    }).when(['looking_for_1','looking_for_5'], {
+        is: (looking_for_1,looking_for_5) => (looking_for_1 == 'spouse' && looking_for_5 == 'father'),       
         then: Yup.string().required('Please select self'),
         othewise: Yup.string()
     }).when(['looking_for_1','looking_for_6'], {
-        is: (looking_for_1,looking_for_6) => (looking_for_1 == 'spouse' && looking_for_6 == 'father'),       
+        is: (looking_for_1,looking_for_6) => (looking_for_1 == 'spouse' && looking_for_6 == 'mother'),       
         then: Yup.string().required('Please select self'),
         othewise: Yup.string()
     }).when(['looking_for_1','looking_for_7'], {
-        is: (looking_for_1,looking_for_7) => (looking_for_1 == 'spouse' && looking_for_7 == 'mother'),       
+        is: (looking_for_1,looking_for_7) => (looking_for_1 == 'spouse' && looking_for_7 == 'fatherInLaw'),       
         then: Yup.string().required('Please select self'),
         othewise: Yup.string()
     }).when(['looking_for_1','looking_for_8'], {
-        is: (looking_for_1,looking_for_8) => (looking_for_1 == 'spouse' && looking_for_8 == 'fatherInLaw'),       
+        is: (looking_for_1,looking_for_8) => (looking_for_1 == 'spouse' && looking_for_8 == 'motherInLaw'),       
         then: Yup.string().required('Please select self'),
         othewise: Yup.string()
-    }).when(['looking_for_1','looking_for_9'], {
-        is: (looking_for_1,looking_for_9) => (looking_for_1 == 'spouse' && looking_for_9 == 'motherInLaw'),       
+    }).when(['looking_for_5','looking_for_6'], {
+        is: (looking_for_5,looking_for_6) => (looking_for_5 == 'father' && looking_for_6 == 'mother'),       
+        then: Yup.string().required('Please select self'),
+        othewise: Yup.string()
+    }).when(['looking_for_5','looking_for_7'], {
+        is: (looking_for_5,looking_for_7) => (looking_for_5 == 'father' && looking_for_7 == 'fatherInLaw'),       
+        then: Yup.string().required('Please select self'),
+        othewise: Yup.string()
+    }).when(['looking_for_5','looking_for_8'], {
+        is: (looking_for_5,looking_for_8) => (looking_for_5 == 'father' && looking_for_8 == 'motherInLaw'),       
         then: Yup.string().required('Please select self'),
         othewise: Yup.string()
     }).when(['looking_for_6','looking_for_7'], {
-        is: (looking_for_6,looking_for_7) => (looking_for_6 == 'father' && looking_for_7 == 'mother'),       
+        is: (looking_for_6,looking_for_7) => (looking_for_6 == 'mother' && looking_for_7 == 'fatherInLaw'),       
         then: Yup.string().required('Please select self'),
         othewise: Yup.string()
     }).when(['looking_for_6','looking_for_8'], {
-        is: (looking_for_6,looking_for_8) => (looking_for_6 == 'father' && looking_for_8 == 'fatherInLaw'),       
-        then: Yup.string().required('Please select self'),
-        othewise: Yup.string()
-    }).when(['looking_for_6','looking_for_9'], {
-        is: (looking_for_6,looking_for_9) => (looking_for_6 == 'father' && looking_for_9 == 'motherInLaw'),       
+        is: (looking_for_6,looking_for_8) => (looking_for_6 == 'mother' && looking_for_8 == 'motherInLaw'),       
         then: Yup.string().required('Please select self'),
         othewise: Yup.string()
     }).when(['looking_for_7','looking_for_8'], {
-        is: (looking_for_7,looking_for_8) => (looking_for_7 == 'mother' && looking_for_8 == 'fatherInLaw'),       
-        then: Yup.string().required('Please select self'),
-        othewise: Yup.string()
-    }).when(['looking_for_7','looking_for_9'], {
-        is: (looking_for_7,looking_for_9) => (looking_for_7 == 'mother' && looking_for_9 == 'motherInLaw'),       
-        then: Yup.string().required('Please select self'),
-        othewise: Yup.string()
-    }).when(['looking_for_8','looking_for_9'], {
-        is: (looking_for_8,looking_for_9) => (looking_for_8 == 'fatherInLaw' && looking_for_9 == 'motherInLaw'),       
+        is: (looking_for_7,looking_for_8) => (looking_for_7 == 'fatherInLaw' && looking_for_8 == 'motherInLaw'),       
         then: Yup.string().required('Please select self'),
         othewise: Yup.string()
     }),
@@ -468,107 +457,9 @@ const validateFamilyMembers  = Yup.object().shape({
         then: Yup.string().required('Child 3 Gender field is required'),
         othewise: Yup.string()
     }).nullable(),
-
-    dob_5: Yup.string().when(['looking_for_5'], {
-        is: looking_for_5 => looking_for_5 == 'child4',
-        then: Yup.string().required('Child 4 DOB field is required').test(
-            "3monthsChecking",
-            function() {
-                return "Age should be minimum 3 months and maximum 25 years"
-            },
-            function (value) {
-                if (value) {
-                    const ageObj = new PersonAge();
-                    return ageObj.whatIsMyAge(value) < 26 && ageObj.whatIsMyAgeMonth(value) >=3 ;
-                }
-                return true;
-            }
-        ).test(
-            "1yearAgeDiffChecking",
-            function() {
-                return "Self and child age difference should be 1 year"
-            },
-            function (value) {
-                if(typeof this.parent.dob_0 != 'undefined'){
-                    var ageDiff = Math.floor(Math.abs(moment(this.parent.dob_0).diff(value, 'years', true)));
-                    if (ageDiff <= 0 ) {   
-                        return false;    
-                    }
-                    return true;
-                }
-                else {
-                    return true
-                }
-            }
-        ).test(
-            "1yearAgeDiffChecking",
-            function() {
-                return "Spouse and child age difference should be 1 year"
-            },
-            function (value) {
-                if(typeof this.parent.dob_1 != 'undefined'){
-                var ageDiff = Math.floor(Math.abs(moment(value).diff(this.parent.dob_1, 'years', true)));
-                    if (ageDiff <= 0 ) {   
-                        return false;    
-                    }
-                    else{
-                        return true;
-                    }                
-                }
-                else{
-                    return true;
-                }   
-            }
-        ).test(
-            "greaterAgeDiffChecking",
-            function() {
-                return "Child age should be less than self"
-            },
-            function (value) {
-                if(typeof this.parent.dob_0 != 'undefined'){
-                    var ageDiff = Math.floor(moment(value).diff(this.parent.dob_0, 'years', true));
-                    if (ageDiff < 0 ) {   
-                        return false;    
-                    }
-                    else{
-                        return true;
-                    }                    
-                }
-                else{
-                    return true;
-                }
-            }
-        )
-        .test(
-            "greaterAgeDiffChecking",
-            function() {
-                return "Child age should be less than spouse"
-            },
-            function (value) {
-                if(typeof this.parent.dob_1 != 'undefined'){
-                    var ageDiff = Math.floor(moment(value).diff(this.parent.dob_1, 'years', true));
-                    if (ageDiff < 0 ) {   
-                        return false;    
-                    }
-                    else{
-                        return true;
-                    }                    
-                }
-                else{
-                    return true;
-                }
-            }
-        ),
-        othewise: Yup.string()
-    }),
-    child4Gender: Yup.string().when(['looking_for_5'], {
-        is: looking_for_5 => looking_for_5 == 'child4',
-        then: Yup.string().required('Child 4 Gender field is required'),
-        othewise: Yup.string()
-    }).nullable(),
     
-    dob_6: Yup.string().when(['looking_for_6'], {
-        is: looking_for_6 => looking_for_6 == 'father',
+    dob_5: Yup.string().when(['looking_for_5'], {
+        is: looking_for_5 => looking_for_5 == 'father',
         then: Yup.string().required('Father DOB field is required')
         .test(
             "18YearsChecking",
@@ -649,8 +540,8 @@ const validateFamilyMembers  = Yup.object().shape({
         othewise: Yup.string()
     }),
 
-    dob_7: Yup.string().when(['looking_for_7'], {
-        is: looking_for_7 => looking_for_7 == 'mother',
+    dob_6: Yup.string().when(['looking_for_6'], {
+        is: looking_for_6 => looking_for_6 == 'mother',
         then: Yup.string().required('Mother DOB field is required')
         .test(
             "18YearsChecking",
@@ -731,8 +622,8 @@ const validateFamilyMembers  = Yup.object().shape({
         othewise: Yup.string()
     }),
 
-    dob_8: Yup.string().when(['looking_for_8'], {
-        is: looking_for_8 => looking_for_8 == 'fatherInLaw',
+    dob_7: Yup.string().when(['looking_for_7'], {
+        is: looking_for_7 => looking_for_7 == 'fatherInLaw',
         then: Yup.string().required('Father-In-Law DOB field is required')
         .test(
             "18YearsChecking",
@@ -812,8 +703,8 @@ const validateFamilyMembers  = Yup.object().shape({
         ),
         othewise: Yup.string()
     }),
-    dob_9: Yup.string().when(['looking_for_9'], {
-        is: looking_for_9 => looking_for_9 == 'motherInLaw',
+    dob_8: Yup.string().when(['looking_for_8'], {
+        is: looking_for_8 => looking_for_8 == 'motherInLaw',
         then: Yup.string().required('Mother-In-Law DOB field is required')
         .test(
             "18YearsChecking",
@@ -907,7 +798,7 @@ function checkSelfData(str)
 
 const newInitialValues = {}
 
-class InformationYourself extends Component {
+class arogya_InformationYourself extends Component {
     constructor(props) {
         super(props);
 
@@ -930,11 +821,6 @@ class InformationYourself extends Component {
             display_gender:[],
             gender_for:[],
             confirm: "",
-            productTypes: "",
-            insureRepository: [],
-            insureBusinessPlan: [],
-            insurePlan: [],
-            ksbinfo: []
         };
     }
 
@@ -1002,14 +888,6 @@ class InformationYourself extends Component {
         });
     }
 
-    chanageProductType = (value) => {
-        sessionStorage.removeItem('display_looking_for');
-        sessionStorage.removeItem('display_dob');
-        this.setState({
-            productTypes : value
-        });
-    }
-
     handleFormSubmit = (values) => {
     const {productId} = this.props.match.params
     const formData = new FormData();
@@ -1018,8 +896,7 @@ class InformationYourself extends Component {
     let dob = this.state.dob ;
     let familyMembers = this.state.familyMembers;
     let post_data = []
-    let menumaster_id = 6;
-    let vehicle_type_id = 10;
+    let menumaster_id = 8;
 
     let bc_data = sessionStorage.getItem('bcLoginData') ? sessionStorage.getItem('bcLoginData') : "";
     if(bc_data) {
@@ -1027,12 +904,7 @@ class InformationYourself extends Component {
     }
 
     post_data['menumaster_id'] = menumaster_id
-    post_data['vehicle_type_id'] = vehicle_type_id
-    post_data['proposer_gender'] = values.gender  
-    post_data['insurrepostry_id'] = values.insurrepostry_id   
-    post_data['varient_type_id'] = values.varient_type_id 
-    post_data['ksbbusniessplan_id'] = values.ksbbusniessplan_id 
-    
+    post_data['proposer_gender'] = values.gender    
     
     let arr_date=[]
     for(let i=0;i<dob.length;i++){        
@@ -1088,20 +960,13 @@ class InformationYourself extends Component {
         //let vvv = encryption.encrypt(JSON.stringify(target))        
         this.props.loadingStart();
         axios
-        .post(`ksb/update-yourself`, formData)
+        .post(`/update-yourself`, formData)
         .then(res => {
-            if(res.data.error === false) {
-                localStorage.setItem('policyHolder_id', res.data.data.policyHolder_id);
-                localStorage.setItem('policyHolder_refNo', res.data.data.policyHolder_refNo);
-                localStorage.setItem('display_gender', JSON.stringify(this.state.display_gender));
-                this.props.loadingStop();
-                this.props.history.push(`/SelectDuration_KSB/${productId}`);
-            }
-            else {
-                swal(res.data.msg)
-                this.props.loadingStop();
-            }
-            
+            localStorage.setItem('policyHolder_id', res.data.data.policyHolder_id);
+            localStorage.setItem('policyHolder_refNo', res.data.data.policyHolder_refNo);
+            localStorage.setItem('display_gender', JSON.stringify(this.state.display_gender));
+            this.props.loadingStop();
+            this.props.history.push(`/arogya_MedicalDetails/${productId}`);
         })
         .catch(err => {
         if(err && err.data){
@@ -1116,19 +981,13 @@ class InformationYourself extends Component {
 
         this.props.loadingStart();
         axios
-        .post(`ksb/yourself`, formData)
+        .post(`/arogya-topup/yourself`, formData)
         .then(res => {
-            if(res.data.error === false) {
             localStorage.setItem('policyHolder_id', res.data.data.policyHolder_id);
             localStorage.setItem('policyHolder_refNo', res.data.data.policyHolder_refNo);
             localStorage.setItem('display_gender', JSON.stringify(this.state.display_gender));
             this.props.loadingStop();
-            this.props.history.push(`/SelectDuration_KSB/${productId}`);
-            }
-            else {
-                swal(res.data.msg)
-                this.props.loadingStop();
-            }
+            this.props.history.push(`/arogya_MedicalDetails/${productId}`);
         })
         .catch(err => {
         if(err && err.data){
@@ -1137,7 +996,8 @@ class InformationYourself extends Component {
         this.props.loadingStop();
         });
     }
-
+    
+       // this.props.history.push(`/MedicalDetails/${productId}`);
     }
 
 
@@ -1152,11 +1012,10 @@ class InformationYourself extends Component {
             display_gender[2] = values.child1Gender ? values.child1Gender :null
             display_gender[3] = values.child2Gender ? values.child2Gender :null
             display_gender[4] = values.child3Gender ? values.child3Gender :null
-            display_gender[5] = values.child4Gender ? values.child4Gender :null
-            display_gender[6] = this.state.gender ? 'm' : null
-            display_gender[7] = this.state.gender ? 'f' : null
-            display_gender[8] = this.state.gender ? 'm' : null
-            display_gender[9] = this.state.gender ? 'f' : null
+            display_gender[5] = this.state.gender ? 'm' : null
+            display_gender[6] = this.state.gender ? 'f' : null
+            display_gender[7] = this.state.gender ? 'm' : null
+            display_gender[8] = this.state.gender ? 'f' : null
         
         if(this.state.validateCheck == 1){
             for (const key in values) {
@@ -1220,6 +1079,20 @@ class InformationYourself extends Component {
                 display_dob
              });  
              this.handleClose()
+        /*formData.append('menumaster_id', 2);
+        formData.append('gender', gender);
+        axios
+            .post(`/yourself`, formData)
+            .then(res => {
+                localStorage.setItem('policyHolder_id', res.data.data.policyHolder_id);
+                localStorage.setItem('policyHolder_refNo', res.data.data.policyHolder_refNo);
+               
+            })
+            .catch(err => {
+              
+              this.props.loadingStop();
+            });
+            this.handleClose()*/
     }   
     else{
         swal('Please select at least one option');
@@ -1233,81 +1106,41 @@ componentDidMount(){
 
 fetchData=()=>{
     const {productId } = this.props.match.params
-    let policyHolder_refNo = localStorage.getItem("policyHolder_refNo");
+    let policyHolder_id = localStorage.getItem("policyHolder_id");
     this.props.loadingStart();
-    axios.get(`ksb/details/${policyHolder_refNo}`)
+    axios.get(`policy-holder/${policyHolder_id}`)
         .then(res=>{
             let family_members =  res.data.data.policyHolder && res.data.data.policyHolder.request_data && res.data.data.policyHolder.request_data.family_members ? res.data.data.policyHolder.request_data.family_members : []
             let addressDetails = JSON.parse(res.data.data.policyHolder.address)
             let is_eia_account = res.data.data.policyHolder.is_eia_account
             let gender = res.data.data.policyHolder.gender
             let validateCheck = family_members && family_members.length>0 ? 1:0;
-            let ksbinfo =  res.data.data.policyHolder && res.data.data.policyHolder.ksbinfo  ? res.data.data.policyHolder.ksbinfo: []
-            var productTypes = ksbinfo ? ksbinfo.varient_type_id : ""
             this.setState({ 
                 familyMembers:family_members,
                 addressDetails,
                 is_eia_account,
                 gender,
-                validateCheck,
-                ksbinfo,
-                productTypes
+                validateCheck
             })
-            this.setStateForPreviousData(family_members);     
+            this.setStateForPreviousData(family_members);
         })
-        .catch(err => {
+        .catch(function (error) {
             // handle error
-            this.props.loadingStop();
-        })
-        
-}
 
-
-fetchInsureBusinessPlan = () => {
-    axios.get(`ksbbusniessplan`)
-    .then(res=>{
-        var insureBusinessPlan = res.data && res.data.data ? res.data.data : []
-        this.setState({
-            insureBusinessPlan            
         })
         this.props.loadingStop();
-    })
-    .catch(err => {
-        // handle error
-        this.props.loadingStop();
-    })
 }
-
-fetchInsureRepository = () => {
-    axios.get(`insur-repostry`)
-    .then(res=>{
-        var insureRepository = res.data && res.data.data ? res.data.data : []
-        this.setState({
-            insureRepository            
-        })
-        this.fetchInsureBusinessPlan()
-        this.props.loadingStop();
-    })
-    .catch(err => {
-        // handle error
-        this.props.loadingStop();
-    })
-}
-
 
 fetchRelations = () => {
-    this.props.loadingStart();
     axios.get(`relations`)
     .then(res=>{
         const relationList = res.data && res.data.data ? res.data.data : []
         this.setState({
             relationList            
         })
-        this.fetchInsureRepository()
     })
-    .catch(err => {
+    .catch(function (error) {
         // handle error
-        this.props.loadingStop();
     })
 }
 
@@ -1356,13 +1189,12 @@ setStateForPreviousData=(family_members)=>{
 		}
     }
     render() {
-        const {memberInfo, insureList,validateCheck,gender,familyMembers,lookingFor,dob,display_looking_for,display_dob,display_gender, 
-                confirm, productTypes, insureRepository, insureBusinessPlan, insurePlan, ksbinfo } = this.state
+        const {memberInfo, insureList,validateCheck,gender,familyMembers,lookingFor,dob,display_looking_for,display_dob,display_gender, confirm} = this.state
         const insureListPrev = this.getInsuredList(familyMembers);
         let display_looking_for_arr = display_looking_for  && display_looking_for.length >0 ? display_looking_for : (sessionStorage.getItem('display_looking_for') ? JSON.parse(sessionStorage.getItem('display_looking_for')) : []);
         let display_dob_arr = display_dob && display_dob.length >0 ? display_dob : (sessionStorage.getItem('display_dob') ? JSON.parse(sessionStorage.getItem('display_dob')) : []);
         let display_gender_arr = display_gender && display_gender.length > 0 ? display_gender : (localStorage.getItem('display_gender') ? JSON.parse(localStorage.getItem('display_gender')) : []);
-console.log("product type ------------- ", productTypes)
+
         const newInitialValues = Object.assign(initialValues, {
             check_input: validateCheck ? validateCheck :0,
             gender: gender ? gender : "",
@@ -1381,19 +1213,13 @@ console.log("product type ------------- ", productTypes)
             child3Gender: display_gender_arr  ? display_gender_arr[4] : "",
             looking_for_5: display_looking_for_arr[5] ? display_looking_for_arr[5] : "",
             dob_5: display_dob_arr[5] ? new Date(display_dob_arr[5]) : "",
-            child4Gender: display_gender_arr  ? display_gender_arr[5] : "",
-            looking_for_6: display_looking_for_arr[5] ? display_looking_for_arr[5] : "",
-            dob_6: display_dob_arr[5] ? new Date(display_dob_arr[5]) : "",
-            looking_for_7: display_looking_for_arr[6] ? display_looking_for_arr[6] : "",
-            dob_7: display_dob_arr[6] ? new Date(display_dob_arr[6]) : "",                        
-            looking_for_8: display_looking_for_arr[7] ? display_looking_for_arr[7] : "",
-            dob_8: display_dob_arr[7] ? new Date(display_dob_arr[7]) : "",
-            looking_for_9: display_looking_for_arr[8] ? display_looking_for_arr[8] : "",
-            dob_9: display_dob_arr[8] ? new Date(display_dob_arr[8]) : "",
-            insureList: insureListPrev ? insureListPrev.toString()  : (insureList ? insureList :''),  
-            varient_type_id: ksbinfo ? ksbinfo.varient_type_id : "",
-            ksbbusniessplan_id: ksbinfo ? ksbinfo.ksbbusniessplan_id : "",
-            insurrepostry_id: ksbinfo ? ksbinfo.insurrepostry_id : "",
+            looking_for_6: display_looking_for_arr[6] ? display_looking_for_arr[6] : "",
+            dob_6: display_dob_arr[6] ? new Date(display_dob_arr[6]) : "",                        
+            looking_for_7: display_looking_for_arr[7] ? display_looking_for_arr[7] : "",
+            dob_7: display_dob_arr[7] ? new Date(display_dob_arr[7]) : "",
+            looking_for_8: display_looking_for_arr[8] ? display_looking_for_arr[8] : "",
+            dob_8: display_dob_arr[8] ? new Date(display_dob_arr[8]) : "",
+            insureList: insureListPrev ? insureListPrev.toString()  : (insureList ? insureList :'')
         });
            
 
@@ -1414,80 +1240,9 @@ console.log("product type ------------- ", productTypes)
                                         onSubmit={this.handleFormSubmit} 
                                         validationSchema={vehicleInspectionValidation}>
                                         {({ values, errors, setFieldValue, setFieldTouched, isValid, isSubmitting, touched }) => {
-console.log("Form errors--------- ", errors)
+
                                         return (
                                         <Form>
-                                        <div className="row formSection">
-                                            <label className="col-md-4">Insurance Repository:</label>
-                                            <div className="col-md-4">
-                                            <Field
-                                                name="insurrepostry_id"
-                                                component="select"
-                                                autoComplete="off"
-                                                value={values.insurrepostry_id}
-                                                className="formGrp"
-                                                onChange={(e) => {
-                                                    setFieldValue('insurrepostry_id', e.target.value);
-                                                }}
-                                            >
-                                            <option value="">Select Repository</option>
-                                            {insureRepository.map((repository, qIndex) => ( 
-                                                <option value={repository.id}>{repository.descriptions}</option>
-                                            ))}
-                                            </Field>  
-                                            {errors.insurrepostry_id && touched.insurrepostry_id ? (
-                                                <span className="errorMsg">{errors.insurrepostry_id}</span>
-                                            ) : null}    
-                                            </div>
-                                        </div>
-                                        <div className="row formSection">
-                                            <label className="col-md-4">Business Source:</label>
-                                            <div className="col-md-4">
-                                            <Field
-                                                name="ksbbusniessplan_id"
-                                                component="select"
-                                                autoComplete="off"
-                                                value={values.ksbbusniessplan_id}
-                                                className="formGrp"
-                                                onChange={(e) => {
-                                                    setFieldValue('ksbbusniessplan_id', e.target.value);
-                                                }}
-                                            >
-                                            <option value="">Select Business Plan</option>
-                                            {insureBusinessPlan.map((businessPlan, qIndex) => ( 
-                                                <option value={businessPlan.id}>{businessPlan.descriptions}</option>
-                                            ))}
-                                            </Field>  
-                                            {errors.ksbbusniessplan_id && touched.ksbbusniessplan_id ? (
-                                                <span className="errorMsg">{errors.ksbbusniessplan_id}</span>
-                                            ) : null}    
-                                            </div>
-                                        </div>
-                                        <div className="row formSection">
-                                            <label className="col-md-4">Product Type:</label>
-                                            <div className="col-md-4">
-                                            <Field
-                                                name="varient_type_id"
-                                                component="select"
-                                                autoComplete="off"
-                                                value={values.varient_type_id}
-                                                className="formGrp"
-                                                onChange={(e) => {
-                                                    setFieldValue('varient_type_id', e.target.value);
-                                                    this.chanageProductType(e.target.value)
-                                                }}
-                                            >
-                                            <option value="">Select product Type</option>
-                                                <option value="1">Individual</option>
-                                                <option value="2">Individual Family</option>
-                                                <option value="3"> Family Floater</option>
-                                            </Field>  
-                                            {errors.varient_type_id && touched.varient_type_id ? (
-                                                <span className="errorMsg">{errors.varient_type_id}</span>
-                                            ) : null}    
-                                            </div>
-                                        </div>
-                                        
                                         <div className="row formSection">
                                             <label className="col-md-4">Gender:</label>
                                             <div className="col-md-4">
@@ -1561,7 +1316,7 @@ console.log("Form errors--------- ", errors)
                                  validationSchema={validateFamilyMembers}
                                 >
                                 {({ values, errors, setFieldValue, setFieldTouched, isValid, isValidating ,isSubmitting, touched }) => {
-console.log("Modal errors--------- ", errors)
+
                                 return (
                                 <Form>
                                     <div className="customModalfamlyForm">
@@ -1569,9 +1324,15 @@ console.log("Modal errors--------- ", errors)
                                             <h4 className="modal-title">Add Family Members to be Insured</h4>
                                         </div>
                                         <Modal.Body>
-                                        {productTypes == '1' || productTypes == '2' || productTypes == '3' ?
+                                           {/* <Field type="hidden" className="form-control" className="check_input" name="check_input" value = {validateCheck}
+                                            validate={checkInputdata} 
+                                            /> 
+                                            {
+                                                errors.check_input && touched.check_input ?                 
+                                                <span className="error-message">{errors.check_input}</span>:''
+                                            }*/}
                                             <div className="row dropinput">
-                                                <div className="col-md-4"> 
+                                                <div className="col-md-4">
                                                     <label className="customCheckBox formGrp formGrp">Self
                                                     <Field
                                                         type="checkbox"
@@ -1607,7 +1368,7 @@ console.log("Modal errors--------- ", errors)
                                                         <span className="error-message"> </span>
                                                     </label>
                                                 </div>
-                                                
+
                                                 <div className="col-md-4">
                                                     <FormGroup>                                                  
                                                         <DatePicker
@@ -1644,11 +1405,10 @@ console.log("Modal errors--------- ", errors)
                                                         </label>
                                                         
                                                     </FormGroup>
-                                                </div>                         
+                                                </div>
                                             </div>
-                                            : null }
 
-                                            { productTypes == '2' || productTypes == '3' ?
+
                                             <div className="row dropinput">
                                                 <div className="col-md-4">
                                                     <label className="customCheckBox formGrp formGrp">Spouse
@@ -1715,9 +1475,8 @@ console.log("Modal errors--------- ", errors)
                                                         </label>
                                                     </FormGroup>
                                                 </div>
-                                            </div> : null}
-                                            { productTypes == '3' ?
-                                            <Fragment>
+                                            </div>
+
                                             <div className="row dropinput">
                                                 <div className="col-md-4">
                                                     <label className="customCheckBox formGrp formGrp">Child 1
@@ -1786,6 +1545,7 @@ console.log("Modal errors--------- ", errors)
                                                 </div>
 
                                                 <div className="col-md-4 formSection">
+                                                    <label className="formGrp">
                                                     <Field
                                                         name="child1Gender"
                                                         component="select"
@@ -1797,13 +1557,11 @@ console.log("Modal errors--------- ", errors)
                                                         <option value="m">Male</option>
                                                         <option value="f">Female</option>
                                                     </Field>    
-
-                                                    <label className="formGrp error">
-                                                    {
-                                                        errors.child1Gender && touched.child1Gender ?                 
-                                                        <span className="error-message">{errors.child1Gender}</span>:''
-                                                    }
                                                     </label>
+                                                    {
+                                                            errors.child1Gender && touched.child1Gender ?                 
+                                                            <span className="error-message">{errors.child1Gender}</span>:''
+                                                    }
                                                 </div>
                                             </div>
 
@@ -1876,6 +1634,7 @@ console.log("Modal errors--------- ", errors)
                                                 </div>
 
                                                 <div className="col-md-4 formSection">
+                                                    <label className="formGrp">
                                                     <Field
                                                         name="child2Gender"
                                                         component="select"
@@ -1887,13 +1646,11 @@ console.log("Modal errors--------- ", errors)
                                                         <option value="m">Male</option>
                                                         <option value="f">Female</option>
                                                     </Field>    
-
-                                                    <label className="formGrp error">
-                                                    {
-                                                        errors.child2Gender && touched.child2Gender ?                 
-                                                        <span className="error-message">{errors.child2Gender}</span>:''
-                                                    }
                                                     </label>
+                                                    {
+                                                            errors.child2Gender && touched.child2Gender ?                 
+                                                            <span className="error-message">{errors.child2Gender}</span>:''
+                                                    }
                                                 </div>
                                             </div>  
 
@@ -1965,6 +1722,7 @@ console.log("Modal errors--------- ", errors)
                                                 </div>
 
                                                 <div className="col-md-4 formSection">
+                                                    <label className="formGrp">
                                                     <Field
                                                         name="child3Gender"
                                                         component="select"
@@ -1976,23 +1734,23 @@ console.log("Modal errors--------- ", errors)
                                                         <option value="m">Male</option>
                                                         <option value="f">Female</option>
                                                     </Field>    
-
-                                                    <label className="formGrp error">
-                                                    {
-                                                        errors.child3Gender && touched.child3Gender ?                 
-                                                        <span className="error-message">{errors.child3Gender}</span>:''
-                                                    }
                                                     </label>
+                                                    {
+                                                            errors.child3Gender && touched.child3Gender ?                 
+                                                            <span className="error-message">{errors.child3Gender}</span>:''
+                                                    }
                                                 </div>
                                             </div> 
 
+
+
                                             <div className="row dropinput">
                                                 <div className="col-md-4">
-                                                    <label className="customCheckBox formGrp formGrp">Child 4
+                                                    <label className="customCheckBox formGrp formGrp">Father
                                                     <Field
                                                         type="checkbox"
                                                         name="looking_for_5"
-                                                        value="child4"
+                                                        value="father"
                                                         className="user-self"
                                                         onChange={(e) => {
                                                             if (e.target.checked === true) {
@@ -2003,6 +1761,7 @@ console.log("Modal errors--------- ", errors)
                                                                 setFieldValue("dob_5", '');
                                                                 
                                                             }
+
                                                             if(this.setValueData()){
                                                                 this.setState({
                                                                     validateCheck:1
@@ -2014,7 +1773,7 @@ console.log("Modal errors--------- ", errors)
                                                                 })
                                                             }
                                                         }}
-                                                        checked={values.looking_for_5 == 'child4' ? true : false}
+                                                        checked={values.looking_for_5 == 'father' ? true : false}
                                                     />
                                                         <span className="checkmark mL-0"></span>
                                                         <span className="error-message"></span>
@@ -2022,7 +1781,7 @@ console.log("Modal errors--------- ", errors)
                                                 </div>
 
                                                 <div className="col-md-4">
-                                                    <FormGroup >
+                                                    <FormGroup>
                                                         <DatePicker
                                                             name="dob_5"
                                                             dateFormat="dd MMM yyyy"
@@ -2031,8 +1790,8 @@ console.log("Modal errors--------- ", errors)
                                                             peekPreviousYear
                                                             showMonthDropdown
                                                             showYearDropdown
-                                                            maxDate={new Date(maxDobChild)}
-                                                            minDate={new Date(minDobChild)}
+                                                            maxDate={new Date(maxDobAdult)}
+                                                            minDate={new Date(minDobAdult)}
                                                             className="datePckr"
                                                             dropdownMode="select"
                                                             onChange={(value,e) => {
@@ -2050,40 +1809,18 @@ console.log("Modal errors--------- ", errors)
                                                             <span className="error-message">{errors.dob_5}</span>:''
                                                         }
                                                         </label>
+                                                        
                                                     </FormGroup>
                                                 </div>
-
-                                                <div className="col-md-4 formSection">
-                                                    <Field
-                                                        name="child4Gender"
-                                                        component="select"
-                                                        autoComplete="off"
-                                                        value={values.child4Gender}
-                                                        className="formGrp"
-                                                    >
-                                                    <option value="">Select gender</option>
-                                                        <option value="m">Male</option>
-                                                        <option value="f">Female</option>
-                                                    </Field>    
-                                                    
-                                                    <label className="formGrp error">
-                                                    {
-                                                        errors.child4Gender && touched.child4Gender ?                 
-                                                        <span className="error-message">{errors.child4Gender}</span>:''
-                                                    }
-                                                    </label>
-                                                </div>
-                                            </div> 
-
-
+                                            </div>
 
                                             <div className="row dropinput">
                                                 <div className="col-md-4">
-                                                    <label className="customCheckBox formGrp formGrp">Father
+                                                    <label className="customCheckBox formGrp formGrp">Mother
                                                     <Field
                                                         type="checkbox"
                                                         name="looking_for_6"
-                                                        value="father"
+                                                        value="mother"
                                                         className="user-self"
                                                         onChange={(e) => {
                                                             if (e.target.checked === true) {
@@ -2106,7 +1843,7 @@ console.log("Modal errors--------- ", errors)
                                                                 })
                                                             }
                                                         }}
-                                                        checked={values.looking_for_6 == 'father' ? true : false}
+                                                        checked={values.looking_for_6 == 'mother' ? true : false}
                                                     />
                                                         <span className="checkmark mL-0"></span>
                                                         <span className="error-message"></span>
@@ -2114,7 +1851,7 @@ console.log("Modal errors--------- ", errors)
                                                 </div>
 
                                                 <div className="col-md-4">
-                                                    <FormGroup>
+                                                    <FormGroup >
                                                         <DatePicker
                                                             name="dob_6"
                                                             dateFormat="dd MMM yyyy"
@@ -2142,18 +1879,17 @@ console.log("Modal errors--------- ", errors)
                                                             <span className="error-message">{errors.dob_6}</span>:''
                                                         }
                                                         </label>
-                                                        
                                                     </FormGroup>
                                                 </div>
                                             </div>
 
                                             <div className="row dropinput">
                                                 <div className="col-md-4">
-                                                    <label className="customCheckBox formGrp formGrp">Mother
+                                                    <label className="customCheckBox formGrp formGrp">Father in law
                                                     <Field
                                                         type="checkbox"
                                                         name="looking_for_7"
-                                                        value="mother"
+                                                        value="fatherInLaw"
                                                         className="user-self"
                                                         onChange={(e) => {
                                                             if (e.target.checked === true) {
@@ -2161,8 +1897,7 @@ console.log("Modal errors--------- ", errors)
                                                                 
                                                             } else {
                                                                 setFieldValue('looking_for_7', '');
-                                                                setFieldValue("dob_7", '');
-                                                                
+                                                                setFieldValue("dob_7", '');                                                                
                                                             }
 
                                                             if(this.setValueData()){
@@ -2176,7 +1911,7 @@ console.log("Modal errors--------- ", errors)
                                                                 })
                                                             }
                                                         }}
-                                                        checked={values.looking_for_7 == 'mother' ? true : false}
+                                                        checked={values.looking_for_7 == 'fatherInLaw' ? true : false}
                                                     />
                                                         <span className="checkmark mL-0"></span>
                                                         <span className="error-message"></span>
@@ -2216,13 +1951,13 @@ console.log("Modal errors--------- ", errors)
                                                 </div>
                                             </div>
 
-                                            <div className="row dropinput">
+                                            <div className="row dropinput m-b-45">
                                                 <div className="col-md-4">
-                                                    <label className="customCheckBox formGrp formGrp">Father in law
+                                                    <label className="customCheckBox formGrp formGrp">Mother in law
                                                     <Field
                                                         type="checkbox"
                                                         name="looking_for_8"
-                                                        value="fatherInLaw"
+                                                        value="motherInLaw"
                                                         className="user-self"
                                                         onChange={(e) => {
                                                             if (e.target.checked === true) {
@@ -2244,7 +1979,7 @@ console.log("Modal errors--------- ", errors)
                                                                 })
                                                             }
                                                         }}
-                                                        checked={values.looking_for_8 == 'fatherInLaw' ? true : false}
+                                                        checked={values.looking_for_8 == 'motherInLaw' ? true : false}
                                                     />
                                                         <span className="checkmark mL-0"></span>
                                                         <span className="error-message"></span>
@@ -2281,80 +2016,10 @@ console.log("Modal errors--------- ", errors)
                                                         }
                                                         </label>
                                                     </FormGroup>
-                                                </div>
-                                            </div>
-
-                                            <div className="row dropinput m-b-45">
-                                                <div className="col-md-4">
-                                                    <label className="customCheckBox formGrp formGrp">Mother in law
-                                                    <Field
-                                                        type="checkbox"
-                                                        name="looking_for_9"
-                                                        value="motherInLaw"
-                                                        className="user-self"
-                                                        onChange={(e) => {
-                                                            if (e.target.checked === true) {
-                                                                setFieldValue('looking_for_9', e.target.value);
-                                                                
-                                                            } else {
-                                                                setFieldValue('looking_for_9', '');
-                                                                setFieldValue("dob_9", '');                                                                
-                                                            }
-
-                                                            if(this.setValueData()){
-                                                                this.setState({
-                                                                    validateCheck:1
-                                                                })
-                                                            }
-                                                            else{
-                                                                this.setState({
-                                                                    validateCheck:0
-                                                                })
-                                                            }
-                                                        }}
-                                                        checked={values.looking_for_9 == 'motherInLaw' ? true : false}
-                                                    />
-                                                        <span className="checkmark mL-0"></span>
-                                                        <span className="error-message"></span>
-                                                    </label>
-                                                </div>
-
-                                                <div className="col-md-4">
-                                                    <FormGroup >
-                                                        <DatePicker
-                                                            name="dob_9"
-                                                            dateFormat="dd MMM yyyy"
-                                                            placeholderText="DOB"
-                                                            peekPreviousMonth
-                                                            peekPreviousYear
-                                                            showMonthDropdown
-                                                            showYearDropdown
-                                                            maxDate={new Date(maxDobAdult)}
-                                                            minDate={new Date(minDobAdult)}
-                                                            className="datePckr"
-                                                            dropdownMode="select"
-                                                            onChange={(value,e) => {
-                                                                if (e && typeof e.preventDefault === 'function') {
-                                                                    e.preventDefault();
-                                                                }
-                                                                setFieldTouched("dob_9");
-                                                                setFieldValue("dob_9", value);
-                                                              }}
-                                                            selected={values.dob_9}
-                                                        />
-                                                        <label className="formGrp error">
-                                                        {
-                                                            errors.dob_9 && touched.dob_9 ?                 
-                                                            <span className="error-message">{errors.dob_9}</span>:''
-                                                        }
-                                                        </label>
-                                                    </FormGroup>
                                                 </div>              
                                             </div>
-                                            </Fragment> : null }
-
-                                            {values.looking_for_2 || values.looking_for_3 || values.looking_for_4 || values.looking_for_5 ?
-                                            <div className="row dropinput m-b-45">
+                                            {values.looking_for_2 || values.looking_for_3 || values.looking_for_4 ?
+                                            <div className="row dropinput m-b-20">
                                                 <div className="col-md-15">
                                                     <label className="customCheckBox formGrp formGrp">
                                                     I confirm that the child is/ children are financially dependent on me
@@ -2385,12 +2050,61 @@ console.log("Modal errors--------- ", errors)
                                                     />
                                                         <span className="checkmark mL-0"></span>
                                                     </label>
-                                                    {errors.confirm && (touched.looking_for_2 || touched.looking_for_3 || touched.looking_for_4 || touched.looking_for_5) ? 
+                                                    {errors.confirm && (touched.looking_for_2 || touched.looking_for_3 || touched.looking_for_4) ? 
                                                             <span className="error-message">{errors.confirm}</span> : ""
                                                         }
                                                 </div>
                                             </div> 
-                                            : null }
+                                            : null }                                      
+                                            <div className="d-flex justify-content-center">      
+                                                <div className="d-inline-flex m-b-15 m-l-20">
+                                                        <div className="p-r-25">
+                                                            <label className="customRadio3">
+                                                                <Field
+                                                                    type="radio"
+                                                                    name='Floater_Plan'
+                                                                    value='1'
+                                                                    key='1'
+                                                                    checked = {values.policy_for == '1' ? true : false}
+                                                                    // onChange = {() =>{
+                                                                    //     setFieldTouched('policy_for')
+                                                                    //     setFieldValue('policy_for', '1');
+                                                                    //     this.handleChange(values,setFieldTouched, setFieldValue)
+                                                                    // }  
+                                                                    // }
+                                                                />
+                                                                <span className="checkmark " /><span className="fs-14">Floater Plan</span>
+                                                                <OverlayTrigger overlay={<Tooltip id="tooltip-disabled">{"A family floater policy is a health insurance plan which covers the entire family on the payment of a single annual premium."}</Tooltip>}>
+                                                                    <a className="infoIcon"><img src={require('../../assets/images/i.svg')} alt="" className="premtool" /></a>
+                                                                </OverlayTrigger>
+                                                            </label>
+                                                        </div>
+                                                        <div className="p-r-25">
+                                                            <label className="customRadio3">
+                                                                <Field
+                                                                    type="radio"
+                                                                    name='Non_Floater_Plan'
+                                                                    value='2'
+                                                                    key='1'
+                                                                    checked = {values.policy_for == '2' ? true : false}
+                                                                    // onChange = {() =>{
+                                                                    //     setFieldTouched('policy_for')
+                                                                    //     setFieldValue('policy_for', '2');
+                                                                    //     this.handleChange(values,setFieldTouched, setFieldValue)
+                                                                    // }  
+                                                                    // }
+                                                                />
+                                                                <span className="checkmark " /><span className="fs-14">Non Floater Plan</span>
+                                                                <OverlayTrigger overlay={<Tooltip id="tooltip-disabled">{"A non floater policy is a health insurance plan which covers the individual family member(s) on the payment of a single annual premium."}</Tooltip>}>
+                                                                    <a className="infoIcon"><img src={require('../../assets/images/i.svg')} alt="" className="premtool" /></a>
+                                                                </OverlayTrigger>
+                                                            </label>
+                                                            {errors.policy_for && touched.policy_for ? (
+                                                                <span className="errorMsg">{errors.policy_for}</span>
+                                                            ) : null}
+                                                        </div>
+                                                </div>
+                                            </div>
                                             
                                             <div className="cntrbtn">
                                             <Button className={`btnPrimary m-r-15`} type="submit" >
@@ -2428,4 +2142,4 @@ const mapStateToProps = state => {
     };
   };
 
-export default withRouter (connect( mapStateToProps, mapDispatchToProps)(InformationYourself));
+export default withRouter (connect( mapStateToProps, mapDispatchToProps)(arogya_InformationYourself));

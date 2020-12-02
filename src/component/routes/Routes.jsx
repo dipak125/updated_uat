@@ -141,6 +141,42 @@ const SelectBrand = Loadable({
     loader: () => import(/*webpackChunkName: "Products" */"../motor/SelectBrand.jsx"),
     loading: () => loadingContent
 });
+
+// =================== AROGYA TOPUP =============================== //
+
+const arogya_Health = Loadable({
+    loader: () => import(/*webpackChunkName: "Products" */"../Arogya_topUp/arogya_InformationYourself"),
+    loading: () => loadingContent
+});
+const arogya_MedicalDetails = Loadable({
+    loader: () => import(/*webpackChunkName: "Products" */"../Arogya_topUp/arogya_MedicalDetails.jsx"),
+    loading: () => loadingContent
+});
+const arogya_SelectDuration = Loadable({
+    loader: () => import(/*webpackChunkName: "Products" */"../Arogya_topUp/arogya_SelectDuration.jsx"),
+    loading: () => loadingContent
+});
+const arogya_Address = Loadable({
+    loader: () => import(/*webpackChunkName: "Products" */"../Arogya_topUp/arogya_Address"),
+    loading: () => loadingContent
+});
+const arogya_NomineeDetails = Loadable({
+    loader: () => import(/*webpackChunkName: "Products" */"../Arogya_topUp/arogya_NomineeDetails.jsx"),
+    loading: () => loadingContent
+});
+const arogya_PolicyDetails = Loadable({
+    loader: () => import(/*webpackChunkName: "Products" */"../Arogya_topUp/arogya_PolicyDetails.jsx"),
+    loading: () => loadingContent
+});
+const arogya_ThankYou = Loadable({
+    loader: () => import(/*webpackChunkName: "Products" */"../Arogya_topUp/arogya_ThankYou.jsx"),
+    loading: () => loadingContent
+});
+const arogya_ThankYouCCM = Loadable({
+    loader: () => import(/*webpackChunkName: "Products" */"../Arogya_topUp/arogya_ThankYouCCM.jsx"),
+    loading: () => loadingContent
+});
+
 //=====================================================================================
 
 // ========== Two-Wheeler TP =============================================
@@ -389,6 +425,19 @@ class Routes extends Component {
                         
                         {/* ********************** LandingPage ***************  */}  RenewalPlanner                  
                         <PrivateRoute exact path="/Dashboard" component={Dashboard} />  
+                        
+                        {/* ********************* AROGYA TOPUP ***************** */}
+                        
+                        <PrivateRoute exact path="/arogya_Health/:productId" component={arogya_Health} />
+                        <PrivateRoute exact path="/arogya_MedicalDetails/:productId" component={arogya_MedicalDetails} />
+                        <PrivateRoute exact path="/arogya_SelectDuration/:productId" component={arogya_SelectDuration} />
+                        <PrivateRoute exact path="/arogya_Address/:productId" component={arogya_Address} />    
+                        <PrivateRoute exact path="/arogya_NomineeDetails/:productId" component={arogya_NomineeDetails} /> 
+                        <PrivateRoute exact path="/arogya_PolicyDetails/:productId" component={arogya_PolicyDetails} />
+                        {/* <PrivateRoute exact path="/PolicySummery/:productId" component={PolicySummery} />                  */}
+                        <PrivateRoute exact path="/arogya_ThankYou/:policyId" component={arogya_ThankYou} />
+                        <PrivateRoute exact path="/arogya_ThankYouCCM" component={arogya_ThankYouCCM} />
+
 
 
                         {/************ TwoWheeler ******************/}

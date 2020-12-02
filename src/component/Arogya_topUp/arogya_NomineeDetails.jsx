@@ -3,7 +3,7 @@ import { Row, Col, Modal, Button, FormGroup, OverlayTrigger, Tooltip } from 'rea
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css"
 import 'react-datepicker/dist/react-datepicker-cssmodules.min.css'
-import BaseComponent from '.././BaseComponent';
+import BaseComponent from '../BaseComponent';
 import SideNav from '../common/side-nav/SideNav';
 import Footer from '../common/footer/Footer';
 import { Formik, Field, Form } from "formik";
@@ -31,10 +31,7 @@ const initialValues = {
     relation_with: "",
     // appointee_dob: "",
     appointee_relation_with: "",
-    appointee_name: "",
-    whatsapp_const_decl: "0",
-    auto_renewal: "",
-    language_id: ""
+    appointee_name: ""
 }
 
 const validateNominee = Yup.object().shape({
@@ -152,25 +149,15 @@ const validateNominee = Yup.object().shape({
             }
             return true;
         }
-    ),
-
-    language_id: Yup.string().required("Select prefered Language of communication"),
-    auto_renewal: Yup.string().required("Select auto renewal").nullable(),
-    ksb_eformat: Yup.string().required("Select e-document").nullable(),
-    ksb_phyformat: Yup.string().required("Select physical document").nullable(),
-    whatsapp_const_decl: Yup.string().required("Please check whatsapp consent")
-
+    )
 })
 
-class NomineeDetails extends Component {
+class arogya_NomineeDetails extends Component {
 
     state = {
         NomineeDetails: [], 
         appointeeFlag: false,
-        is_appointee:0,
-        languageList: [],
-        ksbinfo: [],
-        policy_holder: []
+        is_appointee:0
       };
 
     changePlaceHoldClassAdd(e) {
@@ -201,7 +188,7 @@ class NomineeDetails extends Component {
     }
 
     addressInfo = (productId) => {
-        this.props.history.push(`/Address_KSB/${productId}`);
+        this.props.history.push(`/arogya_Address/${productId}`);
     }
 
     handleSubmit = (values, actions) => {
@@ -212,22 +199,21 @@ class NomineeDetails extends Component {
         for (const key in values) {
             if (values.hasOwnProperty(key)) {
               if(key == "dob" ){
+
+                //formData.append(key, moment(values[key]).format("YYYY-MM-DD"));
                 formArr[key] = moment(values[key]).format("YYYY-MM-DD")
               }
               else {
+                // formData.append(key, values[key]);
                 formArr[key] = values[key]
               }          
             }
           }
 
+        //formData.append('policy_holder_id', localStorage.getItem('policyHolder_id'));
         formArr['policy_holder_id'] = localStorage.getItem('policyHolder_id')
+       // formData.append('is_appointee', this.state.is_appointee);
         formArr['is_appointee'] = this.state.is_appointee
-        formArr['language_id'] = values.language_id;
-        formArr['auto_renewal'] = values.auto_renewal;
-        formArr['ksb_eformat'] = values.ksb_eformat;
-        formArr['ksb_phyformat'] = values.ksb_phyformat;
-        formArr['whatsapp_const_decl'] = values.whatsapp_const_decl;
-
         let formObj = {}
         Object.assign(formObj,formArr)
         console.log("PostData---", formObj)
@@ -236,10 +222,10 @@ class NomineeDetails extends Component {
 
         this.props.loadingStart();
         axios
-        .post(`ksb/insert-nominee`, formData)
+        .post(`/insert-nominee`, formData)
         .then(res => { 
             this.props.loadingStop();
-            this.props.history.push(`/PolicyDetails_KSB/${productId}`);
+            this.props.history.push(`/arogya_PolicyDetails/${productId}`);
         })
         .catch(err => {
             if(err.status == 401) {
@@ -259,24 +245,22 @@ class NomineeDetails extends Component {
         this.setState({
             self_selected
         })
-        this.fetchLanguageList()
         //return self_selected
     }
 
     getNomineeDetails = () => {
         this.props.loadingStart();
-        let policyHolder_refNo = localStorage.getItem("policyHolder_refNo");
         axios
-          .get(`ksb/details/${policyHolder_refNo}`)
+          .get(`/policy-holder/${localStorage.getItem('policyHolder_id')}`)
           .then(res => { 
            let family_members = res.data.data.policyHolder.request_data ? res.data.data.policyHolder.request_data.family_members:[]
-           let ksbinfo =  res.data.data.policyHolder && res.data.data.policyHolder.ksbinfo  ? res.data.data.policyHolder.ksbinfo: []
-           let policy_holder =  res.data.data.policyHolder;
             this.fetchPolicyRelations(family_members)
+           // console.log("SELF SELECTED==============>",self_selected)
             this.setState({
                 NomineeDetails: res.data.data.policyHolder.request_data.nominee[0],
-                is_appointee: res.data.data.policyHolder.request_data.nominee[0].is_appointee, ksbinfo, policy_holder
+                is_appointee: res.data.data.policyHolder.request_data.nominee[0].is_appointee
             }) 
+            this.props.loadingStop();
           })
           .catch(err => {
             this.setState({
@@ -286,29 +270,15 @@ class NomineeDetails extends Component {
           });
       }
 
-    fetchLanguageList = () => {
-        axios.get(`language`)
-        .then(res=>{
-            var languageList = res.data && res.data.data ? res.data.data : []
-            this.setState({
-                languageList            
-            })
-            this.props.loadingStop();
-        })
-        .catch(err => {
-            // handle error
-            this.props.loadingStop();
-        })
-    }
-
-    componentDidMount() {
-    this.getNomineeDetails();
-    }
+      componentDidMount() {
+        this.getNomineeDetails();
+      }
 
 
     render() {
         const {productId} = this.props.match.params
-        const {NomineeDetails,appointeeFlag, is_appointee,self_selected, languageList, ksbinfo, policy_holder} = this.state
+        const {NomineeDetails,appointeeFlag, is_appointee,self_selected} = this.state
+      //  console.log('SELF SELECTED============>',this.state.self_selected)
         moment.defaultFormat = "YYYY-MM-YY";
 
         const newInitialValues = Object.assign(initialValues, {
@@ -320,12 +290,6 @@ class NomineeDetails extends Component {
             // appointee_dob: NomineeDetails && NomineeDetails.appointee_dob ? new Date(NomineeDetails.appointee_dob) : "",
             appointee_relation_with: NomineeDetails && NomineeDetails.appointee_relation_with ? NomineeDetails.appointee_relation_with : "",
             appointee_name: NomineeDetails && NomineeDetails.appointee_name ? NomineeDetails.appointee_name : "",
-
-            language_id: policy_holder && policy_holder.ksbinfo && policy_holder.ksbinfo.language_id ?  policy_holder.ksbinfo.language_id : '',
-            auto_renewal: policy_holder && policy_holder.ksbinfo ?  policy_holder.ksbinfo.auto_renewal : '',
-            ksb_eformat: policy_holder && policy_holder.ksbinfo ?  policy_holder.ksbinfo.ksb_eformat : '',
-            ksb_phyformat: policy_holder && policy_holder.ksbinfo ?  policy_holder.ksbinfo.ksb_phyformat : '',
-            whatsapp_const_decl: policy_holder && policy_holder.ksbinfo ?  policy_holder.ksbinfo.whatsapp_const_decl : ''
 
         })
         
@@ -339,7 +303,7 @@ class NomineeDetails extends Component {
                                 <SideNav />
                             </div>
                             <div className="col-sm-12 col-md-12 col-lg-10 col-xl-10 infobox">
-                                <h4 className="text-center mt-3 mb-3">KSB Retail Policy</h4>
+                                <h4 className="text-center mt-3 mb-3">Arogya Sanjeevani Policy</h4>
                                 <section className="brand">
                                     <div className="boxpd">
                                         <div className="justify-content-left brandhead  m-b-20">
@@ -558,237 +522,6 @@ class NomineeDetails extends Component {
                                                      : null
                                                 } 
 
-                                                <div className="d-flex justify-content-left carloan">
-                                                    <h4> Additional Details</h4>
-                                                </div>
-                                                <div className="d-flex justify-content-left carloan">
-                                                    <h4> &nbsp;</h4>
-                                                </div>
-                                                <Row className="m-b-45">
-                                                    <Col sm={12} md={3} lg={6}>
-                                                        <FormGroup>
-                                                        Prefered Language
-                                                        </FormGroup>
-                                                    </Col>
-                                                    <Col sm={12} md={8} lg={5}>
-                                                            <FormGroup>
-                                                            <div className="formSection">
-                                                                    <Field
-                                                                        name="language_id"
-                                                                        component="select"
-                                                                        autoComplete="off"
-                                                                        value={values.language_id}
-                                                                        className="formGrp"
-                                                                    >
-                                                                    <option value="">Pefered Language</option>
-                                                                    {languageList && languageList.map((resource,rindex)=>
-                                                                        <option value={resource.id}>{resource.descriptions}</option>
-                                                                    )}
-                                                                        
-                                                                        {/*<option value="area2">Area 2</option>*/}
-                                                                    </Field>     
-                                                                    {errors.language_id && touched.language_id ? (
-                                                                        <span className="errorMsg">{errors.language_id}</span>
-                                                                    ) : null}     
-                                                                    </div>
-                                                            </FormGroup>
-                                                        </Col>
-
-                                                        <Col sm={12} md={3} lg={6}>
-                                                            <FormGroup>
-                                                            Auto Renewal
-                                                            </FormGroup>
-                                                        </Col>
-                                                        <Col sm={12} md={8} lg={2}>
-                                                            <FormGroup>
-                                                                <div className="p-r-25">
-                                                                <label className="customRadio3">
-                                                                <Field
-                                                                    type="radio"
-                                                                    name='auto_renewal'                                            
-                                                                    value='1'
-                                                                    key='1'  
-                                                                    onChange={(e) => {
-                                                                        setFieldValue(`auto_renewal`, e.target.value);
-                                                                    }}
-                                                                    checked={values.auto_renewal == '1' ? true : false}
-                                                                />
-                                                                    <span className="checkmark " /><span className="fs-14"> Yes</span>
-                                                                </label>
-                                                                </div>
-                                                            </FormGroup>
-                                                        </Col>
-                                                        <Col sm={12} md={8} lg={2}>
-                                                            <FormGroup>
-                                                                <div className="p-r-25">
-                                                                <label className="customRadio3">
-                                                                <Field
-                                                                    type="radio"
-                                                                    name='auto_renewal'                                            
-                                                                    value='0'
-                                                                    key='1'  
-                                                                    onChange={(e) => {
-                                                                        setFieldValue(`auto_renewal`, e.target.value);
-                                                                    }}
-                                                                    checked={values.auto_renewal == '0' ? true : false}
-                                                                />
-                                                                    <span className="checkmark " /><span className="fs-14"> No</span>
-                                                                    {errors.auto_renewal && touched.auto_renewal ? (
-                                                                        <span className="errorMsg">{errors.auto_renewal}</span>
-                                                                    ) : null}
-                                                                </label>
-                                                                </div>
-                                                            </FormGroup>
-                                                        </Col>
-                                                        <Col sm={12} md={8} lg={1}>
-                                                            <FormGroup>
-                                                                <div className="p-r-25">
-                                                                    &nbsp;
-                                                                </div>
-                                                            </FormGroup>
-                                                        </Col>
-
-                                                        <Col sm={12} md={3} lg={6}>
-                                                            <FormGroup>
-                                                            Do you want Kutumb Swasthya Bima Policy related information in Physical Format?
-                                                            </FormGroup>
-                                                        </Col>
-                                                        <Col sm={12} md={8} lg={2}>
-                                                            <FormGroup>
-                                                                <div className="p-r-25">
-                                                                <label className="customRadio3">
-                                                                <Field
-                                                                    type="radio"
-                                                                    name='ksb_phyformat'                                            
-                                                                    value='1'
-                                                                    key='1'  
-                                                                    onChange={(e) => {
-                                                                        setFieldValue(`ksb_phyformat`, e.target.value);
-                                                                        
-                                                                    }}
-                                                                    checked={values.ksb_phyformat == '1' ? true : false}
-                                                                />
-                                                                    <span className="checkmark " /><span className="fs-14"> Yes</span>
-                                                                </label>
-                                                                </div>
-                                                            </FormGroup>
-                                                        </Col>
-                                                        <Col sm={12} md={8} lg={2}>
-                                                            <FormGroup>
-                                                                <div className="p-r-25">
-                                                                <label className="customRadio3">
-                                                                <Field
-                                                                    type="radio"
-                                                                    name='ksb_phyformat'                                            
-                                                                    value='0'
-                                                                    key='1'  
-                                                                    onChange={(e) => {
-                                                                        setFieldValue(`ksb_phyformat`, e.target.value);
-                                                                      
-                                                                    }}
-                                                                    checked={values.ksb_phyformat == '0' ? true : false}
-                                                                />
-                                                                    <span className="checkmark " /><span className="fs-14"> No</span>
-                                                                    {errors.ksb_phyformat && touched.ksb_phyformat ? (
-                                                                        <span className="errorMsg">{errors.ksb_phyformat}</span>
-                                                                    ) : null}
-                                                                </label>
-                                                                </div>
-                                                            </FormGroup>
-                                                        </Col>
-                                                        <Col sm={12} md={8} lg={1}>
-                                                            <FormGroup>
-                                                                <div className="p-r-25">
-                                                                    &nbsp;
-                                                                </div>
-                                                            </FormGroup>
-                                                        </Col>
-
-                                                        <Col sm={12} md={3} lg={6}>
-                                                            <FormGroup>
-                                                            Do you want Kutumb Swasthya Bima Policy related information in e-Format when applicable?
-                                                            </FormGroup>
-                                                        </Col>
-                                                        <Col sm={12} md={8} lg={2}>
-                                                            <FormGroup>
-                                                                <div className="p-r-25">
-                                                                <label className="customRadio3">
-                                                                <Field
-                                                                    type="radio"
-                                                                    name='ksb_eformat'                                            
-                                                                    value='1'
-                                                                    key='1'  
-                                                                    onChange={(e) => {
-                                                                        setFieldValue(`ksb_eformat`, e.target.value);
-                                                                    }}
-                                                                    checked={values.ksb_eformat == '1' ? true : false}
-                                                                />
-                                                                    <span className="checkmark " /><span className="fs-14"> Yes</span>
-                                                                </label>
-                                                                </div>
-                                                            </FormGroup>
-                                                        </Col>
-                                                        <Col sm={12} md={8} lg={2}>
-                                                            <FormGroup>
-                                                                <div className="p-r-25">
-                                                                <label className="customRadio3">
-                                                                <Field
-                                                                    type="radio"
-                                                                    name='ksb_eformat'                                            
-                                                                    value='0'
-                                                                    key='1'  
-                                                                    onChange={(e) => {
-                                                                        setFieldValue(`ksb_eformat`, e.target.value);
-                                                                      
-                                                                    }}
-                                                                    checked={values.ksb_eformat == '0' ? true : false}
-                                                                />
-                                                                    <span className="checkmark " /><span className="fs-14"> No</span>
-                                                                    {errors.ksb_eformat && touched.ksb_eformat ? (
-                                                                        <span className="errorMsg">{errors.ksb_eformat}</span>
-                                                                    ) : null}
-                                                                </label>
-                                                                </div>
-                                                            </FormGroup>
-                                                        </Col>
-                                                        <Col sm={12} md={8} lg={1}>
-                                                            <FormGroup>
-                                                                <div className="p-r-25">
-                                                                    &nbsp;
-                                                                </div>
-                                                            </FormGroup>
-                                                        </Col>
-
-                                                        
-                                                        <Col sm={12} md={8} lg={11} className="row formSection">
-                                                            <label className="customCheckBox formGrp formGrp">
-                                                                Continue Without Vehicle Registration Number
-                                                                <div className="p-r-25">
-                                                                <Field
-                                                                    type="checkbox"  
-                                                                    name='whatsapp_const_decl'                                            
-                                                                    value='1'
-                                                                    key='1'  
-                                                                    onChange={(e) => {
-                                                                        if (e.target.checked === true) {
-                                                                            setFieldTouched('whatsapp_const_decl')
-                                                                            setFieldValue('whatsapp_const_decl', e.target.value);
-                    
-                                                                        } else {
-                                                                            setFieldValue('whatsapp_const_decl', '0');                                                            
-                                                                        }
-                                                                    }}
-                                                                    checked={values.whatsapp_const_decl == '1' ? true : false}
-                                                                />
-                                                                    <span className="checkmark mL-0"></span>
-                                                                </div>
-                                                            </label>
-                                                            {errors.whatsapp_const_decl ? 
-                                                                <span className="error-message">{errors.whatsapp_const_decl}</span> : ""
-                                                            }
-                                                        </Col>
-                                                    </Row>
-
                                                 <div className="d-flex justify-content-left resmb">
                                                 <Button className={`backBtn`} type="button"  disabled={isSubmitting ? true : false} onClick= {this.addressInfo.bind(this, productId )}>
                                                     {isSubmitting ? 'Wait..' : 'Back'}
@@ -835,4 +568,4 @@ const mapStateToProps = state => {
     };
   };
 
-export default withRouter (connect( mapStateToProps, mapDispatchToProps)(NomineeDetails));
+export default withRouter (connect( mapStateToProps, mapDispatchToProps)(arogya_NomineeDetails));
