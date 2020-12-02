@@ -107,9 +107,9 @@ class ThankYouCCM extends Component {
   }
 
   generateDoc = () => {
-    const { policyId } = this.props.match.params
+    const { policyNo } = this.state
     const formData = new FormData();
-    formData.append('policyNo', policyId)
+    formData.append('policyNo', policyNo)
     this.props.loadingStart();
     axios
       .post(`/policy-download/policy-pdf`, formData)
