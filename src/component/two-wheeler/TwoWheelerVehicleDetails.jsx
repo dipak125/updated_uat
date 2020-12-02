@@ -215,7 +215,7 @@ class TwoWheelerVehicleDetails extends Component {
         let vehicleAge = Math.floor(moment(newPolStartDate).diff(values.registration_date, 'months', true))
         let vehicleAgeDays = Math.floor(moment(newPolStartDate).diff(values.registration_date, 'days', true))
         let policy_type = vehicleAgeDays < 185 ? 6 : 1
-        console.log("vehicleAge===", vehicleAgeDays)
+        // console.log("vehicleAge===", vehicleAgeDays)
         const formData = new FormData(); 
         let post_data = {}
         if(motorInsurance && motorInsurance.policytype_id && motorInsurance.policytype_id == '1') {
@@ -229,7 +229,8 @@ class TwoWheelerVehicleDetails extends Component {
                 'vehicleAge': vehicleAge,
                 'pol_start_date': moment(newPolStartDate).format('YYYY-MM-DD'),
                 'pol_end_date': moment(newPolEndDate).format('YYYY-MM-DD') ,
-                'policy_type':  policy_type    
+                'policy_type':  policy_type,
+                'page_name': `two_wheeler_Vehicle_details/${productId}`,
             } 
             
         }
@@ -246,7 +247,8 @@ class TwoWheelerVehicleDetails extends Component {
                 'pol_start_date': moment(newPolStartDate).format('YYYY-MM-DD'),
                 'pol_end_date': moment(newPolEndDate).format('YYYY-MM-DD'),
                 'policy_type':  policy_type,
-                'insurance_company_id': values.insurance_company_id
+                'insurance_company_id': values.insurance_company_id,
+                'page_name': `two_wheeler_Vehicle_details/${productId}`,
             }
         }
         console.log('post_data', post_data)

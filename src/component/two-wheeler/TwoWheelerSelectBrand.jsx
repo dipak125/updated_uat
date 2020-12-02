@@ -356,7 +356,8 @@ class TwoWheelerSelectBrand extends Component {
                     'bcmaster_id': "5",
                     'lapse_duration': values.lapse_duration,
                     'policy_for': values.policy_for,
-                    'fastlaneLog_id': this.state.fastlaneLogId ? this.state.fastlaneLogId : fastlanelog && fastlanelog.id ? fastlanelog.id : 0
+                    'fastlaneLog_id': this.state.fastlaneLogId ? this.state.fastlaneLogId : fastlanelog && fastlanelog.id ? fastlanelog.id : 0,
+                    'page_name': `two_wheeler_Select-brand/${productId}`,
                 }
             }
             else {
@@ -375,7 +376,8 @@ class TwoWheelerSelectBrand extends Component {
                     'lapse_duration': values.lapse_duration,
                     'policy_for': values.policy_for,
                     'bc_agent_id': bc_data ? bc_data.user_info.data.user.username : "",
-                    'fastlaneLog_id': this.state.fastlaneLogId ? this.state.fastlaneLogId : fastlanelog && fastlanelog.id ? fastlanelog.id : 0
+                    'fastlaneLog_id': this.state.fastlaneLogId ? this.state.fastlaneLogId : fastlanelog && fastlanelog.id ? fastlanelog.id : 0,
+                    'page_name': `two_wheeler_Select-brand/${productId}`,
                 }
             }
             console.log('post_data-----', post_data)
@@ -427,7 +429,8 @@ class TwoWheelerSelectBrand extends Component {
                     'bcmaster_id': "5",
                     'lapse_duration': values.lapse_duration,
                     'policy_for': values.policy_for,
-                    'fastlaneLog_id': this.state.fastlaneLogId ? this.state.fastlaneLogId : fastlanelog && fastlanelog.id ? fastlanelog.id : 0
+                    'fastlaneLog_id': this.state.fastlaneLogId ? this.state.fastlaneLogId : fastlanelog && fastlanelog.id ? fastlanelog.id : 0,
+                    'page_name': `two_wheeler_Select-brand/${productId}`,
                 }
             }
             else{
@@ -445,7 +448,8 @@ class TwoWheelerSelectBrand extends Component {
                     'lapse_duration': values.lapse_duration,
                     'policy_for': values.policy_for,
                     'bc_agent_id': bc_data ? bc_data.user_info.data.user.username : "",
-                    'fastlaneLog_id': this.state.fastlaneLogId ? this.state.fastlaneLogId : fastlanelog && fastlanelog.id ? fastlanelog.id : 0
+                    'fastlaneLog_id': this.state.fastlaneLogId ? this.state.fastlaneLogId : fastlanelog && fastlanelog.id ? fastlanelog.id : 0,
+                    'page_name': `two_wheeler_Select-brand/${productId}`,
                 }
             }
             console.log('post_data-----', post_data)

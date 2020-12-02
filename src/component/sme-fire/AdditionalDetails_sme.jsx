@@ -1,8 +1,8 @@
 import React, { Component, Fragment } from 'react';
 import { Row, Col, Modal, Button, FormGroup, OverlayTrigger, Tooltip  } from 'react-bootstrap';
 import DatePicker from "react-datepicker";
-import "react-datepicker/dist/react-datepicker.css"
-import 'react-datepicker/dist/react-datepicker-cssmodules.min.css'
+import "react-datepicker/dist/react-datepicker.css";
+import "react-datepicker/dist/react-datepicker-cssmodules.min.css";
 import Footer from '../common/footer/Footer';
 import BaseComponent from '.././BaseComponent';
 import SideNav from '../common/side-nav/SideNav';
@@ -225,6 +225,7 @@ class AdditionalDetails_sme extends Component {
         formData.append('bcmaster_id','1')
         formData.append('policy_holder_id',this.props.policy_holder_id)
         formData.append('menumaster_id',this.props.menumaster_id)
+        formData.append('page_name','/AdditionalDetails_SME/9')
         formData.append('first_name',values.first_name)
         formData.append('last_name',values.last_name)
         formData.append('salutation_id',values.salutation_id)
@@ -269,6 +270,7 @@ class AdditionalDetails_sme extends Component {
 
             let formDataNew = new FormData(); 
             formDataNew.append('menumaster_id',this.props.menumaster_id)
+            formData.append('page_name','/AdditionalDetails_SME/9')
             formDataNew.append('policy_ref_no',this.props.policy_holder_ref_no)    
 
             axios.post('/sme/mdm-party',
@@ -305,17 +307,17 @@ class AdditionalDetails_sme extends Component {
                 }).
                 catch(err=>{
                     this.props.loadingStop();
-                    return false;
+                    actions.setSubmitting(false);
                 });
             }).
             catch(err=>{
                 this.props.loadingStop();
-                return false;
+                actions.setSubmitting(false);
             });
         }).
         catch(err=>{
             this.props.loadingStop();
-            return false;
+            actions.setSubmitting(false);
         });
     }
 

@@ -465,7 +465,8 @@ class TwoWheelerVerify extends Component {
                 'chasis_no_last_part': values.chasis_no_last_part,
                 'engine_no': values.engine_no,
                 'prev_policy_flag': 0,
-                'cng_kit': 0
+                'cng_kit': 0,
+                'page_name': `two_wheeler_verifyTP/${productId}`,
             }
         }
         else {
@@ -484,6 +485,7 @@ class TwoWheelerVerify extends Component {
                 'insurance_company_id':values.insurance_company_id,
                 'cng_kit': 0,
                 'previous_city':values.previous_city,
+                'page_name': `two_wheeler_verifyTP/${productId}`,
                         
             }
         }

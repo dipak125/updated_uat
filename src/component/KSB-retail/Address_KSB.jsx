@@ -451,6 +451,7 @@ class Address extends Component {
         formArr['email_id'] = values.email;
         formArr['is_eia_account'] = values.eIA;      
         formArr['ckyc_no'] = values.ckyc_no;
+        formArr['page_name'] = `Address_KSB/${productId}`
         
 
         let address_object = {}

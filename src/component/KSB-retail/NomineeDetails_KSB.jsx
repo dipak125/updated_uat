@@ -227,6 +227,7 @@ class NomineeDetails extends Component {
         formArr['ksb_eformat'] = values.ksb_eformat;
         formArr['ksb_phyformat'] = values.ksb_phyformat;
         formArr['whatsapp_const_decl'] = values.whatsapp_const_decl;
+        formArr['page_name'] = `NomineeDetails_KSB/${productId}`
 
         let formObj = {}
         Object.assign(formObj,formArr)
@@ -567,7 +568,7 @@ class NomineeDetails extends Component {
                                                 <Row className="m-b-45">
                                                     <Col sm={12} md={3} lg={6}>
                                                         <FormGroup>
-                                                        Prefered Language
+                                                        Preferred Language for Teleconsultation
                                                         </FormGroup>
                                                     </Col>
                                                     <Col sm={12} md={8} lg={5}>
@@ -762,7 +763,7 @@ class NomineeDetails extends Component {
                                                         
                                                         <Col sm={12} md={8} lg={11} className="row formSection">
                                                             <label className="customCheckBox formGrp formGrp">
-                                                                Continue Without Vehicle Registration Number
+                                                                    Whats app consent declaration
                                                                 <div className="p-r-25">
                                                                 <Field
                                                                     type="checkbox"  
@@ -784,7 +785,7 @@ class NomineeDetails extends Component {
                                                                 </div>
                                                             </label>
                                                             {errors.whatsapp_const_decl ? 
-                                                                <span className="error-message">{errors.whatsapp_const_decl}</span> : ""
+                                                                <span className="errorMsg">{errors.whatsapp_const_decl}</span> : ""
                                                             }
                                                         </Col>
                                                     </Row>

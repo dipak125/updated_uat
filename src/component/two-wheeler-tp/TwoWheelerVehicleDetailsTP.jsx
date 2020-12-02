@@ -199,7 +199,8 @@ class TwoWheelerVehicleDetails extends Component {
                 'pol_start_date': moment(newPolStartDate).format('YYYY-MM-DD'),
                 'pol_end_date': moment(newPolEndDate).format('YYYY-MM-DD'),
                 'policy_type':  policy_type,
-                'insurance_company_id': values.insurance_company_id
+                'insurance_company_id': values.insurance_company_id,
+                'page_name': `two_wheeler_Vehicle_detailsTP/${productId}`,
             }
 
         console.log('post_data', post_data)
@@ -298,7 +299,8 @@ class TwoWheelerVehicleDetails extends Component {
 
     componentDidMount() {
         this.getInsurerList();
-        this.fetchData();       
+        this.fetchData();
+        
     }
 
 

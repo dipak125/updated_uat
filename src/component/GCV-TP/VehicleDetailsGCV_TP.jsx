@@ -457,7 +457,7 @@ class VehicleDetailsGCV extends Component {
                 'goodscarriedtype_id': values.goodscarriedtypes_id,
                 'permittype_id': values.permittypes_id,
                 'valid_previous_policy': values.valid_previous_policy,
-                'page_name': `VehicleDetails/${productId}`          
+                'page_name': `VehicleDetails_GCV_TP/${productId}`          
             } 
         }
         else if(values.policy_type_id == '1')  {
@@ -475,7 +475,7 @@ class VehicleDetailsGCV extends Component {
                 'goodscarriedtype_id': values.goodscarriedtypes_id,
                 'permittype_id': values.permittypes_id,
                 'valid_previous_policy': 0,
-                'page_name': `VehicleDetails/${productId}`
+                'page_name': `VehicleDetails_GCV_TP/${productId}`
             } 
         }
 

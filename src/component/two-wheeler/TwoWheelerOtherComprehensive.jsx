@@ -360,7 +360,8 @@ class TwoWheelerOtherComprehensive extends Component {
                 'idv_value': sliderVal ? sliderVal : defaultSliderValue.toString(),
                 'add_more_coverage': add_more_coverage,
                 'pa_cover': values.PA_flag ? values.PA_Cover : "0",
-                'pa_flag' : values.PA_cover_flag
+                'pa_flag' : values.PA_cover_flag,
+                'page_name': `two_wheeler_OtherComprehensive/${productId}`,
             }
         }
         else {
@@ -370,7 +371,8 @@ class TwoWheelerOtherComprehensive extends Component {
                 'cng_kit': values.cng_kit,
                 'registration_no': motorInsurance.registration_no,
                 'idv_value': sliderVal ? sliderVal : defaultSliderValue.toString(),
-                'pa_flag' : values.PA_cover_flag
+                'pa_flag' : values.PA_cover_flag,
+                'page_name': `two_wheeler_OtherComprehensive/${productId}`,
             }
         }
         console.log('post_data', post_data)

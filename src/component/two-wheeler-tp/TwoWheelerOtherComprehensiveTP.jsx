@@ -294,7 +294,8 @@ class TwoWheelerOtherComprehensive extends Component {
                 'idv_value': sliderVal ? sliderVal : defaultSliderValue.toString(),
                 'add_more_coverage': add_more_coverage,
                 'pa_cover': values.PA_flag ? values.PA_Cover : "0",
-                'pa_flag' : values.PA_cover_flag
+                'pa_flag' : values.PA_cover_flag,
+                'page_name': `two_wheeler_OtherComprehensiveTP/${productId}`,
             }
         }
         else {
@@ -304,7 +305,8 @@ class TwoWheelerOtherComprehensive extends Component {
                 'cng_kit': values.cng_kit,
                 'registration_no': motorInsurance.registration_no,
                 'idv_value': sliderVal ? sliderVal : defaultSliderValue.toString(),
-                'pa_flag' : values.PA_cover_flag
+                'pa_flag' : values.PA_cover_flag,
+                'page_name': `two_wheeler_OtherComprehensiveTP/${productId}`,
             }
         }
         console.log('post_data', post_data)
@@ -517,9 +519,9 @@ class TwoWheelerOtherComprehensive extends Component {
                                                                         <OverlayTrigger overlay={<Tooltip id="tooltip-disabled">{coverage.description}</Tooltip>}>
                                                                             <a className="infoIcon"><img src={require('../../assets/images/i.svg')} alt="" className="premtool" /></a>
                                                                         </OverlayTrigger>
-                                                                        
                                                                         <Field
                                                                             type="checkbox"
+                                                                            // name={`moreCov_${qIndex}`}
                                                                             name={coverage.code}
                                                                             value={coverage.code}
                                                                             className="user-self"
@@ -528,7 +530,7 @@ class TwoWheelerOtherComprehensive extends Component {
                                                                                 if( e.target.checked == false && values[coverage.code] == 'B00015') {
                                                                                     swal("This cover is mandated by IRDAI, it is compulsory for Owner-Driver to possess a PA cover of minimum Rs 15 Lacs, except in certain conditions. By not choosing this cover, you confirm that you hold an existing PA cover or you do not possess a valid driving license.")
                                                                                 }
-                                                                                this.onRowSelect(e.target.value, e.target.checked, setFieldTouched, setFieldValue)     
+                                                                                this.onRowSelect(e.target.value, e.target.checked, setFieldTouched, setFieldValue)         
                                                                             }
                                                                             }
                                                                             checked = {values[coverage.code] == coverage.code ? true : false}

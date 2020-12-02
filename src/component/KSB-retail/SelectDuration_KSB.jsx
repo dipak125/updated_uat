@@ -187,7 +187,7 @@ class SelectDuration extends Component {
       }
 
       quote = (value) => {
-      const {accessToken} = this.state
+      const {accessToken} = this.state 
       if(value == "") {
         value['polStartDate'] = new Date()
         value['polEndDate'] = new Date(moment(value['polStartDate']).add(1, 'years').format("YYYY-MM-DD")) 
@@ -205,7 +205,7 @@ class SelectDuration extends Component {
             'policyStartDate':polStartDate,
             'policyEndDate':polEndDate,
             'ksbplan_id': value.ksbplan_id ,
-            'ksbperiod_id': value.ksbperiod_id 
+            'ksbperiod_id': value.ksbperiod_id,
         }
         let encryption = new Encryption();
         // formData.append('enc_data',encryption.encrypt(JSON.stringify(post_data)))
@@ -235,7 +235,7 @@ class SelectDuration extends Component {
           else {
             this.setState({
                 fulQuoteResp: [],
-                error: res.data,
+                error: res.data.ValidateResult,
                 serverResponse: []
             });
         }
@@ -336,7 +336,8 @@ class SelectDuration extends Component {
         })
 
         const errMsg =  error && error.message ? (            
-            <span className="errorMsg"><h6><strong>Thank you for showing your interest for buying product.Due to some reasons, we are not able to issue the policy online.Please call 1800 22 1111</strong></h6></span>                                
+            <span className="errorMsg"><h6><strong>{error.message}</strong></h6></span>
+            // <span className="errorMsg"><h6><strong>Thank you for showing your interest for buying product.Due to some reasons, we are not able to issue the policy online.Please call 1800 22 1111</strong></h6></span>                                
         ) : null 
                                                         
        
@@ -352,6 +353,7 @@ class SelectDuration extends Component {
                                 <h4 className="text-center mt-3 mb-3">KSB Retail Policy</h4>
                                 <section className="brand">
                                     <div className="boxpd">
+                                        <div>{errMsg}</div>
                                         <div className="d-flex justify-content-left carloan m-b-25">
                                             <h4> Select the duration for your Health Insurance</h4>                                          
                                         </div>
@@ -362,7 +364,7 @@ class SelectDuration extends Component {
                                         {({ values, errors, setFieldValue, setFieldTouched, isValid, isSubmitting, touched }) => {
                                             
                                         return (   
-                                        <Form>
+                                        <Form>  
                                         <Row>
                                             <Col sm={12} md={9} lg={9}>
 
@@ -597,7 +599,6 @@ class SelectDuration extends Component {
                                                     </div>
                                                 </Row>
                                                 <Row><div>&nbsp;</div></Row>
-                                                <Row><div>{errMsg}</div></Row>
                                             </Col>
 
                                             <Col sm={12} md={3}>

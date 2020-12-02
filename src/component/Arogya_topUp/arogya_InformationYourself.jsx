@@ -904,6 +904,7 @@ class arogya_InformationYourself extends Component {
     }
 
     post_data['menumaster_id'] = menumaster_id
+    post_data['page_name'] = 'arogya_Health/12'
     post_data['proposer_gender'] = values.gender    
     
     let arr_date=[]
@@ -960,13 +961,20 @@ class arogya_InformationYourself extends Component {
         //let vvv = encryption.encrypt(JSON.stringify(target))        
         this.props.loadingStart();
         axios
-        .post(`/update-yourself`, formData)
+        .post(`arogya-topup/update-yourself`, formData)
         .then(res => {
-            localStorage.setItem('policyHolder_id', res.data.data.policyHolder_id);
-            localStorage.setItem('policyHolder_refNo', res.data.data.policyHolder_refNo);
+            let decryptResp = JSON.parse(encryption.decrypt(res.data))
+            console.log("decrypt", decryptResp)
+            localStorage.setItem('policyHolder_id', decryptResp.data.policyHolder_id);
+            localStorage.setItem('policyHolder_refNo', decryptResp.data.policyHolder_refNo);
             localStorage.setItem('display_gender', JSON.stringify(this.state.display_gender));
             this.props.loadingStop();
+            if(decryptResp.error == false) {
             this.props.history.push(`/arogya_MedicalDetails/${productId}`);
+            }
+            else{
+                swal(decryptResp.msg)
+            } 
         })
         .catch(err => {
         if(err && err.data){
@@ -983,17 +991,30 @@ class arogya_InformationYourself extends Component {
         axios
         .post(`/arogya-topup/yourself`, formData)
         .then(res => {
-            localStorage.setItem('policyHolder_id', res.data.data.policyHolder_id);
-            localStorage.setItem('policyHolder_refNo', res.data.data.policyHolder_refNo);
+            let decryptResp = JSON.parse(encryption.decrypt(res.data))
+            console.log("decrypt", decryptResp)
+            localStorage.setItem('policyHolder_id', decryptResp.data.policyHolder_id);
+            localStorage.setItem('policyHolder_refNo', decryptResp.data.policyHolder_refNo);
             localStorage.setItem('display_gender', JSON.stringify(this.state.display_gender));
             this.props.loadingStop();
-            this.props.history.push(`/arogya_MedicalDetails/${productId}`);
+            if(decryptResp.error == false) {
+                this.props.history.push(`/arogya_MedicalDetails/${productId}`);
+            }
+            else{
+                swal(decryptResp.msg)
+            }   
+            // this.props.history.push(`/arogya_MedicalDetails/${productId}`);
         })
         .catch(err => {
-        if(err && err.data){
-            swal('Family Member fields are required...');
-        }
-        this.props.loadingStop();
+            let decryptErr = JSON.parse(encryption.decrypt(err.data));
+            console.log('decryptResp--err---', decryptErr)
+            this.props.loadingStop();
+            if(decryptErr && err.data){
+                swal('Family Member fields are required...');
+            }
+        // if(err && err.data){
+        //     swal('Family Member fields are required...');
+        // }
         });
     }
     
@@ -1107,13 +1128,16 @@ componentDidMount(){
 fetchData=()=>{
     const {productId } = this.props.match.params
     let policyHolder_id = localStorage.getItem("policyHolder_id");
+    let encryption = new Encryption();
     this.props.loadingStart();
     axios.get(`policy-holder/${policyHolder_id}`)
         .then(res=>{
-            let family_members =  res.data.data.policyHolder && res.data.data.policyHolder.request_data && res.data.data.policyHolder.request_data.family_members ? res.data.data.policyHolder.request_data.family_members : []
-            let addressDetails = JSON.parse(res.data.data.policyHolder.address)
-            let is_eia_account = res.data.data.policyHolder.is_eia_account
-            let gender = res.data.data.policyHolder.gender
+            let decryptResp = JSON.parse(encryption.decrypt(res.data))
+            console.log("decrypt", decryptResp)
+            let family_members =  decryptResp.data.policyHolder && decryptResp.data.policyHolder.request_data && decryptResp.data.policyHolder.request_data.family_members ? decryptResp.data.policyHolder.request_data.family_members : []
+            let addressDetails = JSON.parse(decryptResp.data.policyHolder.address)
+            let is_eia_account = decryptResp.data.policyHolder.is_eia_account
+            let gender = decryptResp.data.policyHolder.gender
             let validateCheck = family_members && family_members.length>0 ? 1:0;
             this.setState({ 
                 familyMembers:family_members,
@@ -1132,7 +1156,7 @@ fetchData=()=>{
 }
 
 fetchRelations = () => {
-    axios.get(`relations`)
+    axios.get(`/arogya-topup/relations`)
     .then(res=>{
         const relationList = res.data && res.data.data ? res.data.data : []
         this.setState({

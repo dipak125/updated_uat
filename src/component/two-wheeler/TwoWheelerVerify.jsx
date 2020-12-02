@@ -496,7 +496,8 @@ class TwoWheelerVerify extends Component {
                 'engine_no': values.engine_no,
                 'prev_policy_flag': 0,
                 'cng_kit': 0,
-                'puc': values.puc
+                'puc': values.puc,
+                'page_name': `two_wheeler_verify/${productId}`,
             }
         }
         else {
@@ -516,11 +517,12 @@ class TwoWheelerVerify extends Component {
                 'insurance_company_id':values.insurance_company_id,
                 'cng_kit': 0,
                 'previous_city':values.previous_city,
-                'puc': values.puc
+                'puc': values.puc,
+                'page_name': `two_wheeler_verify/${productId}`,
                         
             }
         }
-        console.log('post_data',post_data)
+        // console.log('post_data',post_data)
         formData.append('enc_data', encryption.encrypt(JSON.stringify(post_data)))
         this.props.loadingStart();
         axios.post('two-wh/previous-vehicle-details', formData).then(res => {
@@ -866,14 +868,13 @@ class TwoWheelerVerify extends Component {
 
                                             <DatePicker
                                                 name="previous_start_date"
-                                                
-                                                maxDate={new Date(maxDate)}
                                                 minDate={new Date(minDate)}
+                                                maxDate={new Date(maxDate)}
                                                 autoComplete="off"
                                                 dateFormat="dd MMM yyyy"
-                                                disabledKeyboardNavigation
-                                                openToDate={new Date(minDate)}
                                                 placeholderText="Previous policy start date"
+                                                peekPreviousMonth
+                                                peekPreviousYear
                                                 showMonthDropdown
                                                 showYearDropdown
                                                 dropdownMode="select"

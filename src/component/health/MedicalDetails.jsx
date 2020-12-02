@@ -81,6 +81,7 @@ class MedicalDetails extends Component {
         let selected_answer = [];
         let selected_question = [];
         const formData = new FormData(); 
+        const {productId} = this.props.match.params
         
         if ( key.match(/question_id/gi)){      
             question_id.push(key.substr(12, 1));                            
@@ -132,7 +133,9 @@ class MedicalDetails extends Component {
                 'question_id':question_id[0],
                 'answer':value,
                 'family_member_ids':arr_data,
-                'policy_holder_id':policy_holder_id
+                'policy_holder_id':policy_holder_id,
+                'page_name': `MedicalDetails/${productId}`
+
             }   
             formData.append('enc_data',encryption.encrypt(JSON.stringify(post_data)))
             this.props.loadingStart();

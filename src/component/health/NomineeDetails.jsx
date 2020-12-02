@@ -214,6 +214,7 @@ class NomineeDetails extends Component {
         formArr['policy_holder_id'] = localStorage.getItem('policyHolder_id')
        // formData.append('is_appointee', this.state.is_appointee);
         formArr['is_appointee'] = this.state.is_appointee
+        formArr['page_name'] = `NomineeDetails/${productId}`
         let formObj = {}
         Object.assign(formObj,formArr)
         console.log("PostData---", formObj)

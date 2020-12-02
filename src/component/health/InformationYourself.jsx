@@ -905,6 +905,7 @@ class InformationYourself extends Component {
 
     post_data['menumaster_id'] = menumaster_id
     post_data['proposer_gender'] = values.gender    
+    post_data['page_name'] = `Health/${productId}`
     
     let arr_date=[]
     for(let i=0;i<dob.length;i++){        

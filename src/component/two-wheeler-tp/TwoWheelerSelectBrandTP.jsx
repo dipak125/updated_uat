@@ -349,7 +349,8 @@ class TwoWheelerSelectBrand extends Component {
                     'product_id':sessionStorage.getItem('product_id') ? sessionStorage.getItem('product_id') : "",
                     'bcmaster_id': "5",
                     'policy_for': values.policy_for,
-                    'fastlaneLog_id': this.state.fastlaneLogId ? this.state.fastlaneLogId : fastlanelog && fastlanelog.id ? fastlanelog.id : 0
+                    'fastlaneLog_id': this.state.fastlaneLogId ? this.state.fastlaneLogId : fastlanelog && fastlanelog.id ? fastlanelog.id : 0,
+                    'page_name': `two_wheeler_Select-brandTP/${productId}`,
                 }
             }
             else {
@@ -367,7 +368,8 @@ class TwoWheelerSelectBrand extends Component {
                     'bc_token': bc_data ? bc_data.token : "",
                     'policy_for': values.policy_for,
                     'bc_agent_id': bc_data ? bc_data.user_info.data.user.username : "",
-                    'fastlaneLog_id': this.state.fastlaneLogId ? this.state.fastlaneLogId : fastlanelog && fastlanelog.id ? fastlanelog.id : 0
+                    'fastlaneLog_id': this.state.fastlaneLogId ? this.state.fastlaneLogId : fastlanelog && fastlanelog.id ? fastlanelog.id : 0,
+                    'page_name': `two_wheeler_Select-brandTP/${productId}`,
                 }
             }
             
@@ -419,7 +421,8 @@ class TwoWheelerSelectBrand extends Component {
                     'product_id':sessionStorage.getItem('product_id') ? sessionStorage.getItem('product_id') : "",
                     'bcmaster_id': "5",
                     'policy_for': values.policy_for,
-                    'fastlaneLog_id': this.state.fastlaneLogId ? this.state.fastlaneLogId : fastlanelog && fastlanelog.id ? fastlanelog.id : 0
+                    'fastlaneLog_id': this.state.fastlaneLogId ? this.state.fastlaneLogId : fastlanelog && fastlanelog.id ? fastlanelog.id : 0,
+                    'page_name': `two_wheeler_Select-brandTP/${productId}`,
                 }
             }
             else {
@@ -436,7 +439,8 @@ class TwoWheelerSelectBrand extends Component {
                     'bc_token': bc_data ? bc_data.token : "",
                     'policy_for': values.policy_for,
                     'bc_agent_id': bc_data ? bc_data.user_info.data.user.username : "",
-                    'fastlaneLog_id': this.state.fastlaneLogId ? this.state.fastlaneLogId : fastlanelog && fastlanelog.id ? fastlanelog.id : 0
+                    'fastlaneLog_id': this.state.fastlaneLogId ? this.state.fastlaneLogId : fastlanelog && fastlanelog.id ? fastlanelog.id : 0,
+                    'page_name': `two_wheeler_Select-brandTP/${productId}`,
                 }
             }
             console.log('post_data-----', post_data)

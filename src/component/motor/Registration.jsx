@@ -394,7 +394,7 @@ fetchData=()=>{
                                                 />
                                                     <span className="checkmark mL-0"></span>
                                                 </label>
-                                                {errors.check_registration && (touched.looking_for_2 || touched.looking_for_3 || touched.looking_for_4) ? 
+                                                {errors.check_registration ? 
                                                         <span className="error-message">{errors.check_registration}</span> : ""
                                                     }
                                                 

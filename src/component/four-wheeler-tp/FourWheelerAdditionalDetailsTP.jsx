@@ -438,7 +438,8 @@ class TwoWheelerAdditionalDetails extends Component {
             'is_eia_account': values['is_eia_account'],
             'eia_no': values['eia_no'],
             'address': values['address'],          
-            'gstn_no': values['gstn_no']
+            'gstn_no': values['gstn_no'],
+            'page_name': values[`four_wheeler_additional_detailsTP/${productId}`],
         }
         if(motorInsurance.policy_for == '1'){
             post_data['dob'] = moment(values['dob']).format("YYYY-MM-DD")
@@ -460,14 +461,14 @@ class TwoWheelerAdditionalDetails extends Component {
             post_data['org_level'] = values['org_level']
         }
             
-        console.log('post_data', post_data);
+        // console.log('post_data', post_data);
         formData.append('enc_data',encryption.encrypt(JSON.stringify(post_data)))
         this.props.loadingStart();
         axios
         .post(`/four-wh-tp/owner-details`, formData)
         .then(res => { 
             let decryptResp = JSON.parse(encryption.decrypt(res.data));
-            console.log('decryptResp-----', decryptResp)
+            // console.log('decryptResp-----', decryptResp)
             this.props.loadingStop();
             if (decryptResp.error == false) {
             this.props.history.push(`/four_wheeler_policy_premium_detailsTP/${productId}`);
@@ -490,7 +491,7 @@ class TwoWheelerAdditionalDetails extends Component {
         axios.get(`four-wh-tp/details/${policyHolder_id}`)
             .then(res => {
                  let decryptResp = JSON.parse(encryption.decrypt(res.data))
-                 console.log("decrypt---", decryptResp)
+                //  console.log("decrypt---", decryptResp)
                  let motorInsurance = decryptResp.data.policyHolder ? decryptResp.data.policyHolder.motorinsurance : {};
                  let previousPolicy = decryptResp.data.policyHolder ? decryptResp.data.policyHolder.previouspolicy : {};
                  let vehicleDetails = decryptResp.data.policyHolder ? decryptResp.data.policyHolder.vehiclebrandmodel : {};

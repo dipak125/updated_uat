@@ -1477,8 +1477,7 @@ class OtherComprehensiveGCV extends Component {
                     onSubmit={ serverResponse && serverResponse != "" ? (serverResponse.message ? this.getAccessToken : this.handleSubmit ) : this.getAccessToken} 
                     validationSchema={ComprehensiveValidation}>
                     {({ values, errors, setFieldValue, setFieldTouched, isValid, isSubmitting, touched }) => {
-console.log("values------------------ ", values)
-console.log("errors------------------ ", errors)
+
                     return (
                         <Form>
                         <Row>
@@ -1785,9 +1784,32 @@ console.log("errors------------------ ", errors)
                                 {moreCoverage && moreCoverage.length > 0 ? moreCoverage.map((coverage, qIndex) => (
                                 <Row key={qIndex}>   
                                 {motorInsurance && motorInsurance.policy_for == '2' && coverage.code != 'B00015' && coverage.code != 'B00018' || motorInsurance && motorInsurance.policy_for == '1' ?
+                                    vehicleDetails.varientmodel.fueltype.id == "2" || vehicleDetails.varientmodel.fueltype.id == "6" || vehicleDetails.varientmodel.fueltype.id == "7" && coverage.code != 'B00010' && coverage.code != 'B00005' && coverage.code !='B00006' ?
                                     <Col sm={12} md={11} lg={6} key={qIndex+"a"} >
                                         <label className="customCheckBox formGrp formGrp">{coverage.name}
                                             
+                                            <Field
+                                                type="checkbox"
+                                                // name={`moreCov_${qIndex}`}
+                                                name={coverage.code}
+                                                value={coverage.code}
+                                                className="user-self"
+                                                // checked={values.roadsideAssistance ? true : false}
+                                                onClick={(e) =>{
+                                                    if( e.target.checked == false && values[coverage.code] == 'B00015') {
+                                                        swal("This cover is mandated by IRDAI, it is compulsory for Owner-Driver to possess a PA cover of minimum Rs 15 Lacs, except in certain conditions. By not choosing this cover, you confirm that you hold an existing PA cover or you do not possess a valid driving license.")
+                                                    }
+                                                    this.onRowSelect(e.target.value, values, e.target.checked, setFieldTouched, setFieldValue)         
+                                                }
+                                                }
+                                                checked = {values[coverage.code] == coverage.code ? true : false}
+                                            />
+                                            <span className="checkmark mL-0"></span>
+                                            <span className="error-message"></span>
+                                        </label>
+                                    </Col> : 
+                                    <Col sm={12} md={11} lg={6} key={qIndex+"a"} >
+                                        <label className="customCheckBox formGrp formGrp">{coverage.name}
                                             <Field
                                                 type="checkbox"
                                                 // name={`moreCov_${qIndex}`}

@@ -150,7 +150,8 @@ class SelectDuration extends Component {
             'swatch_bharat_cess':0,
             'krishi_kalayan_cess':0,
             'net_premium':serverResponse.DuePremium,
-            'sum_insured':values.insureValue
+            'sum_insured':values.insureValue,
+            'page_name': `SelectDuration/${productId}`
         }
         formData.append('enc_data',encryption.encrypt(JSON.stringify(post_data)))
 

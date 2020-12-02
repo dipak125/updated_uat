@@ -55,6 +55,7 @@ class PolicyDetails extends Component {
     accessToken: "",
     policyHolderDetails: [],
     familyMember: [],
+    nomineeDetails: [],
     fulQuoteResp: [],
     error: [],
     purchaseData: [],
@@ -90,9 +91,11 @@ class PolicyDetails extends Component {
     axios
       .get(`ksb/details/${policyHolder_refNo}`)
       .then((res) => {
+        var policyHolderDetails = res.data.data.policyHolder ? res.data.data.policyHolder : []
 
         this.setState({
-          policyHolderDetails: res.data.data.policyHolder ? res.data.data.policyHolder : [],
+          policyHolderDetails: policyHolderDetails,
+          nomineeDetails: policyHolderDetails.request_data && policyHolderDetails.request_data.nominee && policyHolderDetails.request_data.nominee[0],
           familyMember: res.data.data.policyHolder.request_data.family_members,
           refNumber: res.data.data.policyHolder.reference_no,
           paymentStatus: res.data.data.policyHolder.payment ? res.data.data.policyHolder.payment[0] : []
@@ -193,7 +196,7 @@ class PolicyDetails extends Component {
 
   render() {
     const { productId } = this.props.match.params;
-    const { fulQuoteResp, error, show, policyHolderDetails, refNumber, paymentStatus } = this.state;
+    const { fulQuoteResp, error, show, policyHolderDetails, refNumber, paymentStatus, nomineeDetails } = this.state;
 
     console.log("policyHolderDetails ", policyHolderDetails)
     const items =
@@ -203,14 +206,14 @@ class PolicyDetails extends Component {
         ? fulQuoteResp.PolicyLobList[0].PolicyRiskList.map((member, qIndex) => {
             return (
               <div>
-              <Row>
+                <Row>
                 <Col sm={12} md={6}>
                   <Row>
                     <Col sm={12} md={6}>
                       <FormGroup>Name:</FormGroup>
                     </Col>
                     <Col sm={12} md={6}>
-                      <FormGroup>{member.FirstName+" "+member.LastName}</FormGroup>
+                      <FormGroup>{member.InsuredName}</FormGroup>
                     </Col>
                   </Row>
 
@@ -252,6 +255,82 @@ class PolicyDetails extends Component {
             );
           })
         : null;
+
+    const nomineeData = 
+      <div>
+        <Row>
+            <Col sm={12} md={6}>
+                <Row>
+                    <Col sm={12} md={6}>
+                        <FormGroup>Name:</FormGroup>
+                    </Col>
+                    <Col sm={12} md={6}>
+                        <FormGroup>{nomineeDetails ? nomineeDetails.first_name : null}</FormGroup>
+                    </Col>
+                </Row>
+
+                <Row>
+                    <Col sm={12} md={6}>
+                        <FormGroup>Date Of Birth:</FormGroup>
+                    </Col>
+                    <Col sm={12} md={6}>
+                        <FormGroup>{ nomineeDetails ? moment(nomineeDetails.dob).format("DD-MM-YYYY") : null}</FormGroup>
+                    </Col>
+                </Row>
+
+                <Row>
+                    <Col sm={12} md={6}>
+                        <FormGroup>Relation With Proposer:</FormGroup>
+                    </Col>
+                    <Col sm={12} md={6}>
+                        <FormGroup>{relationArr[nomineeDetails.relation_with]}</FormGroup> 
+                    </Col>
+                </Row>
+
+                <Row>
+                    <Col sm={12} md={6}>
+                        <FormGroup>Gender</FormGroup>
+                    </Col>
+                    <Col sm={12} md={6}>
+                        <FormGroup>{nomineeDetails && nomineeDetails.gender == "m" ? "Male" : "Female"}</FormGroup>
+                    </Col>
+                </Row>
+            </Col>
+        </Row>
+        <Row>
+            <p></p>
+        </Row>
+      </div>
+
+
+    const apointeeData = 
+    <div>
+      <Row>
+          <Col sm={12} md={6}>
+              <Row>
+                  <Col sm={12} md={6}>
+                      <FormGroup>Name:</FormGroup>
+                  </Col>
+                  <Col sm={12} md={6}>
+                      <FormGroup>{nomineeDetails && nomineeDetails.appointee_name ? nomineeDetails.appointee_name : null}</FormGroup>
+                  </Col>
+              </Row>
+
+              <Row>
+                  <Col sm={12} md={6}>
+                      <FormGroup>Relation With Nominee:</FormGroup>
+                  </Col>
+                  <Col sm={12} md={6}>
+                  <FormGroup>{relationArr[nomineeDetails.appointee_relation_with]}</FormGroup>
+                  </Col>
+              </Row>
+          </Col>
+      </Row>
+      <Row>
+          <p></p>
+      </Row>
+    </div>
+
 
     const errMsg =
       error && error.message ? (
@@ -357,7 +436,12 @@ class PolicyDetails extends Component {
 
                                           <div className="rghtsideTrigr">
                                             <Collapsible trigger=" Member Details">
-                                              <div className="listrghtsideTrigr">{items}</div>
+                                              <strong>Member Details :</strong>
+                                              <div className="listrghtsideTrigr">{items}</div> 
+                                              <strong>Nominee Details :</strong>
+                                              <div className="listrghtsideTrigr">{nomineeData}</div>
+                                              {nomineeDetails && nomineeDetails.is_appointee == '1' ? <strong>Appointee Details :</strong> : null }
+                                              {nomineeDetails && nomineeDetails.is_appointee == '1' ? <div className="listrghtsideTrigr">{apointeeData}</div> : null }
                                             </Collapsible>
                                           </div>
 
@@ -365,7 +449,7 @@ class PolicyDetails extends Component {
                                             <Collapsible trigger=" Contact information">
                                               <div className="listrghtsideTrigr">
                                                 <div className="d-flex justify-content-end carloan">
-                                                  <Link to ={`/Address/${productId}`}> Edit</Link>
+                                                  <Link to ={`/Address_KSB/${productId}`}> Edit</Link>
                                                 </div>
                                                 <Row>
                                                   <Col sm={12} md={6}>

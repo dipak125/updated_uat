@@ -771,7 +771,7 @@ class OtherComprehensiveGCV extends Component {
                 'puc': values.puc,
                 'pa_cover': values.PA_flag ? values.PA_Cover : "0",
                 'pa_flag' : values.PA_cover_flag,
-                'page_name': `OtherComprehensive/${productId}`,
+                'page_name': `OtherComprehensive_GCV_TP/${productId}`,
                 'coverage_data': JSON.stringify(coverage_data),
                 'fuel_type' : values.fuel_type
             }

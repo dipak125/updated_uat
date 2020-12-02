@@ -431,7 +431,8 @@ class FourWheelerVerifyTP extends Component {
                 'chasis_no_last_part': values.chasis_no_last_part,
                 'engine_no': values.engine_no,
                 'prev_policy_flag': 0,
-                'cng_kit': 0
+                'cng_kit': 0,
+                'page_name': `four_wheeler_verifyTP/${productId}`,
             }
         }
         else {
@@ -450,16 +451,17 @@ class FourWheelerVerifyTP extends Component {
                 'insurance_company_id':values.insurance_company_id,
                 'cng_kit': 0,
                 'previous_city':values.previous_city,
+                'page_name': `four_wheeler_verifyTP/${productId}`,
                         
             }
         }
-        console.log('post_data',post_data)
+        // console.log('post_data',post_data)
         formData.append('enc_data', encryption.encrypt(JSON.stringify(post_data)))
         this.props.loadingStart();
         axios.post('four-wh-tp/previous-vehicle-details', formData).then(res => {
             this.props.loadingStop();
             let decryptResp = JSON.parse(encryption.decrypt(res.data));
-            console.log('decryptResp-----', decryptResp)
+            // console.log('decryptResp-----', decryptResp)
             if (decryptResp.error == false) {
                 this.props.history.push(`/four_wheeler_additional_detailsTP/${productId}`);
             }

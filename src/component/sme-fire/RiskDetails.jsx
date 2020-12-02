@@ -203,6 +203,7 @@ class RiskDetails extends Component {
         
         formData.append('policy_holder_id',this.props.policy_holder_id)
         formData.append('menumaster_id',this.props.menumaster_id)
+        formData.append('page_name','/RiskDetails/9')
         // formData.append('street_name','g6')
         // formData.append('plot_no','g6')
         // formData.append('bcmaster_id','1')house_flat_no salutation
@@ -260,12 +261,13 @@ class RiskDetails extends Component {
             this.props.history.push(`/OtherDetails/${productId}`);
         } else {
             this.props.loadingStop();
-            swal(res.data.msg);
+            swal("Thank you for showing your interest for buying product.Due to some reasons, we are not able to issue the policy online.Please call 1800 22 1111");
             actions.setSubmitting(false);
         }
         }).
         catch(err=>{
             this.props.loadingStop();
+            actions.setSubmitting(false);
         })
     }
     }

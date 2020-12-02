@@ -457,6 +457,7 @@ class Address extends Component {
         formArr['last_name'] = last_name
         formArr['dob'] = dob
         formArr['pancard_no'] = pancard_no
+        formArr['page_name'] = `Address/${productId}`
 
         formArr['policy_holder_id'] = policyHolder_id;
 

@@ -312,7 +312,7 @@ class SelectBrandGCV extends Component {
             'brand_id': values.selectedBrandId,
             'brand_model_id': values.selectedModelId,
             'model_varient_id': values.selectedVarientId,
-            'page_name': `Select-brand/${productId}`
+            'page_name': `SelectBrand_GCV_TP/${productId}`
         }
         formData.append('enc_data', encryption.encrypt(JSON.stringify(post_data)))
         console.log("Post Date---------- ", post_data) 

@@ -28,7 +28,8 @@ import Encryption from '../../shared/payload-encryption';
 const initialValues = {
 polStartDate: "",
 polEndDate: "",
-insureValue: "5"    
+insureValue: "5",
+select_sum_insured: ""    
 }
 
 const today = moment().add(30, 'days');;
@@ -126,8 +127,10 @@ class arogya_SelectDuration extends Component {
     handleSubmit = (values) => {
         let defaultSliderValue =  0
         let defaultBodySliderValue =  0
+        let defaultdeductibleSliderValue = 0
+        let defaulttenureSliderValue = 0
         const {productId} = this.props.match.params
-        const {serverResponse, bodySliderVal} = this.state
+        const {serverResponse, bodySliderVal,deductibleSliderVal,tenureSliderVal} = this.state
         const formData = new FormData(); 
         let encryption = new Encryption();
 
@@ -156,6 +159,8 @@ class arogya_SelectDuration extends Component {
             'net_premium':serverResponse.DuePremium,
             'sum_insured':values.insureValue,
             'select_sum_insured': bodySliderVal ? bodySliderVal : defaultSliderValue.toString(),
+            'select_deductible': deductibleSliderVal ? deductibleSliderVal : defaultSliderValue.toString(),
+            'select_tenure': tenureSliderVal ? tenureSliderVal : defaultSliderValue.toString(),
         }
         formData.append('enc_data',encryption.encrypt(JSON.stringify(post_data)))
 
@@ -226,6 +231,20 @@ class arogya_SelectDuration extends Component {
             error: []
         })
     }
+    deductibleSliderValue = (value) => {
+        this.setState({
+            deductibleSliderVal: value,
+            serverResponse: [],
+            error: []
+        })
+    }
+    tenureSliderValue = (value) => {
+        this.setState({
+            tenureSliderVal: value,
+            serverResponse: [],
+            error: []
+        })
+    }
 
       quote = (value) => {
       const {accessToken} = this.state
@@ -282,6 +301,7 @@ class arogya_SelectDuration extends Component {
         'policyStartDate':polStartDate,
         'policyEndDate':polEndDate,
         'insureValue':insureValue,
+        // 'select_sum_insured':select_sum_insured,
         'access_token':accessToken
     }
     let encryption = new Encryption();
@@ -344,17 +364,25 @@ class arogya_SelectDuration extends Component {
         const {policyHolderDetails, serverResponse, error, EndDate, endDateFlag} = this.state
         const request_data = policyHolderDetails ? policyHolderDetails.request_data:null;
         let start_date = request_data && request_data.start_date ? new Date(request_data.start_date): '';
-        const {bodySliderVal} = this.state
-        let minBodyIDV = 0;
-        let maxBodyIDV = 10000000;
+        const {bodySliderVal,deductibleSliderVal,tenureSliderVal} = this.state
+        let minBodyInsured = 100000;
+        let maxBodyInsured = 5000000;
+        let minBodyTenure = 1;
+        let maxBodyTenure = 3;
+        let minBodyDeductable = 100000;
+        let maxBodyDeductable = 1000000;
 
         // let end_date = endDateFlag ? ( EndDate ? new Date(EndDate) : (request_data && request_data.end_date ? new Date(request_data.end_date) : "") ) 
         // : (request_data && request_data.end_date ? new Date(request_data.end_date) : "");
 
         let end_date = request_data && request_data.end_date ? new Date(request_data.end_date) : "";
-        let defaultBodySliderValue = 0;
-        let defaultSliderValue = 0;
+        let defaultBodySliderValue = 500000;
+        let defaultdeductibleSliderValue = 400000;
+        let defaulttenureSliderValue = 1;
+        let defaultSliderValue = 1;
         let bodySliderValue = bodySliderVal;
+        let deductibleSliderValue = deductibleSliderVal;
+        let tenureSliderValue = tenureSliderVal;
           
 
         const newInitialValues = Object.assign(initialValues, {
@@ -453,7 +481,7 @@ class arogya_SelectDuration extends Component {
                                                         </FormGroup>
                                                     </Col>
 
-                                                    <Col sm={12} md={3} lg={3}>
+                                                    {/* <Col sm={12} md={3} lg={3}>
                                                         <FormGroup>
                                                             Select Sum Insured
                                                         </FormGroup>
@@ -490,13 +518,13 @@ class arogya_SelectDuration extends Component {
                                                                 ) : null} 
                                                             </div>
                                                         </FormGroup>
-                                                    </Col>
+                                                    </Col> */}
                                                 </Row>
                                                 <Row>
                                                     <Col sm={12} md={4} lg={4}>
                                                         <FormGroup>
                                                             <div className="insurerName">
-                                                            select_sum_insured
+                                                            Select Sum Insured
                                                             </div>
                                                         </FormGroup>
                                                     </Col>
@@ -513,8 +541,8 @@ class arogya_SelectDuration extends Component {
                                                                 onBlur={e => this.changePlaceHoldClassRemove(e)}
                                                                 value={bodySliderValue ? bodySliderValue : defaultBodySliderValue}  
                                                             />
-                                                            {errors.body_idv_value && touched.body_idv_value ? (
-                                                                <span className="errorMsg">{errors.body_idv_value}</span>
+                                                            {errors.sum_insured_value && touched.sum_insured_value ? (
+                                                                <span className="errorMsg">{errors.sum_insured_value}</span>
                                                             ) : null}
                                                             </div>
                                                         </FormGroup>
@@ -526,8 +554,8 @@ class arogya_SelectDuration extends Component {
                                                         <input type="range" className="W-90" 
                                                         name= 'slider'
                                                         defaultValue= {defaultBodySliderValue}
-                                                        min= {minBodyIDV}
-                                                        max= {maxBodyIDV}
+                                                        min= {minBodyInsured}
+                                                        max= {maxBodyInsured}
                                                         step= '1'
                                                         value={values.slider}
                                                         onChange= {(e) =>{
@@ -538,7 +566,103 @@ class arogya_SelectDuration extends Component {
                                                         />
                                                         </FormGroup>
                                                     </Col>
-                                                : null }
+                                                 : null } 
+                                                </Row>
+                                                <Row>
+                                                    <Col sm={12} md={4} lg={4}>
+                                                        <FormGroup>
+                                                            <div className="insurerName">
+                                                            Select Deductible
+                                                            </div>
+                                                        </FormGroup>
+                                                    </Col>
+                                                    <Col sm={12} md={3} lg={2}>
+                                                        <FormGroup>
+                                                            <div className="insurerName">
+                                                            <Field
+                                                                name="select_deductible"
+                                                                type="text"
+                                                                placeholder=""
+                                                                autoComplete="off"
+                                                                className="premiumslid"
+                                                                onFocus={e => this.changePlaceHoldClassAdd(e)}
+                                                                onBlur={e => this.changePlaceHoldClassRemove(e)}
+                                                                value={deductibleSliderValue ? deductibleSliderValue : defaultdeductibleSliderValue}  
+                                                            />
+                                                            {errors.deductible_value && touched.deductible_value ? (
+                                                                <span className="errorMsg">{errors.deductible_value}</span>
+                                                            ) : null}
+                                                            </div>
+                                                        </FormGroup>
+                                                    </Col>
+                                                    
+                                                {defaultSliderValue ?
+                                                    <Col sm={12} md={12} lg={6}>
+                                                        <FormGroup>
+                                                        <input type="range" className="W-90" 
+                                                        name= 'slider'
+                                                        defaultValue= {defaultdeductibleSliderValue}
+                                                        min= {minBodyDeductable}
+                                                        max= {maxBodyDeductable}
+                                                        step= '1'
+                                                        value={values.slider}
+                                                        onChange= {(e) =>{
+                                                        setFieldTouched("slider1");
+                                                        setFieldValue("slider1",values.slider);
+                                                        this.deductibleSliderValue(e.target.value)
+                                                    }}
+                                                        />
+                                                        </FormGroup>
+                                                    </Col>
+                                                 : null } 
+                                                </Row>
+                                                <Row>
+                                                    <Col sm={12} md={4} lg={4}>
+                                                        <FormGroup>
+                                                            <div className="insurerName">
+                                                            Select Tenure (Year)
+                                                            </div>
+                                                        </FormGroup>
+                                                    </Col>
+                                                    <Col sm={12} md={3} lg={2}>
+                                                        <FormGroup>
+                                                            <div className="insurerName">
+                                                            <Field
+                                                                name="select_tenure"
+                                                                type="text"
+                                                                placeholder=""
+                                                                autoComplete="off"
+                                                                className="premiumslid"
+                                                                onFocus={e => this.changePlaceHoldClassAdd(e)}
+                                                                onBlur={e => this.changePlaceHoldClassRemove(e)}
+                                                                value={tenureSliderValue ? tenureSliderValue : defaulttenureSliderValue}  
+                                                            />
+                                                            {errors.select_tenure && touched.select_tenure ? (
+                                                                <span className="errorMsg">{errors.select_tenure}</span>
+                                                            ) : null}
+                                                            </div>
+                                                        </FormGroup>
+                                                    </Col>
+                                                    
+                                                {defaultSliderValue ?
+                                                    <Col sm={12} md={12} lg={6}>
+                                                        <FormGroup>
+                                                        <input type="range" className="W-90" 
+                                                        name= 'slider'
+                                                        defaultValue= {defaulttenureSliderValue}
+                                                        min= {minBodyTenure}
+                                                        max= {maxBodyTenure}
+                                                        step= '1'
+                                                        value={values.slider}
+                                                        onChange= {(e) =>{
+                                                        setFieldTouched("slider1");
+                                                        setFieldValue("slider1",values.slider);
+                                                        this.tenureSliderValue(e.target.value)
+                                                    }}
+                                                        />
+                                                        </FormGroup>
+                                                    </Col>
+                                                 : null } 
                                                 </Row>
                                                 <div className="d-flex justify-content-left carloan m-b-25">
                                                     <h4> Premium</h4>

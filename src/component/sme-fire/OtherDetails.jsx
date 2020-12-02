@@ -152,6 +152,7 @@ class OtherDetails extends Component {
         // }
         
         formData.append('menumaster_id',this.props.menumaster_id)
+        formData.append('page_name','/OtherDetails/9')
         formData.append('policy_holder_id',this.props.policy_holder_id)
         formData.append('Commercial_consideration','5')
         // values.previous_city
@@ -185,6 +186,7 @@ class OtherDetails extends Component {
             
             let formDataNew = new FormData(); 
             formDataNew.append('menumaster_id',this.props.menumaster_id)
+            formData.append('page_name','/OtherDetails/9')
             formDataNew.append('policy_ref_no',this.props.policy_holder_ref_no)    
             
             this.props.loadingStart();
@@ -219,8 +221,7 @@ class OtherDetails extends Component {
                 }).
             catch(err=>{
                 this.props.loadingStop();
-                swal("Thank you for showing your interest for buying product.Due to some reasons, we are not able to issue the policy online.Please call 1800 22 1111")
-                actions.setSubmitting(false)
+                actions.setSubmitting(false);
             });
             // const {productId} = this.props.match.params;
             // this.props.history.push(`/AdditionalDetails_SME/${productId}`);
@@ -232,7 +233,6 @@ class OtherDetails extends Component {
             //     swal('Registration number required...');
             // }
         this.props.loadingStop();
-        swal("Thank you for showing your interest for buying product.Due to some reasons, we are not able to issue the policy online.Please call 1800 22 1111")
         actions.setSubmitting(false)
         })
     // }

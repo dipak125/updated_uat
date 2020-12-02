@@ -40,20 +40,6 @@ const ComprehensiveValidation = Yup.object().shape({
 });
 
 
-// const moreCoverage = [
-//     {
-//         "id": "B00015",
-//         "name": "PA for Owner Driver",
-//         "description": "The e-Insurance account or Electronic Insurance Account offers policyholders online space to hold all their insurance policies electronically under one e-insurance account number. This allows the policyholder to access all their policies with a few clicks and no risk of losing the physical insurance policy"
-//     },
-//     {
-//         "id": "B00016",
-//         "name": "PA For Unnamed Passenger",
-//         "description": "The e-Insurance account or Electronic Insurance Account offers policyholders online space to hold all their insurance policies electronically under one e-insurance account number. This allows the policyholder to access all their policies with a few clicks and no risk of losing the physical insurance policy"
-//     }
-    
-// ]
-
 const Coverage = {
     "C101064":"Own Damage",
     "C101065":"Legal Liability to Third Party",
@@ -265,7 +251,8 @@ class TwoWheelerOtherComprehensive extends Component {
                 'idv_value': "0",
                 'add_more_coverage': add_more_coverage,
                 'pa_cover': values.PA_flag ? values.PA_Cover : "0",
-                'pa_flag' : values.PA_cover_flag
+                'pa_flag' : values.PA_cover_flag,
+                'page_name': `four_wheeler_OtherComprehensiveTP/${productId}`,
             }
         }
         else {
@@ -275,7 +262,8 @@ class TwoWheelerOtherComprehensive extends Component {
                 'cng_kit': values.cng_kit,
                 'registration_no': motorInsurance.registration_no,
                 'idv_value': "0",
-                'pa_flag' : values.PA_cover_flag
+                'pa_flag' : values.PA_cover_flag,
+                'page_name': `four_wheeler_OtherComprehensiveTP/${productId}`,
             }
         }
         console.log('post_data', post_data)

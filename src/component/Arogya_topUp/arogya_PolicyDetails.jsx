@@ -71,8 +71,8 @@ class arogya_PolicyDetails extends Component {
     this.props.history.push(`/ThankYou/${policyId}`);
   };
 
-  addressDetails = (productId) => {
-    this.props.history.push(`/arogya_Address/${productId}`);
+  nomineeDetails = (productId) => {
+    this.props.history.push(`/arogya_NomineeDetails/${productId}`);
   };
 
   getPolicyHolderDetails = () => {
@@ -474,7 +474,7 @@ paypoint_payment = () => {
                         <div className="d-flex justify-content-left resmb">
                           <button
                             className="backBtn"
-                            onClick={this.addressDetails.bind(this, productId)}
+                            onClick={this.nomineeDetails.bind(this, productId)}
                           >
                             Back
                           </button>

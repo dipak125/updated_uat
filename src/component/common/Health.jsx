@@ -20,10 +20,11 @@ class Health extends Component {
     buy_policy = (productId) => {
         if(productId == '5')
         this.props.history.push(`/Health/${productId}`);
-
-        else if(productId == '12')
+        if(productId == '10')
+        this.props.history.push(`/Health_KSB/${productId}`);
+        if(productId == '12')
         this.props.history.push(`/arogya_Health/${productId}`);
-    }  
+    }   
 
     getPolicyList = () => {
         let encryption = new Encryption();

@@ -129,6 +129,7 @@ class arogya_MedicalDetails extends Component {
             let policy_holder_id = localStorage.getItem('policyHolder_id') ? localStorage.getItem('policyHolder_id') : 0
             let encryption = new Encryption();
             let post_data = {
+                'page_name':'arogya_MedicalDetails/12',
                 'question_id':question_id[0],
                 'answer':value,
                 'family_member_ids':arr_data,
@@ -235,14 +236,17 @@ class arogya_MedicalDetails extends Component {
     }
 
     getQuestionList = () => {
+        let encryption = new Encryption();
         this.props.loadingStart();
         axios
-          .get(`/questions`)
+          .get(`arogya-topup/questions`)
           .then(res => {
+            let decryptResp = JSON.parse(encryption.decrypt(res.data))
+            console.log("decrypt---medical---", decryptResp)
               
-            let showImage = res.data.data && res.data.data.length ? this.setShowImage(res.data.data):[]
+            let showImage = decryptResp.data && decryptResp.data.length ? this.setShowImage(decryptResp.data):[]
             this.setState({
-                questionList: res.data.data,
+                questionList: decryptResp.data,
                 showImage
             });
           })
@@ -389,7 +393,8 @@ class arogya_MedicalDetails extends Component {
           //  console.log("ARRAY SELECTED======>",arr_selected)
          }
          let policy_holder_id = localStorage.getItem('policyHolder_id') ? localStorage.getItem('policyHolder_id') : 0
-         const post_data = {             
+         const post_data = {        
+            'page_name':'arogya_MedicalDetails/12',     
             'policy_holder_id':policy_holder_id,
             'family_member_ids':arr_data,
             'question_id':classId,

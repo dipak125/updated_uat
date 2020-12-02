@@ -364,11 +364,11 @@ class arogya_Address extends Component {
                 const formData = new FormData();
                 // let encryption = new Encryption();
 
-            //    const post_data_obj = {
-            //         'pincode':pincode.toString()
-            //     };
-               // let encryption = new Encryption();
-            //    formData.append('enc_data',encryption.encrypt(JSON.stringify(post_data_obj)))
+               const post_data_obj = {
+                    'pincode':pincode.toString()
+                };
+               let encryption = new Encryption();
+               formData.append('enc_data',encryption.encrypt(JSON.stringify(post_data_obj)))
 
                 formData.append('pincode', pincode)
                 this.props.loadingStart();
@@ -399,7 +399,7 @@ class arogya_Address extends Component {
             const post_data_obj = {
                 'pincode':pinCode
             };
-        //    formData.append('enc_data',encryption.encrypt(JSON.stringify(post_data_obj)))
+           formData.append('enc_data',encryption.encrypt(JSON.stringify(post_data_obj)))
            formData.append('pincode',pinCode)
            axios.post('pincode-details', formData)
            .then(res=>{       
@@ -456,6 +456,7 @@ class arogya_Address extends Component {
         }  
 
         formArr['looking_for'] = looking_for
+        formArr['page_name'] = '/arogya_Address/12'
         formArr['family_member_id'] = family_member_id
         formArr['gender'] = gender
         formArr['first_name'] = first_name
@@ -505,11 +506,11 @@ class arogya_Address extends Component {
 
         this.props.loadingStart();
         axios
-        .post(`/insured-member-details`, formData)
+        .post(`arogya-topup/insured-member-details`, formData)
         .then(res => {
            // if(res.data.completedStep == 4){
                 this.props.loadingStop();
-                this.props.history.push(`/arogya_PolicyDetails/${productId}`);
+                this.props.history.push(`/arogya_NomineeDetails/${productId}`);
            // }        
         })
         .catch(err => {
@@ -573,12 +574,6 @@ class arogya_Address extends Component {
             state: addressDetails && addressDetails.state ? addressDetails.state:"",
             eIA: is_eia_account,
             eia_account_no : policy_holder && policy_holder.eia_no ?  policy_holder.eia_no : '',
-
-            // nominee_first_name: NomineeDetails ? NomineeDetails.nominee_first_name : "",
-            // nominee_last_name: NomineeDetails ? NomineeDetails.nominee_last_name : "",
-            // nominee_gender: NomineeDetails ? NomineeDetails.nominee_gender : "",
-            // nominee_dob: NomineeDetails && NomineeDetails.nominee_dob ? new Date(NomineeDetails.dob) : "",
-            // nominee_relation_with: NomineeDetails ? NomineeDetails.nominee_relation_with : "",
 
             proposerName : policy_holder && policy_holder.first_name ?  policy_holder.first_name : '',
             proposerLname : policy_holder && policy_holder.last_name ?  policy_holder.last_name : '',
@@ -1069,136 +1064,7 @@ class arogya_Address extends Component {
                                                             </div>
                                                         </FormGroup>
                                                     </Col>
-                                                </Row>
-
-                                                <div className="d-flex justify-content-left carloan">
-                                                    <h4> Nominee  Details</h4>
-                                                </div>
-                                                <Row>
-                                                    <Col sm={12} md={9} lg={9}>
-                                                        <Row>
-                                                            <Col sm={12} md={4} lg={4}>
-                                                                <FormGroup>
-                                                                    <div className="insurerName">
-                                                                        <Field
-                                                                            name="nominee_first_name"
-                                                                            type="text"
-                                                                            placeholder="First Name"
-                                                                            autoComplete="off"
-                                                                            onFocus={e => this.changePlaceHoldClassAdd(e)}
-                                                                            onBlur={e => this.changePlaceHoldClassRemove(e)}
-                                                                            value={values.first_name}
-                                                                        />
-                                                                        {errors.first_name && touched.first_name ? (
-                                                                        <span className="errorMsg">{errors.first_name}</span>
-                                                                        ) : null}
-                                                                        
-                                                                    </div>
-                                                                </FormGroup>
-                                                            </Col>
-
-                                                            <Col sm={12} md={4} lg={4}>
-                                                                <FormGroup>
-                                                                    <div className="insurerName">
-                                                                        <Field
-                                                                            name="nominee_last_name"
-                                                                            type="text"
-                                                                            placeholder="Last Name"
-                                                                            autoComplete="off"
-                                                                            onFocus={e => this.changePlaceHoldClassAdd(e)}
-                                                                            onBlur={e => this.changePlaceHoldClassRemove(e)}
-                                                                            value={values.last_name}
-                                                                        />
-                                                                        {errors.last_name && touched.last_name ? (
-                                                                        <span className="errorMsg">{errors.last_name}</span>
-                                                                        ) : null}
-                                                                    </div>
-                                                                </FormGroup>
-                                                            </Col>
-
-
-                                                            <Col sm={12} md={4} lg={4}>
-                                                                <FormGroup>
-                                                                    <div className="formSection">
-                                                                        <Field
-                                                                            name="nominee_gender"
-                                                                            component="select"
-                                                                            autoComplete="off"
-                                                                            value={values.gender}
-                                                                            className="formGrp"
-                                                                        >
-                                                                        <option value="">Select gender</option>
-                                                                                <option value="m">Male</option>
-                                                                                <option value="f">Female</option>
-                                                                            </Field>     
-                                                                            {errors.gender && touched.gender ? (
-                                                                                <span className="errorMsg">{errors.gender}</span>
-                                                                            ) : null}     
-                                                                    </div>
-                                                                </FormGroup>
-                                                            </Col>
-                                                        </Row>
-                                                    </Col>
-                                                    </Row>
-                                                        
-
-                                                        <Row className="m-b-45">
-                                                            <Col sm={12} md={4} lg={4}>
-                                                                <FormGroup>
-                                                                    <DatePicker
-                                                                        name="nominee_dob"
-                                                                        dateFormat="dd MMM yyyy"
-                                                                        placeholderText="DOB"
-                                                                        peekPreviousMonth
-                                                                        peekPreviousYear
-                                                                        showMonthDropdown
-                                                                        showYearDropdown
-                                                                        dropdownMode="select"
-                                                                        // maxDate={new Date(maxDobNominee)}
-                                                                        // minDate={new Date(minDobNominee)}
-                                                                        className="datePckr"
-                                                                        onChange={(value) => {
-                                                                            setFieldTouched("dob");
-                                                                            setFieldValue("dob", value);
-                                                                            this.ageCheck(value)
-                                                                            }}
-                                                                        selected={values.dob}
-                                                                    />
-                                                                    {errors.dob && touched.dob ? (
-                                                                        <span className="errorMsg">{errors.dob}</span>
-                                                                    ) : null}
-                                                                </FormGroup>
-                                                            </Col>
-
-
-                                                            <Col sm={12} md={8} lg={8}>
-                                                                <FormGroup>
-                                                                    <div className="formSection">                                                           
-                                                                        <Field
-                                                                            name="nominee_relation_with"
-                                                                            component="select"
-                                                                            autoComplete="off"
-                                                                            value={values.relation_with}
-                                                                            className="formGrp"
-                                                                        >
-                                                                        <option value="">Relation with Primary Insured</option>
-                                                                        {/* {self_selected ? '': <option value="1">Self</option>} */}
-                                                                        <option value="1">Self</option>
-                                                                        <option value="2">Spouse</option>
-                                                                        <option value="3">Son</option>
-                                                                        <option value="4">Daughter</option>
-                                                                        <option value="5">Father</option>
-                                                                        <option value="6">Mother</option>
-                                                                        <option value="7">Father In Law</option>
-                                                                        <option value="8">Mother In Law</option>
-                                                                        </Field>     
-                                                                        {errors.relation_with && touched.relation_with ? (
-                                                                            <span className="errorMsg">{errors.relation_with}</span>
-                                                                        ) : null}        
-                                                                    </div>
-                                                                </FormGroup>
-                                                            </Col>
-                                                        </Row>
+                                                </Row>            
 
                                                 <div className="d-flex flex-column flex-sm-column flex-md-column flex-lg-row justify-content-left m-b-40">
                                                 

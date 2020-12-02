@@ -1032,6 +1032,7 @@ class InformationYourself extends Component {
     post_data['insurrepostry_id'] = values.insurrepostry_id   
     post_data['varient_type_id'] = values.varient_type_id 
     post_data['ksbbusniessplan_id'] = values.ksbbusniessplan_id 
+    post_data['page_name'] = `Health_KSB/${productId}`
     
     
     let arr_date=[]

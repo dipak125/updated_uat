@@ -351,7 +351,8 @@ class TwoWheelerSelectBrand extends Component {
                     'product_id':sessionStorage.getItem('product_id') ? sessionStorage.getItem('product_id') : "",
                     'bcmaster_id': "5",
                     'policy_for': values.policy_for,
-                    'fastlaneLog_id': this.state.fastLaneData && this.state.fastLaneData.fastlaneLog_id ? this.state.fastLaneData.fastlaneLog_id : fastlanelog && fastlanelog.id ? fastlanelog.id : ""
+                    'fastlaneLog_id': this.state.fastLaneData && this.state.fastLaneData.fastlaneLog_id ? this.state.fastLaneData.fastlaneLog_id : fastlanelog && fastlanelog.id ? fastlanelog.id : "",
+                    'page_name': `four_wheeler_Select-brandTP/${productId}`,
                 }
             }
             else {
@@ -368,17 +369,18 @@ class TwoWheelerSelectBrand extends Component {
                     'bcmaster_id': bc_data ? bc_data.agent_id : "",
                     'bc_token': bc_data ? bc_data.token : "",
                     'policy_for': values.policy_for,
-                    'fastlaneLog_id': this.state.fastLaneData && this.state.fastLaneData.fastlaneLog_id ? this.state.fastLaneData.fastlaneLog_id : fastlanelog && fastlanelog.id ? fastlanelog.id : ""
+                    'fastlaneLog_id': this.state.fastLaneData && this.state.fastLaneData.fastlaneLog_id ? this.state.fastLaneData.fastlaneLog_id : fastlanelog && fastlanelog.id ? fastlanelog.id : "",
+                    'page_name': `four_wheeler_Select-brandTP/${productId}`,
                 }
             }
             
-            console.log('post_data-----', post_data)
+            // console.log('post_data-----', post_data)
             formData.append('enc_data', encryption.encrypt(JSON.stringify(post_data)))
             this.props.loadingStart();
             axios.post('four-wh-tp/update-registration', formData).then(res => {
                 this.props.loadingStop();
                 let decryptResp = JSON.parse(encryption.decrypt(res.data));
-                console.log('decryptResp-----', decryptResp)
+                // console.log('decryptResp-----', decryptResp)
 
                 if (decryptResp.error == false) {
                     if(this.state.otherBrands) {
@@ -420,7 +422,8 @@ class TwoWheelerSelectBrand extends Component {
                     'product_id':sessionStorage.getItem('product_id') ? sessionStorage.getItem('product_id') : "",
                     'bcmaster_id': "5",
                     'policy_for': values.policy_for,
-                    'fastlaneLog_id': this.state.fastLaneData && this.state.fastLaneData.fastlaneLog_id ? this.state.fastLaneData.fastlaneLog_id : fastlanelog && fastlanelog.id ? fastlanelog.id : ""
+                    'fastlaneLog_id': this.state.fastLaneData && this.state.fastLaneData.fastlaneLog_id ? this.state.fastLaneData.fastlaneLog_id : fastlanelog && fastlanelog.id ? fastlanelog.id : "",
+                    'page_name': `four_wheeler_Select-brandTP/${productId}`,
                 }
             }
             else {
@@ -436,7 +439,8 @@ class TwoWheelerSelectBrand extends Component {
                     'bcmaster_id': bc_data ? bc_data.agent_id : "",
                     'bc_token': bc_data ? bc_data.token : "",
                     'policy_for': values.policy_for,
-                    'fastlaneLog_id': this.state.fastLaneData && this.state.fastLaneData.fastlaneLog_id ? this.state.fastLaneData.fastlaneLog_id : fastlanelog && fastlanelog.id ? fastlanelog.id : ""
+                    'fastlaneLog_id': this.state.fastLaneData && this.state.fastLaneData.fastlaneLog_id ? this.state.fastLaneData.fastlaneLog_id : fastlanelog && fastlanelog.id ? fastlanelog.id : "",
+                    'page_name': `four_wheeler_Select-brandTP/${productId}`,
                 }
             }
             console.log('post_data-----', post_data)

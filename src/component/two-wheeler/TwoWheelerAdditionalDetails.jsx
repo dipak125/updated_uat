@@ -440,7 +440,8 @@ class TwoWheelerAdditionalDetails extends Component {
             'is_eia_account': values['is_eia_account'],
             'eia_no': values['eia_no'],
             'address': values['address'],          
-            'gstn_no': values['gstn_no']
+            'gstn_no': values['gstn_no'],
+            'page_name': `two_wheeler_additional_details/${productId}`,
         }
         if(motorInsurance.policy_for == '1' && motorInsurance.pa_flag == '1'){
             post_data['dob'] = moment(values['dob']).format("YYYY-MM-DD")
@@ -507,7 +508,6 @@ class TwoWheelerAdditionalDetails extends Component {
                  let addressDetails = JSON.parse(decryptResp.data.policyHolder.pincode_response)
                  let step_completed = decryptResp.data.policyHolder ? decryptResp.data.policyHolder.step_no : "";
             
-                 console.log('is_appointee', nomineeDetails ? nomineeDetails.is_appointee : "efg")
                 //  return false;
                  this.setState({
                     quoteId, motorInsurance, previousPolicy, vehicleDetails, policyHolder, nomineeDetails, is_loan_account, 
