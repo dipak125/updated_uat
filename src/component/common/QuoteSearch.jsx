@@ -38,13 +38,17 @@ function polNumFormatter(cell) {
     return (cell ? (cell.policy_note ? cell.policy_note.policy_no : null): null);
 } 
 
-function productFormatter(cell) {
-    return (cell ? (cell.vehicletype ? cell.vehicletype.name : null): null);
+function productFormatter(cell, row) {
+    if(row.menumaster_id == '2'){
+        return 'Arogya Sanjeevani'
+    }else{
+        return (cell ? (cell.vehicletype ? cell.vehicletype.name : null): null);
+    }
 } 
 
 const statusFormatter = (refObj) => (cell,row) => {
     return (
-        <div></div>
+        <div>Quote Issued</div>
     )
 }
 
@@ -61,49 +65,18 @@ class QuoteSearch extends Component {
     }
 
     redirectLink = (cell,row) => {
-        let page_name = 'Products'
+        //console.log('1st Char ===',row.page_name.substr(0, 1))
+        let page_name = row.page_name
+        //console.log('page_name == ', page_name)
         localStorage.setItem("policyHolder_refNo", row.reference_no)
-        localStorage.setItem("policy_holder_ref_no", row.reference_no)
-        if(row.vehiclebrandmodel){
-            console.log('vehicletype_id---', row.vehiclebrandmodel.vehicletype_id)
-            // console.log('cell---', cell)
-            let vehicletype_id = row.vehiclebrandmodel.vehicletype_id;
-            switch(vehicletype_id) {
-                case 2:
-                page_name = 'OtherComprehensive/2';
-                break;    
-                case 3:
-                page_name = 'two_wheeler_OtherComprehensiveTP/3';
-                break;
-                case 4:
-                page_name = 'two_wheeler_OtherComprehensive/4';
-                break;
-                case 5:
-                page_name = 'SelectDuration/5';
-                break;
-                case 6:
-                page_name = 'four_wheeler_OtherComprehensiveTP/6';
-                break;
-                case 7:
-                page_name = 'OtherComprehensive_GCV_TP/7'; 
-                break;
-                case 8:
-                page_name = 'OtherComprehensive_GCV/8';
-                case 9:
-                page_name = 'RiskDetails/5';
-                break; 
-                default:
-                page_name = 'Products';
-            }
-        }else{
-            page_name = 'SelectDuration/5';
-        }
-        // console.log('page_name---', page_name)
-        // console.log('cell---', cell)
-        // console.log('row---', row)
-        
+        localStorage.setItem("policy_holder_ref_no", row.reference_no)        
         localStorage.setItem("policyHolder_id", cell.policyholder_id)
-        this.props.history.push(`/${page_name}`);
+        if(page_name.substr(0, 1) == '/'){
+            this.props.history.push(`${page_name}`);
+        }else{
+            this.props.history.push(`/${page_name}`);
+        }
+        
     }
 
     changePlaceHoldClassAdd(e) {

@@ -203,7 +203,7 @@ class RiskDetails extends Component {
         
         formData.append('policy_holder_id',this.props.policy_holder_id)
         formData.append('menumaster_id',this.props.menumaster_id)
-        formData.append('page_name','/RiskDetails/9')
+        formData.append('page_name','RiskDetails/9')
         // formData.append('street_name','g6')
         // formData.append('plot_no','g6')
         // formData.append('bcmaster_id','1')house_flat_no salutation

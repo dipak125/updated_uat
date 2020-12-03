@@ -270,7 +270,7 @@ class AdditionalDetails_sme extends Component {
 
             let formDataNew = new FormData(); 
             formDataNew.append('menumaster_id',this.props.menumaster_id)
-            formData.append('page_name','/AdditionalDetails_SME/9')
+            formData.append('page_name','AdditionalDetails_SME/9')
             formDataNew.append('policy_ref_no',this.props.policy_holder_ref_no)    
 
             axios.post('/sme/mdm-party',

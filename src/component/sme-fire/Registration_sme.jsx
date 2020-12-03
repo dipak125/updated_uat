@@ -198,6 +198,7 @@ class Registration_sme extends Component {
         const formData = new FormData();
         let encryption = new Encryption();
         formData.append('menumaster_id','5');
+        formData.append('page_name','Registration_SME/9')
         formData.append('vehicle_type_id','9');
 
         if(sessionStorage.getItem('csc_id')) {
@@ -249,6 +250,7 @@ class Registration_sme extends Component {
             }).
             catch(err=>{
                 this.props.loadingStop();
+                actions.setSubmitting(false);
             })
         }else{
             axios.post('sme/policy-info',
@@ -270,6 +272,7 @@ class Registration_sme extends Component {
             }).
             catch(err=>{
                 this.props.loadingStop();
+                actions.setSubmitting(false);
             })
         }
     }

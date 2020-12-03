@@ -152,7 +152,7 @@ class OtherDetails extends Component {
         // }
         
         formData.append('menumaster_id',this.props.menumaster_id)
-        formData.append('page_name','/OtherDetails/9')
+        formData.append('page_name','OtherDetails/9')
         formData.append('policy_holder_id',this.props.policy_holder_id)
         formData.append('Commercial_consideration','5')
         // values.previous_city
