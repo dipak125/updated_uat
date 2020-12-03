@@ -872,6 +872,8 @@ class TwoWheelerVerify extends Component {
                                                 maxDate={new Date(maxDate)}
                                                 autoComplete="off"
                                                 dateFormat="dd MMM yyyy"
+                                                disabledKeyboardNavigation
+                                                openToDate={new Date(minDate)}
                                                 placeholderText="Previous policy start date"
                                                 peekPreviousMonth
                                                 peekPreviousYear
