@@ -133,71 +133,12 @@ class Premium_sme extends Component {
         })  
     }
 
-    getAccessToken = (motorInsurance) => {
-        axios
-            .post(`/callTokenService`)
-            .then((res) => {
-                this.setState({
-                    accessToken: res.data.access_token,
-                });
-                this.fullQuote(res.data.access_token, motorInsurance)
-            })
-            .catch((err) => {
-                this.setState({
-                    accessToken: '',
-                });
-                this.props.loadingStop();
-            });
-    };
 
-    fullQuote = (access_token, motorInsurance) => {
-        const formData = new FormData();
-        let encryption = new Encryption();
-        let dateDiff = 0
-        const {previousPolicy, request_data, policyHolder} = this.state
-        const post_data = {
-            'ref_no':this.state.policyHolder_refNo ? this.state.policyHolder_refNo : '0',
-            'access_token':access_token,
-            'idv_value': motorInsurance.idv_value,
-            'policy_type':  motorInsurance.policy_type,
-            'add_more_coverage': motorInsurance.add_more_coverage,
-            'cng_kit': motorInsurance.cng_kit,
-            'cngKit_Cost': Math.floor(motorInsurance.cngkit_cost),
-            'PA_Cover': motorInsurance && motorInsurance.pa_cover ? motorInsurance.pa_cover : '0',
-        }
-
-        formData.append('enc_data',encryption.encrypt(JSON.stringify(post_data)))
-        console.log("post_data--fullQuotePMCAR- ", post_data)
-        axios.post('fullQuotePMCAR', formData)
-            .then(res => {
-                if (res.data.PolicyObject && res.data.UnderwritingResult && res.data.UnderwritingResult.Status == "Success") {
-                    this.setState({
-                        fulQuoteResp: res.data.PolicyObject,
-                        PolicyArray: res.data.PolicyObject.PolicyLobList,
-                        error: [],
-                    });
-                } else {
-                    this.setState({
-                        fulQuoteResp: [],
-                        error: res.data,
-                    });
-                }
-                this.props.loadingStop();
-                        
-            })
-            .catch(err => {
-                this.setState({
-                    serverResponse: [],
-                });
-                this.props.loadingStop();
-            })
-    }
-// http://14.140.119.44/sbig-csc/ConnectPG/payment_sme_fire.php?refrence_no=5919d14a1fe65f1b62437ce0221a4419
     payment = () => {
         const { refNumber } = this.state;
         window.location = `${process.env.REACT_APP_PAYMENT_URL}/ConnectPG/payment_sme_fire.php?refrence_no=${refNumber}`
     }
-    // http://14.140.119.44/sbig-csc/razorpay/smefire_pay.php?refrence_no=b6682aa3f5bc9003623cdee5506dfb2d
+
     Razor_payment = () => {
         const { refNumber } = this.state;
         window.location = `${process.env.REACT_APP_PAYMENT_URL}/razorpay/smefire_pay.php?refrence_no=${refNumber}`
@@ -224,34 +165,33 @@ class Premium_sme extends Component {
 
     fetchPolicyDetails=()=>{
         let policy_holder_ref_no = localStorage.getItem("policy_holder_ref_no") ? localStorage.getItem("policy_holder_ref_no"):0;
-        console.log('this.props.policy_holder_ref_no',this.props.policy_holder_ref_no);
-
-            
+        let encryption = new Encryption();
+  
             this.props.loadingStart();
             axios.get(`sme/details/${policy_holder_ref_no}`)
             .then(res=>{
-                
+                let decryptResp = JSON.parse(encryption.decrypt(res.data));
 
-                if(res.data.data.policyHolder.step_no > 0){
+                if(decryptResp.data.policyHolder.step_no > 0){
 
                     this.props.setData({
-                        start_date:res.data.data.policyHolder.request_data.start_date,
-                        end_date:res.data.data.policyHolder.request_data.end_date,
+                        start_date:decryptResp.data.policyHolder.request_data.start_date,
+                        end_date:decryptResp.data.policyHolder.request_data.end_date,
                         
-                        policy_holder_id:res.data.data.policyHolder.id,
+                        policy_holder_id:decryptResp.data.policyHolder.id,
                         policy_holder_ref_no:policy_holder_ref_no,
-                        request_data_id:res.data.data.policyHolder.request_data.id,
-                        completed_step:res.data.data.policyHolder.step_no,
-                        menumaster_id:res.data.data.policyHolder.menumaster_id
+                        request_data_id:decryptResp.data.policyHolder.request_data.id,
+                        completed_step:decryptResp.data.policyHolder.step_no,
+                        menumaster_id:decryptResp.data.policyHolder.menumaster_id
                     });
 
                     
 
                 }
 
-                if(res.data.data.policyHolder.step_no == 1 || res.data.data.policyHolder.step_no > 1){
+                if(decryptResp.data.policyHolder.step_no == 1 || decryptResp.data.policyHolder.step_no > 1){
 
-                    let risk_arr = JSON.parse(res.data.data.policyHolder.smeinfo.risk_address);
+                    let risk_arr = JSON.parse(decryptResp.data.policyHolder.smeinfo.risk_address);
 
                     this.props.setRiskData(
                         {
@@ -260,78 +200,78 @@ class Premium_sme extends Component {
                             street_name:risk_arr.street_name,
                             plot_no:risk_arr.plot_no,
                             house_flat_no:risk_arr.house_flat_no,
-                            pincode:res.data.data.policyHolder.smeinfo.pincode,
-                            pincode_id:res.data.data.policyHolder.smeinfo.pincode_id,
+                            pincode:decryptResp.data.policyHolder.smeinfo.pincode,
+                            pincode_id:decryptResp.data.policyHolder.smeinfo.pincode_id,
 
-                            buildings_sum_insured:res.data.data.policyHolder.smeinfo.buildings_sum_insured,
-                            content_sum_insured:res.data.data.policyHolder.smeinfo.content_sum_insured,
-                            stock_sum_insured:res.data.data.policyHolder.smeinfo.stock_sum_insured
+                            buildings_sum_insured:decryptResp.data.policyHolder.smeinfo.buildings_sum_insured,
+                            content_sum_insured:decryptResp.data.policyHolder.smeinfo.content_sum_insured,
+                            stock_sum_insured:decryptResp.data.policyHolder.smeinfo.stock_sum_insured
                         }
                     );
                 }
 
-                // if(res.data.data.policyHolder.step_no == 2 || res.data.data.policyHolder.step_no > 2){
+                // if(decryptResp.data.policyHolder.step_no == 2 || decryptResp.data.policyHolder.step_no > 2){
 
                 //     this.props.setSmeOthersDetails({
                     
-                //         Commercial_consideration:res.data.data.policyHolder.previouspolicy.Commercial_consideration,
-                //         previous_start_date:res.data.data.policyHolder.previouspolicy.start_date,
-                //         previous_end_date:res.data.data.policyHolder.previouspolicy.end_date,
-                //         Previous_Policy_No:res.data.data.policyHolder.previouspolicy.policy_no,
-                //         insurance_company_id:res.data.data.policyHolder.previouspolicy.insurancecompany_id,
-                //         previous_city:res.data.data.policyHolder.previouspolicy.address
+                //         Commercial_consideration:decryptResp.data.policyHolder.previouspolicy.Commercial_consideration,
+                //         previous_start_date:decryptResp.data.policyHolder.previouspolicy.start_date,
+                //         previous_end_date:decryptResp.data.policyHolder.previouspolicy.end_date,
+                //         Previous_Policy_No:decryptResp.data.policyHolder.previouspolicy.policy_no,
+                //         insurance_company_id:decryptResp.data.policyHolder.previouspolicy.insurancecompany_id,
+                //         previous_city:decryptResp.data.policyHolder.previouspolicy.address
         
                 //     });
 
                 // }
 
-                if(res.data.data.policyHolder.step_no == 3 || res.data.data.policyHolder.step_no > 3){
+                if(decryptResp.data.policyHolder.step_no == 3 || decryptResp.data.policyHolder.step_no > 3){
 
-                    let address = JSON.parse(res.data.data.policyHolder.address);
+                    let address = JSON.parse(decryptResp.data.policyHolder.address);
 
                     this.props.setSmeProposerDetails(
                         {
-                            first_name:res.data.data.policyHolder.first_name,
-                            last_name:res.data.data.policyHolder.last_name,
-                            salutation_id:res.data.data.policyHolder.salutation_id,
-                            date_of_birth:res.data.data.policyHolder.dob,
-                            email_id:res.data.data.policyHolder.email_id,
-                            mobile:res.data.data.policyHolder.mobile,
-                            gender:res.data.data.policyHolder.gender,
-                            pan_no:res.data.data.policyHolder.pancard,
-                            gstn_no:res.data.data.policyHolder.gstn_no,
+                            first_name:decryptResp.data.policyHolder.first_name,
+                            last_name:decryptResp.data.policyHolder.last_name,
+                            salutation_id:decryptResp.data.policyHolder.salutation_id,
+                            date_of_birth:decryptResp.data.policyHolder.dob,
+                            email_id:decryptResp.data.policyHolder.email_id,
+                            mobile:decryptResp.data.policyHolder.mobile,
+                            gender:decryptResp.data.policyHolder.gender,
+                            pan_no:decryptResp.data.policyHolder.pancard,
+                            gstn_no:decryptResp.data.policyHolder.gstn_no,
 
                             com_street_name:address.street_name,
                             com_plot_no:address.plot_no,
                             com_building_name:address.house_building_name,
                             com_block_no:address.block_no,
                             com_house_flat_no:address.house_flat_no,
-                            com_pincode:res.data.data.policyHolder.pincode,
-                            com_pincode_id:res.data.data.policyHolder.pincode_id
+                            com_pincode:decryptResp.data.policyHolder.pincode,
+                            com_pincode_id:decryptResp.data.policyHolder.pincode_id
                         }
                     );
                 }
 
-                let pincode_area_arr = JSON.parse(res.data.data.policyHolder.pincode_response);
+                let pincode_area_arr = JSON.parse(decryptResp.data.policyHolder.pincode_response);
                 
                 this.setState(
                     {
-                        // salutationName:res.data.data.policyHolder.salutation.displayvalue ,
+                        // salutationName:decryptResp.data.policyHolder.salutation.displayvalue ,
                         // pincodeArea:pincode_area_arr.LCLTY_SUBRB_TALUK_TEHSL_NM != null ? pincode_area_arr.LCLTY_SUBRB_TALUK_TEHSL_NM : 0,
-                        // quoteId:res.data.data.policyHolder.request_data.quote_id != null ? res.data.data.policyHolder.request_data.quote_id : 0,
-                        // gst:res.data.data.policyHolder.request_data.service_tax != null ? res.data.data.policyHolder.request_data.service_tax : 0,
-                        // netPremium:res.data.data.policyHolder.request_data.net_premium != null ? res.data.data.policyHolder.request_data.net_premium : 0,
-                        // finalPremium:res.data.data.policyHolder.request_data.payable_premium != null ? res.data.data.policyHolder.request_data.payable_premium : 0,
+                        // quoteId:decryptResp.data.policyHolder.request_data.quote_id != null ? decryptResp.data.policyHolder.request_data.quote_id : 0,
+                        // gst:decryptResp.data.policyHolder.request_data.service_tax != null ? decryptResp.data.policyHolder.request_data.service_tax : 0,
+                        // netPremium:decryptResp.data.policyHolder.request_data.net_premium != null ? decryptResp.data.policyHolder.request_data.net_premium : 0,
+                        // finalPremium:decryptResp.data.policyHolder.request_data.payable_premium != null ? decryptResp.data.policyHolder.request_data.payable_premium : 0,
 
-                        salutationName:res.data.data.policyHolder.salutation.displayvalue,
+                        salutationName:decryptResp.data.policyHolder.salutation.displayvalue,
                         pincodeArea:pincode_area_arr.LCLTY_SUBRB_TALUK_TEHSL_NM,
-                        quoteId:res.data.data.policyHolder.request_data.quote_id,
-                        gst:res.data.data.policyHolder.request_data.service_tax,
-                        grossPremium:res.data.data.policyHolder.request_data.gross_premium,
-                        payablePremium:res.data.data.policyHolder.request_data.payable_premium,
-                        refNumber:res.data.data.policyHolder.reference_no,
-                        logo:res.data.data.policyHolder.bcmaster.paymentgateway.logo,
-                        policyHolder:res.data.data.policyHolder
+                        quoteId:decryptResp.data.policyHolder.request_data.quote_id,
+                        gst:decryptResp.data.policyHolder.request_data.service_tax,
+                        grossPremium:decryptResp.data.policyHolder.request_data.gross_premium,
+                        payablePremium:decryptResp.data.policyHolder.request_data.payable_premium,
+                        refNumber:decryptResp.data.policyHolder.reference_no,
+                        logo:decryptResp.data.policyHolder.bcmaster.paymentgateway.logo,
+                        policyHolder:decryptResp.data.policyHolder
                     }
                 );
 

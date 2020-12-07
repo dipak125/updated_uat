@@ -20,7 +20,6 @@ const validatearogya_MedicalDetails = Yup.object().shape({
     question_id: Yup.lazy(obj =>
         Yup.object(
             mapValues(obj => {     
-                console.log('ssss===>',obj);
               //  console.log('aaaaa=====>',key)
            /* if (key.includes('question_id')) {
                 return Yup.object().shape({
@@ -95,7 +94,6 @@ class arogya_MedicalDetails extends Component {
         //resource.id} : false
             })           
         );
-            console.log("SSSSSSSSSSS=======>",newShowImage)
       
       // formData.append('question_id', question_id[0]);
       // formData.append('answer', value);
@@ -114,7 +112,7 @@ class arogya_MedicalDetails extends Component {
 
        let familyMembers=document.getElementsByClassName(`familyMembers${question_id[0]}`)
        let answerStr = value;
-       console.log("AAAAA====>",familyMembers);
+
        if(answerStr=='n'){
             let family_members = this.state.family_members
             let arr_data = []
@@ -168,13 +166,7 @@ class arogya_MedicalDetails extends Component {
            }
            
        }
-       console.log("Form Data=======>",formData)
-      console.log("Form Data=======>",formData)
-       
-       
 
-
-          
     }
 
     capitalize = (s) => {
@@ -190,7 +182,6 @@ class arogya_MedicalDetails extends Component {
         let selectCheck = []
         for(let i=0;i<questionClass.length;i++){
             if(questionClass[i].checked){  
-                //console.log("Name====>",questionClass[i].name  
                let classId = questionClass[i].name[questionClass[i].name.length-1]
                let familyMembers=`familyMembers${classId}`
                let familyMembersClass = document.getElementsByClassName(familyMembers);
@@ -206,15 +197,7 @@ class arogya_MedicalDetails extends Component {
             }            
         }
 
-        console.log("CHECK FAMILY ==============>", checkFamily)
-        console.log("CHECK FAMILY ==============>", checkFamily)
-
         let q = questionClass.length/2
-
-
-
-
-
 
         if(count == q && checkFamily.length >= selectCheck.length){
             if(this.state.isForwarded){
@@ -223,16 +206,7 @@ class arogya_MedicalDetails extends Component {
         }
         else{
             swal('Please answer all of the questions');
-
-           /* this.setState({
-                validation_message:'Please answer all of the questions',
-                show:true
-            })*/
         }
-       /* if(count===questionClass.length){
-            alert(all )
-        }*/
-       //  this.props.history.push(`/SelectDuration/${productId}`);
     }
 
     getQuestionList = () => {
@@ -242,7 +216,6 @@ class arogya_MedicalDetails extends Component {
           .get(`arogya-topup/questions`)
           .then(res => {
             let decryptResp = JSON.parse(encryption.decrypt(res.data))
-            console.log("decrypt---medical---", decryptResp)
               
             let showImage = decryptResp.data && decryptResp.data.length ? this.setShowImage(decryptResp.data):[]
             this.setState({
@@ -279,16 +252,18 @@ class arogya_MedicalDetails extends Component {
 
     getPolicyHolderDetails = () => {
         this.props.loadingStart();
-        axios
-          .get(`/policy-holder/${localStorage.getItem('policyHolder_id')}`)
+        let policyHolder_refNo = localStorage.getItem("policyHolder_refNo");
+        let encryption = new Encryption();
+        axios.get(`arogya-topup/health-policy-details/${policyHolder_refNo}`)
           .then(res => { 
+            let decryptResp = JSON.parse(encryption.decrypt(res.data))
+            console.log("decrypt", decryptResp)
             this.setState({
                 flag: true,
-                question_answer: res.data.data.policyHolder.request_data.question_answer,
-                family_members:res.data.data.policyHolder.request_data.family_members,
+                question_answer: decryptResp.data.policyHolder.request_data.question_answer,
+                family_members:decryptResp.data.policyHolder.request_data.family_members,
             }) 
-            let question_answer = res.data.data.policyHolder.request_data.question_answer ? res.data.data.policyHolder.request_data.question_answer : {};
-            //console.log('FAM ARRRRRR========>',this.getFamilyMembers(question_answer))
+            let question_answer = decryptResp.data.policyHolder.request_data.question_answer ? decryptResp.data.policyHolder.request_data.question_answer : {};
             let selected_family_members =  this.getFamilyMembers(question_answer)
             this.setState({
                 selected_family_members
@@ -326,7 +301,6 @@ class arogya_MedicalDetails extends Component {
     }
 
     setShowImage = (questionList) => {
-        console.log("aaaaa----Question list=====>",questionList);
        let showImage = questionList && questionList.map(resource=>({
                 //`${resource.id}`:false
                 'question_id':resource.id,
@@ -342,14 +316,10 @@ class arogya_MedicalDetails extends Component {
         let selected_question = [];    
         let selected_family_members = [];   
         const formData = new FormData(); 
-       // console.log('aaaassss====>',e.target)
-        
-        console.log('CHECKED====>',e.target.checked)
+
         let classId = e.target.className[e.target.className.length-1]
-        console.log("sssssssssssss===>",classId)
         
         selected_family_members = this.state.selected_family_members
-        console.log("State values===============>",selected_family_members)
         const index = selected_family_members.indexOf(`${classId}~${e.target.value}`);
         if (index > -1) {
             selected_family_members.splice(index, 1);                
@@ -361,12 +331,6 @@ class arogya_MedicalDetails extends Component {
         
         
        // let fselected_family_members = selected_family_members.filter(function(value, index, arr){ return value == `${classId}~${e.target.value}`});//filtered => [6, 7, 8, 9]//array => [1, 2, 3, 4, 5, 6, 7, 8, 9, 0]
-        console.log("aaaaa-SSSSSSSSSSSSSSSSSS====>",selected_family_members);
-
-        
-
- 
-        console.log('aaaassss====>',e.target)
 
         selected_answer.push('y');
         selected_answer = [...new Set(selected_answer)];
@@ -429,12 +393,9 @@ class arogya_MedicalDetails extends Component {
     render() {
         const {productId } = this.props.match.params
         const {questionList, question_answer, flag,selected_question,selected_answer,showImg,family_members,famArr,selected_family_members} = this.state
-      
-       console.log("SHOW IMAGE DATA=======>",question_answer)
+
        // let showImage = {}
        let qlength = questionList ? questionList.length:0;
-        console.log('Selected Questions==>',selected_question)
-        console.log('Selected Answer==>',selected_answer)
         
         let initialValues = {}
         let selectedQuestion = [];
@@ -445,7 +406,6 @@ class arogya_MedicalDetails extends Component {
                 initialValues[`question_id_${answer.question_id}`] = answer.response;
                 initialValues[`family_members_${answer.question_id}`] = answer.family_members;
                 selectedQuestion[answer.question_id] = answer.response == 'y' ? answer.family_members.split(' ') : null  
-                console.log("IIIIIII======>",selectedQuestion[answer.question_id])    
                                 
             })
             }
@@ -459,22 +419,10 @@ class arogya_MedicalDetails extends Component {
 
         })
 
-
-      
-
-
-      //  this.setShowImage(showImage)
-      // console.log("SHOW IMAGE ARRRRRRRRRR=========>",showImage);
     }
 
     
-
-    
-
-console.log("FORM ARRAY----------=====>",famArr)
-    
     const newInitialValues =  Object.assign(initialValues) ;
-    console.log("SSSSSSSSSSSSSSSSSS==============>",newInitialValues);
         
         return (
             <>
@@ -500,7 +448,7 @@ console.log("FORM ARRAY----------=====>",famArr)
                            //  validationSchema={validatearogya_MedicalDetails}
                             >
                             {({ values, errors, setFieldValue, setFieldTouched, isValid, isSubmitting, touched }) => {
-                               console.log("aaaaaa=====>",values)
+
                             return (
                             <Form>
                             <Row>
@@ -529,7 +477,6 @@ console.log("FORM ARRAY----------=====>",famArr)
                                                         setFieldValue(`question_id_${question.id}`, e.target.value);
                                                         this.handleChangeSubmit(`question_id_${question.id}`,e.target.value)
                                                         //this.setState({ showImg: !this.state.showImg })
-                                                        console.log("HURAAAAAAAA",values[`family_members_${question.id}`]);
                                                         if(qIndex == qlength -1){
                                                             this.showRestriction('y');
                                                         } 
@@ -570,9 +517,7 @@ console.log("FORM ARRAY----------=====>",famArr)
                                         </FormGroup>
 
                                     </div>
-                                       {
-                                          console.log("HHHHHHHHIIIIIOOOOO==============>",values[`family_members_${question.id}`]) 
-                                       }             
+            
                                     {(values[`question_id_${question.id}`] =='y' && values[`family_members_${question.id}`]) ||(this.state.showImage && this.state.showImage[qIndex].status == true)  ?
                                     <div class="gender">
                                     {family_members && family_members.map((resource,index)=>(

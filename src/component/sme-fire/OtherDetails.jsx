@@ -132,41 +132,27 @@ class OtherDetails extends Component {
     
 
     handleSubmit=(values, actions)=>{
+        const {productId} = this.props.match.params 
         const formData = new FormData();
-        let previous_start_date = values.previous_start_date == "" ? '' : moment(values.previous_start_date).format('YYYY-MM-DD')
-        let previous_end_date = values.previous_end_date == "" ? '' : moment(values.previous_end_date).format('YYYY-MM-DD')
+        let previous_start_date = values.previous_start_date == "" ? null : moment(values.previous_start_date).format('YYYY-MM-DD')
+        let previous_end_date = values.previous_end_date == "" ? null : moment(values.previous_end_date).format('YYYY-MM-DD')
         let previous_Policy_No = values.Previous_Policy_No == '' ? null : values.Previous_Policy_No
-        // console.log('previous_start_date---------',values.previous_start_date)
-        // console.log('previous_end_date---------',previous_end_date)
-        // if(values.previous_start_date !== null ) {
+        let insurance_company_id = values.insurance_company_id == '' ? null : values.insurance_company_id
+        let encryption = new Encryption();
 
-        
-        formData.append('previous_start_date', previous_start_date)
-        formData.append('previous_end_date',previous_end_date)
-
-
-        formData.append('previous_policy_no',previous_Policy_No)
-        formData.append('insurance_company_id',values.insurance_company_id)
-        // values.insurance_company_id
-        formData.append('address',values.previous_city)
-        // }
-        
-        formData.append('menumaster_id',this.props.menumaster_id)
-        formData.append('page_name','OtherDetails/9')
-        formData.append('policy_holder_id',this.props.policy_holder_id)
-        formData.append('Commercial_consideration','5')
-        // values.previous_city
-
-        // this.props.loadingStart();
-        // if(values.Commercial_consideration < 0) {
-        //     this.props.loadingStop();
-        //     swal("Commercial consideration % should not be less than 1%")
-        //     return false
-        // } else if(values.Commercial_consideration > 100) {
-        //     this.props.loadingStop();
-        //     swal("Commercial consideration % should not be greater than 100%")
-        //     return false
-        // } else {
+        let post_data = {
+            'previous_start_date': previous_start_date,
+            'previous_end_date': previous_end_date,
+            'previous_policy_no': previous_Policy_No,
+            'insurance_company_id': insurance_company_id,
+            'address': values.previous_city,
+            'menumaster_id': this.props.menumaster_id,
+            'page_name': `OtherDetails/${productId}`,
+            'policy_holder_id': this.props.policy_holder_id,
+            'Commercial_consideration':'5',
+        }
+        console.log("Post Data------------- ", post_data)
+        formData.append('enc_data',encryption.encrypt(JSON.stringify(post_data)))
         axios.post('sme/previous-policy-details',
         formData
         ).then(res=>{       
@@ -185,21 +171,30 @@ class OtherDetails extends Component {
             });
             
             let formDataNew = new FormData(); 
-            formDataNew.append('menumaster_id',this.props.menumaster_id)
-            formData.append('page_name','/OtherDetails/9')
-            formDataNew.append('policy_ref_no',this.props.policy_holder_ref_no)    
+            let post_data_new = {
+                'policy_ref_no': this.props.policy_holder_ref_no,
+                'menumaster_id': this.props.menumaster_id,
+                'page_name': `OtherDetails/${productId}`,
+    
+            }
+            formDataNew.append('enc_data',encryption.encrypt(JSON.stringify(post_data_new)))
             
             this.props.loadingStart();
             axios.post('/sme/calculate-premium/phase-one',
             formDataNew
             ).then(res=>{
-                   if( res.data.error === false) {
+                let decryptResp = JSON.parse(encryption.decrypt(res.data));
+                console.log("decryptResp-------->",decryptResp)
+                   if( decryptResp.error === false) {
                        this.props.loadingStart();
                        axios.post('/sme/calculate-premium/phase-two',
                     formDataNew
-                    ).then(res=>{
+                    ).then(res2=>{
                         const {productId} = this.props.match.params;
-                        if( res.data.error === false) {
+                        let decryptResp2 = JSON.parse(encryption.decrypt(res2.data));
+                        console.log("decryptResp Phase 2-------->",decryptResp2)
+
+                        if( decryptResp2.error === false) {
                             this.props.history.push(`/Summary_SME/${productId}`);
                         } else {
                             this.props.loadingStop();
@@ -221,17 +216,15 @@ class OtherDetails extends Component {
                 }).
             catch(err=>{
                 this.props.loadingStop();
+                let decryptResp = JSON.parse(encryption.decrypt(err.data));
+                console.log("decryptErr -------->",decryptResp)
                 actions.setSubmitting(false);
             });
-            // const {productId} = this.props.match.params;
-            // this.props.history.push(`/AdditionalDetails_SME/${productId}`);
         }).
         catch(err=>{
-            // let decryptErr = JSON.parse(encryption.decrypt(err.data));
-            // console.log('decryptResp--err---', decryptErr)
-            // if(decryptErr && err.data){
-            //     swal('Registration number required...');
-            // }
+            let decryptErr = JSON.parse(encryption.decrypt(err.data));
+            console.log('decryptResp--err---', decryptErr)
+
         this.props.loadingStop();
         actions.setSubmitting(false)
         })
@@ -253,19 +246,6 @@ class OtherDetails extends Component {
           });
       }
 
-    fetchData = () => {
-        this.props.loadingStart();
-        axios.get(`sme/details/${this.props.policy_holder_ref_no}`)
-        .then(res => {
-            console.log('fetch_data',res.data.data); 
-            this.props.loadingStop();
-        })
-        .catch(err => {
-            // handle error
-            this.props.loadingStop();
-        })
-    }
-
     fetchInsurance = () => {
         // this.props.loaderStart();
         axios.get('company')
@@ -282,33 +262,33 @@ class OtherDetails extends Component {
 
     fetchPolicyDetails=()=>{
         let policy_holder_ref_no = localStorage.getItem("policy_holder_ref_no") ? localStorage.getItem("policy_holder_ref_no"):0;
-        console.log('this.props.policy_holder_ref_no',this.props.policy_holder_ref_no);
+        let encryption = new Encryption();
 
         if(this.props.policy_holder_ref_no == null && policy_holder_ref_no != ''){
             
             this.props.loadingStart();
             axios.get(`sme/details/${policy_holder_ref_no}`)
             .then(res=>{
-                console.log("OtherDetails---Data",res)
+                let decryptResp = JSON.parse(encryption.decrypt(res.data));
                 
-                if(res.data.data.policyHolder.step_no > 0){
+                if(decryptResp.data.policyHolder.step_no > 0){
 
                     this.props.setData({
-                        start_date:res.data.data.policyHolder.request_data.start_date,
-                        end_date:res.data.data.policyHolder.request_data.end_date,
+                        start_date:decryptResp.data.policyHolder.request_data.start_date,
+                        end_date:decryptResp.data.policyHolder.request_data.end_date,
                         
-                        policy_holder_id:res.data.data.policyHolder.id,
+                        policy_holder_id:decryptResp.data.policyHolder.id,
                         policy_holder_ref_no:policy_holder_ref_no,
-                        request_data_id:res.data.data.policyHolder.request_data.id,
-                        completed_step:res.data.data.policyHolder.step_no,
-                        menumaster_id:res.data.data.policyHolder.menumaster_id
+                        request_data_id:decryptResp.data.policyHolder.request_data.id,
+                        completed_step:decryptResp.data.policyHolder.step_no,
+                        menumaster_id:decryptResp.data.policyHolder.menumaster_id
                     });
                 
                 }
 
-                if(res.data.data.policyHolder.step_no == 1 || res.data.data.policyHolder.step_no > 1){
+                if(decryptResp.data.policyHolder.step_no == 1 || decryptResp.data.policyHolder.step_no > 1){
 
-                    let risk_arr = JSON.parse(res.data.data.policyHolder.smeinfo.risk_address);
+                    let risk_arr = JSON.parse(decryptResp.data.policyHolder.smeinfo.risk_address);
 
                     this.props.setRiskData(
                         {
@@ -317,58 +297,58 @@ class OtherDetails extends Component {
                             street_name:risk_arr.street_name,
                             plot_no:risk_arr.plot_no,
                             house_flat_no:risk_arr.house_flat_no,
-                            pincode:res.data.data.policyHolder.smeinfo.pincode,
-                            pincode_id:res.data.data.policyHolder.smeinfo.pincode_id,
+                            pincode:decryptResp.data.policyHolder.smeinfo.pincode,
+                            pincode_id:decryptResp.data.policyHolder.smeinfo.pincode_id,
 
-                            buildings_sum_insured:res.data.data.policyHolder.smeinfo.buildings_sum_insured,
-                            content_sum_insured:res.data.data.policyHolder.smeinfo.content_sum_insured,
-                            stock_sum_insured:res.data.data.policyHolder.smeinfo.stock_sum_insured
+                            buildings_sum_insured:decryptResp.data.policyHolder.smeinfo.buildings_sum_insured,
+                            content_sum_insured:decryptResp.data.policyHolder.smeinfo.content_sum_insured,
+                            stock_sum_insured:decryptResp.data.policyHolder.smeinfo.stock_sum_insured
                         }
                     );
 
                 }
 
-                if(res.data.data.policyHolder.step_no == 2 || res.data.data.policyHolder.step_no > 2){
+                if(decryptResp.data.policyHolder.step_no == 2 || decryptResp.data.policyHolder.step_no > 2){
 
                     this.props.setSmeOthersDetails({
                     
-                        previous_start_date:res.data.data.policyHolder.previouspolicy.start_date,
-                        previous_end_date:res.data.data.policyHolder.previouspolicy.end_date,
-                        Commercial_consideration:res.data.data.policyHolder.previouspolicy.Commercial_consideration,
-                        Previous_Policy_No:res.data.data.policyHolder.previouspolicy.policy_no,
-                        insurance_company_id:res.data.data.policyHolder.previouspolicy.insurancecompany_id,
-                        previous_city:res.data.data.policyHolder.previouspolicy.address
+                        previous_start_date:decryptResp.data.policyHolder.previouspolicy.start_date,
+                        previous_end_date:decryptResp.data.policyHolder.previouspolicy.end_date,
+                        Commercial_consideration:decryptResp.data.policyHolder.previouspolicy.Commercial_consideration,
+                        Previous_Policy_No:decryptResp.data.policyHolder.previouspolicy.policy_no,
+                        insurance_company_id:decryptResp.data.policyHolder.previouspolicy.insurancecompany_id,
+                        previous_city:decryptResp.data.policyHolder.previouspolicy.address
         
                     });
                 }
 
-                if(res.data.data.policyHolder.step_no == 3 || res.data.data.policyHolder.step_no > 3){
+                if(decryptResp.data.policyHolder.step_no == 3 || decryptResp.data.policyHolder.step_no > 3){
                     
                     let address = '';
-                    if(res.data.data.policyHolder.address == null){
+                    if(decryptResp.data.policyHolder.address == null){
                         
                     }else{
-                        address = JSON.parse(res.data.data.policyHolder.address);
+                        address = JSON.parse(decryptResp.data.policyHolder.address);
 
                         this.props.setSmeProposerDetails(
                             {
-                                first_name:res.data.data.policyHolder.first_name,
-                                last_name:res.data.data.policyHolder.last_name,
-                                salutation_id:res.data.data.policyHolder.salutation_id,
-                                date_of_birth:res.data.data.policyHolder.dob,
-                                email_id:res.data.data.policyHolder.email_id,
-                                mobile:res.data.data.policyHolder.mobile,
-                                gender:res.data.data.policyHolder.gender,
-                                pan_no:res.data.data.policyHolder.pancard,
-                                gstn_no:res.data.data.policyHolder.gstn_no,
+                                first_name:decryptResp.data.policyHolder.first_name,
+                                last_name:decryptResp.data.policyHolder.last_name,
+                                salutation_id:decryptResp.data.policyHolder.salutation_id,
+                                date_of_birth:decryptResp.data.policyHolder.dob,
+                                email_id:decryptResp.data.policyHolder.email_id,
+                                mobile:decryptResp.data.policyHolder.mobile,
+                                gender:decryptResp.data.policyHolder.gender,
+                                pan_no:decryptResp.data.policyHolder.pancard,
+                                gstn_no:decryptResp.data.policyHolder.gstn_no,
 
                                 com_street_name:address.street_name,
                                 com_plot_no:address.plot_no,
                                 com_building_name:address.house_building_name,
                                 com_block_no:address.block_no,
                                 com_house_flat_no:address.house_flat_no,
-                                com_pincode:res.data.data.policyHolder.pincode,
-                                com_pincode_id:res.data.data.policyHolder.pincode_id
+                                com_pincode:decryptResp.data.policyHolder.pincode,
+                                com_pincode_id:decryptResp.data.policyHolder.pincode_id
                             }
                         );
                     }

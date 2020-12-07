@@ -19,7 +19,6 @@ import { loaderStart, loaderStop } from "../../store/actions/loader";
 import { connect } from "react-redux";
 // import { Formik, Form, Field, ErrorMessage, FieldArray } from 'formik'
 import moment from "moment";
-import Otp from "./Otp";
 import swal from 'sweetalert';
 import Encryption from '../../shared/payload-encryption';
 import queryString from 'query-string';
@@ -76,11 +75,10 @@ class arogya_PolicyDetails extends Component {
   };
 
   getPolicyHolderDetails = () => {
-    let policyHolder_id = 0
     
     this.props.loadingStart();
-    axios
-      .get(`/policy-holder/${localStorage.getItem("policyHolder_id")}`)
+    let policyHolder_refNo = localStorage.getItem("policyHolder_refNo");
+    axios.get(`arogya-topup/health-policy-details/${policyHolder_refNo}`)
       .then((res) => {
 
         this.setState({

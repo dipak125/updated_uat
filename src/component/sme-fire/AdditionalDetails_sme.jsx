@@ -217,31 +217,34 @@ class AdditionalDetails_sme extends Component {
 
     handleSubmit = (values, actions) => {
         const {productId} = this.props.match.params 
-        // const {motorInsurance, request_data} = this.state  
-        // this.props.history.push(`/Premium_SME/${productId}`);
-        console.log('handleSubmit', values);
+        let encryption = new Encryption();
         const formData = new FormData();
         let date_of_birth = moment(values.date_of_birth).format('YYYY-MM-DD')
-        formData.append('bcmaster_id','1')
-        formData.append('policy_holder_id',this.props.policy_holder_id)
-        formData.append('menumaster_id',this.props.menumaster_id)
-        formData.append('page_name','/AdditionalDetails_SME/9')
-        formData.append('first_name',values.first_name)
-        formData.append('last_name',values.last_name)
-        formData.append('salutation_id',values.salutation_id)
-        formData.append('date_of_birth', date_of_birth)
-        formData.append('email_id',values.email_id)
-        formData.append('mobile',values.mobile)
-        formData.append('gender',values.gender)
-        formData.append('pan_no',values.pan_no)
-        formData.append('gstn_no',values.gstn_no)
-        formData.append('house_building_name',values.building_name)
-        formData.append('block_no','')
-        formData.append('house_flat_no','')
-        formData.append('plot_no',values.plot_no)
-        formData.append('street_name',values.street_name)
-        formData.append('pincode',values.pincode)
-        formData.append('pincode_id',values.pincode_id)
+
+        let post_data = {
+            'bcmaster_id': '1',
+            'policy_holder_id': this.props.policy_holder_id,
+            'menumaster_id': this.props.menumaster_id,
+            'page_name': `AdditionalDetails_SME/${productId}`,
+            'first_name': values.first_name,
+            'last_name': values.last_name,
+            'salutation_id': values.salutation_id,
+            'date_of_birth': date_of_birth,
+            'email_id': values.email_id,
+            'mobile': values.mobile,
+            'gender': values.gender,
+            'pan_no': values.pan_no,
+            'gstn_no': values.gstn_no,
+            'house_building_name': values.building_name,
+            'block_no': "",
+            'house_flat_no': "",
+            'plot_no': values.plot_no,
+            'street_name': values.street_name,
+            'pincode': values.pincode,
+            'pincode_id': values.pincode_id,
+        }
+
+        formData.append('enc_data',encryption.encrypt(JSON.stringify(post_data)))
         this.props.loadingStart();
         axios.post('sme/proposer-details',
         formData
@@ -269,23 +272,29 @@ class AdditionalDetails_sme extends Component {
             );
 
             let formDataNew = new FormData(); 
-            formDataNew.append('menumaster_id',this.props.menumaster_id)
-            formData.append('page_name','AdditionalDetails_SME/9')
-            formDataNew.append('policy_ref_no',this.props.policy_holder_ref_no)    
-
+            let post_data_new = {
+                'policy_ref_no': this.props.policy_holder_ref_no,
+                'menumaster_id': this.props.menumaster_id,
+                'page_name': `AdditionalDetails_SME/${productId}`,
+    
+            }
+            formDataNew.append('enc_data',encryption.encrypt(JSON.stringify(post_data_new)))
             axios.post('/sme/mdm-party',
             formDataNew
             ).then(res=>{
                 axios.post('/sme/create-quote',
                 formDataNew
-                ).then(res=>{
-                   if( res.data.error === false) {
+                ).then(res1=>{
+                   let decryptResp = JSON.parse(encryption.decrypt(res1.data));
+                   if( decryptResp.error === false) {
                        axios.post('/sme/con-sequence',
                     formDataNew
-                    ).then(res=>{
+                    ).then(res2=>{
                         const {productId} = this.props.match.params;
                         this.props.loadingStop();
-                        if( res.data.error === false) {
+                        let decryptResp = JSON.parse(encryption.decrypt(res2.data));
+                        
+                        if( decryptResp.error === false) {
                             this.props.history.push(`/Premium_SME/${productId}`);
                         } else {
                             this.props.loadingStop();
@@ -473,31 +482,31 @@ class AdditionalDetails_sme extends Component {
 
     fetchPolicyDetails=()=>{
         let policy_holder_ref_no = localStorage.getItem("policy_holder_ref_no") ? localStorage.getItem("policy_holder_ref_no"):0;
-        console.log('this.props.policy_holder_ref_no',this.props.policy_holder_ref_no);
+        let encryption = new Encryption();
 
         if(this.props.policy_holder_ref_no == null && policy_holder_ref_no != ''){
             
             this.props.loadingStart();
             axios.get(`sme/details/${policy_holder_ref_no}`)
             .then(res=>{
-
-                if(res.data.data.policyHolder.step_no > 0){
+                let decryptResp = JSON.parse(encryption.decrypt(res.data));
+                if(decryptResp.data.policyHolder.step_no > 0){
 
                     this.props.setData({
-                        start_date:res.data.data.policyHolder.request_data.start_date,
-                        end_date:res.data.data.policyHolder.request_data.end_date,
+                        start_date:decryptResp.data.policyHolder.request_data.start_date,
+                        end_date:decryptResp.data.policyHolder.request_data.end_date,
                         
-                        policy_holder_id:res.data.data.policyHolder.id,
+                        policy_holder_id:decryptResp.data.policyHolder.id,
                         policy_holder_ref_no:policy_holder_ref_no,
-                        request_data_id:res.data.data.policyHolder.request_data.id,
-                        completed_step:res.data.data.policyHolder.step_no,
-                        menumaster_id:res.data.data.policyHolder.menumaster_id
+                        request_data_id:decryptResp.data.policyHolder.request_data.id,
+                        completed_step:decryptResp.data.policyHolder.step_no,
+                        menumaster_id:decryptResp.data.policyHolder.menumaster_id
                     });
                 }
 
-                if(res.data.data.policyHolder.step_no == 1 || res.data.data.policyHolder.step_no > 1){
+                if(decryptResp.data.policyHolder.step_no == 1 || decryptResp.data.policyHolder.step_no > 1){
 
-                    let risk_arr = JSON.parse(res.data.data.policyHolder.smeinfo.risk_address);
+                    let risk_arr = JSON.parse(decryptResp.data.policyHolder.smeinfo.risk_address);
 
                     this.props.setRiskData(
                         {
@@ -506,60 +515,60 @@ class AdditionalDetails_sme extends Component {
                             street_name:risk_arr.street_name,
                             plot_no:risk_arr.plot_no,
                             house_flat_no:risk_arr.house_flat_no,
-                            pincode:res.data.data.policyHolder.smeinfo.pincode,
-                            pincode_id:res.data.data.policyHolder.smeinfo.pincode_id,
+                            pincode:decryptResp.data.policyHolder.smeinfo.pincode,
+                            pincode_id:decryptResp.data.policyHolder.smeinfo.pincode_id,
 
-                            buildings_sum_insured:res.data.data.policyHolder.smeinfo.buildings_sum_insured,
-                            content_sum_insured:res.data.data.policyHolder.smeinfo.content_sum_insured,
-                            stock_sum_insured:res.data.data.policyHolder.smeinfo.stock_sum_insured
+                            buildings_sum_insured:decryptResp.data.policyHolder.smeinfo.buildings_sum_insured,
+                            content_sum_insured:decryptResp.data.policyHolder.smeinfo.content_sum_insured,
+                            stock_sum_insured:decryptResp.data.policyHolder.smeinfo.stock_sum_insured
                         }
                     );
                 }
 
-                if(res.data.data.policyHolder.step_no == 2 || res.data.data.policyHolder.step_no > 2){
+                if(decryptResp.data.policyHolder.step_no == 2 || decryptResp.data.policyHolder.step_no > 2){
 
                     this.props.setSmeOthersDetails({
                     
-                        Commercial_consideration:res.data.data.policyHolder.previouspolicy.Commercial_consideration,
-                        previous_start_date:res.data.data.policyHolder.previouspolicy.start_date,
-                        previous_end_date:res.data.data.policyHolder.previouspolicy.end_date,
-                        Previous_Policy_No:res.data.data.policyHolder.previouspolicy.policy_no,
-                        insurance_company_id:res.data.data.policyHolder.previouspolicy.insurancecompany_id,
-                        previous_city:res.data.data.policyHolder.previouspolicy.address
+                        Commercial_consideration:decryptResp.data.policyHolder.previouspolicy.Commercial_consideration,
+                        previous_start_date:decryptResp.data.policyHolder.previouspolicy.start_date,
+                        previous_end_date:decryptResp.data.policyHolder.previouspolicy.end_date,
+                        Previous_Policy_No:decryptResp.data.policyHolder.previouspolicy.policy_no,
+                        insurance_company_id:decryptResp.data.policyHolder.previouspolicy.insurancecompany_id,
+                        previous_city:decryptResp.data.policyHolder.previouspolicy.address
         
                     });
                 }
 
-                if(res.data.data.policyHolder.step_no == 3 || res.data.data.policyHolder.step_no > 3){
+                if(decryptResp.data.policyHolder.step_no == 3 || decryptResp.data.policyHolder.step_no > 3){
                     let address = '';
-                    if(res.data.data.policyHolder.address == null){
+                    if(decryptResp.data.policyHolder.address == null){
                         // this.autoPopulateAddress();
                     }else{
-                        address = JSON.parse(res.data.data.policyHolder.address);
+                        address = JSON.parse(decryptResp.data.policyHolder.address);
 
                         this.props.setSmeProposerDetails(
                             {
-                                first_name:res.data.data.policyHolder.first_name,
-                                last_name:res.data.data.policyHolder.last_name,
-                                salutation_id:res.data.data.policyHolder.salutation_id,
-                                date_of_birth:res.data.data.policyHolder.dob,
-                                email_id:res.data.data.policyHolder.email_id,
-                                mobile:res.data.data.policyHolder.mobile,
-                                gender:res.data.data.policyHolder.gender,
-                                pan_no:res.data.data.policyHolder.pancard,
-                                gstn_no:res.data.data.policyHolder.gstn_no,
+                                first_name:decryptResp.data.policyHolder.first_name,
+                                last_name:decryptResp.data.policyHolder.last_name,
+                                salutation_id:decryptResp.data.policyHolder.salutation_id,
+                                date_of_birth:decryptResp.data.policyHolder.dob,
+                                email_id:decryptResp.data.policyHolder.email_id,
+                                mobile:decryptResp.data.policyHolder.mobile,
+                                gender:decryptResp.data.policyHolder.gender,
+                                pan_no:decryptResp.data.policyHolder.pancard,
+                                gstn_no:decryptResp.data.policyHolder.gstn_no,
     
                                 com_street_name:address.street_name,
                                 com_plot_no:address.plot_no,
                                 com_building_name:address.house_building_name,
                                 com_block_no:address.block_no,
                                 com_house_flat_no:address.house_flat_no,
-                                com_pincode:res.data.data.policyHolder.pincode,
-                                com_pincode_id:res.data.data.policyHolder.pincode_id
+                                com_pincode:decryptResp.data.policyHolder.pincode,
+                                com_pincode_id:decryptResp.data.policyHolder.pincode_id
                             }
                         );
     
-                        this.fetchAreadetailsBack(res.data.data.policyHolder.pincode);
+                        this.fetchAreadetailsBack(decryptResp.data.policyHolder.pincode);
 
                     }
                 }

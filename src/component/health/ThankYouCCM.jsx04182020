@@ -20,7 +20,6 @@ class ThankYouCCM extends Component {
     response_text: [],
     policyNo : "",
     retry : 1,
-    policyHolder: [],
     retryCount: 0,
     policy_holder_id: localStorage.getItem("policyHolder_id"),
     refNumber:  queryString.parse(this.props.location.search).access_id ? 
@@ -316,64 +315,35 @@ class ThankYouCCM extends Component {
       
   // }
 
-  handleRefund = (values) => {
-    const {policyHolder} = this.state
-    
-    if(policyHolder && policyHolder.bcmaster && policyHolder.bcmaster.paymentgateway && policyHolder.bcmaster.paymentgateway.slug) {
-        if(policyHolder.bcmaster.paymentgateway.slug == "csc_wallet") {
-            this.CSCRefund()
-        }
-        if(policyHolder.bcmaster.paymentgateway.slug == "razorpay") {
-            this.RazorpayRefund()
-        }
-        // if(policyHolder.bcmaster.paymentgateway.slug == "PPINL") {
-        //     this.paypoint_payment()
-        // }
-    }
-    // else if (policyHolder && policyHolder.bcmaster && policyHolder.bcmaster.paymentgateway && policyHolder.bcmaster.paymentgateway.slug && values.gateway == 2) {
-    //     this.props.history.push(`/Vedvag_gateway/${this.props.match.params.productId}?access_id=${this.state.policyHolder_refNo}`);
-    // }
-}
-
-  CSCRefund = () => {
-    const { refNumber } = this.state;
-    window.location = `${process.env.REACT_APP_PAYMENT_URL}/ConnectPG/sme_fire_refund.php?refrence_no=${refNumber}`
-  }
-  // http://14.140.119.44/sbig-csc/razorpay/smefire_pay.php?refrence_no=b6682aa3f5bc9003623cdee5506dfb2d
-  RazorpayRefund = () => {
-    const { refNumber } = this.state;
-    window.location = `${process.env.REACT_APP_PAYMENT_URL}/razorpay/sme_fire_refund.php?refrence_no=${refNumber}`
-  }
-
 
   fetchPolicyDetails=()=>{
     let policy_holder_ref_no = localStorage.getItem("policy_holder_ref_no") ? localStorage.getItem("policy_holder_ref_no"):0;
-    let encryption = new Encryption();
+    console.log('this.props.policy_holder_ref_no',this.props.policy_holder_ref_no);
 
     if(this.props.policy_holder_ref_no == null && policy_holder_ref_no != ''){
         
         this.props.loadingStart();
         axios.get(`sme/details/${policy_holder_ref_no}`)
         .then(res=>{
-          let decryptResp = JSON.parse(encryption.decrypt(res.data));
           
-          if(decryptResp.data.policyHolder.step_no > 0){
+          
+          if(res.data.data.policyHolder.step_no > 0){
 
             this.props.setData({
-                start_date:decryptResp.data.policyHolder.request_data.start_date,
-                end_date:decryptResp.data.policyHolder.request_data.end_date,
+                start_date:res.data.data.policyHolder.request_data.start_date,
+                end_date:res.data.data.policyHolder.request_data.end_date,
                 
-                policy_holder_id:decryptResp.data.policyHolder.id,
+                policy_holder_id:res.data.data.policyHolder.id,
                 policy_holder_ref_no:policy_holder_ref_no,
-                request_data_id:decryptResp.data.policyHolder.request_data.id,
-                completed_step:decryptResp.data.policyHolder.step_no,
-                menumaster_id:decryptResp.data.policyHolder.menumaster_id
+                request_data_id:res.data.data.policyHolder.request_data.id,
+                completed_step:res.data.data.policyHolder.step_no,
+                menumaster_id:res.data.data.policyHolder.menumaster_id
             });
         }
         
-        if(decryptResp.data.policyHolder.step_no == 1 || decryptResp.data.policyHolder.step_no > 1){
+        if(res.data.data.policyHolder.step_no == 1 || res.data.data.policyHolder.step_no > 1){
 
-            let risk_arr = JSON.parse(decryptResp.data.policyHolder.smeinfo.risk_address);
+            let risk_arr = JSON.parse(res.data.data.policyHolder.smeinfo.risk_address);
 
             this.props.setRiskData(
                 {
@@ -382,78 +352,72 @@ class ThankYouCCM extends Component {
                     street_name:risk_arr.street_name,
                     plot_no:risk_arr.plot_no,
                     house_flat_no:risk_arr.house_flat_no,
-                    pincode:decryptResp.data.policyHolder.smeinfo.pincode,
-                    pincode_id:decryptResp.data.policyHolder.smeinfo.pincode_id,
+                    pincode:res.data.data.policyHolder.smeinfo.pincode,
+                    pincode_id:res.data.data.policyHolder.smeinfo.pincode_id,
 
-                    buildings_sum_insured:decryptResp.data.policyHolder.smeinfo.buildings_sum_insured,
-                    content_sum_insured:decryptResp.data.policyHolder.smeinfo.content_sum_insured,
-                    stock_sum_insured:decryptResp.data.policyHolder.smeinfo.stock_sum_insured
+                    buildings_sum_insured:res.data.data.policyHolder.smeinfo.buildings_sum_insured,
+                    content_sum_insured:res.data.data.policyHolder.smeinfo.content_sum_insured,
+                    stock_sum_insured:res.data.data.policyHolder.smeinfo.stock_sum_insured
                 }
             );
         }
         
-        if(decryptResp.data.policyHolder.step_no == 2 || decryptResp.data.policyHolder.step_no > 2){
+        if(res.data.data.policyHolder.step_no == 2 || res.data.data.policyHolder.step_no > 2){
 
             this.props.setSmeOthersDetails({
             
-                Commercial_consideration: decryptResp.data.policyHolder.previouspolicy ? decryptResp.data.policyHolder.previouspolicy.Commercial_consideration : null,
-                previous_start_date: decryptResp.data.policyHolder.previouspolicy ? decryptResp.data.policyHolder.previouspolicy.start_date : null,
-                previous_end_date: decryptResp.data.policyHolder.previouspolicy ? decryptResp.data.policyHolder.previouspolicy.end_date : null,
-                Previous_Policy_No: decryptResp.data.policyHolder.previouspolicy ? decryptResp.data.policyHolder.previouspolicy.policy_no : null,
-                insurance_company_id: decryptResp.data.policyHolder.previouspolicy ? decryptResp.data.policyHolder.previouspolicy.insurancecompany_id : null,
-                previous_city: decryptResp.data.policyHolder.previouspolicy ? decryptResp.data.policyHolder.previouspolicy.address : null
+                Commercial_consideration: res.data.data.policyHolder.previouspolicy ? res.data.data.policyHolder.previouspolicy.Commercial_consideration : null,
+                previous_start_date: res.data.data.policyHolder.previouspolicy ? res.data.data.policyHolder.previouspolicy.start_date : null,
+                previous_end_date: res.data.data.policyHolder.previouspolicy ? res.data.data.policyHolder.previouspolicy.end_date : null,
+                Previous_Policy_No: res.data.data.policyHolder.previouspolicy ? res.data.data.policyHolder.previouspolicy.policy_no : null,
+                insurance_company_id: res.data.data.policyHolder.previouspolicy ? res.data.data.policyHolder.previouspolicy.insurancecompany_id : null,
+                previous_city: res.data.data.policyHolder.previouspolicy ? res.data.data.policyHolder.previouspolicy.address : null
 
             });
         }
         
-        if(decryptResp.data.policyHolder.step_no == 3 || decryptResp.data.policyHolder.step_no > 3){
+        if(res.data.data.policyHolder.step_no == 3 || res.data.data.policyHolder.step_no > 3){
             let address = '';
-            if(decryptResp.data.policyHolder.address == null){
+            if(res.data.data.policyHolder.address == null){
                 // this.autoPopulateAddress();
             }else{
-                address = JSON.parse(decryptResp.data.policyHolder.address);
+                address = JSON.parse(res.data.data.policyHolder.address);
 
                 this.props.setSmeProposerDetails(
                     {
-                        first_name:decryptResp.data.policyHolder.first_name,
-                        last_name:decryptResp.data.policyHolder.last_name,
-                        salutation_id:decryptResp.data.policyHolder.salutation_id,
-                        date_of_birth:decryptResp.data.policyHolder.dob,
-                        email_id:decryptResp.data.policyHolder.email_id,
-                        mobile:decryptResp.data.policyHolder.mobile,
-                        gender:decryptResp.data.policyHolder.gender,
-                        pan_no:decryptResp.data.policyHolder.pancard,
-                        gstn_no:decryptResp.data.policyHolder.gstn_no,
+                        first_name:res.data.data.policyHolder.first_name,
+                        last_name:res.data.data.policyHolder.last_name,
+                        salutation_id:res.data.data.policyHolder.salutation_id,
+                        date_of_birth:res.data.data.policyHolder.dob,
+                        email_id:res.data.data.policyHolder.email_id,
+                        mobile:res.data.data.policyHolder.mobile,
+                        gender:res.data.data.policyHolder.gender,
+                        pan_no:res.data.data.policyHolder.pancard,
+                        gstn_no:res.data.data.policyHolder.gstn_no,
 
                         com_street_name:address.street_name,
                         com_plot_no:address.plot_no,
                         com_building_name:address.house_building_name,
                         com_block_no:address.block_no,
                         com_house_flat_no:address.house_flat_no,
-                        com_pincode:decryptResp.data.policyHolder.pincode,
-                        com_pincode_id:decryptResp.data.policyHolder.pincode_id
+                        com_pincode:res.data.data.policyHolder.pincode,
+                        com_pincode_id:res.data.data.policyHolder.pincode_id
                     }
                 );
             }        
         }
 
-        if(decryptResp.data.policyHolder.step_no > 3 ){
+        if(res.data.data.policyHolder.step_no > 3 ){
 
           this.props.setTransactionId({
           
-            // receipt_no: decryptResp.data.policyHolder.smeinfo ? decryptResp.data.policyHolder.smeinfo.receipt_no : null,
-            // quoteNo: res.decryptResp.data.policyHolder.request_data ? decryptResp.data.policyHolder.request_data.quote_id : null
-            receipt_no: decryptResp.data.policyHolder.smeinfo.receipt_no,
-            quoteNo: decryptResp.data.policyHolder.request_data.quote_id
+            // receipt_no: res.data.data.policyHolder.smeinfo ? res.data.data.policyHolder.smeinfo.receipt_no : null,
+            // quoteNo: res.res.data.data.policyHolder.request_data ? res.data.data.policyHolder.request_data.quote_id : null
+            receipt_no: res.data.data.policyHolder.smeinfo.receipt_no,
+            quoteNo: res.data.data.policyHolder.request_data.quote_id
 
           });
       }
-      this.setState(
-        {
-        
-            policyHolder:decryptResp.data.policyHolder
-        }
-    );
       this.getAgentReceipt()
 
         })
@@ -480,8 +444,17 @@ downloadWording = () => {
 }
 
 
-  componentDidMount() {   
+  componentDidMount() {
+    // this.getAccessToken();       
     const { policyNo } = this.state
+    // window.addEventListener("popstate", (e) => {
+    // this.props.history.go(`/ThankYou/${policyNo}`);
+    //   });
+
+    // window.history.pushState(null, document.title, window.location.href);
+    // window.addEventListener('popstate', function (event){
+    // window.history.pushState(null, document.title,  window.location.href);
+    // }); 
 
     window.history.pushState(null, null, window.location.href);
     window.onpopstate = function () {
@@ -513,9 +486,6 @@ downloadWording = () => {
                       {retry === 1 ?
                         <div className="d-flex justify-content-center align-items-center">
                           <button className="policy m-l-20" onClick={this.getAgentReceipt}>Retry Policy Creation</button>
-                          {this.state.retryCount > 3 ?
-                          <button className="policy m-l-20" onClick={this.handleRefund}>Refund</button> : null }
-
                         </div> : retry === 0 ?
                         <div className="d-flex justify-content-center align-items-center">
                           <button className="policy m-l-20" onClick={this.generateDoc}>Policy Copy</button>

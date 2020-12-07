@@ -251,8 +251,8 @@ class arogya_NomineeDetails extends Component {
 
     getNomineeDetails = () => {
         this.props.loadingStart();
-        axios
-          .get(`/policy-holder/${localStorage.getItem('policyHolder_id')}`)
+        let policyHolder_refNo = localStorage.getItem("policyHolder_refNo");
+        axios.get(`arogya-topup/health-policy-details/${policyHolder_refNo}`)
           .then(res => { 
            let family_members = res.data.data.policyHolder.request_data ? res.data.data.policyHolder.request_data.family_members:[]
             this.fetchPolicyRelations(family_members)

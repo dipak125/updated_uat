@@ -90,35 +90,35 @@ class Registration_sme extends Component {
 
     fetchPolicyDetails=()=>{
         let policy_holder_ref_no = localStorage.getItem("policy_holder_ref_no") ? localStorage.getItem("policy_holder_ref_no"):0;
-        console.log('this.props.policy_holder_ref_no',this.props.policy_holder_ref_no);
+        let encryption = new Encryption();
 
         if(this.props.policy_holder_ref_no == null && policy_holder_ref_no != ''){
             
             this.props.loadingStart();
             axios.get(`sme/details/${policy_holder_ref_no}`)
-            .then(res=>{
-                
+            .then(res=>{              
+                let decryptResp = JSON.parse(encryption.decrypt(res.data));
 
-                if(res.data.data.policyHolder.step_no > 0){
+                if(decryptResp.data.policyHolder.step_no > 0){
 
                     this.props.setData({
-                        start_date:res.data.data.policyHolder.request_data.start_date,
-                        end_date:res.data.data.policyHolder.request_data.end_date,
+                        start_date:decryptResp.data.policyHolder.request_data.start_date,
+                        end_date:decryptResp.data.policyHolder.request_data.end_date,
                         
-                        policy_holder_id:res.data.data.policyHolder.id,
+                        policy_holder_id:decryptResp.data.policyHolder.id,
                         policy_holder_ref_no:policy_holder_ref_no,
-                        request_data_id:res.data.data.policyHolder.request_data.id,
-                        completed_step:res.data.data.policyHolder.step_no,
-                        menumaster_id:res.data.data.policyHolder.menumaster_id
+                        request_data_id:decryptResp.data.policyHolder.request_data.id,
+                        completed_step:decryptResp.data.policyHolder.step_no,
+                        menumaster_id:decryptResp.data.policyHolder.menumaster_id
                     });
 
                     
 
                 }
 
-                if(res.data.data.policyHolder.step_no == 1 || res.data.data.policyHolder.step_no > 1){
+                if(decryptResp.data.policyHolder.step_no == 1 || decryptResp.data.policyHolder.step_no > 1){
 
-                    let risk_arr = JSON.parse(res.data.data.policyHolder.smeinfo.risk_address);
+                    let risk_arr = JSON.parse(decryptResp.data.policyHolder.smeinfo.risk_address);
 
                     this.props.setRiskData(
                         {
@@ -127,58 +127,58 @@ class Registration_sme extends Component {
                             street_name:risk_arr.street_name,
                             plot_no:risk_arr.plot_no,
                             house_flat_no:risk_arr.house_flat_no,
-                            pincode:res.data.data.policyHolder.smeinfo.pincode,
-                            pincode_id:res.data.data.policyHolder.smeinfo.pincode_id,
+                            pincode:decryptResp.data.policyHolder.smeinfo.pincode,
+                            pincode_id:decryptResp.data.policyHolder.smeinfo.pincode_id,
 
-                            buildings_sum_insured:res.data.data.policyHolder.smeinfo.buildings_sum_insured,
-                            content_sum_insured:res.data.data.policyHolder.smeinfo.content_sum_insured,
-                            stock_sum_insured:res.data.data.policyHolder.smeinfo.stock_sum_insured
+                            buildings_sum_insured:decryptResp.data.policyHolder.smeinfo.buildings_sum_insured,
+                            content_sum_insured:decryptResp.data.policyHolder.smeinfo.content_sum_insured,
+                            stock_sum_insured:decryptResp.data.policyHolder.smeinfo.stock_sum_insured
                         }
                     );
                 }
 
-                if(res.data.data.policyHolder.step_no == 2 || res.data.data.policyHolder.step_no > 2){
+                if(decryptResp.data.policyHolder.step_no == 2 || decryptResp.data.policyHolder.step_no > 2){
 
                     this.props.setSmeOthersDetails({
                     
-                        Commercial_consideration:res.data.data.policyHolder.previouspolicy.Commercial_consideration,
-                        previous_start_date:res.data.data.policyHolder.previouspolicy.start_date,
-                        previous_end_date:res.data.data.policyHolder.previouspolicy.end_date,
-                        Previous_Policy_No:res.data.data.policyHolder.previouspolicy.policy_no,
-                        insurance_company_id:res.data.data.policyHolder.previouspolicy.insurancecompany_id,
-                        previous_city:res.data.data.policyHolder.previouspolicy.address
+                        Commercial_consideration:decryptResp.data.policyHolder.previouspolicy.Commercial_consideration,
+                        previous_start_date:decryptResp.data.policyHolder.previouspolicy.start_date,
+                        previous_end_date:decryptResp.data.policyHolder.previouspolicy.end_date,
+                        Previous_Policy_No:decryptResp.data.policyHolder.previouspolicy.policy_no,
+                        insurance_company_id:decryptResp.data.policyHolder.previouspolicy.insurancecompany_id,
+                        previous_city:decryptResp.data.policyHolder.previouspolicy.address
         
                     });
 
                 }
 
-                if(res.data.data.policyHolder.step_no == 3 || res.data.data.policyHolder.step_no > 3){
+                if(decryptResp.data.policyHolder.step_no == 3 || decryptResp.data.policyHolder.step_no > 3){
 
                     let address = '';
-                    if(res.data.data.policyHolder.address == null){
+                    if(decryptResp.data.policyHolder.address == null){
                         
                     }else{
-                        address = JSON.parse(res.data.data.policyHolder.address);
+                        address = JSON.parse(decryptResp.data.policyHolder.address);
 
                         this.props.setSmeProposerDetails(
                             {
-                                first_name:res.data.data.policyHolder.first_name,
-                                last_name:res.data.data.policyHolder.last_name,
-                                salutation_id:res.data.data.policyHolder.salutation_id,
-                                date_of_birth:res.data.data.policyHolder.dob,
-                                email_id:res.data.data.policyHolder.email_id,
-                                mobile:res.data.data.policyHolder.mobile,
-                                gender:res.data.data.policyHolder.gender,
-                                pan_no:res.data.data.policyHolder.pancard,
-                                gstn_no:res.data.data.policyHolder.gstn_no,
+                                first_name:decryptResp.data.policyHolder.first_name,
+                                last_name:decryptResp.data.policyHolder.last_name,
+                                salutation_id:decryptResp.data.policyHolder.salutation_id,
+                                date_of_birth:decryptResp.data.policyHolder.dob,
+                                email_id:decryptResp.data.policyHolder.email_id,
+                                mobile:decryptResp.data.policyHolder.mobile,
+                                gender:decryptResp.data.policyHolder.gender,
+                                pan_no:decryptResp.data.policyHolder.pancard,
+                                gstn_no:decryptResp.data.policyHolder.gstn_no,
 
                                 com_street_name:address.street_name,
                                 com_plot_no:address.plot_no,
                                 com_building_name:address.house_building_name,
                                 com_block_no:address.block_no,
                                 com_house_flat_no:address.house_flat_no,
-                                com_pincode:res.data.data.policyHolder.pincode,
-                                com_pincode_id:res.data.data.policyHolder.pincode_id
+                                com_pincode:decryptResp.data.policyHolder.pincode,
+                                com_pincode_id:decryptResp.data.policyHolder.pincode_id
                             }
                         );
                     }
@@ -197,44 +197,46 @@ class Registration_sme extends Component {
         const {productId} = this.props.match.params;
         const formData = new FormData();
         let encryption = new Encryption();
-        formData.append('menumaster_id','5');
-        formData.append('page_name','Registration_SME/9')
-        formData.append('vehicle_type_id','9');
+        let post_data = {
+            'menumaster_id': '5',
+            'page_name': `Registration_SME/${productId}`,
+            'vehicle_type_id': productId
+        }
 
         if(sessionStorage.getItem('csc_id')) {
-            formData.append('bcmaster_id', '5');
-            formData.append('csc_id',sessionStorage.getItem('csc_id') ? sessionStorage.getItem('csc_id') : "");
-            formData.append('agent_name',sessionStorage.getItem('agent_name') ? sessionStorage.getItem('agent_name') : "");
-            formData.append('product_id',productId);
-            formData.append('page_name', `Registration_SME/${productId}`);
+            post_data['bcmaster_id'] = '5'
+            post_data['csc_id'] = sessionStorage.getItem('csc_id') ? sessionStorage.getItem('csc_id') : ""
+            post_data['agent_name']= sessionStorage.getItem('agent_name') ? sessionStorage.getItem('agent_name') : ""
+            post_data['product_id'] = productId
         }else{
             let bc_data = sessionStorage.getItem('bcLoginData') ? sessionStorage.getItem('bcLoginData') : "";
             if(bc_data) {
                 bc_data = JSON.parse(encryption.decrypt(bc_data));
-
-                formData.append('bcmaster_id', bc_data ? bc_data.agent_id : "");
-                formData.append('bc_token', bc_data ? bc_data.token : "");
-                formData.append('bc_agent_id', bc_data ? bc_data.user_info.data.user.username : "");
-                formData.append('product_id',productId);
-                formData.append('page_name', `Registration_SME/${productId}`);
+                post_data['bcmaster_id'] = bc_data ? bc_data.agent_id : ""
+                post_data['bc_token'] = bc_data ? bc_data.token : ""
+                post_data['bc_agent_id']= bc_data ? bc_data.user_info.data.user.username : ""
+                post_data['product_id'] = productId
             }
-
         }
-
 
         let pol_start_date = moment(values.pol_start_date).format('YYYY-MM-DD HH:mm:ss')
         let pol_end_date = moment(values.pol_end_date).format('YYYY-MM-DD hh:mm:ss')
-        formData.append('pol_start_date', pol_start_date)
-        formData.append('pol_end_date',pol_end_date)
-        this.props.loadingStart();
-        // console.log
 
+        post_data['pol_start_date'] = pol_start_date
+        post_data['pol_end_date'] = pol_end_date
+
+        this.props.loadingStart();
+        
         if(this.props.policy_holder_id != null){
-            formData.append('policy_holder_id',this.props.policy_holder_id);
+            post_data['policy_holder_id'] = this.props.policy_holder_id
+            formData.append('enc_data',encryption.encrypt(JSON.stringify(post_data)))
+
             axios.post('sme/update-policy-info',
             formData
             ).then(res=>{
-                if (res.data.error === false )
+                let decryptResp = JSON.parse(encryption.decrypt(res.data));
+                // console.log('decryptResp-----', decryptResp)
+                if (decryptResp.error === false )
                 {
                 this.props.loadingStop();
                 this.props.setDataUpdate({
@@ -250,23 +252,27 @@ class Registration_sme extends Component {
             }).
             catch(err=>{
                 this.props.loadingStop();
+                let decryptResp = JSON.parse(encryption.decrypt(err.data));
+                console.log('decryptErr-----', decryptResp)
                 actions.setSubmitting(false);
             })
         }else{
+            formData.append('enc_data',encryption.encrypt(JSON.stringify(post_data)))
             axios.post('sme/policy-info',
             formData
-            ).then(res=>{        
-                localStorage.setItem('policy_holder_ref_no',res.data.data.policyHolder_refNo);
+            ).then(res=>{     
+                let decryptResp = JSON.parse(encryption.decrypt(res.data));   
+                localStorage.setItem('policy_holder_ref_no',decryptResp.data.policyHolder_refNo);
                 this.props.loadingStop();
                 this.props.setData({
                     start_date:values.pol_start_date,
                     end_date:values.pol_end_date,
                     
-                    policy_holder_id:res.data.data.policyHolder_id,
-                    policy_holder_ref_no:res.data.data.policyHolder_refNo,
-                    request_data_id:res.data.data.request_data_id,
-                    completed_step:res.data.data.completedStep,
-                    menumaster_id:res.data.data.menumaster_id
+                    policy_holder_id:decryptResp.data.policyHolder_id,
+                    policy_holder_ref_no:decryptResp.data.policyHolder_refNo,
+                    request_data_id:decryptResp.data.request_data_id,
+                    completed_step:decryptResp.data.completedStep,
+                    menumaster_id:decryptResp.data.menumaster_id
                 });
                 this.props.history.push(`/RiskDetails/${productId}`);
             }).

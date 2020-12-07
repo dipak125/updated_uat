@@ -41,7 +41,8 @@ const initialValues = {
     motherInLaw: 0,
     motherInLawDob: "",
     gender: "",
-    insureList: ""
+    insureList: "",
+    cover_type_id: ""
 
 }
 
@@ -49,7 +50,6 @@ const initialValues = {
 
 const vehicleInspectionValidation = Yup.object().shape({
     gender: Yup.string().required('Please select gender'),
-   
    
 });
 
@@ -785,7 +785,8 @@ const validateFamilyMembers  = Yup.object().shape({
         othewise: Yup.string()
     }),
     
-    
+    cover_type_id: Yup.string().required("Select policy type")
+
 })
 
 function checkSelfData(str)
@@ -821,6 +822,7 @@ class arogya_InformationYourself extends Component {
             display_gender:[],
             gender_for:[],
             confirm: "",
+            cover_type_id: "",
         };
     }
 
@@ -879,8 +881,6 @@ class arogya_InformationYourself extends Component {
             });
 
         }
-        
-
 
         this.setState({
             gender: value,
@@ -889,12 +889,14 @@ class arogya_InformationYourself extends Component {
     }
 
     handleFormSubmit = (values) => {
+        console.log('this.state.lookingFor.length',this.state.lookingFor.length)
     const {productId} = this.props.match.params
     const formData = new FormData();
     let encryption = new Encryption();
     let lookingFor = this.state.lookingFor ;
     let dob = this.state.dob ;
     let familyMembers = this.state.familyMembers;
+    let cover_type_id = this.state.lookingFor.length == 1 ? 1 : this.state.cover_type_id;
     let post_data = []
     let menumaster_id = 8;
 
@@ -904,8 +906,9 @@ class arogya_InformationYourself extends Component {
     }
 
     post_data['menumaster_id'] = menumaster_id
-    post_data['page_name'] = 'arogya_Health/12'
-    post_data['proposer_gender'] = values.gender    
+    post_data['page_name'] = `arogya_Health/${productId}`
+    post_data['proposer_gender'] = values.gender 
+    post_data['cover_type_id'] = cover_type_id  
     
     let arr_date=[]
     for(let i=0;i<dob.length;i++){        
@@ -1089,31 +1092,20 @@ class arogya_InformationYourself extends Component {
             
             sessionStorage.setItem('display_looking_for',JSON.stringify(display_looking_for));
             sessionStorage.setItem('display_dob',JSON.stringify(display_dob));
+            // console.log('dataa',this.state.lookingFor,this.state.display_gender,this.state.cover_type_id)
             this.setState({
                 lookingFor:looking_for,
                 display_looking_for,
                 display_gender:display_gender,
-                gender_for:gender_for
+                gender_for:gender_for,
+                cover_type_id:values.cover_type_id 
              });
              this.setState({
                 dob:dob,
                 display_dob
+
              });  
              this.handleClose()
-        /*formData.append('menumaster_id', 2);
-        formData.append('gender', gender);
-        axios
-            .post(`/yourself`, formData)
-            .then(res => {
-                localStorage.setItem('policyHolder_id', res.data.data.policyHolder_id);
-                localStorage.setItem('policyHolder_refNo', res.data.data.policyHolder_refNo);
-               
-            })
-            .catch(err => {
-              
-              this.props.loadingStop();
-            });
-            this.handleClose()*/
     }   
     else{
         swal('Please select at least one option');
@@ -1127,10 +1119,10 @@ componentDidMount(){
 
 fetchData=()=>{
     const {productId } = this.props.match.params
-    let policyHolder_id = localStorage.getItem("policyHolder_id");
+    let policyHolder_refNo = localStorage.getItem("policyHolder_refNo");
     let encryption = new Encryption();
     this.props.loadingStart();
-    axios.get(`policy-holder/${policyHolder_id}`)
+    axios.get(`arogya-topup/health-policy-details/${policyHolder_refNo}`)
         .then(res=>{
             let decryptResp = JSON.parse(encryption.decrypt(res.data))
             console.log("decrypt", decryptResp)
@@ -1139,12 +1131,14 @@ fetchData=()=>{
             let is_eia_account = decryptResp.data.policyHolder.is_eia_account
             let gender = decryptResp.data.policyHolder.gender
             let validateCheck = family_members && family_members.length>0 ? 1:0;
+            let cover_type_id = decryptResp.data.policyHolder && decryptResp.data.policyHolder.request_data ? decryptResp.data.policyHolder.request_data.cover_type_id : '';
             this.setState({ 
                 familyMembers:family_members,
                 addressDetails,
                 is_eia_account,
                 gender,
-                validateCheck
+                validateCheck,
+                cover_type_id
             })
             this.setStateForPreviousData(family_members);
         })
@@ -1213,7 +1207,7 @@ setStateForPreviousData=(family_members)=>{
 		}
     }
     render() {
-        const {memberInfo, insureList,validateCheck,gender,familyMembers,lookingFor,dob,display_looking_for,display_dob,display_gender, confirm} = this.state
+        const {memberInfo, insureList,validateCheck,gender,familyMembers,lookingFor,dob,display_looking_for,display_dob,display_gender, confirm, cover_type_id} = this.state
         const insureListPrev = this.getInsuredList(familyMembers);
         let display_looking_for_arr = display_looking_for  && display_looking_for.length >0 ? display_looking_for : (sessionStorage.getItem('display_looking_for') ? JSON.parse(sessionStorage.getItem('display_looking_for')) : []);
         let display_dob_arr = display_dob && display_dob.length >0 ? display_dob : (sessionStorage.getItem('display_dob') ? JSON.parse(sessionStorage.getItem('display_dob')) : []);
@@ -1243,6 +1237,8 @@ setStateForPreviousData=(family_members)=>{
             dob_7: display_dob_arr[7] ? new Date(display_dob_arr[7]) : "",
             looking_for_8: display_looking_for_arr[8] ? display_looking_for_arr[8] : "",
             dob_8: display_dob_arr[8] ? new Date(display_dob_arr[8]) : "",
+            cover_type_id: cover_type_id ? cover_type_id : '',
+            // cover_type_id: cover_type_id || lookingFor > 1 ? 1 : cover_type_id,
             insureList: insureListPrev ? insureListPrev.toString()  : (insureList ? insureList :'')
         });
            
@@ -1279,10 +1275,6 @@ setStateForPreviousData=(family_members)=>{
                                                 onChange={(e) => {
                                                     setFieldValue('gender', e.target.value);
                                                     this.chanageGender(e.target.value)
-                                                   /* this.setState({
-                                                        gender:e.target.value
-                                                    }) */
-                                                   // this.handleChangeSubmit(e.target.value)
                                                 }}
                                             >
                                             <option value="">Select gender</option>
@@ -1308,7 +1300,7 @@ setStateForPreviousData=(family_members)=>{
                                                     onBlur={e => this.changePlaceHoldClassRemove(e)}
                                                     value={insureList ? insureList : values.insureList}
                                                 />                    
-                                                <img src={require('../../assets/images/plus-sign.svg')} alt="" />
+                                                <img src={require('../../assets/images/plus-sign.svg')} alt="" className="plus-sign"/>
                                                 <br/><br/>
                                                 {errors.insureList && touched.insureList ? (
                                                     <span className="errorMsg">{errors.insureList}</span>
@@ -2079,23 +2071,24 @@ setStateForPreviousData=(family_members)=>{
                                                         }
                                                 </div>
                                             </div> 
-                                            : null }                                      
+                                            : null }   
+                                            { (values.looking_for_0 && values.looking_for_1) || values.looking_for_2 || values.looking_for_3 || values.looking_for_4 ||values.looking_for_5 || values.looking_for_6 || values.looking_for_7 || values.looking_for_8 ?                                   
                                             <div className="d-flex justify-content-center">      
                                                 <div className="d-inline-flex m-b-15 m-l-20">
                                                         <div className="p-r-25">
                                                             <label className="customRadio3">
                                                                 <Field
                                                                     type="radio"
-                                                                    name='Floater_Plan'
-                                                                    value='1'
+                                                                    name='cover_type_id'
+                                                                    value='3'
                                                                     key='1'
-                                                                    checked = {values.policy_for == '1' ? true : false}
-                                                                    // onChange = {() =>{
-                                                                    //     setFieldTouched('policy_for')
-                                                                    //     setFieldValue('policy_for', '1');
-                                                                    //     this.handleChange(values,setFieldTouched, setFieldValue)
-                                                                    // }  
-                                                                    // }
+                                                                    checked = {values.cover_type_id == '3' ? true : false}
+                                                                    onChange = {() =>{
+                                                                        setFieldTouched('cover_type_id')
+                                                                        setFieldValue('cover_type_id', '3');
+                                                                        // this.handleChange(values,setFieldTouched, setFieldValue)
+                                                                    }  
+                                                                    }
                                                                 />
                                                                 <span className="checkmark " /><span className="fs-14">Floater Plan</span>
                                                                 <OverlayTrigger overlay={<Tooltip id="tooltip-disabled">{"A family floater policy is a health insurance plan which covers the entire family on the payment of a single annual premium."}</Tooltip>}>
@@ -2107,29 +2100,29 @@ setStateForPreviousData=(family_members)=>{
                                                             <label className="customRadio3">
                                                                 <Field
                                                                     type="radio"
-                                                                    name='Non_Floater_Plan'
+                                                                    name='cover_type_id'
                                                                     value='2'
                                                                     key='1'
-                                                                    checked = {values.policy_for == '2' ? true : false}
-                                                                    // onChange = {() =>{
-                                                                    //     setFieldTouched('policy_for')
-                                                                    //     setFieldValue('policy_for', '2');
-                                                                    //     this.handleChange(values,setFieldTouched, setFieldValue)
-                                                                    // }  
-                                                                    // }
+                                                                    checked = {values.cover_type_id == '2' ? true : false}
+                                                                    onChange = {() =>{
+                                                                        setFieldTouched('cover_type_id')
+                                                                        setFieldValue('cover_type_id', '2');
+                                                                        // this.handleChange(values,setFieldTouched, setFieldValue)
+                                                                    }  
+                                                                    }
                                                                 />
                                                                 <span className="checkmark " /><span className="fs-14">Non Floater Plan</span>
                                                                 <OverlayTrigger overlay={<Tooltip id="tooltip-disabled">{"A non floater policy is a health insurance plan which covers the individual family member(s) on the payment of a single annual premium."}</Tooltip>}>
                                                                     <a className="infoIcon"><img src={require('../../assets/images/i.svg')} alt="" className="premtool" /></a>
                                                                 </OverlayTrigger>
                                                             </label>
-                                                            {errors.policy_for && touched.policy_for ? (
-                                                                <span className="errorMsg">{errors.policy_for}</span>
+                                                            {errors.cover_type_id && touched.cover_type_id ? (
+                                                                <span className="errorMsg">{errors.cover_type_id}</span>
                                                             ) : null}
                                                         </div>
                                                 </div>
                                             </div>
-                                            
+                                            : null}
                                             <div className="cntrbtn">
                                             <Button className={`btnPrimary m-r-15`} type="submit" >
                                             {this.setValueData() || this.state.validateCheck == '1' ? 'Submit':'Select' }

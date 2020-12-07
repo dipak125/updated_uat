@@ -155,6 +155,9 @@ ul.navPan li a span{ margin-bottom:8px; display: block; }
 .txtRegistr {color: #FFFFFF; font-size: 12px;}
 .rgistrBtn {border: 1px solid #AFDFF2; border-radius: 15px; background-color: #2770b3; color: #ffffff !important; padding: 3px 15px; font-size: 12px; text-transform: uppercase;}
 
+.grossbox .medihead{ font-size: 16px; text-align: left}
+.grossbox .medihead span{ display: block;}
+.grossbox .table{ color: #fff;}
 
 .brand-table {background-color: #f6faff; border-radius: 16.5px; overflow: hidden; max-width: 710px; border: 1px solid #D4D4D4; margin-top: 30px; margin-bottom: 50px;}
 .brand-table td {border: 1px solid #D4D4D4; padding: 15px 17px; cursor: pointer; text-align: center;}
@@ -872,4 +875,72 @@ img.avatar {  border-radius: inherit;}
       flex: 0 0 49%;
       max-width: 49%;
   }
+}
+.plus-sign {
+  width: 20px;
+  cursor: pointer;
+}
+/*Premium page slider*/
+.irs--round .irs-handle.state_hover, .irs--round .irs-handle:hover {
+  background-color: #801C7D;
+}
+.irs--round .irs-handle {
+  border-radius: 0 !important;
+  border-bottom: 0 !important;
+  height: 22px !important;
+  top: 22px !important;
+  background: #801C7D;
+border: 0;
+}
+.irs--round .irs-handle::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 100%;
+  width: 0;
+  height: 0;
+  border-left: 12px solid transparent;
+  border-right: 12px solid transparent;
+  border-top: 13px solid #801C7D;
+  clear: both;
+}
+.irs-from, .irs--round .irs-to, .irs--round .irs-single{
+	background-color: #801C7D !important;
+}
+.irs-bar{
+	background-color: #801C7D !important;
+}
+.irs-single:before{
+	border-top-color: #801C7D !important;
+}
+/* Bootstrap Range slider */
+.slider-riage {
+  -webkit-appearance: none;
+  width: 100%;
+  height: 5px;
+  border-radius: 0px;  
+  background: #d3d3d3;
+  outline: none;
+  opacity: 1;
+}
+.slider-riage::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 23px;
+  height: 33px;
+  border: 0;
+  background: url('../images/rangeinput.png') no-repeat left 0; 
+  cursor: pointer;
+  border-radius: 0;
+  opacity: 1;
+}
+
+.slider-riage::-moz-range-thumb {
+  width: 23px;
+  height: 33px;
+  border: 0;
+  background: url('../images/rangeinput.png') no-repeat left 0; 
+  cursor: pointer;
+  border-radius: 0;
+  opacity: 1;
 }

@@ -168,14 +168,6 @@ const arogya_PolicyDetails = Loadable({
     loader: () => import(/*webpackChunkName: "Products" */"../Arogya_topUp/arogya_PolicyDetails.jsx"),
     loading: () => loadingContent
 });
-const arogya_ThankYou = Loadable({
-    loader: () => import(/*webpackChunkName: "Products" */"../Arogya_topUp/arogya_ThankYou.jsx"),
-    loading: () => loadingContent
-});
-const arogya_ThankYouCCM = Loadable({
-    loader: () => import(/*webpackChunkName: "Products" */"../Arogya_topUp/arogya_ThankYouCCM.jsx"),
-    loading: () => loadingContent
-});
 
 //=====================================================================================
 
@@ -423,7 +415,7 @@ class Routes extends Component {
                         <PrivateRoute exact path="/Premium/:productId" component={Premium} />
                         {/* <PrivateRoute exact path="/ThankYou_motor/:policyId" component={ThankYou_motor} /> */}
                         
-                        {/* ********************** LandingPage ***************  */}  RenewalPlanner                  
+                        {/* ********************** LandingPage ***************  */}                  
                         <PrivateRoute exact path="/Dashboard" component={Dashboard} />  
                         
                         {/* ********************* AROGYA TOPUP ***************** */}
@@ -434,14 +426,10 @@ class Routes extends Component {
                         <PrivateRoute exact path="/arogya_Address/:productId" component={arogya_Address} />    
                         <PrivateRoute exact path="/arogya_NomineeDetails/:productId" component={arogya_NomineeDetails} /> 
                         <PrivateRoute exact path="/arogya_PolicyDetails/:productId" component={arogya_PolicyDetails} />
-                        {/* <PrivateRoute exact path="/PolicySummery/:productId" component={PolicySummery} />                  */}
-                        <PrivateRoute exact path="/arogya_ThankYou/:policyId" component={arogya_ThankYou} />
-                        <PrivateRoute exact path="/arogya_ThankYouCCM" component={arogya_ThankYouCCM} />
-
 
 
                         {/************ TwoWheeler ******************/}
-                        {/* <PrivateRoute exact path="/two_wheeler_Registration/:productId" component={TwoWheelerRegistration} />                     */}
+                        {/* <PrivateRoute exact path="/two_wheeler_Registration/:productId" component={TwoWheelerRegistration} />  */}
                         <PrivateRoute exact path="/two_wheeler_Select-brand/:productId" component={TwoWheelerSelectBrand} />
                         <PrivateRoute exact path="/two_wheeler_Vehicle_details/:productId" component={TwoWheelerVehicleDetails} />
                         <PrivateRoute exact path="/two_wheeler_OtherComprehensive/:productId" component={TwoWheelerOtherComprehensive} />

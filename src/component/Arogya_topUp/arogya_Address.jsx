@@ -303,7 +303,8 @@ class arogya_Address extends Component {
             pinDataArr:[],
             stateName:[],
             showEIA:false,
-            pincode_Details: []
+            pincode_Details: [],
+            titleList: []
 		}
 	}
 
@@ -321,23 +322,25 @@ class arogya_Address extends Component {
 
     fetchData=()=>{
         const {productId } = this.props.match.params
-        let policyHolder_id = localStorage.getItem("policyHolder_id");
+        let encryption = new Encryption();
         this.props.loadingStart();
-        axios.get(`policy-holder/${policyHolder_id}`)
+        let policyHolder_refNo = localStorage.getItem("policyHolder_refNo");
+        axios.get(`arogya-topup/health-policy-details/${policyHolder_refNo}`)
             .then(res=>{
-                let policy_holder =  res.data.data.policyHolder;
-                let family_members = res.data.data.policyHolder.request_data.family_members
-                let addressDetails = JSON.parse(res.data.data.policyHolder.address)
-                let is_eia_account = res.data.data.policyHolder.is_eia_account == 2 ? "" : res.data.data.policyHolder.is_eia_account
+                let decryptResp = JSON.parse(encryption.decrypt(res.data))
+                console.log("decrypt", decryptResp)
+                let policy_holder =  decryptResp.data.policyHolder;
+                let family_members = decryptResp.data.policyHolder.request_data.family_members
+                let addressDetails = JSON.parse(decryptResp.data.policyHolder.address)
+                let is_eia_account = decryptResp.data.policyHolder.is_eia_account == 2 ? "" : decryptResp.data.policyHolder.is_eia_account
                 let selfFlag = false;
-                let pincode_Details = JSON.parse(res.data.data.policyHolder.pincode_response)
+                let pincode_Details = JSON.parse(decryptResp.data.policyHolder.pincode_response)
                 for(let i=0;i<family_members.length;i++){
                     if(family_members[i].relation_with=='self'){
                         selfFlag = true
                         break
                     }
                 }
-                
 
                 this.setState({ 
                     selfFlag,
@@ -348,10 +351,10 @@ class arogya_Address extends Component {
                     pincode_Details
                 })
                 this.props.loadingStop();
-                this.fetchPrevAreaDetails(pincode_Details)
+                this.fetchSalutation(pincode_Details);
                 
             })
-            .catch(function (error) {
+            .catch(err=>{
                 // handle error
                 // this.props.loadingStop();
             })
@@ -444,6 +447,7 @@ class arogya_Address extends Component {
         let last_name = []
         let dob = []
         let pancard_no = []
+        let salutation_id = []
 
         for(let i=0;i<family_members.length;i++){
              looking_for.push(family_members[i].looking_for)
@@ -451,18 +455,20 @@ class arogya_Address extends Component {
             gender.push(family_members[i].gender)
             first_name.push(family_members[i].fname)
             last_name.push(family_members[i].lname)
+            salutation_id.push(family_members[i].salutation_id)
            dob.push(moment(family_members[i].dob).format("YYYY-MM-DD"))
            pancard_no.push(values.panNo)
         }  
 
         formArr['looking_for'] = looking_for
-        formArr['page_name'] = '/arogya_Address/12'
+        formArr['page_name'] = 'arogya_Address/12'
         formArr['family_member_id'] = family_member_id
         formArr['gender'] = gender
         formArr['first_name'] = first_name
         formArr['last_name'] = last_name
         formArr['dob'] = dob
-        formArr['pancard_no'] = pancard_no
+        formArr['pancard_no'] = pancard_no 
+        formArr['salutation_id'] = salutation_id
 
         formArr['policy_holder_id'] = policyHolder_id;
 
@@ -494,6 +500,7 @@ class arogya_Address extends Component {
         formArr['proposerDob'] = moment(values.proposerDob).format("YYYY-MM-DD");
         formArr['proposerGender'] = values.proposerGender;
         formArr['pincode_id'] = values.pincode_id;
+        formArr['salutation_id'] = values.salutation_id;
         
         if(values.eIA == 1){
             formArr['eia_account_no'] = values.eia_account_no;
@@ -532,7 +539,8 @@ class arogya_Address extends Component {
                 gender: resource.gender ?  resource.gender:'',
                 looking_for: resource.relation_with,
                 family_member_id: resource.id,
-                pancard_no:resource.pancard_no
+                pancard_no:resource.pancard_no,
+                salutation_id: resource.salutation_id,
 			}));
 		} else {
 			return [initialFamilyDetails];
@@ -553,10 +561,33 @@ class arogya_Address extends Component {
             })
         }
     }
+
+    fetchSalutation=(pincode_Details)=>{
+
+        const formData = new FormData();
+        this.props.loadingStart();
+        formData.append('policy_for_flag', 1)
+        axios.post('salutation-list', formData)
+        .then(res=>{
+            let titleList = res.data.data.salutationlist ? res.data.data.salutationlist : []                        
+            this.setState({
+                titleList
+            });
+            this.props.loadingStop();
+            this.fetchPrevAreaDetails(pincode_Details)
+        }).
+        catch(err=>{
+            this.props.loadingStop();
+            this.setState({
+                titleList: []
+            });
+        })
+    
+    }
     
     
     render() {
-        const {policy_holder,familyMembers,addressDetails,is_eia_account,selfFlag,pinDataArr,stateName,showEIA, pincode_Details} = this.state    
+        const {policy_holder,familyMembers,addressDetails,is_eia_account,selfFlag,pinDataArr,stateName,showEIA, pincode_Details, titleList} = this.state    
 
         let newInitialValues = Object.assign(initialValues, {
             proposerAsInsured: sessionStorage.getItem('proposed_insured') ? sessionStorage.getItem('proposed_insured') : (selfFlag ? 1:0),
@@ -767,7 +798,8 @@ class arogya_Address extends Component {
                                             {familyMembers && familyMembers.length>0 && familyMembers.map((resource,index)=> 
                                                     <div className="d-flex justify-content-left prsnlinfo">
                                                         <div className="W12">
-                                                            {resource.relation_with}
+                                                            <strong>{resource.relation_with}</strong>
+                                                            <Row></Row>
                                                             <Field
                                                                 name={`family_members.${index}.family_member_id`}
                                                                 type="hidden"
@@ -780,6 +812,27 @@ class arogya_Address extends Component {
                                                             />
                                                         </div> &nbsp;&nbsp;
                                                         <Row>
+                                                        <Col sm={12} md={3} lg={3}>  
+                                                         <FormGroup>                      
+                                                            <div className="formSection">
+                                                                    <Field
+                                                                        name='salutation_id'
+                                                                        type="text"
+                                                                        component="select"
+                                                                        autoComplete="off"            
+                                                                        className="formGrp"
+                                                                    >
+                                                                        <option value="">Title</option>
+                                                                        {titleList.map((title, qIndex) => ( 
+                                                                        <option value={title.id}>{title.displayvalue}</option>
+                                                                        ))}
+                                                                    </Field>     
+                                                                    {errors.salutation_id && touched.salutation_id ? (
+                                                                    <span className="errorMsg">{errors.salutation_id}</span>
+                                                                    ) : null}               
+                                                                </div>
+                                                             </FormGroup>                               
+                                                            </Col>
                                                         <Col sm={12} md={3} lg={3}>
                                                             <FormGroup>
                                                                 <div className="insurerName">
