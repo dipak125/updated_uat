@@ -30,7 +30,7 @@ let minSumTenure = 1;
 let maxSumTenure = 3;
 let minSumDeductable = 100000;
 let maxSumDeductable = 1000000;
-let defaultSumSliderValue = 2500000;
+let defaultSliderVal = 2500000;
 let defaultdeductibleSliderValue = 400000;
 let defaulttenureSliderValue = 2;
 
@@ -137,16 +137,19 @@ class arogya_SelectDuration extends Component {
 
     handleSubmit = (values) => {
         let defaultSliderValue = 0
-        let defaultSumSliderValue = 0
-        let defaultdeductibleSliderValue = 0
-        let defaulttenureSliderValue = 0
+        // let defaultSumSliderValue = 0
+        // let defaultdeductibleSliderValue = 0
+        // let defaulttenureSliderValue = 0
         const { productId } = this.props.match.params
-        const { serverResponse, SliderVal, deductibleSliderVal, tenureSliderVal } = this.state
+        const { serverResponse, SliderVal} = this.state
         const formData = new FormData();
         let encryption = new Encryption();
 
         // formData.append('policy_holder_id', localStorage.getItem('policyHolder_id'));
         let policy_holder_id = localStorage.getItem('policyHolder_id') ? localStorage.getItem('policyHolder_id') : 0
+        let SumInsuredsliderVal = values.slider_sum_insured ? values.slider_sum_insured : 0
+        let deductibleSliderVal = values.slider_deductible ? values.slider_deductible : 0
+        let tenureSliderVal = values.slider_tenure ? values.slider_tenure : 0
 
 
         const post_data = {
@@ -160,13 +163,16 @@ class arogya_SelectDuration extends Component {
             'krishi_kalayan_cess': 0,
             'net_premium': serverResponse.DuePremium,
             // 'sum_insured':values.insureValue,
-            'sum_insured': SliderVal ? parseInt(SliderVal) : parseInt(defaultSliderValue),
-            'deductible': deductibleSliderVal ? parseInt(deductibleSliderVal) : parseInt(defaultSliderValue),
-            'tenure_year': tenureSliderVal ? parseInt(tenureSliderVal) : parseInt(defaultSliderValue),
+            // 'sum_insured': SliderVal ? parseInt(SliderVal) : parseInt(defaultSliderValue),
+            // 'deductible': deductibleSliderVal ? parseInt(deductibleSliderVal) : parseInt(defaultSliderValue),
+            // 'tenure_year': tenureSliderVal ? parseInt(tenureSliderVal) : parseInt(defaultSliderValue),
+            'sum_insured': parseInt(SumInsuredsliderVal),
+            'deductible': parseInt(deductibleSliderVal),
+            'tenure_year': parseInt(tenureSliderVal),
         }
         formData.append('enc_data', encryption.encrypt(JSON.stringify(post_data)))
-
-
+        
+        console.log('Handle--submit----',post_data)
         this.props.loadingStart();
         axios
             .post(`/arogya-topup/duration-premium`, formData)
@@ -192,8 +198,9 @@ class arogya_SelectDuration extends Component {
             .then(res => {
                 let decryptResp = JSON.parse(encryption.decrypt(res.data))
                 console.log("decrypt", decryptResp.data.policyHolder)
+                let policyHolderDetails= decryptResp.data.policyHolder
                 this.setState({
-                    policyHolderDetails: decryptResp.data.policyHolder,
+                    policyHolderDetails: policyHolderDetails,
                     SliderVal: decryptResp.data.policyHolder && decryptResp.data.policyHolder.request_data ? decryptResp.data.policyHolder.request_data.sum_insured : 0, 
 
                     deductibleSliderVal: decryptResp.data.policyHolder && decryptResp.data.policyHolder.request_data ? decryptResp.data.policyHolder.request_data.deductible : 0, 
@@ -201,7 +208,14 @@ class arogya_SelectDuration extends Component {
                     tenureSliderVal: decryptResp.data.policyHolder && decryptResp.data.policyHolder.request_data ? decryptResp.data.policyHolder.request_data.tenure_year : 0
                 })
                 var values = []
+                let policyDetails = policyHolderDetails && policyHolderDetails.request_data ? policyHolderDetails.request_data : []
+                values['polStartDate'] = policyDetails ? moment(policyDetails.start_date).format("YYYY-MM-DD") : new Date()
+                values['polEndDate'] = policyDetails ? moment(policyDetails.end_date).format("YYYY-MM-DD") : new Date(moment(values['polStartDate']).add(1, 'years').format("YYYY-MM-DD"))
+                values['slider_sum_insured'] = policyDetails ? parseInt(policyDetails.sum_insured) : defaultSliderVal
+                values['slider_deductible'] = policyDetails ? parseInt(policyDetails.deductible) : defaultdeductibleSliderValue
+                values['slider_tenure'] = policyDetails ? parseInt(policyDetails.tenure_year) : defaulttenureSliderValue
                 console.log("policyHolderDetails-----", this.policyHolderDetails)
+
                 this.quote(values)
             })
             .catch(err => {
@@ -235,14 +249,6 @@ class arogya_SelectDuration extends Component {
     }
 
     quote = (values) => {
-
-        if (values == "") {
-            values['polStartDate'] = new Date()
-            values['polEndDate'] = new Date(moment(values['polStartDate']).add(1, 'years').format("YYYY-MM-DD"))
-            values['slider_sum_insured'] = defaultSumSliderValue
-            values['slider_deductible'] = defaultdeductibleSliderValue
-            values['slider_tenure'] = defaulttenureSliderValue
-        }
 
         let polStartDate = moment(values.polStartDate).format("YYYY-MM-DD");
         let polEndDate = moment(values.polEndDate).format("YYYY-MM-DD");
@@ -347,11 +353,11 @@ class arogya_SelectDuration extends Component {
             // insureValue: policyHolderDetails && policyHolderDetails.request_data && policyHolderDetails.request_data.sum_insured ? Math.floor(policyHolderDetails.request_data.sum_insured) : initialValues.insureValue
             // insureValue: policyHolderDetails && policyHolderDetails.request_data && policyHolderDetails.request_data.sum_insured ? sum_assured[policyHolderDetails.request_data.sum_insured] : initialValues.insureValue,
 
-            slider_sum_insured: SliderVal, 
+            slider_sum_insured: SliderVal ? SliderVal : defaultSliderVal, 
 
-            slider_deductible: deductibleSliderVal,
+            slider_deductible: deductibleSliderVal ? deductibleSliderVal : defaultdeductibleSliderValue,
             
-            slider_tenure: tenureSliderVal,
+            slider_tenure: tenureSliderVal ? tenureSliderVal : defaulttenureSliderValue,
         })
 
         const errMsg = error && error.message ? (
@@ -460,7 +466,7 @@ class arogya_SelectDuration extends Component {
                                                                                     className="premiumslid"
                                                                                     onFocus={e => this.changePlaceHoldClassAdd(e)}
                                                                                     onBlur={e => this.changePlaceHoldClassRemove(e)}
-                                                                                    value={SliderVal ? SliderVal : defaultSumSliderValue}
+                                                                                    value={SliderVal ? SliderVal : defaultSliderVal}
                                                                                 />
                                                                                 {errors.sum_insured_value && touched.sum_insured_value ? (
                                                                                     <span className="errorMsg">{errors.sum_insured_value}</span>
@@ -624,20 +630,22 @@ class arogya_SelectDuration extends Component {
 
                                                             <Col sm={12} md={3}>
                                                                 <div className="regisBox grossbox">
-                                                                    <h5 className="medihead">Gross Premium : <span>₹ {serverResponse ? (serverResponse.message ? 0 : serverResponse.DuePremium) : 0}</span></h5>
-                                                                    <table class="table table-bordered">
-                                                                        <tr>
-                                                                            <td>Gross Premium:</td>
-                                                                            <td>₹{Math.round(serverResponse ? (serverResponse.message ? 0 : serverResponse.BeforeVatPremium) : 0)}</td>
-                                                                        </tr>
-                                                                        <tr>
-                                                                            <td>GST:</td>
-                                                                            <td>₹{Math.round(serverResponse ? (serverResponse.message ? 0 : serverResponse.TGST) : 0)}</td>
-                                                                        </tr>
-                                                                        <tr>
-                                                                            <td>Net Premium:</td>
-                                                                            <td>₹{serverResponse ? (serverResponse.message ? 0 : serverResponse.DuePremium) : 0}</td>
-                                                                        </tr>
+                                                                    {/* <h5 className="medihead">Gross Premium : <span>₹ {serverResponse ? (serverResponse.message ? 0 : serverResponse.DuePremium) : 0}</span></h5> */}
+                                                                    <table class="table">
+                                                                        <tbody>
+                                                                            <tr>
+                                                                                <td>Gross Premium:</td>
+                                                                                <td>₹{Math.round(serverResponse ? (serverResponse.message ? 0 : serverResponse.BeforeVatPremium) : 0)}</td>
+                                                                            </tr>
+                                                                            <tr>
+                                                                                <td>GST:</td>
+                                                                                <td>₹{Math.round(serverResponse ? (serverResponse.message ? 0 : serverResponse.TGST) : 0)}</td>
+                                                                            </tr>
+                                                                            <tr>
+                                                                                <td>Net Premium:</td>
+                                                                                <td>₹{serverResponse ? (serverResponse.message ? 0 : serverResponse.DuePremium) : 0}</td>
+                                                                            </tr>
+                                                                        </tbody>
                                                                     </table>
                                                                 </div>
                                                             </Col>

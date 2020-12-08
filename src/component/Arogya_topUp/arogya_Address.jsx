@@ -794,10 +794,10 @@ class arogya_Address extends Component {
                                             <FieldArray
                                                 name="family_members"
                                                 render={arrayHelpers => (
-                                                    <div>
+                                                <div>
                                             {familyMembers && familyMembers.length>0 && familyMembers.map((resource,index)=> 
-                                                    <div className="d-flex justify-content-left prsnlinfo">
-                                                        <div className="W12">
+                                                    <div className="d-flex justify-content-left prsnlinfo" key={index}>
+                                                        <div className="W12" >
                                                             <strong>{resource.relation_with}</strong>
                                                             <Row></Row>
                                                             <Field
@@ -812,7 +812,7 @@ class arogya_Address extends Component {
                                                             />
                                                         </div> &nbsp;&nbsp;
                                                         <Row>
-                                                        <Col sm={12} md={3} lg={3}>  
+                                                        {/* <Col sm={12} md={3} lg={3}>  
                                                          <FormGroup>                      
                                                             <div className="formSection">
                                                                     <Field
@@ -832,7 +832,7 @@ class arogya_Address extends Component {
                                                                     ) : null}               
                                                                 </div>
                                                              </FormGroup>                               
-                                                            </Col>
+                                                            </Col> */}
                                                         <Col sm={12} md={3} lg={3}>
                                                             <FormGroup>
                                                                 <div className="insurerName">

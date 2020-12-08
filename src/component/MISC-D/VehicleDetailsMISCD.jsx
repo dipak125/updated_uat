@@ -33,7 +33,8 @@ const maxDate = moment(moment().subtract(1, 'years').calendar()).add(0, 'day').c
 const maxDatePYP = moment(moment().subtract(1, 'years').calendar()).add(30, 'day').calendar();
 const startRegnDate = moment().subtract(20, 'years').calendar();
 const minRegnDate = moment(startRegnDate).startOf('year').format('YYYY-MM-DD hh:mm');
-const minRegnDateNew = moment(moment().subtract(1, 'months').calendar()).add(1, 'day').calendar();
+// const minRegnDateNew = moment(moment().subtract(1, 'months').calendar()).add(1, 'day').calendar();
+const minRegnDateNew = moment().subtract(1, 'months').calendar();
 const maxDateForValidtion = moment(moment().subtract(1, 'years').calendar()).add(31, 'day').calendar();
 
 const initialValue = {
@@ -209,7 +210,7 @@ const vehicleRegistrationValidation = Yup.object().shape({
     .test(
         "currentMonthChecking",
         function() {
-            return "Please enter previous insurance company city"
+            return "Please enter previous insurance company address"
         },
         function (value) {
             if (this.parent.policy_type_id == '2' && !value  && this.parent.valid_previous_policy == '1') {   

@@ -823,6 +823,8 @@ class arogya_InformationYourself extends Component {
             gender_for:[],
             confirm: "",
             cover_type_id: "",
+            drv: []
+
         };
     }
 
@@ -896,7 +898,7 @@ class arogya_InformationYourself extends Component {
     let lookingFor = this.state.lookingFor ;
     let dob = this.state.dob ;
     let familyMembers = this.state.familyMembers;
-    let cover_type_id = this.state.lookingFor.length == 1 ? 1 : this.state.cover_type_id;
+    let cover_type_id = this.state.cover_type_id;
     let post_data = []
     let menumaster_id = 8;
 
@@ -1024,6 +1026,33 @@ class arogya_InformationYourself extends Component {
        // this.props.history.push(`/MedicalDetails/${productId}`);
     }
 
+    checkPolicyType = (value, isSelect,setFieldTouched, setFieldValue) => {
+        const {drv} = this.state
+        if (isSelect) {
+        drv.push(value);
+        }
+        else{
+        const index = drv.indexOf(value);
+            if (index !== -1) {
+                drv.splice(index, 1);  
+            }
+        }
+
+       if(drv && drv.length == 1){
+        setFieldTouched("cover_type_id");
+        setFieldValue("cover_type_id", '1');
+            this.setState({
+            cover_type_id: 1          
+            })
+        }
+       else if(drv && drv.length > 1){
+        setFieldTouched("cover_type_id");
+        setFieldValue("cover_type_id", '');
+        this.setState({
+           cover_type_id: ""          
+       })
+      } 
+    }
 
     handleSubmitForm = (values, actions) => {
         var drv = []; 
@@ -1075,9 +1104,7 @@ class arogya_InformationYourself extends Component {
                             looking_for.push(values[key]);
                             gender_for.push(display_gender[i])    
                         }   
-                    }
-
-                   
+                    }           
                    
                     if ( key.match(/dob/gi)){                 
                         i = key.substr(4, 1);   
@@ -1194,7 +1221,8 @@ setStateForPreviousData=(family_members)=>{
             lookingFor:looking_for,
             dob,
             gender_for,
-            display_gender
+            display_gender,
+            drv: looking_for
          });
     } 
 }
@@ -1212,6 +1240,7 @@ setStateForPreviousData=(family_members)=>{
         let display_looking_for_arr = display_looking_for  && display_looking_for.length >0 ? display_looking_for : (sessionStorage.getItem('display_looking_for') ? JSON.parse(sessionStorage.getItem('display_looking_for')) : []);
         let display_dob_arr = display_dob && display_dob.length >0 ? display_dob : (sessionStorage.getItem('display_dob') ? JSON.parse(sessionStorage.getItem('display_dob')) : []);
         let display_gender_arr = display_gender && display_gender.length > 0 ? display_gender : (localStorage.getItem('display_gender') ? JSON.parse(localStorage.getItem('display_gender')) : []);
+        let coverTypeId = this.state.lookingFor.length == 1 ? 1 : this.state.cover_type_id;
 
         const newInitialValues = Object.assign(initialValues, {
             check_input: validateCheck ? validateCheck :0,
@@ -1237,7 +1266,7 @@ setStateForPreviousData=(family_members)=>{
             dob_7: display_dob_arr[7] ? new Date(display_dob_arr[7]) : "",
             looking_for_8: display_looking_for_arr[8] ? display_looking_for_arr[8] : "",
             dob_8: display_dob_arr[8] ? new Date(display_dob_arr[8]) : "",
-            cover_type_id: cover_type_id ? cover_type_id : '',
+            cover_type_id: cover_type_id,
             // cover_type_id: cover_type_id || lookingFor > 1 ? 1 : cover_type_id,
             insureList: insureListPrev ? insureListPrev.toString()  : (insureList ? insureList :'')
         });
@@ -1356,6 +1385,7 @@ setStateForPreviousData=(family_members)=>{
                                                         value="self"
                                                         className="user-self"
                                                         onChange={(e) => {
+                                                            this.checkPolicyType(e.target.value,  e.target.checked,setFieldTouched, setFieldValue)
                                                             if (e.target.checked === true) {
                                                                 setFieldValue('looking_for_0', e.target.value);     
                                                                                                                       
@@ -1434,6 +1464,7 @@ setStateForPreviousData=(family_members)=>{
                                                         value="spouse"
                                                         className="user-self"
                                                         onChange={(e) => {
+                                                            this.checkPolicyType(e.target.value,  e.target.checked,setFieldTouched, setFieldValue)
                                                             if (e.target.checked === true) {
                                                                 setFieldValue('looking_for_1', e.target.value);
                                                                 
@@ -1769,6 +1800,7 @@ setStateForPreviousData=(family_members)=>{
                                                         value="father"
                                                         className="user-self"
                                                         onChange={(e) => {
+                                                            this.checkPolicyType(e.target.value,  e.target.checked,setFieldTouched, setFieldValue)
                                                             if (e.target.checked === true) {
                                                                 setFieldValue('looking_for_5', e.target.value);
                                                                 
@@ -1839,6 +1871,7 @@ setStateForPreviousData=(family_members)=>{
                                                         value="mother"
                                                         className="user-self"
                                                         onChange={(e) => {
+                                                            this.checkPolicyType(e.target.value,  e.target.checked,setFieldTouched, setFieldValue)
                                                             if (e.target.checked === true) {
                                                                 setFieldValue('looking_for_6', e.target.value);
                                                                 
@@ -1908,6 +1941,7 @@ setStateForPreviousData=(family_members)=>{
                                                         value="fatherInLaw"
                                                         className="user-self"
                                                         onChange={(e) => {
+                                                            this.checkPolicyType(e.target.value,  e.target.checked,setFieldTouched, setFieldValue)
                                                             if (e.target.checked === true) {
                                                                 setFieldValue('looking_for_7', e.target.value);
                                                                 
@@ -1976,6 +2010,7 @@ setStateForPreviousData=(family_members)=>{
                                                         value="motherInLaw"
                                                         className="user-self"
                                                         onChange={(e) => {
+                                                            this.checkPolicyType(e.target.value,  e.target.checked,setFieldTouched, setFieldValue)
                                                             if (e.target.checked === true) {
                                                                 setFieldValue('looking_for_8', e.target.value);
                                                                 

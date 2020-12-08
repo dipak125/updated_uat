@@ -75,76 +75,24 @@ class arogya_PolicyDetails extends Component {
   };
 
   getPolicyHolderDetails = () => {
+    let encryption = new Encryption();
     
     this.props.loadingStart();
     let policyHolder_refNo = localStorage.getItem("policyHolder_refNo");
-    axios.get(`arogya-topup/health-policy-details/${policyHolder_refNo}`)
+    axios.get(`/arogya-topup/health-policy-details/${policyHolder_refNo}`)
       .then((res) => {
+        let decryptResp = JSON.parse(encryption.decrypt(res.data))
+        let addressArray = JSON.parse(decryptResp.data.policyHolder.address)
+        console.log("decrypt-----", decryptResp)
 
         this.setState({
-          policyHolderDetails: res.data.data.policyHolder ? res.data.data.policyHolder : [],
-          familyMember: res.data.data.policyHolder.request_data.family_members,
-          refNumber: res.data.data.policyHolder.reference_no,
-          paymentStatus: res.data.data.policyHolder.payment ? res.data.data.policyHolder.payment[0] : []
+          policyHolderDetails: decryptResp.data.policyHolder ? decryptResp.data.policyHolder : [],
+          addressArray: decryptResp.data.policyHolder && decryptResp.data.policyHolder.address ? addressArray : null,
+          familyMember: decryptResp.data.policyHolder.request_data.family_members,
+          refNumber: decryptResp.data.policyHolder.reference_no,
+          paymentStatus: decryptResp.data.policyHolder.payment ? decryptResp.data.policyHolder.payment[0] : []
         });
-        this.getAccessToken(
-          res.data.data.policyHolder,
-          res.data.data.policyHolder.request_data.family_members
-        );
-      })
-      .catch((err) => {
-        if(err.status == 401) {
-          swal("Session out. Please login")
-        }
-        else swal("Something wrong happened. Please try after some")
-
-        this.setState({
-          policyHolderDetails: [],
-        });
-        this.props.loadingStop();
-      });
-  };
-
-  getAccessToken = (policyHolderDetails, familyMember) => {
-    axios
-      .post(`/callTokenService`)
-      .then((res) => {
-        this.setState({
-          accessToken: res.data.access_token,
-        });
-        this.fullQuote(
-          res.data.access_token,
-          policyHolderDetails,
-          familyMember
-        );
-      })
-      .catch((err) => {
-        this.setState({
-          accessToken: [],
-        });
-        this.props.loadingStop();
-      });
-  };
-
-
-  getPolicyHolderId = (ref_no) => {
-    let policyHolder_id = 0
-    
-    this.props.loadingStart();
-    axios
-      .get(`/health-policy/${ref_no}`)
-      .then((res) => {
-
-        this.setState({
-          policyHolderDetails: res.data.data.policyHolder ? res.data.data.policyHolder : [],
-          familyMember: res.data.data.policyHolder.request_data.family_members,
-          refNumber: res.data.data.policyHolder.reference_no,
-          paymentStatus: res.data.data.policyHolder.payment ? res.data.data.policyHolder.payment[0] : []
-        });
-        this.getAccessToken(
-          res.data.data.policyHolder,
-          res.data.data.policyHolder.request_data.family_members
-        );
+        this.fullQuote( decryptResp.data.policyHolder );
       })
       .catch((err) => {
         if(err.status == 401) {
@@ -160,39 +108,39 @@ class arogya_PolicyDetails extends Component {
   };
 
 
-  fullQuote = (access_token, policyHolderDetails) => {
-    let id = policyHolderDetails.id;
-    let insureValue = Math.floor(policyHolderDetails.request_data.sum_insured);
+  fullQuote = ( policyHolderDetails) => {
 
     const formData = new FormData();
     let encryption = new Encryption();
+    let policyDetails = policyHolderDetails && policyHolderDetails.request_data ? policyHolderDetails.request_data : []
 
-    //formData.append("id", id);
-    //formData.append("insureValue", insureValue);
-    //formData.append("access_token", access_token);
    const post_data = {
-      "id":id,
-      "insureValue":insureValue,
-      "access_token":access_token
+    'policy_reference_no': policyDetails ? policyHolderDetails.reference_no : null,
+    'start_date': policyDetails ? moment(policyDetails.start_date).format("YYYY-MM-DD") : null,
+    'end_date': policyDetails ? moment(policyDetails.end_date).format("YYYY-MM-DD") : null,
+    'sum_insured': policyDetails ? parseInt(policyDetails.sum_insured) : null,
+    'deductible': policyDetails ? parseInt(policyDetails.deductible) : null,
+    'tenure_year': policyDetails ? parseInt(policyDetails.tenure_year) : null,
     }
     formData.append('enc_data',encryption.encrypt(JSON.stringify(post_data)))    
-
-
+    console.log('post_data-----', post_data);
 
     axios
-      .post(`/fullQuoteServiceArogyaSeries`, formData)
+      .post(`/arogya-topup/fullQuoteServiceArogyaTopup`, formData)
       .then((res) => {
-        if (res.data.PolicyObject) {
+        // let decryptResp = JSON.parse(encryption.decrypt(res.data))
+        let decryptResp = res.data
+        if (decryptResp.PolicyObject) {
           this.setState({
-            fulQuoteResp: res.data.PolicyObject,
-            address: res.data.PolicyObject.PolicyCustomerList,
+            fulQuoteResp: decryptResp.PolicyObject,
+            // address: address.address1,
             error: [],
           });
         } else {
           this.setState({
             fulQuoteResp: [],
             address: [],
-            error: res.data,
+            error: decryptResp.ValidateResult ? decryptResp.ValidateResult : [] ,
           });
         }
         this.props.loadingStop();
@@ -237,24 +185,42 @@ paypoint_payment = () => {
 }
 
   componentDidMount() {
-    if(queryString.parse(this.props.location.search).access_id) {
-       this.getPolicyHolderId(queryString.parse(this.props.location.search).access_id)
-    }
-    else this.getPolicyHolderDetails();
+  this.getPolicyHolderDetails();
   }
 
   render() {
     const { productId } = this.props.match.params;
-    const { fulQuoteResp, address,error, show, policyHolderDetails, refNumber, paymentStatus } = this.state;
+    const { fulQuoteResp, addressArray, error, show, policyHolderDetails, refNumber, paymentStatus } = this.state;
 
-    console.log("policyHolderDetails ", policyHolderDetails)
-    console.log("fulQuoteResp------ ", fulQuoteResp)
-    // console.log("address---------- ", address.BuildingHouseName)
+    console.log("addressArray===================== ", addressArray ? addressArray : "")
+
+    const AddressDetails = addressArray ? (
+        <div>
+          <Row>
+            <Col sm={12} md={6}>
+              <Row>
+                <Col sm={12} md={6}>
+                  <FormGroup>{addressArray.address1 +", "+addressArray.address2 +", "+ addressArray.address3}</FormGroup>
+                  {/* <FormGroup>{ addressArray.address3}</FormGroup> */}
+                </Col>
+              </Row>
+            </Col>
+          </Row>
+        </div>
+    ) :null
+
+    const PincodeDetails = addressArray ? (
+      <div>
+        <Row>
+          <Col sm={12} md={6}>
+            <FormGroup>{addressArray.pincode}</FormGroup>
+          </Col>
+        </Row>
+      </div>
+  ) :null
+
     const items =
-      fulQuoteResp &&
-      fulQuoteResp.PolicyLobList && fulQuoteResp.PolicyLobList.length > 0 && 
-      fulQuoteResp.PolicyLobList[0].PolicyRiskList
-        ? fulQuoteResp.PolicyLobList[0].PolicyRiskList.map((member, qIndex) => {
+    policyHolderDetails.request_data ? policyHolderDetails.request_data.family_members.map((member, qIndex) => {
             return (
               <div>
               <Row>
@@ -265,7 +231,7 @@ paypoint_payment = () => {
                       <FormGroup>Name:</FormGroup>
                     </Col>
                     <Col sm={12} md={6}>
-                      <FormGroup>{member.FirstName+" "+member.LastName}</FormGroup>
+                      <FormGroup>{member.first_name +" "+member.last_name}</FormGroup>
                     </Col>
                   </Row>
 
@@ -274,7 +240,7 @@ paypoint_payment = () => {
                       <FormGroup>Date Of Birth:</FormGroup>
                     </Col>
                     <Col sm={12} md={6}>
-                      <FormGroup>{member.DateOfBirth}</FormGroup>
+                      <FormGroup>{member.dob}</FormGroup>
                     </Col>
                   </Row>
 
@@ -283,10 +249,12 @@ paypoint_payment = () => {
                       <FormGroup>Relation With Proposer:</FormGroup>
                     </Col>
                     <Col sm={12} md={6}>
-                      <FormGroup>{
-                      member.GenderCode == 'F' && member.ArgInsuredRelToProposer > 2?
+                      <FormGroup>
+                        {/* {member.GenderCode == 'F' && member.ArgInsuredRelToProposer > 2?
                       (member.ArgInsuredRelToProposer==3 || member.ArgInsuredRelToProposer==5 || member.ArgInsuredRelToProposer==7)?
-                      relationArr[parseInt(member.ArgInsuredRelToProposer)+1]:relationArr[member.ArgInsuredRelToProposer]:relationArr[member.ArgInsuredRelToProposer]}</FormGroup>
+                      relationArr[parseInt(member.ArgInsuredRelToProposer)+1]:relationArr[member.ArgInsuredRelToProposer]:relationArr[member.ArgInsuredRelToProposer]} */}
+                      {member.relation_with}
+                      </FormGroup>
                     </Col>
                   </Row>
 
@@ -295,7 +263,7 @@ paypoint_payment = () => {
                       <FormGroup>Gender</FormGroup>
                     </Col>
                     <Col sm={12} md={6}>
-                      <FormGroup>{genderArr[member.GenderCode]}</FormGroup>
+                      <FormGroup>{member.gender}</FormGroup>
                     </Col>
                   </Row>
                 </Col>
@@ -306,7 +274,63 @@ paypoint_payment = () => {
               </div>
             );
           })
-        : null;
+          :null
+
+      const nominee = policyHolderDetails.request_data ? policyHolderDetails.request_data.nominee.map((member, qIndex) => {
+        return (
+          <div>
+          <Row>
+            <Col sm={12} md={6}>
+              {/* <h6><strong>Member {qIndex + 1}</strong></h6> */}
+              <Row>
+                <Col sm={12} md={6}>
+                  <FormGroup>Name:</FormGroup>
+                </Col>
+                <Col sm={12} md={6}>
+                  <FormGroup>{member.first_name +" "+member.last_name}</FormGroup>
+                </Col>
+              </Row>
+
+              <Row>
+                <Col sm={12} md={6}>
+                  <FormGroup>Date Of Birth:</FormGroup>
+                </Col>
+                <Col sm={12} md={6}>
+                  <FormGroup>{member.dob}</FormGroup>
+                </Col>
+              </Row>
+
+              <Row>
+                <Col sm={12} md={6}>
+                  <FormGroup>Relation With Proposer:</FormGroup>
+                </Col>
+                <Col sm={12} md={6}>
+                  <FormGroup>
+                    {/* {member.GenderCode == 'F' && member.ArgInsuredRelToProposer > 2?
+                  (member.ArgInsuredRelToProposer==3 || member.ArgInsuredRelToProposer==5 || member.ArgInsuredRelToProposer==7)?
+                  relationArr[parseInt(member.ArgInsuredRelToProposer)+1]:relationArr[member.ArgInsuredRelToProposer]:relationArr[member.ArgInsuredRelToProposer]} */}
+                  {member.relation_with == 2 ? 'Spouce' : member.relation_with == 3 ? 'Son' : member.relation_with == 4 ? 'Daughter' : member.relation_with == 5 ? 'Father' : member.relation_with == 6 ? 'Mother' : member.relation_with == 7 ? 'Father in law' : member.relation_with == 8 ? 'Mother in law' : null}
+                  </FormGroup>
+                </Col>
+              </Row>
+
+              <Row>
+                <Col sm={12} md={6}>
+                  <FormGroup>Gender</FormGroup>
+                </Col>
+                <Col sm={12} md={6}>
+                  <FormGroup>{member.gender}</FormGroup>
+                </Col>
+              </Row>
+            </Col>
+          </Row>
+          <Row>
+          <p></p>
+          </Row>
+          </div>
+        );
+      })
+      :null
 
     const errMsg =
       error && error.message ? (
@@ -353,12 +377,12 @@ paypoint_payment = () => {
                       <h5>{errMsg}</h5>
                       <h5>{paymentErrMsg}</h5>
                       <h4>
-                        Policy Reference Number {fulQuoteResp.QuotationNo}
+                        Policy Reference Number {policyHolderDetails && policyHolderDetails.request_data ? policyHolderDetails.request_data.quote_id : null}
                       </h4>
                     </div>
 
                     <Row>
-                      <Col sm={12} md={9} lg={9}>
+                      <Col sm={12} md={9} lg={18}>
                         <div className="rghtsideTrigr">
                           <Collapsible trigger="Arogya Sanjeevani Policy, SBI General Insurance Company Limited"  open= {true}>
                             <div className="listrghtsideTrigr">
@@ -369,7 +393,7 @@ paypoint_payment = () => {
                                 <Col sm={12} md={3}>
                                   <FormGroup>
                                     <strong>Rs:</strong>{" "}
-                                    {fulQuoteResp.SumInsured}
+                                    {policyHolderDetails && policyHolderDetails.request_data ? Math.round(policyHolderDetails.request_data.sum_insured) : null}
                                   </FormGroup>
                                 </Col>
                                 <Col sm={12} md={3}>
@@ -377,7 +401,8 @@ paypoint_payment = () => {
                                 </Col>
                                 <Col sm={12} md={3}>
                                   <FormGroup>
-                                    <strong>Rs:</strong> {fulQuoteResp.TGST}
+                                    <strong>Rs:</strong>{" "}
+                                    {policyHolderDetails && policyHolderDetails.request_data ? Math.round(policyHolderDetails.request_data.service_tax) : null}
                                   </FormGroup>
                                 </Col>
                                 <Col sm={12} md={3}>
@@ -386,7 +411,7 @@ paypoint_payment = () => {
                                 <Col sm={12} md={3}>
                                   <FormGroup>
                                     <strong>Rs:</strong>{" "}
-                                    {Math.round(fulQuoteResp.GrossPremium+fulQuoteResp.AlcoholLoadingAmount+fulQuoteResp.SmokerLoadingAmount+fulQuoteResp.TobaccoLoadingAmount)}
+                                    {policyHolderDetails && policyHolderDetails.request_data ? Math.round(policyHolderDetails.request_data.gross_premium) : null}
                                   </FormGroup>
                                 </Col>
                                 <Col sm={12} md={3}>
@@ -395,7 +420,7 @@ paypoint_payment = () => {
                                 <Col sm={12} md={3}>
                                   <FormGroup>
                                     <strong>Rs:</strong>{" "}
-                                    {fulQuoteResp.DuePremium}
+                                    {policyHolderDetails && policyHolderDetails.request_data ? Math.round(policyHolderDetails.request_data.net_premium) : null}
                                   </FormGroup>
                                 </Col>
                               </Row>
@@ -409,44 +434,68 @@ paypoint_payment = () => {
                           </Collapsible>
                         </div>
 
-                        <div className="rghtsideTrigr m-b-40">
+                        <div className="rghtsideTrigr">
                           <Collapsible trigger=" Contact information">
                             <div className="listrghtsideTrigr">
                               <div className="d-flex justify-content-end carloan">
                                 <Link to ={`/arogya_Address/${productId}`}> Edit</Link>
                               </div>
                               <Row>
-                                <Col sm={12} md={6}>
+                                <Col sm={12} md={18}>
 
                                   <Row>
-                                    <Col sm={12} md={6}>
+                                    <Col sm={12} md={3}>
                                       Mobile number:
                                     </Col>
-                                    <Col sm={12} md={6}>
+                                    <Col sm={12} md={9}>
                                       {policyHolderDetails.mobile}
                                     </Col>
                                   </Row>
-
                                   <Row>
-                                    <Col sm={12} md={6}>
+                                    <Col sm={12} md={3}>
+                                     &nbsp;
+                                    </Col>
+                                  </Row>
+                                  <Row>
+                                    <Col sm={12} md={3}>
                                       Email:
                                     </Col>
                                     <Col sm={12} md={6}>
                                       {policyHolderDetails.email_id}
                                     </Col>
                                   </Row>
-
                                   <Row>
-                                    <Col sm={12} md={6}>
+                                    <Col sm={12} md={3}>
+                                     &nbsp;
+                                    </Col>
+                                  </Row>
+                                  <Row >
+                                    <Col sm={12} md={3}>
                                       Address:
                                     </Col>
                                     <Col sm={12} md={6}>
-                                      {/* {address} */}
+                                      {AddressDetails} 
+                                    </Col>
+                                  </Row>
+                                  
+                                  <Row>
+                                    <Col sm={12} md={3}>
+                                      Pincode:
+                                    </Col>
+                                    <Col sm={12} md={9}>
+                                      {PincodeDetails}
                                     </Col>
                                   </Row>
 
                                 </Col>
                               </Row>
+                            </div>
+                          </Collapsible>
+                        </div>
+
+                        <div className="rghtsideTrigr m-b-40">
+                          <Collapsible trigger=" Nominee Details">
+                            <div className="listrghtsideTrigr">{nominee}
                             </div>
                           </Collapsible>
                         </div>
@@ -499,24 +548,6 @@ paypoint_payment = () => {
                     </Row>
                   </div>
                 </section>
-                {/* <Modal
-                  className=""
-                  bsSize="md"
-                  show={show}
-                  onHide={this.handleClose}
-                >
-                  <div className="otpmodal">
-                    <Modal.Body>
-                      <Otp
-                        quoteNo = {fulQuoteResp.QuotationNo}
-                        duePremium = {fulQuoteResp.DuePremium}
-                        refNumber = {refNumber}
-                        // reloadPage={(e) => this.getAccessTokenForInception(e)}
-                        reloadPage={(e) => this.payment(e)}
-                      />
-                    </Modal.Body>
-                  </div>
-                </Modal> */}
                 <Footer />
               </div>
             </div>

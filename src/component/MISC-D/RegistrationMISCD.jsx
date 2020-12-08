@@ -11,7 +11,6 @@ import * as Yup from 'yup';
 import swal from 'sweetalert';
 import Encryption from '../../shared/payload-encryption';
 import { Formik, Form, Field, ErrorMessage } from 'formik';
-import { setData } from "../../store/actions/data";
 
 const menumaster_id = 7
 const initialValues = {
@@ -32,15 +31,31 @@ const vehicleRegistrationValidation = Yup.object().shape({
         },
         function (value) {
             // console.log('YUP', value)
-            if ((value == "" || value == undefined) && this.parent.check_registration == 2 ) {  
+            if ((value == "" || value == undefined) && this.parent.check_registration == 2 && this.parent.policy_type == 1) {  
                 return false;
+            }
+            else if ((value == "" || value == undefined) && this.parent.policy_type == 2) {  
+                return false;
+            }
+            return true;
+        }
+    ).test(
+        "last4digitcheck",
+        function() {
+            return "Invalid Registration number"
+        },
+        function (value) {
+            let regnoLength = value.length
+            let subString = value.substring(regnoLength-4, regnoLength)
+            if (subString <= 0) {
+                return subString > 0;
             }
             return true;
         }
     ),
 
     policy_type: Yup.string().required("Please select policy type"),
-    policy_for: Yup.string().required("Please select policy for indivudal or corporate"),
+    policy_for: Yup.string().required("Please select policy for Individual or Corporate"),
     subclass_id: Yup.string().required("Please select sub product"),
    
 // });
@@ -83,8 +98,6 @@ class RegistrationMISCD extends Component {
         let element = e.target.parentElement;
         e.target.value.length === 0 && element.classList.remove('active');
     }
-
-
 
 
 
@@ -151,12 +164,10 @@ handleSubmit=(values)=>{
     }
 
     if(values.check_registration && values.check_registration == 1) {
-        let check_registration = {'check_registration' : 1}
-        this.props.setData(check_registration)
+        sessionStorage.setItem("check_registration", 1)
     }
     else {
-        let check_registration = {'check_registration' : 2}
-        this.props.setData(check_registration)
+        sessionStorage.setItem("check_registration", 2)
     }
    
 
@@ -343,10 +354,11 @@ regnoFormat = (e, setFieldTouched, setFieldValue) => {
             policy_type: motorInsurance && motorInsurance.policytype_id ? motorInsurance.policytype_id : "",
             policy_for: motorInsurance && motorInsurance.policy_for ? motorInsurance.policy_for : "",
             subclass_id : motorInsurance && motorInsurance.subclass_id ? motorInsurance.subclass_id : "",
-            check_registration : this.props.data && this.props.data.check_registration ? this.props.data.check_registration : ""
+            check_registration : sessionStorage.getItem("check_registration")
+            // check_registration : this.props.data && this.props.data.check_registration ? this.props.data.check_registration : ""
         })
 
-        console.log("this.props.data.check_registration--- ", this.props.data && this.props.data.check_registration ? this.props.data.check_registration : "")
+        // console.log("this.props.data.check_registration--- ", this.props.data && this.props.data.check_registration ? this.props.data.check_registration : "")
 
         return (
             <>
@@ -579,7 +591,6 @@ regnoFormat = (e, setFieldTouched, setFieldValue) => {
 const mapStateToProps = state => {
     return {
       loading: state.loader.loading,
-      data: state.processData.data
     };
   };
   
@@ -587,7 +598,6 @@ const mapStateToProps = state => {
     return {
       loadingStart: () => dispatch(loaderStart()),
       loadingStop: () => dispatch(loaderStop()),
-      setData: (data) => dispatch(setData(data))
     };
   };
 

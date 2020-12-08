@@ -28,7 +28,21 @@ const ComprehensiveValidation = Yup.object().shape({
     registration_no: Yup.string().when("newRegistrationNo", {
         is: "NEW",       
         then: Yup.string(),
-        otherwise: Yup.string().required('Please provide registration number').matches(/^[A-Z]{2}[ ][0-9]{1,2}(?: [A-Z])?(?: [A-Z]*)? [0-9]{4}$/, 'Invalid Registration number'),
+        otherwise: Yup.string().required('Please provide registration number').matches(/^[A-Z]{2}[ ][0-9]{1,2}(?: [A-Z])?(?: [A-Z]*)? [0-9]{4}$/, 'Invalid Registration number')
+            .test(
+                "last4digitcheck",
+                function() {
+                    return "Invalid Registration number"
+                },
+                function (value) {
+                    let regnoLength = value.length
+                    let subString = value.substring(regnoLength-4, regnoLength)
+                    if (subString <= 0) {
+                        return subString > 0;
+                    }
+                    return true;
+                }
+            ),
     }),
 
     puc: Yup.string().required("Please verify pollution certificate to proceed"),
@@ -270,9 +284,11 @@ const ComprehensiveValidation = Yup.object().shape({
     trailer_array: Yup.array().of(
         Yup.object().shape({
             regNo : Yup.string().required('Registration no is required')
-            .matches(/^[a-zA-Z0-9]*$/, function() {
-                return "Invalid Registration No"
-            }).min(5, function() {
+            // .matches(/^[a-zA-Z0-9]*$/, function() {
+            //     return "Invalid Registration No"
+            // })
+            .matches(/^[A-Z]{2}[ ][0-9]{1,2}(?: [A-Z])?(?: [A-Z]*)? [0-9]{4}$/, 'Invalid Registration number')
+            .min(5, function() {
                 return "Registration no. should be minimum 5 characters"
             })
             .max(17, function() {
@@ -280,7 +296,7 @@ const ComprehensiveValidation = Yup.object().shape({
             }),
 
             chassisNo : Yup.string().required('Chassis no is required')
-            .matches(/^[a-zA-Z0-9]*$/, function() {
+            .matches(/^[0-9]*$/, function() {
                 return "Invalid chassis No"
             }).min(5, function() {
                 return "Chassis no. should be minimum 5 characters"
@@ -1155,6 +1171,9 @@ class OtherComprehensiveMISCD extends Component {
                                 onFocus={e => this.changePlaceHoldClassAdd(e)}
                                 onBlur={e => this.changePlaceHoldClassRemove(e)}
                                 // value = {values[`trailer_array[${i}].chassisNo`]}
+                                onInput={e=>{
+                                    this.regnoFormat(e, setFieldTouched, setFieldValue)
+                                }}
 
                             />
                             {errors.trailer_array && errors.trailer_array[i] && errors.trailer_array[i].regNo ? (
@@ -1887,7 +1906,7 @@ console.log("errors------------------ ", errors)
                                                             setFieldTouched('B00007_description')
                                                             setFieldValue('B00007_description', e.target.value);
                                                             this.handleChange()
-                                                        }}
+                                                        }} 
                                                     >                                     
                                                     </Field>
                                                     {errors.B00007_description ? (
@@ -2018,7 +2037,7 @@ console.log("errors------------------ ", errors)
                                                     <Field
                                                         name="B00003_value"
                                                         type="text"
-                                                        placeholder="Value of Accessory"
+                                                        placeholder="IDV"
                                                         autoComplete="off"
                                                         maxLength="8"
                                                         onFocus={e => this.changePlaceHoldClassAdd(e)}
@@ -2069,7 +2088,7 @@ console.log("errors------------------ ", errors)
                                                     <Field
                                                         name="B00004_value"
                                                         type="text"
-                                                        placeholder="Value of Accessory"
+                                                        placeholder="IDV"
                                                         autoComplete="off"
                                                         maxLength="8"
                                                         onFocus={e => this.changePlaceHoldClassAdd(e)}

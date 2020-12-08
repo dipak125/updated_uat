@@ -41,10 +41,20 @@ function polNumFormatter(cell) {
 function productFormatter(cell, row) {
     if(row.menumaster_id == '2'){
         return 'Arogya Sanjeevani'
+    }else if(row.menumaster_id == '8'){
+        return 'Arogya Topup'
     }else{
         return (cell ? (cell.vehicletype ? cell.vehicletype.name : null): null);
     }
-} 
+}
+
+function nameFormatter(cell, row){
+
+    return (
+        <div>{row.first_name+' '+row.last_name}</div>
+    )
+    
+}
 
 const statusFormatter = (refObj) => (cell,row) => {
     return (
@@ -198,7 +208,7 @@ class QuoteSearch extends Component {
                                 >
 
                                     <TableHeaderColumn width='195px'  dataField="request_data" dataAlign="center" dataFormat={ actionFormatter(this)} isKey >Quote Number</TableHeaderColumn>
-                                    <TableHeaderColumn width='100px'  dataField="first_name" dataAlign="center">Proposer Name</TableHeaderColumn>
+                                    <TableHeaderColumn width='100px'  dataField="request_data" dataAlign="center" dataFormat={ nameFormatter} >Proposer Name</TableHeaderColumn>
                                     <TableHeaderColumn width='100px'  dataField="vehiclebrandmodel" dataAlign="center" dataFormat={productFormatter} >Product</TableHeaderColumn>
                                     <TableHeaderColumn width='95px'  dataField='created_at' dataFormat={(cell) => (cell !== '0000-00-00 00:00:00' ? moment(cell).format("DD-MM-YYYY") : '')} dataAlign="center" dataSort>Quote Issue Date</TableHeaderColumn>
                                     <TableHeaderColumn width='100px' dataAlign="center" dataField="request_data" dataFormat={premiumFormatter} > Premium</TableHeaderColumn>

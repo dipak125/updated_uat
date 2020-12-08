@@ -199,20 +199,20 @@ class arogya_NomineeDetails extends Component {
         for (const key in values) {
             if (values.hasOwnProperty(key)) {
               if(key == "dob" ){
-
-                //formData.append(key, moment(values[key]).format("YYYY-MM-DD"));
                 formArr[key] = moment(values[key]).format("YYYY-MM-DD")
               }
               else {
-                // formData.append(key, values[key]);
-                formArr[key] = values[key]
+                if(key == "relation_with") {
+                    formArr[key] = (values[key]).toString()
+                  }
+                  else {
+                    formArr[key] = values[key]
+                  } 
               }          
             }
           }
 
-        //formData.append('policy_holder_id', localStorage.getItem('policyHolder_id'));
         formArr['policy_holder_id'] = localStorage.getItem('policyHolder_id')
-       // formData.append('is_appointee', this.state.is_appointee);
         formArr['is_appointee'] = this.state.is_appointee
         formArr['page_name'] = '/arogya_NomineeDetails/12'
         let formObj = {}
@@ -223,12 +223,14 @@ class arogya_NomineeDetails extends Component {
 
         this.props.loadingStart();
         axios
-        .post(`/insert-nominee`, formData)
+        .post(`/arogya-topup/insert-nominee`, formData)
         .then(res => { 
             this.props.loadingStop();
             this.props.history.push(`/arogya_PolicyDetails/${productId}`);
         })
         .catch(err => {
+            let decryptResp = JSON.parse(encryption.decrypt(err.data))
+            console.log("decryptErr----", decryptResp)
             if(err.status == 401) {
                 swal("Session out. Please login")
             }
@@ -252,14 +254,16 @@ class arogya_NomineeDetails extends Component {
     getNomineeDetails = () => {
         this.props.loadingStart();
         let policyHolder_refNo = localStorage.getItem("policyHolder_refNo");
+        let encryption = new Encryption();
         axios.get(`arogya-topup/health-policy-details/${policyHolder_refNo}`)
           .then(res => { 
-           let family_members = res.data.data.policyHolder.request_data ? res.data.data.policyHolder.request_data.family_members:[]
+            let decryptResp = JSON.parse(encryption.decrypt(res.data))
+            console.log("decrypt", decryptResp)
+           let family_members = decryptResp.data.policyHolder.request_data ? decryptResp.data.policyHolder.request_data.family_members:[]
             this.fetchPolicyRelations(family_members)
-           // console.log("SELF SELECTED==============>",self_selected)
             this.setState({
-                NomineeDetails: res.data.data.policyHolder.request_data.nominee[0],
-                is_appointee: res.data.data.policyHolder.request_data.nominee[0].is_appointee
+                NomineeDetails: decryptResp.data.policyHolder.request_data.nominee[0],
+                is_appointee: decryptResp.data.policyHolder.request_data.nominee[0].is_appointee
             }) 
             this.props.loadingStop();
           })
