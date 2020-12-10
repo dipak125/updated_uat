@@ -31,8 +31,9 @@ const ageObj = new PersonAge();
 const minDate = moment(moment().subtract(20, 'years').calendar()).add(1, 'day').calendar();
 const maxDate = moment(moment().subtract(1, 'years').calendar()).add(0, 'day').calendar();
 const maxDatePYP = moment(moment().subtract(1, 'years').calendar()).add(30, 'day').calendar();
-const startRegnDate = moment().subtract(20, 'years').calendar();
-const minRegnDate = moment(startRegnDate).startOf('year').format('YYYY-MM-DD hh:mm');
+// const startRegnDate = moment().subtract(20, 'years').calendar();
+// const minRegnDate = moment(startRegnDate).startOf('year').format('YYYY-MM-DD hh:mm');
+const minRegnDate = moment().subtract(20, 'years').calendar();
 // const minRegnDateNew = moment(moment().subtract(1, 'months').calendar()).add(1, 'day').calendar();
 const minRegnDateNew = moment().subtract(1, 'months').calendar();
 const maxDateForValidtion = moment(moment().subtract(1, 'years').calendar()).add(31, 'day').calendar();
@@ -329,7 +330,7 @@ const vehicleRegistrationValidation = Yup.object().shape({
             return "Since you do not have valid previous policy, issuance of a package policy will be subjet to successful inspection of your vehicle. Our Customer care executive will call you to assit on same, shortly"
         },
         function (value) {
-            if (value == '0' ) {   
+            if (value == '0' && this.parent.policy_type_id != '1') {   
                 return false;    
             }
             return true;
@@ -475,7 +476,6 @@ class VehicleDetailsMISCD extends Component {
     }  
     // const regex = new RegExp('^' + escapedValue, 'i');
     const regex = new RegExp( escapedValue, 'i');
-    console.log('newValue', regex)
     if(this.state.customerDetails && escapedValue.length >1) {
       return this.state.customerDetails.filter(language => regex.test(language.RTO_LOCATION));
     }
@@ -512,7 +512,6 @@ class VehicleDetailsMISCD extends Component {
   //--------------------------------------------------------
 
     handleSubmit = (values, actions) => {
-        console.log('handleSubmit')
         const {productId} = this.props.match.params 
         const {motorInsurance, changeFlag} = this.state
         let policy_type = ageObj.whatIsCurrentMonth(values.registration_date) < 7 ? 6 : 1
@@ -666,7 +665,7 @@ class VehicleDetailsMISCD extends Component {
                  console.log("decrypt", decryptResp)
                  let motorInsurance = decryptResp.data.policyHolder ? decryptResp.data.policyHolder.motorinsurance : {};
                  motorInsurance.valid_previous_policy = motorInsurance.policytype_id && motorInsurance.policytype_id == '1' ? '0' : motorInsurance.valid_previous_policy;
-                 let previousPolicy = decryptResp.data.policyHolder ? decryptResp.data.policyHolder.previouspolicy : {};
+                 let previousPolicy = decryptResp.data.policyHolder && decryptResp.data.policyHolder.previouspolicy ? decryptResp.data.policyHolder.previouspolicy : {};
                  let vehicleDetails = decryptResp.data.policyHolder ? decryptResp.data.policyHolder.vehiclebrandmodel : {};
                  let no_of_claim = previousPolicy && previousPolicy.previouspoliciesclaims ? previousPolicy.previouspoliciesclaims.length : ""
                  let RTO_location = motorInsurance && motorInsurance.rtolocation && motorInsurance.rtolocation.RTO_LOCATION ? motorInsurance.rtolocation.RTO_LOCATION : ""
@@ -693,8 +692,6 @@ class VehicleDetailsMISCD extends Component {
                 let averagemonthlyusages =  decryptResp.data ? decryptResp.data.averagemonthlyusages : []
                 let goodscarriedtypes =  decryptResp.data ? decryptResp.data.goodscarriedtypes : []
                 let permittypes =  decryptResp.data ? decryptResp.data.permittypes : []
-
-                console.log("decrypt--fetchSubVehicle------ ", averagemonthlyusages)
 
                 this.setState({ 
                     averagemonthlyusages, goodscarriedtypes, permittypes
@@ -745,7 +742,6 @@ class VehicleDetailsMISCD extends Component {
     initClaimDetailsList = () => {
         const {previousPolicy} = this.state
         let previous_claims = previousPolicy && previousPolicy.previouspoliciesclaims ? previousPolicy.previouspoliciesclaims : []
-        console.log("previous_claims---------------- ", previous_claims)
         let innicialClaimList = []
             for (var i = 0; i < this.state.no_of_claim ; i++) {
                 innicialClaimList.push(
@@ -853,11 +849,13 @@ class VehicleDetailsMISCD extends Component {
         const {insurerList, showClaim, previous_is_claim, motorInsurance, previousPolicy,CustomerID,suggestions,
               vehicleDetails, RTO_location, averagemonthlyusages,goodscarriedtypes,permittypes, location_reset_flag} = this.state
               
+        var defaultDate = new Date()
         var date = previousPolicy && previousPolicy.start_date ? new Date(previousPolicy.start_date) : ""
-        var day = previousPolicy && previousPolicy.start_date ? date.getDate() : ""
-        var month = previousPolicy && previousPolicy.start_date ? date.getMonth() : ""
-        var year = new Date()
-        year =   year.getFullYear()
+
+        var day = previousPolicy && previousPolicy.start_date ? date.getDate() : defaultDate.getDate()
+        var month = previousPolicy && previousPolicy.start_date ? date.getMonth() : defaultDate.getMonth()      
+        var year =  previousPolicy && previousPolicy.start_date ? date.getFullYear() : defaultDate.getFullYear()-1
+
         var pypDateToOpen = new Date(year,month,day)
 
         let newInitialValues = Object.assign(initialValue, {
@@ -912,7 +910,7 @@ class VehicleDetailsMISCD extends Component {
                             onSubmit={this.handleSubmit} 
                             validationSchema={vehicleRegistrationValidation}>
                             {({ values, errors, setFieldValue, setFieldTouched, isValid, isSubmitting, touched }) => {
-console.log("values-------------------------- ", values)
+console.log("errors-------------------------- ", errors)
                                 return (
                                     <Form enableReinitialize = {true}>
                                         <Row>

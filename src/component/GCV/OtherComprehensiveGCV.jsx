@@ -294,7 +294,21 @@ const ComprehensiveValidation = Yup.object().shape({
             })
             .max(17, function() {
                 return "Registration no. should be maximum 17 characters"
-            }),
+            })
+            .test(
+                "last4digitcheck",
+                function() {
+                    return "Invalid Registration number"
+                },
+                function (value) {
+                    let regnoLength = value.length
+                    let subString = value.substring(regnoLength-4, regnoLength)
+                    if (subString <= 0) {
+                        return subString > 0;
+                    }
+                    return true;
+                }
+            ),
 
             chassisNo : Yup.string().required('Chassis no is required')
             .matches(/^[a-zA-Z0-9]*$/, function() {
