@@ -19,7 +19,7 @@ class ThankYouCCM extends Component {
     accessToken: "",
     response_text: [],
     policyNo : "",
-    retry : 1,
+    retry : 2,
     policyHolder: [],
     retryCount: 0,
     policy_holder_id: localStorage.getItem("policyHolder_id"),
@@ -32,7 +32,7 @@ class ThankYouCCM extends Component {
   getAgentReceipt = () => {
     const formData = new FormData();
     formData.append('policy_ref_no', this.state.refNumber);
-    if(this.state.retryCount <= 3){
+    if(this.state.retryCount < 3){
       this.setState({
         retryCount: this.state.retryCount + 1
       });
@@ -51,7 +51,6 @@ class ThankYouCCM extends Component {
               this.issuePolicy()
             }    
             else {         
-    
               this.props.loadingStop()
               swal(res.data.msg)
             }   
@@ -65,18 +64,29 @@ class ThankYouCCM extends Component {
         }
         else {
           this.issuePolicy()
-        }
-    
+        }  
     }
     else {
       this.props.loadingStop();
-      swal("Maximum Retry attempt limit is crossed.")
+      swal({
+        title: "Alert",
+        text: "Maximum Retry attempt limit is crossed. Now refund process would be initiated",
+        icon: "warning",
+        // buttons: true,
+        dangerMode: true,
+      })
+      .then((willRefund) => {
+        if (willRefund) {
+        this.handleRefund()
+        }
+      })
     }
   }
 
   issuePolicy = () => {
     const formData = new FormData();
     formData.append('policy_ref_no', this.state.refNumber);
+    this.props.loadingStart();
     axios
       .post(`/sme/issue-policy`, formData)
       .then(res => {
@@ -84,20 +94,20 @@ class ThankYouCCM extends Component {
           this.setState({
             policyNo: res.data.data.PolicyNo, retry: 0
           });
+          this.props.loadingStop();   
         }
-        else {
-          this.setState({
-            retry: 1
-          });  
-          if(this.state.retryCount <= 1){
+        else { 
+          if(this.state.retryCount <= 1){   
             this.getAgentReceipt()
           }else {
+            this.setState({
+              retry: 1
+            }); 
+            this.props.loadingStop();   
             swal("Due to some reason, policy could not be created at this moment. Please retry in some time.")
           }
          
-        }
-        this.props.loadingStop();    
-        
+        }      
       })
       .catch(err => {
         this.setState({
@@ -513,8 +523,8 @@ downloadWording = () => {
                       {retry === 1 ?
                         <div className="d-flex justify-content-center align-items-center">
                           <button className="policy m-l-20" onClick={this.getAgentReceipt}>Retry Policy Creation</button>
-                          {this.state.retryCount > 3 ?
-                          <button className="policy m-l-20" onClick={this.handleRefund}>Refund</button> : null }
+                          {/* {this.state.retryCount > 3 ?
+                          <button className="policy m-l-20" onClick={this.handleRefund}>Refund</button> : null } */}
 
                         </div> : retry === 0 ?
                         <div className="d-flex justify-content-center align-items-center">
