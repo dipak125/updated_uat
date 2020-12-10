@@ -22,8 +22,8 @@ const vehicleRegistrationValidation = Yup.object().shape({
 
     check_registration: Yup.string().notRequired(),
 
-    // regNumber: Yup.string().matches(/^[A-Z]{2}[ -][0-9]{1,2}(?: [A-Z])?(?: [A-Z]*)? [0-9]{4}$/, 'Invalid Registration number').required('Please enter valid registration number')
-    regNumber: Yup.string().matches(/^[A-Z]{2}[ ][0-9]{1,2}(?: [A-Z])?(?: [A-Z]*)? [0-9]{4}$/, 'Invalid Registration number')
+    // regNumber: Yup.string().matches(/^[A-Z]{2}[ ][0-9]{1,2}(?: [A-Z])?(?: [A-Z]*)? [0-9]{4}$/, 'Invalid Registration number').required('Please enter valid registration number')
+    regNumber: Yup.string().matches(/^[A-Z]{2}[0-9]{1,2}(?:[A-Z])?(?:[A-Z]*)?[0-9]{4}$/, 'Invalid Registration number')
     .test(
         "registrationNumberCheck",
         function() {
@@ -39,18 +39,22 @@ const vehicleRegistrationValidation = Yup.object().shape({
             }
             return true;
         }
-    ).test(
+    )
+    .test(
         "last4digitcheck",
         function() {
             return "Invalid Registration number"
         },
         function (value) {
-            let regnoLength = value.length
-            let subString = value.substring(regnoLength-4, regnoLength)
-            if (subString <= 0) {
-                return subString > 0;
-            }
-            return true;
+            if(value && value != ""){
+                let regnoLength = value.length
+                    let subString = value.substring(regnoLength-4, regnoLength)
+                    if (subString <= 0) {
+                        return subString > 0;
+                    }
+                    return true;
+            }     
+            return true;          
         }
     ),
 
@@ -114,8 +118,18 @@ fetchData=()=>{
         .then(res=>{
             let decryptResp = JSON.parse(encryption.decrypt(res.data))
             console.log("decrypt", decryptResp)
+            if(decryptResp.data.policyHolder){
+                var obj = decryptResp.data.policyHolder
+                var i = 0
+                for (var x in obj){
+                    if (obj.hasOwnProperty(x)){
+                      i++
+                    }
+                  }
+            }
+            
 
-            let motorInsurance = decryptResp.data.policyHolder.motorinsurance           
+            let motorInsurance = i > 0 ? decryptResp.data.policyHolder.motorinsurance : []          
             this.setState({ 
                 motorInsurance
             })
@@ -320,29 +334,29 @@ handleChange = (values, setFieldTouched, setFieldValue) => {
 regnoFormat = (e, setFieldTouched, setFieldValue) => {
     
     let regno = e.target.value
-    let formatVal = ""
-    let regnoLength = regno.length
-    var letter = /^[a-zA-Z]+$/;
-    var number = /^[0-9]+$/;
-    let subString = regno.substring(regnoLength-1, regnoLength)
-    let preSubString = regno.substring(regnoLength-2, regnoLength-1)
+    // let formatVal = ""
+    // let regnoLength = regno.length
+    // var letter = /^[a-zA-Z]+$/;
+    // var number = /^[0-9]+$/;
+    // let subString = regno.substring(regnoLength-1, regnoLength)
+    // let preSubString = regno.substring(regnoLength-2, regnoLength-1)
 
-    if(subString.match(letter) && preSubString.match(letter)) {
-        formatVal = regno
-    }
-    else if(subString.match(number) && preSubString.match(number) && regnoLength == 6) {
-        formatVal = formatVal = regno.substring(0, regnoLength-1) + " " +subString
-    } 
-    else if(subString.match(number) && preSubString.match(letter)) {        
-        formatVal = regno.substring(0, regnoLength-1) + " " +subString      
-    } 
-    else if(subString.match(letter) && preSubString.match(number)) {
-        formatVal = regno.substring(0, regnoLength-1) + " " +subString   
-    } 
+    // if(subString.match(letter) && preSubString.match(letter)) {
+    //     formatVal = regno
+    // }
+    // else if(subString.match(number) && preSubString.match(number) && regnoLength == 6) {
+    //     formatVal = formatVal = regno.substring(0, regnoLength-1) + " " +subString
+    // } 
+    // else if(subString.match(number) && preSubString.match(letter)) {        
+    //     formatVal = regno.substring(0, regnoLength-1) + " " +subString      
+    // } 
+    // else if(subString.match(letter) && preSubString.match(number)) {
+    //     formatVal = regno.substring(0, regnoLength-1) + " " +subString   
+    // } 
 
-    else formatVal = regno.toUpperCase()
+    // else formatVal = regno.toUpperCase()
     
-    e.target.value = formatVal.toUpperCase()
+    e.target.value = regno.toUpperCase()
 
 }
 
@@ -354,11 +368,11 @@ regnoFormat = (e, setFieldTouched, setFieldValue) => {
             policy_type: motorInsurance && motorInsurance.policytype_id ? motorInsurance.policytype_id : "",
             policy_for: motorInsurance && motorInsurance.policy_for ? motorInsurance.policy_for : "",
             subclass_id : motorInsurance && motorInsurance.subclass_id ? motorInsurance.subclass_id : "",
-            check_registration : sessionStorage.getItem("check_registration")
+            check_registration : sessionStorage.getItem("check_registration") ? sessionStorage.getItem("check_registration") : "2"
             // check_registration : this.props.data && this.props.data.check_registration ? this.props.data.check_registration : ""
         })
 
-        // console.log("this.props.data.check_registration--- ", this.props.data && this.props.data.check_registration ? this.props.data.check_registration : "")
+        console.log("newInitialValues-------------------- ", newInitialValues)
 
         return (
             <>

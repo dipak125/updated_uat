@@ -28,7 +28,7 @@ const ComprehensiveValidation = Yup.object().shape({
     registration_no: Yup.string().when("newRegistrationNo", {
         is: "NEW",       
         then: Yup.string(),
-        otherwise: Yup.string().required('Please provide registration number').matches(/^[A-Z]{2}[ ][0-9]{1,2}(?: [A-Z])?(?: [A-Z]*)? [0-9]{4}$/, 'Invalid Registration number')
+        otherwise: Yup.string().required('Please provide registration number').matches(/^[A-Z]{2}[0-9]{1,2}(?:[A-Z])?(?:[A-Z]*)?[0-9]{4}$/, 'Invalid Registration number')
             .test(
                 "last4digitcheck",
                 function() {
@@ -287,7 +287,7 @@ const ComprehensiveValidation = Yup.object().shape({
             // .matches(/^[a-zA-Z0-9]*$/, function() {
             //     return "Invalid Registration No"
             // })
-            .matches(/^[A-Z]{2}[ ][0-9]{1,2}(?: [A-Z])?(?: [A-Z]*)? [0-9]{4}$/, 'Invalid Registration number')
+            .matches(/^[A-Z]{2}[0-9]{1,2}(?:[A-Z])?(?:[A-Z]*)?[0-9]{4}$/, 'Invalid Registration number')
             .min(5, function() {
                 return "Registration no. should be minimum 5 characters"
             })
@@ -857,6 +857,8 @@ class OtherComprehensiveMISCD extends Component {
 
         const formData = new FormData();
         let encryption = new Encryption();
+        let total_idv = 0
+        let other_idv = 0
         let post_data = {}
         if(add_more_coverage.length > 0){
             post_data = {
@@ -880,6 +882,13 @@ class OtherComprehensiveMISCD extends Component {
                 'trailer_array' : values.trailer_array,
                 'page_name': `OtherComprehensive_MISCD/${productId}`,
             }
+            if(values.B00004_value){
+                other_idv = other_idv + parseInt(values.B00004_value)
+            }
+            if(values.B00003_value){
+                other_idv = other_idv + parseInt(values.B00003_value)
+            }
+            total_idv=parseInt(post_data.idv_value)+parseInt(post_data.body_idv_value)+other_idv
         }
         else {
             post_data = {
@@ -898,10 +907,12 @@ class OtherComprehensiveMISCD extends Component {
                 'fuel_type' : values.fuel_type,
                 'page_name': `OtherComprehensive_MISCD/${productId}`,
             }
+            total_idv=parseInt(post_data.idv_value)+parseInt(post_data.body_idv_value)
         }
         console.log('post_data',post_data)
-        if(post_data.idv_value > 5000000 && csc_user_type == "POSP" ) {
-            swal("Quote cannot proceed with IDV greater than 5000000")
+        
+        if((total_idv > 5000000) && csc_user_type == "POSP" ) {
+            swal("Quote cannot proceed with total IDV (including IDV, Body IDV, Electrical and Non-Electrical IDV) greater than 5000000")
             this.props.loadingStop();
             return false
         }
@@ -1089,29 +1100,29 @@ class OtherComprehensiveMISCD extends Component {
     regnoFormat = (e, setFieldTouched, setFieldValue) => {
     
         let regno = e.target.value
-        let formatVal = ""
-        let regnoLength = regno.length
-        var letter = /^[a-zA-Z]+$/;
-        var number = /^[0-9]+$/;
-        let subString = regno.substring(regnoLength-1, regnoLength)
-        let preSubString = regno.substring(regnoLength-2, regnoLength-1)
+        // let formatVal = ""
+        // let regnoLength = regno.length
+        // var letter = /^[a-zA-Z]+$/;
+        // var number = /^[0-9]+$/;
+        // let subString = regno.substring(regnoLength-1, regnoLength)
+        // let preSubString = regno.substring(regnoLength-2, regnoLength-1)
     
-        if(subString.match(letter) && preSubString.match(letter)) {
-            formatVal = regno
-        }
-        else if(subString.match(number) && preSubString.match(number) && regnoLength == 6) {
-            formatVal = formatVal = regno.substring(0, regnoLength-1) + " " +subString
-        } 
-        else if(subString.match(number) && preSubString.match(letter)) {        
-            formatVal = regno.substring(0, regnoLength-1) + " " +subString      
-        } 
-        else if(subString.match(letter) && preSubString.match(number)) {
-            formatVal = regno.substring(0, regnoLength-1) + " " +subString   
-        } 
+        // if(subString.match(letter) && preSubString.match(letter)) {
+        //     formatVal = regno
+        // }
+        // else if(subString.match(number) && preSubString.match(number) && regnoLength == 6) {
+        //     formatVal = formatVal = regno.substring(0, regnoLength-1) + " " +subString
+        // } 
+        // else if(subString.match(number) && preSubString.match(letter)) {        
+        //     formatVal = regno.substring(0, regnoLength-1) + " " +subString      
+        // } 
+        // else if(subString.match(letter) && preSubString.match(number)) {
+        //     formatVal = regno.substring(0, regnoLength-1) + " " +subString   
+        // } 
     
-        else formatVal = regno.toUpperCase()
+        // else formatVal = regno.toUpperCase()
         
-        e.target.value = formatVal.toUpperCase()
+        e.target.value = regno.toUpperCase()
     
     }
 
@@ -1231,7 +1242,7 @@ class OtherComprehensiveMISCD extends Component {
         }
         
         let minBodyIDV = 0
-        let maxBodyIDV = PolicyArray.length > 0 ? Math.round(PolicyArray[0].PolicyRiskList[0].IDV_Suggested/5) : 0
+        let maxBodyIDV = PolicyArray.length > 0 ? Math.round(PolicyArray[0].PolicyRiskList[0].IDV_Suggested/2) : 0
         let defaultBodySliderValue =  motorInsurance && motorInsurance.body_idv_value ? Math.round(motorInsurance.body_idv_value) : 0
         let bodySliderValue = bodySliderVal
 

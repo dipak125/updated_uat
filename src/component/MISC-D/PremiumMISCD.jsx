@@ -151,28 +151,28 @@ class PremiumMISCD extends Component {
             })
     }
 
-    callBreakin=()=>{
+    // callBreakin=()=>{
 
-        const formData = new FormData();
-        let encryption = new Encryption();
-        let policyHolder_id = this.state.policyHolder_refNo ? this.state.policyHolder_refNo : '0'
-        let bc_data = sessionStorage.getItem('bcLoginData') ? sessionStorage.getItem('bcLoginData') : "";
-        if(bc_data) {
-            bc_data = JSON.parse(encryption.decrypt(bc_data));
-        }
-        formData.append('bcmaster_id', sessionStorage.getItem('csc_id') ? "5" : bc_data ? bc_data.agent_id : "" ) 
-        formData.append('ref_no', policyHolder_id) 
+    //     const formData = new FormData();
+    //     let encryption = new Encryption();
+    //     let policyHolder_id = this.state.policyHolder_refNo ? this.state.policyHolder_refNo : '0'
+    //     let bc_data = sessionStorage.getItem('bcLoginData') ? sessionStorage.getItem('bcLoginData') : "";
+    //     if(bc_data) {
+    //         bc_data = JSON.parse(encryption.decrypt(bc_data));
+    //     }
+    //     formData.append('bcmaster_id', sessionStorage.getItem('csc_id') ? "5" : bc_data ? bc_data.agent_id : "" ) 
+    //     formData.append('ref_no', policyHolder_id) 
 
-        this.props.loadingStart();
-        axios.post('breakin/create',formData)
-        .then(res=>{
-            swal(`Your breakin request has been raised. Your inspection Number: ${res.data.data.inspection_no}`)
-            this.props.loadingStop();
-        }).
-        catch(err=>{
-            this.props.loadingStop();
-        })  
-    }
+    //     this.props.loadingStart();
+    //     axios.post('breakin/create',formData)
+    //     .then(res=>{
+    //         swal(`Your breakin request has been raised. Your inspection Number: ${res.data.data.inspection_no}`)
+    //         this.props.loadingStop();
+    //     }).
+    //     catch(err=>{
+    //         this.props.loadingStop();
+    //     })  
+    // }
 
     getAccessToken = (motorInsurance) => {
         axios
@@ -234,27 +234,27 @@ class PremiumMISCD extends Component {
                 }
                 this.props.loadingStop();
 
-                if(previousPolicy && policyHolder.break_in_status != "Vehicle Recommended and Reports Uploaded") {
-                    dateDiff = Math.floor(moment().diff(previousPolicy.end_date, 'days', true));
-                    if(dateDiff > 0 || previousPolicy.name == "2") {
-                        this.setState({breakin_flag: 1})
-                        swal({
-                            title: "Breakin",
-                            text: `Your Quotation number is ${request_data.quote_id}. Your vehicle needs inspection. Do you want to raise inspection.`,
-                            icon: "warning",
-                            buttons: true,
-                            dangerMode: true,
-                        })
-                        .then((willCreate) => {
-                            if (willCreate) {
-                                this.callBreakin()
-                            }
-                            else {
-                                this.props.loadingStop();
-                            }
-                        })                     
-                    }     
-                }
+                // if(previousPolicy && policyHolder.break_in_status != "Vehicle Recommended and Reports Uploaded") {
+                //     dateDiff = Math.floor(moment().diff(previousPolicy.end_date, 'days', true));
+                //     if(dateDiff > 0 || previousPolicy.name == "2") {
+                //         this.setState({breakin_flag: 1})
+                //         swal({
+                //             title: "Breakin",
+                //             text: `Your Quotation number is ${request_data.quote_id}. Your vehicle needs inspection. Do you want to raise inspection.`,
+                //             icon: "warning",
+                //             buttons: true,
+                //             dangerMode: true,
+                //         })
+                //         .then((willCreate) => {
+                //             if (willCreate) {
+                //                 this.callBreakin()
+                //             }
+                //             else {
+                //                 this.props.loadingStop();
+                //             }
+                //         })                     
+                //     }     
+                // }
             })
             .catch(err => {
                 this.setState({
@@ -381,20 +381,20 @@ class PremiumMISCD extends Component {
 
                                                                             <Col sm={12} md={3}>
                                                                                 <div className="premamount">
-                                                                                    ₹ {fulQuoteResp.DuePremium}
+                                                                                    ₹ {fulQuoteResp.DuePremium ? fulQuoteResp.DuePremium : 0}
                                                                                 </div>
                                                                             </Col>
 
                                                                             <Col sm={12} md={3}>
                                                                                 <div className="motopremium">
                                                                                     Gross Premium:
-                                                                    </div>
+                                                                                </div>
                                                                             </Col>
 
 
                                                                             <Col sm={12} md={3}>
                                                                                 <div className="premamount">
-                                                                                    ₹ {Math.round(fulQuoteResp.BeforeVatPremium)}
+                                                                                    ₹ {fulQuoteResp.BeforeVatPremium ? Math.round(fulQuoteResp.BeforeVatPremium) : 0}
                                                                                 </div>
                                                                             </Col>
 
@@ -407,7 +407,7 @@ class PremiumMISCD extends Component {
 
                                                                             <Col sm={12} md={3}>
                                                                                 <div className="premamount">
-                                                                                    ₹ {Math.round(fulQuoteResp.TGST)}
+                                                                                    ₹ {fulQuoteResp.TGST ? Math.round(fulQuoteResp.TGST) : 0}
                                                                                 </div>
                                                                             </Col>
                                                                         </Row>
@@ -779,6 +779,7 @@ class PremiumMISCD extends Component {
                                     show={show}
                                     onHide={this.handleClose}>
                                     <div className="otpmodal">
+                                    <Modal.Header closeButton />
                                         <Modal.Body>
                                             <Otp
                                                 quoteNo={fulQuoteResp.QuotationNo}

@@ -56,7 +56,8 @@ class Products extends Component {
                                                     <div className="d-flex justify-content-left messageDeskTab">
                                                     <div><Nav.Item><Nav.Link eventKey="first">Motor</Nav.Link></Nav.Item></div>
                                                     <div><Nav.Item><Nav.Link eventKey="second">Health</Nav.Link></Nav.Item></div>         
-                                                    <div><Nav.Item><Nav.Link eventKey="third">Fire Insurance</Nav.Link></Nav.Item></div>                       
+                                                    <div><Nav.Item><Nav.Link eventKey="third">Fire Insurance</Nav.Link></Nav.Item></div>         
+                                                    <div><Nav.Item><Nav.Link eventKey="fourth">Personal Accident</Nav.Link></Nav.Item></div>                       
                                                     </div>
                                                 </Nav>
                                             </Col>
@@ -74,6 +75,10 @@ class Products extends Component {
                                                             <Others tabId='3'/>
                                                             <Footer />
                                                     </Tab.Pane>
+                                                    <Tab.Pane eventKey="fourth">
+                                                            <Others tabId='4'/>
+                                                            <Footer />
+                                                    </Tab.Pane>
                                                     
                                                 </Tab.Content>
                                             </Col>
@@ -88,6 +93,7 @@ class Products extends Component {
                                                         <div><Nav.Item><Nav.Link eventKey="first">Motor</Nav.Link></Nav.Item></div>
                                                         <div><Nav.Item><Nav.Link eventKey="second">Health</Nav.Link></Nav.Item></div>
                                                         <div><Nav.Item><Nav.Link eventKey="third">Fire Insurance</Nav.Link></Nav.Item></div>
+                                                        <div><Nav.Item><Nav.Link eventKey="fourth">Personal Accident</Nav.Link></Nav.Item></div>
                                                         
                                                         </div>
                                                     </Nav>
@@ -106,6 +112,10 @@ class Products extends Component {
                                                             <Others tabId='3'/>
                                                             <Footer />
                                                         </Tab.Pane>
+                                                        <Tab.Pane eventKey="fourth">
+                                                            <Others tabId='4'/>
+                                                            <Footer />
+                                                        </Tab.Pane>
                                                         
                                                     </Tab.Content>
                                                 </Col>
@@ -118,6 +128,7 @@ class Products extends Component {
                                                         <div><Nav.Item><Nav.Link eventKey="first">Motor</Nav.Link></Nav.Item></div>
                                                         <div><Nav.Item><Nav.Link eventKey="second">Health</Nav.Link></Nav.Item></div>
                                                         <div><Nav.Item><Nav.Link eventKey="third">Fire Insurance</Nav.Link></Nav.Item></div>
+                                                        <div><Nav.Item><Nav.Link eventKey="fourth">Personal Accident</Nav.Link></Nav.Item></div>
                         
                                                         </div>
                                                     </Nav>
@@ -134,6 +145,10 @@ class Products extends Component {
                                                         </Tab.Pane>
                                                         <Tab.Pane eventKey="third">
                                                             <Others tabId='3'/>
+                                                            <Footer />
+                                                        </Tab.Pane>
+                                                        <Tab.Pane eventKey="fourth">
+                                                            <Others tabId='4'/>
                                                             <Footer />
                                                         </Tab.Pane>
                                                         

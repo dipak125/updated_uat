@@ -208,13 +208,13 @@ class arogya_SelectDuration extends Component {
                     tenureSliderVal: decryptResp.data.policyHolder && decryptResp.data.policyHolder.request_data ? decryptResp.data.policyHolder.request_data.tenure_year : 0
                 })
                 var values = []
-                let policyDetails = policyHolderDetails && policyHolderDetails.request_data ? policyHolderDetails.request_data : []
-                values['polStartDate'] = policyDetails ? moment(policyDetails.start_date).format("YYYY-MM-DD") : new Date()
-                values['polEndDate'] = policyDetails ? moment(policyDetails.end_date).format("YYYY-MM-DD") : new Date(moment(values['polStartDate']).add(1, 'years').format("YYYY-MM-DD"))
-                values['slider_sum_insured'] = policyDetails ? parseInt(policyDetails.sum_insured) : defaultSliderVal
-                values['slider_deductible'] = policyDetails ? parseInt(policyDetails.deductible) : defaultdeductibleSliderValue
-                values['slider_tenure'] = policyDetails ? parseInt(policyDetails.tenure_year) : defaulttenureSliderValue
-                console.log("policyHolderDetails-----", this.policyHolderDetails)
+                let policyDetails = policyHolderDetails && policyHolderDetails.request_data ? policyHolderDetails.request_data : [] 
+
+                values['polStartDate'] = policyDetails && policyDetails.start_date ? moment(policyDetails.start_date).format("YYYY-MM-DD") : new Date()
+                values['polEndDate'] = policyDetails && policyDetails.end_date ? moment(policyDetails.end_date).format("YYYY-MM-DD") : new Date(moment(values['polStartDate']).add(1, 'years').format("YYYY-MM-DD"))
+                values['slider_sum_insured'] = policyDetails && policyDetails.sum_insured ? parseInt(policyDetails.sum_insured) : defaultSliderVal
+                values['slider_deductible'] = policyDetails && policyDetails.deductible ? parseInt(policyDetails.deductible) : defaultdeductibleSliderValue
+                values['slider_tenure'] = policyDetails && policyDetails.tenure_year ? parseInt(policyDetails.tenure_year) : defaulttenureSliderValue
 
                 this.quote(values)
             })
@@ -249,7 +249,6 @@ class arogya_SelectDuration extends Component {
     }
 
     quote = (values) => {
-
         let polStartDate = moment(values.polStartDate).format("YYYY-MM-DD");
         let polEndDate = moment(values.polEndDate).format("YYYY-MM-DD");
         let SumInsuredsliderVal = values.slider_sum_insured ? values.slider_sum_insured : 0

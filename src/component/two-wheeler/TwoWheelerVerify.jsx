@@ -52,7 +52,24 @@ const ComprehensiveValidation = Yup.object().shape({
     registration_no: Yup.string().when("newRegistrationNo", {
         is: "NEW",       
         then: Yup.string(),
-        otherwise: Yup.string().required('Please provide registration number').matches(/^[A-Z]{2}(?: [A-Z])?(?: [0-9]{1,2})?(?: [A-Z])?(?: [A-Z]*)? [0-9]{4}$/, 'Invalid Registration number')
+        otherwise: Yup.string().required('Please provide registration number').matches(/^[A-Z]{2}[0-9]{1,2}(?:[A-Z])?(?:[A-Z]*)?[0-9]{4}$/, 'Invalid Registration number')
+        .test(
+            "last4digitcheck",
+            function() {
+                return "Invalid Registration number"
+            },
+            function (value) {
+                if(value && value != ""){
+                    let regnoLength = value.length
+                        let subString = value.substring(regnoLength-4, regnoLength)
+                        if (subString <= 0) {
+                            return subString > 0;
+                        }
+                        return true;
+                }     
+                return true;          
+            }
+        )
     }),
 
     puc: Yup.string().required("Please verify pollution certificate to proceed"),
@@ -549,35 +566,35 @@ class TwoWheelerVerify extends Component {
     regnoFormat = (e, setFieldTouched, setFieldValue) => {
         
         let regno = e.target.value
-        let formatVal = ""
-        let regnoLength = regno.length
-        var letter = /^[a-zA-Z]+$/;
-        var number = /^[0-9]+$/;
-        let subString = regno.substring(regnoLength-1, regnoLength)
-        let preSubString = regno.substring(regnoLength-2, regnoLength-1)
+        // let formatVal = ""
+        // let regnoLength = regno.length
+        // var letter = /^[a-zA-Z]+$/;
+        // var number = /^[0-9]+$/;
+        // let subString = regno.substring(regnoLength-1, regnoLength)
+        // let preSubString = regno.substring(regnoLength-2, regnoLength-1)
     
-        if(subString.match(letter) && preSubString.match(letter) && regnoLength == 3) {        
-            formatVal = formatVal = regno.substring(0, regnoLength-1) + " " +subString
-        }
-        else if(subString.match(letter) && preSubString.match(letter)) {
-            formatVal = regno
-        }
-        else if(subString.match(number) && preSubString.match(number) && regnoLength == 6) {
-            formatVal = formatVal = regno.substring(0, regnoLength-1) + " " +subString
-        } 
-        else if(subString.match(number) && preSubString.match(number) && regnoLength == 11 && regno.substring(3, 4).match(letter) && regno.substring(5, 7).match(number) ) {
-            formatVal = formatVal = regno.substring(0, 7) + " " +regno.substring(7, 11)
-        } 
-        else if(subString.match(number) && preSubString.match(letter)) {        
-            formatVal = regno.substring(0, regnoLength-1) + " " +subString      
-        } 
-        else if(subString.match(letter) && preSubString.match(number)) {
-            formatVal = regno.substring(0, regnoLength-1) + " " +subString   
-        } 
+        // if(subString.match(letter) && preSubString.match(letter) && regnoLength == 3) {        
+        //     formatVal = formatVal = regno.substring(0, regnoLength-1) + " " +subString
+        // }
+        // else if(subString.match(letter) && preSubString.match(letter)) {
+        //     formatVal = regno
+        // }
+        // else if(subString.match(number) && preSubString.match(number) && regnoLength == 6) {
+        //     formatVal = formatVal = regno.substring(0, regnoLength-1) + " " +subString
+        // } 
+        // else if(subString.match(number) && preSubString.match(number) && regnoLength == 11 && regno.substring(3, 4).match(letter) && regno.substring(5, 7).match(number) ) {
+        //     formatVal = formatVal = regno.substring(0, 7) + " " +regno.substring(7, 11)
+        // } 
+        // else if(subString.match(number) && preSubString.match(letter)) {        
+        //     formatVal = regno.substring(0, regnoLength-1) + " " +subString      
+        // } 
+        // else if(subString.match(letter) && preSubString.match(number)) {
+        //     formatVal = regno.substring(0, regnoLength-1) + " " +subString   
+        // } 
         
-        else formatVal = regno.toUpperCase()
+        // else formatVal = regno.toUpperCase()
         
-        e.target.value = formatVal.toUpperCase()
+        e.target.value = regno.toUpperCase()
 
     }
 
@@ -621,17 +638,11 @@ class TwoWheelerVerify extends Component {
             var month = motorInsurance && motorInsurance.registration_date ? date.getMonth() : ""
              year =   year.getFullYear() - 1
             minDate = new Date(year,month,day)
-            // var minD = minDate
-            // console.log("minD");
             maxDate = moment().subtract(1, 'years').calendar()
-            // var maxD = maxDate
-            // console.log("minD");
 
             var difference =  moment(maxDate).diff(motorInsurance.registration_date, 'days', true)
             var difference_1 =  moment(maxDate).diff(minDate, 'days', true)
-            console.log("maxDate--->", maxDate)
-            console.log("minDate--->", minDate)
-            console.log("difference_1---", difference_1)
+
             if(difference >= 1 || difference < 0 ) {
                 // minDate = moment(moment().subtract(1, 'years').calendar()).add(1, 'day').calendar()
                 // if(difference > difference_1 && difference < 89){
@@ -640,9 +651,7 @@ class TwoWheelerVerify extends Component {
             // }
 
             }
-            console.log("maxDate--->", maxDate)
-            console.log("minDate--->", minDate)
-            console.log("difference---", difference)
+
         }
         else {
             minDate = moment(moment().subtract(1, 'years').calendar()).add(1, 'day').calendar();

@@ -185,9 +185,9 @@ const vehicleRegistrationValidation = Yup.object().shape({
             return "Since previous policy is a liability policy, issuance of a package policy will be subjet to successful inspection of your vehicle. Our Customer care executive will call you to assit on same, shortly"
         },
         function (value) {
-            // if (value == '2' ) {   
-            //     return false;    
-            // }
+            if (value == '2' ) {   
+                return false;    
+            }
             return true;
         }
     ),
@@ -322,7 +322,19 @@ const vehicleRegistrationValidation = Yup.object().shape({
     valid_previous_policy: Yup.string()
     .required(function() {
         return "This field is required"
-    }),
+    })
+    .test(
+        "currentMonthChecking",
+        function() {
+            return "Since you do not have valid previous policy, issuance of a package policy will be subjet to successful inspection of your vehicle. Our Customer care executive will call you to assit on same, shortly"
+        },
+        function (value) {
+            if (value == '0' ) {   
+                return false;    
+            }
+            return true;
+        }
+    ),
 
 
     claim_array: Yup.array().of(
@@ -519,10 +531,10 @@ class VehicleDetailsMISCD extends Component {
             return false
         }
 
-        // if((values.valid_previous_policy == "0" || values.previous_policy_name == "2" || Math.floor(moment().diff(values.previous_end_date, 'days', true)) >0 ) && values.policy_type_id == "2") {
-        //     swal("Thank you for showing your interest for buying product.Due to some reasons, we are not able to issue the policy online.Please call 1800 22 1111")
-        //     return false
-        // }
+        if((values.valid_previous_policy == "0" || values.previous_policy_name == "2" || Math.floor(moment().diff(values.previous_end_date, 'days', true)) >0 ) && values.policy_type_id == "2") {
+            swal("Thank you for showing your interest for buying product.Due to some reasons, we are not able to issue the policy online.Please call 1800 22 1111")
+            return false
+        }
 
 
         const formData = new FormData(); 
@@ -840,6 +852,13 @@ class VehicleDetailsMISCD extends Component {
         const {productId} = this.props.match.params  
         const {insurerList, showClaim, previous_is_claim, motorInsurance, previousPolicy,CustomerID,suggestions,
               vehicleDetails, RTO_location, averagemonthlyusages,goodscarriedtypes,permittypes, location_reset_flag} = this.state
+              
+        var date = previousPolicy && previousPolicy.start_date ? new Date(previousPolicy.start_date) : ""
+        var day = previousPolicy && previousPolicy.start_date ? date.getDate() : ""
+        var month = previousPolicy && previousPolicy.start_date ? date.getMonth() : ""
+        var year = new Date()
+        year =   year.getFullYear()
+        var pypDateToOpen = new Date(year,month,day)
 
         let newInitialValues = Object.assign(initialValue, {
             registration_date: motorInsurance && motorInsurance.registration_date ? new Date(motorInsurance.registration_date) : "",
@@ -1142,6 +1161,7 @@ console.log("values-------------------------- ", values)
                                                                 maxDate={new Date(maxDatePYP)}
                                                                 dateFormat="dd MMM yyyy"
                                                                 placeholderText="Previous policy start date"
+                                                                openToDate={new Date(pypDateToOpen)}
                                                                 peekPreviousMonth
                                                                 autoComplete="off"
                                                                 peekPreviousYear

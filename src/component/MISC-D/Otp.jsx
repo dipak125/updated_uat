@@ -6,16 +6,25 @@ import { loaderStart, loaderStop } from "../../store/actions/loader";
 import { connect } from "react-redux";
 import axios from "../../shared/axios";
 import Encryption from '../../shared/payload-encryption';
+import * as Yup from "yup";
 
 // import OtpInput from 'react-otp-input';
 
 const initialValue = {
-    otp1: "",
-    otp2: "",
-    otp3: "",
-    otp4: "",
-    otp5: ""
+    otp: "",
+    appCodeRadio: "1"
 }
+const ComprehensiveValidation = Yup.object().shape({
+
+  appCodeRadio: Yup.number().required('Please select one option'),
+
+  otp: Yup.string().when(['appCodeRadio'], {
+    is: appCodeRadio => appCodeRadio == '1',
+    then: Yup.string().required('Please enter policy App Code'),
+    otherwise: Yup.string()
+  })
+
+})
 
 class Otp extends Component {
 
@@ -29,7 +38,7 @@ class Otp extends Component {
     checkOtp = (values, actions) => {
        this.props.loadingStart();
        const formData = new FormData();
-       let otp_enter = Number(values.otp1+values.otp2+values.otp3+values.otp4+values.otp5)
+       let otp_enter = Number(values.otp)
        let post_data_obj = {
          'policy_ref_no': this.props.refNumber,
          'app_code': otp_enter
@@ -51,11 +60,7 @@ class Otp extends Component {
             else {
                 actions.setSubmitting(false);
                 this.setState({ otp: "", errorMsg: decryptResp.msg });
-                actions.setFieldValue('otp1', "")
-                actions.setFieldValue('otp2', "")
-                actions.setFieldValue('otp3', "")
-                actions.setFieldValue('otp4', "")
-                actions.setFieldValue('otp5', "")
+                // actions.setFieldValue('otp', "")
             } 
             this.props.loadingStop();         
           })
@@ -67,41 +72,6 @@ class Otp extends Component {
           });
     };
 
-
-    toUnicode= (elmnt,content)=>
-    {
-      //elmnt.target.form.elements[2].focus();
-      //console.log(document.forms[0].elements.length);
-      if (elmnt.key === "Delete" || elmnt.key === "Backspace") {
- 
-       
-        //elmnt.target.form.elements[3].focus()
-        
-          const next=elmnt.target.tabIndex -2;
-          // console.log(elmnt.target.tabIndex);
-          
-          //elmnt.target.form.elements[elmnt.target.tabIndex]="";
-           if (next>-1){
-           
-            elmnt.target.form.elements[next].focus()
-         }
-
-    }
-      else {
-        if (content.length==elmnt.target.maxLength){
-         const next=elmnt.target.tabIndex;
-          if (next<5){
-            elmnt.target.form.elements[next].focus()
-        }
-      }
-    }
-  
-   
-    }
-    onKeyUp = (e) =>{
-     
- 
-    }
 
     changePlaceHoldClassAdd(e) {
         let element = e.target.parentElement;
@@ -145,10 +115,16 @@ class Otp extends Component {
           }, 1000) 
       }
 
+      changeError = () => { 
+        this.setState({
+          errorMsg: "",
+        });
+      }
+
 
     componentDidMount() {
         this.generateOtp();  
-        this.coundown();
+        // this.coundown();
         
       }
     
@@ -156,16 +132,12 @@ class Otp extends Component {
         const {otp, errorMsg, seconds} = this.state
 
         const newInitialValues = Object.assign(initialValue, {
-            otp1: errorMsg ? "" : "",
-            otp2: errorMsg ? "" : "",
-            otp3: errorMsg ? "" : "",
-            otp4: errorMsg ? "" : "",
-            otp5: errorMsg ? "" : "",
+            otp: errorMsg ? "" : "",
         })
         return (
            
                 <Formik initialValues={initialValue} onSubmit={this.checkOtp}
-                    // validationSchema={validateNominee}
+                    validationSchema={ComprehensiveValidation}
                     >
                     {({ values, errors, setFieldValue, setFieldTouched, isValid, isSubmitting, touched }) => {
 
@@ -178,115 +150,72 @@ class Otp extends Component {
                     return (
                     <Form>
                         <div className="text-center boxotpmodl">
-                            {/* <img src={require('../../assets/images/desk.svg')} alt="" className="m-b-25" /> */}
                             <div className="verfy">Digital consent form</div>
                             <div className="mobotp">An automated SMS & e-mail has been sent to customer with a Policy App code and Proposal link.</div>
                             <span className="errorMsg">{otp}</span>
 
                             <div className="d-flex justify-content-center otpInputWrap mx-auto m-b-25">
-                                <div className="mr-1 ml-1">
+                                <div className="p-r-25">
+                                    <label className="customRadio3">
+                                        <Field
+                                            type="radio"
+                                            name='appCodeRadio'
+                                            value='1'
+                                            key='1'
+                                            checked = {values.appCodeRadio == '1' ? true : false}
+                                            onChange = {() =>{
+                                                setFieldTouched('appCodeRadio')
+                                                setFieldValue('appCodeRadio', '1');
+                                            }  
+                                            }
+                                        />
+                                        <span className="checkmark " /><span className="fs-14"> Call customer and enter Policy App Code</span>
+                                    </label>
+                                    {errors.appCodeRadio && touched.appCodeRadio ? (
+                                        <span className="errorMsg">{errors.appCodeRadio}</span>
+                                    ) : null}
+                                </div>
+                              </div>
+                              {values.appCodeRadio == '1' ? 
+                              <div className="d-flex justify-content-center otpInputWrap mx-auto m-b-25">
+                                <div className="insurerName">
                                     <Field
-                                        name="otp1"
+                                        name="otp"
                                         type="text"
                                         autoComplete="off"
-                                        className="form-control placeHCenter"
-                                        value = {values.otp1}
+                                        className="premiumslid"
+                                        value = {values.otp}
                                         onFocus={e => this.changePlaceHoldClassAdd(e)}
                                         onBlur={e => this.changePlaceHoldClassRemove(e)}
-                                       
                                         onChange={(e) => {
-                                                setFieldValue('otp1', e.target.value);  
+                                          this.changeError()
+                                          setFieldValue('otp', e.target.value);  
                                         }}
-                                        onKeyPress={this.keyPressed}
-                                        tabindex="1" maxlength="1" onKeyUp={e=>this.toUnicode(e,e.target.value)}
-                                        
+                                        tabindex="1" 
+                                        maxlength="6"       
                                     />
+                                    {errors.otp && touched.otp ? (
+                                        <span className="errorMsg">{errors.otp}</span>
+                                    ) : null}
+                                    {errorMsg ? 
+                                    <span className="errorMsg">{errorMsg}</span> : null }
                                 </div>
-                                <div className="mr-1 ml-1">
-                                    <Field
-                                        name="otp2"
-                                        type="text"
-                                        autoComplete="off"
-                                        className="form-control placeHCenter"
-                                        value = {values.otp2}
-                                        onFocus={e => this.changePlaceHoldClassAdd(e)}
-                                        onBlur={e => this.changePlaceHoldClassRemove(e)}
-                                      
-                                        onChange={(e) => {
-                                            setFieldValue('otp2', e.target.value);  
-                                    }}
-                                    tabindex="2" maxlength="1" onKeyUp={e=>this.toUnicode(e,e.target.value)}
-                                    
-                                    />
-                                </div>
-                                <div className="mr-1 ml-1">
-                                    <Field
-                                        name="otp3"
-                                        type="text"
-                                        autoComplete="off"
-                                        className="form-control placeHCenter"
-                                        value = {values.otp3}
-                                        onFocus={e => this.changePlaceHoldClassAdd(e)}
-                                        onBlur={e => this.changePlaceHoldClassRemove(e)}
-                                       
-                                        onChange={(e) => {
-                                            setFieldValue('otp3', e.target.value); 
-                                             
-                                    }}
-                                    tabindex="3" maxlength="1" onKeyUp={e=>this.toUnicode(e,e.target.value)}
-                                    
-                                    />
-                                </div>
-                                <div className="mr-1 ml-1">
-                                    <Field
-                                        name="otp4"
-                                        type="text"
-                                        autoComplete="off"
-                                        className="form-control placeHCenter"
-                                        value = {values.otp4}
-                                        onFocus={e => this.changePlaceHoldClassAdd(e)}
-                                        onBlur={e => this.changePlaceHoldClassRemove(e)}
-                                       
-                                        onChange={(e) => {
-                                            setFieldValue('otp4', e.target.value);  
-                                    }}
-                                    tabindex="4" maxlength="1" onKeyUp={e=>this.toUnicode(e,e.target.value)}
-                                    
-                                    />
-                                </div>
-                                <div className="mr-1 ml-1">
-                                    <Field
-                                        name="otp5"
-                                        type="text"
-                                        autoComplete="off"
-                                        className="form-control placeHCenter"
-                                        value = {values.otp5}
-                                        onFocus={e => this.changePlaceHoldClassAdd(e)}
-                                        onBlur={e => this.changePlaceHoldClassRemove(e)}
-                                       
-                                        onChange={(e) => {
-                                            setFieldValue('otp5', e.target.value);  
-                                    }}
-                                    tabindex="5" maxlength="1" onKeyUp={e=>this.toUnicode(e,e.target.value)}
-                                    
-                                    />
-                                </div>
-                            </div>
-                            <div className="m-b-25">
-                            {/* <div className="sndSms">Resend Policy App code via SMS & e-mail</div> */}
-                            <div>You can resend Policy App code in {seconds >= 0 ? seconds : 0} seconds</div>
+                            </div> : null }
+
+                            {/* <div className="m-b-25">
+                             <div>You can resend Policy App code in {seconds >= 0 ? seconds : 0} seconds</div> 
                             {errorMsg ? 
                             <span className="errorMsg">{errorMsg}</span> : null }
 
-                            </div>
+                            </div> */}
                            
                             <div className="text-center">
                             <Button className={`proceedBtn`} type="button" onClick={this.generateOtp} >
-                            Resend App code
+                            ReGenerate App code
                             </Button>
                             &nbsp;&nbsp;
-                            <Button className={`proceedBtn`} type="submit" disabled = {this.state.disable?true:false}>
-                                {isSubmitting ? 'Wait..' : 'Continue'}                            
+                            <Button className={`proceedBtn`} type="submit">
+                                {isSubmitting ? 'Wait..' : 'Submit'}                            
                             </Button> 
                             </div>
                         </div>  
