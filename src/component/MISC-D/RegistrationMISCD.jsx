@@ -11,6 +11,7 @@ import * as Yup from 'yup';
 import swal from 'sweetalert';
 import Encryption from '../../shared/payload-encryption';
 import { Formik, Form, Field, ErrorMessage } from 'formik';
+import {  validRegistrationNumber } from "../../shared/validationFunctions";
 
 const menumaster_id = 7
 const initialValues = {
@@ -22,8 +23,7 @@ const vehicleRegistrationValidation = Yup.object().shape({
 
     check_registration: Yup.string().notRequired(),
 
-    // regNumber: Yup.string().matches(/^[A-Z]{2}[ ][0-9]{1,2}(?: [A-Z])?(?: [A-Z]*)? [0-9]{4}$/, 'Invalid Registration number').required('Please enter valid registration number')
-    regNumber: Yup.string().matches(/^[A-Z]{2}[0-9]{1,2}(?:[A-Z])?(?:[A-Z]*)?[0-9]{4}$/, 'Invalid Registration number')
+    regNumber: Yup.string()
     .test(
         "registrationNumberCheck",
         function() {
@@ -46,11 +46,9 @@ const vehicleRegistrationValidation = Yup.object().shape({
             return "Invalid Registration number"
         },
         function (value) {
-            let regnoLength = value && value !="" && value.length > 4 ? value.length : 0
-            let subString = regnoLength > 4 ? value.substring(regnoLength-4, regnoLength) : 0
-            if (subString <= 0) {
-                return subString > 0;
-            }
+            if (value && this.parent.check_registration == 2 && (value != "" || value != undefined) ) {             
+                return validRegistrationNumber(value);
+            }   
             return true;
         }
     ),
@@ -60,21 +58,6 @@ const vehicleRegistrationValidation = Yup.object().shape({
     subclass_id: Yup.string().required("Please select sub product"),
    
 // });
-
-// regNumber: Yup.string().matches(/^[A-Z]{2}[0-9]{2}(?:[A-Z])?(?:[A-Z]*)?[0-9]{4}$/, 'Invalid Registration number')
-// .test(
-//     "registrationNumberCheck",
-//     function() {
-//         return "Please Provide Vehicle Registration Number"
-//     },
-//     function (value) {
-//         // console.log('YUP', value)
-//         if ((value == "" || value == undefined) && this.parent.check_registration == 2 ) {  
-//             return false;
-//         }
-//         return true;
-//     }
-// ),
 
 });
 
@@ -386,7 +369,8 @@ regnoFormat = (e, setFieldTouched, setFieldValue) => {
                                         <h4 className="m-b-30">Help us with some information about yourself</h4>
                                         <Formik initialValues={newInitialValues} 
                                         onSubmit={this.handleSubmit} 
-                                        validationSchema={vehicleRegistrationValidation}>
+                                        validationSchema={vehicleRegistrationValidation}
+                                        >
                                         {({ values, errors, setFieldValue, setFieldTouched, isValid, isSubmitting, touched }) => {
                                             // console.log('values',values)
                                             
@@ -548,7 +532,7 @@ regnoFormat = (e, setFieldTouched, setFieldValue) => {
                                                         onChange={(e) => {
                                                             if (e.target.checked === true) {
                                                                 setFieldTouched('regNumber')
-                                                                setFieldValue('regNumber', '');
+                                                                setFieldValue('regNumber', 'NEW');
                                                                 setFieldTouched('check_registration')
                                                                 setFieldValue('check_registration', e.target.value);
         

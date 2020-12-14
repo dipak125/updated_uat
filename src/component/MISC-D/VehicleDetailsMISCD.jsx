@@ -249,7 +249,7 @@ const vehicleRegistrationValidation = Yup.object().shape({
             return "Policy No. must be maximum 18 characters"
         }),
 
-    previous_claim_bonus:Yup.mixed()
+    previous_claim_bonus:Yup.string()
     .notRequired('No Claim bonus is required')
     .test(
         "currentMonthChecking",
@@ -868,7 +868,7 @@ class VehicleDetailsMISCD extends Component {
             previous_city: previousPolicy && previousPolicy.city ? previousPolicy.city : "",
             previous_policy_no: previousPolicy && previousPolicy.policy_no ? previousPolicy.policy_no : "",
             previous_is_claim: previous_is_claim,
-            previous_claim_bonus: previousPolicy && previousPolicy.claim_bonus ? Math.floor(previousPolicy.claim_bonus) : "1",
+            previous_claim_bonus: previousPolicy && (previousPolicy.claim_bonus || previousPolicy.claim_bonus == 0) ? previousPolicy.claim_bonus.toString() : "1",
             no_of_claim: previousPolicy && previousPolicy.previouspoliciesclaims ? previousPolicy.previouspoliciesclaims.length : "",
             // goodscarriedtypes_id: motorInsurance && motorInsurance.goodscarriedtype_id ? motorInsurance.goodscarriedtype_id : "",
             // averagemonthlyusages_id: motorInsurance && motorInsurance.averagemonthlyusage_id ? motorInsurance.averagemonthlyusage_id : "",
@@ -910,7 +910,7 @@ class VehicleDetailsMISCD extends Component {
                             onSubmit={this.handleSubmit} 
                             validationSchema={vehicleRegistrationValidation}>
                             {({ values, errors, setFieldValue, setFieldTouched, isValid, isSubmitting, touched }) => {
-console.log("errors-------------------------- ", errors)
+console.log("values-------------------------- ", values)
                                 return (
                                     <Form enableReinitialize = {true}>
                                         <Row>

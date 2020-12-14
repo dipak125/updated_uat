@@ -17,29 +17,25 @@ import Encryption from '../../shared/payload-encryption';
 import * as Yup from "yup";
 import swal from 'sweetalert';
 import moment from "moment";
+import {  validRegistrationNumber } from "../../shared/validationFunctions";
 
 const menumaster_id = 7
 const ComprehensiveValidation = Yup.object().shape({
     // is_carloan: Yup.number().required('Please select one option')
 
-    // registration_no: Yup.string().required('Please enter valid registration number')
-    // .matches(/^[A-Z]{2}[ -][0-9]{1,2}(?: [A-Z])?(?: [A-Z]*)? [0-9]{4}$/, 'Invalid Registration number'),
-
     registration_no: Yup.string().when("newRegistrationNo", {
         is: "NEW",       
         then: Yup.string(),
-        otherwise: Yup.string().required('Please provide registration number').matches(/^[A-Z]{2}[0-9]{1,2}(?:[A-Z])?(?:[A-Z]*)?[0-9]{4}$/, 'Invalid Registration number')
+        otherwise: Yup.string().required('Please provide registration number')
             .test(
                 "last4digitcheck",
                 function() {
                     return "Invalid Registration number"
                 },
                 function (value) {
-                    let regnoLength = value && value !="" && value.length > 4 ? value.length : 0
-                    let subString = regnoLength > 4 ? value.substring(regnoLength-4, regnoLength) : 0
-                    if (subString <= 0) {
-                        return subString > 0;
-                    }
+                    if (value && (value != "" || value != undefined)) {             
+                        return validRegistrationNumber(value);
+                    }   
                     return true;
                 }
             )
@@ -284,18 +280,15 @@ const ComprehensiveValidation = Yup.object().shape({
     trailer_array: Yup.array().of(
         Yup.object().shape({
             regNo : Yup.string().required('Please provide registration number')
-                .matches(/^[A-Z]{2}[0-9]{1,2}(?:[A-Z])?(?:[A-Z]*)?[0-9]{4}$/, 'Invalid Registration number')
                 .test(
                     "last4digitcheck",
                     function() {
                         return "Invalid Registration number"
                     },
                     function (value) {
-                        let regnoLength = value && value !="" && value.length > 4 ? value.length : 0
-                        let subString = regnoLength > 4 ? value.substring(regnoLength-4, regnoLength) : 0
-                        if (subString <= 0) {
-                            return subString > 0;
-                        }
+                        if (value && (value != "" || value != undefined)) {             
+                            return validRegistrationNumber(value);
+                        }   
                         return true;
                     }
                 ),
@@ -470,7 +463,6 @@ class OtherComprehensiveMISCD extends Component {
                 let motorInsurance = decryptResp.data.policyHolder ? decryptResp.data.policyHolder.motorinsurance : {}
                 let request_data = decryptResp.data.policyHolder ? decryptResp.data.policyHolder.request_data : {};
                 let vehicleDetails = decryptResp.data.policyHolder ? decryptResp.data.policyHolder.vehiclebrandmodel : {};
-                console.log('motorInsurance.trailers',motorInsurance.trailers)
                 let trailer_array = motorInsurance.trailers && motorInsurance.trailers!=null ? motorInsurance.trailers : null
                 
                 trailer_array = trailer_array!=null ? JSON.parse(trailer_array) : []
@@ -588,7 +580,6 @@ class OtherComprehensiveMISCD extends Component {
         axios
           .get(`/fuel-list`)
           .then((res) => {
-              console.log("fuel list--------- ", res.data)
             this.setState({
               fuelList: res.data.data.fuellist,
             });
@@ -611,7 +602,6 @@ class OtherComprehensiveMISCD extends Component {
             let decryptResp = JSON.parse(encryption.decrypt(res.data))
             let Coverage = []
             let drv = []
-            console.log("decrypt--getMoreCoverage-- ", decryptResp)
 
             this.setState({
             moreCoverage: decryptResp.data,
@@ -620,7 +610,6 @@ class OtherComprehensiveMISCD extends Component {
           })
           .catch((err) => {
             let decryptResp = JSON.parse(encryption.decrypt(err.data))
-            console.log("decryptERR--getMoreCoverage-- ", decryptResp)
             this.setState({
                 moreCoverage: [],
             });
@@ -920,12 +909,15 @@ class OtherComprehensiveMISCD extends Component {
             if (decryptResp.error == false) {
                 this.props.history.push(`/AdditionalDetails_MISCD/${productId}`);
             }
+            else{
+                swal(decryptResp.msg)
+            }   
 
         })
             .catch(err => {
                 // handle error
                 let decryptResp = JSON.parse(encryption.decrypt(err.data))
-            console.log("decryptErr--fetchData-- ", decryptResp)
+                console.log("decryptErr--fetchData-- ", decryptResp)
                 this.props.loadingStop();
             })
     }
@@ -1381,13 +1373,11 @@ class OtherComprehensiveMISCD extends Component {
 // -------------------------------------------------------
         let OD_TP_premium = serverResponse.PolicyLobList ? serverResponse.PolicyLobList[0].PolicyRiskList[0] : []
         let TRAILOR_OD_PREMIUM = 0
-        console.log('ncbDiscount', ncbDiscount);
         policyCoverage.map((coverage, qIndex) => (
             coverage.PolicyBenefitList && coverage.PolicyBenefitList.map((benefit, bIndex) => (
                 benefit.ProductElementCode == 'B00007' ? TRAILOR_OD_PREMIUM+=benefit.AnnualPremium : 0
             ))
         ))
-        console.log('TRAILOR_OD_PREMIUM -- ', TRAILOR_OD_PREMIUM)
         let productCount = 1;
         let ncbCount = 1;
         const policyCoverageList =  policyCoverage && policyCoverage.length > 0 ?
@@ -1430,7 +1420,6 @@ class OtherComprehensiveMISCD extends Component {
 
         productCount=1
         ncbCount=1
-        console.log('ncbDiscount_breakup', ncbDiscount);
          const premiumBreakup = policyCoverage && policyCoverage.length > 0 ?
             policyCoverage.map((coverage, qIndex) => (
                 coverage.PolicyBenefitList && coverage.PolicyBenefitList.map((benefit, bIndex) => (
@@ -1507,8 +1496,7 @@ class OtherComprehensiveMISCD extends Component {
                     onSubmit={ serverResponse && serverResponse != "" ? (serverResponse.message ? this.getAccessToken : this.handleSubmit ) : this.getAccessToken} 
                     validationSchema={ComprehensiveValidation}>
                     {({ values, errors, setFieldValue, setFieldTouched, isValid, isSubmitting, touched }) => {
-console.log("values------------------ ", values)
-console.log("errors------------------ ", errors)
+
                     return (
                         <Form>
                         <Row>

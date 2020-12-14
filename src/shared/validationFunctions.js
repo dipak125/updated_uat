@@ -185,3 +185,21 @@ export const validServiceHourRange = (value) => {
     }
     return false;
 }
+
+
+export const validRegistrationNumber = (value) => {
+    var str = /^[A-Z]{2}(?:[A-Z])?(?:[0-9]{1,2})?(?:[ABCDEFGHJKLMNPQRSTUVWXYZ])?(?:[ABCDEFGHJKLMNPQRSTUVWXYZ]{2})?[0-9]{4}$/;
+    
+    if ( value && value != "NEW" && (value != '' || value != undefined) ) {  
+        if(value.match(str)) {    
+            let regnoLength = value && value !="" && value.length > 4 ? value.length : 0
+            let subString = regnoLength > 4 ? value.substring(regnoLength-4, regnoLength) : 0
+            if (subString <= 0) {
+                return false;
+            }         
+            else return true;  
+        }
+        else return false;
+    }
+     return true;
+}

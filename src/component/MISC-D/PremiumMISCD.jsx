@@ -134,13 +134,13 @@ class PremiumMISCD extends Component {
                 let previousPolicy = decryptResp.data.policyHolder ? decryptResp.data.policyHolder.previouspolicy : {};
                 let request_data = decryptResp.data.policyHolder ? decryptResp.data.policyHolder.request_data : {}
                 let step_completed = decryptResp.data.policyHolder ? decryptResp.data.policyHolder.step_no : "";
-		let dateDiff = 0
+	
                 this.setState({
                     motorInsurance,policyHolder,vehicleDetails,previousPolicy,request_data,step_completed,
                     refNumber: decryptResp.data.policyHolder.reference_no,
                     paymentStatus: decryptResp.data.policyHolder.payment ? decryptResp.data.policyHolder.payment[0] : [],
                     memberdetails : decryptResp.data.policyHolder ? decryptResp.data.policyHolder : [],
-                    nomineedetails: decryptResp.data.policyHolder ? decryptResp.data.policyHolder.request_data.nominee[0]:[]
+                    nomineedetails: decryptResp.data.policyHolder && decryptResp.data.policyHolder.request_data.nominee ? decryptResp.data.policyHolder.request_data.nominee[0]:[]
                     
                 })
                 this.fullQuote(motorInsurance)       
@@ -178,10 +178,12 @@ class PremiumMISCD extends Component {
     fullQuote = ( motorInsurance) => {
         const formData = new FormData();
         let encryption = new Encryption();
-        let dateDiff = 0
+        
         const {previousPolicy, request_data, policyHolder} = this.state
-        let trailer_array = motorInsurance.trailers ? motorInsurance.trailers : []
+
+        let trailer_array = motorInsurance.trailers ? motorInsurance.trailers : ""
         trailer_array = trailer_array ? JSON.parse(trailer_array) : []
+        
         const post_data = {
             'ref_no':this.state.policyHolder_refNo ? this.state.policyHolder_refNo : '0',
             'idv_value': motorInsurance.idv_value,
@@ -196,7 +198,7 @@ class PremiumMISCD extends Component {
         }
 
         formData.append('enc_data',encryption.encrypt(JSON.stringify(post_data)))
-        console.log("post_data--fullQuoteMISCD- ", post_data)
+        
         axios.post('fullQuoteMISCD', formData)
             .then(res => {
                 if (res.data.PolicyObject) {
