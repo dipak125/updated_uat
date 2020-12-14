@@ -20,7 +20,14 @@ const ComprehensiveValidation = Yup.object().shape({
 
   otp: Yup.string().when(['appCodeRadio'], {
     is: appCodeRadio => appCodeRadio == '1',
-    then: Yup.string().required('Please enter policy App Code'),
+    then: Yup.string().required('Please enter policy App Code')
+        .matches(/^[0-9]*$/, function() {
+          return "Invalid App code"
+      }).min(6, function() {
+          return "App code should be minimum 6 characters"
+      }).max(6, function() {
+        return "App code should be maximum 6 characters"
+    }),
     otherwise: Yup.string()
   })
 

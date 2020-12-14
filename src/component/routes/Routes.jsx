@@ -371,6 +371,25 @@ const PolicyDetails_KSB = Loadable({
     loading: () => loadingContent
 });
 
+// =================== INDIVIDUAL PERSONAL ACCIDENT  =============================== //
+
+const AccidentSelectPlan = Loadable({
+    loader: () => import(/*webpackChunkName: "Products" */"../IndividualPersonalAccident/IPA_SelectPlan"),
+    loading: () => loadingContent
+});
+const AccidentAddDetails = Loadable({
+    loader: () => import(/*webpackChunkName: "Products" */"../IndividualPersonalAccident/IPA_AddDetails"),
+    loading: () => loadingContent
+});
+const AccidentAdditionalDetails = Loadable({
+    loader: () => import(/*webpackChunkName: "Products" */"../IndividualPersonalAccident/IPA_CommunicationalDetails"),
+    loading: () => loadingContent
+});
+const IPA_Premium = Loadable({
+    loader: () => import(/*webpackChunkName: "Products" */"../IndividualPersonalAccident/IPA_Premium"),
+    loading: () => loadingContent
+});
+
 // ====================================================================
 
 
@@ -418,6 +437,12 @@ class Routes extends Component {
                         {/* ********************** LandingPage ***************  */}                  
                         <PrivateRoute exact path="/Dashboard" component={Dashboard} />  
                         
+                        {/* ******************* Individual Personal Accident ************* */}              
+                        <PrivateRoute exact path="/AccidentSelectPlan/:productId" component={AccidentSelectPlan} /> 
+                        <PrivateRoute exact path="/AccidentAddDetails/:productId" component={AccidentAddDetails} /> 
+                        <PrivateRoute exact path="/AccidentAdditionalDetails/:productId" component={AccidentAdditionalDetails} /> 
+                        <PrivateRoute exact path="/AccidentAdditionalPremium/:productId" component={IPA_Premium} /> 
+
                         {/* ********************* AROGYA TOPUP ***************** */}
                         
                         <PrivateRoute exact path="/arogya_Health/:productId" component={arogya_Health} />

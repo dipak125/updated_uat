@@ -38,18 +38,20 @@ const vehicleValidation = Yup.object().shape({
         then: Yup.string(),
         otherwise: Yup.string().required('Please provide registration number')
         // .matches(/^[A-Z]{2}[0-9]{2}(?:[A-Z])?(?:[A-Z])?(?:[A-Z])?[0-9]{4}$/, 'Invalid Registration number')
-        .matches(/^[A-Z]{2}[0-9]{1,2}(?:[A-Z])?(?:[A-Z]*)?[0-9]{4}$/, 'Invalid Registration number')
+        .matches(/^[A-Z]{2}(?:[A-Z])?(?:[0-9]{1,2})?(?:[A-Z])?(?:[A-Z]*)?[0-9]{4}$/, 'Invalid Registration number')
         .test(
             "last4digitcheck",
             function() {
                 return "Invalid Registration number"
             },
             function (value) {
-                let regnoLength = value.length
-                let subString = value.substring(regnoLength-4, regnoLength)
-                if (subString <= 0) {
-                    return subString > 0;
-                }
+                if ((value != "" || value != undefined) && this.parent.check_registration == 2) {  
+                    let regnoLength = value && value !="" && value.length > 4 ? value.length : 0
+                    let subString = regnoLength > 4 ? value.substring(regnoLength-4, regnoLength) : 0
+                    if (subString <= 0) {
+                        return subString > 0;
+                    }
+                }   
                 return true;
             }
         )

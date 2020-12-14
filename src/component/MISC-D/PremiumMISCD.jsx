@@ -143,7 +143,7 @@ class PremiumMISCD extends Component {
                     nomineedetails: decryptResp.data.policyHolder ? decryptResp.data.policyHolder.request_data.nominee[0]:[]
                     
                 })
-                this.getAccessToken(motorInsurance)       
+                this.fullQuote(motorInsurance)       
             })
             .catch(err => {
                 // handle error
@@ -174,24 +174,8 @@ class PremiumMISCD extends Component {
     //     })  
     // }
 
-    getAccessToken = (motorInsurance) => {
-        axios
-            .post(`/callTokenService`)
-            .then((res) => {
-                this.setState({
-                    accessToken: res.data.access_token,
-                });
-                this.fullQuote(res.data.access_token, motorInsurance)
-            })
-            .catch((err) => {
-                this.setState({
-                    accessToken: '',
-                });
-                this.props.loadingStop();
-            });
-    };
 
-    fullQuote = (access_token, motorInsurance) => {
+    fullQuote = ( motorInsurance) => {
         const formData = new FormData();
         let encryption = new Encryption();
         let dateDiff = 0
@@ -200,7 +184,6 @@ class PremiumMISCD extends Component {
         trailer_array = trailer_array ? JSON.parse(trailer_array) : []
         const post_data = {
             'ref_no':this.state.policyHolder_refNo ? this.state.policyHolder_refNo : '0',
-            'access_token':access_token,
             'idv_value': motorInsurance.idv_value,
             'policy_type':  motorInsurance.policy_type,
             'add_more_coverage': motorInsurance.add_more_coverage,

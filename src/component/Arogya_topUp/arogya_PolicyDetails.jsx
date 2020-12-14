@@ -366,7 +366,7 @@ paypoint_payment = () => {
               </div>
               <div className="col-sm-12 col-md-12 col-lg-10 col-xl-10 infobox">
                 <h4 className="text-center mt-3 mb-3">
-                  Arogya Sanjeevani Policy
+                  Arogya Top Up Policy
                 </h4>
                 <section className="brand">
                   <div className="boxpd">
@@ -384,7 +384,7 @@ paypoint_payment = () => {
                     <Row>
                       <Col sm={12} md={9} lg={18}>
                         <div className="rghtsideTrigr">
-                          <Collapsible trigger="Arogya Sanjeevani Policy, SBI General Insurance Company Limited"  open= {true}>
+                          <Collapsible trigger="Arogya Top Up Policy, SBI General Insurance Company Limited"  open= {true}>
                             <div className="listrghtsideTrigr">
                               <Row>
                                 <Col sm={12} md={3}>

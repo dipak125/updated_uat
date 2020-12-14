@@ -308,7 +308,7 @@ class arogya_NomineeDetails extends Component {
                                 <SideNav />
                             </div>
                             <div className="col-sm-12 col-md-12 col-lg-10 col-xl-10 infobox">
-                                <h4 className="text-center mt-3 mb-3">Arogya Sanjeevani Policy</h4>
+                                <h4 className="text-center mt-3 mb-3">Arogya Top Up Policy</h4>
                                 <section className="brand">
                                     <div className="boxpd">
                                         <div className="justify-content-left brandhead  m-b-20">

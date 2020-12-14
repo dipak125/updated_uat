@@ -28,22 +28,19 @@ const ComprehensiveValidation = Yup.object().shape({
     registration_no: Yup.string().when("newRegistrationNo", {
         is: "NEW",       
         then: Yup.string(),
-        otherwise: Yup.string().required('Please provide registration number').matches(/^[A-Z]{2}[0-9]{1,2}(?:[A-Z])?(?:[A-Z]*)?[0-9]{4}$/, 'Invalid Registration number')
+        otherwise: Yup.string().required('Please provide registration number').matches(/^[A-Z]{2}(?:[A-Z])?(?:[0-9]{1,2})?(?:[A-Z])?(?:[A-Z]*)?[0-9]{4}$/, 'Invalid Registration number')
         .test(
             "last4digitcheck",
             function() {
                 return "Invalid Registration number"
             },
             function (value) {
-                if(value && value != ""){
-                    let regnoLength = value.length
-                        let subString = value.substring(regnoLength-4, regnoLength)
-                        if (subString <= 0) {
-                            return subString > 0;
-                        }
-                        return true;
-                }     
-                return true;          
+                let regnoLength = value && value !="" && value.length > 4 ? value.length : 0
+                let subString = regnoLength > 4 ? value.substring(regnoLength-4, regnoLength) : 0
+                if (subString <= 0) {
+                    return subString > 0;
+                }
+                return true;
             }
         ),
     }),
@@ -301,8 +298,8 @@ const ComprehensiveValidation = Yup.object().shape({
                     return "Invalid Registration number"
                 },
                 function (value) {
-                    let regnoLength = value.length
-                    let subString = value.substring(regnoLength-4, regnoLength)
+                    let regnoLength = value && value !="" && value.length > 4 ? value.length : 0
+                    let subString = regnoLength > 4 ? value.substring(regnoLength-4, regnoLength) : 0
                     if (subString <= 0) {
                         return subString > 0;
                     }
@@ -1186,46 +1183,52 @@ class OtherComprehensiveGCV extends Component {
         
         for (var i = 0; i < values.B00007_value ; i++) {
             field_array.push(
-                <Row className="m-b-30">
-                <Col sm={12} md={6} lg={10}>
-                    <FormGroup>
-                        <div className="formSection">
-                        <Field
-                                name={`trailer_array[${i}].regNo`}
-                                type="text"
-                                placeholder="Registration No"
-                                autoComplete="off"
-                                onFocus={e => this.changePlaceHoldClassAdd(e)}
-                                onBlur={e => this.changePlaceHoldClassRemove(e)}
-                                // value = {values[`trailer_array[${i}].chassisNo`]}
+                <Col sm={12} md={12} lg={12}>
+                    <Row >
+                        <Col sm={1} md={1} lg={1}><span className="indexing"> {i+1} </span></Col>
+                        <Col sm={12} md={5} lg={4}>
+                            <FormGroup>
+                                <div className="formSection">
+                                <Field
+                                        name={`trailer_array[${i}].regNo`}
+                                        type="text"
+                                        placeholder="Registration No"
+                                        autoComplete="off"
+                                        onFocus={e => this.changePlaceHoldClassAdd(e)}
+                                        onBlur={e => this.changePlaceHoldClassRemove(e)}
+                                        onInput={e=>{
+                                            this.regnoFormat(e, setFieldTouched, setFieldValue)
+                                        }} 
+                                        // value = {values[`trailer_array[${i}].chassisNo`]}
 
-                            />
-                            {errors.trailer_array && errors.trailer_array[i] && errors.trailer_array[i].regNo ? (
-                            <span className="errorMsg">{errors.trailer_array[i].regNo}</span>
-                            ) : null}    
-                        </div>
-                    </FormGroup>
-                </Col>
-                <Col sm={12} md={6} lg={10}>
-                    <FormGroup>
-                        <div className="formSection">
-                            <Field
-                                name={`trailer_array[${i}].chassisNo`}
-                                type="text"
-                                placeholder="Chassis No"
-                                autoComplete="off"
-                                onFocus={e => this.changePlaceHoldClassAdd(e)}
-                                onBlur={e => this.changePlaceHoldClassRemove(e)}
-                                // value = {values[`trailer_array[${i}].chassisNo`]}
+                                    />
+                                    {errors.trailer_array && errors.trailer_array[i] && errors.trailer_array[i].regNo ? (
+                                    <span className="errorMsg">{errors.trailer_array[i].regNo}</span>
+                                    ) : null}    
+                                </div>
+                            </FormGroup>
+                        </Col>
+                        <Col sm={12} md={5} lg={4}>
+                            <FormGroup>
+                                <div className="formSection">
+                                    <Field
+                                        name={`trailer_array[${i}].chassisNo`}
+                                        type="text"
+                                        placeholder="Chassis No"
+                                        autoComplete="off"
+                                        onFocus={e => this.changePlaceHoldClassAdd(e)}
+                                        onBlur={e => this.changePlaceHoldClassRemove(e)}
+                                        // value = {values[`trailer_array[${i}].chassisNo`]}
 
-                            />
-                            {errors.trailer_array && errors.trailer_array[i] && errors.trailer_array[i].chassisNo ? (
-                            <span className="errorMsg">{errors.trailer_array[i].chassisNo}</span>
-                            ) : null}   
-                        </div>
-                    </FormGroup>
+                                    />
+                                    {errors.trailer_array && errors.trailer_array[i] && errors.trailer_array[i].chassisNo ? (
+                                    <span className="errorMsg">{errors.trailer_array[i].chassisNo}</span>
+                                    ) : null}   
+                                </div>
+                            </FormGroup>
+                        </Col>
+                    </Row>
                 </Col>
-            </Row>
             )
             } 
         return field_array

@@ -35,14 +35,14 @@ const ComprehensiveValidation = Yup.object().shape({
                     return "Invalid Registration number"
                 },
                 function (value) {
-                    let regnoLength = value.length
-                    let subString = value.substring(regnoLength-4, regnoLength)
+                    let regnoLength = value && value !="" && value.length > 4 ? value.length : 0
+                    let subString = regnoLength > 4 ? value.substring(regnoLength-4, regnoLength) : 0
                     if (subString <= 0) {
                         return subString > 0;
                     }
                     return true;
                 }
-            ),
+            )
     }),
 
     puc: Yup.string().required("Please verify pollution certificate to proceed"),
@@ -283,31 +283,22 @@ const ComprehensiveValidation = Yup.object().shape({
 
     trailer_array: Yup.array().of(
         Yup.object().shape({
-            regNo : Yup.string().required('Registration no is required')
-            // .matches(/^[a-zA-Z0-9]*$/, function() {
-            //     return "Invalid Registration No"
-            // })
-            .matches(/^[A-Z]{2}[0-9]{1,2}(?:[A-Z])?(?:[A-Z]*)?[0-9]{4}$/, 'Invalid Registration number')
-            .min(5, function() {
-                return "Registration no. should be minimum 5 characters"
-            })
-            .max(17, function() {
-                return "Registration no. should be maximum 17 characters"
-            })
-            .test(
-                "last4digitcheck",
-                function() {
-                    return "Invalid Registration number"
-                },
-                function (value) {
-                    let regnoLength = value.length
-                    let subString = value.substring(regnoLength-4, regnoLength)
-                    if (subString <= 0) {
-                        return subString > 0;
+            regNo : Yup.string().required('Please provide registration number')
+                .matches(/^[A-Z]{2}[0-9]{1,2}(?:[A-Z])?(?:[A-Z]*)?[0-9]{4}$/, 'Invalid Registration number')
+                .test(
+                    "last4digitcheck",
+                    function() {
+                        return "Invalid Registration number"
+                    },
+                    function (value) {
+                        let regnoLength = value && value !="" && value.length > 4 ? value.length : 0
+                        let subString = regnoLength > 4 ? value.substring(regnoLength-4, regnoLength) : 0
+                        if (subString <= 0) {
+                            return subString > 0;
+                        }
+                        return true;
                     }
-                    return true;
-                }
-            ),
+                ),
 
             chassisNo : Yup.string().required('Chassis no is required')
             .matches(/^[0-9]*$/, function() {
@@ -871,8 +862,6 @@ class OtherComprehensiveMISCD extends Component {
 
         const formData = new FormData();
         let encryption = new Encryption();
-        let total_idv = 0
-        let other_idv = 0
         let post_data = {}
         if(add_more_coverage.length > 0){
             post_data = {
@@ -896,13 +885,6 @@ class OtherComprehensiveMISCD extends Component {
                 'trailer_array' : values.trailer_array,
                 'page_name': `OtherComprehensive_MISCD/${productId}`,
             }
-            if(values.B00004_value){
-                other_idv = other_idv + parseInt(values.B00004_value)
-            }
-            if(values.B00003_value){
-                other_idv = other_idv + parseInt(values.B00003_value)
-            }
-            total_idv=parseInt(post_data.idv_value)+parseInt(post_data.body_idv_value)+other_idv
         }
         else {
             post_data = {
@@ -921,12 +903,10 @@ class OtherComprehensiveMISCD extends Component {
                 'fuel_type' : values.fuel_type,
                 'page_name': `OtherComprehensive_MISCD/${productId}`,
             }
-            total_idv=parseInt(post_data.idv_value)+parseInt(post_data.body_idv_value)
         }
         console.log('post_data',post_data)
-        
-        if((total_idv > 5000000) && csc_user_type == "POSP" ) {
-            swal("Quote cannot proceed with total IDV (including IDV, Body IDV, Electrical and Non-Electrical IDV) greater than 5000000")
+        if(post_data.idv_value > 5000000 && csc_user_type == "POSP" ) {
+            swal("Quote cannot proceed with IDV greater than 5000000")
             this.props.loadingStop();
             return false
         }
@@ -1184,49 +1164,52 @@ class OtherComprehensiveMISCD extends Component {
         
         for (var i = 0; i < values.B00007_value ; i++) {
             field_array.push(
-                <Row className="m-b-30">
-                <Col sm={12} md={6} lg={10}>
-                    <FormGroup>
-                        <div className="formSection">
-                        <Field
-                                name={`trailer_array[${i}].regNo`}
-                                type="text"
-                                placeholder="Registration No"
-                                autoComplete="off"
-                                onFocus={e => this.changePlaceHoldClassAdd(e)}
-                                onBlur={e => this.changePlaceHoldClassRemove(e)}
-                                // value = {values[`trailer_array[${i}].chassisNo`]}
-                                onInput={e=>{
-                                    this.regnoFormat(e, setFieldTouched, setFieldValue)
-                                }}
+                <Col sm={12} md={12} lg={12}>
+                    <Row >
+                        <Col sm={1} md={1} lg={1}><span className="indexing"> {i+1} </span></Col>
+                        <Col sm={12} md={5} lg={4}>
+                            <FormGroup>
+                                <div className="formSection">
+                                <Field
+                                        name={`trailer_array[${i}].regNo`}
+                                        type="text"
+                                        placeholder="Registration No"
+                                        autoComplete="off"
+                                        onFocus={e => this.changePlaceHoldClassAdd(e)}
+                                        onBlur={e => this.changePlaceHoldClassRemove(e)}
+                                        onInput={e=>{
+                                            this.regnoFormat(e, setFieldTouched, setFieldValue)
+                                        }} 
+                                        // value = {values[`trailer_array[${i}].chassisNo`]}
 
-                            />
-                            {errors.trailer_array && errors.trailer_array[i] && errors.trailer_array[i].regNo ? (
-                            <span className="errorMsg">{errors.trailer_array[i].regNo}</span>
-                            ) : null}    
-                        </div>
-                    </FormGroup>
-                </Col>
-                <Col sm={12} md={6} lg={10}>
-                    <FormGroup>
-                        <div className="formSection">
-                            <Field
-                                name={`trailer_array[${i}].chassisNo`}
-                                type="text"
-                                placeholder="Chassis No"
-                                autoComplete="off"
-                                onFocus={e => this.changePlaceHoldClassAdd(e)}
-                                onBlur={e => this.changePlaceHoldClassRemove(e)}
-                                // value = {values[`trailer_array[${i}].chassisNo`]}
+                                    />
+                                    {errors.trailer_array && errors.trailer_array[i] && errors.trailer_array[i].regNo ? (
+                                    <span className="errorMsg">{errors.trailer_array[i].regNo}</span>
+                                    ) : null}    
+                                </div>
+                            </FormGroup>
+                        </Col>
+                        <Col sm={12} md={5} lg={4}>
+                            <FormGroup>
+                                <div className="formSection">
+                                    <Field
+                                        name={`trailer_array[${i}].chassisNo`}
+                                        type="text"
+                                        placeholder="Chassis No"
+                                        autoComplete="off"
+                                        onFocus={e => this.changePlaceHoldClassAdd(e)}
+                                        onBlur={e => this.changePlaceHoldClassRemove(e)}
+                                        // value = {values[`trailer_array[${i}].chassisNo`]}
 
-                            />
-                            {errors.trailer_array && errors.trailer_array[i] && errors.trailer_array[i].chassisNo ? (
-                            <span className="errorMsg">{errors.trailer_array[i].chassisNo}</span>
-                            ) : null}   
-                        </div>
-                    </FormGroup>
+                                    />
+                                    {errors.trailer_array && errors.trailer_array[i] && errors.trailer_array[i].chassisNo ? (
+                                    <span className="errorMsg">{errors.trailer_array[i].chassisNo}</span>
+                                    ) : null}   
+                                </div>
+                            </FormGroup>
+                        </Col>
+                    </Row>
                 </Col>
-            </Row>
             )
             } 
         return field_array
@@ -1256,7 +1239,7 @@ class OtherComprehensiveMISCD extends Component {
         }
         
         let minBodyIDV = 0
-        let maxBodyIDV = PolicyArray.length > 0 ? Math.round(PolicyArray[0].PolicyRiskList[0].IDV_Suggested/2) : 0
+        let maxBodyIDV = PolicyArray.length > 0 ? Math.round(PolicyArray[0].PolicyRiskList[0].IDV_Suggested/5) : 0
         let defaultBodySliderValue =  motorInsurance && motorInsurance.body_idv_value ? Math.round(motorInsurance.body_idv_value) : 0
         let bodySliderValue = bodySliderVal
 
@@ -1832,8 +1815,7 @@ console.log("errors------------------ ", errors)
                                 {moreCoverage && moreCoverage.length > 0 ? moreCoverage.map((coverage, qIndex) => (
                                 <Row key={qIndex}>   
                                 {motorInsurance && motorInsurance.policy_for == '2' && coverage.code != 'B00015' && coverage.code != 'B00018' || motorInsurance && motorInsurance.policy_for == '1' ?
-                                    vehicleDetails.varientmodel.fueltype.id == "2" || vehicleDetails.varientmodel.fueltype.id == "6" || vehicleDetails.varientmodel.fueltype.id == "7" && coverage.code != 'B00010' && coverage.code != 'B00005' && coverage.code !='B00006' ?
-                                    <Col sm={12} md={11} lg={6} key={qIndex+"a"} >
+                                    <Col sm={12} md={11} lg={5} key={qIndex+"a"} >
                                         <label className="customCheckBox formGrp formGrp">{coverage.name}
                                             
                                             <Field
@@ -1855,31 +1837,9 @@ console.log("errors------------------ ", errors)
                                             <span className="checkmark mL-0"></span>
                                             <span className="error-message"></span>
                                         </label>
-                                    </Col> : 
-                                    <Col sm={12} md={11} lg={6} key={qIndex+"a"} >
-                                        <label className="customCheckBox formGrp formGrp">{coverage.name}
-                                            <Field
-                                                type="checkbox"
-                                                // name={`moreCov_${qIndex}`}
-                                                name={coverage.code}
-                                                value={coverage.code}
-                                                className="user-self"
-                                                // checked={values.roadsideAssistance ? true : false}
-                                                onClick={(e) =>{
-                                                    if( e.target.checked == false && values[coverage.code] == 'B00015') {
-                                                        swal("This cover is mandated by IRDAI, it is compulsory for Owner-Driver to possess a PA cover of minimum Rs 15 Lacs, except in certain conditions. By not choosing this cover, you confirm that you hold an existing PA cover or you do not possess a valid driving license.")
-                                                    }
-                                                    this.onRowSelect(e.target.value, values, e.target.checked, setFieldTouched, setFieldValue)         
-                                                }
-                                                }
-                                                checked = {values[coverage.code] == coverage.code ? true : false}
-                                            />
-                                            <span className="checkmark mL-0"></span>
-                                            <span className="error-message"></span>
-                                        </label>
-                                    </Col>: null }
+                                    </Col> : null }
                                     {values.PA_cover_flag == '1' && values[coverage.code] == 'B00015' ?
-                                        <Col sm={12} md={11} lg={3} key={qIndex+"b"}>
+                                        <Col sm={12} md={11} lg={4} key={qIndex+"b"}>
                                             <FormGroup>
                                                 <div className="formSection">
                                                     <Field
@@ -1912,7 +1872,7 @@ console.log("errors------------------ ", errors)
                                         
                                      {values.trailer_flag == '1' && values[coverage.code] == 'B00007' ?
                                      <Fragment>
-                                        <Col sm={12} md={11} lg={2} key={qIndex+"b"}>
+                                        <Col sm={12} md={11} lg={4} key={qIndex+"b"}>
                                             <FormGroup>
                                                 <div className="formSection">
                                                     <Field
@@ -1954,7 +1914,7 @@ console.log("errors------------------ ", errors)
                                                             setFieldTouched('B00007_description')
                                                             setFieldValue('B00007_description', e.target.value);
                                                             this.handleChange()
-                                                        }} 
+                                                        }}
                                                     >                                     
                                                     </Field>
                                                     {errors.B00007_description ? (
@@ -2025,7 +1985,7 @@ console.log("errors------------------ ", errors)
                                     } */}
                                     {values.pa_coolie_flag == '1' && values[coverage.code] == 'B00073' ?
                                      <Fragment>
-                                        <Col sm={12} md={11} lg={2} key={qIndex+"b"}>
+                                        <Col sm={12} md={11} lg={4} key={qIndex+"b"}>
                                             <FormGroup>
                                                 <div className="formSection">
                                                 <Field
@@ -2079,13 +2039,13 @@ console.log("errors------------------ ", errors)
                                     }
                                     {values.nonElectric_flag == '1' && values[coverage.code] == 'B00003' ?
                                      <Fragment>
-                                        <Col sm={12} md={11} lg={2} key={qIndex+"b"}>
+                                        <Col sm={12} md={11} lg={4} key={qIndex+"b"}>
                                             <FormGroup>
                                                 <div className="formSection">
                                                     <Field
                                                         name="B00003_value"
                                                         type="text"
-                                                        placeholder="IDV"
+                                                        placeholder="Value of Accessory"
                                                         autoComplete="off"
                                                         maxLength="8"
                                                         onFocus={e => this.changePlaceHoldClassAdd(e)}
@@ -2130,13 +2090,13 @@ console.log("errors------------------ ", errors)
                                     }
                                     {values.electric_flag == '1' && values[coverage.code] == 'B00004' ?
                                         <Fragment>
-                                        <Col sm={12} md={11} lg={2} key={qIndex+"b"}>
+                                        <Col sm={12} md={11} lg={4} key={qIndex+"b"}>
                                             <FormGroup>
                                                 <div className="formSection">
                                                     <Field
                                                         name="B00004_value"
                                                         type="text"
-                                                        placeholder="IDV"
+                                                        placeholder="Value of Accessory"
                                                         autoComplete="off"
                                                         maxLength="8"
                                                         onFocus={e => this.changePlaceHoldClassAdd(e)}
@@ -2181,7 +2141,7 @@ console.log("errors------------------ ", errors)
                                     }
                                     {values.CNG_OD_flag == '1' && values[coverage.code] == 'B00005' ?
                                         <Fragment>
-                                        <Col sm={12} md={11} lg={2} key={qIndex+"b"}>
+                                        <Col sm={12} md={11} lg={4} key={qIndex+"b"}>
                                             <FormGroup>
                                                 <div className="formSection">
                                                     <Field
@@ -2209,7 +2169,7 @@ console.log("errors------------------ ", errors)
                                     }
                                     {values.hospital_cash_OD_flag == '1' && values[coverage.code] == 'B00020' ?
                                         <Fragment>
-                                        <Col sm={12} md={11} lg={2} key={qIndex+"b"}>
+                                        <Col sm={12} md={11} lg={4} key={qIndex+"b"}>
                                             <FormGroup>
                                                 <div className="formSection">
                                                     <Field
@@ -2240,7 +2200,7 @@ console.log("errors------------------ ", errors)
                                     }
                                     {values.hospital_cash_PD_flag == '1' && values[coverage.code] == 'B00022' ?
                                         <Fragment>
-                                        <Col sm={12} md={11} lg={2} key={qIndex+"b"}>
+                                        <Col sm={12} md={11} lg={4} key={qIndex+"b"}>
                                             <FormGroup>
                                                 <div className="formSection">
                                                     <Field
@@ -2331,7 +2291,7 @@ console.log("errors------------------ ", errors)
                                     }
                                     {values.LL_Coolie_flag == '1' && values[coverage.code] == 'B00069' ?
                                         <Fragment>
-                                        <Col sm={12} md={11} lg={2} key={qIndex+"b"}>
+                                        <Col sm={12} md={11} lg={4} key={qIndex+"b"}>
                                             <FormGroup>
                                                 <div className="formSection">
                                                 <Field
@@ -2359,7 +2319,7 @@ console.log("errors------------------ ", errors)
                                     }
                                      {values.enhance_PA_OD_flag == '1' && values[coverage.code] == 'B00018' ?
                                         <Fragment>
-                                        <Col sm={12} md={11} lg={3} key={qIndex+"b"}>
+                                        <Col sm={12} md={11} lg={4} key={qIndex+"b"}>
                                             <FormGroup>
                                                 <div className="formSection">
                                                 <Field
@@ -2387,7 +2347,7 @@ console.log("errors------------------ ", errors)
                                     }
                                     {values.LL_workman_flag == '1' && values[coverage.code] == 'B00070' ?
                                         <Fragment>
-                                        <Col sm={12} md={11} lg={3} key={qIndex+"b"}>
+                                        <Col sm={12} md={11} lg={4} key={qIndex+"b"}>
                                             <FormGroup>
                                                 <div className="formSection">
                                                 <Field
@@ -2416,7 +2376,7 @@ console.log("errors------------------ ", errors)
 
                                     {values.ATC_flag == '1' && values[coverage.code] == 'ATC' ?
                                         <Fragment>
-                                        <Col sm={12} md={11} lg={2} key={qIndex+"c"}>
+                                        <Col sm={12} md={11} lg={4} key={qIndex+"c"}>
                                             <FormGroup>
                                                 <div className="formSection">
                                                     <Field

@@ -23,7 +23,7 @@ const vehicleRegistrationValidation = Yup.object().shape({
     check_registration: Yup.string().notRequired(),
 
     // regNumber: Yup.string().matches(/^[A-Z]{2}[ -][0-9]{1,2}(?: [A-Z])?(?: [A-Z]*)? [0-9]{4}$/, 'Invalid Registration number').required('Please enter valid registration number')
-    regNumber: Yup.string().matches(/^[A-Z]{2}[0-9]{1,2}(?:[A-Z])?(?:[A-Z]*)?[0-9]{4}$/, 'Invalid Registration number')
+    regNumber: Yup.string().matches(/^[A-Z]{2}(?:[A-Z])?(?:[0-9]{1,2})?(?:[A-Z])?(?:[A-Z]*)?[0-9]{4}$/, 'Invalid Registration number')
     .test(
         "registrationNumberCheck",
         function() {
@@ -43,15 +43,14 @@ const vehicleRegistrationValidation = Yup.object().shape({
             return "Invalid Registration number"
         },
         function (value) {
-            if(value && value != ""){
-                let regnoLength = value.length
-                    let subString = value.substring(regnoLength-4, regnoLength)
-                    if (subString <= 0) {
-                        return subString > 0;
-                    }
-                    return true;
-            }     
-            return true;          
+            if ((value != "" || value != undefined) && this.parent.check_registration == 2) {  
+                let regnoLength = value && value !="" && value.length > 4 ? value.length : 0
+                let subString = regnoLength > 4 ? value.substring(regnoLength-4, regnoLength) : 0
+                if (subString <= 0) {
+                    return subString > 0;
+                }
+            }   
+            return true;
         }
     ),
     policy_type: Yup.string().required("Please select policy type"),

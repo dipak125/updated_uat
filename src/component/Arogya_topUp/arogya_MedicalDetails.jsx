@@ -433,7 +433,7 @@ class arogya_MedicalDetails extends Component {
                             <SideNav />
                         </div>
                         <div className="col-sm-12 col-md-12 col-lg-10 col-xl-10 infobox">
-                        <h4 className="text-center mt-3 mb-3">Arogya Sanjeevani Policy</h4>
+                        <h4 className="text-center mt-3 mb-3">Arogya Top Up Policy</h4>
                             <section className="d-flex justify-content-center brand m-t-60">
                                 <div className="brand-bg pd-30">
                                 <div className="d-flex justify-content-left">

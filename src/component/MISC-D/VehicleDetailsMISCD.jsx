@@ -75,7 +75,7 @@ const vehicleRegistrationValidation = Yup.object().shape({
         function (value) {
             if (value && this.parent.policy_type_id == '1') {
                 // return checkGreaterStartEndTimes(value, new Date()) && checkGreaterStartEndTimes(minRegnDateNew, value);
-                return checkGreaterStartEndTimes(value, new Date()) && Math.floor(moment(minRegnDateNew).diff(value, 'days', true)<0);       
+                return checkGreaterStartEndTimes(value, new Date()) && Math.floor(moment(minRegnDateNew).diff(value, 'days', true)<=0);       
             }
             return true;
         }
@@ -186,9 +186,9 @@ const vehicleRegistrationValidation = Yup.object().shape({
             return "Since previous policy is a liability policy, issuance of a package policy will be subjet to successful inspection of your vehicle. Our Customer care executive will call you to assit on same, shortly"
         },
         function (value) {
-            if (value == '2' ) {   
-                return false;    
-            }
+            // if (value == '2' ) {   
+            //     return false;    
+            // }
             return true;
         }
     ),
@@ -330,9 +330,9 @@ const vehicleRegistrationValidation = Yup.object().shape({
             return "Since you do not have valid previous policy, issuance of a package policy will be subjet to successful inspection of your vehicle. Our Customer care executive will call you to assit on same, shortly"
         },
         function (value) {
-            if (value == '0' && this.parent.policy_type_id != '1') {   
-                return false;    
-            }
+            // if (value == '0' && this.parent.policy_type_id != '1') {   
+            //     return false;    
+            // }
             return true;
         }
     ),
