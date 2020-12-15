@@ -439,7 +439,7 @@ class TwoWheelerAdditionalDetails extends Component {
             'eia_no': values['eia_no'],
             'address': values['address'],          
             'gstn_no': values['gstn_no'],
-            'page_name': values[`four_wheeler_additional_detailsTP/${productId}`],
+            'page_name': `four_wheeler_additional_detailsTP/${productId}`,
         }
         if(motorInsurance.policy_for == '1'){
             post_data['dob'] = moment(values['dob']).format("YYYY-MM-DD")
@@ -461,7 +461,7 @@ class TwoWheelerAdditionalDetails extends Component {
             post_data['org_level'] = values['org_level']
         }
             
-        // console.log('post_data', post_data);
+        console.log('post_data', post_data);
         formData.append('enc_data',encryption.encrypt(JSON.stringify(post_data)))
         this.props.loadingStart();
         axios
