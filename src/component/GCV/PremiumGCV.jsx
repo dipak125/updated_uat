@@ -224,26 +224,48 @@ class PremiumGCV extends Component {
                 }
                 this.props.loadingStop();
 
-                if(previousPolicy && policyHolder.break_in_status != "Vehicle Recommended and Reports Uploaded") {
+                if(previousPolicy && policyHolder.break_in_status != "Vehicle Recommended and Reports Uploaded"){
                     dateDiff = Math.floor(moment().diff(previousPolicy.end_date, 'days', true));
                     if(dateDiff > 0 || previousPolicy.name == "2") {
                         this.setState({breakin_flag: 1})
-                        swal({
-                            title: "Breakin",
-                            text: `Your Quotation number is ${request_data.quote_id}. Your vehicle needs inspection. Do you want to raise inspection.`,
-                            icon: "warning",
-                            buttons: true,
-                            dangerMode: true,
-                        })
-                        .then((willCreate) => {
-                            if (willCreate) {
-                                this.callBreakin()
-                            }
-                            else {
+                            const formData1 = new FormData();
+                            let policyHolder_id = this.state.policyHolder_refNo ? this.state.policyHolder_refNo : '0'
+                            formData1.append('policy_ref_no',policyHolder_id)
+                            axios.post('breakin/checking', formData1)
+                            .then(res => {
+                                let break_in_checking = res.data.data.break_in_checking
+                                let break_in_inspection_no = res.data.data.break_in_inspection_no
+                                let break_in_status = res.data.data.break_in_status
+                                if( break_in_checking == true && break_in_inspection_no == "" && break_in_status == null) {
+                                    swal({
+                                        title: "Breakin",
+                                        text: `Your Quotation number is ${request_data.quote_id}. Your vehicle needs inspection. Do you want to raise inspection.`,
+                                        icon: "warning",
+                                        buttons: true,
+                                        dangerMode: true,
+                                    })
+                                    .then((willCreate) => {
+                                        if (willCreate) {
+                                            this.callBreakin()
+                                        }
+                                        else {
+                                            this.props.loadingStop();
+                                        }
+                                    })                                                           
+                                }
+                                else {
+                                    swal({
+                                        title: "Breakin",
+                                        text: `Breakin already raised. \nBreaking number ${break_in_inspection_no}.`,
+                                        icon: "warning",
+                                    })
+                                }
+                            })
+                            .catch(err => {
+                                this.setState({breakin_flag: 1})
                                 this.props.loadingStop();
-                            }
-                        })                     
-                    }     
+                            })
+                    }
                 }
             })
             .catch(err => {

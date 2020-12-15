@@ -134,32 +134,6 @@ class Premium extends Component {
                     
                 })
                 this.getAccessToken(motorInsurance)
-                // if(previousPolicy && policyHolder.break_in_status != "Vehicle Recommended and Reports Uploaded") {
-                //     dateDiff = Math.floor(moment().diff(previousPolicy.end_date, 'days', true));
-                //     if(dateDiff > 0 || previousPolicy.name == "2") {
-                //         swal({
-                //             title: "Breakin",
-                //             text: `Your Quotation number is ${request_data.quote_id}. Your vehicle needs inspection. Do you want to raise inspection.`,
-                //             icon: "warning",
-                //             buttons: true,
-                //             dangerMode: true,
-                //         })
-                //         .then((willCreate) => {
-                //             if (willCreate) {
-                //                 this.callBreakin()
-                //             }
-                //             else {
-                //                 this.props.loadingStop();
-                //             }
-                //         })                     
-                //     }
-                //     else {
-                //         this.getAccessToken(motorInsurance)
-                //     }
-                // }
-                // else{
-                //     this.getAccessToken(motorInsurance)
-                // }           
             })
             .catch(err => {
                 // handle error
@@ -251,7 +225,9 @@ class Premium extends Component {
                             axios.post('breakin/checking', formData1)
                             .then(res => {
                                 let break_in_checking = res.data.data.break_in_checking
-                                if( break_in_checking == true) {
+                                let break_in_inspection_no = res.data.data.break_in_inspection_no
+                                let break_in_status = res.data.data.break_in_status
+                                if( break_in_checking == true && break_in_inspection_no == "" && break_in_status == null) {
                                     swal({
                                         title: "Breakin",
                                         text: `Your Quotation number is ${request_data.quote_id}. Your vehicle needs inspection. Do you want to raise inspection.`,
@@ -268,14 +244,20 @@ class Premium extends Component {
                                         }
                                     })                                                           
                                 }
+                                else {
+                                    swal({
+                                        title: "Breakin",
+                                        text: `Breakin already raised. \nBreaking number ${break_in_inspection_no}.`,
+                                        icon: "warning",
+                                    })
+                                }
                             })
                             .catch(err => {
                                 this.setState({breakin_flag: 1})
                                 this.props.loadingStop();
                             })
-                        }
                     }
-                        
+                }                      
             })
             .catch(err => {
                 this.setState({
