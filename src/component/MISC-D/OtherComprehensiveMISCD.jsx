@@ -1383,7 +1383,7 @@ class OtherComprehensiveMISCD extends Component {
         const policyCoverageList =  policyCoverage && policyCoverage.length > 0 ?
             policyCoverage.map((coverage, qIndex) => (
                 coverage.PolicyBenefitList && coverage.PolicyBenefitList.map((benefit, bIndex) => (
-                    <div>
+                    <div key= {bIndex}>
                         {(benefit.ProductElementCode != 'B00007') ?
                             <Row><Col sm={12} md={6}>
                                 <FormGroup>{Coverage[benefit.ProductElementCode]}</FormGroup>
@@ -1877,7 +1877,7 @@ class OtherComprehensiveMISCD extends Component {
                                                     >
                                                         <option value="">No of Trailer</option>
                                                         {JSON.parse(coverage.covarage_value).value.length > 0 && JSON.parse(coverage.covarage_value).value.map((insurer, qIndex) => (
-                                                                <option value= {insurer}>{insurer}</option>
+                                                                <option key={qIndex} value= {insurer}>{insurer}</option>
                                                             ))}  
                                             
                                                     </Field>

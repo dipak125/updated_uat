@@ -508,7 +508,7 @@ class PremiumMISCD extends Component {
                                                                                         <Col sm={12} md={6}>
                                                                                         {nomineedetails && relation.map((relations, qIndex) => 
                                                                                         relations.id == nomineedetails.relation_with ?
-                                                                                            <FormGroup>{relations.name}</FormGroup> : null
+                                                                                            <FormGroup key={qIndex}>{relations.name}</FormGroup> : null
                                                                                         )}
                                                                                         </Col>
                                                                                     </Row>
@@ -550,7 +550,7 @@ class PremiumMISCD extends Component {
                                                                                             <Col sm={12} md={6}>
                                                                                             {nomineedetails && nomineedetails.appointee_relation_with && relation.map((relations, qIndex) => 
                                                                                             relations.id == nomineedetails.appointee_relation_with ?
-                                                                                                <FormGroup>{relations.name}</FormGroup> : null
+                                                                                                <FormGroup key={qIndex}>{relations.name}</FormGroup> : null
                                                                                             )}
                                                                                             </Col>
                                                                                         </Row>

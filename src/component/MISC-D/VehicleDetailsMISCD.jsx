@@ -910,7 +910,7 @@ class VehicleDetailsMISCD extends Component {
                             onSubmit={this.handleSubmit} 
                             validationSchema={vehicleRegistrationValidation}>
                             {({ values, errors, setFieldValue, setFieldTouched, isValid, isSubmitting, touched }) => {
-console.log("values-------------------------- ", values)
+
                                 return (
                                     <Form enableReinitialize = {true}>
                                         <Row>
@@ -1241,7 +1241,7 @@ console.log("values-------------------------- ", values)
                                                         >
                                                             <option value="">Select Insurer Company</option>
                                                             {insurerList.map((insurer, qIndex) => ( 
-                                                                <option value= {insurer.Id}>{insurer.name}</option>
+                                                                <option key={qIndex} value= {insurer.Id}>{insurer.name}</option>
                                                             ))}
                                                         </Field>     
                                                         {errors.insurance_company_id && touched.insurance_company_id ? (

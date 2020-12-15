@@ -1014,7 +1014,7 @@ class AdditionalDetailsMISCD extends Component {
                                                 type="test"
                                                 placeholder="Pincode"
                                                 autoComplete="off"
-                                                maxlength = "6"
+                                                maxLength = "6"
                                                 onFocus={e => this.changePlaceHoldClassAdd(e)}
                                                 onBlur={e => this.changePlaceHoldClassRemove(e)}
                                                 onKeyUp={e=> this.fetchAreadetails(e)}

@@ -198,8 +198,8 @@ class Otp extends Component {
                                           this.changeError()
                                           setFieldValue('otp', e.target.value);  
                                         }}
-                                        tabindex="1" 
-                                        maxlength="6"       
+                                        tabIndex="1" 
+                                        maxLength="6"       
                                     />
                                     {errors.otp && touched.otp ? (
                                         <span className="errorMsg">{errors.otp}</span>

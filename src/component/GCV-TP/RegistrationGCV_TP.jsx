@@ -11,6 +11,7 @@ import * as Yup from 'yup';
 import swal from 'sweetalert';
 import Encryption from '../../shared/payload-encryption';
 import { Formik, Form, Field, ErrorMessage } from 'formik';
+import {  validRegistrationNumber } from "../../shared/validationFunctions";
 
 
 const initialValues = {
@@ -22,15 +23,13 @@ const vehicleRegistrationValidation = Yup.object().shape({
 
     check_registration: Yup.string().notRequired(),
 
-    // regNumber: Yup.string().matches(/^[A-Z]{2}[ -][0-9]{1,2}(?: [A-Z])?(?: [A-Z]*)? [0-9]{4}$/, 'Invalid Registration number').required('Please enter valid registration number')
-    regNumber: Yup.string().matches(/^[A-Z]{2}(?:[A-Z])?(?:[0-9]{1,2})?(?:[A-Z])?(?:[A-Z]*)?[0-9]{4}$/, 'Invalid Registration number')
+    regNumber: Yup.string()
     .test(
         "registrationNumberCheck",
         function() {
             return "Please Provide Vehicle Registration Number"
         },
         function (value) {
-            // console.log('YUP', value)
             if ((value == "" || value == undefined) && this.parent.check_registration == 2 ) {  
                 return false;
             }
@@ -43,12 +42,8 @@ const vehicleRegistrationValidation = Yup.object().shape({
             return "Invalid Registration number"
         },
         function (value) {
-            if ((value != "" || value != undefined) && this.parent.check_registration == 2) {  
-                let regnoLength = value && value !="" && value.length > 4 ? value.length : 0
-                let subString = regnoLength > 4 ? value.substring(regnoLength-4, regnoLength) : 0
-                if (subString <= 0) {
-                    return subString > 0;
-                }
+            if (value && this.parent.check_registration == 2 && (value != "" || value != undefined) ) {             
+                return validRegistrationNumber(value);
             }   
             return true;
         }

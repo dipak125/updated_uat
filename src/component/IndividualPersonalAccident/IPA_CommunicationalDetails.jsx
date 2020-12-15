@@ -40,7 +40,7 @@ const initialValues = {
   date_of_birth: "",
   relation_with: "", 
   appointee_name: "",
-  appointee_dob: null,
+  appointee_dob: "",
   appointee_relation_with: "",
   // is_appointee: 0
 };
@@ -183,7 +183,7 @@ email_id: Yup.string().email().min(8, function() {
   //       ),
   // appointee_name:Yup.string(function() {
   //   return "Please enter appointee name"
-  //   }).required(function() {
+  //   }).notRequired(function() {
   //   return "Please enter appointee name"
   //     })        
   //     .matches(/^[a-zA-Z]+([\s]?[a-zA-Z]+)$/, function() {
@@ -206,7 +206,7 @@ email_id: Yup.string().email().min(8, function() {
   //     .max(40, function() {
   //     return "Name must be maximum 40 chracters"
   //     }),
-  //     appointee_relation_with: Yup.string().required(function() {
+  //     appointee_relation_with: Yup.string().notRequired(function() {
   //     return "Please select relation"
   //     }).test(
   //     "18YearsChecking",
@@ -282,7 +282,7 @@ class AccidentAdditionalDetails extends Component {
     const formData = new FormData(); 
     let encryption = new Encryption();
     let date_of_birth = moment(values.nominee_dob).format('yyyy-MM-DD');
-    let date_of_birth_appointee = moment(values.appointee_dob).format('yyyy-MM-DD');
+    let date_of_birth_appointee = moment(values.appointee_dob).format('yyyy-MM-DD') ? moment(values.appointee_dob).format('yyyy-MM-DD') : null;
     this.props.loadingStart();
     let post_data = {
         'policy_holder_id': accidentDetails.id,
@@ -489,7 +489,7 @@ class AccidentAdditionalDetails extends Component {
       relation_with : (accidentDetails && accidentDetails.request_data) && accidentDetails.request_data.nominee.length > 0  ? accidentDetails.request_data.nominee[0].relation_with : "",        
       // is_appointee: ,
       appointee_name: (accidentDetails && accidentDetails.request_data) && accidentDetails.request_data.nominee.length > 0  ? accidentDetails.request_data.nominee[0].appointee_name : "",
-      appointee_dob:  (accidentDetails && accidentDetails.request_data) && accidentDetails.request_data.nominee.length > 0  ? new Date(accidentDetails.request_data.nominee[0].appointee_dob) : "",
+      appointee_dob: accidentDetails && accidentDetails.request_data ? new Date(accidentDetails.request_data.nominee[0].appointee_dob) : "",
       appointee_relation_with: (accidentDetails && accidentDetails.request_data) && accidentDetails.request_data.nominee.length > 0  ? accidentDetails.request_data.nominee[0].appointee_relation_with : "",
       nominee_age: this.state.ageValue ? this.state.ageValue : ""
     });
@@ -975,15 +975,8 @@ class AccidentAdditionalDetails extends Component {
                                       type="text"
                                       placeholder="Age"
                                       autoComplete="off"
-                                      // selected={}
-                                      // value={this.nominee_age}
+                                      value={new Date().getFullYear() - new Date(values.nominee_dob).getFullYear()}
                                     />
-                                    {/* {errors.nominee_first_name &&
-                                    touched.nominee_first_name ? (
-                                      <span className="errorMsg">
-                                        {errors.nominee_first_name}
-                                      </span>
-                                    ) : null} */}
                                   </div>
                                 </FormGroup>
                               </Col>

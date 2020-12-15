@@ -54,9 +54,10 @@ class IPA_Premium extends Component {
         let decryptResp = JSON.parse(encryption.decrypt(res.data));
         // console.log("decrypt---accidentDetails--->>", decryptResp);
         let accidentDetails = decryptResp.data && decryptResp.data.policyHolder ? decryptResp.data.policyHolder : null;
+        let address = accidentDetails && accidentDetails.address ? JSON.parse(accidentDetails.address) : {};
         console.log("---accidentDetails--->>", accidentDetails);
         this.setState({
-          accidentDetails
+          accidentDetails,address
         });
         this.props.loadingStop();
       })
@@ -88,7 +89,7 @@ class IPA_Premium extends Component {
   };
 
   render() {
-    const { occupationList, accidentDetails} = this.state;
+    const { occupationList, accidentDetails, address} = this.state;
     const {productId} = this.props.match.params
     const newInitialValues = Object.assign(initialValues, {});
     return (
@@ -120,6 +121,14 @@ class IPA_Premium extends Component {
 
                             <div className="d-flex justify-content-left carloan">
                               <h4> </h4>
+                            </div>
+                            <div className="rghtsideTrigr">
+                                <Collapsible trigger="Policy Details" open={true}>
+                                    <div className="listrghtsideTrigr">
+                                        <div> 
+                                        </div>
+                                    </div>
+                                </Collapsible>
                             </div>
                             <div className="rghtsideTrigr">
                                 <Collapsible trigger="Proposer Details">
@@ -184,7 +193,63 @@ class IPA_Premium extends Component {
                                                 </Col>
                                                </Row>
                                            </Col>
+                                        </Row>                                         
+                                        <Row>
+                                           <Col sm={12} md={6}>
+                                              <Row>
+                                               <Col sm={12} md={6}>
+                                                <FormGroup>Address :</FormGroup>
+                                                </Col>
+                                                <Col sm={12} md={6}>
+                                                  <FormGroup>{address && address.street_name ? address.street_name : ""}, {address && address.plot_no ? address.plot_no : ""}, {address && address.house_building_name ? address.house_building_name : ""}</FormGroup>
+                                                </Col>
+                                               </Row>
+                                           </Col>
                                         </Row>
+                                        </div>
+                                    </div>
+                                </Collapsible>
+                            </div>
+                            <div className="rghtsideTrigr">
+                                <Collapsible trigger="Nominee Details">
+                                    <div className="listrghtsideTrigr">
+                                        <div>                                         
+                                        <Row>
+                                           <Col sm={12} md={6}>
+                                              <Row>
+                                               <Col sm={12} md={6}>
+                                                <FormGroup>Name:</FormGroup>
+                                                </Col>
+                                                <Col sm={12} md={6}>
+                                                  <FormGroup>{(accidentDetails && accidentDetails.request_data) && accidentDetails.request_data.nominee.length > 0 ? accidentDetails.request_data.nominee[0].first_name : ""}  {(accidentDetails && accidentDetails.request_data) && accidentDetails.request_data.nominee.length > 0  ? accidentDetails.request_data.nominee[0].last_name : ""}</FormGroup>
+                                                </Col>
+                                               </Row>
+                                           </Col>
+                                        </Row>                                         
+                                        <Row>
+                                           <Col sm={12} md={6}>
+                                              <Row>
+                                               <Col sm={12} md={6}>
+                                                <FormGroup>Date of birth :</FormGroup>
+                                                </Col>
+                                                <Col sm={12} md={6}>
+                                                  <FormGroup>{(accidentDetails && accidentDetails.request_data) && accidentDetails.request_data.nominee.length > 0  ? accidentDetails.request_data.nominee[0].dob : null}</FormGroup>
+                                                </Col>
+                                               </Row>
+                                           </Col>
+                                        </Row>                                        
+                                        <Row>
+                                           <Col sm={12} md={6}>
+                                              <Row>
+                                               <Col sm={12} md={6}>
+                                                <FormGroup>Relation with proposer :</FormGroup>
+                                                </Col>
+                                                <Col sm={12} md={6}>
+                                                  <FormGroup>{(accidentDetails && accidentDetails.request_data) && accidentDetails.request_data.nominee.length > 0  ? accidentDetails.request_data.nominee[0].relation.ksb_slug : ""}</FormGroup>
+                                                </Col>
+                                               </Row>
+                                           </Col>
+                                        </Row>   
                                         </div>
                                     </div>
                                 </Collapsible>
