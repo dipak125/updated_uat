@@ -391,7 +391,7 @@ class PolicyDetails extends Component {
                                       <Row>
                                         <Col sm={12} md={9} lg={9}>
                                           <div className="rghtsideTrigr">
-                                            <Collapsible trigger="Arogya Sanjeevani Policy, SBI General Insurance Company Limited">
+                                            <Collapsible trigger="KSB Retail Policy, SBI General Insurance Company Limited"  open= {true}>
                                               <div className="listrghtsideTrigr">
                                                 <Row>
                                                   <Col sm={12} md={3}>

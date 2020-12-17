@@ -1111,6 +1111,24 @@ class AdditionalDetailsMISCD extends Component {
                                             </div>
                                         </FormGroup>
                                     </Col>
+                                    <Col sm={12} md={4} lg={4}>
+                                        <FormGroup>
+                                            <div className="insurerName">
+                                            <Field
+                                                name='email'
+                                                type="email"
+                                                placeholder="Email "
+                                                autoComplete="off"
+                                                onFocus={e => this.changePlaceHoldClassAdd(e)}
+                                                onBlur={e => this.changePlaceHoldClassRemove(e)}
+                                                value = {values.email}                                                                            
+                                            />
+                                            {errors.email && touched.email ? (
+                                            <span className="errorMsg">{errors.email}</span>
+                                            ) : null}  
+                                            </div>
+                                        </FormGroup>
+                                    </Col>
                                 </Row> : null }
                                 
                                 <Row>
@@ -1136,6 +1154,7 @@ class AdditionalDetailsMISCD extends Component {
                                             </div>
                                         </FormGroup>
                                     </Col> : null }
+                                    {motorInsurance && motorInsurance.policy_for == '1' ?
                                     <Col sm={12} md={4} lg={4}>
                                         <FormGroup>
                                             <div className="insurerName">
@@ -1153,7 +1172,7 @@ class AdditionalDetailsMISCD extends Component {
                                             ) : null}  
                                             </div>
                                         </FormGroup>
-                                    </Col>
+                                    </Col> : null }
                                 </Row> 
 
                                 <div className="d-flex justify-content-left carloan">

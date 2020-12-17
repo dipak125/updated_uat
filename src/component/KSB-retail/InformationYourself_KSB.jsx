@@ -18,7 +18,7 @@ import { Formik, Form, Field, ErrorMessage } from 'formik';
 import { changeFormat, get18YearsBeforeDate, PersonAge } from "../../shared/dateFunctions";
 import Encryption from '../../shared/payload-encryption';
 
-const minDobAdult = moment(moment().subtract(56, 'years').calendar()).add(1, 'day').calendar()
+const minDobAdult = moment(moment().subtract(66, 'years').calendar()).add(1, 'day').calendar()
 const maxDobAdult = moment().subtract(18, 'years').calendar();
 
 const minDobChild = moment(moment().subtract(26, 'years').calendar()).add(1, 'day').calendar()
@@ -148,7 +148,7 @@ const validateFamilyMembers  = Yup.object().shape({
         function (value) {
             if (value) {
                 const ageObj = new PersonAge();
-                return ageObj.whatIsMyAge(value) < 56 && ageObj.whatIsMyAge(value) >= 18 ;
+                return ageObj.whatIsMyAge(value) < 66 && ageObj.whatIsMyAge(value) >= 18 ;
             }
             return true;
         }
@@ -166,7 +166,7 @@ const validateFamilyMembers  = Yup.object().shape({
             function (value) {
                 if (value) {
                     const ageObj = new PersonAge();
-                    return ageObj.whatIsMyAge(value) < 56 && ageObj.whatIsMyAge(value) >= 18;
+                    return ageObj.whatIsMyAge(value) < 66 && ageObj.whatIsMyAge(value) >= 18;
                 }
                 return true;
             }
@@ -579,7 +579,7 @@ const validateFamilyMembers  = Yup.object().shape({
             function (value) {
                 if (value) {
                     const ageObj = new PersonAge();
-                    return ageObj.whatIsMyAge(value) < 56 && ageObj.whatIsMyAge(value) >= 18;
+                    return ageObj.whatIsMyAge(value) < 66 && ageObj.whatIsMyAge(value) >= 18;
                 }
                 return true;
             }
@@ -661,7 +661,7 @@ const validateFamilyMembers  = Yup.object().shape({
             function (value) {
                 if (value) {
                     const ageObj = new PersonAge();
-                    return ageObj.whatIsMyAge(value) < 56 && ageObj.whatIsMyAge(value) >= 18;
+                    return ageObj.whatIsMyAge(value) < 66 && ageObj.whatIsMyAge(value) >= 18;
                 }
                 return true;
             }
@@ -743,7 +743,7 @@ const validateFamilyMembers  = Yup.object().shape({
             function (value) {
                 if (value) {
                     const ageObj = new PersonAge();
-                    return ageObj.whatIsMyAge(value) < 56 && ageObj.whatIsMyAge(value) >= 18;
+                    return ageObj.whatIsMyAge(value) < 66 && ageObj.whatIsMyAge(value) >= 18;
                 }
                 return true;
             }
@@ -824,7 +824,7 @@ const validateFamilyMembers  = Yup.object().shape({
             function (value) {
                 if (value) {
                     const ageObj = new PersonAge();
-                    return ageObj.whatIsMyAge(value) < 56 && ageObj.whatIsMyAge(value) >= 18;
+                    return ageObj.whatIsMyAge(value) < 66 && ageObj.whatIsMyAge(value) >= 18;
                 }
                 return true;
             }
@@ -895,7 +895,11 @@ const validateFamilyMembers  = Yup.object().shape({
         othewise: Yup.string()
     }),
 
-    primaryInsured: Yup.string().required("please select primary insured")
+    primaryInsured: Yup.string().when(['productTypes'], {
+        is: productTypes => productTypes == '3',       
+        then: Yup.string().required('please select primary insured'),
+        othewise: Yup.string()
+    })
     
     
 })
@@ -974,10 +978,11 @@ class InformationYourself extends Component {
             display_gender_new[2] = display_gender[2] ? display_gender[2] :null
             display_gender_new[3] = display_gender[3] ? display_gender[3] :null
             display_gender_new[4] = display_gender[4] ? display_gender[4] :null
-            display_gender_new[5] = 'm'
-            display_gender_new[6] = 'f'
-            display_gender_new[7] = 'm' 
-            display_gender_new[8] = 'f'
+            display_gender_new[5] = display_gender[5] ? display_gender[5] :null
+            display_gender_new[6] = 'm'
+            display_gender_new[7] = 'f'
+            display_gender_new[8] = 'm' 
+            display_gender_new[9] = 'f'
             
             let looking_for = []
             let gender_for = []
@@ -1285,21 +1290,21 @@ fetchInsureBusinessPlan = () => {
     })
 }
 
-fetchInsureRepository = () => {
-    axios.get(`insur-repostry`)
-    .then(res=>{
-        var insureRepository = res.data && res.data.data ? res.data.data : []
-        this.setState({
-            insureRepository            
-        })
-        this.fetchInsureBusinessPlan()
-        this.props.loadingStop();
-    })
-    .catch(err => {
-        // handle error
-        this.props.loadingStop();
-    })
-}
+// fetchInsureRepository = () => {
+//     axios.get(`insur-repostry`)
+//     .then(res=>{
+//         var insureRepository = res.data && res.data.data ? res.data.data : []
+//         this.setState({
+//             insureRepository            
+//         })
+//         this.fetchInsureBusinessPlan()
+//         this.props.loadingStop();
+//     })
+//     .catch(err => {
+//         // handle error
+//         this.props.loadingStop();
+//     })
+// }
 
 
 fetchRelations = () => {
@@ -1310,7 +1315,7 @@ fetchRelations = () => {
         this.setState({
             relationList            
         })
-        this.fetchInsureRepository()
+        this.fetchInsureBusinessPlan()
     })
     .catch(err => {
         // handle error
@@ -1369,7 +1374,7 @@ setStateForPreviousData=(family_members)=>{
         let display_looking_for_arr = display_looking_for  && display_looking_for.length >0 ? display_looking_for : (sessionStorage.getItem('display_looking_for') ? JSON.parse(sessionStorage.getItem('display_looking_for')) : []);
         let display_dob_arr = display_dob && display_dob.length >0 ? display_dob : (sessionStorage.getItem('display_dob') ? JSON.parse(sessionStorage.getItem('display_dob')) : []);
         let display_gender_arr = display_gender && display_gender.length > 0 ? display_gender : (localStorage.getItem('display_gender') ? JSON.parse(localStorage.getItem('display_gender')) : []);
-console.log("product type ------------- ", productTypes)
+
         const newInitialValues = Object.assign(initialValues, {
             check_input: validateCheck ? validateCheck :0,
             gender: gender ? gender : "",
@@ -1389,16 +1394,18 @@ console.log("product type ------------- ", productTypes)
             looking_for_5: display_looking_for_arr[5] ? display_looking_for_arr[5] : "",
             dob_5: display_dob_arr[5] ? new Date(display_dob_arr[5]) : "",
             child4Gender: display_gender_arr  ? display_gender_arr[5] : "",
-            looking_for_6: display_looking_for_arr[5] ? display_looking_for_arr[5] : "",
-            dob_6: display_dob_arr[5] ? new Date(display_dob_arr[5]) : "",
-            looking_for_7: display_looking_for_arr[6] ? display_looking_for_arr[6] : "",
-            dob_7: display_dob_arr[6] ? new Date(display_dob_arr[6]) : "",                        
-            looking_for_8: display_looking_for_arr[7] ? display_looking_for_arr[7] : "",
-            dob_8: display_dob_arr[7] ? new Date(display_dob_arr[7]) : "",
-            looking_for_9: display_looking_for_arr[8] ? display_looking_for_arr[8] : "",
-            dob_9: display_dob_arr[8] ? new Date(display_dob_arr[8]) : "",
+            looking_for_6: display_looking_for_arr[6] ? display_looking_for_arr[6] : "",
+            dob_6: display_dob_arr[6] ? new Date(display_dob_arr[6]) : "",
+            looking_for_7: display_looking_for_arr[7] ? display_looking_for_arr[7] : "",
+            dob_7: display_dob_arr[7] ? new Date(display_dob_arr[7]) : "",                        
+            looking_for_8: display_looking_for_arr[8] ? display_looking_for_arr[8] : "",
+            dob_8: display_dob_arr[8] ? new Date(display_dob_arr[8]) : "",
+            looking_for_9: display_looking_for_arr[9] ? display_looking_for_arr[9] : "",
+            dob_9: display_dob_arr[9] ? new Date(display_dob_arr[9]) : "",
             insureList: insureListPrev ? insureListPrev.toString()  : (insureList ? insureList :''),  
             varient_type_id: ksbinfo ? ksbinfo.varient_type_id : "",
+            primaryInsured: ksbinfo ? ksbinfo.primary_insured : "",
+            productTypes: productTypes
             // ksbbusniessplan_id: ksbinfo ? ksbinfo.ksbbusniessplan_id : "",
             // insurrepostry_id: ksbinfo ? ksbinfo.insurrepostry_id : "",
         });
@@ -1421,7 +1428,7 @@ console.log("product type ------------- ", productTypes)
                                         onSubmit={this.handleFormSubmit} 
                                         validationSchema={vehicleInspectionValidation}>
                                         {({ values, errors, setFieldValue, setFieldTouched, isValid, isSubmitting, touched }) => {
-console.log("Form errors--------- ", errors)
+
                                         return (
                                         <Form>
                                         {/* <div className="row formSection">
@@ -1568,7 +1575,7 @@ console.log("Form errors--------- ", errors)
                                  validationSchema={validateFamilyMembers}
                                 >
                                 {({ values, errors, setFieldValue, setFieldTouched, isValid, isValidating ,isSubmitting, touched }) => {
-console.log("Modal errors--------- ", errors)
+
                                 return (
                                 <Form>
                                     <div className="customModalfamlyForm">

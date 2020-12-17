@@ -240,10 +240,12 @@ class NomineeDetails extends Component {
         axios
         .post(`ksb/insert-nominee`, formData)
         .then(res => { 
+            console.log("decrypt - Resp---- ", res.data)
             this.props.loadingStop();
             this.props.history.push(`/PolicyDetails_KSB/${productId}`);
         })
         .catch(err => {
+            console.log("decrypt - Err---- ", err.data)
             if(err.status == 401) {
                 swal("Session out. Please login")
             }
