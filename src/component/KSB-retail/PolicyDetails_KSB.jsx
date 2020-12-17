@@ -283,7 +283,7 @@ class PolicyDetails extends Component {
                         <FormGroup>Relation With Proposer:</FormGroup>
                     </Col>
                     <Col sm={12} md={6}>
-                        <FormGroup>{relationArr[nomineeDetails.relation_with]}</FormGroup> 
+                        <FormGroup>{nomineeDetails ? relationArr[nomineeDetails.relation_with] : []}</FormGroup> 
                     </Col>
                 </Row>
 
@@ -321,7 +321,7 @@ class PolicyDetails extends Component {
                       <FormGroup>Relation With Nominee:</FormGroup>
                   </Col>
                   <Col sm={12} md={6}>
-                  <FormGroup>{relationArr[nomineeDetails.appointee_relation_with]}</FormGroup>
+                  <FormGroup>{nomineeDetails ? relationArr[nomineeDetails.appointee_relation_with] : []}</FormGroup>
                   </Col>
               </Row>
           </Col>

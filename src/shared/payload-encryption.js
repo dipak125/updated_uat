@@ -53,33 +53,22 @@ class Encryption {
      * @return string Return decrypted string.
      */
     decrypt(encryptedString, key) {
-
-        var orgStr = JSON.parse(CryptoJS.enc.Utf8.stringify(CryptoJS.enc.Base64.parse(decodeURIComponent(encryptedString))));
-        
-        // if(!key) key = 'eTJmS3F6UlM5SVlSRG5sa1owOUF4dEpk';
-       // if(!key) key = 'ABFE538E1664B722899673B1BB466E282A5700FA298D3549';
-       if(!key) key = 'C496F11C96DCCDD373DA1478E2D086E93E1AB006C0D322783CE7BDC34AA8D52B';
-
-        
-        /* var salt = CryptoJS.enc.Hex.parse(json.salt);
-        var iv = CryptoJS.enc.Hex.parse(json.iv);
-        var encrypted = json.ciphertext;// no need to base64 decode. */
-
-        let salt = CryptoJS.enc.Hex.parse(orgStr.substring(32, 544));
-        let iv = CryptoJS.enc.Hex.parse(orgStr.substring(0, 32));
-        let encrypted = orgStr.substring(544);// no need to base64 decode.
-
-        /* var iterations = parseInt(json.iterations);
-        if (iterations <= 0) {
-            iterations = 999;
-        } */
-        var iterations = 999;
-        var encryptMethodLength = (this.encryptMethodLength/4);// example: AES number is 256 / 4 = 64
-        var hashKey = CryptoJS.PBKDF2(key, salt, {'hasher': CryptoJS.algo.SHA512, 'keySize': (encryptMethodLength/8), 'iterations': iterations});
-
-        var decrypted = CryptoJS.AES.decrypt(encrypted, hashKey, {'mode': CryptoJS.mode.CBC, 'iv': iv});
-
-        return decrypted.toString(CryptoJS.enc.Utf8);
+        console.log('ENC_FLAG -- ', process.env.REACT_APP_ENC_FLAG)
+        if(process.env.REACT_APP_ENC_FLAG==1){
+            var orgStr = JSON.parse(CryptoJS.enc.Utf8.stringify(CryptoJS.enc.Base64.parse(decodeURIComponent(encryptedString))));
+            // if(!key) key = 'eTJmS3F6UlM5SVlSRG5sa1owOUF4dEpk';
+            if(!key) key = 'C496F11C96DCCDD373DA1478E2D086E93E1AB006C0D322783CE7BDC34AA8D52B';
+            let salt = CryptoJS.enc.Hex.parse(orgStr.substring(32, 544));
+            let iv = CryptoJS.enc.Hex.parse(orgStr.substring(0, 32));
+            let encrypted = orgStr.substring(544);// no need to base64 decode.
+            var iterations = 999;
+            var encryptMethodLength = (this.encryptMethodLength/4);// example: AES number is 256 / 4 = 64
+            var hashKey = CryptoJS.PBKDF2(key, salt, {'hasher': CryptoJS.algo.SHA512, 'keySize': (encryptMethodLength/8), 'iterations': iterations});
+            var decrypted = CryptoJS.AES.decrypt(encrypted, hashKey, {'mode': CryptoJS.mode.CBC, 'iv': iv});
+            return decrypted.toString(CryptoJS.enc.Utf8);
+        }else{
+            return encryptedString
+        }
     }// decrypt
 
     /**
@@ -92,30 +81,23 @@ class Encryption {
      * @return string Return encrypted string.
      */
     encrypt(string, key) {
-        
-        // if(!key) key = 'eTJmS3F6UlM5SVlSRG5sa1owOUF4dEpk';
-       // if(!key) key = 'ABFE538E1664B722899673B1BB466E282A5700FA298D3549';
-       if(!key) key = 'C496F11C96DCCDD373DA1478E2D086E93E1AB006C0D322783CE7BDC34AA8D52B';
-        var iv = CryptoJS.lib.WordArray.random(16);// the reason to be 16, please read on `encryptMethod` property.
-
-        var salt = CryptoJS.lib.WordArray.random(256);
-        var iterations = 999;
-        var encryptMethodLength = (this.encryptMethodLength/4);// example: AES number is 256 / 4 = 64
-        var hashKey = CryptoJS.PBKDF2(key, salt, {'hasher': CryptoJS.algo.SHA512, 'keySize': (encryptMethodLength/8), 'iterations': iterations});
-
-        var encrypted = CryptoJS.AES.encrypt(string, hashKey, {'mode': CryptoJS.mode.CBC, 'iv': iv});
-        var encryptedString = CryptoJS.enc.Base64.stringify(encrypted.ciphertext);
-
-        /* var output = {
-            'ciphertext': encryptedString,
-            'iv': CryptoJS.enc.Hex.stringify(iv),
-            'salt': CryptoJS.enc.Hex.stringify(salt),
-            'iterations': iterations
-        };
-        */
-
-        var output = ""+CryptoJS.enc.Hex.stringify(iv)+""+CryptoJS.enc.Hex.stringify(salt)+""+encryptedString;
-        return encodeURIComponent(CryptoJS.enc.Base64.stringify(CryptoJS.enc.Utf8.parse(JSON.stringify(output))));
+        console.log('ENC_FLAG -- ', process.env.REACT_APP_ENC_FLAG)
+        console.log('encrypt_string', JSON.stringify(string))
+        if(process.env.REACT_APP_ENC_FLAG==1){
+            // if(!key) key = 'eTJmS3F6UlM5SVlSRG5sa1owOUF4dEpk';
+            if(!key) key = 'C496F11C96DCCDD373DA1478E2D086E93E1AB006C0D322783CE7BDC34AA8D52B';
+            var iv = CryptoJS.lib.WordArray.random(16);// the reason to be 16, please read on `encryptMethod` property.
+            var salt = CryptoJS.lib.WordArray.random(256);
+            var iterations = 999;
+            var encryptMethodLength = (this.encryptMethodLength/4);// example: AES number is 256 / 4 = 64
+            var hashKey = CryptoJS.PBKDF2(key, salt, {'hasher': CryptoJS.algo.SHA512, 'keySize': (encryptMethodLength/8), 'iterations': iterations});
+            var encrypted = CryptoJS.AES.encrypt(string, hashKey, {'mode': CryptoJS.mode.CBC, 'iv': iv});
+            var encryptedString = CryptoJS.enc.Base64.stringify(encrypted.ciphertext);
+            var output = ""+CryptoJS.enc.Hex.stringify(iv)+""+CryptoJS.enc.Hex.stringify(salt)+""+encryptedString;
+            return encodeURIComponent(CryptoJS.enc.Base64.stringify(CryptoJS.enc.Utf8.parse(JSON.stringify(output))));
+        }else{
+            return string;
+        }
     }// encrypt
 
 }

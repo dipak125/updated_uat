@@ -20,7 +20,7 @@ import dateformat from "dateformat";
 import Encryption from '../../shared/payload-encryption';
 
 
-const minDobNominee = moment(moment().subtract(111, 'years').calendar()).add(1, 'day').calendar()
+const minDobNominee = moment(moment().subtract(100, 'years').calendar()).add(1, 'day').calendar()
 const maxDobNominee = moment().subtract(3, 'months').calendar();
 
 const initialValues = {
@@ -33,8 +33,9 @@ const initialValues = {
     appointee_relation_with: "",
     appointee_name: "",
     whatsapp_const_decl: "0",
-    auto_renewal: "",
-    language_id: ""
+    auto_renewal: "0",
+    language_id: "",
+    ksb_phyformat: "1"
 }
 
 const validateNominee = Yup.object().shape({
@@ -323,9 +324,9 @@ class NomineeDetails extends Component {
             appointee_name: NomineeDetails && NomineeDetails.appointee_name ? NomineeDetails.appointee_name : "",
 
             language_id: policy_holder && policy_holder.ksbinfo && policy_holder.ksbinfo.language_id ?  policy_holder.ksbinfo.language_id : '',
-            auto_renewal: policy_holder && policy_holder.ksbinfo ?  policy_holder.ksbinfo.auto_renewal : '',
+            // auto_renewal: policy_holder && policy_holder.ksbinfo ?  policy_holder.ksbinfo.auto_renewal : '',
             ksb_eformat: policy_holder && policy_holder.ksbinfo ?  policy_holder.ksbinfo.ksb_eformat : '',
-            ksb_phyformat: policy_holder && policy_holder.ksbinfo ?  policy_holder.ksbinfo.ksb_phyformat : '',
+            // ksb_phyformat: policy_holder && policy_holder.ksbinfo ?  policy_holder.ksbinfo.ksb_phyformat : '',
             whatsapp_const_decl: policy_holder && policy_holder.ksbinfo ?  policy_holder.ksbinfo.whatsapp_const_decl : ''
 
         })
@@ -595,7 +596,7 @@ class NomineeDetails extends Component {
                                                             </FormGroup>
                                                         </Col>
 
-                                                        <Col sm={12} md={3} lg={6}>
+                                                        {/* <Col sm={12} md={3} lg={6}>
                                                             <FormGroup>
                                                             Auto Renewal
                                                             </FormGroup>
@@ -640,16 +641,16 @@ class NomineeDetails extends Component {
                                                                 </label>
                                                                 </div>
                                                             </FormGroup>
-                                                        </Col>
-                                                        <Col sm={12} md={8} lg={1}>
+                                                        </Col> */}
+                                                        {/* <Col sm={12} md={8} lg={1}>
                                                             <FormGroup>
                                                                 <div className="p-r-25">
                                                                     &nbsp;
                                                                 </div>
                                                             </FormGroup>
-                                                        </Col>
+                                                        </Col> */}
 
-                                                        <Col sm={12} md={3} lg={6}>
+                                                        {/* <Col sm={12} md={3} lg={6}>
                                                             <FormGroup>
                                                             Do you want Kutumb Swasthya Bima Policy related information in Physical Format?
                                                             </FormGroup>
@@ -703,7 +704,7 @@ class NomineeDetails extends Component {
                                                                     &nbsp;
                                                                 </div>
                                                             </FormGroup>
-                                                        </Col>
+                                                        </Col> */}
 
                                                         <Col sm={12} md={3} lg={6}>
                                                             <FormGroup>
@@ -763,7 +764,10 @@ class NomineeDetails extends Component {
                                                         
                                                         <Col sm={12} md={8} lg={11} className="row formSection">
                                                             <label className="customCheckBox formGrp formGrp">
-                                                                    Whats app consent declaration
+                                                                Declaration for Update via Digital Mode
+                                                                <OverlayTrigger overlay={<Tooltip id="tooltip-disabled">I/We acknowledge that by opting for digital services (including WhatsApp), I/We provide consent to receive communication/services from SBI General Insurance Company Limited related to my insurance policy through my registered mobile number & email</Tooltip>}>
+                                                                <a href="#" className="infoIcon"><img src={require('../../assets/images/i.svg')} alt="" /></a>
+                                                                </OverlayTrigger>
                                                                 <div className="p-r-25">
                                                                 <Field
                                                                     type="checkbox"  

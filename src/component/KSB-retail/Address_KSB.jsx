@@ -46,12 +46,14 @@ const initialValues = {
     pincode: "",
     // area: "",
     state: "",
-    eIA: "",
-    eia_account_no:"",
     proposerName: "",
     proposerLname: "",
     proposerDob: "",
-    proposerGender: ""
+    proposerGender: "",
+    is_eia_account: "",
+    is_ckyc_account: "",
+    eia_no: "",
+    ckyc_account_no: ""
     };
 
 const validateAddress =  Yup.object().shape({
@@ -68,13 +70,13 @@ const validateAddress =  Yup.object().shape({
     address2: Yup.string()
         .required(function() {
             return "Enter building name / number"
-        }).matches(/^([0-9A-Za-z\s]*)$/, function() {
+        }).matches(/^([0-9A-Za-z-,./\s]*)$/, function() {
             return "Invalid building name / number"
         }),
     address3: Yup.string()
         .required(function() {
             return "Enter street name"
-        }).matches(/^([A-Za-z\s]*)$/, function() {
+        }).matches(/^([0-9A-Za-z-,./\s]*)$/, function() {
             return "Invalid street name"
         }),
     email:Yup.string().email().required('Email is required').min(8, function() {
@@ -85,7 +87,7 @@ const validateAddress =  Yup.object().shape({
         }).matches(/^[a-zA-Z0-9]+([._\-]?[a-zA-Z0-9]+)*@\w+([-]?\w+)*(\.\w{2,3})+$/,'Invalid Email Id'),
     
     phoneNo: Yup.string()
-    .matches(/^[6-9][0-9]{9}$/,'Invalid Mobile number').required('Phone No. is required'),
+    .matches(/^[6-9][0-9]{9}$/,'Invalid Mobile number').required('Mobile No. is required'),
    
     panNo: Yup.string()
         .notRequired(function() {
@@ -109,10 +111,7 @@ const validateAddress =  Yup.object().shape({
     //     .required(function() {
     //         return "Enter state"
     //     }),
-    eIA: Yup.string()
-        .required(function() {
-            return "Select eIA option"
-        }),
+
     family_members: Yup.array().of(
             Yup.object().shape({
                 looking_for : Yup.string(),
@@ -171,19 +170,6 @@ const validateAddress =  Yup.object().shape({
 
             })     
     ),
-    eia_account_no:Yup.string().when(['eIA'], {
-        is: eIA => eIA == 1,
-        then: Yup.string().required('Please select the EIA account number')
-        .min(13, function() {
-            return "EIA number should be minimum 13 digits"
-        })
-        .max(13, function() {
-            return "EIA number should be maximum 13 digits"
-        }).matches(/^[1245]{1}[0-9]{12}$/, function() {
-            return "Invalid number"
-        }),
-        othewise: Yup.string()
-    }),
     proposerName: Yup.string(function() {
         return "Please enter proposer name"
         }).notRequired(function() {
@@ -274,6 +260,49 @@ const validateAddress =  Yup.object().shape({
             return true;
     }),
 
+    is_eia_account: Yup.string().required('This field is required'),
+    eia_no: Yup.string()
+        .test(
+            "isEIAchecking",
+            function() {
+                return "Please enter EIA no"
+            },
+            function (value) {
+                if (this.parent.is_eia_account == 1 && !value) {   
+                    return false;    
+                }
+                return true;
+            }
+        )
+        .min(13, function() {
+            return "EIA no must be minimum 13 characters"
+        })
+        .max(13, function() {
+            return "EIA no must be maximum 13 characters"
+        }).matches(/^[1245][0-9]{0,13}$/,'Please enter valid EIA no').notRequired('EIA no is required'),
+
+    is_ckyc_account: Yup.string().required('This field is required'),
+    ckyc_account_no: Yup.string()
+        .test(
+            "isCKYCchecking",
+            function() {
+                return "Please enter CKYC no"
+            },
+            function (value) {
+                if (this.parent.is_ckyc_account == 1 && !value) {   
+                    return false;    
+                }
+                return true;
+            }
+        )
+        .min(13, function() {
+            return "CKYC no must be minimum 13 characters"
+        })
+        .max(13, function() {
+            return "CKYC no must be maximum 13 characters"
+        }).matches(/^[1245][0-9]{0,13}$/,'Please enter valid CKYC no').notRequired('CKYC no is required'),
+
+
 });
 
 const validateFirstName=(str)=>{
@@ -294,10 +323,12 @@ class Address extends Component {
             familyMembers:[],
             addressDetails:{},
             is_eia_account:'',
+            is_ckyc_account: '',
             selfFlag:false,
             pinDataArr:[],
             stateName:[],
             showEIA:false,
+            showckyc_no:false,
             pincode_Details: [],
 		}
 	}
@@ -324,6 +355,7 @@ class Address extends Component {
                 let family_members = res.data.data.policyHolder.request_data.family_members
                 let addressDetails = JSON.parse(res.data.data.policyHolder.address)
                 let is_eia_account = res.data.data.policyHolder.is_eia_account == 2 ? "" : res.data.data.policyHolder.is_eia_account
+                let is_ckyc_account =  res.data.data.policyHolder.ckyc_no == 2 ? "" : res.data.data.policyHolder.ckyc_no
                 let selfFlag = false;
                 let pincode_Details = JSON.parse(res.data.data.policyHolder.pincode_response)
                 for(let i=0;i<family_members.length;i++){
@@ -339,6 +371,7 @@ class Address extends Component {
                     familyMembers:family_members,
                     addressDetails,
                     is_eia_account,
+                    is_ckyc_account,
                     pincode_Details
                 })
                 this.fetchPrevAreaDetails(pincode_Details)
@@ -449,8 +482,8 @@ class Address extends Component {
         formArr['policy_holder_id'] = policyHolder_id;
         formArr['phoneNo'] = values.phoneNo;
         formArr['email_id'] = values.email;
-        formArr['is_eia_account'] = values.eIA;      
-        formArr['ckyc_no'] = values.ckyc_no;
+        formArr['is_eia_account'] = values.is_eia_account;      
+        formArr['ckyc_no'] = values.is_ckyc_account;
         formArr['page_name'] = `Address_KSB/${productId}`
         
 
@@ -474,9 +507,13 @@ class Address extends Component {
         formArr['proposerGender'] = values.proposerGender;
         formArr['pincode_id'] = values.pincode_id;
         
-        if(values.eIA == 1){
-            formArr['eia_account_no'] = values.eia_account_no;
-        }       
+        if(values.is_eia_account == 1){
+            formArr['eia_no'] = values.eia_no;
+        }     
+        if(values.is_ckyc_account == 1){
+            formArr['ckyc_account_no'] = values.ckyc_account_no;
+        }  
+        
 
         let formObj = {}
         Object.assign(formObj,formArr);
@@ -533,9 +570,25 @@ class Address extends Component {
         }
     }
 
+
+    showCKYCText = (value) =>{
+        if(value == 1){
+            this.setState({
+                showckyc_no:true,
+                is_ckyc_account:1
+            })
+        }
+        else{
+            this.setState({
+                showckyc_no:false,
+                is_ckyc_account:0
+            })
+        }
+    }
+
     
     render() {
-        const {policy_holder,familyMembers,addressDetails,is_eia_account,selfFlag,pinDataArr,stateName,showEIA, pincode_Details} = this.state    
+        const {policy_holder,familyMembers,addressDetails,is_eia_account,is_ckyc_account,selfFlag,pinDataArr,stateName,showEIA, pincode_Details,showckyc_no} = this.state    
 
         let newInitialValues = Object.assign(initialValues, {
             proposerAsInsured: sessionStorage.getItem('proposed_insured') ? sessionStorage.getItem('proposed_insured') : (selfFlag ? 1:0),
@@ -551,14 +604,15 @@ class Address extends Component {
             pincode: addressDetails && addressDetails.pincode ? addressDetails.pincode: "",
             pincode_id: pincode_Details && pincode_Details.id ? pincode_Details.id : "",
             state: addressDetails && addressDetails.state ? addressDetails.state:"",
-            eIA: is_eia_account,
-            eia_account_no : policy_holder && policy_holder.eia_no ?  policy_holder.eia_no : '',
+            is_eia_account: is_eia_account,            
+            eia_no : policy_holder && policy_holder.eia_no ?  policy_holder.eia_no : '',
 
             proposerName : policy_holder && policy_holder.first_name ?  policy_holder.first_name : '',
             proposerLname : policy_holder && policy_holder.last_name ?  policy_holder.last_name : '',
             proposerDob : policy_holder && policy_holder.dob ?  new Date(policy_holder.dob) : '',
             proposerGender : policy_holder && policy_holder.gender ?  policy_holder.gender : '',
-            ckyc_no: policy_holder && policy_holder.ckyc_no ?  policy_holder.ckyc_no : '',
+            is_ckyc_account: is_ckyc_account,
+            ckyc_account_no: policy_holder && policy_holder.ckyc_account_no ?  policy_holder.ckyc_account_no : '',
         });
 
         const {productId} = this.props.match.params
@@ -877,7 +931,7 @@ class Address extends Component {
                                                             <Field
                                                                 name="phoneNo"
                                                                 type="text"
-                                                                placeholder="PHONE NO"
+                                                                placeholder="MOBILE NO"
                                                                 autoComplete="off"
                                                                 onFocus={e => this.changePlaceHoldClassAdd(e)}
                                                                 onBlur={e => this.changePlaceHoldClassRemove(e)}
@@ -1064,14 +1118,14 @@ class Address extends Component {
                                                                     <label className="customRadio3">
                                                                     <Field
                                                                         type="radio"
-                                                                        name='ckyc_no'                                            
+                                                                        name='is_ckyc_account'                                            
                                                                         value='1'
                                                                         key='1'  
                                                                         onChange={(e) => {
-                                                                            setFieldValue(`ckyc_no`, e.target.value);
-                                                                            // this.showCHYCText(1);
+                                                                            setFieldValue(`is_ckyc_account`, e.target.value);
+                                                                            this.showCKYCText(1);
                                                                         }}
-                                                                        checked={values.ckyc_no == '1' ? true : false}
+                                                                        checked={values.is_ckyc_account == '1' ? true : false}
                                                                     />
                                                                         <span className="checkmark " /><span className="fs-14"> Yes</span>
                                                                     </label>
@@ -1081,19 +1135,19 @@ class Address extends Component {
                                                                     <label className="customRadio3">
                                                                         <Field
                                                                         type="radio"
-                                                                        name='ckyc_no'                                            
+                                                                        name='is_ckyc_account'                                            
                                                                         value='0'
                                                                         key='1'  
                                                                         onChange={(e) => {
-                                                                            setFieldValue(`ckyc_no`, e.target.value);
-                                                                            // this.showCKYCText(0);
+                                                                            setFieldValue(`is_ckyc_account`, e.target.value);
+                                                                            this.showCKYCText(0);
                                                                         }}
-                                                                        checked={values.ckyc_no == '0' ? true : false}
+                                                                        checked={values.is_ckyc_account == '0' ? true : false}
                                                                     />
                                                                         <span className="checkmark" />
                                                                         <span className="fs-14">No</span>
-                                                                        {errors.ckyc_no && touched.ckyc_no ? (
-                                                                        <span className="errorMsg">{errors.ckyc_no}</span>
+                                                                        {errors.is_ckyc_account && touched.is_ckyc_account ? (
+                                                                        <span className="errorMsg">{errors.is_ckyc_account}</span>
                                                                     ) : null}
                                                                     </label>
                                                                 </div>
@@ -1101,14 +1155,14 @@ class Address extends Component {
                                                         </FormGroup>
                                                     </Col>
                                                     
-                                                    {/* {showckyc_no || is_ckyc_account == '1' ?
+                                                    {showckyc_no || is_ckyc_account == '1' ?
                                                     <Col sm={12} md={4} lg={4}>
                                                         <FormGroup>
                                                         <div className="insurerName">   
                                                             <Field
                                                                 name="ckyc_account_no"
                                                                 type="text"
-                                                                placeholder="EIA Number"
+                                                                placeholder="CKYC Number"
                                                                 autoComplete="off"
                                                                 value = {values.ckyc_account_no}
                                                                 maxLength="13"
@@ -1120,7 +1174,7 @@ class Address extends Component {
                                                             ) : null}                                             
                                                             </div>
                                                         </FormGroup>
-                                                    </Col> : ''} */}
+                                                    </Col> : ''}
                                                 </Row> 
 
                                                 <Row>
@@ -1140,14 +1194,14 @@ class Address extends Component {
                                                                     <label className="customRadio3">
                                                                     <Field
                                                                         type="radio"
-                                                                        name='eIA'                                            
+                                                                        name='is_eia_account'                                            
                                                                         value='1'
                                                                         key='1'  
                                                                         onChange={(e) => {
-                                                                            setFieldValue(`eIA`, e.target.value);
+                                                                            setFieldValue(`is_eia_account`, e.target.value);
                                                                             this.showEIAText(1);
                                                                         }}
-                                                                        checked={values.eIA == '1' ? true : false}
+                                                                        checked={values.is_eia_account == '1' ? true : false}
                                                                     />
                                                                         <span className="checkmark " /><span className="fs-14"> Yes</span>
                                                                     </label>
@@ -1157,19 +1211,19 @@ class Address extends Component {
                                                                     <label className="customRadio3">
                                                                         <Field
                                                                         type="radio"
-                                                                        name='eIA'                                            
+                                                                        name='is_eia_account'                                            
                                                                         value='0'
                                                                         key='1'  
                                                                         onChange={(e) => {
-                                                                            setFieldValue(`eIA`, e.target.value);
+                                                                            setFieldValue(`is_eia_account`, e.target.value);
                                                                             this.showEIAText(0);
                                                                         }}
-                                                                        checked={values.eIA == '0' ? true : false}
+                                                                        checked={values.is_eia_account == '0' ? true : false}
                                                                     />
                                                                         <span className="checkmark" />
                                                                         <span className="fs-14">No</span>
-                                                                        {errors.eIA && touched.eIA ? (
-                                                                        <span className="errorMsg">{errors.eIA}</span>
+                                                                        {errors.is_eia_account && touched.is_eia_account ? (
+                                                                        <span className="errorMsg">{errors.is_eia_account}</span>
                                                                     ) : null}
                                                                     </label>
                                                                 </div>
@@ -1182,17 +1236,17 @@ class Address extends Component {
                                                         <FormGroup>
                                                         <div className="insurerName">   
                                                             <Field
-                                                                name="is_eia_account"
+                                                                name="eia_no"
                                                                 type="text"
                                                                 placeholder="EIA Number"
                                                                 autoComplete="off"
-                                                                value = {values.is_eia_account}
+                                                                value = {values.eia_no}
                                                                 maxLength="13"
                                                                 onFocus={e => this.changePlaceHoldClassAdd(e)}
                                                                 onBlur={e => this.changePlaceHoldClassRemove(e)}
                                                             />
-                                                            {errors.is_eia_account && touched.is_eia_account ? (
-                                                            <span className="errorMsg">{errors.is_eia_account}</span>
+                                                            {errors.eia_no && touched.eia_no ? (
+                                                            <span className="errorMsg">{errors.eia_no}</span>
                                                             ) : null}                                             
                                                             </div>
                                                         </FormGroup>
@@ -1211,8 +1265,10 @@ class Address extends Component {
                                         </div>
                                         </Col>                                       
                                             <Col sm={12} md={3}>
-                                                <div className="regisBox">
-                                                    <h3 className="medihead">113 Operating Branches and Satellite Presence in 350+ locations </h3>
+                                                <div className="regisBox medpd">
+                                                    <h3 className="medihead">
+                                                    Kutumb Swasthya Bima is for anyone and everyone who is looking for health insurance that is cost effective and offers great value
+                                                    </h3>
                                                 </div>
                                             </Col>
                                         </Row>

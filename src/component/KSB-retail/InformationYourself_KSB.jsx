@@ -41,7 +41,8 @@ const initialValues = {
     motherInLaw: 0,
     motherInLawDob: "",
     gender: "",
-    insureList: ""
+    insureList: "",
+    primaryInsured: ""
 
 }
 
@@ -50,8 +51,8 @@ const initialValues = {
 const vehicleInspectionValidation = Yup.object().shape({
     gender: Yup.string().required('Please select gender'),
     varient_type_id: Yup.string().required('Please select product type'),
-    ksbbusniessplan_id: Yup.string().required('Please select business plan'),
-    insurrepostry_id: Yup.string().required('Please select repository'),
+    // ksbbusniessplan_id: Yup.string().required('Please select business plan'),
+    // insurrepostry_id: Yup.string().required('Please select repository'),
    
    
 });
@@ -893,6 +894,8 @@ const validateFamilyMembers  = Yup.object().shape({
         ),
         othewise: Yup.string()
     }),
+
+    primaryInsured: Yup.string().required("please select primary insured")
     
     
 })
@@ -934,7 +937,8 @@ class InformationYourself extends Component {
             insureRepository: [],
             insureBusinessPlan: [],
             insurePlan: [],
-            ksbinfo: []
+            ksbinfo: [],
+            primaryInsured: ""
         };
     }
 
@@ -1029,10 +1033,11 @@ class InformationYourself extends Component {
     post_data['menumaster_id'] = menumaster_id
     post_data['vehicle_type_id'] = vehicle_type_id
     post_data['proposer_gender'] = values.gender  
-    post_data['insurrepostry_id'] = values.insurrepostry_id   
+    // post_data['insurrepostry_id'] = values.insurrepostry_id   
     post_data['varient_type_id'] = values.varient_type_id 
-    post_data['ksbbusniessplan_id'] = values.ksbbusniessplan_id 
+    post_data['ksbbusniessplan_id'] = 1
     post_data['page_name'] = `Health_KSB/${productId}`
+    post_data['primaryInsured'] = this.state.primaryInsured
     
     
     let arr_date=[]
@@ -1214,7 +1219,8 @@ class InformationYourself extends Component {
                 lookingFor:looking_for,
                 display_looking_for,
                 display_gender:display_gender,
-                gender_for:gender_for
+                gender_for:gender_for,
+                primaryInsured: values.primaryInsured
              });
              this.setState({
                 dob:dob,
@@ -1393,8 +1399,8 @@ console.log("product type ------------- ", productTypes)
             dob_9: display_dob_arr[8] ? new Date(display_dob_arr[8]) : "",
             insureList: insureListPrev ? insureListPrev.toString()  : (insureList ? insureList :''),  
             varient_type_id: ksbinfo ? ksbinfo.varient_type_id : "",
-            ksbbusniessplan_id: ksbinfo ? ksbinfo.ksbbusniessplan_id : "",
-            insurrepostry_id: ksbinfo ? ksbinfo.insurrepostry_id : "",
+            // ksbbusniessplan_id: ksbinfo ? ksbinfo.ksbbusniessplan_id : "",
+            // insurrepostry_id: ksbinfo ? ksbinfo.insurrepostry_id : "",
         });
            
 
@@ -1418,7 +1424,7 @@ console.log("product type ------------- ", productTypes)
 console.log("Form errors--------- ", errors)
                                         return (
                                         <Form>
-                                        <div className="row formSection">
+                                        {/* <div className="row formSection">
                                             <label className="col-md-4">Insurance Repository:</label>
                                             <div className="col-md-4">
                                             <Field
@@ -1440,8 +1446,8 @@ console.log("Form errors--------- ", errors)
                                                 <span className="errorMsg">{errors.insurrepostry_id}</span>
                                             ) : null}    
                                             </div>
-                                        </div>
-                                        <div className="row formSection">
+                                        </div> */}
+                                        {/* <div className="row formSection">
                                             <label className="col-md-4">Business Source:</label>
                                             <div className="col-md-4">
                                             <Field
@@ -1463,7 +1469,7 @@ console.log("Form errors--------- ", errors)
                                                 <span className="errorMsg">{errors.ksbbusniessplan_id}</span>
                                             ) : null}    
                                             </div>
-                                        </div>
+                                        </div> */}
                                         <div className="row formSection">
                                             <label className="col-md-4">Product Type:</label>
                                             <div className="col-md-4">
@@ -2350,10 +2356,41 @@ console.log("Modal errors--------- ", errors)
                                                         }
                                                         </label>
                                                     </FormGroup>
-                                                </div>              
+                                                </div>            
+                                            </div>
+                                            <div className="row dropinput m-b-45">
+                                                <div className="col-md-7">
+                                                    <label className="customCheckBox formGrp formGrp"><h5>Select Primary Insured</h5>
+                                                    </label>
+                                                </div>
+
+                                                <div className="col-md-4 formSection">
+                                                    <Field
+                                                        name="primaryInsured"
+                                                        component="select"
+                                                        autoComplete="off"
+                                                        value={values.primaryInsured}
+                                                        className="formGrp"
+                                                    >
+                                                    <option value="">Select</option>
+                                                        <option value="self">Self</option>
+                                                        <option value="spouse">Spouse</option>
+                                                        <option value="father">Father</option>
+                                                        <option value="mother">Mother</option>
+                                                        <option value="fatherinlaw">Father in law</option>
+                                                        <option value="motherinlaw">Mother in law</option>
+                                                    </Field>    
+
+                                                    <label className="formGrp error">
+                                                    {
+                                                        errors.primaryInsured && touched.primaryInsured ?                 
+                                                        <span className="error-message">{errors.primaryInsured}</span>:''
+                                                    }
+                                                    </label>
+                                                </div>         
                                             </div>
                                             </Fragment> : null }
-
+                                             
                                             {values.looking_for_2 || values.looking_for_3 || values.looking_for_4 || values.looking_for_5 ?
                                             <div className="row dropinput m-b-45">
                                                 <div className="col-md-15">
@@ -2385,10 +2422,12 @@ console.log("Modal errors--------- ", errors)
                                                         checked={values.confirm == '1' ? true : false}
                                                     />
                                                         <span className="checkmark mL-0"></span>
-                                                    </label>
-                                                    {errors.confirm && (touched.looking_for_2 || touched.looking_for_3 || touched.looking_for_4 || touched.looking_for_5) ? 
-                                                            <span className="error-message">{errors.confirm}</span> : ""
-                                                        }
+                                                        <label className="formGrp error">
+                                                            {errors.confirm && (touched.looking_for_2 || touched.looking_for_3 || touched.looking_for_4 || touched.looking_for_5) ? 
+                                                                    <span className="error-message">{errors.confirm}</span> : ""
+                                                                }
+                                                        </label>
+                                                    </label> 
                                                 </div>
                                             </div> 
                                             : null }

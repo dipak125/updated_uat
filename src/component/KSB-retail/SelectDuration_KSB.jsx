@@ -574,12 +574,19 @@ class SelectDuration extends Component {
                                                     <Col sm={12}>
                                                         <div className="justify-content-left align-items-center list m-b-30">
                                                         <p>Your Health Insurance covers you for following :</p>
-                                                        <ul>
-                                                            <li>Your hospital room rent,boarding expenses and doctor fees</li>
-                                                            <li>Nursing expenses.Operation theatre and ICU charges</li>
-                                                            <li>Medicines that you consume during the hospital stay</li>
-                                                            <li>Road Ambulance Charges</li>
-                                                            <li>Pre and Post hospitalization expenses up to 30 and 60 days respectively</li>
+                                                        <ul><b>Base/Silver</b>
+                                                            <li>24 Doctor consultation calls in a year</li>
+                                                            <li>1 lakh PA Cover to Primary Insured </li>
+                                                        </ul>
+                                                        <ul><b>Medium/Gold</b>
+                                                            <li>36 Doctor Consultation calls in a year</li>
+                                                            <li>Hospital Daily Cash Benefit of Rs 250/day up to 30 Days </li>
+                                                            <li>3 Lakhs PA Cover to Primary Insured  </li>
+                                                        </ul>
+                                                        <ul><b>Top/Platinum</b>
+                                                            <li>60 Doctor Consultation calls in a year</li>
+                                                            <li>Hospital Daily Cash Benefit of Rs 250/day up to 60 Days </li>
+                                                            <li>5 Lakhs PA Cover to Primary Insured</li>
                                                         </ul>
                                                         </div>
                                                     </Col>
@@ -602,8 +609,11 @@ class SelectDuration extends Component {
                                             </Col>
 
                                             <Col sm={12} md={3}>
-                                                <div className="regisBox">
-                                                    <h3 className="medihead">6000+ Network Hospitals for you to avail cashless facility</h3>
+                                                <div className="regisBox medpd">
+                                                    <h4 className="txtRegistr resmb-15">
+                                                        <p>Ab Kutumb Swasthya Bima Ke Saath Doctor Ki Salah Phone Par</p>
+                                                        <p>Kutumb Swasthya Bima is for anyone and everyone who is looking for health insurance that is cost effective and offers great value</p>
+                                                    </h4>
                                                 </div>
                                             </Col>
 

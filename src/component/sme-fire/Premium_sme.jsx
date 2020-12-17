@@ -694,14 +694,14 @@ class Premium_sme extends Component {
                                                         </Col>
                                                         <Col sm={12} md={3}>
                                                         <div className="regisBox medpd">
-                                                            <h5 className="medihead">Exclutions: </h5>
+                                                            <h5 className="medihead">Exclusions: </h5>
                                                             <h4>
                                                                 <ul>
                                                                     <li className="txtRegistr resmb-15">Shops on wheels</li>
-                                                                    <li className="txtRegistr resmb-15">Kulcha Construction</li>
+                                                                    <li className="txtRegistr resmb-15">Kutcha Construction</li>
                                                                     <li className="txtRegistr resmb-15">Basement Risks</li>
                                                                     <li className="txtRegistr resmb-15">Shops dealing in Fire-Crackers / Arms / Ammunition, Precious Jewellery </li>
-                                                                    <li className="txtRegistr resmb-15">Godown / Standalone / Storage Risks</li>
+                                                                    <li className="txtRegistr resmb-15">Godown / Standalone Storage Risks</li>
                                                                 </ul>
                                                             </h4>
                                                         </div>
