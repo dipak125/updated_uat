@@ -201,21 +201,22 @@ class PremiumMISCD extends Component {
         
         axios.post('fullQuoteMISCD', formData)
             .then(res => {
-                if (res.data.PolicyObject) {
+                if (res.data.data.PolicyObject) {
                     this.setState({
-                        fulQuoteResp: res.data.PolicyObject,
-                        PolicyArray: res.data.PolicyObject.PolicyLobList,
+                        fulQuoteResp: res.data.data.PolicyObject,
+                        PolicyArray: res.data.data.PolicyObject.PolicyLobList,
                         error: [],
                     });
                 }
-                else if(res.data.ValidateResult) {
-                    swal(res.data.ValidateResult.message)
+                else if(res.data.data.ValidateResult) {
+                    swal(res.data.data.ValidateResult.message)
                 }
                  else {
                     this.setState({
                         fulQuoteResp: [],
-                        error: res.data,
+                        error: res.data.data,
                     });
+                    swal(res.data.msg)
                 }
                 this.props.loadingStop();
 
