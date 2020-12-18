@@ -350,6 +350,7 @@ class OtherComprehensiveMISCD extends Component {
             serverResponse: [],
             fulQuoteResp: [],
             PolicyArray: [],
+            chasis_price: '',
             show: false,
             sliderVal: '',
             motorInsurance: [],
@@ -692,7 +693,7 @@ class OtherComprehensiveMISCD extends Component {
 
 
     fullQuote = (access_token, values) => {
-        const { PolicyArray, sliderVal, add_more_coverage, motorInsurance, bodySliderVal ,vehicleDetails} = this.state
+        const { PolicyArray, sliderVal, add_more_coverage, motorInsurance, bodySliderVal ,vehicleDetails, chasis_price} = this.state
         // let cng_kit_flag = 0;
         // let cngKit_Cost = 0;
         // if(values.toString()) {            
@@ -774,12 +775,14 @@ class OtherComprehensiveMISCD extends Component {
                     this.setState({
                         fulQuoteResp: res.data.data.PolicyObject,
                         PolicyArray: res.data.data.PolicyObject.PolicyLobList,
+                        chasis_price: res.data.data.chasis_price,
                         error: [],
                         validation_error: [],
                         ncbDiscount,
                         serverResponse: res.data.data.PolicyObject,
                         policyCoverage: res.data.data.PolicyObject.PolicyLobList ? res.data.data.PolicyObject.PolicyLobList[0].PolicyRiskList[0].PolicyCoverageList : [],
                     });
+                    console.log('chasis_price', res.data.data.chasis_price)
                 }
                 else if (res.data.data.PolicyObject && res.data.data.UnderwritingResult && res.data.data.UnderwritingResult.Status == "Fail") {
                     this.setState({
@@ -1236,7 +1239,7 @@ class OtherComprehensiveMISCD extends Component {
 
 
     render() {
-        const {showCNG, is_CNG_account, vahanDetails,error, policyCoverage, vahanVerify, selectFlag, fulQuoteResp, PolicyArray, fuelList, vehicleDetails,validation_error,
+        const {showCNG, is_CNG_account, vahanDetails,error, policyCoverage, vahanVerify, selectFlag, fulQuoteResp, PolicyArray, fuelList, chasis_price, vehicleDetails,validation_error,
             moreCoverage, sliderVal, bodySliderVal, motorInsurance, serverResponse, engine_no, chasis_no, initialValue, add_more_coverage_request_array,ncbDiscount} = this.state
         const {productId} = this.props.match.params 
         let defaultSliderValue = PolicyArray.length > 0 ? Math.round(PolicyArray[0].PolicyRiskList[0].IDV_Suggested) : 0
@@ -1253,7 +1256,8 @@ class OtherComprehensiveMISCD extends Component {
         }
         
         let minBodyIDV = 0
-        let maxBodyIDV = PolicyArray.length > 0 ? Math.round(PolicyArray[0].PolicyRiskList[0].IDV_Suggested/5) : 0
+        //let maxBodyIDV = PolicyArray.length > 0 ? Math.round(PolicyArray[0].PolicyRiskList[0].IDV_Suggested/5) : 0
+        let maxBodyIDV = Math.round(chasis_price*0.5); //Maximum Limit is 50 percent of Chasis Price.
         let defaultBodySliderValue =  motorInsurance && motorInsurance.body_idv_value ? Math.round(motorInsurance.body_idv_value) : 0
         let bodySliderValue = bodySliderVal
 
