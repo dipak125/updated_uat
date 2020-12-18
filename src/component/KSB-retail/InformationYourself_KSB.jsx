@@ -1073,7 +1073,8 @@ class InformationYourself extends Component {
     } 
     post_data['gender'] = arr_date
     post_data['confirm'] = this.state.confirm
-    
+    localStorage.setItem("confirm", this.state.confirm)
+
     if(sessionStorage.getItem('csc_id')) {
         post_data['csc_id'] = sessionStorage.getItem('csc_id') ? sessionStorage.getItem('csc_id') : ""
         post_data['agent_name'] = sessionStorage.getItem('agent_name') ? sessionStorage.getItem('agent_name') : ""
@@ -1106,7 +1107,7 @@ class InformationYourself extends Component {
                 localStorage.setItem('policyHolder_refNo', res.data.data.policyHolder_refNo);
                 localStorage.setItem('display_gender', JSON.stringify(this.state.display_gender));
                 this.props.loadingStop();
-                this.props.history.push(`/SelectDuration_KSB/${productId}`);
+                this.props.history.push(`/PreExistingDisease_KSB/${productId}`);
             }
             else {
                 swal(res.data.msg)
@@ -1134,7 +1135,7 @@ class InformationYourself extends Component {
             localStorage.setItem('policyHolder_refNo', res.data.data.policyHolder_refNo);
             localStorage.setItem('display_gender', JSON.stringify(this.state.display_gender));
             this.props.loadingStop();
-            this.props.history.push(`/SelectDuration_KSB/${productId}`);
+            this.props.history.push(`/PreExistingDisease_KSB/${productId}`);
             }
             else {
                 swal(res.data.msg)
@@ -1405,7 +1406,8 @@ setStateForPreviousData=(family_members)=>{
             insureList: insureListPrev ? insureListPrev.toString()  : (insureList ? insureList :''),  
             varient_type_id: ksbinfo ? ksbinfo.varient_type_id : "",
             primaryInsured: ksbinfo ? ksbinfo.primary_insured : "",
-            productTypes: productTypes
+            productTypes: productTypes,
+            confirm: localStorage.getItem("confirm") ? localStorage.getItem("confirm") : ""
             // ksbbusniessplan_id: ksbinfo ? ksbinfo.ksbbusniessplan_id : "",
             // insurrepostry_id: ksbinfo ? ksbinfo.insurrepostry_id : "",
         });

@@ -350,10 +350,10 @@ const Health_KSB = Loadable({
     loader: () => import(/*webpackChunkName: "Products" */"../KSB-retail/InformationYourself_KSB.jsx"),
     loading: () => loadingContent
 });
-// const MedicalDetails_KSB = Loadable({
-//     loader: () => import(/*webpackChunkName: "Products" */"../KSB-retail/MedicalDetails_KSB.jsx"),
-//     loading: () => loadingContent
-// });
+const PreExistingDisease_KSB = Loadable({
+    loader: () => import(/*webpackChunkName: "Products" */"../KSB-retail/PreExistingDisease_KSB.jsx"),
+    loading: () => loadingContent
+});
 const SelectDuration_KSB = Loadable({
     loader: () => import(/*webpackChunkName: "Products" */"../KSB-retail/SelectDuration_KSB.jsx"),
     loading: () => loadingContent
@@ -530,7 +530,7 @@ class Routes extends Component {
 
                         {/************ KSB-Retail ******************/}
                         <PrivateRoute exact path="/Health_KSB/:productId" component={Health_KSB} />
-                        {/* <PrivateRoute exact path="/MedicalDetails_KSB/:productId" component={MedicalDetails_KSB} /> */}
+                        <PrivateRoute exact path="/PreExistingDisease_KSB/:productId" component={PreExistingDisease_KSB} />
                         <PrivateRoute exact path="/SelectDuration_KSB/:productId" component={SelectDuration_KSB} />
                         <PrivateRoute exact path="/Address_KSB/:productId" component={Address_KSB} />    
                         <PrivateRoute exact path="/NomineeDetails_KSB/:productId" component={NomineeDetails_KSB} /> 

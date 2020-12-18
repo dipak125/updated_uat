@@ -281,7 +281,7 @@ const validateAddress =  Yup.object().shape({
             return "EIA no must be maximum 13 characters"
         }).matches(/^[1245][0-9]{0,13}$/,'Please enter valid EIA no').notRequired('EIA no is required'),
 
-    is_ckyc_account: Yup.string().required('This field is required'),
+    is_ckyc_account: Yup.string().required('This field is required').nullable(),
     ckyc_account_no: Yup.string()
         .test(
             "isCKYCchecking",

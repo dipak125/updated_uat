@@ -128,7 +128,7 @@ class SelectDuration extends Component {
 
 
     medicalQuestions = (productId) => {
-        this.props.history.push(`/Health_KSB/${productId}`);
+        this.props.history.push(`/PreExistingDisease_KSB/${productId}`);
     }
 
     handleSubmit = (values) => {

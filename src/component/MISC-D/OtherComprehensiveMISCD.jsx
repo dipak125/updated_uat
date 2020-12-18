@@ -769,46 +769,47 @@ class OtherComprehensiveMISCD extends Component {
         axios.post('fullQuoteMISCD',formData)
             .then(res => {
 
-                if (res.data.PolicyObject && res.data.UnderwritingResult && res.data.UnderwritingResult.Status == "Success") {
-                    let ncbDiscount= (res.data.PolicyObject.PolicyLobList && res.data.PolicyObject.PolicyLobList[0].PolicyRiskList[0].IsNCB) ? res.data.PolicyObject.PolicyLobList[0].PolicyRiskList[0].OD_NCBAmount : 0
+                if (res.data.data.PolicyObject && res.data.data.UnderwritingResult && res.data.data.UnderwritingResult.Status == "Success") {
+                    let ncbDiscount= (res.data.data.PolicyObject.PolicyLobList && res.data.data.PolicyObject.PolicyLobList[0].PolicyRiskList[0].IsNCB) ? res.data.data.PolicyObject.PolicyLobList[0].PolicyRiskList[0].OD_NCBAmount : 0
                     this.setState({
-                        fulQuoteResp: res.data.PolicyObject,
-                        PolicyArray: res.data.PolicyObject.PolicyLobList,
+                        fulQuoteResp: res.data.data.PolicyObject,
+                        PolicyArray: res.data.data.PolicyObject.PolicyLobList,
                         error: [],
                         validation_error: [],
                         ncbDiscount,
-                        serverResponse: res.data.PolicyObject,
-                        policyCoverage: res.data.PolicyObject.PolicyLobList ? res.data.PolicyObject.PolicyLobList[0].PolicyRiskList[0].PolicyCoverageList : [],
+                        serverResponse: res.data.data.PolicyObject,
+                        policyCoverage: res.data.data.PolicyObject.PolicyLobList ? res.data.data.PolicyObject.PolicyLobList[0].PolicyRiskList[0].PolicyCoverageList : [],
                     });
                 }
-                else if (res.data.PolicyObject && res.data.UnderwritingResult && res.data.UnderwritingResult.Status == "Fail") {
+                else if (res.data.data.PolicyObject && res.data.data.UnderwritingResult && res.data.data.UnderwritingResult.Status == "Fail") {
                     this.setState({
-                        fulQuoteResp: res.data.PolicyObject,
+                        fulQuoteResp: res.data.data.PolicyObject,
                         error: {"message": 1},
                         validation_error: [],
                         serverResponse: [],
-                        policyCoverage: res.data.PolicyObject.PolicyLobList ? res.data.PolicyObject.PolicyLobList[0].PolicyRiskList[0].PolicyCoverageList : [],
+                        policyCoverage: res.data.data.PolicyObject.PolicyLobList ? res.data.data.PolicyObject.PolicyLobList[0].PolicyRiskList[0].PolicyCoverageList : [],
                     });
                 }
-                else if (res.data.code && res.data.message && res.data.code == "validation failed" && res.data.message == "validation failed") {
+                else if (res.data.data.code && res.data.data.message && res.data.data.code == "validation failed" && res.data.data.message == "validation failed") {
                     var validationErrors = []
-                    for (const x in res.data.messages) {
-                        validationErrors.push(res.data.messages[x].message)
+                    for (const x in res.data.data.messages) {
+                        validationErrors.push(res.data.data.messages[x].message)
                        }
                        this.setState({
                         fulQuoteResp: [], add_more_coverage,
                         validation_error: validationErrors,
                         serverResponse: []
                     });
-                    // swal(res.data.messages[0].message)
+                    // swal(res.data.data.messages[0].message)
                 }
                 else {
                     this.setState({
                         fulQuoteResp: [], add_more_coverage,
-                        error: res.data,
+                        error: res.data.data,
                         serverResponse: [],
                         validation_error: []
                     });
+                    swal(res.data.msg)
                 }
                 this.props.loadingStop();
             })

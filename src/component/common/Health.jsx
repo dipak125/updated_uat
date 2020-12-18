@@ -56,6 +56,7 @@ class Health extends Component {
             localStorage.removeItem('registration_number');
             localStorage.removeItem('policy_type');
             localStorage.removeItem('check_registration');
+            localStorage.removeItem('confirm');
 
             
             this.props.loadingStop();
