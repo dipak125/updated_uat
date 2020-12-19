@@ -274,11 +274,11 @@ const validateAddress =  Yup.object().shape({
                 return true;
             }
         )
-        .min(13, function() {
-            return "EIA no must be minimum 13 characters"
+        .min(14, function() {
+            return "EIA no must be minimum 14 characters"
         })
-        .max(13, function() {
-            return "EIA no must be maximum 13 characters"
+        .max(14, function() {
+            return "EIA no must be maximum 14 characters"
         }).matches(/^[1245][0-9]{0,13}$/,'Please enter valid EIA no').notRequired('EIA no is required'),
 
     is_ckyc_account: Yup.string().required('This field is required').nullable(),
@@ -1241,7 +1241,7 @@ class Address extends Component {
                                                                 placeholder="EIA Number"
                                                                 autoComplete="off"
                                                                 value = {values.eia_no}
-                                                                maxLength="13"
+                                                                maxLength="14"
                                                                 onFocus={e => this.changePlaceHoldClassAdd(e)}
                                                                 onBlur={e => this.changePlaceHoldClassRemove(e)}
                                                             />

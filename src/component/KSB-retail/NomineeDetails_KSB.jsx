@@ -159,7 +159,7 @@ const validateNominee = Yup.object().shape({
     auto_renewal: Yup.string().required("Select auto renewal").nullable(),
     // ksb_eformat: Yup.string().required("Select e-document").nullable(),
     // ksb_phyformat: Yup.string().required("Select physical document").nullable(),
-    whatsapp_const_decl: Yup.string().required("Please check whatsapp consent")
+    whatsapp_const_decl: Yup.boolean().oneOf([true], 'Please check WhatsApp consent')
 
 })
 
@@ -773,13 +773,11 @@ class NomineeDetails extends Component {
                                                                 <div className="p-r-25">
                                                                 <Field
                                                                     type="checkbox"  
-                                                                    name='whatsapp_const_decl'                                            
-                                                                    value='1'
-                                                                    key='1'  
+                                                                    name='whatsapp_const_decl'                                             
                                                                     onChange={(e) => {
                                                                         if (e.target.checked === true) {
                                                                             setFieldTouched('whatsapp_const_decl')
-                                                                            setFieldValue('whatsapp_const_decl', e.target.value);
+                                                                            setFieldValue('whatsapp_const_decl', '1');
                     
                                                                         } else {
                                                                             setFieldValue('whatsapp_const_decl', '0');                                                            
@@ -807,10 +805,13 @@ class NomineeDetails extends Component {
                                             </Col>
 
                                             <Col sm={12} md={3}>
-                                                <div className="regisBox">
-                                                    <h3 className="medihead">Assurance of Insurance Everywhere in India, for every Indian </h3>
+                                                <div className="regisBox medpd">
+                                                    <h4 className="txtRegistr resmb-15">
+                                                        <p>Ab Kutumb Swasthya Bima Ke Saath Doctor Ki Salah Phone Par</p>
+                                                        <p>Kutumb Swasthya Bima is for anyone and everyone who is looking for health insurance that is cost effective and offers great value</p>
+                                                    </h4>
                                                 </div>
-                                            </Col>                                            
+                                            </Col>                                           
                                         </Row>
                                        
                                     </Form>
