@@ -118,13 +118,16 @@ class PolicyDetails extends Component {
 
   fullQuote = (policyHolderDetails) => {
     let id = policyHolderDetails.id;
-    let insureValue = Math.floor(policyHolderDetails.request_data.sum_insured);
-
+    let ksbplan_id = policyHolderDetails.ksbinfo.ksbplan_id
+    let polStartDate = policyHolderDetails.request_data.start_date
+    console.log('policyHolderDetails', policyHolderDetails)
     const formData = new FormData();
-    let encryption = new Encryption();
+    //let encryption = new Encryption();
 
     formData.append("id", id);
-    formData.append("insureValue", insureValue);
+    formData.append("ksbplan_id", ksbplan_id);
+    formData.append("policyStartDate", polStartDate);
+    formData.append("ksbperiod_id", '3');
 
   //  const post_data = {
   //     "id":id,
@@ -549,13 +552,13 @@ class PolicyDetails extends Component {
                                         </Col>
 
                                         <Col sm={12} md={3}>
-                                          <div className="regisBox">
-                                            <h3 className="medihead">
-                                              Assurance of Insurance. Everywhere in India, for
-                                              every Indian{" "}
-                                            </h3>
-                                          </div>
-                                        </Col>
+                                                <div className="regisBox medpd">
+                                                    <h4 className="txtRegistr resmb-15">
+                                                        <p>Ab Kutumb Swasthya Bima Ke Saath Doctor Ki Salah Phone Par</p>
+                                                        <p>Kutumb Swasthya Bima is for anyone and everyone who is looking for health insurance that is cost effective and offers great value</p>
+                                                    </h4>
+                                                </div>
+                                            </Col>
                                       </Row>
                                     </div>
                                   </section>

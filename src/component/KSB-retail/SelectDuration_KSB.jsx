@@ -586,16 +586,16 @@ class SelectDuration extends Component {
                                                     <Col sm={12}>
                                                         <div className="justify-content-left align-items-center list m-b-30">
                                                         <p>Your Health Insurance covers you for following :</p>
-                                                        <ul><b>Base/Silver</b>
+                                                        <ul><b>Silver</b>
                                                             <li>24 Doctor consultation calls in a year</li>
                                                             <li>1 lakh PA Cover to Primary Insured </li>
                                                         </ul>
-                                                        <ul><b>Medium/Gold</b>
+                                                        <ul><b>Gold</b>
                                                             <li>36 Doctor Consultation calls in a year</li>
                                                             <li>Hospital Daily Cash Benefit of Rs 250/day up to 30 Days </li>
                                                             <li>3 Lakhs PA Cover to Primary Insured  </li>
                                                         </ul>
-                                                        <ul><b>Top/Platinum</b>
+                                                        <ul><b>Platinum</b>
                                                             <li>60 Doctor Consultation calls in a year</li>
                                                             <li>Hospital Daily Cash Benefit of Rs 250/day up to 60 Days </li>
                                                             <li>5 Lakhs PA Cover to Primary Insured</li>

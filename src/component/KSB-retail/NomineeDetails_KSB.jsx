@@ -20,7 +20,7 @@ import dateformat from "dateformat";
 import Encryption from '../../shared/payload-encryption';
 
 
-const minDobNominee = moment(moment().subtract(100, 'years').calendar()).add(1, 'day').calendar()
+const minDobNominee = moment(moment().subtract(100, 'years').calendar()).calendar()
 const maxDobNominee = moment().subtract(3, 'months').calendar();
 
 const initialValues = {
@@ -157,8 +157,8 @@ const validateNominee = Yup.object().shape({
 
     language_id: Yup.string().required("Select prefered Language of communication"),
     auto_renewal: Yup.string().required("Select auto renewal").nullable(),
-    ksb_eformat: Yup.string().required("Select e-document").nullable(),
-    ksb_phyformat: Yup.string().required("Select physical document").nullable(),
+    // ksb_eformat: Yup.string().required("Select e-document").nullable(),
+    // ksb_phyformat: Yup.string().required("Select physical document").nullable(),
     whatsapp_const_decl: Yup.string().required("Please check whatsapp consent")
 
 })
@@ -225,8 +225,8 @@ class NomineeDetails extends Component {
         formArr['is_appointee'] = this.state.is_appointee
         formArr['language_id'] = values.language_id;
         formArr['auto_renewal'] = values.auto_renewal;
-        formArr['ksb_eformat'] = values.ksb_eformat;
-        formArr['ksb_phyformat'] = values.ksb_phyformat;
+        formArr['ksb_eformat'] = 1;
+        // formArr['ksb_phyformat'] = values.ksb_phyformat;
         formArr['whatsapp_const_decl'] = values.whatsapp_const_decl;
         formArr['page_name'] = `NomineeDetails_KSB/${productId}`
 
@@ -327,7 +327,7 @@ class NomineeDetails extends Component {
 
             language_id: policy_holder && policy_holder.ksbinfo && policy_holder.ksbinfo.language_id ?  policy_holder.ksbinfo.language_id : '',
             // auto_renewal: policy_holder && policy_holder.ksbinfo ?  policy_holder.ksbinfo.auto_renewal : '',
-            ksb_eformat: policy_holder && policy_holder.ksbinfo ?  policy_holder.ksbinfo.ksb_eformat : '',
+            // ksb_eformat: policy_holder && policy_holder.ksbinfo ?  policy_holder.ksbinfo.ksb_eformat : '',
             // ksb_phyformat: policy_holder && policy_holder.ksbinfo ?  policy_holder.ksbinfo.ksb_phyformat : '',
             whatsapp_const_decl: policy_holder && policy_holder.ksbinfo ?  policy_holder.ksbinfo.whatsapp_const_decl : ''
 
@@ -708,7 +708,7 @@ class NomineeDetails extends Component {
                                                             </FormGroup>
                                                         </Col> */}
 
-                                                        <Col sm={12} md={3} lg={6}>
+                                                        {/* <Col sm={12} md={3} lg={6}>
                                                             <FormGroup>
                                                             Do you want Kutumb Swasthya Bima Policy related information in e-Format when applicable?
                                                             </FormGroup>
@@ -731,8 +731,8 @@ class NomineeDetails extends Component {
                                                                 </label>
                                                                 </div>
                                                             </FormGroup>
-                                                        </Col>
-                                                        <Col sm={12} md={8} lg={2}>
+                                                        </Col> */}
+                                                        {/* <Col sm={12} md={8} lg={2}>
                                                             <FormGroup>
                                                                 <div className="p-r-25">
                                                                 <label className="customRadio3">
@@ -754,7 +754,7 @@ class NomineeDetails extends Component {
                                                                 </label>
                                                                 </div>
                                                             </FormGroup>
-                                                        </Col>
+                                                        </Col> */}
                                                         <Col sm={12} md={8} lg={1}>
                                                             <FormGroup>
                                                                 <div className="p-r-25">
