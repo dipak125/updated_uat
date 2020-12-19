@@ -176,6 +176,8 @@ class SelectDuration extends Component {
             this.setState({
                 policyHolderDetails: res.data.data.policyHolder, ksbinfo, installment_premium_payment
             }) 
+            // console.log('policyHolderDetails', this.state.policyHolderDetails)
+            // console.log('ksbinfo', this.state.ksbinfo)
             this.fetchInsurePlan()
           })
           .catch(err => {
@@ -187,14 +189,16 @@ class SelectDuration extends Component {
       }
 
       quote = (value) => {
-      const {accessToken} = this.state 
-      if(value == "") {
-        value['polStartDate'] = new Date()
-        value['polEndDate'] = new Date(moment(value['polStartDate']).add(1, 'years').format("YYYY-MM-DD")) 
-        value['ksbplan_id'] = '1'
-        value['ksbperiod_id'] = '3'
-      }
-
+        //console.log('value', value)
+        const {accessToken} = this.state 
+        if (value.polStartDate === null){
+            value['polStartDate'] = new Date()
+            value['polEndDate'] = new Date(moment(value['polStartDate']).add(1, 'years').format("YYYY-MM-DD")) 
+        }
+        if (value.ksbplan_id === 0){
+            value['ksbplan_id'] = '1'
+        }
+        
         let polStartDate = moment(value.polStartDate).format("YYYY-MM-DD");
         let polEndDate = moment(value.polEndDate).format("YYYY-MM-DD");
         const formData = new FormData(); 
@@ -274,7 +278,15 @@ class SelectDuration extends Component {
             this.setState({
                 insurePlan            
             })
-            this.fetchPaymentPeriod()
+            console.log('policyHolderDetails', this.state.policyHolderDetails)
+            console.log('ksbinfo', this.state.ksbinfo)
+            let value = []
+            value['polStartDate'] = this.state.policyHolderDetails.request_data.start_date
+            value['polEndDate'] = new Date(moment(value['polStartDate']).add(1, 'years').format("YYYY-MM-DD")) 
+            value['ksbplan_id'] = this.state.ksbinfo.ksbplan_id
+            value['ksbperiod_id'] = '3'
+            this.quote(value)
+            //this.fetchPaymentPeriod()
         })
         .catch(err => {
             // handle error
@@ -289,8 +301,8 @@ class SelectDuration extends Component {
             this.setState({
                 insurePeriod            
             })
-            let value = []
-            this.quote(value)
+            // let value = []
+            // this.quote(value)
         })
         .catch(err => {
             // handle error
