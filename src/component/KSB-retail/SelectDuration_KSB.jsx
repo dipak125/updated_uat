@@ -113,6 +113,7 @@ class SelectDuration extends Component {
         fulQuoteResp: [],
         showInstallment:false,
         installment_premium_payment:'',
+        validation_error: []
       };
 
 
@@ -226,20 +227,36 @@ class SelectDuration extends Component {
               this.setState({
                   fulQuoteResp: res.data.PolicyObject,
                   serverResponse: res.data.PolicyObject,
-                  error: []
+                  error: [],
+                  validation_error: []
               }) 
           }
           else if (res.data.PolicyObject && res.data.UnderwritingResult && res.data.UnderwritingResult.Status == "Fail") {
               this.setState({
                   fulQuoteResp: res.data.PolicyObject,
                   serverResponse: [],
+                  validation_error: [],
                   error: {"message": 1}
               }) 
+          }
+          else if (res.data.code && res.data.message && res.data.code == "validation failed" && res.data.message == "validation failed") {
+            var validationErrors = []
+            for (const x in res.data.messages) {
+                validationErrors.push(res.data.messages[x].message)
+               }
+               this.setState({
+                fulQuoteResp: [],
+                validation_error: validationErrors,
+                error: [],
+                serverResponse: []
+            });
+            // swal(res.data.data.messages[0].message)
           }
           else {
             this.setState({
                 fulQuoteResp: [],
                 error: res.data.ValidateResult,
+                validation_error: [],
                 serverResponse: []
             });
         }
@@ -333,7 +350,7 @@ class SelectDuration extends Component {
 
     render() {
         const {productId} = this.props.match.params
-        const {policyHolderDetails, serverResponse, error, EndDate, endDateFlag, fulQuoteResp, insurePlan, ksbinfo, insurePeriod, showInstallment, installment_premium_payment } = this.state
+        const {policyHolderDetails, serverResponse, error, EndDate, endDateFlag, fulQuoteResp, insurePlan, ksbinfo, insurePeriod, showInstallment, installment_premium_payment, validation_error } = this.state
         const request_data = policyHolderDetails ? policyHolderDetails.request_data:null;
         let start_date = request_data && request_data.start_date ? new Date(request_data.start_date): '';
 
@@ -351,6 +368,21 @@ class SelectDuration extends Component {
             <span className="errorMsg"><h6><strong>{error.message}</strong></h6></span>
             // <span className="errorMsg"><h6><strong>Thank you for showing your interest for buying product.Due to some reasons, we are not able to issue the policy online.Please call 1800 22 1111</strong></h6></span>                                
         ) : null 
+
+        const validationErrors = 
+            validation_error ? (
+                validation_error.map((errors, qIndex) => (
+                    <span className="errorMsg"><h6>Errors : 
+                        <strong>
+                            <ul>
+                                <li>
+                                    {errors}
+                                </li>
+                            </ul>
+                        </strong></h6>
+                    </span>
+                ))        
+        ): null;
                                                         
        
         return (
@@ -366,6 +398,7 @@ class SelectDuration extends Component {
                                 <section className="brand">
                                     <div className="boxpd">
                                         <div>{errMsg}</div>
+                                        <h5>{validationErrors}</h5>
                                         <div className="d-flex justify-content-left carloan m-b-25">
                                             <h4> Select the duration for your Health Insurance</h4>                                          
                                         </div>

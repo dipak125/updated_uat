@@ -897,7 +897,7 @@ const validateFamilyMembers  = Yup.object().shape({
 
     primaryInsured: Yup.string().when(['productTypes'], {
         is: productTypes => productTypes == '3',       
-        then: Yup.string().required('please select primary insured'),
+        then: Yup.string().required('Please select primary insured').nullable(),
         othewise: Yup.string()
     })
     
@@ -2374,7 +2374,7 @@ setStateForPreviousData=(family_members)=>{
                                                 </div>
 
                                                 <div className="col-md-4 formSection">
-                                                    <Field
+                                                    {/* <Field
                                                         name="primaryInsured"
                                                         component="select"
                                                         autoComplete="off"
@@ -2387,13 +2387,52 @@ setStateForPreviousData=(family_members)=>{
                                                         <option value="father">Father</option>
                                                         <option value="mother">Mother</option>
                                                         <option value="fatherinlaw">Father in law</option>
-                                                        <option value="motherinlaw">Mother in law</option>
-                                                    </Field>    
+                                                        <option value="motherinlaw">Mother in law</option> 
+                                                    </Field> */}
+                                                    <FormGroup>
+                                                            <div className="d-inline-flex m-b-35">
+                                                                <div className="p-r-25">
+                                                                    <label className="customRadio3">
+                                                                    <Field
+                                                                        type="radio"
+                                                                        name='primaryInsured'                                            
+                                                                        value='self'
+                                                                        key='1'  
+                                                                        onChange={(e) => {
+                                                                            setFieldValue(`primaryInsured`, e.target.value);
+                                                                        }}
+                                                                        checked={values.primaryInsured == 'self' ? true : false}
+                                                                    />
+                                                                        <span className="checkmark " /><span className="fs-14"> Self</span>
+                                                                    </label>
+                                                                </div>
+
+                                                                <div className="">
+                                                                    <label className="customRadio3">
+                                                                        <Field
+                                                                        type="radio"
+                                                                        name='primaryInsured'                                            
+                                                                        value='spouse'
+                                                                        key='1'  
+                                                                        onChange={(e) => {
+                                                                            setFieldValue(`primaryInsured`, e.target.value);
+                                                                        }}
+                                                                        checked={values.primaryInsured == 'spouse' ? true : false}
+                                                                    />
+                                                                        <span className="checkmark" />
+                                                                        <span className="fs-14">Spouse</span>
+                                                                        {/* {errors.primaryInsured && touched.primaryInsured ? (
+                                                                        <span className="errorMsg">{errors.primaryInsured}</span>
+                                                                    ) : null} */}
+                                                                    </label>
+                                                                </div>
+                                                            </div>
+                                                        </FormGroup>    
 
                                                     <label className="formGrp error">
                                                     {
                                                         errors.primaryInsured && touched.primaryInsured ?                 
-                                                        <span className="error-message">{errors.primaryInsured}</span>:''
+                                                        <span className="errorMsg">{errors.primaryInsured}</span>:''
                                                     }
                                                     </label>
                                                 </div>         
