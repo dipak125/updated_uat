@@ -785,10 +785,14 @@ class OtherComprehensiveMISCD extends Component {
                     console.log('chasis_price', res.data.data.chasis_price)
                 }
                 else if (res.data.data.PolicyObject && res.data.data.UnderwritingResult && res.data.data.UnderwritingResult.Status == "Fail") {
+                    var validationErrors = []
+                    for (const x in res.data.data.UnderwritingResult.MessageList) {
+                        validationErrors.push(res.data.data.UnderwritingResult.MessageList[x].Message)
+                       }
                     this.setState({
                         fulQuoteResp: res.data.data.PolicyObject,
-                        error: {"message": 1},
-                        validation_error: [],
+                        error: {"message": 0},
+                        validation_error: validationErrors,
                         serverResponse: [],
                         policyCoverage: res.data.data.PolicyObject.PolicyLobList ? res.data.data.PolicyObject.PolicyLobList[0].PolicyRiskList[0].PolicyCoverageList : [],
                     });
@@ -1256,8 +1260,9 @@ class OtherComprehensiveMISCD extends Component {
         }
         
         let minBodyIDV = 0
-        //let maxBodyIDV = PolicyArray.length > 0 ? Math.round(PolicyArray[0].PolicyRiskList[0].IDV_Suggested/5) : 0
-        let maxBodyIDV = Math.round(chasis_price*0.5); //Maximum Limit is 50 percent of Chasis Price.
+        let maxBodyIDV = PolicyArray.length > 0 ? Math.floor(PolicyArray[0].PolicyRiskList[0].IDV_Suggested*0.5) : 0
+        // let maxBodyIDV = PolicyArray.length > 0 ? Math.round(PolicyArray[0].PolicyRiskList[0].IDV_Suggested/5) : 0
+        // let maxBodyIDV = Math.round(chasis_price*0.5); //Maximum Limit is 50 percent of Chasis Price.
         let defaultBodySliderValue =  motorInsurance && motorInsurance.body_idv_value ? Math.round(motorInsurance.body_idv_value) : 0
         let bodySliderValue = bodySliderVal
 

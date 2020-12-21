@@ -268,7 +268,7 @@ class PolicyDetails extends Component {
                         <FormGroup>Name:</FormGroup>
                     </Col>
                     <Col sm={12} md={6}>
-                        <FormGroup>{nomineeDetails ? nomineeDetails.first_name : null}</FormGroup>
+                        <FormGroup>{nomineeDetails ? nomineeDetails.first_name+" "+nomineeDetails.last_name : null}</FormGroup>
                     </Col>
                 </Row>
 
