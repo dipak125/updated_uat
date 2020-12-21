@@ -655,10 +655,9 @@ class SelectDuration extends Component {
 
                                             <Col sm={12} md={3}>
                                                 <div className="regisBox medpd">
-                                                    <h4 className="txtRegistr resmb-15">
-                                                        <p>Ab Kutumb Swasthya Bima Ke Saath Doctor Ki Salah Phone Par</p>
-                                                        <p>Kutumb Swasthya Bima is for anyone and everyone who is looking for health insurance that is cost effective and offers great value</p>
-                                                    </h4>
+                                                    <h3 className="medihead">
+                                                        Ab Kutumb Swasthya Bima Ke Saath Doctor Ki Salah Phone Par  
+                                                    </h3>
                                                 </div>
                                             </Col>
 

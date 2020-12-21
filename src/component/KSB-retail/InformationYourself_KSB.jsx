@@ -42,10 +42,11 @@ const initialValues = {
     motherInLawDob: "",
     gender: "",
     insureList: "",
-    primaryInsured: ""
+    primaryInsured: "",
+    varient_type_id: "3",
+    productTypes: "3"
 
 }
-
 
 
 const vehicleInspectionValidation = Yup.object().shape({
@@ -937,7 +938,7 @@ class InformationYourself extends Component {
             display_gender:[],
             gender_for:[],
             confirm: "",
-            productTypes: "",
+            productTypes: "3",
             insureRepository: [],
             insureBusinessPlan: [],
             insurePlan: [],
@@ -1404,9 +1405,9 @@ setStateForPreviousData=(family_members)=>{
             looking_for_9: display_looking_for_arr[9] ? display_looking_for_arr[9] : "",
             dob_9: display_dob_arr[9] ? new Date(display_dob_arr[9]) : "",
             insureList: insureListPrev ? insureListPrev.toString()  : (insureList ? insureList :''),  
-            varient_type_id: ksbinfo ? ksbinfo.varient_type_id : "",
+            // varient_type_id: ksbinfo ? ksbinfo.varient_type_id : "3",
             primaryInsured: ksbinfo ? ksbinfo.primary_insured : "",
-            productTypes: productTypes,
+            // productTypes: productTypes,
             confirm: localStorage.getItem("confirm") ? localStorage.getItem("confirm") : ""
             // ksbbusniessplan_id: ksbinfo ? ksbinfo.ksbbusniessplan_id : "",
             // insurrepostry_id: ksbinfo ? ksbinfo.insurrepostry_id : "",
@@ -1479,7 +1480,7 @@ setStateForPreviousData=(family_members)=>{
                                             ) : null}    
                                             </div>
                                         </div> */}
-                                        <div className="row formSection">
+                                        {/* <div className="row formSection">
                                             <label className="col-md-4">Product Type:</label>
                                             <div className="col-md-4">
                                             <Field
@@ -1502,7 +1503,7 @@ setStateForPreviousData=(family_members)=>{
                                                 <span className="errorMsg">{errors.varient_type_id}</span>
                                             ) : null}    
                                             </div>
-                                        </div>
+                                        </div> */}
                                         
                                         <div className="row formSection">
                                             <label className="col-md-4">Gender:</label>
