@@ -52,6 +52,7 @@ const initialValues = {
 const vehicleInspectionValidation = Yup.object().shape({
     gender: Yup.string().required('Please select gender'),
     varient_type_id: Yup.string().required('Please select product type'),
+    ksbplan_id: Yup.string().required('Please select Plan'),
     // ksbbusniessplan_id: Yup.string().required('Please select business plan'),
     // insurrepostry_id: Yup.string().required('Please select repository'),
    
@@ -1044,6 +1045,7 @@ class InformationYourself extends Component {
     post_data['ksbbusniessplan_id'] = 1
     post_data['page_name'] = `Health_KSB/${productId}`
     post_data['primaryInsured'] = this.state.primaryInsured
+    post_data['ksbplan_id'] = values.ksbplan_id
     
     
     let arr_date=[]
@@ -1240,6 +1242,22 @@ class InformationYourself extends Component {
         //this.handleClose()
     }
 }
+
+fetchInsurePlan = () => {
+    axios.get(`ksbplan`)
+    .then(res=>{
+        var insurePlan = res.data && res.data.data ? res.data.data : []
+        this.setState({
+            insurePlan            
+        })
+        this.props.loadingStop();
+    })
+    .catch(err => {
+        // handle error
+        this.props.loadingStop();
+    })
+}
+
 componentDidMount(){
     this.fetchData();
     this.fetchRelations();
@@ -1317,7 +1335,8 @@ fetchRelations = () => {
         this.setState({
             relationList            
         })
-        this.fetchInsureBusinessPlan()
+        // this.fetchInsureBusinessPlan()
+        this.fetchInsurePlan()
     })
     .catch(err => {
         // handle error
@@ -1408,7 +1427,8 @@ setStateForPreviousData=(family_members)=>{
             // varient_type_id: ksbinfo ? ksbinfo.varient_type_id : "3",
             primaryInsured: ksbinfo ? ksbinfo.primary_insured : "",
             // productTypes: productTypes,
-            confirm: localStorage.getItem("confirm") ? localStorage.getItem("confirm") : ""
+            confirm: localStorage.getItem("confirm") ? localStorage.getItem("confirm") : "",
+            ksbplan_id: ksbinfo && ksbinfo.ksbplan_id ? ksbinfo.ksbplan_id : "",
             // ksbbusniessplan_id: ksbinfo ? ksbinfo.ksbbusniessplan_id : "",
             // insurrepostry_id: ksbinfo ? ksbinfo.insurrepostry_id : "",
         });
@@ -1504,7 +1524,31 @@ setStateForPreviousData=(family_members)=>{
                                             ) : null}    
                                             </div>
                                         </div> */}
-                                        
+
+                                        <div className="row formSection">
+                                            <label className="col-md-4">Plan Name:</label>
+                                            <div className="col-md-4">
+                                            <Field
+                                                name="ksbplan_id"
+                                                component="select"
+                                                autoComplete="off"
+                                                value={values.ksbplan_id}
+                                                className="formGrp"
+                                                onChange={(e) => {
+                                                    setFieldValue('ksbplan_id', e.target.value);
+                                                }}
+                                            >
+                                           <option value="">Select Plan</option> 
+                                                {insurePlan.map((plan, qIndex) => ( 
+                                                    <option value={plan.id}>{plan.descriptions}</option>
+                                                ))}
+                                            </Field>  
+                                            {errors.ksbplan_id && touched.ksbplan_id ? (
+                                                <span className="errorMsg">{errors.ksbplan_id}</span>
+                                            ) : null}    
+                                            </div>
+                                        </div>
+
                                         <div className="row formSection">
                                             <label className="col-md-4">Gender:</label>
                                             <div className="col-md-4">

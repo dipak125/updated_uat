@@ -16,6 +16,7 @@ import queryString from 'query-string';
 import fuel from '../common/FuelTypes';
 import swal from 'sweetalert';
 import moment from "moment";
+import {registrationNoFormat} from '../../shared/reUseFunctions';
 
 const initialValue = {
     gateway : ""
@@ -53,7 +54,7 @@ class PremiumGCV extends Component {
             nomineedetails:[],
             relation: [],
             policyHolder: [],
-	    step_completed: "0",
+	        step_completed: "0",
             vehicleDetails: [],
             previousPolicy: [],
             request_data: [],
@@ -141,10 +142,19 @@ class PremiumGCV extends Component {
             })
     }
 
-    callBreakin=()=>{
+    callBreakin=(regnNumber)=>{
 
         const formData = new FormData();
         let encryption = new Encryption();
+        let num = regnNumber
+        let numLength = num.length
+        let val =""
+        let formatVal = num.substring(0, 1)
+        for(var i=0;i<=14;i++){
+            formatVal = val+num.substring(i, i+1)
+            val = registrationNoFormat(formatVal, numLength)
+        }
+
         let policyHolder_id = this.state.policyHolder_refNo ? this.state.policyHolder_refNo : '0'
         let bc_data = sessionStorage.getItem('bcLoginData') ? sessionStorage.getItem('bcLoginData') : "";
         if(bc_data) {
@@ -152,6 +162,7 @@ class PremiumGCV extends Component {
         }
         formData.append('bcmaster_id', sessionStorage.getItem('csc_id') ? "5" : bc_data ? bc_data.agent_id : "" ) 
         formData.append('ref_no', policyHolder_id) 
+        formData.append('registrationNo', val)
 
         this.props.loadingStart();
         axios.post('breakin/create',formData)
@@ -246,7 +257,7 @@ class PremiumGCV extends Component {
                                     })
                                     .then((willCreate) => {
                                         if (willCreate) {
-                                            this.callBreakin()
+                                            this.callBreakin(motorInsurance && motorInsurance.registration_no)
                                         }
                                         else {
                                             this.props.loadingStop();
