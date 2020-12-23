@@ -40,7 +40,7 @@ const initialValues = {
   date_of_birth: "",
   relation_with: "", 
   appointee_name: "",
-  appointee_dob: "",
+  appointee_dob: null,
   appointee_relation_with: "",
   // is_appointee: 0
 };
@@ -153,34 +153,38 @@ email_id: Yup.string().email().min(8, function() {
   relation_with: Yup.string().required(function () {
     return "Please select relation";
   }),
-  //  appointee_dob: Yup.date().required(function() {
-  //       return "Date should not be future date"
-  //       }).test(
-  //           "18YearsChecking",
-  //           function() {
-  //               return "Appointee age should be more than 18 years"
-  //           },
-  //           function (value) {
-  //               const ageObj = new PersonAge();
-  //               if (value) {
-  //                   const age_Obj = new PersonAge();
-  //                   return age_Obj.whatIsMyAge(value) >= 18;
-  //               }
-  //               return true;
-  //           }
-  //       ).test(
-  //           "18YearsChecking",
-  //           function() {
-  //               return "Please enter Appointee date of birth"
-  //           },
-  //           function (value) {
-  //               const ageObj = new PersonAge();
-  //               if (ageObj.whatIsMyAge(this.parent.dob) < 18) {   
-  //                   return ageObj.whatIsMyAge(value) >= 18;    
-  //               }
-  //               return true;
-  //           }
-  //       ),
+appointee_dob: Yup.string().when(['ageCheckValue'], {
+    is: ageCheckValue => ageCheckValue == '1',   
+  then: Yup.date().required(function() {
+        return "Date should not be future date"
+        }).test(
+            "18YearsChecking",
+            function() {
+                return "Appointee age should be more than 18 years"
+            },
+            function (value) {
+                const ageObj = new PersonAge();
+                if (value) {
+                    const age_Obj = new PersonAge();
+                    return age_Obj.whatIsMyAge(value) >= 18;
+                }
+                return true;
+            }
+        ).test(
+            "18YearsChecking",
+            function() {
+                return "Please enter Appointee date of birth"
+            },
+            function (value) {
+                const ageObj = new PersonAge();
+                if (ageObj.whatIsMyAge(this.parent.dob) < 18) {   
+                    return ageObj.whatIsMyAge(value) >= 18;    
+                }
+                return true;
+            }
+        ),
+        otherwise: Yup.string().nullable()
+      }),
   // appointee_name:Yup.string(function() {
   //   return "Please enter appointee name"
   //   }).notRequired(function() {
@@ -206,21 +210,24 @@ email_id: Yup.string().email().min(8, function() {
   //     .max(40, function() {
   //     return "Name must be maximum 40 chracters"
   //     }),
-  //     appointee_relation_with: Yup.string().notRequired(function() {
-  //     return "Please select relation"
-  //     }).test(
-  //     "18YearsChecking",
-  //     function() {
-  //         return "Please enter Appointee relation"
-  //     },
-  //     function (value) {
-  //         const ageObj = new PersonAge();
-  //         if (ageObj.whatIsMyAge(this.parent.dob) < 18 && !value) {   
-  //             return false;    
-  //         }
-  //         return true;
-  //     }
-  //     )
+      appointee_relation_with: Yup.string().when(['ageCheckValue'], {
+        is: ageCheckValue => ageCheckValue == '1',   
+      then: Yup.string().required(function() {
+      return "Please select relation"
+      }).test(
+      "18YearsChecking",
+      function() {
+          return "Please enter Appointee relation"
+      },
+      function (value) {
+          const ageObj = new PersonAge();
+          if (ageObj.whatIsMyAge(this.parent.dob) < 18 && !value) {   
+              return false;    
+          }
+          return true;
+      }),
+      otherwise: Yup.string().nullable()
+    })
 });
 
 class AccidentAdditionalDetails extends Component {
@@ -256,7 +263,7 @@ class AccidentAdditionalDetails extends Component {
         let decryptResp = JSON.parse(encryption.decrypt(res.data));
         // console.log("decrypt---accidentDetails--->>", decryptResp);
         let accidentDetails = decryptResp.data && decryptResp.data.policyHolder ? decryptResp.data.policyHolder : null;
-        console.log("---accidentDetails--->>", accidentDetails);
+        // console.log("---accidentDetails--->>", accidentDetails);
         let address = accidentDetails && accidentDetails.address ? JSON.parse(accidentDetails.address) : {};
         let pincodeRESP = accidentDetails && accidentDetails.pincode_response ? JSON.parse(accidentDetails.pincode_response) : {};
         this.setState({
@@ -265,7 +272,7 @@ class AccidentAdditionalDetails extends Component {
           pincodeRESP,
         });
         let pincodeArea = pincodeRESP && pincodeRESP.PIN_CD ?  pincodeRESP.PIN_CD : ""
-        console.log('pincodeArea------>>',pincodeArea)
+        // console.log('pincodeArea------>>',pincodeArea)
          this.fetchAreadetailsBack(pincodeArea)
         this.props.loadingStop();
       })
@@ -278,7 +285,7 @@ class AccidentAdditionalDetails extends Component {
   handleSubmit = (values, actions, ageValue) => {
     const {productId} = this.props.match.params 
     const {accidentDetails} = this.state
-    console.log('values------->>>',values)
+    // console.log('values------->>>',values)
     const formData = new FormData(); 
     let encryption = new Encryption();
     let date_of_birth = moment(values.nominee_dob).format('yyyy-MM-DD');
@@ -308,13 +315,13 @@ class AccidentAdditionalDetails extends Component {
         'appointee_dob':date_of_birth_appointee,
         'appointee_relation_with':values.appointee_relation_with,
     }
-    console.log('post_data', post_data);
+    // console.log('post_data', post_data);
     formData.append('enc_data',encryption.encrypt(JSON.stringify(post_data)))
     axios
     .post(`ipa/proposer-info`, formData)
     .then(res => { 
         let decryptResp = JSON.parse(encryption.decrypt(res.data));
-        console.log('decryptResp-----', decryptResp)
+        // console.log('decryptResp-----', decryptResp)
         if (decryptResp.error == false) {
         this.props.history.push(`/AccidentAdditionalPremium/${productId}`);
         } else {
@@ -373,10 +380,10 @@ class AccidentAdditionalDetails extends Component {
   fetchAreadetailsBack = (pincode_input) => {
     let pinCode = pincode_input.toString();
 
-    console.log("fetchAreadetailsBack pinCode", pinCode.length);
+    // console.log("fetchAreadetailsBack pinCode", pinCode.length);
 
     if (pinCode != null && pinCode != "" && pinCode.length == 6) {
-      console.log("fetchAreadetailsBack pinCode", pinCode);
+      // console.log("fetchAreadetailsBack pinCode", pinCode);
       const formData = new FormData();
       this.props.loadingStart();
       // let encryption = new Encryption();
@@ -414,9 +421,9 @@ class AccidentAdditionalDetails extends Component {
     axios.get('ipa/titles')
     .then(res=>{
       let decryptResp = JSON.parse(encryption.decrypt(res.data))
-      console.log("decrypt", decryptResp)
+      // console.log("decrypt", decryptResp)
         let titleList = decryptResp.data
-        console.log('titlelist----->>',titleList)                       
+        // console.log('titlelist----->>',titleList)                       
         this.setState({
             titleList
         });
@@ -437,36 +444,29 @@ class AccidentAdditionalDetails extends Component {
   ageCheck = (value) => {
       const ageObj = new PersonAge();
       let age = ageObj.whatIsMyAge(value)
-      console.log("ageCheck---->>",age)
+      let ageCheckValue = ''
+      // console.log("ageCheck---->>",age)
       if(age < 18){
+        ageCheckValue = 1
           this.setState({
               appointeeFlag: true,
               is_appointee:1,
           })
       }
       else {
+        ageCheckValue = 0
           this.setState({
               appointeeFlag: false,
-              is_appointee:0
+              is_appointee:0,
           })
       } 
-      // console.log('is_appointee------->>',this.is_appointee)
+      // console.log('ageCheckValue------->>',ageCheckValue)
   }
-  ageCheckValue = (value) => {
-      const ageObj = new PersonAge();
-      let ageValue = ageObj.whatIsMyAge(value)
-          this.setState({
-              ageValue
-          })
-          // console.log("ageCheckValue---->>",ageValue)
-  }
-
 
   render() {
-    const { pinDataArr, titleList, appointeeFlag, is_appointee, accidentDetails, ageValue, address, pincodeRESP } = this.state;
-    console.log('address--------->>',address)
-    const age_Value = ageValue ? ageValue : ""
-    console.log("ageCheckValue--->>state---->>",age_Value)
+    const { pinDataArr, titleList, appointeeFlag, is_appointee, accidentDetails, ageValue, address, pincodeRESP, ageCheckValue } = this.state;
+    // console.log('address--------->>',address)
+    // console.log("ageCheckValue--->>state---->>",this.state.ageCheckValue)
     const { productId } = this.props.match.params;
     const newInitialValues = Object.assign(initialValues, {      
       salutation_id: accidentDetails && accidentDetails.ipainfo ? accidentDetails.ipainfo.ipatitle.id : "",
@@ -489,9 +489,9 @@ class AccidentAdditionalDetails extends Component {
       relation_with : (accidentDetails && accidentDetails.request_data) && accidentDetails.request_data.nominee.length > 0  ? accidentDetails.request_data.nominee[0].relation_with : "",        
       // is_appointee: ,
       appointee_name: (accidentDetails && accidentDetails.request_data) && accidentDetails.request_data.nominee.length > 0  ? accidentDetails.request_data.nominee[0].appointee_name : "",
-      appointee_dob: accidentDetails && accidentDetails.request_data ? new Date(accidentDetails.request_data.nominee[0].appointee_dob) : "",
+      // appointee_dob: accidentDetails && accidentDetails.request_data ? new Date(accidentDetails.request_data.nominee[0].appointee_dob) : null,
       appointee_relation_with: (accidentDetails && accidentDetails.request_data) && accidentDetails.request_data.nominee.length > 0  ? accidentDetails.request_data.nominee[0].appointee_relation_with : "",
-      nominee_age: this.state.ageValue ? this.state.ageValue : ""
+      // nominee_age: null
     });
 
     return (
@@ -529,7 +529,7 @@ class AccidentAdditionalDetails extends Component {
                               <div className="brandhead">
                                 <h4 className="fs-18 m-b-30">
                                   Contact details of proposer
-                                </h4>
+                                 </h4>
                               </div>
                             </div>
 
@@ -956,7 +956,6 @@ class AccidentAdditionalDetails extends Component {
                                       setFieldTouched("nominee_dob");
                                       setFieldValue("nominee_dob", value);
                                       this.ageCheck(value);
-                                      this.ageCheckValue(value)
                                     }}
                                     selected={values.nominee_dob}
                                   />
@@ -975,7 +974,7 @@ class AccidentAdditionalDetails extends Component {
                                       type="text"
                                       placeholder="Age"
                                       autoComplete="off"
-                                      value={new Date().getFullYear() - new Date(values.nominee_dob).getFullYear()}
+                                      value={new Date().getFullYear() - new Date(values.nominee_dob).getFullYear()} 
                                     />
                                   </div>
                                 </FormGroup>

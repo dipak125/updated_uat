@@ -387,7 +387,10 @@ class OtherComprehensiveMISCD extends Component {
             no_of_claim: [],
             trailer_array: [],
             ncbDiscount:0,
-            validation_error: []
+            validation_error: [],
+            vehicle_age: "",
+            depreciationPercentage: "",
+            bodyIdvStatus: 0
         };
     }
 
@@ -441,12 +444,14 @@ class OtherComprehensiveMISCD extends Component {
     }
 
     bodySliderValue = (value) => {
+
         this.setState({
             bodySliderVal: value,
             serverResponse: [],
-            error: []
+            error: [],
         })
     }
+
 
     vehicleDetails = (productId) => {      
         this.props.history.push(`/VehicleDetails_MISCD/${productId}`);
@@ -465,6 +470,7 @@ class OtherComprehensiveMISCD extends Component {
                 let request_data = decryptResp.data.policyHolder ? decryptResp.data.policyHolder.request_data : {};
                 let vehicleDetails = decryptResp.data.policyHolder ? decryptResp.data.policyHolder.vehiclebrandmodel : {};
                 let trailer_array = motorInsurance.trailers && motorInsurance.trailers!=null ? motorInsurance.trailers : null
+                let vehicle_age = motorInsurance && (motorInsurance.vehicle_age || motorInsurance.vehicle_age == "0") ? motorInsurance.vehicle_age : ""
                 
                 trailer_array = trailer_array!=null ? JSON.parse(trailer_array) : []
                 let values = []
@@ -547,10 +553,11 @@ class OtherComprehensiveMISCD extends Component {
                     vahanVerify: motorInsurance.chasis_no && motorInsurance.engine_no ? true : false,
                     selectFlag: motorInsurance && motorInsurance.add_more_coverage != null ? '0' : '1',
                     no_of_claim: add_more_coverage_request_array.B00007 ? add_more_coverage_request_array.B00007.value : "",
-                    add_more_coverage_request_array,trailer_array
+                    add_more_coverage_request_array,trailer_array, vehicle_age
                 })
                 this.props.loadingStop();
-                this.getAccessToken(values)
+                this.depreciation(values)
+                
             })
             .catch(err => {
                 // handle error
@@ -558,8 +565,41 @@ class OtherComprehensiveMISCD extends Component {
             })
     }
 
+    depreciation = (values) => {      
+        const {vehicle_age} = this.state
+        const formData = new FormData();
+        this.props.loadingStart();
+        const post_data = {
+            'vehicle_age':vehicle_age,
+        }
+        let encryption = new Encryption();
+        formData.append('enc_data',encryption.encrypt(JSON.stringify(post_data)))
+        axios
+          .post(`/miscd/getMaxBodyIDV`, formData)
+          .then((res) => {
+            let decryptResp = JSON.parse(encryption.decrypt(res.data))
+            this.setState({
+                depreciationPercentage: decryptResp.data,
+            });
+            this.getAccessToken(values)
+          })
+          .catch((err) => {
+            this.setState({
+              accessToken: '',
+            });
+            this.props.loadingStop();
+          });
+
+    }
+
+
     getAccessToken = (values) => {
         this.props.loadingStart();
+        var bodyIdvStatus = this.state.bodyIdvStatus
+        bodyIdvStatus = bodyIdvStatus + 1
+        this.setState({
+            bodyIdvStatus: bodyIdvStatus
+        })
         axios
           .post(`/callTokenService`)
           .then((res) => {
@@ -694,6 +734,8 @@ class OtherComprehensiveMISCD extends Component {
 
     fullQuote = (access_token, values) => {
         const { PolicyArray, sliderVal, add_more_coverage, motorInsurance, bodySliderVal ,vehicleDetails, chasis_price} = this.state
+
+        console.log("values----------------///--- ", values)
         // let cng_kit_flag = 0;
         // let cngKit_Cost = 0;
         // if(values.toString()) {            
@@ -745,7 +787,7 @@ class OtherComprehensiveMISCD extends Component {
         const post_data = {
             'ref_no':localStorage.getItem('policyHolder_refNo'),
             'access_token':access_token,
-            'idv_value': sliderVal ? sliderVal : defaultSliderValue.toString(),
+            'idv_value': this.state.bodyIdvStatus != 2 ? (sliderVal ? sliderVal : defaultSliderValue.toString()) : 0,
             'policy_type': motorInsurance.policy_type,
             'add_more_coverage': add_more_coverage.toString(),
             'PA_Cover': values.PA_flag ? values.PA_Cover : "0",
@@ -1114,31 +1156,8 @@ class OtherComprehensiveMISCD extends Component {
 
     regnoFormat = (e, setFieldTouched, setFieldValue) => {
     
-        let regno = e.target.value
-        // let formatVal = ""
-        // let regnoLength = regno.length
-        // var letter = /^[a-zA-Z]+$/;
-        // var number = /^[0-9]+$/;
-        // let subString = regno.substring(regnoLength-1, regnoLength)
-        // let preSubString = regno.substring(regnoLength-2, regnoLength-1)
-    
-        // if(subString.match(letter) && preSubString.match(letter)) {
-        //     formatVal = regno
-        // }
-        // else if(subString.match(number) && preSubString.match(number) && regnoLength == 6) {
-        //     formatVal = formatVal = regno.substring(0, regnoLength-1) + " " +subString
-        // } 
-        // else if(subString.match(number) && preSubString.match(letter)) {        
-        //     formatVal = regno.substring(0, regnoLength-1) + " " +subString      
-        // } 
-        // else if(subString.match(letter) && preSubString.match(number)) {
-        //     formatVal = regno.substring(0, regnoLength-1) + " " +subString   
-        // } 
-    
-        // else formatVal = regno.toUpperCase()
-        
-        e.target.value = regno.toUpperCase()
-    
+        let regno = e.target.value      
+        e.target.value = regno.toUpperCase()  
     }
 
     
@@ -1243,7 +1262,7 @@ class OtherComprehensiveMISCD extends Component {
 
 
     render() {
-        const {showCNG, is_CNG_account, vahanDetails,error, policyCoverage, vahanVerify, selectFlag, fulQuoteResp, PolicyArray, fuelList, chasis_price, vehicleDetails,validation_error,
+        const {showCNG, is_CNG_account, vahanDetails,error, policyCoverage, vahanVerify, selectFlag, fulQuoteResp, PolicyArray, fuelList, depreciationPercentage, vehicleDetails,validation_error,
             moreCoverage, sliderVal, bodySliderVal, motorInsurance, serverResponse, engine_no, chasis_no, initialValue, add_more_coverage_request_array,ncbDiscount} = this.state
         const {productId} = this.props.match.params 
         let defaultSliderValue = PolicyArray.length > 0 ? Math.round(PolicyArray[0].PolicyRiskList[0].IDV_Suggested) : 0
@@ -1258,9 +1277,10 @@ class OtherComprehensiveMISCD extends Component {
             minIDV = minIDV + 1;
             // maxIDV = maxIDV - 1;
         }
-        
+        let maxBodyVal =  PolicyArray.length > 0 ? PolicyArray[0].PolicyRiskList[0].MSP *depreciationPercentage : 0
+        console.log("maxBodyVal============== ", maxBodyVal)
         let minBodyIDV = 0
-        let maxBodyIDV = PolicyArray.length > 0 ? Math.floor(PolicyArray[0].PolicyRiskList[0].IDV_Suggested*0.5) : 0
+        let maxBodyIDV = PolicyArray.length > 0 ? Math.floor(maxBodyVal/200) : 0
         // let maxBodyIDV = PolicyArray.length > 0 ? Math.round(PolicyArray[0].PolicyRiskList[0].IDV_Suggested/5) : 0
         // let maxBodyIDV = Math.round(chasis_price*0.5); //Maximum Limit is 50 percent of Chasis Price.
         let defaultBodySliderValue =  motorInsurance && motorInsurance.body_idv_value ? Math.round(motorInsurance.body_idv_value) : 0

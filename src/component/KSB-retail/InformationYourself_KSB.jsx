@@ -42,7 +42,7 @@ const initialValues = {
     motherInLawDob: "",
     gender: "",
     insureList: "",
-    primaryInsured: "",
+    primaryInsured: "self",
     varient_type_id: "3",
     productTypes: "3"
 
@@ -1425,7 +1425,7 @@ setStateForPreviousData=(family_members)=>{
             dob_9: display_dob_arr[9] ? new Date(display_dob_arr[9]) : "",
             insureList: insureListPrev ? insureListPrev.toString()  : (insureList ? insureList :''),  
             // varient_type_id: ksbinfo ? ksbinfo.varient_type_id : "3",
-            primaryInsured: ksbinfo ? ksbinfo.primary_insured : "",
+            primaryInsured: ksbinfo && ksbinfo.primary_insured ? ksbinfo.primary_insured : "self",
             // productTypes: productTypes,
             confirm: localStorage.getItem("confirm") ? localStorage.getItem("confirm") : "",
             ksbplan_id: ksbinfo && ksbinfo.ksbplan_id ? ksbinfo.ksbplan_id : "",
@@ -1724,7 +1724,8 @@ setStateForPreviousData=(family_members)=>{
                                                                 
                                                             } else {
                                                                 setFieldValue('looking_for_1', '');
-                                                                setFieldValue("dob_1", '');                                                                
+                                                                setFieldValue("dob_1", '');  
+                                                                setFieldValue("primaryInsured", 'self');                                                                 
                                                             }
 
                                                             if(this.setValueData()){
@@ -2418,22 +2419,7 @@ setStateForPreviousData=(family_members)=>{
                                                     </label>
                                                 </div>
 
-                                                <div className="col-md-4 formSection">
-                                                    {/* <Field
-                                                        name="primaryInsured"
-                                                        component="select"
-                                                        autoComplete="off"
-                                                        value={values.primaryInsured}
-                                                        className="formGrp"
-                                                    >
-                                                    <option value="">Select</option>
-                                                        <option value="self">Self</option>
-                                                        <option value="spouse">Spouse</option>
-                                                        <option value="father">Father</option>
-                                                        <option value="mother">Mother</option>
-                                                        <option value="fatherinlaw">Father in law</option>
-                                                        <option value="motherinlaw">Mother in law</option> 
-                                                    </Field> */}
+                                                <div className="col-md-4 formSection">                                                   
                                                     <FormGroup>
                                                             <div className="d-inline-flex m-b-35">
                                                                 <div className="p-r-25">
@@ -2451,7 +2437,7 @@ setStateForPreviousData=(family_members)=>{
                                                                         <span className="checkmark " /><span className="fs-14"> Self</span>
                                                                     </label>
                                                                 </div>
-
+                                                                {values.looking_for_1 == "spouse" ? 
                                                                 <div className="">
                                                                     <label className="customRadio3">
                                                                         <Field
@@ -2470,8 +2456,8 @@ setStateForPreviousData=(family_members)=>{
                                                                         <span className="errorMsg">{errors.primaryInsured}</span>
                                                                     ) : null} */}
                                                                     </label>
-                                                                </div>
-                                                            </div>
+                                                                </div> : null }
+                                                            </div> 
                                                         </FormGroup>    
 
                                                     <label className="formGrp error">

@@ -23,6 +23,14 @@ const initialValues = {
     titleList: []
 };
 
+const sum_insured_array = {
+  1:100000,
+  2:200000,
+  3:300000,
+  4:400000,
+  5:500000
+}
+
 const vehicleRegistrationValidation = Yup.object().shape({  
   salutation_id: Yup.string().required('Title is required').nullable(),
   first_name: Yup.string().required('First Name is required').min(3, function() {return "First name must be 3 characters"}).max(40,function() {
@@ -94,16 +102,14 @@ class AccidentSelectPlan extends Component {
     const {productId} = this.props.match.params;
     const formData = new FormData();
     let encryption = new Encryption();
-    // this.props.history.push(`/AccidentAddDetails/${productId}`)
     // const {} = this.state;
-    // let post_data = {};
     let date_of_birth = moment(values.date_of_birth).format('yyyy-MM-DD');
     this.props.loadingStart();
     let post_data = {
           'menumaster_id': '9',
           'page_name': `Registration_SME/${productId}`,
           'vehicle_type_id': '13',
-          'sum_insured' : values.sumInsured == 1 ? 100000 : values.sumInsured == 2 ? 200000 : values.sumInsured == 3 ? 300000 : values.sumInsured == 4 ? 400000 : values.sumInsured == 5 ? 500000  : null,
+          'sum_insured' : values.sumInsured ? sum_insured_array[values.sumInsured] : null,
           'proposer_title_id' : values.salutation_id,
           'proposer_first_name' : values.first_name,
           'proposer_last_name' : values.last_name,
@@ -113,7 +119,7 @@ class AccidentSelectPlan extends Component {
           // 'proposer_gender' : 'm'
       }
       let policyHolder_id = localStorage.getItem('policyHolder_id') ? localStorage.getItem('policyHolder_id') :0
-      console.log('policyHolder_id------>>',policyHolder_id)
+
       if(sessionStorage.getItem('csc_id')) {
           post_data['bcmaster_id'] = '2'
           post_data['csc_id'] = sessionStorage.getItem('csc_id') ? sessionStorage.getItem('csc_id') : ""
@@ -207,8 +213,73 @@ class AccidentSelectPlan extends Component {
       });
   };
 
+  quote = (values) => {
+    //console.log('value', value)
+    const {accessToken} = this.state 
+    const formData = new FormData(); 
+    this.props.loadingStart();
+    let date_of_birth = moment(values.date_of_birth).format('yyyy-MM-DD');
+    const post_data = {
+        'id':localStorage.getItem('policyHolder_id'),
+        'proposer_dob': date_of_birth ,
+        'sum_insured': values.sumInsured ? sum_insured_array[values.sumInsured] : null
+    }
+    let encryption = new Encryption();
+    formData.append('enc_data',encryption.encrypt(JSON.stringify(post_data)))
+    axios
+      .post(`/fullQuoteServiceIPA`, formData)
+      .then(res => { 
+        if (res.data.PolicyObject && res.data.UnderwritingResult && res.data.UnderwritingResult.Status == "Success") {
+          this.setState({
+              fulQuoteResp: res.data.PolicyObject,
+              serverResponse: res.data.PolicyObject,
+              error: [],
+              validation_error: []
+          }) 
+      }
+      else if (res.data.PolicyObject && res.data.UnderwritingResult && res.data.UnderwritingResult.Status == "Fail") {
+          this.setState({
+              fulQuoteResp: res.data.PolicyObject,
+              serverResponse: [],
+              validation_error: [],
+              error: {"message": 1}
+          }) 
+      }
+      else if (res.data.code && res.data.message && res.data.code == "validation failed" && res.data.message == "validation failed") {
+        var validationErrors = []
+        for (const x in res.data.messages) {
+            validationErrors.push(res.data.messages[x].message)
+           }
+           this.setState({
+            fulQuoteResp: [],
+            validation_error: validationErrors,
+            error: [],
+            serverResponse: []
+        });
+        // swal(res.data.data.messages[0].message)
+      }
+      else {
+        this.setState({
+            fulQuoteResp: [],
+            error: res.data.ValidateResult,
+            validation_error: [],
+            serverResponse: []
+        });
+    }
+      this.props.loadingStop();
+      })
+      .catch(err => {
+        this.setState({
+          serverResponse: []
+        });
+        this.props.loadingStop();
+      });
+  
+}
+
+
   render() {
-    const {titleList, accidentDetails} = this.state;
+    const {titleList, accidentDetails, serverResponse} = this.state;
     const newInitialValues = Object.assign(initialValues, {
       sumInsured: accidentDetails && accidentDetails.ipainfo ? accidentDetails.ipainfo.sum_insured == 100000 ? 1 : accidentDetails.ipainfo.sum_insured == 200000 ? 2 : accidentDetails.ipainfo.sum_insured == 300000 ? 3 : accidentDetails.ipainfo.sum_insured == 400000 ? 4 : accidentDetails.ipainfo.sum_insured == 500000 ? 5 : 0 : null,
       salutation_id: accidentDetails && accidentDetails.ipainfo ? accidentDetails.ipainfo.ipatitle.id : "",
@@ -238,7 +309,9 @@ class AccidentSelectPlan extends Component {
                       {" "}
                       {/* Select the Sum Insured for individual personal accident */}
                     </h4>
-                    <Formik initialValues={newInitialValues} onSubmit={this.handleSubmit} validationSchema={vehicleRegistrationValidation}>
+                    <Formik initialValues={newInitialValues} 
+                    onSubmit={ serverResponse && serverResponse != "" ? (serverResponse.message ? this.quote : this.handleSubmit ) : this.quote}
+                    validationSchema={vehicleRegistrationValidation}>
                       {({
                         values, errors, setFieldValue, setFieldTouched, isValid, isSubmitting, touched, }) => {
                         // console.log('values',values)
@@ -427,9 +500,14 @@ class AccidentSelectPlan extends Component {
                                     <h4> </h4>
                                 </div>
                                 <div className="d-flex justify-content-left resmb">
-                                <Button className={`proceedBtn`} type="submit"  disabled={isSubmitting ? true : false}>
-                                    {isSubmitting ? 'Wait..' : 'Procced'}
-                                </Button> 
+                                { serverResponse && serverResponse != "" ? (serverResponse.message ? 
+                                  <Button className={`proceedBtn`} type="submit"  >
+                                      Quote
+                                  </Button> : <Button className={`proceedBtn`} type="submit"  >
+                                      Continue
+                                  </Button> ) : <Button className={`proceedBtn`} type="submit"  >
+                                  Quote
+                                  </Button>}
                                 </div>
                           </Form>
                         );
