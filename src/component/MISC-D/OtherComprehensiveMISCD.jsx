@@ -467,11 +467,24 @@ class OtherComprehensiveMISCD extends Component {
                 let decryptResp = JSON.parse(encryption.decrypt(res.data))
                 console.log("decrypt--fetchData-- ", decryptResp)
                 let motorInsurance = decryptResp.data.policyHolder ? decryptResp.data.policyHolder.motorinsurance : {}
+                let previouspolicy = decryptResp.data.policyHolder ? decryptResp.data.policyHolder.previouspolicy : {}
                 let request_data = decryptResp.data.policyHolder ? decryptResp.data.policyHolder.request_data : {};
                 let vehicleDetails = decryptResp.data.policyHolder ? decryptResp.data.policyHolder.vehiclebrandmodel : {};
                 let trailer_array = motorInsurance.trailers && motorInsurance.trailers!=null ? motorInsurance.trailers : null
-                let vehicle_age = motorInsurance && (motorInsurance.vehicle_age || motorInsurance.vehicle_age == "0") ? motorInsurance.vehicle_age : ""
-                
+                let registration_date = motorInsurance && motorInsurance.registration_date ? motorInsurance.registration_date : ""
+                let previous_end_date = previouspolicy && previouspolicy.end_date ? previouspolicy.end_date : ""
+                let valid_previous_policy =  motorInsurance ? motorInsurance.valid_previous_policy : "0"
+                let policytype_id = motorInsurance ? motorInsurance.policytype_id : ""
+                let vehicle_age = 0
+
+                if(Math.floor(moment().diff(previous_end_date, 'months', true)) >1 || valid_previous_policy == "0" || policytype_id == "1") {
+                    vehicle_age = moment().diff(registration_date, 'days', true)
+                } 
+                else {
+                    vehicle_age = moment(previous_end_date).add(1, 'day').diff(registration_date, 'days', true)
+                }
+                console.log("vehicle_age---------- ", vehicle_age)
+
                 trailer_array = trailer_array!=null ? JSON.parse(trailer_array) : []
                 let values = []
                 let add_more_coverage = []
