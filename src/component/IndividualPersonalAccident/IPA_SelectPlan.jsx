@@ -220,12 +220,13 @@ class AccidentSelectPlan extends Component {
     this.props.loadingStart();
     let date_of_birth = moment(values.date_of_birth).format('yyyy-MM-DD');
     const post_data = {
-        'id':localStorage.getItem('policyHolder_id'),
+        'id':4473,
         'proposer_dob': date_of_birth ,
         'sum_insured': values.sumInsured ? sum_insured_array[values.sumInsured] : null
     }
     let encryption = new Encryption();
     formData.append('enc_data',encryption.encrypt(JSON.stringify(post_data)))
+
     axios
       .post(`/fullQuoteServiceIPA`, formData)
       .then(res => { 
@@ -359,7 +360,21 @@ class AccidentSelectPlan extends Component {
                                   </FormGroup>
                                 </Col>
                             </Row>
-                            <Row> <h1> </h1> </Row>
+                            <Row><h4>&nbsp;</h4></Row>
+                            <Row className="d-flex justify-content-left carloan m-b-25"> 
+                            <Col sm={4}>
+                                <div className="d-flex justify-content-between align-items-center premium m-b-25">
+                                    <p>Quotation No:</p>
+                                    <p><strong>Rs:</strong> { serverResponse ? (serverResponse.message ? 0 : serverResponse.DuePremium ) :0}</p>
+                                </div>
+                            </Col>
+                            <Col sm={4}>
+                                <div className="d-flex justify-content-between align-items-center premium m-b-25">
+                                    <p>Total Premium:</p>
+                                    <p><strong>Rs:</strong> { serverResponse ? (serverResponse.message ? 0 : serverResponse.DuePremium ) : 0}</p>
+                                </div>
+                            </Col>
+                            </Row>
                                 <div className="d-flex justify-content-left">
                                 <div className="brandhead">
                                     <h4>Enter proposer details</h4>
@@ -388,7 +403,7 @@ class AccidentSelectPlan extends Component {
                                         </FormGroup>
                                     </Col>
 
-                                    <Col sm={12} md={4} lg={4}>
+                                    <Col sm={6} md={3} lg={3}>
                                         <FormGroup>
                                             <div className="insurerName">
                                             <Field
@@ -407,7 +422,7 @@ class AccidentSelectPlan extends Component {
                                         </FormGroup>
                                     </Col>
 
-                                    <Col sm={12} md={4} lg={4}>
+                                    <Col sm={6} md={3} lg={3}>
                                         <FormGroup>
                                             <div className="insurerName">
                                             <Field
@@ -453,7 +468,7 @@ class AccidentSelectPlan extends Component {
                                             ) : null}  
                                             </FormGroup>
                                         </Col>
-                                        <Col sm={12} md={4} lg={4}>
+                                        <Col sm={6} md={3} lg={3}>
                                             <FormGroup className="m-b-25">
                                                 <div className="insurerName nmbract">
                                                     <span>+91</span>
@@ -474,7 +489,7 @@ class AccidentSelectPlan extends Component {
                                                 </div>
                                             </FormGroup>
                                         </Col>   
-                                        <Col sm={12} md={4} lg={4}>
+                                        <Col sm={6} md={3} lg={3}>
                                             <FormGroup>
                                                 <div className="insurerName">
                                                 <Field

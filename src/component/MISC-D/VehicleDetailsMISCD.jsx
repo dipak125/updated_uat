@@ -515,14 +515,7 @@ class VehicleDetailsMISCD extends Component {
         const {productId} = this.props.match.params 
         const {motorInsurance, changeFlag} = this.state
         let policy_type = 1
-        let vehicleAge = 0
-        // let vehicleAge = ageObj.whatIsMyVehicleAge(values.registration_date)
-        if(Math.floor(moment().diff(values.previous_end_date, 'days', true)) >1) {
-            vehicleAge = Math.floor(moment().diff(values.registration_date, 'months', true))
-        } 
-        else {
-            vehicleAge = Math.floor(moment(values.previous_end_date).add(1, 'day').diff(values.registration_date, 'months', true))
-        }
+        let vehicleAge = Math.floor(moment().diff(values.registration_date, 'months', true))
 
         if(changeFlag == 1) {
             swal("Registration city is required")

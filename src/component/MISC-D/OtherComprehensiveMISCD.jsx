@@ -478,7 +478,8 @@ class OtherComprehensiveMISCD extends Component {
                 let vehicle_age = 0
 
                 if(Math.floor(moment().diff(previous_end_date, 'months', true)) >1 || valid_previous_policy == "0" || policytype_id == "1") {
-                    vehicle_age = moment().diff(registration_date, 'days', true)
+                    let val = moment().format("YYYY-MM-DD")
+                    vehicle_age = moment(val).diff(registration_date, 'days', true)
                 } 
                 else {
                     vehicle_age = moment(previous_end_date).add(1, 'day').diff(registration_date, 'days', true)

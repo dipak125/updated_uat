@@ -217,10 +217,10 @@ class AccidentAddDetails extends Component {
                         return (
                           <Form>
                             <Row>
-                              <Col sm={6} md={5} lg={5}>
+                              <Col sm={6} md={4} lg={4}>
                                 <h6>Policy start date:</h6>
                               </Col>
-                              <Col sm={6} md={11} lg={4}>
+                              <Col sm={6} md={4} lg={4}>
                                 <FormGroup>
                                   <div className="formSection">
                                     <DatePicker
@@ -247,10 +247,10 @@ class AccidentAddDetails extends Component {
                               </Col>
                             </Row>
                             <Row>
-                              <Col sm={6} md={5} lg={5}>
+                              <Col sm={6} md={4} lg={4}>
                                 <h6>Policy end date</h6>
                               </Col>
-                              <Col sm={6} md={11} lg={4}>
+                              <Col sm={6} md={4} lg={4}>
                                 <FormGroup>
                                   <div className="formSection">
                                     <DatePicker
@@ -290,7 +290,7 @@ class AccidentAddDetails extends Component {
                               <h1> </h1>{" "}
                             </Row>
                             <Row>
-                              <Col sm={12} md={3} lg={3}>
+                              <Col sm={6} md={3} lg={3}>
                                 <FormGroup>
                                   <div className="formSection">
                                     <Field
@@ -311,7 +311,7 @@ class AccidentAddDetails extends Component {
                                 </FormGroup>
                               </Col>
 
-                              <Col sm={12} md={3} lg={4}>
+                              <Col sm={6} md={3} lg={3}>
                                 <FormGroup>
                                   <div className="insurerName">
                                     <Field
@@ -337,7 +337,7 @@ class AccidentAddDetails extends Component {
                                 </FormGroup>
                               </Col>
 
-                              <Col sm={12} md={3} lg={4}>
+                              <Col sm={6} md={3} lg={3}>
                                 <FormGroup>
                                   <div className="insurerName">
                                     <Field
@@ -365,7 +365,7 @@ class AccidentAddDetails extends Component {
                             </Row>
 
                             <Row>
-                              <Col sm={12} md={3} lg={3}>
+                              <Col sm={6} md={3} lg={3}>
                                 <FormGroup>
                                   <DatePicker
                                     name="date_of_birth"
@@ -394,7 +394,7 @@ class AccidentAddDetails extends Component {
                                   ) : null}
                                 </FormGroup>
                               </Col>
-                              <Col sm={12} md={3} lg={4}>
+                              <Col sm={6} md={3} lg={3}>
                                 <FormGroup>
                                   <div className="formSection">
                                     <Field
@@ -416,7 +416,7 @@ class AccidentAddDetails extends Component {
                                 </FormGroup>
                               </Col>
 
-                              <Col sm={12} md={3} lg={4}>
+                              <Col sm={6} md={3} lg={3}>
                                 <FormGroup>
                                   <div className="formSection">
                                     <Field
