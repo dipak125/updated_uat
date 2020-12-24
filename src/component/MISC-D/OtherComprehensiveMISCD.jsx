@@ -1277,10 +1277,10 @@ class OtherComprehensiveMISCD extends Component {
             minIDV = minIDV + 1;
             // maxIDV = maxIDV - 1;
         }
-        let maxBodyVal =  PolicyArray.length > 0 ? PolicyArray[0].PolicyRiskList[0].MSP *depreciationPercentage : 0
+        let maxBodyVal =  PolicyArray.length > 0 ? (PolicyArray[0].PolicyRiskList[0].MSP - (PolicyArray[0].PolicyRiskList[0].MSP * (depreciationPercentage/100))) : 0
         console.log("maxBodyVal============== ", maxBodyVal)
         let minBodyIDV = 0
-        let maxBodyIDV = PolicyArray.length > 0 ? Math.floor(maxBodyVal/200) : 0
+        let maxBodyIDV = PolicyArray.length > 0 ? Math.floor(maxBodyVal/2) : 0
         // let maxBodyIDV = PolicyArray.length > 0 ? Math.round(PolicyArray[0].PolicyRiskList[0].IDV_Suggested/5) : 0
         // let maxBodyIDV = Math.round(chasis_price*0.5); //Maximum Limit is 50 percent of Chasis Price.
         let defaultBodySliderValue =  motorInsurance && motorInsurance.body_idv_value ? Math.round(motorInsurance.body_idv_value) : 0
