@@ -9,6 +9,7 @@ import { loaderStart, loaderStop } from "../../store/actions/loader";
 import Motor from '../common/Motor';
 import Health from '../common/Health';
 import Others from '../common/Others';
+import PersonalAccident from '../common/PersonalAccident';
 import Footer from '../common/footer/Footer';
 import { setData } from "../../store/actions/data";
 
@@ -76,7 +77,7 @@ class Products extends Component {
                                                             <Footer />
                                                     </Tab.Pane>
                                                     <Tab.Pane eventKey="fourth">
-                                                            <Others tabId='4'/>
+                                                            <PersonalAccident tabId='4'/>
                                                             <Footer />
                                                     </Tab.Pane>
                                                     
@@ -113,7 +114,7 @@ class Products extends Component {
                                                             <Footer />
                                                         </Tab.Pane>
                                                         <Tab.Pane eventKey="fourth">
-                                                            <Others tabId='4'/>
+                                                            <PersonalAccident tabId='4'/>
                                                             <Footer />
                                                         </Tab.Pane>
                                                         
@@ -148,7 +149,7 @@ class Products extends Component {
                                                             <Footer />
                                                         </Tab.Pane>
                                                         <Tab.Pane eventKey="fourth">
-                                                            <Others tabId='4'/>
+                                                            <PersonalAccident tabId='4'/>
                                                             <Footer />
                                                         </Tab.Pane>
                                                         

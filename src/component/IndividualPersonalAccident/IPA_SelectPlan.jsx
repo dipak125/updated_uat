@@ -78,12 +78,15 @@ class AccidentSelectPlan extends Component {
       const formData = new FormData();
       let encryption = new Encryption();
       this.props.loadingStart();
-      formData.append('policy_for_flag', 1)
-      axios.get('ipa/titles')
+      let post_data = {
+        'policy_for_flag': '1',
+    }
+      formData.append('enc_data',encryption.encrypt(JSON.stringify(post_data)))
+      axios.post('ipa/titles', formData)
       .then(res=>{
         let decryptResp = JSON.parse(encryption.decrypt(res.data))
         console.log("decrypt", decryptResp)
-          let titleList = decryptResp.data
+          let titleList = decryptResp.data.salutationlist
           console.log('titlelist----->>',titleList)                       
           this.setState({
               titleList
@@ -147,13 +150,13 @@ class AccidentSelectPlan extends Component {
           console.log("decrypt", decryptResp)
 
           if(decryptResp.error == false) {
-              this.props.history.push(`/AccidentAddDetails/${productId}`);
+              // this.props.history.push(`/AccidentAddDetails/${productId}`);
+              this.quote(values)
           }
           else{
               swal(decryptResp.msg)
               actions.setSubmitting(false);
-          }   
-          this.props.loadingStop();
+          }    
         }).
         catch(err=>{
             this.props.loadingStop();
@@ -173,7 +176,8 @@ class AccidentSelectPlan extends Component {
           localStorage.setItem('policyHolder_id',decryptResp.data.policyHolder_id);
           this.props.loadingStop();
           if(decryptResp.error == false) {
-              this.props.history.push(`/AccidentAddDetails/${productId}`);
+              // this.props.history.push(`/AccidentAddDetails/${productId}`);
+              this.quote(values)
           }
           else{
               swal(decryptResp.msg)
@@ -190,6 +194,11 @@ class AccidentSelectPlan extends Component {
         })
     }
   };
+
+  handleSubmitNxtPage = (values,actions) => {
+    this.props.history.push(`/AccidentAddDetails/${this.props.match.params.productId}`);
+  }
+
 
   fetchData = () => {
     const { productId } = this.props.match.params;
@@ -220,7 +229,7 @@ class AccidentSelectPlan extends Component {
     this.props.loadingStart();
     let date_of_birth = moment(values.date_of_birth).format('yyyy-MM-DD');
     const post_data = {
-        'id':4473,
+        'id':localStorage.getItem('policyHolder_id'),
         'proposer_dob': date_of_birth ,
         'sum_insured': values.sumInsured ? sum_insured_array[values.sumInsured] : null
     }
@@ -237,6 +246,7 @@ class AccidentSelectPlan extends Component {
               error: [],
               validation_error: []
           }) 
+          this.props.loadingStop();
       }
       else if (res.data.PolicyObject && res.data.UnderwritingResult && res.data.UnderwritingResult.Status == "Fail") {
           this.setState({
@@ -245,6 +255,7 @@ class AccidentSelectPlan extends Component {
               validation_error: [],
               error: {"message": 1}
           }) 
+          this.props.loadingStop();
       }
       else if (res.data.code && res.data.message && res.data.code == "validation failed" && res.data.message == "validation failed") {
         var validationErrors = []
@@ -258,6 +269,7 @@ class AccidentSelectPlan extends Component {
             serverResponse: []
         });
         // swal(res.data.data.messages[0].message)
+        this.props.loadingStop();
       }
       else {
         this.setState({
@@ -266,8 +278,8 @@ class AccidentSelectPlan extends Component {
             validation_error: [],
             serverResponse: []
         });
+        this.props.loadingStop();
     }
-      this.props.loadingStop();
       })
       .catch(err => {
         this.setState({
@@ -278,9 +290,16 @@ class AccidentSelectPlan extends Component {
   
 }
 
+handleChange =(e) => {
+  this.setState({
+      serverResponse: [],
+      error: []
+  }) 
+}
+
 
   render() {
-    const {titleList, accidentDetails, serverResponse} = this.state;
+    const {titleList, accidentDetails, serverResponse, validation_error, error} = this.state;
     const newInitialValues = Object.assign(initialValues, {
       sumInsured: accidentDetails && accidentDetails.ipainfo ? accidentDetails.ipainfo.sum_insured == 100000 ? 1 : accidentDetails.ipainfo.sum_insured == 200000 ? 2 : accidentDetails.ipainfo.sum_insured == 300000 ? 3 : accidentDetails.ipainfo.sum_insured == 400000 ? 4 : accidentDetails.ipainfo.sum_insured == 500000 ? 5 : 0 : null,
       salutation_id: accidentDetails && accidentDetails.ipainfo ? accidentDetails.ipainfo.ipatitle.id : "",
@@ -291,6 +310,26 @@ class AccidentSelectPlan extends Component {
       email_id: accidentDetails ? accidentDetails.email_id : "",
       proposer_gender: accidentDetails ? accidentDetails.gender : ""
     });
+
+    const errMsg =  error && error.message ? (            
+      <span className="errorMsg"><h6><strong>{error.message}</strong></h6></span>
+      // <span className="errorMsg"><h6><strong>Thank you for showing your interest for buying product.Due to some reasons, we are not able to issue the policy online.Please call 1800 22 1111</strong></h6></span>                                
+  ) : null 
+
+    const validationErrors = 
+      validation_error ? (
+          validation_error.map((errors, qIndex) => (
+              <span className="errorMsg"><h6>Errors : 
+                  <strong>
+                      <ul>
+                          <li>
+                              {errors}
+                          </li>
+                      </ul>
+                  </strong></h6>
+              </span>
+          ))        
+    ): null;
 
     return (
       <>
@@ -306,12 +345,10 @@ class AccidentSelectPlan extends Component {
                 </h4>
                 <section className="brand">
                   <div className="boxpd">
-                    <h4 className="m-b-30">
-                      {" "}
-                      {/* Select the Sum Insured for individual personal accident */}
-                    </h4>
+                    <div>{errMsg}</div>
+                    <h4>{validationErrors}</h4>
                     <Formik initialValues={newInitialValues} 
-                    onSubmit={ serverResponse && serverResponse != "" ? (serverResponse.message ? this.quote : this.handleSubmit ) : this.quote}
+                    onSubmit={ serverResponse && serverResponse != "" ? (serverResponse.message ? this.handleSubmit : this.handleSubmitNxtPage ) : this.handleSubmit}
                     validationSchema={vehicleRegistrationValidation}>
                       {({
                         values, errors, setFieldValue, setFieldTouched, isValid, isSubmitting, touched, }) => {
@@ -342,7 +379,7 @@ class AccidentSelectPlan extends Component {
                                             "sumInsured",
                                             e.target.value
                                           );
-                                          // this.handleAmountChange(e);
+                                          this.handleChange(e);
                                         }}
                                       >
                                         <option value="">
@@ -365,7 +402,7 @@ class AccidentSelectPlan extends Component {
                             <Col sm={4}>
                                 <div className="d-flex justify-content-between align-items-center premium m-b-25">
                                     <p>Quotation No:</p>
-                                    <p><strong>Rs:</strong> { serverResponse ? (serverResponse.message ? 0 : serverResponse.DuePremium ) :0}</p>
+                                    <p> { serverResponse ? (serverResponse.message ? 0 : serverResponse.QuotationNo ) :0}</p>
                                 </div>
                             </Col>
                             <Col sm={4}>
@@ -393,7 +430,7 @@ class AccidentSelectPlan extends Component {
                                             >
                                                 <option value="">Title</option>
                                                 {titleList && titleList.length >0 && titleList.map((title, qIndex) => ( 
-                                                <option value={title.id}>{title.description}</option>
+                                                <option value={title.id}>{title.displayvalue}</option>
                                                 ))}
                                             </Field>     
                                             {errors.salutation_id && touched.salutation_id ? (
@@ -461,6 +498,7 @@ class AccidentSelectPlan extends Component {
                                                 onChange={(val) => {
                                                     setFieldTouched('date_of_birth');
                                                     setFieldValue('date_of_birth', val);
+                                                    this.handleChange()
                                                     }}
                                             />
                                             {errors.date_of_birth && touched.date_of_birth ? (

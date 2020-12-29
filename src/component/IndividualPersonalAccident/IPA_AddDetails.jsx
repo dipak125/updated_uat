@@ -179,7 +179,7 @@ class AccidentAddDetails extends Component {
     const newInitialValues = Object.assign(initialValues, {
       pol_start_date: new Date(),
       pol_end_date : new Date(moment().add(364, "day").calendar()),
-      insured:  accidentDetails && accidentDetails.ipainfo ? accidentDetails.ipainfo.insured_type_id  : "",
+      insured:  accidentDetails && accidentDetails.ipainfo && accidentDetails.ipainfo.length > 0 ? accidentDetails.ipainfo.insured_type_id  : "",
       previous_policy_check: 0,
       disability: 0,
       first_name: accidentDetails ? accidentDetails.first_name : "",

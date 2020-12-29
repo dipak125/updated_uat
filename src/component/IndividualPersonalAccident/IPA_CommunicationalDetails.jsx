@@ -228,6 +228,7 @@ class AccidentAdditionalDetails extends Component {
     appointeeFlag: false,
     is_appointee:0,
     request_data: [],
+    nominee_age: ""
   };
 
   changePlaceHoldClassAdd(e) {
@@ -243,7 +244,7 @@ class AccidentAdditionalDetails extends Component {
   componentDidMount() {
     // this.fetchSubVehicle();
     this.fetchSalutation();
-    this.fetchData();
+    // this.fetchData();
   }
 
   fetchData = () => {
@@ -254,15 +255,21 @@ class AccidentAdditionalDetails extends Component {
       .get(`ipa/details/${policyHolder_refNo}`)
       .then((res) => {
         let decryptResp = JSON.parse(encryption.decrypt(res.data));
-        // console.log("decrypt---accidentDetails--->>", decryptResp);
+        const ageObj = new PersonAge();
         let accidentDetails = decryptResp.data && decryptResp.data.policyHolder ? decryptResp.data.policyHolder : null;
         console.log("---accidentDetails--->>", accidentDetails);
+
         let address = accidentDetails && accidentDetails.address ? JSON.parse(accidentDetails.address) : {};
         let pincodeRESP = accidentDetails && accidentDetails.pincode_response ? JSON.parse(accidentDetails.pincode_response) : {};
+        let is_appointee= accidentDetails.request_data.nominee.length > 0 ?accidentDetails.request_data.nominee[0].is_appointee : "0"
+        let nominee_age = (accidentDetails && accidentDetails.request_data) && accidentDetails.request_data.nominee.length > 0  ?  ageObj.whatIsMyAge(new Date(accidentDetails.request_data.nominee[0].dob)) : null
+       
         this.setState({
           accidentDetails,
           address,
-          pincodeRESP,
+          pincodeRESP, 
+          is_appointee, nominee_age
+
         });
         let pincodeArea = pincodeRESP && pincodeRESP.PIN_CD ?  pincodeRESP.PIN_CD : ""
         console.log('pincodeArea------>>',pincodeArea)
@@ -275,10 +282,9 @@ class AccidentAdditionalDetails extends Component {
       });
   };
 
-  handleSubmit = (values, actions, ageValue) => {
+  handleSubmit = (values, actions) => {
     const {productId} = this.props.match.params 
     const {accidentDetails} = this.state
-    console.log('values------->>>',values)
     const formData = new FormData(); 
     let encryption = new Encryption();
     let date_of_birth = moment(values.nominee_dob).format('yyyy-MM-DD');
@@ -303,6 +309,7 @@ class AccidentAdditionalDetails extends Component {
         'nominee_title_id' : values.nominee_salutation_id,
         'nominee_dob' : date_of_birth,
         'relation_with' : values.relation_with, 
+        'is_appointee' : this.state.is_appointee
     }
     if(values.appointee_dob != "") {
       let date_of_birth_appointee = moment(values.appointee_dob).format('yyyy-MM-DD');
@@ -376,8 +383,6 @@ class AccidentAdditionalDetails extends Component {
   fetchAreadetailsBack = (pincode_input) => {
     let pinCode = pincode_input.toString();
 
-    console.log("fetchAreadetailsBack pinCode", pinCode.length);
-
     if (pinCode != null && pinCode != "" && pinCode.length == 6) {
       console.log("fetchAreadetailsBack pinCode", pinCode);
       const formData = new FormData();
@@ -413,17 +418,18 @@ class AccidentAdditionalDetails extends Component {
     const formData = new FormData();
     let encryption = new Encryption();
     this.props.loadingStart();
-    formData.append('policy_for_flag', 1)
-    axios.get('ipa/titles')
+    let post_data = {
+      'policy_for_flag': '1',
+  }
+    formData.append('enc_data',encryption.encrypt(JSON.stringify(post_data)))
+    axios.post('ipa/titles', formData)
     .then(res=>{
       let decryptResp = JSON.parse(encryption.decrypt(res.data))
-      console.log("decrypt", decryptResp)
-        let titleList = decryptResp.data
-        console.log('titlelist----->>',titleList)                       
+        let titleList = decryptResp.data.salutationlist                     
         this.setState({
             titleList
         });
-        this.props.loadingStop();
+        this.fetchData();
     }).
     catch(err=>{
         this.props.loadingStop();
@@ -457,19 +463,16 @@ class AccidentAdditionalDetails extends Component {
   }
   ageCheckValue = (value) => {
       const ageObj = new PersonAge();
-      let ageValue = ageObj.whatIsMyAge(value)
+      let nominee_age = ageObj.whatIsMyAge(value)
           this.setState({
-              ageValue
+            nominee_age
           })
           // console.log("ageCheckValue---->>",ageValue)
   }
 
 
   render() {
-    const { pinDataArr, titleList, appointeeFlag, is_appointee, accidentDetails, ageValue, address, pincodeRESP } = this.state;
-    console.log('address--------->>',address)
-    const age_Value = ageValue ? ageValue : ""
-    console.log("ageCheckValue--->>state---->>",age_Value)
+    const { pinDataArr, titleList, appointeeFlag, is_appointee, accidentDetails, address, pincodeRESP } = this.state;
     const { productId } = this.props.match.params;
     const newInitialValues = Object.assign(initialValues, {      
       salutation_id: accidentDetails && accidentDetails.ipainfo ? accidentDetails.ipainfo.ipatitle.id : "",
@@ -490,13 +493,12 @@ class AccidentAdditionalDetails extends Component {
       nominee_last_name: (accidentDetails && accidentDetails.request_data) && accidentDetails.request_data.nominee.length > 0  ? accidentDetails.request_data.nominee[0].last_name : "" ,
       nominee_dob : (accidentDetails && accidentDetails.request_data) && accidentDetails.request_data.nominee.length > 0  ? new Date(accidentDetails.request_data.nominee[0].dob) : null,
       relation_with : (accidentDetails && accidentDetails.request_data) && accidentDetails.request_data.nominee.length > 0  ? accidentDetails.request_data.nominee[0].relation_with : "",        
-      // is_appointee: ,
+      is_appointee: is_appointee ,
       appointee_name: (accidentDetails && accidentDetails.request_data) && accidentDetails.request_data.nominee.length > 0  ? accidentDetails.request_data.nominee[0].appointee_name : "",
       appointee_dob:  (accidentDetails && accidentDetails.request_data) && accidentDetails.request_data.nominee.length > 0  ? new Date(accidentDetails.request_data.nominee[0].appointee_dob) : "",
       appointee_relation_with: (accidentDetails && accidentDetails.request_data) && accidentDetails.request_data.nominee.length > 0  ? accidentDetails.request_data.nominee[0].appointee_relation_with : "",
-      nominee_age: this.state.ageValue ? this.state.ageValue : ""
     });
-
+console.log("newInitialValues---------- ", newInitialValues)
     return (
       <>
         <BaseComponent>
@@ -549,7 +551,7 @@ class AccidentAdditionalDetails extends Component {
                                     >
                                       <option value="">Title</option>
                                       {titleList && titleList.length > 0 && titleList.map((title, qIndex) => ( 
-                                        <option key={qIndex} value={title.id}>{title.description}</option>
+                                        <option key={qIndex} value={title.id}>{title.displayvalue}</option>
                                       ))}
                                     </Field>
                                     {errors.salutation_id && touched.salutation_id ? (
@@ -592,6 +594,7 @@ class AccidentAdditionalDetails extends Component {
                                       name="last_name"
                                       type="text"
                                       placeholder="Last Name"
+                                      disabled={true}
                                       autoComplete="off"
                                       onFocus={(e) =>
                                         this.changePlaceHoldClassAdd(e)
@@ -676,6 +679,7 @@ class AccidentAdditionalDetails extends Component {
                                       type="email"
                                       placeholder="Email "
                                       autoComplete="off"
+                                      disabled={true}
                                       onFocus={(e) =>
                                         this.changePlaceHoldClassAdd(e)
                                       }
@@ -878,7 +882,7 @@ class AccidentAdditionalDetails extends Component {
                                     >
                                       <option value="">Title</option>
                                       {titleList && titleList.length >0 && titleList.map((title, qIndex) => ( 
-                                       <option key= {qIndex} value={title.id}>{title.description}</option>
+                                       <option key= {qIndex} value={title.id}>{title.displayvalue}</option>
                                       ))}
                                     </Field>
                                     {errors.nominee_salutation_id && touched.nominee_salutation_id ? (
@@ -979,14 +983,9 @@ class AccidentAdditionalDetails extends Component {
                                       placeholder="Age"
                                       autoComplete="off"
                                       // selected={}
-                                      // value={this.nominee_age}
+                                      value={this.state.nominee_age}
                                     />
-                                    {/* {errors.nominee_first_name &&
-                                    touched.nominee_first_name ? (
-                                      <span className="errorMsg">
-                                        {errors.nominee_first_name}
-                                      </span>
-                                    ) : null} */}
+                                    
                                   </div>
                                 </FormGroup>
                               </Col>
