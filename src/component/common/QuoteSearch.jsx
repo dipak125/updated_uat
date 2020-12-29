@@ -50,9 +50,16 @@ function productFormatter(cell, row) {
 
 function nameFormatter(cell, row){
 
-    return (
-        <div>{row.first_name+' '+row.last_name}</div>
-    )
+    if(row.first_name!=null){
+        return (
+            <div>{row.first_name+' '+row.last_name}</div>
+        ) 
+    }else{
+        return (
+            <div> --- </div>
+        )
+    }
+    
     
 }
 

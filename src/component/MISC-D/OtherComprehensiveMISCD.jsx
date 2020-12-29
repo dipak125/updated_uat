@@ -801,7 +801,7 @@ class OtherComprehensiveMISCD extends Component {
         const post_data = {
             'ref_no':localStorage.getItem('policyHolder_refNo'),
             'access_token':access_token,
-            'idv_value': this.state.bodyIdvStatus != 2 ? (sliderVal ? sliderVal : defaultSliderValue.toString()) : 0,
+            'idv_value': 0,
             'policy_type': motorInsurance.policy_type,
             'add_more_coverage': add_more_coverage.toString(),
             'PA_Cover': values.PA_flag ? values.PA_Cover : "0",
@@ -809,6 +809,7 @@ class OtherComprehensiveMISCD extends Component {
             'body_idv_value' : bodySliderVal ? bodySliderVal : defaultBodySliderValue,
             'trailer_array' : values.trailer_array,
             'fuel_type' : values.fuel_type ? values.fuel_type : (vehicleDetails && vehicleDetails.varientmodel && vehicleDetails.varientmodel.fueltype  ? vehicleDetails.varientmodel.fueltype.id : "")
+            // 'idv_value': this.state.bodyIdvStatus != 2 ? (sliderVal ? sliderVal : defaultSliderValue.toString()) : 0,
             // 'cng_kit': cng_kit_flag,
             // 'cngKit_Cost': cngKit_Cost
         }
@@ -1292,9 +1293,11 @@ class OtherComprehensiveMISCD extends Component {
             // maxIDV = maxIDV - 1;
         }
         let maxBodyVal =  PolicyArray.length > 0 ? (PolicyArray[0].PolicyRiskList[0].MSP - (PolicyArray[0].PolicyRiskList[0].MSP * (depreciationPercentage/100))) : 0
-        console.log("maxBodyVal============== ", maxBodyVal)
+        
         let minBodyIDV = 0
         let maxBodyIDV = PolicyArray.length > 0 ? Math.floor(maxBodyVal/2) : 0
+        console.log("maxBodyVal============== ", maxBodyIDV)
+        console.log("bodyIdvStatus", this.state.bodyIdvStatus)
         // let maxBodyIDV = PolicyArray.length > 0 ? Math.round(PolicyArray[0].PolicyRiskList[0].IDV_Suggested/5) : 0
         // let maxBodyIDV = Math.round(chasis_price*0.5); //Maximum Limit is 50 percent of Chasis Price.
         let defaultBodySliderValue =  motorInsurance && motorInsurance.body_idv_value ? Math.round(motorInsurance.body_idv_value) : 0
@@ -1756,6 +1759,7 @@ class OtherComprehensiveMISCD extends Component {
                                     max= {maxIDV}
                                     step= '1'
                                     value={values.slider}
+                                    disabled = {true}
                                     onChange= {(e) =>{
                                     setFieldTouched("slider");
                                     setFieldValue("slider",values.slider);
