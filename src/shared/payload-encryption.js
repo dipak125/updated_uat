@@ -138,12 +138,12 @@ class Encryption {
 
         if(!key) key = 'eTJmS3F6UlM5SVlSRG5sa1owOUF4dEpk';
         if(process.env.REACT_APP_ENC_FLAG==1){
-
             return this.gcmencrypt(string, key)
 
         }else{
             
             return string
+			//return btoa(unescape(encodeURIComponent(string)));
         }
 
         /*console.log('ENC_FLAG -- ', process.env.REACT_APP_ENC_FLAG)

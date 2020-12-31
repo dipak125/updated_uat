@@ -180,7 +180,6 @@ class LogIn extends Component {
                 }
 
                 sessionStorage.setItem('bcLoginData', encryption.encrypt(JSON.stringify(bcLoginData)));
-                //sessionStorage.setItem('bcLoginData', JSON.stringify(bcLoginData));
                 sessionStorage.setItem('logo', bcData.master_data.logo) 
                 this.setState({broker_id: bcLoginData.agent_id})
                 this.callLogin(bcLoginData)
