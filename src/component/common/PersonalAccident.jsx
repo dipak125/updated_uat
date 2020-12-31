@@ -30,6 +30,8 @@ class Others extends Component {
         let bc_data = sessionStorage.getItem('bcLoginData') ? sessionStorage.getItem('bcLoginData') : "";
         if(bc_data) {
             bc_data = JSON.parse(encryption.decrypt(bc_data));
+            //bc_data = encryption.decrypt(bc_data);
+            console.log('bc_data', bc_data)
         }
         let bcmaster_id = sessionStorage.getItem('csc_id') ? sessionStorage.getItem('csc_id') : (bc_data ? bc_data.agent_id : "")
         this.props.loadingStart();

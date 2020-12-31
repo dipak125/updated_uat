@@ -16,6 +16,7 @@ import queryString from 'query-string';
 import fuel from '../common/FuelTypes';
 import swal from 'sweetalert';
 import moment from "moment";
+import {registrationNoFormat} from '../../shared/reUseFunctions';
 
 const initialValue = {
     gateway : ""
@@ -151,28 +152,38 @@ class PremiumMISCD extends Component {
             })
     }
 
-    // callBreakin=()=>{
+    callBreakin=(regnNumber)=>{
 
-    //     const formData = new FormData();
-    //     let encryption = new Encryption();
-    //     let policyHolder_id = this.state.policyHolder_refNo ? this.state.policyHolder_refNo : '0'
-    //     let bc_data = sessionStorage.getItem('bcLoginData') ? sessionStorage.getItem('bcLoginData') : "";
-    //     if(bc_data) {
-    //         bc_data = JSON.parse(encryption.decrypt(bc_data));
-    //     }
-    //     formData.append('bcmaster_id', sessionStorage.getItem('csc_id') ? "5" : bc_data ? bc_data.agent_id : "" ) 
-    //     formData.append('ref_no', policyHolder_id) 
+        const formData = new FormData();
+        let encryption = new Encryption();
+        let num = regnNumber
+        let numLength = num.length
+        let val =""
+        let formatVal = num.substring(0, 1)
+        for(var i=0;i<=14;i++){
+            formatVal = val+num.substring(i, i+1)
+            val = registrationNoFormat(formatVal, numLength)
+        }
 
-    //     this.props.loadingStart();
-    //     axios.post('breakin/create',formData)
-    //     .then(res=>{
-    //         swal(`Your breakin request has been raised. Your inspection Number: ${res.data.data.inspection_no}`)
-    //         this.props.loadingStop();
-    //     }).
-    //     catch(err=>{
-    //         this.props.loadingStop();
-    //     })  
-    // }
+        let policyHolder_id = this.state.policyHolder_refNo ? this.state.policyHolder_refNo : '0'
+        let bc_data = sessionStorage.getItem('bcLoginData') ? sessionStorage.getItem('bcLoginData') : "";
+        if(bc_data) {
+            bc_data = JSON.parse(encryption.decrypt(bc_data));
+        }
+        formData.append('bcmaster_id', sessionStorage.getItem('csc_id') ? "5" : bc_data ? bc_data.agent_id : "" ) 
+        formData.append('ref_no', policyHolder_id) 
+        formData.append('registrationNo', val)
+
+        this.props.loadingStart();
+        axios.post('breakin/create',formData)
+        .then(res=>{
+            swal(`Your breakin request has been raised. Your inspection Number: ${res.data.data.inspection_no}`)
+            this.props.loadingStop();
+        }).
+        catch(err=>{
+            this.props.loadingStop();
+        })  
+    }
 
 
     fullQuote = ( motorInsurance) => {
@@ -220,27 +231,49 @@ class PremiumMISCD extends Component {
                 }
                 this.props.loadingStop();
 
-                // if(previousPolicy && policyHolder.break_in_status != "Vehicle Recommended and Reports Uploaded") {
-                //     dateDiff = Math.floor(moment().diff(previousPolicy.end_date, 'days', true));
-                //     if(dateDiff > 0 || previousPolicy.name == "2") {
-                //         this.setState({breakin_flag: 1})
-                //         swal({
-                //             title: "Breakin",
-                //             text: `Your Quotation number is ${request_data.quote_id}. Your vehicle needs inspection. Do you want to raise inspection.`,
-                //             icon: "warning",
-                //             buttons: true,
-                //             dangerMode: true,
-                //         })
-                //         .then((willCreate) => {
-                //             if (willCreate) {
-                //                 this.callBreakin()
-                //             }
-                //             else {
-                //                 this.props.loadingStop();
-                //             }
-                //         })                     
-                //     }     
-                // }
+                if(previousPolicy && policyHolder.break_in_status != "Vehicle Recommended and Reports Uploaded"){
+                    let dateDiff = Math.floor(moment().diff(previousPolicy.end_date, 'days', true));
+                    if(dateDiff > 0 || previousPolicy.name == "2") {
+                        this.setState({breakin_flag: 1})
+                            const formData1 = new FormData();
+                            let policyHolder_id = this.state.policyHolder_refNo ? this.state.policyHolder_refNo : '0'
+                            formData1.append('policy_ref_no',policyHolder_id)
+                            axios.post('breakin/checking', formData1)
+                            .then(res => {
+                                let break_in_checking = res.data.data.break_in_checking
+                                let break_in_inspection_no = res.data.data.break_in_inspection_no
+                                let break_in_status = res.data.data.break_in_status
+                                if( break_in_checking == true && break_in_inspection_no == "" && (break_in_status == null || break_in_status == "0")) {
+                                    swal({
+                                        title: "Breakin",
+                                        text: `Your Quotation number is ${request_data.quote_id}. Your vehicle needs inspection. Do you want to raise inspection.`,
+                                        icon: "warning",
+                                        buttons: true,
+                                        dangerMode: true,
+                                    })
+                                    .then((willCreate) => {
+                                        if (willCreate) {
+                                            this.callBreakin(motorInsurance && motorInsurance.registration_no)
+                                        }
+                                        else {
+                                            this.props.loadingStop();
+                                        }
+                                    })                                                           
+                                }
+                                else {
+                                    swal({
+                                        title: "Breakin",
+                                        text: `Breakin already raised. \nBreaking number ${break_in_inspection_no}.`,
+                                        icon: "warning",
+                                    })
+                                }
+                            })
+                            .catch(err => {
+                                this.setState({breakin_flag: 1})
+                                this.props.loadingStop();
+                            })
+                    }
+                }
             })
             .catch(err => {
                 this.setState({

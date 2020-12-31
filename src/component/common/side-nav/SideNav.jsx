@@ -101,9 +101,9 @@ class SideNav extends Component {
                 Services
               </Link>
             </li>
-            {/* <li>
+            <li>
 							<Link to="/Supports" activeClassName="active"><span className="leftIcon01"><img src={require('../../../assets/images/support.png')} alt="" /></span>Support</Link>
-                        </li>*/}
+            </li>
             <li>
               <Link to="/Break_in" activeClassName="active">
                 <span className="leftIcon01">

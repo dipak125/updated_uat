@@ -73,7 +73,10 @@ class LogIn extends Component {
             let csc_type = queryString.parse(this.props.location.search).type
             sessionStorage.setItem('csc_id', csc_id);
             sessionStorage.setItem('type', csc_type);
-            this.callLogin();          
+            let bcLoginData = {}
+            bcLoginData.agent_id = ""
+            bcLoginData.bc_agent_id = ""
+            this.callLogin(bcLoginData);          
         }
         else{
             this.fetchCustDetail()
@@ -170,15 +173,17 @@ class LogIn extends Component {
                 let bcData = res.data.data ? res.data.data : [] 
                 bcLoginData.agent_id = bcData ? bcData.token_data.bcmaster_id : ""
                 bcLoginData.token = token
+                bcLoginData.bc_agent_id = bcData ? bcData.token_data.bc_agent_id : ""
                 let user_info = JSON.parse(bcData.token_data.additional_info)
                 if(user_info && user_info.is_success == true ) {
                     bcLoginData.user_info = user_info
                 }
 
                 sessionStorage.setItem('bcLoginData', encryption.encrypt(JSON.stringify(bcLoginData)));
+                //sessionStorage.setItem('bcLoginData', JSON.stringify(bcLoginData));
                 sessionStorage.setItem('logo', bcData.master_data.logo) 
                 this.setState({broker_id: bcLoginData.agent_id})
-                this.callLogin()
+                this.callLogin(bcLoginData)
             }
             else {
                 sessionStorage.removeItem('bcLoginData');
@@ -193,11 +198,11 @@ class LogIn extends Component {
         })
     }
 
-    callLogin = async () => {
-        const result = await this.handle_AutoSubmit();
+    callLogin = async (bcLoginData) => {
+        const result = await this.handle_AutoSubmit(bcLoginData);
     }
 
-    handle_AutoSubmit = () => {
+    handle_AutoSubmit = (bcLoginData) => {
         //console.log('values', values); return false;
         return new Promise(resolve => {
             setTimeout(() => {
@@ -207,7 +212,9 @@ class LogIn extends Component {
                 values.emailAddress= "csc@gmail.com";
                 values.password= "12345";
                 values.bc_id= sessionStorage.getItem('csc_id')
-                values.user_type= sessionStorage.getItem('user_type')
+                values.user_type= sessionStorage.getItem('type')
+                values.agent_id=  bcLoginData.agent_id ? bcLoginData.agent_id : ""
+                values.bc_agent_id= bcLoginData.bc_agent_id ? bcLoginData.bc_agent_id : ""
                 
                 // this.setState({ errMsg: '' });
                 console.log("values-- ", values)

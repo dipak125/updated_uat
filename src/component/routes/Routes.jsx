@@ -390,6 +390,17 @@ const IPA_Premium = Loadable({
     loading: () => loadingContent
 });
 
+// =================== GRAMIN SAMRIDDHI BIMA =============================== //
+
+const SelectPlan_GSB = Loadable({
+    loader: () => import(/*webpackChunkName: "Products" */"../GSB/SelectPlan_GSB"),
+    loading: () => loadingContent
+});
+const AdditionalDetails_GSB = Loadable({
+    loader: () => import(/*webpackChunkName: "Products" */"../GSB/AdditionalDetails_GSB"),
+    loading: () => loadingContent
+});
+
 // ====================================================================
 
 
@@ -535,6 +546,10 @@ class Routes extends Component {
                         <PrivateRoute exact path="/Address_KSB/:productId" component={Address_KSB} />    
                         <PrivateRoute exact path="/NomineeDetails_KSB/:productId" component={NomineeDetails_KSB} /> 
                         <PrivateRoute exact path="/PolicyDetails_KSB/:productId" component={PolicyDetails_KSB} />
+                        
+                        {/************ GSB ******************/}
+                        <PrivateRoute exact path="/SelectPlan_GSB/:productId" component={SelectPlan_GSB} />
+                        <PrivateRoute exact path="/AdditionalDetails_GSB/:productId" component={AdditionalDetails_GSB} />
 
                         {/************ Vedvag Payment Gateway ******************/}
                         <PrivateRoute exact path="/Vedvag_gateway/:productId" component={VedvagGateway} />

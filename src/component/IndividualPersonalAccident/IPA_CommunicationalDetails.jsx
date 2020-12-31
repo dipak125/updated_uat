@@ -181,46 +181,46 @@ email_id: Yup.string().email().min(8, function() {
   //               return true;
   //           }
   //       ),
-  // appointee_name:Yup.string(function() {
-  //   return "Please enter appointee name"
-  //   }).required(function() {
-  //   return "Please enter appointee name"
-  //     })        
-  //     .matches(/^[a-zA-Z]+([\s]?[a-zA-Z]+)$/, function() {
-  //         return "Please enter valid name"
-  //     }).test(
-  //     "18YearsChecking",
-  //     function() {
-  //         return "Please enter appointee name"
-  //     },
-  //     function (value) {
-  //         const ageObj = new PersonAge();
-  //         if (ageObj.whatIsMyAge(this.parent.dob) < 18 && !value) {   
-  //             return false;    
-  //         }
-  //         return true;
-  //     }
-  //     ).min(3, function() {
-  //     return "Name must be minimum 3 chracters"
-  //     })
-  //     .max(40, function() {
-  //     return "Name must be maximum 40 chracters"
-  //     }),
-  //     appointee_relation_with: Yup.string().required(function() {
-  //     return "Please select relation"
-  //     }).test(
-  //     "18YearsChecking",
-  //     function() {
-  //         return "Please enter Appointee relation"
-  //     },
-  //     function (value) {
-  //         const ageObj = new PersonAge();
-  //         if (ageObj.whatIsMyAge(this.parent.dob) < 18 && !value) {   
-  //             return false;    
-  //         }
-  //         return true;
-  //     }
-  //     )
+  appointee_name:Yup.string() 
+      .matches(/^[a-zA-Z]+([\s]?[a-zA-Z]+)$/, function() {
+          return "Please enter valid name"
+      }).test(
+      "18YearsChecking",
+      function() {
+          return "Please enter appointee name"
+      },
+      function (value) {
+          const ageObj = new PersonAge();
+          console.log("this.parent.nominee_dob------ ",ageObj.whatIsMyAge(this.parent.nominee_dob))
+          if (ageObj.whatIsMyAge(this.parent.nominee_dob) < 18 && !value) {   
+              return false;    
+          }
+          return true;
+      }
+      ).min(3, function() {
+      return "Name must be minimum 3 chracters"
+      })
+      .max(40, function() {
+      return "Name must be maximum 40 chracters"
+      })
+      .nullable(),
+
+      
+      appointee_relation_with: Yup.string()
+      .test(
+      "18YearsChecking",
+      function() {
+          return "Please enter Appointee relation"
+      },
+      function (value) {
+          const ageObj = new PersonAge();
+          if (ageObj.whatIsMyAge(this.parent.nominee_dob) < 18 && !value) {   
+              return false;    
+          }
+          return true;
+      }
+      )
+      .nullable()
 });
 
 class AccidentAdditionalDetails extends Component {
@@ -498,7 +498,7 @@ class AccidentAdditionalDetails extends Component {
       appointee_dob:  (accidentDetails && accidentDetails.request_data) && accidentDetails.request_data.nominee.length > 0  ? new Date(accidentDetails.request_data.nominee[0].appointee_dob) : "",
       appointee_relation_with: (accidentDetails && accidentDetails.request_data) && accidentDetails.request_data.nominee.length > 0  ? accidentDetails.request_data.nominee[0].appointee_relation_with : "",
     });
-console.log("newInitialValues---------- ", newInitialValues)
+
     return (
       <>
         <BaseComponent>
@@ -524,7 +524,7 @@ console.log("newInitialValues---------- ", newInitialValues)
                     >
                       {({values,errors,setFieldValue,setFieldTouched,isValid,isSubmitting,touched}) => {
                         // console.log('values',values)
-
+                        console.log("errors---------- ", errors)
                         return (
                           <Form>
                             <h4 className="text mt-3 mb-3">
@@ -1052,7 +1052,7 @@ console.log("newInitialValues---------- ", newInitialValues)
                                       </div>
                                     </FormGroup>
                                   </Col>
-                              <Col sm={6} md={3} lg={3}>
+                              {/* <Col sm={6} md={3} lg={3}>
                                 <FormGroup>
                                   <DatePicker
                                     name="appointee_dob"
@@ -1079,7 +1079,7 @@ console.log("newInitialValues---------- ", newInitialValues)
                                     </span>
                                   ) : null}
                                 </FormGroup>
-                              </Col>
+                              </Col> */}
 
                                   <Col sm={6} md={3} lg={3}>
                                     <FormGroup>

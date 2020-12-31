@@ -398,20 +398,22 @@ handleChange =(e) => {
                                 </Col>
                             </Row>
                             <Row><h4>&nbsp;</h4></Row>
+                            { serverResponse && serverResponse.QuotationNo ?
                             <Row className="d-flex justify-content-left carloan m-b-25"> 
                             <Col sm={4}>
                                 <div className="d-flex justify-content-between align-items-center premium m-b-25">
                                     <p>Quotation No:</p>
-                                    <p> { serverResponse ? (serverResponse.message ? 0 : serverResponse.QuotationNo ) :0}</p>
+                                    <p><b> { serverResponse ? (serverResponse.message ? "---" : serverResponse.QuotationNo ) :"---"}</b></p>
                                 </div>
                             </Col>
                             <Col sm={4}>
                                 <div className="d-flex justify-content-between align-items-center premium m-b-25">
                                     <p>Total Premium:</p>
-                                    <p><strong>Rs:</strong> { serverResponse ? (serverResponse.message ? 0 : serverResponse.DuePremium ) : 0}</p>
+                                    <p><strong>Rs: { serverResponse ? (serverResponse.message ? 0 : serverResponse.DuePremium ) : 0}</strong></p>
                                 </div>
                             </Col>
                             </Row>
+                            : null }
                                 <div className="d-flex justify-content-left">
                                 <div className="brandhead">
                                     <h4>Enter proposer details</h4>

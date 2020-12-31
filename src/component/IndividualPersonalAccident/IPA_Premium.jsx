@@ -36,6 +36,15 @@ const relationArr = {
 8:"Mother In Law"
 }
 
+const Coverage = {
+
+  "IPA101": "Accidental Death",
+  "IPA102": "Permanent Total Disability",
+  "IPA103": "Permanent Pertial Disability",
+  "IPA104": "Temporary Total Disability",
+  "IPA105": "Adaptation allowance",
+  "IPA106": "Education Benefit",
+}
 
 class IPA_Premium extends Component {
   state = {
@@ -49,6 +58,7 @@ class IPA_Premium extends Component {
     error1: [],
     show: false,
     refNumber: "",
+    policyCoverage: [],
     paymentStatus: [],
     policyHolder_refNo: queryString.parse(this.props.location.search).access_id ? 
                         queryString.parse(this.props.location.search).access_id : 
@@ -74,6 +84,7 @@ class IPA_Premium extends Component {
     const { productId } = this.props.match.params;
     let policyHolder_refNo = localStorage.getItem("policyHolder_refNo") ? localStorage.getItem("policyHolder_refNo") : 0;
     let encryption = new Encryption();
+    this.props.loadingStart();
     axios
       .get(`ipa/details/${policyHolder_refNo}`)
       .then((res) => {
@@ -86,8 +97,7 @@ class IPA_Premium extends Component {
           accidentDetails, policyHolderDetails,
           nomineeDetails: policyHolderDetails.request_data && policyHolderDetails.request_data.nominee && policyHolderDetails.request_data.nominee[0],
         });
-        this.quote()
-        this.props.loadingStop();
+        this.quote() 
       })
       .catch((err) => {
         // handle error
@@ -116,7 +126,8 @@ class IPA_Premium extends Component {
               fulQuoteResp: res.data.PolicyObject,
               serverResponse: res.data.PolicyObject,
               error: [],
-              validation_error: []
+              validation_error: [],
+              policyCoverage: res.data.PolicyObject.PolicyLobList ? res.data.PolicyObject.PolicyLobList[0].PolicyRiskList[0].PolicyCoverageList : [],
           }) 
           this.props.loadingStop();
       }
@@ -125,7 +136,8 @@ class IPA_Premium extends Component {
               fulQuoteResp: res.data.PolicyObject,
               serverResponse: [],
               validation_error: [],
-              error: {"message": 1}
+              error: {"message": 1},
+              policyCoverage: res.data.PolicyObject.PolicyLobList ? res.data.PolicyObject.PolicyLobList[0].PolicyRiskList[0].PolicyCoverageList : [],
           }) 
           this.props.loadingStop();
       }
@@ -222,65 +234,25 @@ class IPA_Premium extends Component {
 
   render() {
     const { productId } = this.props.match.params;
-    const { fulQuoteResp, error, show, policyHolderDetails, nomineeDetails, paymentStatus } = this.state;
+    const { fulQuoteResp, error, show, policyHolderDetails, nomineeDetails, paymentStatus, policyCoverage } = this.state;
 
     console.log("policyHolderDetails ", policyHolderDetails)
-    const items =
-      fulQuoteResp &&
-      fulQuoteResp.PolicyLobList && fulQuoteResp.PolicyLobList.length > 0 && 
-      fulQuoteResp.PolicyLobList[0].PolicyRiskList
-        ? fulQuoteResp.PolicyLobList[0].PolicyRiskList.map((member, qIndex) => {
-            return (
-              <div>
-              <Row>
-                <Col sm={12} md={6}>
-                  <Row>
-                    <Col sm={12} md={6}>
-                      <FormGroup>Name:</FormGroup>
-                    </Col>
-                    <Col sm={12} md={6}>
-                      <FormGroup>{member.FirstName+" "+member.LastName}</FormGroup>
-                    </Col>
-                  </Row>
 
-                  <Row>
-                    <Col sm={12} md={6}>
-                      <FormGroup>Date Of Birth:</FormGroup>
-                    </Col>
-                    <Col sm={12} md={6}>
-                      <FormGroup>{member.DateOfBirth}</FormGroup>
-                    </Col>
-                  </Row>
-
-                  <Row>
-                    <Col sm={12} md={6}>
-                      <FormGroup>Relation With Proposer:</FormGroup>
-                    </Col>
-                    <Col sm={12} md={6}>
-                      <FormGroup>{
-                      member.GenderCode == 'F' && member.ArgInsuredRelToProposer > 2?
-                      (member.ArgInsuredRelToProposer==3 || member.ArgInsuredRelToProposer==5 || member.ArgInsuredRelToProposer==7)?
-                      relationArr[parseInt(member.ArgInsuredRelToProposer)+1]:relationArr[member.ArgInsuredRelToProposer]:relationArr[member.ArgInsuredRelToProposer]}</FormGroup>
-                    </Col>
-                  </Row>
-
-                  <Row>
-                    <Col sm={12} md={6}>
-                      <FormGroup>Gender</FormGroup>
-                    </Col>
-                    <Col sm={12} md={6}>
-                      <FormGroup>{genderArr[member.GenderCode]}</FormGroup>
-                    </Col>
-                  </Row>
-                </Col>
-              </Row>
-              <Row>
-              <p></p>
-              </Row>
-              </div>
-            );
-          })
-        : null;
+    const policyCoverageList =  policyCoverage && policyCoverage.length > 0 ?
+    policyCoverage.map((coverage, qIndex) => (
+        coverage.PolicyBenefitList && coverage.PolicyBenefitList.map((benefit, bIndex) => (
+            <div key= {bIndex}>
+                    <Row>
+                      <Col sm={12} md={6}>
+                        <FormGroup>{Coverage[benefit.ProductElementCode]}</FormGroup>
+                      </Col>
+                      <Col sm={12} md={6}>
+                        <FormGroup>₹ {Math.round(benefit.BasePremium)}</FormGroup>
+                      </Col>
+                    </Row> 
+           </div>
+        ))
+    )) : null
 
       const memberDetails =
       fulQuoteResp &&
@@ -459,6 +431,13 @@ class IPA_Premium extends Component {
 
                                       <Row>
                                         <Col sm={12} md={9} lg={9}>
+                                          <div className="rghtsideTrigr">
+                                              <Collapsible trigger="Default Covered Coverages & Benefit" open= {true}>
+                                                  <div className="listrghtsideTrigr">
+                                                      {policyCoverageList}
+                                                  </div>
+                                              </Collapsible>
+                                          </div>
                                           <div className="rghtsideTrigr">
                                             <Collapsible trigger="SBI General Insurance Company Limited">
                                               <div className="listrghtsideTrigr">

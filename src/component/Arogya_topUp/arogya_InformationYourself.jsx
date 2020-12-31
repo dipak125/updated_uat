@@ -67,10 +67,14 @@ const validateFamilyMembers  = Yup.object().shape({
         is: looking_for_4 => looking_for_4 == 'child3',       
         then: Yup.string().required('Please agree to the terms'),
         othewise: Yup.string()
+    }).when(['looking_for_5'], {
+        is: looking_for_5 => looking_for_5 == 'child4',       
+        then: Yup.string().required('Please agree to the terms'),
+        othewise: Yup.string()
     }),
     
     looking_for_1 : Yup.string(),
-    looking_for_5 : Yup.string(),
+    looking_for_6 : Yup.string(),
     looking_for_0: Yup.string().when(['looking_for_2'], {
         is: looking_for_2 => looking_for_2 == 'child1',       
         then: Yup.string().required('Please select self'),
@@ -83,44 +87,48 @@ const validateFamilyMembers  = Yup.object().shape({
         is: looking_for_4 => looking_for_4 == 'child3',       
         then: Yup.string().required('Please select self'),
         othewise: Yup.string()
-    }).when(['looking_for_1','looking_for_5'], {
-        is: (looking_for_1,looking_for_5) => (looking_for_1 == 'spouse' && looking_for_5 == 'father'),       
+    }).when(['looking_for_5'], {
+        is: looking_for_5 => looking_for_5 == 'child4',       
         then: Yup.string().required('Please select self'),
         othewise: Yup.string()
-    }).when(['looking_for_1','looking_for_6'], {
-        is: (looking_for_1,looking_for_6) => (looking_for_1 == 'spouse' && looking_for_6 == 'mother'),       
+    }).when(['looking_for_1','looking_for_6','cover_type_id'], {
+        is: (looking_for_1,looking_for_6,cover_type_id) => (looking_for_1 == 'spouse' && looking_for_6 == 'father' && cover_type_id == '3'),       
         then: Yup.string().required('Please select self'),
         othewise: Yup.string()
-    }).when(['looking_for_1','looking_for_7'], {
-        is: (looking_for_1,looking_for_7) => (looking_for_1 == 'spouse' && looking_for_7 == 'fatherInLaw'),       
+    }).when(['looking_for_1','looking_for_7','cover_type_id'], {
+        is: (looking_for_1,looking_for_7,cover_type_id) => (looking_for_1 == 'spouse' && looking_for_7 == 'mother' && cover_type_id == '3'),       
         then: Yup.string().required('Please select self'),
         othewise: Yup.string()
-    }).when(['looking_for_1','looking_for_8'], {
-        is: (looking_for_1,looking_for_8) => (looking_for_1 == 'spouse' && looking_for_8 == 'motherInLaw'),       
+    }).when(['looking_for_1','looking_for_8','cover_type_id'], {
+        is: (looking_for_1,looking_for_8,cover_type_id) => (looking_for_1 == 'spouse' && looking_for_8 == 'fatherInLaw' && cover_type_id == '3'),       
         then: Yup.string().required('Please select self'),
         othewise: Yup.string()
-    }).when(['looking_for_5','looking_for_6'], {
-        is: (looking_for_5,looking_for_6) => (looking_for_5 == 'father' && looking_for_6 == 'mother'),       
+    }).when(['looking_for_1','looking_for_9','cover_type_id'], {
+        is: (looking_for_1,looking_for_9,cover_type_id) => (looking_for_1 == 'spouse' && looking_for_9 == 'motherInLaw' && cover_type_id == '3'),       
         then: Yup.string().required('Please select self'),
         othewise: Yup.string()
-    }).when(['looking_for_5','looking_for_7'], {
-        is: (looking_for_5,looking_for_7) => (looking_for_5 == 'father' && looking_for_7 == 'fatherInLaw'),       
+    }).when(['looking_for_6','looking_for_7','cover_type_id'], {
+        is: (looking_for_6,looking_for_7,cover_type_id) => (looking_for_6 == 'father' && looking_for_7 == 'mother' && cover_type_id == '3'),       
         then: Yup.string().required('Please select self'),
         othewise: Yup.string()
-    }).when(['looking_for_5','looking_for_8'], {
-        is: (looking_for_5,looking_for_8) => (looking_for_5 == 'father' && looking_for_8 == 'motherInLaw'),       
+    }).when(['looking_for_6','looking_for_8','cover_type_id'], {
+        is: (looking_for_6,looking_for_8,cover_type_id) => (looking_for_6 == 'father' && looking_for_8 == 'fatherInLaw' && cover_type_id == '3'),       
         then: Yup.string().required('Please select self'),
         othewise: Yup.string()
-    }).when(['looking_for_6','looking_for_7'], {
-        is: (looking_for_6,looking_for_7) => (looking_for_6 == 'mother' && looking_for_7 == 'fatherInLaw'),       
+    }).when(['looking_for_6','looking_for_9','cover_type_id'], {
+        is: (looking_for_6,looking_for_9,cover_type_id) => (looking_for_6 == 'father' && looking_for_9 == 'motherInLaw' && cover_type_id == '3'),       
         then: Yup.string().required('Please select self'),
         othewise: Yup.string()
-    }).when(['looking_for_6','looking_for_8'], {
-        is: (looking_for_6,looking_for_8) => (looking_for_6 == 'mother' && looking_for_8 == 'motherInLaw'),       
+    }).when(['looking_for_7','looking_for_8','cover_type_id'], {
+        is: (looking_for_7,looking_for_8,cover_type_id) => (looking_for_7 == 'mother' && looking_for_8 == 'fatherInLaw' && cover_type_id == '3'),       
         then: Yup.string().required('Please select self'),
         othewise: Yup.string()
-    }).when(['looking_for_7','looking_for_8'], {
-        is: (looking_for_7,looking_for_8) => (looking_for_7 == 'fatherInLaw' && looking_for_8 == 'motherInLaw'),       
+    }).when(['looking_for_7','looking_for_9','cover_type_id'], {
+        is: (looking_for_7,looking_for_9,cover_type_id) => (looking_for_7 == 'mother' && looking_for_9 == 'motherInLaw' && cover_type_id == '3'),       
+        then: Yup.string().required('Please select self'),
+        othewise: Yup.string()
+    }).when(['looking_for_8','looking_for_9','cover_type_id'], {
+        is: (looking_for_8,looking_for_9,cover_type_id) => (looking_for_8 == 'fatherInLaw' && looking_for_9 == 'motherInLaw' && cover_type_id == '3'),       
         then: Yup.string().required('Please select self'),
         othewise: Yup.string()
     }),
@@ -457,9 +465,107 @@ const validateFamilyMembers  = Yup.object().shape({
         then: Yup.string().required('Child 3 Gender field is required'),
         othewise: Yup.string()
     }).nullable(),
-    
+
     dob_5: Yup.string().when(['looking_for_5'], {
-        is: looking_for_5 => looking_for_5 == 'father',
+        is: looking_for_5 => looking_for_5 == 'child4',
+        then: Yup.string().required('Child 4 DOB field is required').test(
+            "3monthsChecking",
+            function() {
+                return "Age should be minimum 3 months and maximum 25 years"
+            },
+            function (value) {
+                if (value) {
+                    const ageObj = new PersonAge();
+                    return ageObj.whatIsMyAge(value) < 26 && ageObj.whatIsMyAgeMonth(value) >=3 ;
+                }
+                return true;
+            }
+        ).test(
+            "1yearAgeDiffChecking",
+            function() {
+                return "Self and child age difference should be 1 year"
+            },
+            function (value) {
+                if(typeof this.parent.dob_0 != 'undefined'){
+                    var ageDiff = Math.floor(Math.abs(moment(this.parent.dob_0).diff(value, 'years', true)));
+                    if (ageDiff <= 0 ) {   
+                        return false;    
+                    }
+                    return true;
+                }
+                else {
+                    return true
+                }
+            }
+        ).test(
+            "1yearAgeDiffChecking",
+            function() {
+                return "Spouse and child age difference should be 1 year"
+            },
+            function (value) {
+                if(typeof this.parent.dob_1 != 'undefined'){
+                var ageDiff = Math.floor(Math.abs(moment(value).diff(this.parent.dob_1, 'years', true)));
+                    if (ageDiff <= 0 ) {   
+                        return false;    
+                    }
+                    else{
+                        return true;
+                    }                
+                }
+                else{
+                    return true;
+                }   
+            }
+        ).test(
+            "greaterAgeDiffChecking",
+            function() {
+                return "Child age should be less than self"
+            },
+            function (value) {
+                if(typeof this.parent.dob_0 != 'undefined'){
+                    var ageDiff = Math.floor(moment(value).diff(this.parent.dob_0, 'years', true));
+                    if (ageDiff < 0 ) {   
+                        return false;    
+                    }
+                    else{
+                        return true;
+                    }                    
+                }
+                else{
+                    return true;
+                }
+            }
+        )
+        .test(
+            "greaterAgeDiffChecking",
+            function() {
+                return "Child age should be less than spouse"
+            },
+            function (value) {
+                if(typeof this.parent.dob_1 != 'undefined'){
+                    var ageDiff = Math.floor(moment(value).diff(this.parent.dob_1, 'years', true));
+                    if (ageDiff < 0 ) {   
+                        return false;    
+                    }
+                    else{
+                        return true;
+                    }                    
+                }
+                else{
+                    return true;
+                }
+            }
+        ),
+        othewise: Yup.string()
+    }),
+    child4Gender: Yup.string().when(['looking_for_5'], {
+        is: looking_for_5 => looking_for_5 == 'child4',
+        then: Yup.string().required('Child 4 Gender field is required'),
+        othewise: Yup.string()
+    }).nullable(),
+    
+    dob_6: Yup.string().when(['looking_for_6'], {
+        is: looking_for_6 => looking_for_6 == 'father',
         then: Yup.string().required('Father DOB field is required')
         .test(
             "18YearsChecking",
@@ -540,8 +646,8 @@ const validateFamilyMembers  = Yup.object().shape({
         othewise: Yup.string()
     }),
 
-    dob_6: Yup.string().when(['looking_for_6'], {
-        is: looking_for_6 => looking_for_6 == 'mother',
+    dob_7: Yup.string().when(['looking_for_7'], {
+        is: looking_for_7 => looking_for_7 == 'mother',
         then: Yup.string().required('Mother DOB field is required')
         .test(
             "18YearsChecking",
@@ -622,8 +728,8 @@ const validateFamilyMembers  = Yup.object().shape({
         othewise: Yup.string()
     }),
 
-    dob_7: Yup.string().when(['looking_for_7'], {
-        is: looking_for_7 => looking_for_7 == 'fatherInLaw',
+    dob_8: Yup.string().when(['looking_for_8'], {
+        is: looking_for_8 => looking_for_8 == 'fatherInLaw',
         then: Yup.string().required('Father-In-Law DOB field is required')
         .test(
             "18YearsChecking",
@@ -703,8 +809,8 @@ const validateFamilyMembers  = Yup.object().shape({
         ),
         othewise: Yup.string()
     }),
-    dob_8: Yup.string().when(['looking_for_8'], {
-        is: looking_for_8 => looking_for_8 == 'motherInLaw',
+    dob_9: Yup.string().when(['looking_for_9'], {
+        is: looking_for_9 => looking_for_9 == 'motherInLaw',
         then: Yup.string().required('Mother-In-Law DOB field is required')
         .test(
             "18YearsChecking",
@@ -1065,10 +1171,11 @@ class arogya_InformationYourself extends Component {
             display_gender[2] = values.child1Gender ? values.child1Gender :null
             display_gender[3] = values.child2Gender ? values.child2Gender :null
             display_gender[4] = values.child3Gender ? values.child3Gender :null
-            display_gender[5] = this.state.gender ? 'm' : null
-            display_gender[6] = this.state.gender ? 'f' : null
-            display_gender[7] = this.state.gender ? 'm' : null
-            display_gender[8] = this.state.gender ? 'f' : null
+            display_gender[5] = values.child4Gender ? values.child4Gender :null
+            display_gender[6] = this.state.gender ? 'm' : null
+            display_gender[7] = this.state.gender ? 'f' : null
+            display_gender[8] = this.state.gender ? 'm' : null
+            display_gender[9] = this.state.gender ? 'f' : null
         
         if(this.state.validateCheck == 1){
             for (const key in values) {
@@ -1260,12 +1367,15 @@ setStateForPreviousData=(family_members)=>{
             child3Gender: display_gender_arr  ? display_gender_arr[4] : "",
             looking_for_5: display_looking_for_arr[5] ? display_looking_for_arr[5] : "",
             dob_5: display_dob_arr[5] ? new Date(display_dob_arr[5]) : "",
+            child4Gender: display_gender_arr  ? display_gender_arr[5] : "",
             looking_for_6: display_looking_for_arr[6] ? display_looking_for_arr[6] : "",
-            dob_6: display_dob_arr[6] ? new Date(display_dob_arr[6]) : "",                        
+            dob_6: display_dob_arr[6] ? new Date(display_dob_arr[6]) : "",
             looking_for_7: display_looking_for_arr[7] ? display_looking_for_arr[7] : "",
-            dob_7: display_dob_arr[7] ? new Date(display_dob_arr[7]) : "",
+            dob_7: display_dob_arr[7] ? new Date(display_dob_arr[7]) : "",  
             looking_for_8: display_looking_for_arr[8] ? display_looking_for_arr[8] : "",
             dob_8: display_dob_arr[8] ? new Date(display_dob_arr[8]) : "",
+            looking_for_9: display_looking_for_arr[9] ? display_looking_for_arr[9] : "",
+            dob_9: display_dob_arr[9] ? new Date(display_dob_arr[9]) : "",
             cover_type_id: cover_type_id,
             // cover_type_id: cover_type_id || lookingFor > 1 ? 1 : cover_type_id,
             insureList: insureListPrev ? insureListPrev.toString()  : (insureList ? insureList :'')
@@ -1591,8 +1701,7 @@ setStateForPreviousData=(family_members)=>{
                                                     </FormGroup>
                                                 </div>
 
-                                                <div className="col-md-4 formSection">
-                                                    <label className="formGrp">
+                                                <div className="col-md-4 formSection">                                               
                                                     <Field
                                                         name="child1Gender"
                                                         component="select"
@@ -1604,11 +1713,12 @@ setStateForPreviousData=(family_members)=>{
                                                         <option value="m">Male</option>
                                                         <option value="f">Female</option>
                                                     </Field>    
-                                                    </label>
+                                                    <label className="formGrp error">
                                                     {
                                                             errors.child1Gender && touched.child1Gender ?                 
                                                             <span className="error-message">{errors.child1Gender}</span>:''
                                                     }
+                                                    </label>
                                                 </div>
                                             </div>
 
@@ -1681,7 +1791,6 @@ setStateForPreviousData=(family_members)=>{
                                                 </div>
 
                                                 <div className="col-md-4 formSection">
-                                                    <label className="formGrp">
                                                     <Field
                                                         name="child2Gender"
                                                         component="select"
@@ -1693,11 +1802,12 @@ setStateForPreviousData=(family_members)=>{
                                                         <option value="m">Male</option>
                                                         <option value="f">Female</option>
                                                     </Field>    
-                                                    </label>
+                                                    <label className="formGrp error">
                                                     {
                                                             errors.child2Gender && touched.child2Gender ?                 
                                                             <span className="error-message">{errors.child2Gender}</span>:''
                                                     }
+                                                    </label>
                                                 </div>
                                             </div>  
 
@@ -1769,7 +1879,6 @@ setStateForPreviousData=(family_members)=>{
                                                 </div>
 
                                                 <div className="col-md-4 formSection">
-                                                    <label className="formGrp">
                                                     <Field
                                                         name="child3Gender"
                                                         component="select"
@@ -1781,26 +1890,24 @@ setStateForPreviousData=(family_members)=>{
                                                         <option value="m">Male</option>
                                                         <option value="f">Female</option>
                                                     </Field>    
-                                                    </label>
+                                                    <label className="formGrp error">
                                                     {
                                                             errors.child3Gender && touched.child3Gender ?                 
                                                             <span className="error-message">{errors.child3Gender}</span>:''
                                                     }
+                                                    </label>
                                                 </div>
                                             </div> 
 
-
-
                                             <div className="row dropinput">
                                                 <div className="col-md-4">
-                                                    <label className="customCheckBox formGrp formGrp">Father
+                                                    <label className="customCheckBox formGrp formGrp">Child 4
                                                     <Field
                                                         type="checkbox"
                                                         name="looking_for_5"
-                                                        value="father"
+                                                        value="child4"
                                                         className="user-self"
                                                         onChange={(e) => {
-                                                            this.checkPolicyType(e.target.value,  e.target.checked,setFieldTouched, setFieldValue)
                                                             if (e.target.checked === true) {
                                                                 setFieldValue('looking_for_5', e.target.value);
                                                                 
@@ -1809,7 +1916,6 @@ setStateForPreviousData=(family_members)=>{
                                                                 setFieldValue("dob_5", '');
                                                                 
                                                             }
-
                                                             if(this.setValueData()){
                                                                 this.setState({
                                                                     validateCheck:1
@@ -1821,7 +1927,7 @@ setStateForPreviousData=(family_members)=>{
                                                                 })
                                                             }
                                                         }}
-                                                        checked={values.looking_for_5 == 'father' ? true : false}
+                                                        checked={values.looking_for_5 == 'child4' ? true : false}
                                                     />
                                                         <span className="checkmark mL-0"></span>
                                                         <span className="error-message"></span>
@@ -1829,7 +1935,7 @@ setStateForPreviousData=(family_members)=>{
                                                 </div>
 
                                                 <div className="col-md-4">
-                                                    <FormGroup>
+                                                    <FormGroup >
                                                         <DatePicker
                                                             name="dob_5"
                                                             dateFormat="dd MMM yyyy"
@@ -1838,8 +1944,8 @@ setStateForPreviousData=(family_members)=>{
                                                             peekPreviousYear
                                                             showMonthDropdown
                                                             showYearDropdown
-                                                            maxDate={new Date(maxDobAdult)}
-                                                            minDate={new Date(minDobAdult)}
+                                                            maxDate={new Date(maxDobChild)}
+                                                            minDate={new Date(minDobChild)}
                                                             className="datePckr"
                                                             dropdownMode="select"
                                                             onChange={(value,e) => {
@@ -1857,18 +1963,38 @@ setStateForPreviousData=(family_members)=>{
                                                             <span className="error-message">{errors.dob_5}</span>:''
                                                         }
                                                         </label>
-                                                        
                                                     </FormGroup>
+                                                </div>
+
+                                                <div className="col-md-4 formSection">
+                                                    <Field
+                                                        name="child4Gender"
+                                                        component="select"
+                                                        autoComplete="off"
+                                                        value={values.child4Gender}
+                                                        className="formGrp"
+                                                    >
+                                                    <option value="">Select gender</option>
+                                                        <option value="m">Male</option>
+                                                        <option value="f">Female</option>
+                                                    </Field>    
+                                                    <label className="formGrp error">
+                                                    {
+                                                            errors.child4Gender && touched.child4Gender ?                 
+                                                            <span className="error-message">{errors.child4Gender}</span>:''
+                                                    }
+                                                    </label>
                                                 </div>
                                             </div>
 
+
                                             <div className="row dropinput">
                                                 <div className="col-md-4">
-                                                    <label className="customCheckBox formGrp formGrp">Mother
+                                                    <label className="customCheckBox formGrp formGrp">Father
                                                     <Field
                                                         type="checkbox"
                                                         name="looking_for_6"
-                                                        value="mother"
+                                                        value="father"
                                                         className="user-self"
                                                         onChange={(e) => {
                                                             this.checkPolicyType(e.target.value,  e.target.checked,setFieldTouched, setFieldValue)
@@ -1892,7 +2018,7 @@ setStateForPreviousData=(family_members)=>{
                                                                 })
                                                             }
                                                         }}
-                                                        checked={values.looking_for_6 == 'mother' ? true : false}
+                                                        checked={values.looking_for_6 == 'father' ? true : false}
                                                     />
                                                         <span className="checkmark mL-0"></span>
                                                         <span className="error-message"></span>
@@ -1900,7 +2026,7 @@ setStateForPreviousData=(family_members)=>{
                                                 </div>
 
                                                 <div className="col-md-4">
-                                                    <FormGroup >
+                                                    <FormGroup>
                                                         <DatePicker
                                                             name="dob_6"
                                                             dateFormat="dd MMM yyyy"
@@ -1928,17 +2054,18 @@ setStateForPreviousData=(family_members)=>{
                                                             <span className="error-message">{errors.dob_6}</span>:''
                                                         }
                                                         </label>
+                                                        
                                                     </FormGroup>
                                                 </div>
                                             </div>
 
                                             <div className="row dropinput">
                                                 <div className="col-md-4">
-                                                    <label className="customCheckBox formGrp formGrp">Father in law
+                                                    <label className="customCheckBox formGrp formGrp">Mother
                                                     <Field
                                                         type="checkbox"
                                                         name="looking_for_7"
-                                                        value="fatherInLaw"
+                                                        value="mother"
                                                         className="user-self"
                                                         onChange={(e) => {
                                                             this.checkPolicyType(e.target.value,  e.target.checked,setFieldTouched, setFieldValue)
@@ -1947,7 +2074,8 @@ setStateForPreviousData=(family_members)=>{
                                                                 
                                                             } else {
                                                                 setFieldValue('looking_for_7', '');
-                                                                setFieldValue("dob_7", '');                                                                
+                                                                setFieldValue("dob_7", '');
+                                                                
                                                             }
 
                                                             if(this.setValueData()){
@@ -1961,7 +2089,7 @@ setStateForPreviousData=(family_members)=>{
                                                                 })
                                                             }
                                                         }}
-                                                        checked={values.looking_for_7 == 'fatherInLaw' ? true : false}
+                                                        checked={values.looking_for_7 == 'mother' ? true : false}
                                                     />
                                                         <span className="checkmark mL-0"></span>
                                                         <span className="error-message"></span>
@@ -2001,13 +2129,13 @@ setStateForPreviousData=(family_members)=>{
                                                 </div>
                                             </div>
 
-                                            <div className="row dropinput m-b-45">
+                                            <div className="row dropinput">
                                                 <div className="col-md-4">
-                                                    <label className="customCheckBox formGrp formGrp">Mother in law
+                                                    <label className="customCheckBox formGrp formGrp">Father in law
                                                     <Field
                                                         type="checkbox"
                                                         name="looking_for_8"
-                                                        value="motherInLaw"
+                                                        value="fatherInLaw"
                                                         className="user-self"
                                                         onChange={(e) => {
                                                             this.checkPolicyType(e.target.value,  e.target.checked,setFieldTouched, setFieldValue)
@@ -2030,7 +2158,7 @@ setStateForPreviousData=(family_members)=>{
                                                                 })
                                                             }
                                                         }}
-                                                        checked={values.looking_for_8 == 'motherInLaw' ? true : false}
+                                                        checked={values.looking_for_8 == 'fatherInLaw' ? true : false}
                                                     />
                                                         <span className="checkmark mL-0"></span>
                                                         <span className="error-message"></span>
@@ -2067,9 +2195,78 @@ setStateForPreviousData=(family_members)=>{
                                                         }
                                                         </label>
                                                     </FormGroup>
+                                                </div>
+                                            </div>
+
+                                            <div className="row dropinput m-b-45">
+                                                <div className="col-md-4">
+                                                    <label className="customCheckBox formGrp formGrp">Mother in law
+                                                    <Field
+                                                        type="checkbox"
+                                                        name="looking_for_9"
+                                                        value="motherInLaw"
+                                                        className="user-self"
+                                                        onChange={(e) => {
+                                                            this.checkPolicyType(e.target.value,  e.target.checked,setFieldTouched, setFieldValue)
+                                                            if (e.target.checked === true) {
+                                                                setFieldValue('looking_for_9', e.target.value);
+                                                                
+                                                            } else {
+                                                                setFieldValue('looking_for_9', '');
+                                                                setFieldValue("dob_9", '');                                                                
+                                                            }
+
+                                                            if(this.setValueData()){
+                                                                this.setState({
+                                                                    validateCheck:1
+                                                                })
+                                                            }
+                                                            else{
+                                                                this.setState({
+                                                                    validateCheck:0
+                                                                })
+                                                            }
+                                                        }}
+                                                        checked={values.looking_for_9 == 'motherInLaw' ? true : false}
+                                                    />
+                                                        <span className="checkmark mL-0"></span>
+                                                        <span className="error-message"></span>
+                                                    </label>
+                                                </div>
+
+                                                <div className="col-md-4">
+                                                    <FormGroup >
+                                                        <DatePicker
+                                                            name="dob_9"
+                                                            dateFormat="dd MMM yyyy"
+                                                            placeholderText="DOB"
+                                                            peekPreviousMonth
+                                                            peekPreviousYear
+                                                            showMonthDropdown
+                                                            showYearDropdown
+                                                            maxDate={new Date(maxDobAdult)}
+                                                            minDate={new Date(minDobAdult)}
+                                                            className="datePckr"
+                                                            dropdownMode="select"
+                                                            onChange={(value,e) => {
+                                                                if (e && typeof e.preventDefault === 'function') {
+                                                                    e.preventDefault();
+                                                                }
+                                                                setFieldTouched("dob_9");
+                                                                setFieldValue("dob_9", value);
+                                                              }}
+                                                            selected={values.dob_9}
+                                                        />
+                                                        <label className="formGrp error">
+                                                        {
+                                                            errors.dob_9 && touched.dob_9 ?                 
+                                                            <span className="error-message">{errors.dob_9}</span>:''
+                                                        }
+                                                        </label>
+                                                    </FormGroup>
                                                 </div>              
                                             </div>
-                                            {values.looking_for_2 || values.looking_for_3 || values.looking_for_4 ?
+                                            {values.looking_for_2 || values.looking_for_3 || values.looking_for_4 || values.looking_for_5 ?
                                             <div className="row dropinput m-b-20">
                                                 <div className="col-md-15">
                                                     <label className="customCheckBox formGrp formGrp">
@@ -2100,14 +2297,16 @@ setStateForPreviousData=(family_members)=>{
                                                         checked={values.confirm == '1' ? true : false}
                                                     />
                                                         <span className="checkmark mL-0"></span>
-                                                    </label>
-                                                    {errors.confirm && (touched.looking_for_2 || touched.looking_for_3 || touched.looking_for_4) ? 
+                                                        <label className="formGrp error">
+                                                        {errors.confirm && (touched.looking_for_2 || touched.looking_for_3 || touched.looking_for_4 || values.looking_for_5) ? 
                                                             <span className="error-message">{errors.confirm}</span> : ""
                                                         }
+                                                        </label>
+                                                    </label>                     
                                                 </div>
                                             </div> 
                                             : null }   
-                                            { (values.looking_for_0 && values.looking_for_1) || values.looking_for_2 || values.looking_for_3 || values.looking_for_4 ||values.looking_for_5 || values.looking_for_6 || values.looking_for_7 || values.looking_for_8 ?                                   
+                                            { (values.looking_for_0 && values.looking_for_1) || values.looking_for_2 || values.looking_for_3 || values.looking_for_4 || values.looking_for_5 ||values.looking_for_6 || values.looking_for_7 || values.looking_for_8 || values.looking_for_9 ?                                   
                                             <div className="d-flex justify-content-center">      
                                                 <div className="d-inline-flex m-b-15 m-l-20">
                                                         <div className="p-r-25">

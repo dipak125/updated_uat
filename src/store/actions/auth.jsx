@@ -73,20 +73,23 @@ export const authProcess = (data, onSuccess, onFailure) => {
         dispatch(authStart());
         // Auth Processing
         const formData = new FormData();
-
+console.log("data-------- ", data)
         let post_data_obj = {}
         if(data.bc_id) {
             post_data_obj = {
                 'email': data.emailAddress,
                 'password':data.password,
                 'bc_id': data.bc_id,
-                'user_type': data.user_type
+                'user_type': data.user_type,
+                'user_id': data.bc_id
             }
         }
         else {
             post_data_obj = {
                 'email': data.emailAddress,
                 'password':data.password,
+                'bc_id': data.agent_id,
+                'user_id': data.bc_agent_id
             }
         }
         let encryption = new Encryption();
