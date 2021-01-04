@@ -895,6 +895,7 @@ class OtherComprehensiveMISCD extends Component {
 
         let csc_data = localStorage.getItem('users') ? localStorage.getItem('users') : "";
         let csc_user_type = "";
+        let bc_data = sessionStorage.getItem('bcLoginData') ? sessionStorage.getItem('bcLoginData') : "";
 
         if(csc_data && sessionStorage.getItem('csc_id')) {
             let encryption = new Encryption();
@@ -902,6 +903,12 @@ class OtherComprehensiveMISCD extends Component {
             csc_data = csc_data.user
             csc_data = JSON.parse(encryption.decrypt(csc_data));           
             csc_user_type = csc_data.type
+        }
+        else {
+            if(bc_data) {
+                let encryption = new Encryption();
+                bc_data = JSON.parse(encryption.decrypt(bc_data));
+            }
         }
 
         if(add_more_coverage) {
@@ -980,7 +987,7 @@ class OtherComprehensiveMISCD extends Component {
 
         console.log('post_data',post_data)
 
-        if(( total_idv> 5000000) && csc_user_type == "POSP" ) {
+        if(((total_idv > 5000000) && csc_user_type == "POSP" ) || ((total_idv > 5000000) && bc_data && bc_data.master_data.vendor_name == "PayPoint" ) ) {
             swal("Quote cannot proceed with total IDV (including IDV, Body IDV, Electrical and Non-Electrical IDV) greater than 5000000")
             this.props.loadingStop();
             return false

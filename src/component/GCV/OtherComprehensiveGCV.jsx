@@ -759,10 +759,10 @@ class OtherComprehensiveGCV extends Component {
             // 'cng_kit': cng_kit_flag,
             // 'cngKit_Cost': cngKit_Cost
         }
-        console.log('other_idv', other_idv)
+
         total_idv = parseInt(other_idv) + parseInt(post_data.idv_value)+parseInt(post_data.body_idv_value)
         console.log('fullQuote_post_data', post_data)
-        console.log('total_idv', total_idv)
+
 
         if(( total_idv> 5000000) && csc_user_type == "POSP" ) {
             swal("Quote cannot proceed with total IDV (including IDV, Body IDV, Electrical and Non-Electrical IDV) greater than 5000000")
@@ -821,6 +821,7 @@ class OtherComprehensiveGCV extends Component {
 
         let csc_data = localStorage.getItem('users') ? localStorage.getItem('users') : "";
         let csc_user_type = "";
+        let bc_data = sessionStorage.getItem('bcLoginData') ? sessionStorage.getItem('bcLoginData') : "";
 
         if(csc_data && sessionStorage.getItem('csc_id')) {
             let encryption = new Encryption();
@@ -828,6 +829,13 @@ class OtherComprehensiveGCV extends Component {
             csc_data = csc_data.user
             csc_data = JSON.parse(encryption.decrypt(csc_data));           
             csc_user_type = csc_data.type
+        }
+        else {
+            if(bc_data) {
+                let encryption = new Encryption();
+                bc_data = JSON.parse(encryption.decrypt(bc_data));
+            }
+            console.log("bc_data------ ", bc_data)
         }
 
         if(add_more_coverage) {
@@ -847,6 +855,7 @@ class OtherComprehensiveGCV extends Component {
                 'B00070' : {'value': values.B00070_value},
                 'B00005' : {'value': values.B00005_value}
             }
+            
         }
 
         const formData = new FormData();
@@ -901,8 +910,8 @@ class OtherComprehensiveGCV extends Component {
             }
             total_idv=parseInt(post_data.idv_value)+parseInt(post_data.body_idv_value)
         }
-
-        if((total_idv > 5000000) && csc_user_type == "POSP" ) {
+        console.log("--total_idv------ ", total_idv)
+        if(((total_idv > 5000000) && csc_user_type == "POSP" ) || ((total_idv > 5000000) && bc_data && bc_data.master_data.vendor_name == "PayPoint" ) ) {
             swal("Quote cannot proceed with total IDV (including IDV, Body IDV, Electrical and Non-Electrical IDV) greater than 5000000")
             this.props.loadingStop();
             return false

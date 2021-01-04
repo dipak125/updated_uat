@@ -174,6 +174,7 @@ class LogIn extends Component {
                 let bcData = res.data.data ? res.data.data : [] 
                 bcLoginData.agent_id = bcData ? bcData.token_data.bcmaster_id : ""
                 bcLoginData.token = token
+                bcLoginData.master_data = bcData ? bcData.master_data : ""
                 bcLoginData.bc_agent_id = bcData ? bcData.token_data.bc_agent_id : ""
                 let user_info = JSON.parse(bcData.token_data.additional_info)
                 if(user_info && user_info.is_success == true ) {
