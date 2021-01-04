@@ -69,7 +69,8 @@ class LogIn extends Component {
             sessionStorage.removeItem('bcLoginData');
             sessionStorage.setItem('logo', "CSC.svg");
             let encryption = new Encryption();
-            let csc_id = encryption.decrypt(queryString.parse(this.props.location.search).csc_id);
+            let csc_id = encryption.decrypt(queryString.parse(this.props.location.search).csc_id);          
+            csc_id = csc_id.replace(/["]/g, "");
             let csc_type = queryString.parse(this.props.location.search).type
             sessionStorage.setItem('csc_id', csc_id);
             sessionStorage.setItem('type', csc_type);
