@@ -201,7 +201,7 @@ class arogya_SelectDuration extends Component {
                 let policyHolderDetails= decryptResp.data.policyHolder
                 this.setState({
                     policyHolderDetails: policyHolderDetails,
-                    SliderVal: decryptResp.data.policyHolder && decryptResp.data.policyHolder.request_data ? decryptResp.data.policyHolder.request_data.sum_insured : 0, 
+                    SliderVal: decryptResp.data.policyHolder && decryptResp.data.policyHolder.arogyatopupsuminsured ? decryptResp.data.policyHolder.arogyatopupsuminsured.insured_amount : 0, 
 
                     deductibleSliderVal: decryptResp.data.policyHolder && decryptResp.data.policyHolder.request_data ? decryptResp.data.policyHolder.request_data.deductible : 0, 
 

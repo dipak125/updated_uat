@@ -113,12 +113,13 @@ class arogya_PolicyDetails extends Component {
     const formData = new FormData();
     let encryption = new Encryption();
     let policyDetails = policyHolderDetails && policyHolderDetails.request_data ? policyHolderDetails.request_data : []
+    let sunInsured = policyHolderDetails && policyHolderDetails.arogyatopupsuminsured ? policyHolderDetails.arogyatopupsuminsured.insured_amount : 0 
 
    const post_data = {
     'policy_reference_no': policyDetails ? policyHolderDetails.reference_no : null,
     'start_date': policyDetails ? moment(policyDetails.start_date).format("YYYY-MM-DD") : null,
     'end_date': policyDetails ? moment(policyDetails.end_date).format("YYYY-MM-DD") : null,
-    'sum_insured': policyDetails ? parseInt(policyDetails.sum_insured) : null,
+    'sum_insured': sunInsured ? parseInt(sunInsured) : null,
     'deductible': policyDetails ? parseInt(policyDetails.deductible) : null,
     'tenure_year': policyDetails ? parseInt(policyDetails.tenure_year) : null,
     }
@@ -130,6 +131,7 @@ class arogya_PolicyDetails extends Component {
       .then((res) => {
         // let decryptResp = JSON.parse(encryption.decrypt(res.data))
         let decryptResp = res.data
+        
         if (decryptResp.PolicyObject) {
           this.setState({
             fulQuoteResp: decryptResp.PolicyObject,

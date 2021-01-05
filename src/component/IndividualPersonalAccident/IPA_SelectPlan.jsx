@@ -16,7 +16,7 @@ import "react-datepicker/dist/react-datepicker.css";
 import "react-datepicker/dist/react-datepicker-cssmodules.min.css";
 import moment from "moment";
 
-const minDobAdult = moment(moment().subtract(65, 'years').calendar()).add(1, 'day').format("YYYY-MM-DD")
+const minDobAdult = moment(moment().subtract(65, 'years').calendar()).format("YYYY-MM-DD")
 const maxDobAdult = moment().subtract(18, 'years').format("YYYY-MM-DD");
 
 const initialValues = {
@@ -34,9 +34,9 @@ const sum_insured_array = {
 const vehicleRegistrationValidation = Yup.object().shape({  
   salutation_id: Yup.string().required('Title is required').nullable(),
   first_name: Yup.string().required('First Name is required').min(3, function() {return "First name must be 3 characters"}).max(40,function() {
-      return "Full name must be maximum 40 characters"
+      return "First name must be maximum 40 characters"
   }).matches(/^[A-Za-z]+$/, function() {return "Please enter valid first name"}).nullable(),
-  last_name: Yup.string().required('Last Name is required').min(1, function() {return "Last name must be 1 characters"}).max(40, function() {return "Full name must be maximum 40 characters"})
+  last_name: Yup.string().required('Last Name is required').min(1, function() {return "Last name must be 1 characters"}).max(40, function() {return "Last name must be maximum 40 characters"})
   .matches(/^[A-Za-z]+$/, function() {
       return "Please enter valid last name"
   }).nullable(),

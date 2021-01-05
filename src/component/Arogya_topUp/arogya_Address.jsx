@@ -73,13 +73,13 @@ const validateAddress =  Yup.object().shape({
     address2: Yup.string()
         .required(function() {
             return "Enter building name / number"
-        }).matches(/^([0-9A-Za-z\s]*)$/, function() {
+        }).matches(/^[a-zA-Z0-9][a-zA-Z0-9\s,/.-]*$/, function() {
             return "Invalid building name / number"
         }),
     address3: Yup.string()
         .required(function() {
             return "Enter street name"
-        }).matches(/^([A-Za-z\s]*)$/, function() {
+        }).matches(/^[a-zA-Z0-9][a-zA-Z0-9\s,/.-]*$/, function() {
             return "Invalid street name"
         }),
     email:Yup.string().email().required('Email is required').min(8, function() {
@@ -515,6 +515,8 @@ class arogya_Address extends Component {
         axios
         .post(`arogya-topup/insured-member-details`, formData)
         .then(res => {
+            let decryptResp = JSON.parse(encryption.decrypt(res.data))
+            console.log("decryptResp--------- ", decryptResp)
            // if(res.data.completedStep == 4){
                 this.props.loadingStop();
                 this.props.history.push(`/arogya_NomineeDetails/${productId}`);
