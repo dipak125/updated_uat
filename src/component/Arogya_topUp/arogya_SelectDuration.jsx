@@ -209,10 +209,11 @@ class arogya_SelectDuration extends Component {
                 })
                 var values = []
                 let policyDetails = policyHolderDetails && policyHolderDetails.request_data ? policyHolderDetails.request_data : [] 
+                let insured_amount = policyHolderDetails && policyHolderDetails.arogyatopupsuminsured ? policyHolderDetails.arogyatopupsuminsured.insured_amount : [] 
 
                 values['polStartDate'] = policyDetails && policyDetails.start_date ? moment(policyDetails.start_date).format("YYYY-MM-DD") : new Date()
                 values['polEndDate'] = policyDetails && policyDetails.end_date ? moment(policyDetails.end_date).format("YYYY-MM-DD") : new Date(moment(values['polStartDate']).add(1, 'years').format("YYYY-MM-DD"))
-                values['slider_sum_insured'] = policyDetails && policyDetails.sum_insured ? parseInt(policyDetails.sum_insured) : defaultSliderVal
+                values['slider_sum_insured'] = insured_amount ? parseInt(insured_amount) : defaultSliderVal
                 values['slider_deductible'] = policyDetails && policyDetails.deductible ? parseInt(policyDetails.deductible) : defaultdeductibleSliderValue
                 values['slider_tenure'] = policyDetails && policyDetails.tenure_year ? parseInt(policyDetails.tenure_year) : defaulttenureSliderValue
 
@@ -396,7 +397,7 @@ class arogya_SelectDuration extends Component {
                                                                         <FormGroup>
                                                                             <div className="insurerName">
                                                                                 Policy Start Date
-                                                            </div>
+                                                                            </div>
                                                                         </FormGroup>
                                                                     </Col>
                                                                     <Col sm={12} md={3} lg={3}>
@@ -437,7 +438,7 @@ class arogya_SelectDuration extends Component {
                                                                                 placeholderText="End Date"
                                                                                 disabled={true}
                                                                                 className="datePckr"
-                                                                                selected={addDays(new Date(values.polStartDate), 364)}
+                                                                                selected={addDays(new Date(values.polStartDate), (365*values.slider_tenure)-1 )}
                                                                             />
                                                                             {errors.polEndDate && touched.polEndDate ? (
                                                                                 <span className="errorMsg">{errors.polEndDate}</span>
@@ -451,7 +452,7 @@ class arogya_SelectDuration extends Component {
                                                                         <FormGroup>
                                                                             <div className="insurerName">
                                                                                 Select Sum Insured
-                                                            </div>
+                                                                            </div>
                                                                         </FormGroup>
                                                                     </Col>
                                                                     <Col sm={12} md={3} lg={2}>
@@ -604,6 +605,7 @@ class arogya_SelectDuration extends Component {
                                                                                 <li>Nursing expenses.Operation theatre and ICU charges</li>
                                                                                 <li>Medicines that you consume during the hospital stay</li>
                                                                                 <li>Road Ambulance Charges</li>
+                                                                                <li>Day Care expenses for 142 daycare procedures</li>
                                                                                 <li>Pre and Post hospitalization expenses up to 30 and 60 days respectively</li>
                                                                             </ul>
                                                                         </div>

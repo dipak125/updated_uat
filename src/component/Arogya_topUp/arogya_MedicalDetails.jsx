@@ -194,8 +194,16 @@ class arogya_MedicalDetails extends Component {
                     }   
                }  
                count++;              
-            }            
+            }                
         }
+
+        let qlength = this.state.questionList ? this.state.questionList.length:0;
+        console.log("qlength---0-- ", values.question_id_4)
+
+        if( qlength == 4 && values.question_id_4 == 'y'){
+            this.showRestriction('y');
+            return false
+        }       
 
         let q = questionClass.length/2
 
@@ -216,12 +224,14 @@ class arogya_MedicalDetails extends Component {
           .get(`arogya-topup/questions`)
           .then(res => {
             let decryptResp = JSON.parse(encryption.decrypt(res.data))
-              
+              console.log("question --- decryptResp---- ", decryptResp)
             let showImage = decryptResp.data && decryptResp.data.length ? this.setShowImage(decryptResp.data):[]
             this.setState({
                 questionList: decryptResp.data,
                 showImage
             });
+
+            this.getPolicyHolderDetails();
           })
           .catch(err => {
             this.setState({
@@ -229,7 +239,6 @@ class arogya_MedicalDetails extends Component {
             });
             this.props.loadingStop();
           });
-          this.props.loadingStop();
       }
 
     getFamilyMembers = (question_answer) => {
@@ -268,6 +277,7 @@ class arogya_MedicalDetails extends Component {
             this.setState({
                 selected_family_members
             })
+            this.props.loadingStop();
           })
           .catch(err => {
             this.setState({
@@ -275,12 +285,11 @@ class arogya_MedicalDetails extends Component {
             });
             this.props.loadingStop();
           });
-          this.props.loadingStop();
       }
 
     componentDidMount() {
         this.getQuestionList();
-        this.getPolicyHolderDetails();
+        // this.getPolicyHolderDetails();
         //this.setShowImage();
       }
 

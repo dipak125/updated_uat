@@ -966,10 +966,11 @@ class arogya_InformationYourself extends Component {
             display_gender_new[2] = display_gender[2] ? display_gender[2] :null
             display_gender_new[3] = display_gender[3] ? display_gender[3] :null
             display_gender_new[4] = display_gender[4] ? display_gender[4] :null
-            display_gender_new[5] = 'm'
-            display_gender_new[6] = 'f'
-            display_gender_new[7] = 'm' 
-            display_gender_new[8] = 'f'
+            display_gender_new[5] = display_gender[5] ? display_gender[5] :null
+            display_gender_new[6] = 'm'
+            display_gender_new[7] = 'f'
+            display_gender_new[8] = 'm' 
+            display_gender_new[9] = 'f'
             
             let looking_for = []
             let gender_for = []

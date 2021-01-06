@@ -25,8 +25,8 @@ import queryString from 'query-string';
 
 
 const genderArr = {
-  M: "Male",
-  F: "Female",
+  m: "Male",
+  f: "Female",
 };
 
 const relationArr = {
@@ -37,8 +37,36 @@ const relationArr = {
 5:"Father",
 6:"Mother",
 7:"Father In Law",
-8:"Mother In Law"
+8:"Mother In Law",
+9:"Brother",
+10:"Sister",
+11:"Grandfather",
+12:"Grandmother",
+13:"Husband",
+14:"Wife",
+15:"Brother In Law",
+16:"Sister In Law",
+17:"Uncle",
+18:"Aunty",
+19:"Ex-Wife",
+20:"Ex-Husband",
+21:"Employee",
+22:"Niece",
+23:"Nephew"
 }
+
+const insuredRelationArr = {
+  self:"Self",
+  spouse:"Spouse",
+  child1:"Child",
+  child2:"Child",
+  child3:"Child",
+  child4:"Child",
+  father:"Father",
+  mother:"Mother",
+  fatherInLaw:"Father In Law",
+  motherInLaw:"Mother In Law",
+  }
 
 // const date_UTC = moment().format();
 const date_cstom = moment().format("D-MMMM-YYYY-h:mm:ss");
@@ -55,7 +83,8 @@ class arogya_PolicyDetails extends Component {
     error1: [],
     show: false,
     refNumber: "",
-    paymentStatus: []
+    paymentStatus: [],
+    nomineedetails: []
   };
 
   handleClose = () => {
@@ -90,7 +119,8 @@ class arogya_PolicyDetails extends Component {
           addressArray: decryptResp.data.policyHolder && decryptResp.data.policyHolder.address ? addressArray : null,
           familyMember: decryptResp.data.policyHolder.request_data.family_members,
           refNumber: decryptResp.data.policyHolder.reference_no,
-          paymentStatus: decryptResp.data.policyHolder.payment ? decryptResp.data.policyHolder.payment[0] : []
+          paymentStatus: decryptResp.data.policyHolder.payment ? decryptResp.data.policyHolder.payment[0] : [],
+          nomineedetails: decryptResp.data.policyHolder ? decryptResp.data.policyHolder.request_data.nominee[0]:[]
         });
         this.fullQuote( decryptResp.data.policyHolder );
       })
@@ -192,9 +222,10 @@ paypoint_payment = () => {
 
   render() {
     const { productId } = this.props.match.params;
-    const { fulQuoteResp, addressArray, error, show, policyHolderDetails, refNumber, paymentStatus } = this.state;
+    const { fulQuoteResp, addressArray, error, show, policyHolderDetails, nomineedetails, paymentStatus } = this.state;
 
     console.log("addressArray===================== ", addressArray ? addressArray : "")
+    console.log("policyHolderDetails===================== ", policyHolderDetails ? policyHolderDetails : "")
 
     const AddressDetails = addressArray ? (
         <div>
@@ -252,10 +283,7 @@ paypoint_payment = () => {
                     </Col>
                     <Col sm={12} md={6}>
                       <FormGroup>
-                        {/* {member.GenderCode == 'F' && member.ArgInsuredRelToProposer > 2?
-                      (member.ArgInsuredRelToProposer==3 || member.ArgInsuredRelToProposer==5 || member.ArgInsuredRelToProposer==7)?
-                      relationArr[parseInt(member.ArgInsuredRelToProposer)+1]:relationArr[member.ArgInsuredRelToProposer]:relationArr[member.ArgInsuredRelToProposer]} */}
-                      {member.relation_with}
+                      { insuredRelationArr[member.relation_with] }
                       </FormGroup>
                     </Col>
                   </Row>
@@ -265,7 +293,7 @@ paypoint_payment = () => {
                       <FormGroup>Gender</FormGroup>
                     </Col>
                     <Col sm={12} md={6}>
-                      <FormGroup>{member.gender}</FormGroup>
+                      <FormGroup>{genderArr[member.gender]}</FormGroup>
                     </Col>
                   </Row>
                 </Col>
@@ -283,7 +311,7 @@ paypoint_payment = () => {
           <div>
           <Row>
             <Col sm={12} md={6}>
-              {/* <h6><strong>Member {qIndex + 1}</strong></h6> */}
+              <h6><strong>Nominee</strong></h6>
               <Row>
                 <Col sm={12} md={6}>
                   <FormGroup>Name:</FormGroup>
@@ -308,10 +336,7 @@ paypoint_payment = () => {
                 </Col>
                 <Col sm={12} md={6}>
                   <FormGroup>
-                    {/* {member.GenderCode == 'F' && member.ArgInsuredRelToProposer > 2?
-                  (member.ArgInsuredRelToProposer==3 || member.ArgInsuredRelToProposer==5 || member.ArgInsuredRelToProposer==7)?
-                  relationArr[parseInt(member.ArgInsuredRelToProposer)+1]:relationArr[member.ArgInsuredRelToProposer]:relationArr[member.ArgInsuredRelToProposer]} */}
-                  {member.relation_with == 2 ? 'Spouce' : member.relation_with == 3 ? 'Son' : member.relation_with == 4 ? 'Daughter' : member.relation_with == 5 ? 'Father' : member.relation_with == 6 ? 'Mother' : member.relation_with == 7 ? 'Father in law' : member.relation_with == 8 ? 'Mother in law' : null}
+                  { relationArr[member.relation_with] }
                   </FormGroup>
                 </Col>
               </Row>
@@ -321,7 +346,51 @@ paypoint_payment = () => {
                   <FormGroup>Gender</FormGroup>
                 </Col>
                 <Col sm={12} md={6}>
-                  <FormGroup>{member.gender}</FormGroup>
+                  <FormGroup>{genderArr[member.gender]}</FormGroup>
+                </Col>
+              </Row>
+            </Col>
+          </Row>
+          <Row>
+          <p></p>
+          </Row>
+          </div>
+        );
+      })
+      :null
+
+      const appointee = policyHolderDetails.request_data ? policyHolderDetails.request_data.nominee.map((member, qIndex) => {
+        return (
+          <div>
+          <Row>
+            <Col sm={12} md={6}>
+              <h6><strong>Appointee </strong></h6>
+              <Row>
+                <Col sm={12} md={6}>
+                  <FormGroup>Name:</FormGroup>
+                </Col>
+                <Col sm={12} md={6}>
+                  <FormGroup>{member.appointee_name}</FormGroup>
+                </Col>
+              </Row>
+
+              <Row>
+                <Col sm={12} md={6}>
+                  <FormGroup>Relation With Nominee:</FormGroup>
+                </Col>
+                <Col sm={12} md={6}>
+                  <FormGroup>
+                  { relationArr[member.appointee_relation_with] }
+                  </FormGroup>
+                </Col>
+              </Row>
+
+              <Row>
+                <Col sm={12} md={6}>
+                  <FormGroup>Gender</FormGroup>
+                </Col>
+                <Col sm={12} md={6}>
+                  <FormGroup>{genderArr[member.gender]}</FormGroup>
                 </Col>
               </Row>
             </Col>
@@ -497,8 +566,11 @@ paypoint_payment = () => {
 
                         <div className="rghtsideTrigr m-b-40">
                           <Collapsible trigger=" Nominee Details">
-                            <div className="listrghtsideTrigr">{nominee}
-                            </div>
+                            <div className="listrghtsideTrigr">{nominee}</div>
+                            {nomineedetails && nomineedetails.is_appointee == '1'  ? 
+                            <div className="listrghtsideTrigr">{appointee}</div> 
+                            : null}
+                            
                           </Collapsible>
                         </div>
 
