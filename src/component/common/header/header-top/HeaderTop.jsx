@@ -91,10 +91,9 @@ class HeaderTop extends Component {
         
         return (
             <>
-            {phrases ? 
                 <section className="container-fluid headerTop d-flex justify-content-between">
                     <div className="align-self-center"><img src={require('../../../../assets/images/logo.svg')} alt="" /></div>
-                    {sessionStorage.getItem("auth_token") ? 
+                    {sessionStorage.getItem("auth_token") && phrases ? 
                     <div className="align-self-right">
                         <select
                             name="langauage"
@@ -126,7 +125,7 @@ class HeaderTop extends Component {
                         <Dropdown alignRight>
                             <Dropdown.Toggle variant="" id="dropdown-basic">
                                 <div className="d-flex topUserBtn">
-                                {sessionStorage.getItem("auth_token") && bc_data.user_info ?
+                                {sessionStorage.getItem("auth_token") && bc_data.user_info && phrases ?
                                     <div className="align-self-center userNameImg">
                                         {phrases['Welcome']} {bc_data.user_info.data.user.name}
                                         <p><a href={process.env.REACT_APP_PAYMENT_URL+'/core/public/pdf_files/RM-name-SBIG.xlsx'}>
@@ -136,7 +135,7 @@ class HeaderTop extends Component {
                                         </a></p>
                                     </div>
                                         :  
-                                        sessionStorage.getItem("auth_token") && csc_data ?
+                                        sessionStorage.getItem("auth_token") && csc_data && phrases ?
                                         <div className="align-self-center userNameImg">
                                             {phrases['Welcome']} {csc_data.name}
                                             <p><a href={process.env.REACT_APP_PAYMENT_URL+'/core/public/pdf_files/RM-name-SBIG.xlsx'}>
@@ -170,7 +169,7 @@ class HeaderTop extends Component {
                             <Loader type="Oval" color="#edae21" height="50" width="50" />
                         </div>
                     ) : null}
-                </section> : null }
+                </section>
             </>
         )
     }

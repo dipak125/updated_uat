@@ -548,7 +548,7 @@ class Dashboard extends Component {
                                     >
                                       <Card.Header className="card-header-custom">
                                         <h6 className="mt-1 mb-4">
-                                          <strong>Product Summary</strong>
+                                          <strong>{phrases['ProductSummary']}</strong>
                                         </h6>
                                       </Card.Header>
                                       <Card.Body className="scrollable">
