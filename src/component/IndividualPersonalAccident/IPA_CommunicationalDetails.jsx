@@ -1002,7 +1002,7 @@ class AccidentAdditionalDetails extends Component {
                                       <option value="">
                                         Relation with Primary Insured
                                       </option>
-                                      <option value="1">Self</option>
+                                      {/* <option value="1">Self</option> */}
                                       <option value="2">Spouse</option>
                                       <option value="3">Son</option>
                                       <option value="4">Daughter</option>
@@ -1097,7 +1097,7 @@ class AccidentAdditionalDetails extends Component {
                                           {/* {self_selected ? ( */}
                                             {/* "" */}
                                           {/* ) : ( */}
-                                            <option value="1">Self</option>
+                                            {/* <option value="1">Self</option> */}
                                           {/* )} */}
                                           <option value="2">Spouse</option>
                                           <option value="3">Son</option>

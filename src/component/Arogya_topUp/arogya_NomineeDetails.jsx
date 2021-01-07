@@ -523,15 +523,12 @@ class arogya_NomineeDetails extends Component {
                                                                     >
                                                                     <option value="">Relation with Nominee</option>
                                                                     {self_selected ? '':<option value="1">Self</option>}
-                                                                    {/* <option value="2">Spouse</option>
-                                                                    <option value="3">Son</option>
-                                                                    <option value="4">Daughter</option> */}
-                                                                    <option value="2">Father</option>
-                                                                    <option value="3">Mother</option>
-                                                                    <option value="7">Grandfather</option>
-                                                                    <option value="8">Grandmother</option>
-                                                                    <option value="9">Unlce</option>
-                                                                    <option value="10">Aunty</option>
+                                                                    <option value="5">Father</option>
+                                                                    <option value="6">Mother</option>
+                                                                    <option value="11">Grandfather</option>
+                                                                    <option value="12">Grandmother</option>
+                                                                    <option value="17">Unlce</option>
+                                                                    <option value="18">Aunty</option>
                                                                     </Field>     
                                                                     {errors.appointee_relation_with && touched.appointee_relation_with ? (
                                                                         <span className="errorMsg">{errors.appointee_relation_with}</span>

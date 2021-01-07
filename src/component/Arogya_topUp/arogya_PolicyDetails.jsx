@@ -326,7 +326,7 @@ paypoint_payment = () => {
                   <FormGroup>Date Of Birth:</FormGroup>
                 </Col>
                 <Col sm={12} md={6}>
-                  <FormGroup>{member.dob}</FormGroup>
+                  <FormGroup>{moment(member.dob).format('DD-MM-yyy')}</FormGroup>
                 </Col>
               </Row>
 

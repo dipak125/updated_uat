@@ -953,3 +953,13 @@ border: 0;
   border: 1px solid #aeaeae;
   text-align: center;
 }
+
+.ticketTable .react-bs-table .react-bs-container-body .table>tbody>tr>td {
+  min-width: 100px;
+  text-align: center !important;
+}
+
+.ticketTable .react-bs-table .react-bs-container-header .table>thead>tr>th {
+  text-align: center !important;
+  min-width: 100px;
+}

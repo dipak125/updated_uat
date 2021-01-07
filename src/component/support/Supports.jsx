@@ -79,7 +79,7 @@ class Supports extends Component {
                         </div>
                     </div>
                 </section>
-            </BaseComponent>>
+            </BaseComponent>
             </>
         );
     }

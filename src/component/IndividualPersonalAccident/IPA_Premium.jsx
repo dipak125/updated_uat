@@ -407,7 +407,7 @@ class IPA_Premium extends Component {
               </div>
               <div className="col-sm-12 col-md-12 col-lg-10 col-xl-10 infobox">
                 <h4 className="text-center mt-3 mb-3">
-                  SBI General Insurance Company Limited
+                SBI General Insurance Company Limited
                 </h4>
                   <Formik initialValues={initialValue} onSubmit={this.handleSubmit}
                     // validationSchema={validatePremium}
@@ -439,9 +439,25 @@ class IPA_Premium extends Component {
                                               </Collapsible>
                                           </div>
                                           <div className="rghtsideTrigr">
-                                            <Collapsible trigger="SBI General Insurance Company Limited">
+                                            <Collapsible trigger="Premium Summary">
                                               <div className="listrghtsideTrigr">
                                                 <Row>
+                                                  <Col sm={12} md={3}>
+                                                    <FormGroup>Policy Start Date:</FormGroup>
+                                                  </Col>
+                                                  <Col sm={12} md={3}>
+                                                    <FormGroup>
+                                                      {policyHolderDetails && policyHolderDetails.request_data ? moment(policyHolderDetails.request_data.start_date).format('DD-MM-yyyy') : null}
+                                                    </FormGroup>
+                                                  </Col>
+                                                  <Col sm={12} md={3}>
+                                                    <FormGroup>Policy Start Date:</FormGroup>
+                                                  </Col>
+                                                  <Col sm={12} md={3}>
+                                                    <FormGroup>
+                                                      {policyHolderDetails && policyHolderDetails.request_data ? moment(policyHolderDetails.request_data.end_date).format('DD-MM-yyyy') : null}
+                                                    </FormGroup>
+                                                  </Col>
                                                   <Col sm={12} md={3}>
                                                     <FormGroup>Sum Insured:</FormGroup>
                                                   </Col>
