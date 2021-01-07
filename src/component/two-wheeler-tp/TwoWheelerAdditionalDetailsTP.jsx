@@ -441,7 +441,7 @@ class TwoWheelerAdditionalDetails extends Component {
             'is_carloan':values['is_carloan'],
             'bank_name':values['bank_name'],
             'bank_branch':values['bank_branch'],
-            'page_name': values[`two_wheeler_additional_detailsTP/${productId}`],
+            'page_name': `two_wheeler_additional_detailsTP/${productId}`,
         }
         if(motorInsurance.policy_for == '1' && motorInsurance.pa_flag == '1'){
             post_data['dob'] = moment(values['dob']).format("YYYY-MM-DD")

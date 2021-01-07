@@ -330,6 +330,7 @@ class Address extends Component {
             showEIA:false,
             showckyc_no:false,
             pincode_Details: [],
+            ksbinfo: []
 		}
 	}
 
@@ -358,6 +359,7 @@ class Address extends Component {
                 let is_ckyc_account =  res.data.data.policyHolder.ckyc_no == 2 ? "" : res.data.data.policyHolder.ckyc_no
                 let selfFlag = false;
                 let pincode_Details = JSON.parse(res.data.data.policyHolder.pincode_response)
+                let ksbinfo =  res.data.data.policyHolder && res.data.data.policyHolder.ksbinfo  ? res.data.data.policyHolder.ksbinfo: []
                 for(let i=0;i<family_members.length;i++){
                     if(family_members[i].relation_with=='self'){
                         selfFlag = true
@@ -372,7 +374,8 @@ class Address extends Component {
                     addressDetails,
                     is_eia_account,
                     is_ckyc_account,
-                    pincode_Details
+                    pincode_Details,
+                    ksbinfo
                 })
                 this.fetchPrevAreaDetails(pincode_Details)
                 
@@ -588,7 +591,7 @@ class Address extends Component {
 
     
     render() {
-        const {policy_holder,familyMembers,addressDetails,is_eia_account,is_ckyc_account,selfFlag,pinDataArr,stateName,showEIA, pincode_Details,showckyc_no} = this.state    
+        const {policy_holder,familyMembers,addressDetails,is_eia_account,is_ckyc_account,selfFlag,pinDataArr,stateName,showEIA, pincode_Details,showckyc_no, ksbinfo} = this.state    
 
         let newInitialValues = Object.assign(initialValues, {
             proposerAsInsured: sessionStorage.getItem('proposed_insured') ? sessionStorage.getItem('proposed_insured') : (selfFlag ? 1:0),
@@ -900,6 +903,13 @@ class Address extends Component {
                                                                 </div>
                                                             </FormGroup>
                                                         </Col>
+                                                        {/* <Col sm={12} md={3} lg={1}>
+                                                            <FormGroup>
+                                                                <div className="insurerName">
+                                                                {ksbinfo && ksbinfo.primary_insured == resource.relation_with ? 'PI' : 'No' }
+                                                                </div>
+                                                            </FormGroup>
+                                                        </Col> */}
                                                         </Row>   
                                                     </div>
                                                     )}                                                

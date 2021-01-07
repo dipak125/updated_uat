@@ -54,7 +54,7 @@ const validateAddress =  Yup.object().shape({
     family_members: Yup.array().of(
             Yup.object().shape({
                 looking_for : Yup.string(),
-                preExistingDisease: Yup.string().notRequired()
+                preExistingDisease: Yup.string().required("Pre-existing disease required")
                     .min(3, function() {
                         return "Name must be minimum 3 chracters"
                     })

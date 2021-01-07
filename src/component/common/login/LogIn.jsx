@@ -16,6 +16,7 @@ import axiosBCintegration from "../../../shared/axiosBCintegration"
 import Encryption from '../../../shared/payload-encryption';
 import queryString from 'query-string';
 import swal from 'sweetalert';
+import axios from "../../../shared/axios";
 
 const initialValues = {
     userId: "",
@@ -41,10 +42,33 @@ class LogIn extends Component {
         broker_id: ""
     }
 
+    fetchPhrases = () => {
+        this.props.loadingStart();
+        axios
+          .post(`maintenance/fetchPhrases`, {})
+          .then(res => {
+            let phraseData = (res.data.phrase ? res.data.phrase : []);
+            this.setState({
+                phrases: phraseData
+            });
+            localStorage.setItem("phrases", JSON.stringify(phraseData) )
+            this.props.loadingStop();
+            return true
+          })
+          .catch(err => {
+            this.setState({
+              phrases: []
+            });
+            this.props.loadingStop();
+            return false
+          });
+      }
+
 
     componentDidMount() {
         localStorage.clear()
         sessionStorage.removeItem('logo') 
+        
         let bodyClass = [];
         bodyClass.length && document.body.classList.remove(...bodyClass);
         document.body.classList.add("loginBody");
@@ -203,6 +227,10 @@ class LogIn extends Component {
         const result = await this.handle_AutoSubmit(bcLoginData);
     }
 
+    callFetchPhrase = async () => {
+        const result = await this.fetchPhrases();
+    }
+
     handle_AutoSubmit = (bcLoginData) => {
         //console.log('values', values); return false;
         return new Promise(resolve => {
@@ -222,7 +250,9 @@ class LogIn extends Component {
                 this.props.onFormSubmit(values,
                     () => {
                         this.props.loadingStop();
-                        this.props.history.push('/Dashboard');
+                        if(this.callFetchPhrase()){
+                            this.props.history.push('/Dashboard');
+                        }                     
                     },
                     (err) => {
                         this.props.loadingStop();

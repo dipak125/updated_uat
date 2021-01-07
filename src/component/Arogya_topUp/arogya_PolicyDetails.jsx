@@ -385,14 +385,14 @@ paypoint_payment = () => {
                 </Col>
               </Row>
 
-              <Row>
+              {/* <Row>
                 <Col sm={12} md={6}>
                   <FormGroup>Gender</FormGroup>
                 </Col>
                 <Col sm={12} md={6}>
                   <FormGroup>{genderArr[member.gender]}</FormGroup>
                 </Col>
-              </Row>
+              </Row> */}
             </Col>
           </Row>
           <Row>

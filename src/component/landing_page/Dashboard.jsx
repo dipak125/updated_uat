@@ -37,6 +37,7 @@ import moment from "moment";
 // import "./style.css";
 // import Autosuggest from "react-autosuggest";
 
+
 const initialValues = {
   start_date: new Date(),
   end_date: new Date(),
@@ -136,8 +137,8 @@ class Dashboard extends Component {
     let health_policy_count = 0;
     let motor_premium_count = 0;
     let health_premium_count = 0;
-    let maxMotor = rawData.motor.length;
-    let maxHealth = rawData.health.length;
+    let maxMotor = rawData ? rawData.motor.length : null;
+    let maxHealth = rawData ? rawData.health.length : null;
 
     for (var i = 0; i < maxMotor; i++) {
       motor_policy_count =
@@ -193,6 +194,7 @@ class Dashboard extends Component {
   };
 
   fetchNotification = () => {
+    this.props.loadingStart();
     axios
       .get(`notifications`)
       .then((res) => {
@@ -200,6 +202,7 @@ class Dashboard extends Component {
         this.setState({
           update_data: Data,
         });
+        this.props.loadingStop();
       })
       .catch((err) => {
         this.props.loadingStop();
@@ -266,6 +269,7 @@ class Dashboard extends Component {
     }
   };
 
+
   componentDidMount() {
     this.fetchNotification();
   }
@@ -275,8 +279,8 @@ class Dashboard extends Component {
 
     // let newInitialValues = Object.assign()
     const { chartData, rawData, update_data, search_flag, report_chart, flag } = this.state;
-    console.log("Stateflag------",flag)
-    // console.log("raw-data----------",rawData)
+    let phrases = localStorage.getItem("phrases") ? JSON.parse(localStorage.getItem("phrases")) : null
+
     let healthList =
       rawData && rawData.health && rawData.health.length > 0
         ? rawData.health
@@ -334,6 +338,7 @@ class Dashboard extends Component {
     return (
       <>
         <BaseComponent>
+        {phrases ? 
           <div className="container-fluid">
             <div className="row">
               <div className="col-sm-12 col-md-12 col-lg-2 col-xl-2 pd-l-0">
@@ -341,10 +346,10 @@ class Dashboard extends Component {
               </div>
               <div className="col-sm-12 col-md-12 col-lg-10 col-xl-10 infobox">
                 <h4 className="text-center mt-3 mb-3">
-                  SBI General Insurance Company Limited
+                {phrases['SBIGICL']}
                 </h4>
                 <section className="brand m-b-25">
-                  <h4 className="text-center mt-3 mb-3">Dashboard</h4>
+                  <h4 className="text-center mt-3 mb-3">{phrases['Dashboard']}</h4>
                   <Formik
                     initialValues={initialValues}
                     onSubmit={this.handleSubmit}
@@ -382,12 +387,12 @@ class Dashboard extends Component {
                                     >
                                       <Card.Header className="card-header-custom">
                                         <h6>
-                                          <strong>Business Achievement</strong>
+                                          <strong>{phrases['BusinessAchievement']}</strong>
                                           <Button
                                             type="submit"
                                             className="ml-4"
                                           >
-                                            Fetch
+                                            {phrases['Fetch']}
                                             {/* {<HiRefresh />} */}
                                           </Button>
                                         </h6>
@@ -445,8 +450,8 @@ class Dashboard extends Component {
                                                       );
                                                     }}
                                                   >
-                                                    <option value="1">GWP</option>
-                                                    <option value="2">NOP</option>
+                                                    <option value="1">{phrases['GWP']}</option>
+                                                    <option value="2">{phrases['NOP']}</option>
                                                   </Field>
                                                   {errors.report_chart &&
                                                   touched.report_chart ? (
@@ -551,9 +556,9 @@ class Dashboard extends Component {
                                         <table className="table table-bordered" style={({width: "27rem"})}>
                                          <thead>
                                             <tr>
-                                              <th>Product</th>
-                                              <th>NOP</th>
-                                              <th>GWP</th>
+                                              <th>{phrases['Product']}</th>
+                                              <th>{phrases['GWP']}</th>
+                                              <th>{phrases['NOP']}</th>
                                             </tr>
                                           </thead>
                                           <tbody>
@@ -576,7 +581,7 @@ class Dashboard extends Component {
                                 >
                                   <Card.Header className="card-header-custom">
                                     <h6 className="mt-1 mb-4">
-                                      <strong>Updates and notification</strong>
+                                      <strong>{phrases['Updatesandnotification']}</strong>
                                     </h6>
                                   </Card.Header>
                                   <Card.Body className="scrollable">
@@ -594,7 +599,7 @@ class Dashboard extends Component {
                 <Footer />
               </div>
             </div>
-          </div>
+          </div> : null }
         </BaseComponent>
       </>
     );

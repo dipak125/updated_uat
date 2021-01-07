@@ -12,7 +12,13 @@ let encryption = new Encryption();
 instance.interceptors.request.use(config => {
     // Insert authorization token on request call
     const auth_token = sessionStorage.getItem('auth_token');
+    const lang_name = localStorage.getItem('lang_name');
     if( auth_token ) config.headers['Authorization'] = auth_token;
+    if( lang_name && auth_token ) {
+        config.headers['X-localization'] = lang_name;
+    } else {
+        config.headers['X-localization'] = 'en';
+    }
 
     return config;
 }, error => {

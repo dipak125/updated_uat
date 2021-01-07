@@ -39,8 +39,10 @@ class SideNav extends Component {
   };
 
   render() {
+    let childPhrase = localStorage.getItem("phrases") ? JSON.parse(localStorage.getItem("phrases")) : null
     return (
       <>
+      {childPhrase ?
         <nav className="flex-fill leftNav">
           <ul className="navPan">
             <li>
@@ -51,7 +53,7 @@ class SideNav extends Component {
                     alt=""
                   />
                 </span>
-                Dashboard
+                {childPhrase['Dashboard']}
               </Link>
             </li>
             <li>
@@ -62,11 +64,11 @@ class SideNav extends Component {
                     alt=""
                   />
                 </span>
-                Policy Search
+                {childPhrase['PolicySearch']}
               </Link>
             </li>
             <li>
-							<Link to="/QuoteHistory" activeClassName="active"><span className="leftIcon01"><img src={require('../../../assets/images/document.png')} alt="" /></span>Quote History</Link>
+							<Link to="/QuoteHistory" activeClassName="active"><span className="leftIcon01"><img src={require('../../../assets/images/document.png')} alt="" /></span> {childPhrase['QuoteHistory']}</Link>
             </li>
             <li>
               <Link to="/Products" activeClassName="active">
@@ -76,7 +78,7 @@ class SideNav extends Component {
                     alt=""
                   />
                 </span>
-                Products
+                {childPhrase['Products']}
               </Link>
             </li>
             <li>
@@ -87,7 +89,7 @@ class SideNav extends Component {
                     alt=""
                   />
                 </span>
-                Documents
+                {childPhrase['Documents']}
               </Link>
             </li>
             <li>
@@ -98,11 +100,11 @@ class SideNav extends Component {
                     alt=""
                   />
                 </span>
-                Services
+                {childPhrase['Services']}
               </Link>
             </li>
             <li>
-							<Link to="/Supports" activeClassName="active"><span className="leftIcon01"><img src={require('../../../assets/images/support.png')} alt="" /></span>Support</Link>
+							<Link to="/Supports" activeClassName="active"><span className="leftIcon01"><img src={require('../../../assets/images/support.png')} alt="" /></span>{childPhrase['Support']}</Link>
             </li>
             <li>
               <Link to="/Break_in" activeClassName="active">
@@ -112,7 +114,7 @@ class SideNav extends Component {
                     alt=""
                   />
                 </span>
-                Break In
+                {childPhrase['BreakIn']}
               </Link>
             </li>
             {/* <li>
@@ -128,10 +130,10 @@ class SideNav extends Component {
                   alt=""
                 />
               </span>
-              Logout
+              {childPhrase['Logout']}
             </a>
           </button>
-        </nav>
+        </nav> : null }
       </>
     );
   }

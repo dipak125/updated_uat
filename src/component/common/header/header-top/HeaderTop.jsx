@@ -6,16 +6,17 @@ import { authLogout } from "../../../../store/actions/auth";
 import axios from "../../../../shared/axios"
 import Encryption from '../../../../shared/payload-encryption';
 import Blink from 'react-blink-text';
+import { loaderStart, loaderStop } from "../../../../store/actions/loader";
 
 // let logo = sessionStorage.getItem('logo') && sessionStorage.getItem('logo') != "undefined" ? sessionStorage.getItem('logo') : "search.svg"
-
 
 class HeaderTop extends Component {
 
     state = {
         logo: sessionStorage.getItem('logo') && sessionStorage.getItem('logo') != "undefined" ? sessionStorage.getItem('logo') : "",
         bc_data: {},
-        csc_data: {}
+        csc_data: {},
+        phrases: []
     }
 
     handleLogout = () => {
@@ -38,6 +39,28 @@ class HeaderTop extends Component {
         // logo = sessionStorage.getItem('logo') && sessionStorage.getItem('logo') != "undefined" ? sessionStorage.getItem('logo') : ""
         
     }
+
+    fetchPhrases = () => {
+        this.props.loadingStart();
+        axios
+          .post(`maintenance/fetchPhrases`, {})
+          .then(res => {
+            let phraseData = (res.data.phrase ? res.data.phrase : []);
+            this.setState({
+                phrases: phraseData
+            });
+            localStorage.setItem("phrases", JSON.stringify(phraseData) )
+            this.props.loadingStop();
+            return true
+          })
+          .catch(err => {
+            this.setState({
+              phrases: []
+            });
+            this.props.loadingStop();
+            return false
+          });
+      }
 
     componentDidMount() {
         let bc_data = sessionStorage.getItem('bcLoginData') ? sessionStorage.getItem('bcLoginData') : "";
@@ -63,12 +86,15 @@ class HeaderTop extends Component {
     render() {
         // console.log("BC_data---", bc_data.user_info )
         const { logo, bc_data, csc_data } = this.state
+
+        let phrases = localStorage.getItem("phrases") ? JSON.parse(localStorage.getItem("phrases")) : null
         
         return (
             <>
+            {phrases ? 
                 <section className="container-fluid headerTop d-flex justify-content-between">
                     <div className="align-self-center"><img src={require('../../../../assets/images/logo.svg')} alt="" /></div>
-                    {/* {localStorage.getItem("auth_token") ? 
+                    {sessionStorage.getItem("auth_token") ? 
                     <div className="align-self-right">
                         <select
                             name="langauage"
@@ -76,7 +102,10 @@ class HeaderTop extends Component {
                             defaultValue={localStorage.getItem('lang_name')}
                             onChange={e => {
                                 localStorage.setItem('lang_name', e.target.value);
-                                window.location.reload();
+                                if(this.fetchPhrases()){
+                                    window.location.reload();
+                                }
+                                
                             }}
                             style={{
                                 width: '96px',
@@ -90,7 +119,7 @@ class HeaderTop extends Component {
                             <option value="hi">Hindi</option>
                         </select>
                     </div> 
-                     : null }  */}
+                     : null } 
 
                     
                     <div className="align-self-center userTopRtSec">
@@ -99,20 +128,20 @@ class HeaderTop extends Component {
                                 <div className="d-flex topUserBtn">
                                 {sessionStorage.getItem("auth_token") && bc_data.user_info ?
                                     <div className="align-self-center userNameImg">
-                                        Welcome {bc_data.user_info.data.user.name}
+                                        {phrases['Welcome']} {bc_data.user_info.data.user.name}
                                         <p><a href={process.env.REACT_APP_PAYMENT_URL+'/core/public/pdf_files/RM-name-SBIG.xlsx'}>
-                                                <Blink color='blue' text='Download RM List' fontSize='14'>
-                                                    Download RM List
+                                                <Blink color='blue' text= {phrases['DownloadRMList']} fontSize='14'>
+                                                {phrases['DownloadRMList']}
                                                 </Blink> 
                                         </a></p>
                                     </div>
                                         :  
                                         sessionStorage.getItem("auth_token") && csc_data ?
                                         <div className="align-self-center userNameImg">
-                                            Welcome {csc_data.name}
+                                            {phrases['Welcome']} {csc_data.name}
                                             <p><a href={process.env.REACT_APP_PAYMENT_URL+'/core/public/pdf_files/RM-name-SBIG.xlsx'}>
-                                                <Blink color='blue' text='Download RM List' fontSize='14'>
-                                                    Download RM List
+                                                <Blink color='blue' text= {phrases['DownloadRMList']} fontSize='14'>
+                                                {phrases['DownloadRMList']}
                                                 </Blink> 
                                             </a></p>
                                         </div>
@@ -141,7 +170,7 @@ class HeaderTop extends Component {
                             <Loader type="Oval" color="#edae21" height="50" width="50" />
                         </div>
                     ) : null}
-                </section>
+                </section> : null }
             </>
         )
     }
@@ -149,7 +178,9 @@ class HeaderTop extends Component {
 
 const mapDispatchToProps = dispatch => {
     return {
-        logout: () => dispatch(authLogout())
+        logout: () => dispatch(authLogout()),
+        loadingStart: () => dispatch(loaderStart()),
+        loadingStop: () => dispatch(loaderStop()),
     }
 }
 
