@@ -143,7 +143,7 @@ class TicketStatus extends Component {
                         alert('SUCCESS!! :-)\n\n' + JSON.stringify(fields, null, 4))
                     }}
                     >
-                    {({ errors, status, touched, values }) => (
+                    {({ errors, status, touched, values, setFieldValue, setFieldTouched }) => (
                         <Form>
                             <div className="tootalTicketinfo">
                                 <Row>
@@ -161,12 +161,16 @@ class TicketStatus extends Component {
                                                         className="formGrp inputfs12"
                                                         value = {values.status}      
                                                         onChange= {(e) => {
+                                                            setFieldValue(`status`, e.target.value);
+                                                            setFieldTouched(`status`);
                                                             this.updateStatus(e.target.value)
                                                         }}                                      
                                                     >
-                                                        <option value=""></option>
+                                                        <option value="">-----</option>
                                                         <option value="Created">Created</option>
+                                                        <option value="Pending">Pending</option>
                                                         <option value="In-Progress">In-Progress</option>
+                                                        <option value="Closed">Closed</option>
                                                         <option value="Resolved">Resolved</option>
 
                                                         {/* {goodscarriedtypes.map((subVehicle, qIndex) => ( 
@@ -192,7 +196,7 @@ class TicketStatus extends Component {
                                         <div className="col-two">
                                             <Row>
                                                 <Col sm={12} md={3}><div className="first">Name:</div></Col>
-                                                <Col sm={12} md={9}><div className="first">{selectedTicket.user_id}</div></Col>
+                                                <Col sm={12} md={9}><div className="first">{selectedTicket.bc_user_id ? selectedTicket.bc_user_id : selectedTicket.csc_id}</div></Col>
                                             </Row>
                                             <Row>
                                                 <Col sm={12} md={3}><div>Email:</div></Col>
@@ -222,10 +226,10 @@ class TicketStatus extends Component {
                                         <img className="avatar" alt="Avatar" src="//www.gravatar.com/avatar/c4b67d2401af1361e3b91f250ebc5b1b?s=80&amp;d=mm" />    </span>
                                     <div className="header-panel">
                                         <div className="header">
-                                            <b>{selectedTicket.user_id}</b> posted <span>{moment(selectedTicket.created_at).format('DD/MM/YYYY hh:mm A')}</span> <span className="title truncate"></span>
+                                            <b>{selectedTicket.bc_user_id ? selectedTicket.bc_user_id : selectedTicket.csc_id}</b> posted <span>{moment(selectedTicket.created_at).format('DD/MM/YYYY hh:mm A')}</span> <span className="title truncate"></span>
                                         </div>
                                         <div className="thread-body">
-                                            <div><p> {selectedTicket.description} </p></div>
+                                            <div> {selectedTicket.description} </div>
                                             <div className="clear"></div>
                                         </div>
                                     </div>

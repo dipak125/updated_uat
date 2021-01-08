@@ -439,7 +439,7 @@ class IPA_Premium extends Component {
                                               </Collapsible>
                                           </div>
                                           <div className="rghtsideTrigr">
-                                            <Collapsible trigger="Premium Summary">
+                                            <Collapsible trigger="Premium Summary" open={true}>
                                               <div className="listrghtsideTrigr">
                                                 <Row>
                                                   <Col sm={12} md={3}>

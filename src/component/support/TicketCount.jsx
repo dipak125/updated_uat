@@ -61,13 +61,18 @@ class TicketCount extends Component {
         if(bc_data) {
             bc_data = JSON.parse(encryption.decrypt(bc_data));
         }
+        let user_type = sessionStorage.getItem('csc_id') ? 'csc' : 'bc'
+        let master_id = sessionStorage.getItem('csc_id') ? '5' : bc_data ? bc_data.agent_id : ""
+        let user_id = sessionStorage.getItem('csc_id') ? sessionStorage.getItem('csc_id') : bc_data ? bc_data.user_info.data.user.username : ""
 
-        formData.append('page_no', page_no)   
-        formData.append('policy_status', 'pending')
-        formData.append('bc_agent_id', sessionStorage.getItem('csc_id') ? sessionStorage.getItem('csc_id') : bc_data ? bc_data.user_info.data.user.username : "") 
+        formData.append('user_type', user_type); 
+        formData.append('master_id', master_id);
+        formData.append('user_id', user_id);
+
+        // formData.append('page_no', page_no)   
 
         this.props.loadingStart();
-        axios.get('help-ticket/list')
+        axios.post('help-ticket/list',formData)
         .then(res=>{
             let statusCount = res.data.data ? res.data.data : []   
             let ticketCount = res.data.data ? res.data.data : []                      
@@ -145,8 +150,8 @@ class TicketCount extends Component {
 
                             <TableHeaderColumn width='100px' dataField='ticket_no' isKey={true} dataFormat={actionFormatter(this)} >Ticket No.</TableHeaderColumn>
                             <TableHeaderColumn width='120px' dataField="status" tdStyle={{ whiteSpace: 'normal' }} >Status</TableHeaderColumn>
-                            <TableHeaderColumn width='150px' dataField="attachment_file_name" tdStyle={{ whiteSpace: 'normal' }}>Attachment</TableHeaderColumn>
-
+                            <TableHeaderColumn width='100px' dataField='area' >Subject</TableHeaderColumn>
+                            <TableHeaderColumn width='120px' dataField="created_at" dataFormat={cell => moment(cell).format('DD/MM/YYYY hh:mm A')} tdStyle={{ whiteSpace: 'normal' }} >Date Logged</TableHeaderColumn>
 
                         </BootstrapTable>
                     }
