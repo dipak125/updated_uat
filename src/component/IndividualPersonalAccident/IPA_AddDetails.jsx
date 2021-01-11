@@ -20,10 +20,10 @@ import moment from "moment";
 const initialValues = {
   pol_start_date : "",
   pol_end_date : "",
-  insured : "",
   first_name : "",
   last_name : "",
   date_of_birth : "",
+  insured : "",
   occupation : "",
   gender : "",
   previous_policy_check : "",
@@ -40,6 +40,7 @@ const vehicleRegistrationValidation = Yup.object().shape({
 class AccidentAddDetails extends Component {
   state = {
     occupationList: [],
+    requestedData: []
   };
 
   changePlaceHoldClassAdd(e) {
@@ -67,9 +68,10 @@ class AccidentAddDetails extends Component {
         let decryptResp = JSON.parse(encryption.decrypt(res.data));
         // console.log("decrypt---accidentDetails--->>", decryptResp);
         let accidentDetails = decryptResp.data && decryptResp.data.policyHolder ? decryptResp.data.policyHolder : null;
+        let requestedData =accidentDetails && accidentDetails.request_data ? accidentDetails.request_data : null;
         console.log("---accidentDetails--->>", accidentDetails);
         this.setState({
-          accidentDetails
+          accidentDetails, requestedData
         });
         this.props.loadingStop();
       })
@@ -114,7 +116,7 @@ class AccidentAddDetails extends Component {
     let encryption = new Encryption();
     this.props.loadingStart();
     let policy_start_date = moment(values.pol_start_date).format('yyyy-MM-DD HH:mm:ss')
-    let policy_end_date = moment(values.date_of_birth).format('yyyy-MM-DD HH:mm:ss')
+    let policy_end_date = moment(values.pol_end_date).format('yyyy-MM-DD HH:mm:ss')
     let post_data = {
         'policy_holder_id':accidentDetails.id,
         'menumaster_id':'9',
@@ -174,12 +176,12 @@ class AccidentAddDetails extends Component {
   };
 
   render() {
-    const { occupationList, accidentDetails} = this.state;
+    const { occupationList, accidentDetails, requestedData} = this.state;
     const {productId} = this.props.match.params
     const newInitialValues = Object.assign(initialValues, {
-      pol_start_date: new Date(),
-      pol_end_date : new Date(moment().add(364, "day").calendar()),
-      insured:  accidentDetails && accidentDetails.ipainfo ? accidentDetails.ipainfo.insured_type_id  : "",
+      pol_start_date: requestedData && requestedData.start_date ? new Date(requestedData.start_date) : new Date(),
+      pol_end_date : requestedData && requestedData.end_date ? new Date(requestedData.end_date) : new Date(moment().add(364, "day").calendar()),
+      insured:  accidentDetails && accidentDetails.ipainfo && accidentDetails.ipainfo.insured_type_id != 0 ? accidentDetails.ipainfo.insured_type_id  : "",
       previous_policy_check: 0,
       disability: 0,
       first_name: accidentDetails ? accidentDetails.first_name : "",
@@ -188,6 +190,8 @@ class AccidentAddDetails extends Component {
       occupation: accidentDetails && accidentDetails.ipainfo && accidentDetails.ipainfo.occupation ? accidentDetails.ipainfo.occupation.id : "",
       gender: accidentDetails ? accidentDetails.gender : ""
     });
+
+    // console.log("newInitialValues------ ", newInitialValues)
     return (
       <>
         <BaseComponent>

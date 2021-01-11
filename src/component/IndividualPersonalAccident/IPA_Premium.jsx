@@ -329,14 +329,14 @@ class IPA_Premium extends Component {
                       </Col>
                   </Row>
   
-                  <Row>
+                  {/* <Row>
                       <Col sm={12} md={6}>
                           <FormGroup>Gender</FormGroup>
                       </Col>
                       <Col sm={12} md={6}>
                           <FormGroup>{nomineeDetails && nomineeDetails.gender == "m" ? "Male" : "Female"}</FormGroup>
                       </Col>
-                  </Row>
+                  </Row> */}
               </Col>
           </Row>
           <Row>
@@ -451,7 +451,7 @@ class IPA_Premium extends Component {
                                                     </FormGroup>
                                                   </Col>
                                                   <Col sm={12} md={3}>
-                                                    <FormGroup>Policy Start Date:</FormGroup>
+                                                    <FormGroup>Policy End Date:</FormGroup>
                                                   </Col>
                                                   <Col sm={12} md={3}>
                                                     <FormGroup>

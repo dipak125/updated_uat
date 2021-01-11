@@ -27,7 +27,7 @@ const initialValues = {
   salutation_id: "",
   date_of_birth: "",
   email_id: "",
-  building_name : "",
+  building_name: "",
   city: "",
   plot_no: "",
   street_name: "",
@@ -38,7 +38,7 @@ const initialValues = {
   nominee_last_name: "",
   nominee_salutation_id: "",
   date_of_birth: "",
-  relation_with: "", 
+  relation_with: "",
   appointee_name: "",
   appointee_dob: null,
   appointee_relation_with: "",
@@ -77,15 +77,15 @@ const IPA__Validation = Yup.object().shape({
   //   .nullable(),
   // // last_name: Yup.string().required('Name is required').nullable(),
   // date_of_birth: Yup.date().required("Please enter date of birth").nullable(),
-  
-email_id: Yup.string().email().min(8, function() {
+
+  email_id: Yup.string().email().min(8, function () {
     return "Email must be minimum 8 characters"
-})
-.max(75, function() {
-    return "Email must be maximum 75 characters"
-}).matches(/^[a-zA-Z0-9]+([._\-]?[a-zA-Z0-9]+)*@\w+([-]?\w+)*(\.\w{2,3})+$/,'Invalid Email Id').nullable(),
-// mobile: Yup.string()
-// .matches(/^[6-9][0-9]{9}$/,'Invalid Mobile number').required('Mobile No. is required').nullable(),
+  })
+    .max(75, function () {
+      return "Email must be maximum 75 characters"
+    }).matches(/^[a-zA-Z0-9]+([._\-]?[a-zA-Z0-9]+)*@\w+([-]?\w+)*(\.\w{2,3})+$/, 'Invalid Email Id').nullable(),
+  // mobile: Yup.string()
+  // .matches(/^[6-9][0-9]{9}$/,'Invalid Mobile number').required('Mobile No. is required').nullable(),
   // pan_no: Yup.string()
   // .matches(/^[A-Z]{3}[CPHFATBLJG]{1}[A-Z]{1}[0-9]{4}[A-Z]{1}$/,'Invalid PAN number') .nullable(),
   // gstn_no: Yup.string()
@@ -181,52 +181,52 @@ email_id: Yup.string().email().min(8, function() {
   //               return true;
   //           }
   //       ),
-  appointee_name:Yup.string() 
-      .matches(/^[a-zA-Z]+([\s]?[a-zA-Z]+)$/, function() {
-          return "Please enter valid name"
-      }).test(
+  appointee_name: Yup.string()
+    .matches(/^[a-zA-Z]+([\s]+[a-zA-Z]+)$/, function () {
+      return "Please enter full name"
+    }).test(
       "18YearsChecking",
-      function() {
-          return "Please enter appointee name"
+      function () {
+        return "Please enter appointee name"
       },
       function (value) {
-          const ageObj = new PersonAge();
-          console.log("this.parent.nominee_dob------ ",ageObj.whatIsMyAge(this.parent.nominee_dob))
-          if (ageObj.whatIsMyAge(this.parent.nominee_dob) < 18 && !value) {   
-              return false;    
-          }
-          return true;
+        const ageObj = new PersonAge();
+        console.log("this.parent.nominee_dob------ ", ageObj.whatIsMyAge(this.parent.nominee_dob))
+        if (ageObj.whatIsMyAge(this.parent.nominee_dob) < 18 && !value) {
+          return false;
+        }
+        return true;
       }
-      ).min(3, function() {
+    ).min(3, function () {
       return "Name must be minimum 3 chracters"
-      })
-      .max(40, function() {
+    })
+    .max(40, function () {
       return "Name must be maximum 40 chracters"
-      })
-      .nullable(),
+    })
+    .nullable(),
 
-      
-      appointee_relation_with: Yup.string()
-      .test(
+
+  appointee_relation_with: Yup.string()
+    .test(
       "18YearsChecking",
-      function() {
-          return "Please enter Appointee relation"
+      function () {
+        return "Please enter Appointee relation"
       },
       function (value) {
-          const ageObj = new PersonAge();
-          if (ageObj.whatIsMyAge(this.parent.nominee_dob) < 18 && !value) {   
-              return false;    
-          }
-          return true;
+        const ageObj = new PersonAge();
+        if (ageObj.whatIsMyAge(this.parent.nominee_dob) < 18 && !value) {
+          return false;
+        }
+        return true;
       }
-      )
-      .nullable()
+    )
+    .nullable()
 });
 
 class AccidentAdditionalDetails extends Component {
   state = {
     appointeeFlag: false,
-    is_appointee:0,
+    is_appointee: 0,
     request_data: [],
     nominee_age: ""
   };
@@ -261,19 +261,19 @@ class AccidentAdditionalDetails extends Component {
 
         let address = accidentDetails && accidentDetails.address ? JSON.parse(accidentDetails.address) : {};
         let pincodeRESP = accidentDetails && accidentDetails.pincode_response ? JSON.parse(accidentDetails.pincode_response) : {};
-        let is_appointee= accidentDetails.request_data.nominee.length > 0 ?accidentDetails.request_data.nominee[0].is_appointee : "0"
-        let nominee_age = (accidentDetails && accidentDetails.request_data) && accidentDetails.request_data.nominee.length > 0  ?  ageObj.whatIsMyAge(new Date(accidentDetails.request_data.nominee[0].dob)) : null
-       
+        let is_appointee = accidentDetails.request_data.nominee.length > 0 ? accidentDetails.request_data.nominee[0].is_appointee : "0"
+        let nominee_age = (accidentDetails && accidentDetails.request_data) && accidentDetails.request_data.nominee.length > 0 ? ageObj.whatIsMyAge(new Date(accidentDetails.request_data.nominee[0].dob)) : null
+
         this.setState({
           accidentDetails,
           address,
-          pincodeRESP, 
+          pincodeRESP,
           is_appointee, nominee_age
 
         });
-        let pincodeArea = pincodeRESP && pincodeRESP.PIN_CD ?  pincodeRESP.PIN_CD : ""
-        console.log('pincodeArea------>>',pincodeArea)
-         this.fetchAreadetailsBack(pincodeArea)
+        let pincodeArea = pincodeRESP && pincodeRESP.PIN_CD ? pincodeRESP.PIN_CD : ""
+        console.log('pincodeArea------>>', pincodeArea)
+        this.fetchAreadetailsBack(pincodeArea)
         this.props.loadingStop();
       })
       .catch((err) => {
@@ -283,64 +283,64 @@ class AccidentAdditionalDetails extends Component {
   };
 
   handleSubmit = (values, actions) => {
-    const {productId} = this.props.match.params 
-    const {accidentDetails} = this.state
-    const formData = new FormData(); 
+    const { productId } = this.props.match.params
+    const { accidentDetails } = this.state
+    const formData = new FormData();
     let encryption = new Encryption();
     let date_of_birth = moment(values.nominee_dob).format('yyyy-MM-DD');
     this.props.loadingStart();
     let post_data = {
-        'policy_holder_id': accidentDetails.id,
-        'menumaster_id':'9',
-        'page_name': `AccidentAdditionalDetails/${productId}`,
-        'first_name': values.first_name,
-        'last_name': values.last_name,
-        'salutation_id': values.salutation_id,
-        'date_of_birth': date_of_birth,
-        'email_id': values.email_id,
-        'house_building_name': values.building_name,
-        'city':values.city,
-        'plot_no': values.plot_no,
-        'street': values.street_name,
-        'pincode': values.pincode,
-        'pincode_id': values.pincode_id,
-        'nominee_first_name': values.nominee_first_name,
-        'nominee_last_name': values.nominee_last_name,
-        'nominee_title_id' : values.nominee_salutation_id,
-        'nominee_dob' : date_of_birth,
-        'relation_with' : values.relation_with, 
-        'is_appointee' : this.state.is_appointee
+      'policy_holder_id': accidentDetails.id,
+      'menumaster_id': '9',
+      'page_name': `AccidentAdditionalDetails/${productId}`,
+      'first_name': values.first_name,
+      'last_name': values.last_name,
+      'salutation_id': values.salutation_id,
+      'date_of_birth': date_of_birth,
+      'email_id': values.email_id,
+      'house_building_name': values.building_name,
+      'city': values.city,
+      'plot_no': values.plot_no,
+      'street': values.street_name,
+      'pincode': values.pincode,
+      'pincode_id': values.pincode_id,
+      'nominee_first_name': values.nominee_first_name,
+      'nominee_last_name': values.nominee_last_name,
+      'nominee_title_id': values.nominee_salutation_id,
+      'nominee_dob': date_of_birth,
+      'relation_with': values.relation_with,
+      'is_appointee': this.state.is_appointee
     }
-    if(values.appointee_dob != "") {
-      let date_of_birth_appointee = moment(values.appointee_dob).format('yyyy-MM-DD');
+    if (this.state.appointeeFlag == true || this.state.is_appointee == '1') {
+      // let date_of_birth_appointee = moment(values.appointee_dob).format('yyyy-MM-DD');
       post_data['appointee_name'] = values.appointee_name
-      post_data['appointee_dob'] = date_of_birth_appointee
+      // post_data['appointee_dob'] = date_of_birth_appointee
       post_data['appointee_relation_with'] = values.appointee_relation_with
     }
-   
+
     console.log('post_data', post_data);
-    formData.append('enc_data',encryption.encrypt(JSON.stringify(post_data)))
+    formData.append('enc_data', encryption.encrypt(JSON.stringify(post_data)))
     axios
-    .post(`ipa/proposer-info`, formData)
-    .then(res => { 
+      .post(`ipa/proposer-info`, formData)
+      .then(res => {
         let decryptResp = JSON.parse(encryption.decrypt(res.data));
         console.log('decryptResp-----', decryptResp)
         if (decryptResp.error == false) {
-        this.props.history.push(`/AccidentAdditionalPremium/${productId}`);
+          this.props.history.push(`/AccidentAdditionalPremium/${productId}`);
         } else {
           actions.setSubmitting(false)
         }
         this.props.loadingStop();
-    })
-    .catch(err => { 
-      this.props.loadingStop();
-      actions.setSubmitting(false)
-      let decryptErr = JSON.parse(encryption.decrypt(err.data));
-      console.log('decryptErr-----', decryptErr)
-      actions.setSubmitting(false)
-    });
+      })
+      .catch(err => {
+        this.props.loadingStop();
+        actions.setSubmitting(false)
+        let decryptErr = JSON.parse(encryption.decrypt(err.data));
+        console.log('decryptErr-----', decryptErr)
+        actions.setSubmitting(false)
+      });
 
-}
+  }
 
   fetchAreadetails = (e) => {
     let pinCode = e.target.value;
@@ -360,8 +360,8 @@ class AccidentAdditionalDetails extends Component {
           if (res.data.error === false) {
             let stateName =
               res.data.data &&
-              res.data.data[0] &&
-              res.data.data[0].pinstate.STATE_NM
+                res.data.data[0] &&
+                res.data.data[0].pinstate.STATE_NM
                 ? res.data.data[0].pinstate.STATE_NM
                 : "";
             this.setState({
@@ -398,8 +398,8 @@ class AccidentAdditionalDetails extends Component {
         .then((res) => {
           let stateName =
             res.data.data &&
-            res.data.data[0] &&
-            res.data.data[0].pinstate.STATE_NM
+              res.data.data[0] &&
+              res.data.data[0].pinstate.STATE_NM
               ? res.data.data[0].pinstate.STATE_NM
               : "";
           this.setState({
@@ -414,89 +414,89 @@ class AccidentAdditionalDetails extends Component {
     }
   };
 
-  fetchSalutation=()=>{
+  fetchSalutation = () => {
     const formData = new FormData();
     let encryption = new Encryption();
     this.props.loadingStart();
     let post_data = {
       'policy_for_flag': '1',
-  }
-    formData.append('enc_data',encryption.encrypt(JSON.stringify(post_data)))
+    }
+    formData.append('enc_data', encryption.encrypt(JSON.stringify(post_data)))
     axios.post('ipa/titles', formData)
-    .then(res=>{
-      let decryptResp = JSON.parse(encryption.decrypt(res.data))
-        let titleList = decryptResp.data.salutationlist                     
+      .then(res => {
+        let decryptResp = JSON.parse(encryption.decrypt(res.data))
+        let titleList = decryptResp.data.salutationlist
         this.setState({
-            titleList
+          titleList
         });
         this.fetchData();
-    }).
-    catch(err=>{
+      }).
+      catch(err => {
         this.props.loadingStop();
         this.setState({
-            titleList: []
+          titleList: []
         });
-    })  
-}
+      })
+  }
 
   AddDetails = (productId) => {
     this.props.history.push(`/AccidentAddDetails/${productId}`);
   };
 
   ageCheck = (value) => {
-      const ageObj = new PersonAge();
-      let age = ageObj.whatIsMyAge(value)
-      console.log("ageCheck---->>",age)
-      if(age < 18){
-          this.setState({
-              appointeeFlag: true,
-              is_appointee:1,
-          })
-      }
-      else {
-          this.setState({
-              appointeeFlag: false,
-              is_appointee:0
-          })
-      } 
-      // console.log('is_appointee------->>',this.is_appointee)
+    const ageObj = new PersonAge();
+    let age = ageObj.whatIsMyAge(value)
+    console.log("ageCheck---->>", age)
+    if (age < 18) {
+      this.setState({
+        appointeeFlag: true,
+        is_appointee: 1,
+      })
+    }
+    else {
+      this.setState({
+        appointeeFlag: false,
+        is_appointee: 0
+      })
+    }
+    // console.log('is_appointee------->>',this.is_appointee)
   }
   ageCheckValue = (value) => {
-      const ageObj = new PersonAge();
-      let nominee_age = ageObj.whatIsMyAge(value)
-          this.setState({
-            nominee_age
-          })
-          // console.log("ageCheckValue---->>",ageValue)
+    const ageObj = new PersonAge();
+    let nominee_age = ageObj.whatIsMyAge(value)
+    this.setState({
+      nominee_age
+    })
+    // console.log("ageCheckValue---->>",ageValue)
   }
 
 
   render() {
     const { pinDataArr, titleList, appointeeFlag, is_appointee, accidentDetails, address, pincodeRESP } = this.state;
     const { productId } = this.props.match.params;
-    const newInitialValues = Object.assign(initialValues, {      
+    const newInitialValues = Object.assign(initialValues, {
       salutation_id: accidentDetails && accidentDetails.ipainfo ? accidentDetails.ipainfo.ipatitle.id : "",
       first_name: accidentDetails ? accidentDetails.first_name : "",
       last_name: accidentDetails ? accidentDetails.last_name : "",
       date_of_birth: accidentDetails && accidentDetails.dob ? new Date(accidentDetails.dob) : "",
       mobile: accidentDetails ? accidentDetails.mobile : "",
       email_id: accidentDetails ? accidentDetails.email_id : "",
-      proposer_gender: accidentDetails ? accidentDetails.gender : "",  
+      proposer_gender: accidentDetails ? accidentDetails.gender : "",
       building_name: address && address.house_building_name ? address.house_building_name : "",
       city: address && address.city ? address.city : "",
       plot_no: address && address.plot_no ? address.plot_no : "",
       street_name: address && address.street_name ? address.street_name : "",
       pincode: accidentDetails ? accidentDetails.pincode : "",
-      pincode_id: pincodeRESP && pincodeRESP.id ? pincodeRESP.id  : "",
-      nominee_salutation_id : (accidentDetails && accidentDetails.request_data) && accidentDetails.request_data.nominee.length > 0 ? accidentDetails.request_data.nominee[0].title_id : "",
-      nominee_first_name: (accidentDetails && accidentDetails.request_data) && accidentDetails.request_data.nominee.length > 0 ? accidentDetails.request_data.nominee[0].first_name : "" ,
-      nominee_last_name: (accidentDetails && accidentDetails.request_data) && accidentDetails.request_data.nominee.length > 0  ? accidentDetails.request_data.nominee[0].last_name : "" ,
-      nominee_dob : (accidentDetails && accidentDetails.request_data) && accidentDetails.request_data.nominee.length > 0  ? new Date(accidentDetails.request_data.nominee[0].dob) : null,
-      relation_with : (accidentDetails && accidentDetails.request_data) && accidentDetails.request_data.nominee.length > 0  ? accidentDetails.request_data.nominee[0].relation_with : "",        
-      is_appointee: is_appointee ,
-      appointee_name: (accidentDetails && accidentDetails.request_data) && accidentDetails.request_data.nominee.length > 0  ? accidentDetails.request_data.nominee[0].appointee_name : "",
-      appointee_dob:  (accidentDetails && accidentDetails.request_data) && accidentDetails.request_data.nominee.length > 0  ? new Date(accidentDetails.request_data.nominee[0].appointee_dob) : "",
-      appointee_relation_with: (accidentDetails && accidentDetails.request_data) && accidentDetails.request_data.nominee.length > 0  ? accidentDetails.request_data.nominee[0].appointee_relation_with : "",
+      pincode_id: pincodeRESP && pincodeRESP.id ? pincodeRESP.id : "",
+      nominee_salutation_id: (accidentDetails && accidentDetails.request_data) && accidentDetails.request_data.nominee.length > 0 ? accidentDetails.request_data.nominee[0].title_id : "",
+      nominee_first_name: (accidentDetails && accidentDetails.request_data) && accidentDetails.request_data.nominee.length > 0 ? accidentDetails.request_data.nominee[0].first_name : "",
+      nominee_last_name: (accidentDetails && accidentDetails.request_data) && accidentDetails.request_data.nominee.length > 0 ? accidentDetails.request_data.nominee[0].last_name : "",
+      nominee_dob: (accidentDetails && accidentDetails.request_data) && accidentDetails.request_data.nominee.length > 0 ? new Date(accidentDetails.request_data.nominee[0].dob) : null,
+      relation_with: (accidentDetails && accidentDetails.request_data) && accidentDetails.request_data.nominee.length > 0 ? accidentDetails.request_data.nominee[0].relation_with : "",
+      is_appointee: is_appointee,
+      appointee_name: (accidentDetails && accidentDetails.request_data) && accidentDetails.request_data.nominee.length > 0 ? accidentDetails.request_data.nominee[0].appointee_name : "",
+      appointee_dob: (accidentDetails && accidentDetails.request_data) && accidentDetails.request_data.nominee.length > 0 ? new Date(accidentDetails.request_data.nominee[0].appointee_dob) : "",
+      appointee_relation_with: (accidentDetails && accidentDetails.request_data) && accidentDetails.request_data.nominee.length > 0 ? accidentDetails.request_data.nominee[0].appointee_relation_with : "",
     });
 
     return (
@@ -522,7 +522,7 @@ class AccidentAdditionalDetails extends Component {
                       onSubmit={this.handleSubmit}
                       validationSchema={IPA__Validation}
                     >
-                      {({values,errors,setFieldValue,setFieldTouched,isValid,isSubmitting,touched}) => {
+                      {({ values, errors, setFieldValue, setFieldTouched, isValid, isSubmitting, touched }) => {
                         // console.log('values',values)
                         console.log("errors---------- ", errors)
                         return (
@@ -550,13 +550,13 @@ class AccidentAdditionalDetails extends Component {
                                       className="formGrp"
                                     >
                                       <option value="">Title</option>
-                                      {titleList && titleList.length > 0 && titleList.map((title, qIndex) => ( 
+                                      {titleList && titleList.length > 0 && titleList.map((title, qIndex) => (
                                         <option key={qIndex} value={title.id}>{title.displayvalue}</option>
                                       ))}
                                     </Field>
                                     {errors.salutation_id && touched.salutation_id ? (
-                                  <span className="errorMsg">{errors.salutation_id}</span>
-                                  ) : null}               
+                                      <span className="errorMsg">{errors.salutation_id}</span>
+                                    ) : null}
                                   </div>
                                 </FormGroup>
                               </Col>
@@ -636,11 +636,11 @@ class AccidentAdditionalDetails extends Component {
                                     }}
                                   />
                                   {errors.date_of_birth &&
-                                  touched.date_of_birth ? (
-                                    <span className="errorMsg">
-                                      {errors.date_of_birth}
-                                    </span>
-                                  ) : null}
+                                    touched.date_of_birth ? (
+                                      <span className="errorMsg">
+                                        {errors.date_of_birth}
+                                      </span>
+                                    ) : null}
                                 </FormGroup>
                               </Col>
                               <Col sm={6} md={3} lg={3}>
@@ -716,7 +716,7 @@ class AccidentAdditionalDetails extends Component {
                                       onKeyUp={(e) => this.fetchAreadetails(e)}
                                       value={values.pincode}
                                       maxLength="6"
-                                      onInput={(e) => {}}
+                                      onInput={(e) => { }}
                                     />
                                     {errors.pincode && touched.pincode ? (
                                       <span className="errorMsg">
@@ -740,7 +740,7 @@ class AccidentAdditionalDetails extends Component {
                                       {pinDataArr &&
                                         pinDataArr.length > 0 &&
                                         pinDataArr.map((resource, rindex) => (
-                                          <option key= {rindex} value={resource.id}>
+                                          <option key={rindex} value={resource.id}>
                                             {
                                               resource.LCLTY_SUBRB_TALUK_TEHSL_NM
                                             }
@@ -775,11 +775,11 @@ class AccidentAdditionalDetails extends Component {
                                       value={values.building_name}
                                     />
                                     {errors.building_name &&
-                                    touched.building_name ? (
-                                      <span className="errorMsg">
-                                        {errors.building_name}
-                                      </span>
-                                    ) : null}
+                                      touched.building_name ? (
+                                        <span className="errorMsg">
+                                          {errors.building_name}
+                                        </span>
+                                      ) : null}
                                   </div>
                                 </FormGroup>
                               </Col>
@@ -826,11 +826,11 @@ class AccidentAdditionalDetails extends Component {
                                       value={values.street_name}
                                     />
                                     {errors.street_name &&
-                                    touched.street_name ? (
-                                      <span className="errorMsg">
-                                        {errors.street_name}
-                                      </span>
-                                    ) : null}
+                                      touched.street_name ? (
+                                        <span className="errorMsg">
+                                          {errors.street_name}
+                                        </span>
+                                      ) : null}
                                   </div>
                                 </FormGroup>
                               </Col>
@@ -881,13 +881,13 @@ class AccidentAdditionalDetails extends Component {
                                       className="formGrp"
                                     >
                                       <option value="">Title</option>
-                                      {titleList && titleList.length >0 && titleList.map((title, qIndex) => ( 
-                                       <option key= {qIndex} value={title.id}>{title.displayvalue}</option>
+                                      {titleList && titleList.length > 0 && titleList.map((title, qIndex) => (
+                                        <option key={qIndex} value={title.id}>{title.displayvalue}</option>
                                       ))}
                                     </Field>
                                     {errors.nominee_salutation_id && touched.nominee_salutation_id ? (
-                                        <span className="errorMsg">{errors.nominee_salutation_id}</span>
-                                        ) : null}               
+                                      <span className="errorMsg">{errors.nominee_salutation_id}</span>
+                                    ) : null}
                                   </div>
                                 </FormGroup>
                               </Col>
@@ -909,11 +909,11 @@ class AccidentAdditionalDetails extends Component {
                                       value={values.nominee_first_name}
                                     />
                                     {errors.nominee_first_name &&
-                                    touched.nominee_first_name ? (
-                                      <span className="errorMsg">
-                                        {errors.nominee_first_name}
-                                      </span>
-                                    ) : null}
+                                      touched.nominee_first_name ? (
+                                        <span className="errorMsg">
+                                          {errors.nominee_first_name}
+                                        </span>
+                                      ) : null}
                                   </div>
                                 </FormGroup>
                               </Col>
@@ -935,11 +935,11 @@ class AccidentAdditionalDetails extends Component {
                                       value={values.nominee_last_name}
                                     />
                                     {errors.nominee_last_name &&
-                                    touched.nominee_last_name ? (
-                                      <span className="errorMsg">
-                                        {errors.nominee_last_name}
-                                      </span>
-                                    ) : null}
+                                      touched.nominee_last_name ? (
+                                        <span className="errorMsg">
+                                          {errors.nominee_last_name}
+                                        </span>
+                                      ) : null}
                                   </div>
                                 </FormGroup>
                               </Col>
@@ -985,7 +985,7 @@ class AccidentAdditionalDetails extends Component {
                                       // selected={}
                                       value={this.state.nominee_age}
                                     />
-                                    
+
                                   </div>
                                 </FormGroup>
                               </Col>
@@ -1006,17 +1006,25 @@ class AccidentAdditionalDetails extends Component {
                                       <option value="2">Spouse</option>
                                       <option value="3">Son</option>
                                       <option value="4">Daughter</option>
-                                      <option value="5">Father</option>
-                                      <option value="6">Mother</option>
-                                      <option value="7">Father In Law</option>
-                                      <option value="8">Mother In Law</option>
+                                      <option value="5">Brother</option>
+                                      <option value="6">Sister</option>
+                                      <option value="7">Father</option>
+                                      <option value="8">Father In Law</option>
+                                      <option value="9">Mother In Law</option>
+                                      <option value="10">Grand Father</option>
+                                      <option value="11">Grand Mother</option>
+                                      <option value="12">Son in law</option>
+                                      <option value="13">Daughter In Law</option>
+                                      <option value="14">Uncle</option>
+                                      <option value="15">Aunty</option>
+                                      <option value="16">Employee</option>
                                     </Field>
                                     {errors.relation_with &&
-                                    touched.relation_with ? (
-                                      <span className="errorMsg">
-                                        {errors.relation_with}
-                                      </span>
-                                    ) : null}
+                                      touched.relation_with ? (
+                                        <span className="errorMsg">
+                                          {errors.relation_with}
+                                        </span>
+                                      ) : null}
                                   </div>
                                 </FormGroup>
                               </Col>
@@ -1044,15 +1052,15 @@ class AccidentAdditionalDetails extends Component {
                                           value={values.appointee_name}
                                         />
                                         {errors.appointee_name &&
-                                        touched.appointee_name ? (
-                                          <span className="errorMsg">
-                                            {errors.appointee_name}
-                                          </span>
-                                        ) : null}
+                                          touched.appointee_name ? (
+                                            <span className="errorMsg">
+                                              {errors.appointee_name}
+                                            </span>
+                                          ) : null}
                                       </div>
                                     </FormGroup>
                                   </Col>
-                              {/* <Col sm={6} md={3} lg={3}>
+                                  {/* <Col sm={6} md={3} lg={3}>
                                 <FormGroup>
                                   <DatePicker
                                     name="appointee_dob"
@@ -1095,28 +1103,32 @@ class AccidentAdditionalDetails extends Component {
                                             Relation with Nominee
                                           </option>
                                           {/* {self_selected ? ( */}
-                                            {/* "" */}
+                                          {/* "" */}
                                           {/* ) : ( */}
-                                            {/* <option value="1">Self</option> */}
+                                          {/* <option value="1">Self</option> */}
                                           {/* )} */}
                                           <option value="2">Spouse</option>
                                           <option value="3">Son</option>
                                           <option value="4">Daughter</option>
-                                          <option value="5">Father</option>
-                                          <option value="6">Mother</option>
-                                          <option value="7">
-                                            Father In Law
-                                          </option>
-                                          <option value="8">
-                                            Mother In Law
-                                          </option>
+                                          <option value="5">Brother</option>
+                                          <option value="6">Sister</option>
+                                          <option value="7">Father</option>
+                                          <option value="8">Father In Law</option>
+                                          <option value="9">Mother In Law</option>
+                                          <option value="10">Grand Father</option>
+                                          <option value="11">Grand Mother</option>
+                                          <option value="12">Son in law</option>
+                                          <option value="13">Daughter In Law</option>
+                                          <option value="14">Uncle</option>
+                                          <option value="15">Aunty</option>
+                                          <option value="16">Employee</option>
                                         </Field>
                                         {errors.appointee_relation_with &&
-                                        touched.appointee_relation_with ? (
-                                          <span className="errorMsg">
-                                            {errors.appointee_relation_with}
-                                          </span>
-                                        ) : null}
+                                          touched.appointee_relation_with ? (
+                                            <span className="errorMsg">
+                                              {errors.appointee_relation_with}
+                                            </span>
+                                          ) : null}
                                       </div>
                                     </FormGroup>
                                   </Col>
@@ -1131,7 +1143,7 @@ class AccidentAdditionalDetails extends Component {
                               <Button
                                 className={`backBtn`}
                                 type="button"
-                                onClick={this.AddDetails.bind(this,productId)}
+                                onClick={this.AddDetails.bind(this, productId)}
                               >
                                 {isSubmitting ? "Wait.." : "Back"}
                               </Button>

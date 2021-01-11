@@ -124,7 +124,7 @@ class AccidentSelectPlan extends Component {
       let policyHolder_id = localStorage.getItem('policyHolder_id') ? localStorage.getItem('policyHolder_id') :0
 
       if(sessionStorage.getItem('csc_id')) {
-          post_data['bcmaster_id'] = '2'
+          post_data['bcmaster_id'] = '5'
           post_data['csc_id'] = sessionStorage.getItem('csc_id') ? sessionStorage.getItem('csc_id') : ""
           post_data['agent_name']= sessionStorage.getItem('agent_name') ? sessionStorage.getItem('agent_name') : ""
           post_data['product_id'] = productId
