@@ -40,7 +40,11 @@ const vehicleRegistrationValidation = Yup.object().shape({
 class AccidentAddDetails extends Component {
   state = {
     occupationList: [],
-    requestedData: []
+    requestedData: [],
+    fulQuoteResp: [],
+    serverResponse: [],
+    error: {},
+    validation_error: []
   };
 
   changePlaceHoldClassAdd(e) {
@@ -81,32 +85,89 @@ class AccidentAddDetails extends Component {
       });
   };
 
-  // fetchSubVehicle = () => {
-  //   const { productId } = this.props.match.params;
-  //   let encryption = new Encryption();
-  //   this.props.loadingStart();
-  //   axios
-  //     .get(`gcv-tp/sub-vehical-list/4`)
-  //     .then((res) => {
-  //       let decryptResp = JSON.parse(encryption.decrypt(res.data));
-  //       console.log("decrypt--fetchSubVehicle------ ", decryptResp);
-
-  //       let subVehicleList = decryptResp.data;
-  //       this.setState({
-  //         subVehicleList,
-  //       });
-  //       // this.fetchData();
-  //     })
-  //     .catch((err) => {
-  //       // handle error
-  //       this.props.loadingStop();
-  //     });
-  // };
 
   select_Plan = (productId) => {
     // productId === 5
     this.props.history.push(`/AccidentSelectPlan/${productId}`);
   };
+
+  handleChange =(e) => {
+    this.setState({
+        serverResponse: [],
+        error: []
+    }) 
+  }
+
+  quote = (values, actions) => {
+    //console.log('value', value)
+    const {accessToken, accidentDetails} = this.state 
+    const formData = new FormData(); 
+    this.props.loadingStart();
+    let date_of_birth = moment(accidentDetails.dob).format('yyyy-MM-DD');
+    let ipaInfo = accidentDetails && accidentDetails.ipainfo ? accidentDetails.ipainfo  : null
+    const post_data = {
+        'id':localStorage.getItem('policyHolder_id'),
+        'proposer_dob': date_of_birth ,
+        'sum_insured': ipaInfo ? ipaInfo.sum_insured : null
+    }
+    let encryption = new Encryption();
+    formData.append('enc_data',encryption.encrypt(JSON.stringify(post_data)))
+
+    axios
+      .post(`/fullQuoteServiceIPA`, formData)
+      .then(res => { 
+        if (res.data.PolicyObject && res.data.UnderwritingResult && res.data.UnderwritingResult.Status == "Success") {
+          this.setState({
+              fulQuoteResp: res.data.PolicyObject,
+              serverResponse: res.data.PolicyObject,
+              error: [],
+              validation_error: []
+          })          
+          this.props.loadingStop();
+      }
+      else if (res.data.PolicyObject && res.data.UnderwritingResult && res.data.UnderwritingResult.Status == "Fail") {
+          this.setState({
+              fulQuoteResp: res.data.PolicyObject,
+              serverResponse: [],
+              validation_error: [],
+              error: {"message": 1}
+          }) 
+          this.props.loadingStop();
+      }
+      else if (res.data.code && res.data.message && ((res.data.code == "validation failed" && res.data.message == "validation failed") || (res.data.code == "Policy Validation Error" && res.data.message == "Policy Validation Error"))) {
+        var validationErrors = []
+        for (const x in res.data.messages) {
+            validationErrors.push(res.data.messages[x].message)
+           }
+           this.setState({
+            fulQuoteResp: [],
+            validation_error: validationErrors,
+            error: [],
+            serverResponse: []
+        });
+        // swal(res.data.data.messages[0].message)
+        this.props.loadingStop();
+      }
+      else {
+        this.setState({
+            fulQuoteResp: [],
+            error: res.data.ValidateResult,
+            validation_error: [],
+            serverResponse: []
+        });
+        this.props.loadingStop();
+    }
+    actions.setSubmitting(false)
+      })
+      .catch(err => {
+        this.setState({
+          serverResponse: []
+        });
+        this.props.loadingStop();
+      });
+  
+}
+
 
  handleSubmit = (values, actions) => {
     const {productId} = this.props.match.params 
@@ -176,7 +237,7 @@ class AccidentAddDetails extends Component {
   };
 
   render() {
-    const { occupationList, accidentDetails, requestedData} = this.state;
+    const { occupationList, accidentDetails, requestedData, serverResponse, validation_error, error} = this.state;
     const {productId} = this.props.match.params
     const newInitialValues = Object.assign(initialValues, {
       pol_start_date: requestedData && requestedData.start_date ? new Date(requestedData.start_date) : new Date(),
@@ -190,8 +251,28 @@ class AccidentAddDetails extends Component {
       occupation: accidentDetails && accidentDetails.ipainfo && accidentDetails.ipainfo.occupation ? accidentDetails.ipainfo.occupation.id : "",
       gender: accidentDetails ? accidentDetails.gender : ""
     });
+console.log("validation_error-------- ", validation_error)
+console.log("error-------- ", error)
+    const errMsg =  error && error.message ? (            
+      <span className="errorMsg"><h6><strong>{error.message}</strong></h6></span>
+      // <span className="errorMsg"><h6><strong>Thank you for showing your interest for buying product.Due to some reasons, we are not able to issue the policy online.Please call 1800 22 1111</strong></h6></span>                                
+  ) : null 
 
-    // console.log("newInitialValues------ ", newInitialValues)
+    const validationErrors = 
+      validation_error ? (
+          validation_error.map((errors, qIndex) => (
+              <span className="errorMsg"><h6>Errors : 
+                  <strong>
+                      <ul>
+                          <li>
+                              {errors}
+                          </li>
+                      </ul>
+                  </strong></h6>
+              </span>
+          ))        
+    ): null;
+
     return (
       <>
         <BaseComponent>
@@ -206,13 +287,11 @@ class AccidentAddDetails extends Component {
                 </h4>
                 <section className="brand">
                   <div className="boxpd">
-                    <h4 className="m-b-30">
-                      {" "}
-                      {/* Select the Sum Insured for individual personal accident */}
-                    </h4>
+                  <div>{errMsg}</div>
+                    <h4>{validationErrors}</h4>
                     <Formik
                       initialValues={newInitialValues}
-                      onSubmit={this.handleSubmit}
+                      onSubmit={ serverResponse && serverResponse != "" ? (serverResponse.message ? this.quote : this.handleSubmit ) : this.quote}
                       validationSchema={vehicleRegistrationValidation}
                     >
                       {({values, errors, setFieldValue, setFieldTouched, isValid, isSubmitting, touched }) => {
@@ -428,6 +507,14 @@ class AccidentAddDetails extends Component {
                                       component="select"
                                       autoComplete="off"
                                       className="formGrp"
+                                      onChange={(e) => {
+                                        setFieldTouched("occupation");
+                                        setFieldValue(
+                                          "occupation",
+                                          e.target.value
+                                        );
+                                        this.handleChange(e);
+                                      }}
                                     >
                                       <option value="">Occupation Type</option>
                                         {occupationList && occupationList.length > 0 && occupationList.map((insurer, qIndex) => ( 
@@ -574,6 +661,22 @@ class AccidentAddDetails extends Component {
                                 </div>
                               </div>
                             </div>
+                            { serverResponse && serverResponse.QuotationNo ?
+                            <Row className="d-flex justify-content-left carloan m-b-25"> 
+                            <Col sm={4}>
+                                <div className="d-flex justify-content-between align-items-center premium m-b-25">
+                                    <p>Quotation No:</p>
+                                    <p><b> { serverResponse ? (serverResponse.message ? "---" : serverResponse.QuotationNo ) :"---"}</b></p>
+                                </div>
+                            </Col>
+                            <Col sm={4}>
+                                <div className="d-flex justify-content-between align-items-center premium m-b-25">
+                                    <p>Total Premium:</p>
+                                    <p><strong>Rs: { serverResponse ? (serverResponse.message ? 0 : serverResponse.DuePremium ) : 0}</strong></p>
+                                </div>
+                            </Col>
+                            </Row>
+                            : null }
 
                             <div className="d-flex justify-content-left carloan">
                               <h4> </h4>
@@ -586,13 +689,14 @@ class AccidentAddDetails extends Component {
                               >
                                 {isSubmitting ? "Wait.." : "Back"}
                               </Button>
-                              <Button
-                                className={`proceedBtn`}
-                                type="submit"
-                                disabled={isSubmitting ? true : false}
-                              >
-                                {isSubmitting ? "Wait.." : "Procced"}
-                              </Button>
+                              { serverResponse && serverResponse != "" ? (serverResponse.message ? 
+                                  <Button className={`proceedBtn`} type="submit"  >
+                                      Quote
+                                  </Button> : <Button className={`proceedBtn`} type="submit"  >
+                                      Continue
+                                  </Button> ) : <Button className={`proceedBtn`} type="submit"  >
+                                  Quote
+                                  </Button>}
                             </div>
                           </Form>
                         );

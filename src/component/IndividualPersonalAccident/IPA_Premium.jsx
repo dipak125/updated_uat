@@ -25,16 +25,6 @@ const genderArr = {
   F: "Female",
 };
 
-const relationArr = {
-1:"Self",
-2:"Spouse",
-3:"Son",
-4:"Daughter",
-5:"Father",
-6:"Mother",
-7:"Father In Law",
-8:"Mother In Law"
-}
 
 const Coverage = {
 
@@ -60,6 +50,7 @@ class IPA_Premium extends Component {
     refNumber: "",
     policyCoverage: [],
     paymentStatus: [],
+    relationArr: {},
     policyHolder_refNo: queryString.parse(this.props.location.search).access_id ? 
                         queryString.parse(this.props.location.search).access_id : 
                         localStorage.getItem("policyHolder_refNo")
@@ -76,9 +67,36 @@ class IPA_Premium extends Component {
   }
 
   componentDidMount() {
-    this.fetchData();
+    this.fetchNomineeRel();
     // this.fetchInsurance();
   }
+
+  fetchNomineeRel = () => {
+    const { productId } = this.props.match.params;
+    let encryption = new Encryption();
+    this.props.loadingStart();
+    axios
+      .get(`ipa/ipa-relation-list`)
+      .then((res) => {
+        let decryptResp = JSON.parse(encryption.decrypt(res.data));
+        console.log("decrypt--fetchSubVehicle------ ", decryptResp);
+        if(decryptResp.error == false) {
+          let nomineeRelation = decryptResp.data.iparelationList;
+          let relationArr = []
+          for (const x in nomineeRelation) {
+            relationArr[nomineeRelation[x].id] = nomineeRelation[x].ipa_relation_name
+           }
+          this.setState({
+          nomineeRelation, relationArr
+        });
+        this.fetchData();
+        }      
+      })
+      .catch((err) => {
+        // handle error
+        this.props.loadingStop();
+      });
+  };
 
   fetchData = () => {
     const { productId } = this.props.match.params;
@@ -234,7 +252,7 @@ class IPA_Premium extends Component {
 
   render() {
     const { productId } = this.props.match.params;
-    const { fulQuoteResp, error, show, policyHolderDetails, nomineeDetails, paymentStatus, policyCoverage } = this.state;
+    const { fulQuoteResp, error, show, policyHolderDetails, nomineeDetails, paymentStatus, policyCoverage, relationArr } = this.state;
 
     console.log("policyHolderDetails ", policyHolderDetails)
 
@@ -247,7 +265,7 @@ class IPA_Premium extends Component {
                         <FormGroup>{Coverage[benefit.ProductElementCode]}</FormGroup>
                       </Col>
                       <Col sm={12} md={6}>
-                        <FormGroup>₹ {Math.round(benefit.BasePremium)}</FormGroup>
+                        <FormGroup>₹ {Math.round(benefit.SumInsured)}</FormGroup>
                       </Col>
                     </Row> 
            </div>

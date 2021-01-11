@@ -150,8 +150,7 @@ class AccidentSelectPlan extends Component {
           console.log("decrypt", decryptResp)
 
           if(decryptResp.error == false) {
-              // this.props.history.push(`/AccidentAddDetails/${productId}`);
-              this.quote(values)
+            this.props.history.push(`/AccidentAddDetails/${this.props.match.params.productId}`);
           }
           else{
               swal(decryptResp.msg)
@@ -176,8 +175,7 @@ class AccidentSelectPlan extends Component {
           localStorage.setItem('policyHolder_id',decryptResp.data.policyHolder_id);
           this.props.loadingStop();
           if(decryptResp.error == false) {
-              // this.props.history.push(`/AccidentAddDetails/${productId}`);
-              this.quote(values)
+            this.props.history.push(`/AccidentAddDetails/${this.props.match.params.productId}`);
           }
           else{
               swal(decryptResp.msg)
@@ -221,81 +219,6 @@ class AccidentSelectPlan extends Component {
         this.props.loadingStop();
       });
   };
-
-  quote = (values) => {
-    //console.log('value', value)
-    const {accessToken} = this.state 
-    const formData = new FormData(); 
-    this.props.loadingStart();
-    let date_of_birth = moment(values.date_of_birth).format('yyyy-MM-DD');
-    const post_data = {
-        'id':localStorage.getItem('policyHolder_id'),
-        'proposer_dob': date_of_birth ,
-        'sum_insured': values.sumInsured ? sum_insured_array[values.sumInsured] : null
-    }
-    let encryption = new Encryption();
-    formData.append('enc_data',encryption.encrypt(JSON.stringify(post_data)))
-
-    axios
-      .post(`/fullQuoteServiceIPA`, formData)
-      .then(res => { 
-        if (res.data.PolicyObject && res.data.UnderwritingResult && res.data.UnderwritingResult.Status == "Success") {
-          this.setState({
-              fulQuoteResp: res.data.PolicyObject,
-              serverResponse: res.data.PolicyObject,
-              error: [],
-              validation_error: []
-          }) 
-          this.props.loadingStop();
-      }
-      else if (res.data.PolicyObject && res.data.UnderwritingResult && res.data.UnderwritingResult.Status == "Fail") {
-          this.setState({
-              fulQuoteResp: res.data.PolicyObject,
-              serverResponse: [],
-              validation_error: [],
-              error: {"message": 1}
-          }) 
-          this.props.loadingStop();
-      }
-      else if (res.data.code && res.data.message && res.data.code == "validation failed" && res.data.message == "validation failed") {
-        var validationErrors = []
-        for (const x in res.data.messages) {
-            validationErrors.push(res.data.messages[x].message)
-           }
-           this.setState({
-            fulQuoteResp: [],
-            validation_error: validationErrors,
-            error: [],
-            serverResponse: []
-        });
-        // swal(res.data.data.messages[0].message)
-        this.props.loadingStop();
-      }
-      else {
-        this.setState({
-            fulQuoteResp: [],
-            error: res.data.ValidateResult,
-            validation_error: [],
-            serverResponse: []
-        });
-        this.props.loadingStop();
-    }
-      })
-      .catch(err => {
-        this.setState({
-          serverResponse: []
-        });
-        this.props.loadingStop();
-      });
-  
-}
-
-handleChange =(e) => {
-  this.setState({
-      serverResponse: [],
-      error: []
-  }) 
-}
 
 
   render() {
@@ -348,7 +271,7 @@ handleChange =(e) => {
                     <div>{errMsg}</div>
                     <h4>{validationErrors}</h4>
                     <Formik initialValues={newInitialValues} 
-                    onSubmit={ serverResponse && serverResponse != "" ? (serverResponse.message ? this.handleSubmit : this.handleSubmitNxtPage ) : this.handleSubmit}
+                    onSubmit={ this.handleSubmit }
                     validationSchema={vehicleRegistrationValidation}>
                       {({
                         values, errors, setFieldValue, setFieldTouched, isValid, isSubmitting, touched, }) => {
@@ -379,7 +302,6 @@ handleChange =(e) => {
                                             "sumInsured",
                                             e.target.value
                                           );
-                                          this.handleChange(e);
                                         }}
                                       >
                                         <option value="">
@@ -500,7 +422,6 @@ handleChange =(e) => {
                                                 onChange={(val) => {
                                                     setFieldTouched('date_of_birth');
                                                     setFieldValue('date_of_birth', val);
-                                                    this.handleChange()
                                                     }}
                                             />
                                             {errors.date_of_birth && touched.date_of_birth ? (
@@ -555,14 +476,9 @@ handleChange =(e) => {
                                     <h4> </h4>
                                 </div>
                                 <div className="d-flex justify-content-left resmb">
-                                { serverResponse && serverResponse != "" ? (serverResponse.message ? 
                                   <Button className={`proceedBtn`} type="submit"  >
-                                      Quote
-                                  </Button> : <Button className={`proceedBtn`} type="submit"  >
                                       Continue
-                                  </Button> ) : <Button className={`proceedBtn`} type="submit"  >
-                                  Quote
-                                  </Button>}
+                                  </Button> 
                                 </div>
                           </Form>
                         );

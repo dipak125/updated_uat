@@ -42,6 +42,7 @@ const initialValues = {
   appointee_name: "",
   appointee_dob: null,
   appointee_relation_with: "",
+  marital_status_id: ""
   // is_appointee: 0
 };
 const minDobNominee = moment(moment().subtract(111, 'years').calendar()).add(1, 'day').calendar()
@@ -220,7 +221,9 @@ const IPA__Validation = Yup.object().shape({
         return true;
       }
     )
-    .nullable()
+    .nullable(),
+
+  marital_status_id: Yup.string().required("Please select marital status")
 });
 
 class AccidentAdditionalDetails extends Component {
@@ -228,7 +231,8 @@ class AccidentAdditionalDetails extends Component {
     appointeeFlag: false,
     is_appointee: 0,
     request_data: [],
-    nominee_age: ""
+    nominee_age: "",
+    nomineeRelation: []
   };
 
   changePlaceHoldClassAdd(e) {
@@ -242,10 +246,33 @@ class AccidentAdditionalDetails extends Component {
   }
 
   componentDidMount() {
-    // this.fetchSubVehicle();
-    this.fetchSalutation();
+    this.fetchNomineeRel();
+    // this.fetchSalutation();
     // this.fetchData();
   }
+
+  fetchNomineeRel = () => {
+    const { productId } = this.props.match.params;
+    let encryption = new Encryption();
+    this.props.loadingStart();
+    axios
+      .get(`ipa/ipa-relation-list`)
+      .then((res) => {
+        let decryptResp = JSON.parse(encryption.decrypt(res.data));
+        console.log("decrypt--fetchSubVehicle------ ", decryptResp);
+        if(decryptResp.error == false) {
+          let nomineeRelation = decryptResp.data.iparelationList;
+          this.setState({
+          nomineeRelation,
+        });
+        this.fetchSalutation();
+        }      
+      })
+      .catch((err) => {
+        // handle error
+        this.props.loadingStop();
+      });
+  };
 
   fetchData = () => {
     const { productId } = this.props.match.params;
@@ -309,7 +336,8 @@ class AccidentAdditionalDetails extends Component {
       'nominee_title_id': values.nominee_salutation_id,
       'nominee_dob': date_of_birth,
       'relation_with': values.relation_with,
-      'is_appointee': this.state.is_appointee
+      'is_appointee': this.state.is_appointee,
+      'marital_status_id': values.marital_status_id
     }
     if (this.state.appointeeFlag == true || this.state.is_appointee == '1') {
       // let date_of_birth_appointee = moment(values.appointee_dob).format('yyyy-MM-DD');
@@ -472,7 +500,7 @@ class AccidentAdditionalDetails extends Component {
 
 
   render() {
-    const { pinDataArr, titleList, appointeeFlag, is_appointee, accidentDetails, address, pincodeRESP } = this.state;
+    const { pinDataArr, titleList, appointeeFlag, is_appointee, accidentDetails, address, pincodeRESP, nomineeRelation } = this.state;
     const { productId } = this.props.match.params;
     const newInitialValues = Object.assign(initialValues, {
       salutation_id: accidentDetails && accidentDetails.ipainfo ? accidentDetails.ipainfo.ipatitle.id : "",
@@ -497,6 +525,7 @@ class AccidentAdditionalDetails extends Component {
       appointee_name: (accidentDetails && accidentDetails.request_data) && accidentDetails.request_data.nominee.length > 0 ? accidentDetails.request_data.nominee[0].appointee_name : "",
       appointee_dob: (accidentDetails && accidentDetails.request_data) && accidentDetails.request_data.nominee.length > 0 ? new Date(accidentDetails.request_data.nominee[0].appointee_dob) : "",
       appointee_relation_with: (accidentDetails && accidentDetails.request_data) && accidentDetails.request_data.nominee.length > 0 ? accidentDetails.request_data.nominee[0].appointee_relation_with : "",
+      marital_status_id: accidentDetails && accidentDetails.ipainfo && accidentDetails.ipainfo.marital_status_id != '0' ? accidentDetails.ipainfo.marital_status_id : "",
     });
 
     return (
@@ -859,6 +888,33 @@ class AccidentAdditionalDetails extends Component {
                                 </FormGroup>
                               </Col>
                             </Row>
+                            <Row>
+                            <Col sm={6} md={3} lg={3}>
+                                <FormGroup>
+                                  <div className="formSection">
+                                    <Field
+                                      name="marital_status_id"
+                                      placeholder="Marital Status"
+                                      component="select"
+                                      autoComplete="off"
+                                      className="formGrp"
+                                      value={values.marital_status_id}
+                                    >
+                                      <option value="">Select Marital Status</option>
+                                      <option value="1">Married</option>
+                                      <option value="2">Single</option>
+                                      <option value="3">Widow</option>
+                                      <option value="4">Divorced</option>
+                                    </Field>
+                                    {errors.marital_status_id && touched.marital_status_id ? (
+                                      <span className="errorMsg">
+                                        {errors.marital_status_id}
+                                      </span>
+                                    ) : null}
+                                  </div>
+                                </FormGroup>
+                              </Col>
+                            </Row>
                             <Row></Row>
                             <Row>
                               <h3></h3>
@@ -1002,22 +1058,9 @@ class AccidentAdditionalDetails extends Component {
                                       <option value="">
                                         Relation with Primary Insured
                                       </option>
-                                      {/* <option value="1">Self</option> */}
-                                      <option value="2">Spouse</option>
-                                      <option value="3">Son</option>
-                                      <option value="4">Daughter</option>
-                                      <option value="5">Brother</option>
-                                      <option value="6">Sister</option>
-                                      <option value="7">Father</option>
-                                      <option value="8">Father In Law</option>
-                                      <option value="9">Mother In Law</option>
-                                      <option value="10">Grand Father</option>
-                                      <option value="11">Grand Mother</option>
-                                      <option value="12">Son in law</option>
-                                      <option value="13">Daughter In Law</option>
-                                      <option value="14">Uncle</option>
-                                      <option value="15">Aunty</option>
-                                      <option value="16">Employee</option>
+                                      { nomineeRelation && nomineeRelation.map((relation, qIndex)=> (
+                                         <option value={relation.id}>{relation.ipa_relation_name}</option>
+                                      ))}
                                     </Field>
                                     {errors.relation_with &&
                                       touched.relation_with ? (
@@ -1102,26 +1145,9 @@ class AccidentAdditionalDetails extends Component {
                                           <option value="">
                                             Relation with Nominee
                                           </option>
-                                          {/* {self_selected ? ( */}
-                                          {/* "" */}
-                                          {/* ) : ( */}
-                                          {/* <option value="1">Self</option> */}
-                                          {/* )} */}
-                                          <option value="2">Spouse</option>
-                                          <option value="3">Son</option>
-                                          <option value="4">Daughter</option>
-                                          <option value="5">Brother</option>
-                                          <option value="6">Sister</option>
-                                          <option value="7">Father</option>
-                                          <option value="8">Father In Law</option>
-                                          <option value="9">Mother In Law</option>
-                                          <option value="10">Grand Father</option>
-                                          <option value="11">Grand Mother</option>
-                                          <option value="12">Son in law</option>
-                                          <option value="13">Daughter In Law</option>
-                                          <option value="14">Uncle</option>
-                                          <option value="15">Aunty</option>
-                                          <option value="16">Employee</option>
+                                          { nomineeRelation && nomineeRelation.map((relation, qIndex)=> (
+                                         <option value={relation.id}>{relation.ipa_relation_name}</option>
+                                      ))}
                                         </Field>
                                         {errors.appointee_relation_with &&
                                           touched.appointee_relation_with ? (
