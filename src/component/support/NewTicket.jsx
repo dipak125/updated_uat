@@ -321,7 +321,15 @@ class NewTicket extends Component {
                                                 className={'form-control' + (errors.description && touched.description ? ' is-invalid' : '')}
                                                 component={props =>
                                                     <CKEditor
-                                                        config={{placeholder: "Write your details here"}} 
+                                                        config={
+                                                            {placeholder: "Write your details here"},
+                                                            {fillEmptyBlocks: false},
+                                                            {forcePasteAsPlainText: true},
+                                                            {basicEntities : false},
+                                                            {entities_greek : false},
+                                                            {entities_latin : false},
+                                                            {entities_additional : ''}
+                                                        }
                                                         editor={ClassicEditor}
                                                         // onInit={editor => {
                                                         //     // You can store the "editor" and use when it is needed.

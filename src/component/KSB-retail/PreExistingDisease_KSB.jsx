@@ -54,17 +54,22 @@ const validateAddress =  Yup.object().shape({
     family_members: Yup.array().of(
             Yup.object().shape({
                 looking_for : Yup.string(),
-                preExistingDisease: Yup.string().required("Pre-existing disease required")
+                preExistingDisease: Yup.string().required("Pre-existing disease required"),
+
+                preExistingDetails: Yup.string().when(['preExistingDisease'], {
+                    is: preExistingDisease => preExistingDisease == 'yes',       
+                    then: Yup.string().required("Pre-existing disease required")
                     .min(3, function() {
-                        return "Name must be minimum 3 chracters"
+                        return "Pre-existing disease must be minimum 3 chracters"
                     })
-                    .max(40, function() {
-                        return "Name must be maximum 40 chracters"
+                    .max(50, function() {
+                        return "Pre-existing disease must be maximum 50 chracters"
                     })
                     .matches(/^([A-Za-z,\s]*)$/, function() {
                         return "Please enter valid disease name"
-                }),
-                
+                    }),
+                    otherwise: Yup.string()
+                })
                 // dob: Yup.date().when(['looking_for'],{
                 //     //is: looking_for => (looking_for == 'self' || looking_for == 'spouse' || looking_for == 'child1') ,
                 //     is: looking_for => ['self','spouse','mother','father','fatherInLaw','motherInLaw'].includes(looking_for) ,
@@ -171,12 +176,14 @@ class Address extends Component {
         let looking_for = []
         let family_member_id = []
         let preExistingDisease = []
+        let preExistingDetails = []
 
 
         for(let i=0;i<family_members.length;i++){
              looking_for.push(family_members[i].looking_for)
             family_member_id.push(family_members[i].family_member_id)
             preExistingDisease.push(family_members[i].preExistingDisease)
+            preExistingDetails.push(family_members[i].preExistingDetails && family_members[i].preExistingDisease == "yes" ? family_members[i].preExistingDetails : "" )
 
         }  
 
@@ -184,12 +191,13 @@ class Address extends Component {
         formArr['family_member_id'] = family_member_id     
         formArr['policy_holder_id'] = policyHolder_id;
         formArr['pre_existing_disease'] = preExistingDisease;
+        formArr['pre_existing_details'] = preExistingDetails;
         formArr['page_name'] = `PreExistingDisease_KSB/${productId}`
         
 
         let formObj = {}
         Object.assign(formObj,formArr);
-        console.log("preExistingDisease---- ", formObj)
+        // console.log("preExistingDisease---- ", formObj)
         let encryption = new Encryption(); 
         formData.append('enc_data',encryption.encrypt(JSON.stringify(formObj)))
 
@@ -221,7 +229,8 @@ class Address extends Component {
                 // gender: resource.gender ?  resource.gender:'',
                 looking_for: resource.relation_with,
                 family_member_id: resource.id,
-                preExistingDisease: ksbPreExisting && ksbPreExisting.length > 0 && index < ksbPreExisting.length ? ksbPreExisting[index].description : ""
+                preExistingDisease: ksbPreExisting && ksbPreExisting.length > 0 && index < ksbPreExisting.length ? ksbPreExisting[index].description : "",
+                preExistingDetails: ksbPreExisting && ksbPreExisting.length > 0 && index < ksbPreExisting.length ? ksbPreExisting[index].pre_existing_details : ""
 			}));
 		} else {
 			return [initialFamilyDetails];
@@ -274,7 +283,7 @@ console.log("innitial family_members------------------- ", newInitialValues)
                                             {familyMembers && familyMembers.length>0 && familyMembers.map((resource,index)=> 
                                                     <div className="d-flex justify-content-left prsnlinfo">
                                                         <div className="W12">
-                                                            {resource.relation_with.toUpperCase()}
+                                                            {resource.relation_with == "motherInLaw" ? "MOTHER IN LAW" : resource.relation_with == "fatherInLaw" ? "FATHER IN LAW" : resource.relation_with.toUpperCase()}
                                                             <Field
                                                                 name={`family_members.${index}.family_member_id`}
                                                                 type="hidden"
@@ -289,23 +298,64 @@ console.log("innitial family_members------------------- ", newInitialValues)
                                                         <Row>
                                                         <Col sm={12} md={12} lg={12}>
                                                             <FormGroup>
-                                                                <div className="insurerName">
-                                                                    <Field
-                                                                        name={`family_members.${index}.preExistingDisease`}
-                                                                        type="text"
-                                                                        placeholder="  Pre-existing disease  "
-                                                                        autoComplete="off"
-                                                                        onFocus={e => this.changePlaceHoldClassAdd(e)}
-                                                                        onBlur={e => this.changePlaceHoldClassRemove(e)}
-                                                                        value = {values.family_members[index].preExistingDisease}
-                                                                    />
-                                                                     {errors.family_members && errors.family_members[index] && errors.family_members[index].preExistingDisease ? (
-                                                                    <span className="errorMsg">{errors.family_members[index].preExistingDisease}</span>
-                                                                    ) : null}
+                                                                <div className="d-inline-flex m-b-35">
+                                                                    <div className="p-r-25">
+                                                                    <label className="customRadio3">
+                                                                        <Field
+                                                                            name={`family_members.${index}.preExistingDisease`}
+                                                                            type="radio"
+                                                                            value='yes'
+                                                                            autoComplete="off"
+                                                                            onFocus={e => this.changePlaceHoldClassAdd(e)}
+                                                                            onBlur={e => this.changePlaceHoldClassRemove(e)}
+                                                                            checked = {values.family_members[index].preExistingDisease == 'yes' ? true : false}
+                                                                        /> 
+                                                                         <span className="checkmark " /><span className="fs-14"> Yes</span>
+                                                                    </label>
+                                                                    </div>
+                                                                    <div className="p-r-25">
+                                                                    <label className="customRadio3">
+                                                                        <Field
+                                                                            name={`family_members.${index}.preExistingDisease`}
+                                                                            type="radio"
+                                                                            value='no'
+                                                                            autoComplete="off"
+                                                                            onFocus={e => this.changePlaceHoldClassAdd(e)}
+                                                                            onBlur={e => this.changePlaceHoldClassRemove(e)}
+                                                                            checked = {values.family_members[index].preExistingDisease == 'no' ? true : false}
+                                                                        />
+                                                                         <span className="checkmark " /><span className="fs-14"> No</span>
+                                                                    </label>
+                                                                    </div>
+                                                                    <div className="p-r-25">
+                                                                    {errors.family_members && errors.family_members[index] && errors.family_members[index].preExistingDisease ? (
+                                                                        <span className="errorMsg">{errors.family_members[index].preExistingDisease}</span>
+                                                                        ) : null}
+                                                                    </div>
                                                                 </div>
                                                             </FormGroup>
                                                         </Col>
-                                                        
+                                                        {values.family_members[index].preExistingDisease == 'yes' ?
+                                                        <Col sm={12} md={12} lg={12}>
+                                                            <FormGroup>
+                                                                <div className="insurerName">
+                                                                    <Field
+                                                                        name={`family_members.${index}.preExistingDetails`}
+                                                                        type="text"
+                                                                        placeholder="Pre-existing disease "
+                                                                        autoComplete="off"
+                                                                        maxLength = {50}
+                                                                        onFocus={e => this.changePlaceHoldClassAdd(e)}
+                                                                        onBlur={e => this.changePlaceHoldClassRemove(e)}
+                                                                        value = {values.family_members[index].preExistingDetails}
+                                                                    />
+                                                                    {errors.family_members && errors.family_members[index] && errors.family_members[index].preExistingDetails ? (
+                                                                    <span className="errorMsg">{errors.family_members[index].preExistingDetails}</span>
+                                                                    ) : null}
+                                                                </div>
+                                                            </FormGroup>
+                                                        </Col> : null
+                                                        }
                                                         </Row>   
                                                     </div>
                                                     )}                                                

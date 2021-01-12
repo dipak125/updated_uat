@@ -433,6 +433,7 @@ class OtherComprehensiveGCV extends Component {
     sliderValue = (value) => {
         this.setState({
             sliderVal: value,
+            bodySliderVal: '',
             serverResponse: [],
             error: []
         })
@@ -441,6 +442,7 @@ class OtherComprehensiveGCV extends Component {
     bodySliderValue = (value) => {
         this.setState({
             bodySliderVal: value,
+            sliderVal: '',
             serverResponse: [],
             error: []
         })
@@ -748,16 +750,14 @@ class OtherComprehensiveGCV extends Component {
         const post_data = {
             'ref_no':localStorage.getItem('policyHolder_refNo'),
             'access_token':access_token,
-            'idv_value': sliderVal ? sliderVal : defaultSliderValue.toString(),
             'policy_type': motorInsurance.policy_type,
             'add_more_coverage': add_more_coverage.toString(),
             'PA_Cover': values.PA_flag ? values.PA_Cover : "0",
             'coverage_data': JSON.stringify(coverage_data),
-            'body_idv_value' : bodySliderVal ? bodySliderVal : defaultBodySliderValue,
             'trailer_array' : values.trailer_array,
-            'fuel_type' : values.fuel_type ? values.fuel_type : (vehicleDetails && vehicleDetails.varientmodel && vehicleDetails.varientmodel.fueltype  ? vehicleDetails.varientmodel.fueltype.id : "")
-            // 'cng_kit': cng_kit_flag,
-            // 'cngKit_Cost': cngKit_Cost
+            'fuel_type' : values.fuel_type ? values.fuel_type : (vehicleDetails && vehicleDetails.varientmodel && vehicleDetails.varientmodel.fueltype  ? vehicleDetails.varientmodel.fueltype.id : ""),
+            'idv_value': sliderVal ? sliderVal : 0,
+            'body_idv_value' : bodySliderVal ? bodySliderVal : 0
         }
 
         total_idv = parseInt(other_idv) + parseInt(post_data.idv_value)+parseInt(post_data.body_idv_value)
@@ -1256,7 +1256,11 @@ class OtherComprehensiveGCV extends Component {
         let minBodyIDV = 0
         let maxBodyIDV = PolicyArray.length > 0 ? Math.round(PolicyArray[0].PolicyRiskList[0].IDV_Suggested/5) : 0
         let defaultBodySliderValue =  motorInsurance && motorInsurance.body_idv_value ? Math.round(motorInsurance.body_idv_value) : 0
+        //let defaultBodySliderValue =  bodySliderVal ? bodySliderVal : 0
         let bodySliderValue = bodySliderVal
+
+        console.log("sliderVal", this.state.sliderVal)
+        console.log("bodySliderVal", this.state.bodySliderVal)
 
         let covList = motorInsurance && motorInsurance.add_more_coverage ? motorInsurance.add_more_coverage.split(",") : ""
         let newInnitialArray = {}

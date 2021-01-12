@@ -64,7 +64,7 @@ const validateAddress =  Yup.object().shape({
     address1: Yup.string()
         .notRequired(function() {
             return "Enter plot number."
-        }).matches(/^([0-9]*)$/, function() {
+        }).matches(/^[a-zA-Z0-9][a-zA-Z0-9]*$/, function() {
             return "Invalid plot number"
         }),
     address2: Yup.string()

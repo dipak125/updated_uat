@@ -18,19 +18,19 @@ import { addDays } from "date-fns";
 import moment from "moment";
 
 const initialValues = {
-  pol_start_date : "",
-  pol_end_date : "",
-  first_name : "",
-  last_name : "",
-  date_of_birth : "",
-  insured : "",
-  occupation : "",
-  gender : "",
-  previous_policy_check : "",
-  disability : ""
+  pol_start_date: "",
+  pol_end_date: "",
+  first_name: "",
+  last_name: "",
+  date_of_birth: "",
+  insured: "",
+  occupation: "",
+  gender: "",
+  previous_policy_check: "",
+  disability: ""
 };
 
-const vehicleRegistrationValidation = Yup.object().shape({  
+const vehicleRegistrationValidation = Yup.object().shape({
   // insured: Yup.string().required("Please select insured type").nullable(),
   occupation: Yup.string().required("Please select occupation type"),
   gender: Yup.string().required("Please select gender").nullable(),
@@ -72,7 +72,7 @@ class AccidentAddDetails extends Component {
         let decryptResp = JSON.parse(encryption.decrypt(res.data));
         // console.log("decrypt---accidentDetails--->>", decryptResp);
         let accidentDetails = decryptResp.data && decryptResp.data.policyHolder ? decryptResp.data.policyHolder : null;
-        let requestedData =accidentDetails && accidentDetails.request_data ? accidentDetails.request_data : null;
+        let requestedData = accidentDetails && accidentDetails.request_data ? accidentDetails.request_data : null;
         console.log("---accidentDetails--->>", accidentDetails);
         this.setState({
           accidentDetails, requestedData
@@ -91,73 +91,73 @@ class AccidentAddDetails extends Component {
     this.props.history.push(`/AccidentSelectPlan/${productId}`);
   };
 
-  handleChange =(e) => {
+  handleChange = (e) => {
     this.setState({
-        serverResponse: [],
-        error: []
-    }) 
+      serverResponse: [],
+      error: []
+    })
   }
 
   quote = (values, actions) => {
     //console.log('value', value)
-    const {accessToken, accidentDetails} = this.state 
-    const formData = new FormData(); 
+    const { accessToken, accidentDetails } = this.state
+    const formData = new FormData();
     this.props.loadingStart();
     let date_of_birth = moment(accidentDetails.dob).format('yyyy-MM-DD');
-    let ipaInfo = accidentDetails && accidentDetails.ipainfo ? accidentDetails.ipainfo  : null
+    let ipaInfo = accidentDetails && accidentDetails.ipainfo ? accidentDetails.ipainfo : null
     const post_data = {
-        'id':localStorage.getItem('policyHolder_id'),
-        'proposer_dob': date_of_birth ,
-        'sum_insured': ipaInfo ? ipaInfo.sum_insured : null
+      'id': localStorage.getItem('policyHolder_id'),
+      'proposer_dob': date_of_birth,
+      'sum_insured': ipaInfo ? ipaInfo.sum_insured : null
     }
     let encryption = new Encryption();
-    formData.append('enc_data',encryption.encrypt(JSON.stringify(post_data)))
+    formData.append('enc_data', encryption.encrypt(JSON.stringify(post_data)))
 
     axios
       .post(`/fullQuoteServiceIPA`, formData)
-      .then(res => { 
+      .then(res => {
         if (res.data.PolicyObject && res.data.UnderwritingResult && res.data.UnderwritingResult.Status == "Success") {
           this.setState({
-              fulQuoteResp: res.data.PolicyObject,
-              serverResponse: res.data.PolicyObject,
-              error: [],
-              validation_error: []
-          })          
+            fulQuoteResp: res.data.PolicyObject,
+            serverResponse: res.data.PolicyObject,
+            error: [],
+            validation_error: []
+          })
           this.props.loadingStop();
-      }
-      else if (res.data.PolicyObject && res.data.UnderwritingResult && res.data.UnderwritingResult.Status == "Fail") {
+        }
+        else if (res.data.PolicyObject && res.data.UnderwritingResult && res.data.UnderwritingResult.Status == "Fail") {
           this.setState({
-              fulQuoteResp: res.data.PolicyObject,
-              serverResponse: [],
-              validation_error: [],
-              error: {"message": 1}
-          }) 
+            fulQuoteResp: res.data.PolicyObject,
+            serverResponse: [],
+            validation_error: [],
+            error: { "message": 1 }
+          })
           this.props.loadingStop();
-      }
-      else if (res.data.code && res.data.message && ((res.data.code == "validation failed" && res.data.message == "validation failed") || (res.data.code == "Policy Validation Error" && res.data.message == "Policy Validation Error"))) {
-        var validationErrors = []
-        for (const x in res.data.messages) {
+        }
+        else if (res.data.code && res.data.message && ((res.data.code == "validation failed" && res.data.message == "validation failed") || (res.data.code == "Policy Validation Error" && res.data.message == "Policy Validation Error"))) {
+          var validationErrors = []
+          for (const x in res.data.messages) {
             validationErrors.push(res.data.messages[x].message)
-           }
-           this.setState({
+          }
+          this.setState({
             fulQuoteResp: [],
             validation_error: validationErrors,
             error: [],
             serverResponse: []
-        });
-        // swal(res.data.data.messages[0].message)
-        this.props.loadingStop();
-      }
-      else {
-        this.setState({
+          });
+          // swal(res.data.data.messages[0].message)
+          this.props.loadingStop();
+        }
+        else {
+          this.setState({
             fulQuoteResp: [],
             error: res.data.ValidateResult,
             validation_error: [],
             serverResponse: []
-        });
-        this.props.loadingStop();
-    }
-    actions.setSubmitting(false)
+          });
+          this.props.loadingStop();
+        }
+        actions.setSubmitting(false)
       })
       .catch(err => {
         this.setState({
@@ -165,60 +165,63 @@ class AccidentAddDetails extends Component {
         });
         this.props.loadingStop();
       });
-  
-}
+
+  }
 
 
- handleSubmit = (values, actions) => {
-    const {productId} = this.props.match.params 
-    const {accidentDetails} = this.state
-    console.log('values------->>>',values)
-    const formData = new FormData(); 
+  handleSubmit = (values, actions) => {
+    const { productId } = this.props.match.params
+    const { accidentDetails } = this.state
+    console.log('values------->>>', values)
+    const formData = new FormData();
     let encryption = new Encryption();
     this.props.loadingStart();
     let policy_start_date = moment(values.pol_start_date).format('yyyy-MM-DD HH:mm:ss')
     let policy_end_date = moment(values.pol_end_date).format('yyyy-MM-DD HH:mm:ss')
     let post_data = {
-        'policy_holder_id':accidentDetails.id,
-        'menumaster_id':'9',
-        'page_name': `AccidentAddDetails/${productId}`,
-        'pol_start_date': policy_start_date,
-        'pol_end_date': policy_end_date,
-        'insured_type_id':values.insured,
-        'claim_existing':values.previous_policy_check,
-        'existing_physical_disability':values.disability,
-        'occupation_id':values.occupation,
-        'proposer_gender' : values.gender
+      'policy_holder_id': accidentDetails.id,
+      'menumaster_id': '9',
+      'page_name': `AccidentAddDetails/${productId}`,
+      'pol_start_date': policy_start_date,
+      'pol_end_date': policy_end_date,
+      'insured_type_id': values.insured,
+      'claim_existing': values.previous_policy_check,
+      'existing_physical_disability': values.disability,
+      'occupation_id': values.occupation,
+      'proposer_gender': values.gender
     }
     console.log('post_data', post_data);
-    formData.append('enc_data',encryption.encrypt(JSON.stringify(post_data)))
+    formData.append('enc_data', encryption.encrypt(JSON.stringify(post_data)))
     // this.props.loadingStart();
-    if( values.previous_policy_check == 1) {
+    if (values.previous_policy_check == 1) {
       swal('Insurance Policy cannot be offered')
-    } 
-    else if(values.disability == 1) {
+    }
+    else if (values.disability == 1) {
       swal('Insurance Policy cannot be offered')
     }
     axios
-    .post(`ipa/policy-details`, formData)
-    .then(res => { 
+      .post(`ipa/policy-details`, formData)
+      .then(res => {
         let decryptResp = JSON.parse(encryption.decrypt(res.data));
         console.log('decryptResp-----', decryptResp)
         this.props.loadingStop();
         if (decryptResp.error == false) {
-        this.props.history.push(`/AccidentAdditionalDetails/${productId}`);
+          this.props.history.push(`/AccidentAdditionalDetails/${productId}`);
         } else {
           actions.setSubmitting(false)
+          if (decryptResp.error == true) {
+            swal(decryptResp.msg)
+          }
         }
-    })
-    .catch(err => { 
-      this.props.loadingStop();
-      actions.setSubmitting(false)
-      let decryptErr = JSON.parse(encryption.decrypt(err.data));
-      console.log('decryptErr-----', decryptErr)
-    });
+      })
+      .catch(err => {
+        this.props.loadingStop();
+        actions.setSubmitting(false)
+        let decryptErr = JSON.parse(encryption.decrypt(err.data));
+        console.log('decryptErr-----', decryptErr)
+      });
 
-}
+  }
 
   fetchInsurance = () => {
     let encryption = new Encryption();
@@ -237,12 +240,12 @@ class AccidentAddDetails extends Component {
   };
 
   render() {
-    const { occupationList, accidentDetails, requestedData, serverResponse, validation_error, error} = this.state;
-    const {productId} = this.props.match.params
+    const { occupationList, accidentDetails, requestedData, serverResponse, validation_error, error } = this.state;
+    const { productId } = this.props.match.params
     const newInitialValues = Object.assign(initialValues, {
       pol_start_date: requestedData && requestedData.start_date ? new Date(requestedData.start_date) : new Date(),
-      pol_end_date : requestedData && requestedData.end_date ? new Date(requestedData.end_date) : new Date(moment().add(364, "day").calendar()),
-      insured:  accidentDetails && accidentDetails.ipainfo && accidentDetails.ipainfo.insured_type_id != 0 ? accidentDetails.ipainfo.insured_type_id  : "",
+      pol_end_date: requestedData && requestedData.end_date ? new Date(requestedData.end_date) : new Date(moment().add(364, "day").calendar()),
+      insured: accidentDetails && accidentDetails.ipainfo && accidentDetails.ipainfo.insured_type_id != 0 ? accidentDetails.ipainfo.insured_type_id : "",
       previous_policy_check: 0,
       disability: 0,
       first_name: accidentDetails ? accidentDetails.first_name : "",
@@ -251,27 +254,27 @@ class AccidentAddDetails extends Component {
       occupation: accidentDetails && accidentDetails.ipainfo && accidentDetails.ipainfo.occupation ? accidentDetails.ipainfo.occupation.id : "",
       gender: accidentDetails ? accidentDetails.gender : ""
     });
-console.log("validation_error-------- ", validation_error)
-console.log("error-------- ", error)
-    const errMsg =  error && error.message ? (            
+    console.log("validation_error-------- ", validation_error)
+    console.log("error-------- ", error)
+    const errMsg = error && error.message ? (
       <span className="errorMsg"><h6><strong>{error.message}</strong></h6></span>
       // <span className="errorMsg"><h6><strong>Thank you for showing your interest for buying product.Due to some reasons, we are not able to issue the policy online.Please call 1800 22 1111</strong></h6></span>                                
-  ) : null 
+    ) : null
 
-    const validationErrors = 
+    const validationErrors =
       validation_error ? (
-          validation_error.map((errors, qIndex) => (
-              <span className="errorMsg"><h6>Errors : 
+        validation_error.map((errors, qIndex) => (
+          <span className="errorMsg"><h6>Errors :
                   <strong>
-                      <ul>
-                          <li>
-                              {errors}
-                          </li>
-                      </ul>
-                  </strong></h6>
-              </span>
-          ))        
-    ): null;
+              <ul>
+                <li>
+                  {errors}
+                </li>
+              </ul>
+            </strong></h6>
+          </span>
+        ))
+      ) : null;
 
     return (
       <>
@@ -287,15 +290,22 @@ console.log("error-------- ", error)
                 </h4>
                 <section className="brand">
                   <div className="boxpd">
-                  <div>{errMsg}</div>
+                    <div>{errMsg}</div>
                     <h4>{validationErrors}</h4>
                     <Formik
                       initialValues={newInitialValues}
-                      onSubmit={ serverResponse && serverResponse != "" ? (serverResponse.message ? this.quote : this.handleSubmit ) : this.quote}
+                      onSubmit={serverResponse && serverResponse != "" ? (serverResponse.message ? this.quote : this.handleSubmit) : this.quote}
                       validationSchema={vehicleRegistrationValidation}
                     >
-                      {({values, errors, setFieldValue, setFieldTouched, isValid, isSubmitting, touched }) => {
+                      {({ values, errors, setFieldValue, setFieldTouched, isValid, isSubmitting, touched }) => {
                         // console.log('values',values)
+                        if (values) {
+                          {
+                            occupationList && occupationList.length > 0 && occupationList.map((insure, qIndex) => (
+                              insure.id == values.occupation ? insure.decline_status == "Decline" ? swal('Insurance Policy cannot be offered') : '' : ''
+                            ))
+                          }
+                        }
 
                         return (
                           <Form>
@@ -318,8 +328,8 @@ console.log("error-------- ", error)
                                       onChange={(val) => {
                                         setFieldTouched("pol_start_date");
                                         setFieldValue("pol_start_date", val);
-                                        }}
-                                      /> 
+                                      }}
+                                    />
                                     {errors.pol_start_date && touched.pol_start_date ? (
                                       <span className="errorMsg">
                                         {errors.pol_start_date}
@@ -347,14 +357,14 @@ console.log("error-------- ", error)
                                       onChange={(val) => {
                                         setFieldTouched('pol_end_date');
                                         setFieldValue('pol_end_date', val);
-                                        }}
-                                      /> 
+                                      }}
+                                    />
                                     {errors.pol_end_date &&
-                                    touched.pol_end_date ? (
-                                      <span className="errorMsg">
-                                        {errors.pol_end_date}
-                                      </span>
-                                    ) : null}
+                                      touched.pol_end_date ? (
+                                        <span className="errorMsg">
+                                          {errors.pol_end_date}
+                                        </span>
+                                      ) : null}
                                   </div>
                                 </FormGroup>
                               </Col>
@@ -470,11 +480,11 @@ console.log("error-------- ", error)
                                     }}
                                   />
                                   {errors.date_of_birth &&
-                                  touched.date_of_birth ? (
-                                    <span className="errorMsg">
-                                      {errors.date_of_birth}
-                                    </span>
-                                  ) : null}
+                                    touched.date_of_birth ? (
+                                      <span className="errorMsg">
+                                        {errors.date_of_birth}
+                                      </span>
+                                    ) : null}
                                 </FormGroup>
                               </Col>
                               <Col sm={6} md={3} lg={3}>
@@ -517,9 +527,9 @@ console.log("error-------- ", error)
                                       }}
                                     >
                                       <option value="">Occupation Type</option>
-                                        {occupationList && occupationList.length > 0 && occupationList.map((insurer, qIndex) => ( 
-                                          <option key={qIndex} value= {insurer.id}>{insurer.occupation}</option>
-                                        ))} 
+                                      {occupationList && occupationList.length > 0 && occupationList.map((insurer, qIndex) => (
+                                        <option key={qIndex} value={insurer.id} val={insurer.decline_status}> {insurer.occupation} </option>
+                                      ))}
                                     </Field>
                                     {errors.occupation && touched.occupation ? (
                                       <span className="errorMsg">
@@ -548,54 +558,54 @@ console.log("error-------- ", error)
                                   <div className="d-inline-flex m-b-35">
                                     <div className="p-r-25">
                                       <label className="customRadio3">
-                                      <Field
-                                        type="radio"
-                                        name="previous_policy_check"
-                                        value="0"
-                                        key="1"
-                                        checked={
-                                          values.previous_policy_check == "0" ? true : false }
-                                        onChange={(e) => {
-                                          setFieldTouched("previous_policy_check");
-                                          setFieldValue("previous_policy_check", e.target.value);
-                                          // this.handleChange(
-                                          //   values,
-                                          //   setFieldTouched,
-                                          //   setFieldValue
-                                          // );
-                                        }}
-                                      />
-                                      <span className="checkmark " />
-                                      <span className="fs-14"> No</span>
-                                    </label>
-                                  </div>
-                                  <div className="p-r-25">
-                                    <label className="customRadio3">
-                                      <Field
-                                        type="radio"
-                                        name="previous_policy_check"
-                                        value="1"
-                                        key="1"
-                                        checked={
-                                          values.previous_policy_check == "1" ? true : false }
-                                        onChange={(e) => {
-                                          setFieldTouched("previous_policy_check");
-                                          setFieldValue("previous_policy_check", e.target.value);
-                                          // this.handleChange(
-                                          //   values,
-                                          //   setFieldTouched,
-                                          //   setFieldValue
-                                          // );
-                                        }}
-                                      />
-                                      <span className="checkmark " />
-                                      <span className="fs-14"> Yes</span>
-                                    </label>
-                                    {errors.previous_policy_check && touched.previous_policy_check ? (
-                                      <span className="errorMsg">
-                                        {errors.previous_policy_check}
-                                      </span>
-                                    ) : null}
+                                        <Field
+                                          type="radio"
+                                          name="previous_policy_check"
+                                          value="0"
+                                          key="1"
+                                          checked={
+                                            values.previous_policy_check == "0" ? true : false}
+                                          onChange={(e) => {
+                                            setFieldTouched("previous_policy_check");
+                                            setFieldValue("previous_policy_check", e.target.value);
+                                            // this.handleChange(
+                                            //   values,
+                                            //   setFieldTouched,
+                                            //   setFieldValue
+                                            // );
+                                          }}
+                                        />
+                                        <span className="checkmark " />
+                                        <span className="fs-14"> No</span>
+                                      </label>
+                                    </div>
+                                    <div className="p-r-25">
+                                      <label className="customRadio3">
+                                        <Field
+                                          type="radio"
+                                          name="previous_policy_check"
+                                          value="1"
+                                          key="1"
+                                          checked={
+                                            values.previous_policy_check == "1" ? true : false}
+                                          onChange={(e) => {
+                                            setFieldTouched("previous_policy_check");
+                                            setFieldValue("previous_policy_check", e.target.value);
+                                            // this.handleChange(
+                                            //   values,
+                                            //   setFieldTouched,
+                                            //   setFieldValue
+                                            // );
+                                          }}
+                                        />
+                                        <span className="checkmark " />
+                                        <span className="fs-14"> Yes</span>
+                                      </label>
+                                      {errors.previous_policy_check && touched.previous_policy_check ? (
+                                        <span className="errorMsg">
+                                          {errors.previous_policy_check}
+                                        </span>
+                                      ) : null}
                                     </div>
                                   </div>
                                 </FormGroup>
@@ -615,7 +625,7 @@ console.log("error-------- ", error)
                                         value="0"
                                         key="1"
                                         checked={
-                                          values.disability == "0" ? true : false }
+                                          values.disability == "0" ? true : false}
                                         onChange={(e) => {
                                           setFieldTouched("disability");
                                           setFieldValue("disability", e.target.value);
@@ -638,7 +648,7 @@ console.log("error-------- ", error)
                                         value="1"
                                         key="1"
                                         checked={
-                                          values.disability == "1" ? true : false }
+                                          values.disability == "1" ? true : false}
                                         onChange={(e) => {
                                           setFieldTouched("disability");
                                           setFieldValue("disability", e.target.value);
@@ -662,21 +672,21 @@ console.log("error-------- ", error)
                               </div>
                             </div>
                             { serverResponse && serverResponse.QuotationNo ?
-                            <Row className="d-flex justify-content-left carloan m-b-25"> 
-                            <Col sm={4}>
-                                <div className="d-flex justify-content-between align-items-center premium m-b-25">
+                              <Row className="d-flex justify-content-left carloan m-b-25">
+                                <Col sm={4}>
+                                  <div className="d-flex justify-content-between align-items-center premium m-b-25">
                                     <p>Quotation No:</p>
-                                    <p><b> { serverResponse ? (serverResponse.message ? "---" : serverResponse.QuotationNo ) :"---"}</b></p>
-                                </div>
-                            </Col>
-                            <Col sm={4}>
-                                <div className="d-flex justify-content-between align-items-center premium m-b-25">
+                                    <p><b> {serverResponse ? (serverResponse.message ? "---" : serverResponse.QuotationNo) : "---"}</b></p>
+                                  </div>
+                                </Col>
+                                <Col sm={4}>
+                                  <div className="d-flex justify-content-between align-items-center premium m-b-25">
                                     <p>Total Premium:</p>
-                                    <p><strong>Rs: { serverResponse ? (serverResponse.message ? 0 : serverResponse.DuePremium ) : 0}</strong></p>
-                                </div>
-                            </Col>
-                            </Row>
-                            : null }
+                                    <p><strong>Rs: {serverResponse ? (serverResponse.message ? 0 : serverResponse.DuePremium) : 0}</strong></p>
+                                  </div>
+                                </Col>
+                              </Row>
+                              : null}
 
                             <div className="d-flex justify-content-left carloan">
                               <h4> </h4>
@@ -685,16 +695,16 @@ console.log("error-------- ", error)
                               <Button
                                 className={`backBtn`}
                                 type="button"
-                                onClick={this.select_Plan.bind(this,productId)}
+                                onClick={this.select_Plan.bind(this, productId)}
                               >
                                 {isSubmitting ? "Wait.." : "Back"}
                               </Button>
-                              { serverResponse && serverResponse != "" ? (serverResponse.message ? 
-                                  <Button className={`proceedBtn`} type="submit"  >
-                                      Quote
+                              {serverResponse && serverResponse != "" ? (serverResponse.message ?
+                                <Button className={`proceedBtn`} type="submit"  >
+                                  Quote
                                   </Button> : <Button className={`proceedBtn`} type="submit"  >
-                                      Continue
-                                  </Button> ) : <Button className={`proceedBtn`} type="submit"  >
+                                  Continue
+                                  </Button>) : <Button className={`proceedBtn`} type="submit"  >
                                   Quote
                                   </Button>}
                             </div>
