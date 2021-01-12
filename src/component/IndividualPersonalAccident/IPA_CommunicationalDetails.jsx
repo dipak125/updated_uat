@@ -183,7 +183,7 @@ const IPA__Validation = Yup.object().shape({
   //           }
   //       ),
   appointee_name: Yup.string()
-    .matches(/^[a-zA-Z]+([\s]+[a-zA-Z]+)$/, function () {
+    .matches(/^[a-zA-Z]+([\s]+[a-zA-Z])$/, function () {
       return "Please enter full name"
     }).test(
       "18YearsChecking",
@@ -1005,7 +1005,7 @@ class AccidentAdditionalDetails extends Component {
                                 <FormGroup>
                                   <DatePicker
                                     name="nominee_dob"
-                                    dateFormat="yyyy-MM-dd"
+                                    dateFormat="dd-MM-yyyy"
                                     placeholderText="DOB"
                                     peekPreviousMonth
                                     peekPreviousYear

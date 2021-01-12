@@ -42,12 +42,12 @@ const vehicleRegistrationValidation = Yup.object().shape({
   }).nullable(),
   // last_name: Yup.string().required('Name is required').nullable(),
   date_of_birth: Yup.date().required("Please enter date of birth").nullable(),
-  email_id: Yup.string().email().min(8, function() {
-      return "Email must be minimum 8 characters"
-  })
-  .max(75, function() {
-      return "Email must be maximum 75 characters"
-  }).matches(/^[a-zA-Z0-9]+([._\-]?[a-zA-Z0-9]+)*@\w+([-]?\w+)*(\.\w{2,3})+$/,'Invalid Email Id').nullable(),
+  // email_id: Yup.string().email().min(8, function() {
+  //     return "Email must be minimum 8 characters"
+  // })
+  // .max(75, function() {
+  //     return "Email must be maximum 75 characters"
+  // }).matches(/^[a-zA-Z0-9]+([._\-]?[a-zA-Z0-9]+)*@\w+([-]?\w+)*(\.\w{2,3})+$/,'Invalid Email Id').nullable(),
   mobile: Yup.string()
   .matches(/^[6-9][0-9]{9}$/,'Invalid Mobile number').required('Mobile No. is required').nullable(),
   // gender: Yup.string().required("Please select gender").nullable(),
@@ -408,7 +408,7 @@ class AccidentSelectPlan extends Component {
                                             <FormGroup>
                                             <DatePicker
                                                 name="date_of_birth"
-                                                dateFormat="yyyy-MM-dd"
+                                                dateFormat="dd-MM-yyyy"
                                                 placeholderText="DOB"
                                                 peekPreviousMonth
                                                 peekPreviousYear
