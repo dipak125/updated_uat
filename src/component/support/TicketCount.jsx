@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import BaseComponent from '../BaseComponent';
-import { Row, Col, FormGroup } from 'react-bootstrap';
+import { Row, Col, FormGroup, Button } from 'react-bootstrap';
 import Encryption from '../../shared/payload-encryption';
 import moment from "moment";
 
@@ -12,6 +12,7 @@ import { BootstrapTable, TableHeaderColumn, ExportCSVButton } from "react-bootst
 import axios from "../../shared/axios"
 import { loaderStart, loaderStop } from "../../store/actions/loader";
 import { connect } from "react-redux";
+import swal from 'sweetalert';
 
 
 const actionFormatter = (refObj) => (cell, row, enumObject) => {
@@ -27,6 +28,22 @@ const actionFormatter = (refObj) => (cell, row, enumObject) => {
         </LinkWithTooltip>
     )
 }
+
+const getStatus = (refObj) => (cell, row, enumObject) => {
+        return (
+            <LinkWithTooltip
+                tooltip="Get Status"
+                href="#"
+                clicked={() => refObj.getCurrentStatus(row)
+                }
+                id="tooltip-1"
+            >
+                <Button type="button" >
+                    Get Status
+                </Button> 
+            </LinkWithTooltip>
+        )
+    }
 
 class TicketCount extends Component {
 
@@ -49,6 +66,31 @@ class TicketCount extends Component {
 
     componentDidMount() {
         this.getTickets(1);
+    }
+
+    getCurrentStatus = (row) => {
+        const formData = new FormData(); 
+        formData.append('ticket_id', row.ticketid_Internal) 
+
+        this.props.loadingStart();
+        axios.post('help-ticket/incident-details',formData)
+        .then(res=>{
+            if(res.data.error == false) {
+                swal(`Status: ${res.data.data.currentStatus}`)
+                .then((willUpdate) =>{
+                    if(willUpdate) {
+                        this.getTickets(1)
+                    }
+                } )
+            }   
+            else{
+                this.getTickets(1)
+            }             
+            this.props.loadingStop();
+        }).
+        catch(err=>{
+            this.props.loadingStop();
+        })  
     }
 
     getTickets = (page_no) => {
@@ -152,6 +194,7 @@ class TicketCount extends Component {
                             <TableHeaderColumn width='120px' dataField="status" tdStyle={{ whiteSpace: 'normal' }} >Status</TableHeaderColumn>
                             <TableHeaderColumn width='100px' dataField='area' >Subject</TableHeaderColumn>
                             <TableHeaderColumn width='120px' dataField="created_at" dataFormat={cell => moment(cell).format('DD/MM/YYYY hh:mm A')} tdStyle={{ whiteSpace: 'normal' }} >Date Logged</TableHeaderColumn>
+                            <TableHeaderColumn width='100px' dataField='id' dataFormat={getStatus(this)} >Get Status</TableHeaderColumn>
 
                         </BootstrapTable>
                     }

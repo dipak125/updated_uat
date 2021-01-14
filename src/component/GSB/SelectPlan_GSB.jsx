@@ -80,7 +80,10 @@ class SelectPlan_GSB extends Component {
         stateName: "",
         requested_Data: [],
         gsb_Details: [],
-        addressDetails: []
+        addressDetails: [],
+        coverPlanA: [], 
+        coverPlanB: [], 
+        coverPlanC: []
     }
    
     forwardNextPage=()=> {    
@@ -110,6 +113,49 @@ class SelectPlan_GSB extends Component {
         })
       }
 
+    handleCoverChange = (val) => {
+        const {coverPlanA, coverPlanB, coverPlanC} = this.state
+        let policyCoverage = val == 1 ? coverPlanA : val == 2 ? coverPlanB : coverPlanC
+        
+        return(
+            <table >
+                 <tr>
+                    <th>Section</th>
+                    <th>Sum Insured</th>
+                </tr>
+               { policyCoverage && policyCoverage.length > 0 ?
+                    policyCoverage.map((coverage, qIndex) => (
+                        <tr>
+                            <td>{coverage.benefit_name}:</td>
+                            <td>₹ {Math.round(coverage.benefit_suminsured)}</td>
+                        </tr>                    
+
+                )) : null}
+            </table > 
+        )
+    }
+
+    fetchCoveragePlan=(pincode_Details)=>{
+        const { productId } = this.props.match.params;
+        let encryption = new Encryption();
+        axios
+          .get(`gsb/get-plan-with-coverage`)
+          .then((res) => {
+            let decryptResp = JSON.parse(encryption.decrypt(res.data));
+            let coverPlanA = decryptResp.data && decryptResp.data.plan_with_coverages ? decryptResp.data.plan_with_coverages[2].coveragebenefit : null;
+            let coverPlanB = decryptResp.data && decryptResp.data.plan_with_coverages ? decryptResp.data.plan_with_coverages[1].coveragebenefit : null;
+            let coverPlanC = decryptResp.data && decryptResp.data.plan_with_coverages ? decryptResp.data.plan_with_coverages[0].coveragebenefit : null;
+            console.log("---gsb_Details--->>", decryptResp);
+            this.setState({
+                coverPlanA, coverPlanB, coverPlanC
+            });
+            this.fetchPrevAreaDetails(pincode_Details)
+          })
+          .catch((err) => {
+            // handle error
+            this.props.loadingStop();
+          });        
+    }
 
     fetchPolicyDetails=()=>{
         const { productId } = this.props.match.params;
@@ -128,7 +174,7 @@ class SelectPlan_GSB extends Component {
               gsb_Details, requested_Data, 
               addressDetails, pincode_Details
             });
-            this.fetchPrevAreaDetails(pincode_Details)
+            this.fetchCoveragePlan(pincode_Details)           
             this.props.loadingStop();
           })
           .catch((err) => {
@@ -387,7 +433,8 @@ class SelectPlan_GSB extends Component {
     
 
     render() {
-        const {pinDataArr, stateName, cityName, requested_Data, gsb_Details, addressDetails, serverResponse,validation_error, error} = this.state
+        const {pinDataArr, stateName, cityName, requested_Data, gsb_Details, addressDetails, serverResponse,
+                validation_error, error, coverPlanA, coverPlanB, coverPlanC} = this.state
         const newInitialValues = Object.assign(initialValues,{
             pol_start_date: requested_Data && requested_Data.start_date ? new Date(requested_Data.start_date)  : null,
             pol_end_date: requested_Data && requested_Data.end_date ? new Date(requested_Data.end_date)  : null,
@@ -762,10 +809,11 @@ class SelectPlan_GSB extends Component {
                                                                     value='1'
                                                                     key='1'
                                                                     checked = {values.plan_id == '1' ? true : false}
-                                                                    onChange = {() =>{
+                                                                    onChange = {(e) =>{
                                                                         setFieldTouched('plan_id')
                                                                         setFieldValue('plan_id', '1');
                                                                         this.handleChange(values,setFieldTouched, setFieldValue)
+                                                                        this.fetchCoveragePlan(e.target.value)
                                                                     }  
                                                                     }
                                                                 />
@@ -780,10 +828,11 @@ class SelectPlan_GSB extends Component {
                                                                     value='2'
                                                                     key='1'
                                                                     checked = {values.plan_id == '2' ? true : false}
-                                                                    onChange = {() =>{
+                                                                    onChange = {(e) =>{
                                                                         setFieldTouched('plan_id')
                                                                         setFieldValue('plan_id', '2');
                                                                         this.handleChange(values,setFieldTouched, setFieldValue)
+                                                                        this.fetchCoveragePlan(e.target.value)
                                                                     }  
                                                                     }
                                                                 />
@@ -801,10 +850,11 @@ class SelectPlan_GSB extends Component {
                                                                     value='3'
                                                                     key='1'
                                                                     checked = {values.plan_id == '3' ? true : false}
-                                                                    onChange = {() =>{
+                                                                    onChange = {(e) =>{
                                                                         setFieldTouched('plan_id')
                                                                         setFieldValue('plan_id', '3');
                                                                         this.handleChange(values,setFieldTouched, setFieldValue)
+                                                                        this.fetchCoveragePlan(e.target.value)
                                                                     }  
                                                                     }
                                                                 />
@@ -815,7 +865,13 @@ class SelectPlan_GSB extends Component {
                                                             ) : null}
                                                         </div>
                                                     </div>
-                                                </div>
+                                                </div>                                               
+                                            </div>
+                                            <div className="brandhead"> 
+                                                {this.handleCoverChange(values.plan_id)}
+                                            </div>
+                                            <div className="brandhead"> 
+                                                <p>&nbsp;</p>
                                             </div>
                                             { serverResponse && serverResponse.QuotationNo ?
                                                 <Row className="d-flex justify-content-left carloan m-b-25">
@@ -834,10 +890,7 @@ class SelectPlan_GSB extends Component {
                                                 </Row>
                                                 : null}
 
-                                            <div className="brandhead"> 
-                                                <p>&nbsp;</p>
-                                            </div>
-                                           
+                                            
                                             <div className="cntrbtn">
                                             {serverResponse && serverResponse != "" ? (serverResponse.message ?
                                                 <Button className={`proceedBtn`} type="submit"  >

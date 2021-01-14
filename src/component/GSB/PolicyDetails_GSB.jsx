@@ -88,7 +88,8 @@ class PolicyDetails_GSB extends Component {
     show: false,
     refNumber: "",
     paymentStatus: [],
-    nomineedetails: []
+    nomineedetails: [],
+    policyCoverage: []
   };
 
   handleClose = () => {
@@ -113,22 +114,48 @@ class PolicyDetails_GSB extends Component {
       .get(`gsb/gsb-policy-details/${policyHolder_refNo}`)
       .then((res) => {
         let decryptResp = JSON.parse(encryption.decrypt(res.data));
+        let policyHolderDetails= decryptResp.data.policyHolder ? decryptResp.data.policyHolder : [];
         let gsb_Details = decryptResp.data && decryptResp.data.policyHolder.gsbinfo ? decryptResp.data.policyHolder.gsbinfo : null;
         let requested_Data = decryptResp.data && decryptResp.data.policyHolder.request_data ? decryptResp.data.policyHolder.request_data : null;
-        let addressDetails = gsb_Details ? JSON.parse(gsb_Details.risk_address) : null
+        let addressDetails = policyHolderDetails ? JSON.parse(policyHolderDetails.address) : null
         let pincode_Details = gsb_Details ? JSON.parse(gsb_Details.pincode_response) : null
-        console.log("---gsb_Details--->>", gsb_Details);
+        
+        console.log("---gsb_Details--->>", decryptResp.data.policyHolder);
         this.setState({
           gsb_Details, requested_Data, 
-          addressDetails, pincode_Details
+          addressDetails, pincode_Details, policyHolderDetails
         });
-        this.fullQuote(decryptResp.data.policyHolder)
+        this.fetchCoveragePlan(decryptResp.data.policyHolder, gsb_Details)
         this.props.loadingStop();
       })
       .catch((err) => {
         // handle error
         this.props.loadingStop();
       });        
+}
+
+fetchCoveragePlan=(policyHolder, gsb_Details)=>{
+  const { productId } = this.props.match.params;
+  let encryption = new Encryption();
+  
+  axios
+    .get(`gsb/get-plan-with-coverage`)
+    .then((res) => {
+      let decryptResp = JSON.parse(encryption.decrypt(res.data));
+      let coverPlanA = decryptResp.data && decryptResp.data.plan_with_coverages ? decryptResp.data.plan_with_coverages[2].coveragebenefit : null;
+      let coverPlanB = decryptResp.data && decryptResp.data.plan_with_coverages ? decryptResp.data.plan_with_coverages[1].coveragebenefit : null;
+      let coverPlanC = decryptResp.data && decryptResp.data.plan_with_coverages ? decryptResp.data.plan_with_coverages[0].coveragebenefit : null;
+      console.log("---gsb_Details--->>", decryptResp);
+      let policyCoverage = gsb_Details && gsb_Details.plan_id == 1 ? coverPlanA : gsb_Details && gsb_Details.plan_id == 2 ? coverPlanB : coverPlanC 
+      this.setState({
+        policyCoverage
+      });
+      this.fullQuote(policyHolder)
+    })
+    .catch((err) => {
+      // handle error
+      this.props.loadingStop();
+    });        
 }
 
 fullQuote = (values, actions) => {
@@ -162,7 +189,7 @@ fullQuote = (values, actions) => {
       else if (res.data.PolicyObject && res.data.UnderwritingResult && res.data.UnderwritingResult.Status == "Fail") {
         this.setState({
           fulQuoteResp: res.data.PolicyObject,
-          serverResponse: [],
+          serverResponse: res.data.PolicyObject,
           validation_error: [],
           error: { "message": 1 }
         })
@@ -239,16 +266,16 @@ paypoint_payment = () => {
 
   render() {
     const { productId } = this.props.match.params;
-    const { fulQuoteResp, addressArray, error, show, policyHolderDetails, nomineedetails, paymentStatus } = this.state;
+    const { fulQuoteResp, addressDetails, error, show, policyHolderDetails, nomineedetails, paymentStatus, policyCoverage } = this.state;
 
-    const AddressDetails = addressArray ? (
+    const AddressDetails = addressDetails ? (
         <div>
           <Row>
             <Col sm={12} md={6}>
               <Row>
                 <Col sm={12} md={6}>
-                  <FormGroup>{addressArray.address1 +", "+addressArray.address2 +", "+ addressArray.address3}</FormGroup>
-                  {/* <FormGroup>{ addressArray.address3}</FormGroup> */}
+                  <FormGroup>{addressDetails.house_flat_no +", "+addressDetails.house_building_name +", "+ addressDetails.area_name}</FormGroup>
+                  {/* <FormGroup>{ addressDetails.address3}</FormGroup> */}
                 </Col>
               </Row>
             </Col>
@@ -256,69 +283,15 @@ paypoint_payment = () => {
         </div>
     ) :null
 
-    const PincodeDetails = addressArray ? (
+    const PincodeDetails = policyHolderDetails ? (
       <div>
         <Row>
           <Col sm={12} md={6}>
-            <FormGroup>{addressArray.pincode}</FormGroup>
+            <FormGroup>{policyHolderDetails.pincode}</FormGroup>
           </Col>
         </Row>
       </div>
   ) :null
-
-    const items =
-    policyHolderDetails.request_data ? policyHolderDetails.request_data.family_members.map((member, qIndex) => {
-            return (
-              <div>
-              <Row>
-                <Col sm={12} md={6}>
-                  <h6><strong>Member {qIndex + 1}</strong></h6>
-                  <Row>
-                    <Col sm={12} md={6}>
-                      <FormGroup>Name:</FormGroup>
-                    </Col>
-                    <Col sm={12} md={6}>
-                      <FormGroup>{member.first_name +" "+member.last_name}</FormGroup>
-                    </Col>
-                  </Row>
-
-                  <Row>
-                    <Col sm={12} md={6}>
-                      <FormGroup>Date Of Birth:</FormGroup>
-                    </Col>
-                    <Col sm={12} md={6}>
-                      <FormGroup>{member.dob}</FormGroup>
-                    </Col>
-                  </Row>
-
-                  <Row>
-                    <Col sm={12} md={6}>
-                      <FormGroup>Relation With Proposer:</FormGroup>
-                    </Col>
-                    <Col sm={12} md={6}>
-                      <FormGroup>
-                      { insuredRelationArr[member.relation_with] }
-                      </FormGroup>
-                    </Col>
-                  </Row>
-
-                  <Row>
-                    <Col sm={12} md={6}>
-                      <FormGroup>Gender</FormGroup>
-                    </Col>
-                    <Col sm={12} md={6}>
-                      <FormGroup>{genderArr[member.gender]}</FormGroup>
-                    </Col>
-                  </Row>
-                </Col>
-              </Row>
-              <Row>
-              <p></p>
-              </Row>
-              </div>
-            );
-          })
-          :null
 
       const nominee = policyHolderDetails.request_data ? policyHolderDetails.request_data.nominee.map((member, qIndex) => {
         return (
@@ -352,15 +325,6 @@ paypoint_payment = () => {
                   <FormGroup>
                   { relationArr[member.relation_with] }
                   </FormGroup>
-                </Col>
-              </Row>
-
-              <Row>
-                <Col sm={12} md={6}>
-                  <FormGroup>Gender</FormGroup>
-                </Col>
-                <Col sm={12} md={6}>
-                  <FormGroup>{genderArr[member.gender]}</FormGroup>
                 </Col>
               </Row>
             </Col>
@@ -416,6 +380,53 @@ paypoint_payment = () => {
         );
       })
       :null
+
+    const proposerDetails = policyHolderDetails ? 
+        <div>
+        <Row>
+          <Col sm={12} md={6}>
+            <Row>
+              <Col sm={12} md={6}>
+                <FormGroup>Proposer Name:</FormGroup>
+              </Col>
+              <Col sm={12} md={6}>
+                <FormGroup>{policyHolderDetails.salutation && policyHolderDetails.salutation.displayvalue+" "+policyHolderDetails.first_name+" "+policyHolderDetails.last_name}</FormGroup>
+              </Col>
+            </Row>
+
+            <Row>
+              <Col sm={12} md={6}>
+                <FormGroup>Date of Birth:</FormGroup>
+              </Col>
+              <Col sm={12} md={6}>
+                <FormGroup>
+                {policyHolderDetails.dob}
+                </FormGroup>
+              </Col>
+            </Row>
+          </Col>
+        </Row>
+        <Row>
+        <p></p>
+        </Row>
+        </div>
+      :null
+
+    const policy_Coverage =
+      <table >
+          <tr>
+            <th>Section</th>
+            <th>Sum Insured</th>
+        </tr>
+        { policyCoverage && policyCoverage.length > 0 ?
+            policyCoverage.map((coverage, qIndex) => (
+                <tr>
+                    <td>{coverage.benefit_name}:</td>
+                    <td>₹ {Math.round(coverage.benefit_suminsured)}</td>
+                </tr>                    
+
+        )) : null}
+      </table > 
 
     const errMsg =
       error && error.message ? (
@@ -476,61 +487,24 @@ paypoint_payment = () => {
                                       <Row>
                                         <Col sm={12} md={9} lg={18}>
                                           <div className="rghtsideTrigr">
-                                            <Collapsible trigger=" SBI General Insurance Company Limited"  open= {true}>
+                                            <Collapsible trigger=" SBI General Insurance Company Limited Plan"  open= {true}>
                                               <div className="listrghtsideTrigr">
-                                                <Row>
-                                                  <Col sm={12} md={3}>
-                                                    <FormGroup>Sum Insured:</FormGroup>
-                                                  </Col>
-                                                  <Col sm={12} md={3}>
-                                                    <FormGroup>
-                                                      <strong>Rs:</strong>{" "}
-                                                      {policyHolderDetails && policyHolderDetails.request_data ? Math.round(policyHolderDetails.request_data.sum_insured) : null}
-                                                    </FormGroup>
-                                                  </Col>
-                                                  <Col sm={12} md={3}>
-                                                    <FormGroup>Applicable Taxes:</FormGroup>
-                                                  </Col>
-                                                  <Col sm={12} md={3}>
-                                                    <FormGroup>
-                                                      <strong>Rs:</strong>{" "}
-                                                      {policyHolderDetails && policyHolderDetails.request_data ? Math.round(policyHolderDetails.request_data.service_tax) : null}
-                                                    </FormGroup>
-                                                  </Col>
-                                                  <Col sm={12} md={3}>
-                                                    <FormGroup>Gross Premium:</FormGroup>
-                                                  </Col>
-                                                  <Col sm={12} md={3}>
-                                                    <FormGroup>
-                                                      <strong>Rs:</strong>{" "}
-                                                      {policyHolderDetails && policyHolderDetails.request_data ? Math.round(policyHolderDetails.request_data.gross_premium) : null}
-                                                    </FormGroup>
-                                                  </Col>
-                                                  <Col sm={12} md={3}>
-                                                    <FormGroup>Net Premium:</FormGroup>
-                                                  </Col>
-                                                  <Col sm={12} md={3}>
-                                                    <FormGroup>
-                                                      <strong>Rs:</strong>{" "}
-                                                      {policyHolderDetails && policyHolderDetails.request_data ? Math.round(policyHolderDetails.request_data.net_premium) : null}
-                                                    </FormGroup>
-                                                  </Col>
-                                                </Row>
+                                                {policy_Coverage ? policy_Coverage : null}
                                               </div>
+                                             </Collapsible>
+                                          </div>
+
+                                          <div className="rghtsideTrigr">
+                                            <Collapsible trigger=" Proposer Details">
+                                              <div className="listrghtsideTrigr">{proposerDetails}</div>
                                             </Collapsible>
                                           </div>
 
                                           <div className="rghtsideTrigr">
-                                            <Collapsible trigger=" Member Details">
-                                              <div className="listrghtsideTrigr">{items}</div>
-                                            </Collapsible>
-                                          </div>
-
-                                          <div className="rghtsideTrigr">
-                                            <Collapsible trigger=" Contact information">
+                                            <Collapsible trigger=" Communication Address">
                                               <div className="listrghtsideTrigr">
                                                 <div className="d-flex justify-content-end carloan">
-                                                  <Link to ={`/arogya_Address/${productId}`}> Edit</Link>
+                                                  {/* <Link to ={`/arogya_Address/${productId}`}> Edit</Link> */}
                                                 </div>
                                                 <Row>
                                                   <Col sm={12} md={18}>

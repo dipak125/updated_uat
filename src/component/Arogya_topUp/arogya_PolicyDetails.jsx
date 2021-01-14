@@ -230,10 +230,10 @@ paypoint_payment = () => {
     const AddressDetails = addressArray ? (
         <div>
           <Row>
-            <Col sm={12} md={6}>
+            <Col sm={12} md={12}>
               <Row>
-                <Col sm={12} md={6}>
-                  <FormGroup>{addressArray.address1 +", "+addressArray.address2 +", "+ addressArray.address3}</FormGroup>
+                <Col sm={12} md={12}>
+                  <FormGroup>{addressArray.address1 +", "+addressArray.address2 +", "+addressArray.address3}</FormGroup>
                   {/* <FormGroup>{ addressArray.address3}</FormGroup> */}
                 </Col>
               </Row>
@@ -273,7 +273,7 @@ paypoint_payment = () => {
                       <FormGroup>Date Of Birth:</FormGroup>
                     </Col>
                     <Col sm={12} md={6}>
-                      <FormGroup>{member.dob}</FormGroup>
+                      <FormGroup>{moment(member.dob).format("DD-MM-yyyy")}</FormGroup>
                     </Col>
                   </Row>
 
@@ -295,7 +295,31 @@ paypoint_payment = () => {
                     <Col sm={12} md={6}>
                       <FormGroup>{genderArr[member.gender]}</FormGroup>
                     </Col>
+                  </Row>                   
+                  {qIndex == 0 ? 
+                  <Row> 
+                    <Col sm={12} md={6}>
+                      <FormGroup>PAN No.</FormGroup>
+                    </Col>
+                    <Col sm={12} md={6}>
+                      <FormGroup>
+                      { member.pancard_no }
+                      </FormGroup>
+                    </Col>
                   </Row>
+                    : ''}                                     
+                  {qIndex == 0 ? 
+                  <Row> 
+                    <Col sm={12} md={6}>
+                      <FormGroup>EIA No.</FormGroup>
+                    </Col>
+                    <Col sm={12} md={6}>
+                      <FormGroup>
+                      { policyHolderDetails.eia_no }
+                      </FormGroup>
+                    </Col>
+                  </Row>
+                    : ''}
                 </Col>
               </Row>
               <Row>

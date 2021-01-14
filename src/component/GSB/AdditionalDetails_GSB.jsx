@@ -39,8 +39,8 @@ const initialValues = {
     property_protected_type: "",
     year_of_construction: "",
     pedal_cycle_type: "",
-    description: "",
-    check_box: "",
+    pedal_cycle_description: "",
+    address_flag: "0",
     house_flat_no: "",
     city: "",
     house_building_name: "",
@@ -119,7 +119,7 @@ const vehicleRegistrationValidation = Yup.object().shape({
     property_protected_type: Yup.string().required("Please select option for protected with doors/windows/grill").nullable(),
     year_of_construction: Yup.string().required("Please enter construction year").nullable(),
     pedal_cycle_type: Yup.string().required("Please select option for type & construction").nullable(),
-    description: Yup.string().required("Please enter description").nullable(),
+    pedal_cycle_description: Yup.string().required("Please enter description").nullable(),
     // NOMINEE--------
     // nominee_salutation_id: Yup.string().required("Title is required").nullable(),
     nominee_first_name: Yup.string()
@@ -276,7 +276,8 @@ class AdditionalDetails_GSB extends Component {
             'proposer_title_id': values.proposer_title_id,
             'street_name': values.street_name,
             'year_of_construction': values.year_of_construction ? moment(values.year_of_construction).format("YYYY-MM-DD") : "",
-            'pincode_id': values.area_name
+            'pincode_id': values.area_name,
+            'relation_with': values.relation_with
 
         }
 
@@ -321,13 +322,6 @@ class AdditionalDetails_GSB extends Component {
             })
     }
 
-    handleChange = (e) => {
-        const {occupationList} = this.state
-        this.setState({
-          serverResponse: [],
-          error: []
-        })
-      }
 
     fetchAreadetails = (e) => {
         let pinCode = e.target.value;
@@ -443,8 +437,8 @@ class AdditionalDetails_GSB extends Component {
             property_protected_type: "",
             year_of_construction: "",
             pedal_cycle_type: "",
-            description: "",
-            check_box: "",
+            pedal_cycle_description: "",
+            check_box: "0",
             house_flat_no: "",
             city: "",
             house_building_name: "",
@@ -857,16 +851,16 @@ class AdditionalDetails_GSB extends Component {
                                                                         <FormGroup>
                                                                             <div className="insurerName">
                                                                                 <Field
-                                                                                    name='description'
+                                                                                    name='pedal_cycle_description'
                                                                                     type="text"
                                                                                     placeholder="Description"
                                                                                     autoComplete="off"
                                                                                     onFocus={e => this.changePlaceHoldClassAdd(e)}
                                                                                     onBlur={e => this.changePlaceHoldClassRemove(e)}
-                                                                                    value={values.description}
+                                                                                    value={values.pedal_cycle_description}
                                                                                 />
-                                                                                {errors.description && touched.description ? (
-                                                                                    <span className="errorMsg">{errors.description}</span>
+                                                                                {errors.pedal_cycle_description && touched.pedal_cycle_description ? (
+                                                                                    <span className="errorMsg">{errors.pedal_cycle_description}</span>
                                                                                 ) : null}
                                                                             </div>
                                                                         </FormGroup>
@@ -874,22 +868,41 @@ class AdditionalDetails_GSB extends Component {
                                                                 </div>
                                                             </div>
                                                         </div>
+                                                        <Row >
+                                                            <Col sm={12} md={3} lg={2}> &nbsp;
+                                                            </Col>
+                                                        </Row>
                                                         <div className="brandhead">
                                                             <h4 className="fs-18 m-b-30">COMMUNICATION ADDRESS</h4>
                                                         </div>
-                                                        <label className="customCheckBox formGrp formGrp">{`is communication address same as risk location address`}
+                                                        <label className="customCheckBox formGrp formGrp">is communication address same as risk location address
                                                             <Field
                                                                 type="checkbox"
-                                                                name="check_box"
+                                                                name="address_flag"
+                                                                value="1"
                                                                 className="user-self"
                                                                 onClick={(e) => {
                                                                 }}
-                                                                checked={values.check_box}
-                                                                value={values.check_box}
+                                                                checked={values.address_flag}
+                                                                value={values.address_flag}
+                                                                onChange={(e) => {
+                                                                    if (e.target.checked === true) {
+                                                                        setFieldValue('address_flag', e.target.value);
+                                                                        this.setState({
+                                                                            address_flag: e.target.value
+                                                                        })
+                                                                        
+                                                                    } else {
+                                                                        setFieldValue('address_flag', '0');   
+                                                                        this.setState({
+                                                                            address_flag: 0
+                                                                        })                                                         
+                                                                    }
+                                                                }}
                                                             />
-                                                            {errors.check_box && touched.check_box ? (
+                                                            {errors.address_flag && touched.address_flag ? (
                                                                 <span className="errorMsg">
-                                                                    {errors.check_box}
+                                                                    {errors.address_flag}
                                                                 </span>
                                                             ) : null}
                                                             <span className="checkmark mL-0"></span>
@@ -1085,13 +1098,16 @@ class AdditionalDetails_GSB extends Component {
                                                                 </FormGroup>
                                                             </Col>
                                                         </Row>
-
+                                                        <Row >
+                                                            <Col sm={12} md={3} lg={2}> &nbsp;
+                                                            </Col>
+                                                        </Row>
                                                         <div className="d-flex justify-content-left">
                                                             <div className="brandhead">
                                                                 <h4 className="fs-18 m-b-30">NOMINEE DETAILS</h4>
                                                             </div>
                                                         </div>
-                                                        <Row className="m-b-45">
+                                                        <Row >
                                                             <Col sm={12} md={3} lg={2}>
                                                                 <FormGroup>
                                                                     <div className="formSection">
@@ -1162,6 +1178,8 @@ class AdditionalDetails_GSB extends Component {
                                                                     </div>
                                                                 </FormGroup>
                                                             </Col>
+                                                            </Row>
+                                                            <Row>
                                                             <Col sm={12} md={3} lg={3}>
                                                                 <FormGroup>
                                                                     <DatePicker

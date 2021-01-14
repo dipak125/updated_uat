@@ -92,12 +92,11 @@ const validateAddress =  Yup.object().shape({
     phoneNo: Yup.string()
     .matches(/^[6-9][0-9]{9}$/,'Invalid Mobile number').required('Phone No. is required'),
    
-    panNo: Yup.string()
-        .notRequired(function() {
-            return "Enter PAN number"
-        }).matches(/^[A-Z]{3}[CPHFATBLJG]{1}[A-Z]{1}[0-9]{4}[A-Z]{1}$/, function() {
-            return "Please enter valid Pan Number"
-        }),
+    panNo: Yup.string().when(['netPremiumCheckCount'], {
+        is: netPremiumCheckCount => netPremiumCheckCount == 1,       
+        then: Yup.string().required("PAN number is required")
+    .matches(/^[A-Z]{3}[CPHFATBLJG]{1}[A-Z]{1}[0-9]{4}[A-Z]{1}$/,'Invalid PAN number'),
+        otherwise: Yup.string().matches(/^[A-Z]{3}[CPHFATBLJG]{1}[A-Z]{1}[0-9]{4}[A-Z]{1}$/,'Invalid PAN number').nullable()}),
     pincode: Yup.string()
         .required(function() {
             return "Enter pin code"
@@ -335,6 +334,8 @@ class arogya_Address extends Component {
                 let is_eia_account = decryptResp.data.policyHolder.is_eia_account == 2 ? "" : decryptResp.data.policyHolder.is_eia_account
                 let selfFlag = false;
                 let pincode_Details = JSON.parse(decryptResp.data.policyHolder.pincode_response)
+                let netPremiumCheck = policy_holder.request_data.net_premium;
+                console.log("netPremiumCheck----",netPremiumCheck);
                 for(let i=0;i<family_members.length;i++){
                     if(family_members[i].relation_with=='self'){
                         selfFlag = true
@@ -348,7 +349,8 @@ class arogya_Address extends Component {
                     familyMembers:family_members,
                     addressDetails,
                     is_eia_account,
-                    pincode_Details
+                    pincode_Details,
+                    netPremiumCheck
                 })
                 this.props.loadingStop();
                 this.fetchSalutation(pincode_Details);
@@ -589,7 +591,7 @@ class arogya_Address extends Component {
     
     
     render() {
-        const {policy_holder,familyMembers,addressDetails,is_eia_account,selfFlag,pinDataArr,stateName,showEIA, pincode_Details, titleList} = this.state    
+        const {policy_holder,familyMembers,addressDetails,is_eia_account,selfFlag,pinDataArr,stateName,showEIA, pincode_Details, netPremiumCheck, titleList} = this.state    
 
         let newInitialValues = Object.assign(initialValues, {
             proposerAsInsured: sessionStorage.getItem('proposed_insured') ? sessionStorage.getItem('proposed_insured') : (selfFlag ? 1:0),
@@ -611,7 +613,8 @@ class arogya_Address extends Component {
             proposerName : policy_holder && policy_holder.first_name ?  policy_holder.first_name : '',
             proposerLname : policy_holder && policy_holder.last_name ?  policy_holder.last_name : '',
             proposerDob : policy_holder && policy_holder.dob ?  new Date(policy_holder.dob) : '',
-            proposerGender : policy_holder && policy_holder.gender ?  policy_holder.gender : ''
+            proposerGender : policy_holder && policy_holder.gender ?  policy_holder.gender : '',
+            netPremiumCheckCount: netPremiumCheck > 100000 ? 1 : 0
         });
 
         const {productId} = this.props.match.params

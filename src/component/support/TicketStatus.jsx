@@ -15,6 +15,7 @@ import axios from "../../shared/axios"
 import swal from 'sweetalert';
 import moment from "moment";
 import Encryption from '../../shared/payload-encryption';
+import ReactHtmlParser from 'react-html-parser';
 import ReadMoreReact from 'read-more-react';
 
 
@@ -187,12 +188,13 @@ class TicketStatus extends Component {
         let userName = selectedTicket.user_type == 'bc' ? (selectedTicket.bcuser == null ? selectedTicket.bc_user_id : selectedTicket.bcuser.user_name) : selectedTicket.csc_user.name
         console.log("userName--- ", selectedTicket.bc_user);
         console.log("selectedTicket--- ", selectedTicket);
+
         return (
             <>
                 <div className="">
                     <div className="d-flex justify-content-left opntckt">
                         <div>
-                            <h2><strong>{selectedTicket.title}</strong> #{this.props.ticketId}</h2>
+                            <h2><strong>{selectedTicket.title}</strong> #{this.props.selectedTicket.ticket_no}</h2>
                         </div>
                     </div>
 
@@ -203,9 +205,6 @@ class TicketStatus extends Component {
                         status: selectedTicket.status
                     }}
                     onSubmit={this.fileAttachment}
-                    // onSubmit={fields => {
-                    //     alert('SUCCESS!! :-)\n\n' + JSON.stringify(fields, null, 4))
-                    // }}
                     >
                     {({ errors, status, touched, values, setFieldValue, setFieldTouched }) => (
                         <Form>
@@ -216,9 +215,9 @@ class TicketStatus extends Component {
                                         <div className="col-one">
                                             <Row>
                                                 <Col sm={12} md={3}><div className="first">Ticket Status:</div></Col>
-                                                <Col sm={12} md={4}><div className="formSection">
-                                                
-                                                    <Field
+                                                <Col sm={12} md={9}><div>{selectedTicket.status}</div></Col>
+                                                {/*<Col sm={12} md={4}><div className="formSection">
+                                                     <Field
                                                         name='status'
                                                         component="select"
                                                         autoComplete="off"
@@ -237,13 +236,13 @@ class TicketStatus extends Component {
                                                         <option value="Closed">Closed</option>
                                                         <option value="Resolved">Resolved</option>
 
-                                                        {/* {goodscarriedtypes.map((subVehicle, qIndex) => ( 
+                                                         {goodscarriedtypes.map((subVehicle, qIndex) => ( 
                                                             <option value= {subVehicle.id}>{subVehicle.goodscarriedtype}</option>
-                                                        ))} */}
+                                                        ))} 
                                             
-                                                    </Field>
+                                                    </Field> 
                                                     </div>
-                                                </Col>
+                                                </Col>*/}
                                             </Row>
                                             <Row>
                                                 <Col sm={12} md={3}><div>Department:</div></Col>
@@ -293,15 +292,15 @@ class TicketStatus extends Component {
                                             <b>{userName}</b> posted <span>{moment(selectedTicket.created_at).format('DD/MM/YYYY hh:mm A')}</span> <span className="title truncate"></span>
                                         </div>
                                         <div className="thread-body">
-                                            <div> 
-                                                {/* <ReadMoreReact text={selectedTicket.description} min={2} max={20} />  */}
-                                                <ReadMoreReact 
+                                             {/* <div>
+					                            <ReadMoreReact 
                                                     text={selectedTicket.description}
                                                     min={2}
                                                     ideal={50}
                                                     max={50}
                                                     readMoreText="...Read More"/>
-                                            </div>
+					                        </div> */}
+                                            {ReactHtmlParser(selectedTicket.description)}
                                             <div className="clear"></div>
                                         </div>
                                     </div>
@@ -324,7 +323,7 @@ class TicketStatus extends Component {
                                             <b>{userName}</b> posted <span>{moment(row.created_at).format('DD/MM/YYYY hh:mm A')}</span> <span className="title truncate"></span>
                                         </div>
                                         <div className="thread-body">
-                                            <div> 
+ 					                         {/* <div> 
                                                 {row.decriptions && row.decriptions !== "" ? (
                                                     <ReadMoreReact 
                                                         text={row.decriptions}
@@ -332,8 +331,9 @@ class TicketStatus extends Component {
                                                         ideal={50}
                                                         max={50}
                                                         readMoreText="...Read More"/>
-                                                ) : row.decriptions}
-                                            </div>
+                                                ) : row.decriptions}                                               
+                                            </div> */}
+                                             {ReactHtmlParser(row.decriptions)}
                                             <div className="clear"></div>
                                         </div>
                                     </div>
