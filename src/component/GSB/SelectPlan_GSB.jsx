@@ -21,41 +21,35 @@ const maxDate = moment().add(14, 'day');
 const maxDateEnd = moment().add(15, 'day').calendar();
 
 const initialValues = {
-    policy_type: '1',
-    pol_start_date:null,
+    pol_start_date: new Date(new Date().setHours(0, 0, 0, 0)),
+    pol_end_date: new Date(new Date(moment().add(364, 'day').calendar()).setHours(23, 59, 0, 0) ),
     pinDataArr: [],
-    flat_no: "",
+    house_flat_no: "",
     city: "",
-    building_name: "",
+    house_building_name: "",
     area_name: "",
     state_name: "",
     pincode: "",
     pincode_id: "",
-    policy_for: "",
-    plan_for: ""
+    business_type: "",
+    plan_id: ""
 
 }
 
 const vehicleRegistrationValidation = Yup.object().shape({
     pol_start_date: Yup.date().required("Please select both policy start date & time").nullable(),
     pol_end_date: Yup.date().required("Please select both policy end date & time").nullable(),
-    building_name: Yup.string()
+    house_building_name: Yup.string()
       .required("Please enter building name")
       .matches(/^[a-zA-Z0-9][a-zA-Z0-9-/.,-\s]*$/, function () {
         return "Please enter valid building name";
       })
       .nullable(),
     // block_no: Yup.string().required("Please enter Plot number").nullable(),
-    flat_no: Yup.string()
+    house_flat_no: Yup.string()
       .required("Please enter flat number")
       .matches(/^[a-zA-Z0-9][a-zA-Z0-9-/.,-\s]*$/, function () {
         return "Please enter valid flat number";
-      })
-      .nullable(),
-    city: Yup.string()
-      .required("Please enter city")
-      .matches(/^[a-zA-Z0-9][a-zA-Z0-9-/.,-\s]*$/, function () {
-        return "Please enter valid city";
       })
       .nullable(),
     area_name: Yup.string()
@@ -64,12 +58,6 @@ const vehicleRegistrationValidation = Yup.object().shape({
         return "Please enter valid area name";
       })
       .nullable(),
-    state_name: Yup.string()
-        .required("Please enter state")
-        .matches(/^[a-zA-Z0-9][a-zA-Z0-9-/.,-\s]*$/, function () {
-          return "Please enter valid state";
-        })
-        .nullable(),
     pincode: Yup.string()
       .required("Pincode is required")
       .matches(/^[0-9]{6}$/, function () {
@@ -77,8 +65,8 @@ const vehicleRegistrationValidation = Yup.object().shape({
       })
       .nullable(),
     pincode_id: Yup.string().required("Please select locality").nullable(),
-    policy_for: Yup.string().required("Please select type of business").nullable(),
-    plan_for: Yup.string().required("Please select a plan").nullable()
+    business_type: Yup.string().required("Please select type of business").nullable(),
+    plan_id: Yup.string().required("Please select a plan").nullable()
 })
 
 
@@ -87,11 +75,16 @@ class SelectPlan_GSB extends Component {
         motorInsurance:'',
         regno:'',
         length:14,
-        fastlanelog: []
+        fastlanelog: [],
+        cityName:"",
+        stateName: "",
+        requested_Data: [],
+        gsb_Details: [],
+        addressDetails: []
     }
    
-     handleChange = date => {    
-        // this.setState({ startDate: date });  
+    forwardNextPage=()=> {    
+        this.props.history.push(`/AdditionalDetails_GSB/${this.props.match.params.productId}`);  
     }
 
     changePlaceHoldClassAdd(e) {
@@ -106,51 +99,36 @@ class SelectPlan_GSB extends Component {
 
 
     componentDidMount(){
-        this.fetchPolicyDetails();
-        console.log("product_id",this.props.match.params)
-
-        // let encryption = new Encryption();
-        // let bc_data = sessionStorage.getItem('bcLoginData') ? sessionStorage.getItem('bcLoginData') : "";
-        // console.log('bc_data',JSON.parse(encryption.decrypt(bc_data)));
-        
+        this.fetchPolicyDetails(); 
     }
 
-    fetchData=()=>{
-        const {productId } = this.props.match.params
-        let policyHolder_id = localStorage.getItem("policyHolder_refNo") ? localStorage.getItem("policyHolder_refNo"):0;
-        let encryption = new Encryption();
-        this.props.loadingStart();
-        axios.get(`sme/details/${policyHolder_id}`)
-            .then(res=>{
-                // let decryptResp = JSON.parse(encryption.decrypt(res.data))
-                // console.log("decrypt", decryptResp)
+    handleChange = (e) => {
+        const {occupationList} = this.state
+        this.setState({
+          serverResponse: [],
+          error: []
+        })
+      }
 
-                // let policyHolder = decryptResp.data.policyHolder.motorinsurance           
-                // // let fastlanelog = decryptResp.data.policyHolder ? decryptResp.data.policyHolder.fastlanelog : {};
-                // this.setState({ 
-                //     policyHolder
-                // })
-                this.props.loadingStop();
-            })
-            .catch(err => {
-                // handle error
-                this.props.loadingStop();
-            })
-    }
 
     fetchPolicyDetails=()=>{
         const { productId } = this.props.match.params;
         let policyHolder_refNo = localStorage.getItem("policyHolder_refNo") ? localStorage.getItem("policyHolder_refNo") : 0;
         let encryption = new Encryption();
         axios
-          .get(`/${policyHolder_refNo}`)
+          .get(`gsb/gsb-policy-details/${policyHolder_refNo}`)
           .then((res) => {
             let decryptResp = JSON.parse(encryption.decrypt(res.data));
-            let gsb_Details = decryptResp.data && decryptResp.data.policyHolder ? decryptResp.data.policyHolder : null;
+            let gsb_Details = decryptResp.data && decryptResp.data.policyHolder.gsbinfo ? decryptResp.data.policyHolder.gsbinfo : null;
+            let requested_Data = decryptResp.data && decryptResp.data.policyHolder.request_data ? decryptResp.data.policyHolder.request_data : null;
+            let addressDetails = gsb_Details ? JSON.parse(gsb_Details.risk_address) : null
+            let pincode_Details = gsb_Details ? JSON.parse(gsb_Details.pincode_response) : null
             console.log("---gsb_Details--->>", gsb_Details);
             this.setState({
-              gsb_Details
+              gsb_Details, requested_Data, 
+              addressDetails, pincode_Details
             });
+            this.fetchPrevAreaDetails(pincode_Details)
             this.props.loadingStop();
           })
           .catch((err) => {
@@ -159,95 +137,177 @@ class SelectPlan_GSB extends Component {
           });        
     }
 
-    handleSubmit=(values, actions)=>{
+    quote = (values, actions) => {
+        const { accessToken, accidentDetails, declineStatus } = this.state
+        const formData = new FormData();
+        this.props.loadingStart();
+        // const post_data = {
+        //   'id': localStorage.getItem('policyHolder_id'),
+        //   'proposer_dob': date_of_birth,
+        //   'sum_insured': ipaInfo ? ipaInfo.sum_insured : null
+        // }
+        let encryption = new Encryption();
+        // formData.append('enc_data', encryption.encrypt(JSON.stringify(post_data)))
+        formData.append('policy_reference_no',localStorage.getItem("policyHolder_refNo"))
+    
+        axios
+          .post(`/gsb/fullQuoteGSB`, formData)
+          .then(res => {
+            if (res.data.PolicyObject && res.data.UnderwritingResult && res.data.UnderwritingResult.Status == "Success") {
+              this.setState({
+                fulQuoteResp: res.data.PolicyObject,
+                serverResponse: res.data.PolicyObject,
+                error: [],
+                validation_error: []
+              })
+              this.props.loadingStop();
+            }
+            else if (res.data.PolicyObject && res.data.UnderwritingResult && res.data.UnderwritingResult.Status == "Fail") {
+              this.setState({
+                fulQuoteResp: res.data.PolicyObject,
+                serverResponse: res.data.PolicyObject,
+                validation_error: [],
+                error: { "message": 1 }
+              })
+              this.props.loadingStop();
+            }
+            else if (res.data.code && res.data.message && ((res.data.code == "validation failed" && res.data.message == "validation failed") || (res.data.code == "Policy Validation Error" && res.data.message == "Policy Validation Error"))) {
+              var validationErrors = []
+              for (const x in res.data.messages) {
+                validationErrors.push(res.data.messages[x].message)
+              }
+              this.setState({
+                fulQuoteResp: [],
+                validation_error: validationErrors,
+                error: [],
+                serverResponse: []
+              });
+              // swal(res.data.data.messages[0].message)
+              this.props.loadingStop();
+            }
+            else {
+              this.setState({
+                fulQuoteResp: [],
+                error: res.data.ValidateResult,
+                validation_error: [],
+                serverResponse: []
+              });
+              this.props.loadingStop();
+            }
+            actions.setSubmitting(false)
+          })
+          .catch(err => {
+            this.setState({
+              serverResponse: []
+            });
+            this.props.loadingStop();
+          }); 
+    }
+    
+
+    handleSubmit=(values,actions)=>{
+
         const {productId} = this.props.match.params;
+    
         const formData = new FormData();
         let encryption = new Encryption();
-        let post_data = {
-            'menumaster_id': '5',
+        const {fastLaneData, fastlanelog } = this.state
+        let post_data = {}
+        let policyHolder_id = localStorage.getItem('policyHolder_id') ? localStorage.getItem('policyHolder_id') :0
+
+        post_data = {
+            'area_name':values.area_name,
+            'plan_id': values.plan_id,
+            'menumaster_id':10,
+            'vehicle_type_id':productId,
             'page_name': `SelectPlan_GSB/${productId}`,
-            'vehicle_type_id': productId
-        }
+            'house_building_name' : values.house_building_name,
+            'business_type': values.business_type,
+            'house_flat_no': values.house_flat_no,
+            'pincode_id': values.pincode_id,
+            'pol_end_date': values.pol_end_date ? moment(values.pol_end_date).format("YYYY-MM-DD HH:mm") : "" ,
+            'pol_start_date': values.pol_start_date ? moment(values.pol_start_date).format("YYYY-MM-DD HH:mm") : "",
 
+        } 
+    
+        let bc_data = sessionStorage.getItem('bcLoginData') ? sessionStorage.getItem('bcLoginData') : "";
+        if(bc_data) {
+            bc_data = JSON.parse(encryption.decrypt(bc_data));
+        }
         if(sessionStorage.getItem('csc_id')) {
-            post_data['bcmaster_id'] = '5'
             post_data['csc_id'] = sessionStorage.getItem('csc_id') ? sessionStorage.getItem('csc_id') : ""
-            post_data['agent_name']= sessionStorage.getItem('agent_name') ? sessionStorage.getItem('agent_name') : ""
-            post_data['product_id'] = productId
-        }else{
-            let bc_data = sessionStorage.getItem('bcLoginData') ? sessionStorage.getItem('bcLoginData') : "";
-            if(bc_data) {
-                bc_data = JSON.parse(encryption.decrypt(bc_data));
-                post_data['bcmaster_id'] = bc_data ? bc_data.agent_id : ""
-                post_data['bc_token'] = bc_data ? bc_data.token : ""
-                post_data['bc_agent_id']= bc_data ? bc_data.user_info.data.user.username : ""
-                post_data['product_id'] = productId
-            }
+            post_data['agent_name'] = sessionStorage.getItem('agent_name') ? sessionStorage.getItem('agent_name') : ""
+            post_data['product_id'] = sessionStorage.getItem('product_id') ? sessionStorage.getItem('product_id') : ""
+            post_data['bcmaster_id'] = "5"
         }
-
-        let pol_start_date = moment(values.pol_start_date).format('YYYY-MM-DD HH:mm:ss')
-        let pol_end_date = moment(values.pol_end_date).format('YYYY-MM-DD hh:mm:ss')
-
-        post_data['pol_start_date'] = pol_start_date
-        post_data['pol_end_date'] = pol_end_date
-
-        this.props.loadingStart();
+        else {
+            post_data['bcmaster_id'] = bc_data ? bc_data.agent_id : ""
+            post_data['bc_token'] = bc_data ? bc_data.token : ""
+            post_data['bc_agent_id'] = bc_data ? bc_data.user_info.data.user.username : ""
+        }
+    
+        if(policyHolder_id > 0){
+            post_data['policy_holder_id'] = policyHolder_id
+            
+            console.log('post_data', post_data)
+            formData.append('enc_data',encryption.encrypt(JSON.stringify(post_data)))
         
-        if(this.props.policy_holder_id != null){
-            post_data['policy_holder_id'] = this.props.policy_holder_id
-            formData.append('enc_data',encryption.encrypt(JSON.stringify(post_data)))
-
-            axios.post('',
-            formData
-            ).then(res=>{
-                let decryptResp = JSON.parse(encryption.decrypt(res.data));
-                // console.log('decryptResp-----', decryptResp)
-                if (decryptResp.error === false )
-                {
-                this.props.loadingStop();
-                this.props.setDataUpdate({
-                    start_date:values.pol_start_date,
-                    end_date:values.pol_end_date
-                });
-                this.props.history.push(`/RiskDetails/${productId}`);
-            } else {
-                this.props.loadingStop();
-                swal("Thank you for showing your interest for buying product.Due to some reasons, we are not able to issue the policy online.Please call 1800 22 1111");
-                actions.setSubmitting(false);
-            }
-            }).
-            catch(err=>{
-                this.props.loadingStop();
-                let decryptResp = JSON.parse(encryption.decrypt(err.data));
-                console.log('decryptErr-----', decryptResp)
-                actions.setSubmitting(false);
+            this.props.loadingStart();
+            axios
+            .post(`gsb/update-registration`, formData)
+            .then(res => {
+                let decryptResp = JSON.parse(encryption.decrypt(res.data))
+                console.log("decrypt", decryptResp)
+    
+                if(decryptResp.error == false) {
+                    this.quote(values, actions)
+                }
+                else{
+                    this.props.loadingStop();
+                    swal(decryptResp.msg)
+                }                          
             })
-        }else{
-            formData.append('enc_data',encryption.encrypt(JSON.stringify(post_data)))
-            axios.post('',
-            formData
-            ).then(res=>{     
-                let decryptResp = JSON.parse(encryption.decrypt(res.data));   
-                localStorage.setItem('policy_holder_ref_no',decryptResp.data.policyHolder_refNo);
-                this.props.loadingStop();
-                this.props.setData({
-                    start_date:values.pol_start_date,
-                    end_date:values.pol_end_date,
-                    
-                    policy_holder_id:decryptResp.data.policyHolder_id,
-                    policy_holder_ref_no:decryptResp.data.policyHolder_refNo,
-                    request_data_id:decryptResp.data.request_data_id,
-                    completed_step:decryptResp.data.completedStep,
-                    menumaster_id:decryptResp.data.menumaster_id
-                });
-                this.props.history.push(`/RiskDetails/${productId}`);
-            }).
-            catch(err=>{
-                this.props.loadingStop();
-                actions.setSubmitting(false);
-            })
+            .catch(err => {
+                let decryptErr = JSON.parse(encryption.decrypt(err.data));
+                console.log('decryptResp--err---', decryptErr)
+                if(decryptErr && err.data){
+                    swal('Registration number required...');
+                }
+            this.props.loadingStop();
+            });
         }
-    } 
+        else{
+
+            console.log('post_data', post_data)
+            formData.append('enc_data',encryption.encrypt(JSON.stringify(post_data)))
+            this.props.loadingStart();
+            axios
+            .post(`gsb/registration`, formData)
+            .then(res => {
+                let decryptResp = JSON.parse(encryption.decrypt(res.data))
+                console.log("decrypt", decryptResp)
+
+                if(decryptResp.error == false) {
+                    localStorage.setItem('policyHolder_id', decryptResp.data.policyHolder_id);
+                    localStorage.setItem('policyHolder_refNo', decryptResp.data.policyHolder_refNo);
+                    this.quote(values, actions)
+                }   
+                else{
+                    this.props.loadingStop();
+                    swal(decryptResp.msg)
+                }                          
+            })
+            .catch(err => {
+            this.props.loadingStop();
+            let decryptErr = JSON.parse(encryption.decrypt(err.data));
+            console.log('decryptResp--err---', decryptErr)
+            if(err && err.data){
+                swal('Please check..something went wrong!!');
+            }      
+            });
+        }
+    }
+
     fetchAreadetails = (e) => {
         let pinCode = e.target.value;
     
@@ -270,9 +330,16 @@ class SelectPlan_GSB extends Component {
                   res.data.data[0].pinstate.STATE_NM
                     ? res.data.data[0].pinstate.STATE_NM
                     : "";
+
+                let cityName =
+                    res.data.data &&
+                    res.data.data[0] &&
+                    res.data.data[0].pincity.CITY_NM
+                      ? res.data.data[0].pincity.CITY_NM
+                      : "";
                 this.setState({
                   pinDataArr: res.data.data,
-                  stateName,
+                  stateName, cityName
                 });
                 this.props.loadingStop();
               } else {
@@ -286,55 +353,52 @@ class SelectPlan_GSB extends Component {
         }
       };
     
-      fetchAreadetailsBack = (pincode_input) => {
-        let pinCode = pincode_input.toString();
-    
-        if (pinCode != null && pinCode != "" && pinCode.length == 6) {
-          console.log("fetchAreadetailsBack pinCode", pinCode);
-          const formData = new FormData();
-          this.props.loadingStart();
-          // let encryption = new Encryption();
-          const post_data_obj = {
-            pincode: pinCode,
-          };
-          // formData.append('enc_data',encryption.encrypt(JSON.stringify(post_data_obj)))
-          formData.append("pincode", pinCode);
-          axios
-            .post("pincode-details", formData)
-            .then((res) => {
-              let stateName =
-                res.data.data &&
-                res.data.data[0] &&
-                res.data.data[0].pinstate.STATE_NM
-                  ? res.data.data[0].pinstate.STATE_NM
-                  : "";
-              this.setState({
-                pinDataArr: res.data.data,
-                stateName,
-              });
-              this.props.loadingStop();
+      fetchPrevAreaDetails=(pincode_Details)=>{
+        if(pincode_Details){
+            let pincode = pincode_Details.PIN_CD;
+            const formData = new FormData();
+            // let encryption = new Encryption();
+
+           const post_data_obj = {
+                'pincode':pincode.toString()
+            };
+           let encryption = new Encryption();
+           formData.append('enc_data',encryption.encrypt(JSON.stringify(post_data_obj)))
+
+            formData.append('pincode', pincode)
+            this.props.loadingStart();
+            axios.post('pincode-details',
+            formData
+            ).then(res=>{
+                let stateName = res.data.data && res.data.data[0] && res.data.data[0].pinstate.STATE_NM ? res.data.data[0].pinstate.STATE_NM : ""    
+                let cityName = res.data.data && res.data.data[0] && res.data.data[0].pincity.CITY_NM ? res.data.data[0].pincity.CITY_NM : ""                     
+                this.setState({
+                    pinDataArr: res.data.data,
+                    stateName, cityName
+                });
+                this.props.loadingStop();
+            }).
+            catch(err=>{
+                this.props.loadingStop();
             })
-            .catch((err) => {
-              this.props.loadingStop();
-            });
         }
-      };
+        
+}
     
 
     render() {
-        const {pinDataArr} = this.state
+        const {pinDataArr, stateName, cityName, requested_Data, gsb_Details, addressDetails, serverResponse,validation_error, error} = this.state
         const newInitialValues = Object.assign(initialValues,{
-            pol_start_date:this.props.start_date != null? new Date(this.props.start_date): null,
-            pol_end_date:this.props.end_date != null? new Date(this.props.end_date): null,
-            flat_no: "",
-            city: "",
-            building_name: "",
-            area_name: "",
-            state_name: "",
-            pincode: "",
-            pincode_id: "",
-            policy_for: "",
-            plan_for: ""
+            pol_start_date: requested_Data && requested_Data.start_date ? new Date(requested_Data.start_date)  : null,
+            pol_end_date: requested_Data && requested_Data.end_date ? new Date(requested_Data.end_date)  : null,
+            house_flat_no: addressDetails && addressDetails.house_flat_no ? addressDetails.house_flat_no: "",
+            city: addressDetails && addressDetails.city ? addressDetails.city: "",
+            house_building_name:  addressDetails && addressDetails.house_building_name ? addressDetails.house_building_name: "",
+            area_name: addressDetails && addressDetails.area_name ? addressDetails.area_name: "",
+            pincode: gsb_Details && gsb_Details.pincode ? gsb_Details.pincode : "",
+            pincode_id: gsb_Details && gsb_Details.pincode_id ? gsb_Details.pincode_id : "",
+            business_type: gsb_Details && gsb_Details.business_type ? gsb_Details.business_type : "",
+            plan_id: gsb_Details && gsb_Details.plan_id ? gsb_Details.plan_id : "",
         })
 
 
@@ -351,7 +415,7 @@ class SelectPlan_GSB extends Component {
                                 <section className="brand">
                                     <div className="boxpd">
                                         <Formik initialValues={newInitialValues} 
-                                        onSubmit={this.handleSubmit} 
+                                       onSubmit={ serverResponse && serverResponse != "" ? (serverResponse.message ? this.handleSubmit : this.forwardNextPage ) : this.handleSubmit}  
                                         validationSchema={vehicleRegistrationValidation}
                                         >
                                         {({ values, errors, setFieldValue, setFieldTouched, isValid, isSubmitting, touched }) => {
@@ -375,13 +439,13 @@ class SelectPlan_GSB extends Component {
                                                             <label className="customRadio3">
                                                                 <Field
                                                                     type="radio"
-                                                                    name='policy_for'
+                                                                    name='business_type'
                                                                     value='1'
                                                                     key='1'
-                                                                    checked = {values.policy_for == '1' ? true : false}
+                                                                    checked = {values.business_type == '1' ? true : false}
                                                                     onChange = {() =>{
-                                                                        setFieldTouched('policy_for')
-                                                                        setFieldValue('policy_for', '1');
+                                                                        setFieldTouched('business_type')
+                                                                        setFieldValue('business_type', '1');
                                                                         this.handleChange(values,setFieldTouched, setFieldValue)
                                                                     }  
                                                                     }
@@ -393,21 +457,21 @@ class SelectPlan_GSB extends Component {
                                                             <label className="customRadio3">
                                                                 <Field
                                                                     type="radio"
-                                                                    name='policy_for'
+                                                                    name='business_type'
                                                                     value='2'
                                                                     key='1'
-                                                                    checked = {values.policy_for == '2' ? true : false}
+                                                                    checked = {values.business_type == '2' ? true : false}
                                                                     onChange = {() =>{
-                                                                        setFieldTouched('policy_for')
-                                                                        setFieldValue('policy_for', '2');
+                                                                        setFieldTouched('business_type')
+                                                                        setFieldValue('business_type', '2');
                                                                         this.handleChange(values,setFieldTouched, setFieldValue)
                                                                     }  
                                                                     }
                                                                 />
                                                                 <span className="checkmark " /><span className="fs-14"><h7> SBIG Renewal</h7></span>
                                                             </label>
-                                                            {errors.policy_for && touched.policy_for ? (
-                                                                <span className="errorMsg">{errors.policy_for}</span>
+                                                            {errors.business_type && touched.business_type ? (
+                                                                <span className="errorMsg">{errors.business_type}</span>
                                                             ) : null}
                                                         </div>
                                                     </div>
@@ -426,16 +490,11 @@ class SelectPlan_GSB extends Component {
                                                                 maxDate={new Date(maxDate)}
                                                                 excludeOutOfBoundsTimes
                                                                 dateFormat="dd-MM-yyyy HH:mm"
-                                                                // showTimeSelect
-                                                                // timeFormat="p"
                                                                 timeFormat="HH:mm"
-                                                                // timeIntervals={15}
                                                                 placeholderText="Policy Start Date & Time"
                                                                 peekPreviousMonth
                                                                 autoComplete="off"
                                                                 peekPreviousYear
-                                                                // showMonthDropdown
-                                                                // showYearDropdown
                                                                 dropdownMode="select"
                                                                 className="datePckr inputfs12"
                                                                 selected={values.pol_start_date}
@@ -501,7 +560,7 @@ class SelectPlan_GSB extends Component {
                                                 <FormGroup>
                                                 <div className="insurerName">
                                                     <Field
-                                                    name="flat_no"
+                                                    name="house_flat_no"
                                                     type="text"
                                                     placeholder="House/Flat No."
                                                     autoComplete="off"
@@ -511,11 +570,11 @@ class SelectPlan_GSB extends Component {
                                                     onBlur={(e) =>
                                                         this.changePlaceHoldClassRemove(e)
                                                     }
-                                                    value={values.flat_no}
+                                                    value={values.house_flat_no}
                                                     />
-                                                    {errors.flat_no && touched.flat_no ? (
+                                                    {errors.house_flat_no && touched.house_flat_no ? (
                                                     <span className="errorMsg">
-                                                        {errors.flat_no}
+                                                        {errors.house_flat_no}
                                                     </span>
                                                     ) : null}
                                                 </div>
@@ -525,7 +584,7 @@ class SelectPlan_GSB extends Component {
                                                 <FormGroup>
                                                 <div className="insurerName">
                                                     <Field
-                                                    name="building_name"
+                                                    name="house_building_name"
                                                     type="text"
                                                     placeholder="House/Building Name"
                                                     autoComplete="off"
@@ -535,12 +594,12 @@ class SelectPlan_GSB extends Component {
                                                     // onBlur={(e) =>
                                                     //   this.changePlaceHoldClassRemove(e)
                                                     // }
-                                                    value={values.building_name}
+                                                    value={values.house_building_name}
                                                     />
-                                                    {errors.building_name &&
-                                                    touched.building_name ? (
+                                                    {errors.house_building_name &&
+                                                    touched.house_building_name ? (
                                                     <span className="errorMsg">
-                                                        {errors.building_name}
+                                                        {errors.house_building_name}
                                                     </span>
                                                     ) : null}
                                                 </div>
@@ -640,6 +699,7 @@ class SelectPlan_GSB extends Component {
                                                     name="city"
                                                     type="text"
                                                     placeholder="City"
+                                                    disabled = {true}
                                                     autoComplete="off"
                                                     onFocus={(e) =>
                                                         this.changePlaceHoldClassAdd(e)
@@ -647,7 +707,7 @@ class SelectPlan_GSB extends Component {
                                                     onBlur={(e) =>
                                                         this.changePlaceHoldClassRemove(e)
                                                     }
-                                                    value={values.city}
+                                                    value={cityName}
                                                     />
                                                     {errors.city && touched.city ? (
                                                     <span className="errorMsg">
@@ -668,13 +728,14 @@ class SelectPlan_GSB extends Component {
                                                     type="text"
                                                     placeholder="State"
                                                     autoComplete="off"
+                                                    disabled = {true}
                                                     onFocus={(e) =>
                                                         this.changePlaceHoldClassAdd(e)
                                                     }
                                                     onBlur={(e) =>
                                                         this.changePlaceHoldClassRemove(e)
                                                     }
-                                                    value={values.state_name}
+                                                    value={stateName}
                                                     />
                                                     {errors.state_name &&
                                                     touched.state_name ? (
@@ -697,13 +758,13 @@ class SelectPlan_GSB extends Component {
                                                             <label className="customRadio3">
                                                                 <Field
                                                                     type="radio"
-                                                                    name='plan_for'
+                                                                    name='plan_id'
                                                                     value='1'
                                                                     key='1'
-                                                                    checked = {values.plan_for == '1' ? true : false}
+                                                                    checked = {values.plan_id == '1' ? true : false}
                                                                     onChange = {() =>{
-                                                                        setFieldTouched('plan_for')
-                                                                        setFieldValue('plan_for', '1');
+                                                                        setFieldTouched('plan_id')
+                                                                        setFieldValue('plan_id', '1');
                                                                         this.handleChange(values,setFieldTouched, setFieldValue)
                                                                     }  
                                                                     }
@@ -715,57 +776,77 @@ class SelectPlan_GSB extends Component {
                                                             <label className="customRadio3">
                                                                 <Field
                                                                     type="radio"
-                                                                    name='plan_for'
+                                                                    name='plan_id'
                                                                     value='2'
                                                                     key='1'
-                                                                    checked = {values.plan_for == '2' ? true : false}
+                                                                    checked = {values.plan_id == '2' ? true : false}
                                                                     onChange = {() =>{
-                                                                        setFieldTouched('plan_for')
-                                                                        setFieldValue('plan_for', '2');
+                                                                        setFieldTouched('plan_id')
+                                                                        setFieldValue('plan_id', '2');
                                                                         this.handleChange(values,setFieldTouched, setFieldValue)
                                                                     }  
                                                                     }
                                                                 />
                                                                 <span className="checkmark " /><span className="fs-14"><h7> Plan B</h7></span>
                                                             </label>
-                                                            {errors.plan_for && touched.plan_for ? (
-                                                                <span className="errorMsg">{errors.plan_for}</span>
+                                                            {errors.plan_id && touched.plan_id ? (
+                                                                <span className="errorMsg">{errors.plan_id}</span>
                                                             ) : null}
                                                         </div>
                                                         <div className="p-r-25">
                                                             <label className="customRadio3">
                                                                 <Field
                                                                     type="radio"
-                                                                    name='plan_for'
+                                                                    name='plan_id'
                                                                     value='3'
                                                                     key='1'
-                                                                    checked = {values.plan_for == '3' ? true : false}
+                                                                    checked = {values.plan_id == '3' ? true : false}
                                                                     onChange = {() =>{
-                                                                        setFieldTouched('plan_for')
-                                                                        setFieldValue('plan_for', '3');
+                                                                        setFieldTouched('plan_id')
+                                                                        setFieldValue('plan_id', '3');
                                                                         this.handleChange(values,setFieldTouched, setFieldValue)
                                                                     }  
                                                                     }
                                                                 />
                                                                 <span className="checkmark " /><span className="fs-14"><h7> Plan C</h7></span>
                                                             </label>
-                                                            {/* {errors.plan_for && touched.plan_for ? (
-                                                                <span className="errorMsg">{errors.plan_for}</span>
-                                                            ) : null} */}
+                                                            {errors.plan_id && touched.plan_id ? (
+                                                                <span className="errorMsg">{errors.plan_id}</span>
+                                                            ) : null}
                                                         </div>
                                                     </div>
                                                 </div>
                                             </div>
-
+                                            { serverResponse && serverResponse.QuotationNo ?
+                                                <Row className="d-flex justify-content-left carloan m-b-25">
+                                                    <Col sm={4}>
+                                                    <div className="d-flex justify-content-between align-items-center premium m-b-25">
+                                                        <p>Quotation No:</p>
+                                                        <p><b> {serverResponse ? (serverResponse.message ? "---" : serverResponse.QuotationNo) : "---"}</b></p>
+                                                    </div>
+                                                    </Col>
+                                                    <Col sm={4}>
+                                                    <div className="d-flex justify-content-between align-items-center premium m-b-25">
+                                                        <p>Total Premium:</p>
+                                                        <p><strong>Rs: {serverResponse ? (serverResponse.message ? 0 : serverResponse.DuePremium) : 0}</strong></p>
+                                                    </div>
+                                                    </Col>
+                                                </Row>
+                                                : null}
 
                                             <div className="brandhead"> 
                                                 <p>&nbsp;</p>
                                             </div>
                                            
                                             <div className="cntrbtn">
-                                            <Button className={`btnPrimary`} type="submit" >
+                                            {serverResponse && serverResponse != "" ? (serverResponse.message ?
+                                                <Button className={`proceedBtn`} type="submit"  >
+                                                Quote
+                                                </Button> : <Button className={`proceedBtn`} type="submit"  >
                                                 Go
-                                            </Button>                                      
+                                                </Button>) : <Button className={`proceedBtn`} type="submit"  >
+                                                Quote
+                                                </Button>}                                    
                                             </div>
                                         </Form>
                                         );

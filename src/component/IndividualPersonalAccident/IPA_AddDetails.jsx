@@ -44,7 +44,8 @@ class AccidentAddDetails extends Component {
     fulQuoteResp: [],
     serverResponse: [],
     error: {},
-    validation_error: []
+    validation_error: [],
+    declineStatus: ""
   };
 
   changePlaceHoldClassAdd(e) {
@@ -92,15 +93,29 @@ class AccidentAddDetails extends Component {
   };
 
   handleChange = (e) => {
+    const {occupationList} = this.state
+    let declineStatus = ""
+    if (occupationList) {
+      {
+        occupationList && occupationList.length > 0 && occupationList.map((insure, qIndex) => (
+          insure.id == e.target.value ? insure.decline_status == "Decline" ? swal('Insurance Policy cannot be offered') : '' : '',
+          insure.id == e.target.value && (declineStatus = insure.decline_status)     
+        ))
+      }
+    }
     this.setState({
       serverResponse: [],
-      error: []
+      error: [],
+      declineStatus
     })
   }
 
   quote = (values, actions) => {
-    //console.log('value', value)
-    const { accessToken, accidentDetails } = this.state
+    const { accessToken, accidentDetails, declineStatus } = this.state
+    if(declineStatus == "Decline") {
+      swal('Insurance Policy cannot be offered')
+      return false
+    }
     const formData = new FormData();
     this.props.loadingStart();
     let date_of_birth = moment(accidentDetails.dob).format('yyyy-MM-DD');
@@ -171,8 +186,11 @@ class AccidentAddDetails extends Component {
 
   handleSubmit = (values, actions) => {
     const { productId } = this.props.match.params
-    const { accidentDetails } = this.state
-    console.log('values------->>>', values)
+    const { accidentDetails, declineStatus } = this.state
+    if(declineStatus == "Decline") {
+      swal('Insurance Policy cannot be offered')
+      return false
+    }
     const formData = new FormData();
     let encryption = new Encryption();
     this.props.loadingStart();
@@ -230,7 +248,7 @@ class AccidentAddDetails extends Component {
       .get("occupations")
       .then((res) => {
         let decryptErr = JSON.parse(encryption.decrypt(res.data));
-        console.log('decryptErr-----', decryptErr)
+        console.log('decrypOccupation-----', decryptErr)
         this.setState({ occupationList: decryptErr.data });
         this.props.loadingStop();
       })
@@ -299,13 +317,13 @@ class AccidentAddDetails extends Component {
                     >
                       {({ values, errors, setFieldValue, setFieldTouched, isValid, isSubmitting, touched }) => {
                         // console.log('values',values)
-                        if (values) {
-                          {
-                            occupationList && occupationList.length > 0 && occupationList.map((insure, qIndex) => (
-                              insure.id == values.occupation ? insure.decline_status == "Decline" ? swal('Insurance Policy cannot be offered') : '' : ''
-                            ))
-                          }
-                        }
+                        // if (values) {
+                        //   {
+                        //     occupationList && occupationList.length > 0 && occupationList.map((insure, qIndex) => (
+                        //       insure.id == values.occupation ? insure.decline_status == "Decline" ? swal('Insurance Policy cannot be offered') : '' : ''
+                        //     ))
+                        //   }
+                        // }
 
                         return (
                           <Form>
@@ -528,7 +546,7 @@ class AccidentAddDetails extends Component {
                                     >
                                       <option value="">Occupation Type</option>
                                       {occupationList && occupationList.length > 0 && occupationList.map((insurer, qIndex) => (
-                                        <option key={qIndex} value={insurer.id} val={insurer.decline_status}> {insurer.occupation} </option>
+                                        <option key={qIndex} value={insurer.id} > {insurer.occupation} </option>
                                       ))}
                                     </Field>
                                     {errors.occupation && touched.occupation ? (

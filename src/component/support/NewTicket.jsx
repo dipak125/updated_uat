@@ -360,7 +360,8 @@ class NewTicket extends Component {
                                     </div>
                                     <div class="form-group">
                                         <input type="file" key='1' name="attachment"
-                                            accept=".png, .jpeg, .jpg, .doc, .docx, .xls, .xlsx, .pdf"
+                                            // accept=".png, .jpeg, .jpg, .doc, .docx, .xls, .xlsx, .pdf"
+                                            accept=".jpg,.jpeg,.png,.gif,.pdf,.doc,.docx,.key,.ppt,.pptx,.pps,.ppsx,.odt,.xls,.xlsx,.zip,.html,.bmp,.dib,.txt,.xml,.eml,.csv,.msg,.xps,.htm"
                                             onChange={(e) => {
                                                 const { target } = e
                                                 if (target.value.length > 0) {

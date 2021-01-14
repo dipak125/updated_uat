@@ -27,29 +27,29 @@ const initialValues = {
     policy_type: '1',
     pol_start_date: null,
     pinDataArr: [],
-    salutation_id: "",
-    first_name: "",
-    last_name: "",
-    date_of_birth: "",
-    mobile: "",
-    email_id: "",
-    disability_for: "",
-    construction_for: "",
-    basement_for: "",
-    protection_for: "",
-    construction_year: "",
-    type_condition: "",
+    proposer_title_id: "",
+    proposer_first_name: "",
+    proposer_last_name: "",
+    proposer_dob: "",
+    proposer_mobile: "",
+    proposer_email: "",
+    proposer_disability: "",
+    construction_type: "",
+    proposer_property_type: "",
+    property_protected_type: "",
+    year_of_construction: "",
+    pedal_cycle_type: "",
     description: "",
     check_box: "",
-    flat_no: "",
+    house_flat_no: "",
     city: "",
-    building_name: "",
+    house_building_name: "",
     street_name: "",
     state_name: "",
-    pincode: "",
     pincode_id: "",
+    area_name: "",
     nominee_salutation_id: "",
-    nominee_name: "",
+    nominee_first_name: "",
     nominee_dob: null,
     relation_with: "",
     appointee_relation_with: ""
@@ -57,32 +57,32 @@ const initialValues = {
 }
 
 const vehicleRegistrationValidation = Yup.object().shape({
-    salutation_id: Yup.string().required('Title is required').nullable(),
-    first_name: Yup.string().required('First Name is required').min(3, function () { return "First name must be 3 characters" }).max(40, function () {
+    proposer_title_id: Yup.string().required('Title is required').nullable(),
+    proposer_first_name: Yup.string().required('First Name is required').min(3, function () { return "First name must be 3 characters" }).max(40, function () {
         return "Full name must be maximum 40 characters"
     }).matches(/^[A-Za-z]+$/, function () { return "Please enter valid first name" }).nullable(),
-    last_name: Yup.string().required('Last Name is required').min(1, function () { return "Last name must be 1 characters" }).max(40, function () { return "Full name must be maximum 40 characters" })
+    proposer_last_name: Yup.string().required('Last Name is required').min(1, function () { return "Last name must be 1 characters" }).max(40, function () { return "Full name must be maximum 40 characters" })
         .matches(/^[A-Za-z]+$/, function () {
             return "Please enter valid last name"
         }).nullable(),
-    // last_name: Yup.string().required('Name is required').nullable(),
-    date_of_birth: Yup.date().required("Please enter date of birth").nullable(),
-    email_id: Yup.string().email().required('Email is required').min(8, function () {
+    // proposer_last_name: Yup.string().required('Name is required').nullable(),
+    proposer_dob: Yup.date().required("Please enter date of birth").nullable(),
+    proposer_email: Yup.string().email().required('Email is required').min(8, function () {
         return "Email must be minimum 8 characters"
     })
         .max(75, function () {
             return "Email must be maximum 75 characters"
         }).matches(/^[a-zA-Z0-9]+([._\-]?[a-zA-Z0-9]+)*@\w+([-]?\w+)*(\.\w{2,3})+$/, 'Invalid Email Id').nullable(),
-    mobile: Yup.string()
+    proposer_mobile: Yup.string()
         .matches(/^[6-9][0-9]{9}$/, 'Invalid Mobile number').required('Mobile No. is required').nullable(),
-    building_name: Yup.string()
+    house_building_name: Yup.string()
         .required("Please enter building name")
         .matches(/^[a-zA-Z0-9][a-zA-Z0-9-/.,-\s]*$/, function () {
             return "Please enter valid building name";
         })
         .nullable(),
     // block_no: Yup.string().required("Please enter Plot number").nullable(),
-    flat_no: Yup.string()
+    house_flat_no: Yup.string()
         .required("Please enter flat number")
         .matches(/^[a-zA-Z0-9][a-zA-Z0-9-/.,-\s]*$/, function () {
             return "Please enter valid flat number";
@@ -106,23 +106,23 @@ const vehicleRegistrationValidation = Yup.object().shape({
             return "Please enter valid state";
         })
         .nullable(),
-    pincode: Yup.string()
+    pincode_id: Yup.string()
         .required("Pincode is required")
         .matches(/^[0-9]{6}$/, function () {
             return "Please enter valid 6 digit pin code";
         })
         .nullable(),
-    pincode_id: Yup.string().required("Please select locality").nullable(),
-    disability_for: Yup.string().required("Please select optioin for disability").nullable(),
-    construction_for: Yup.string().required("Please select type of construction").nullable(),
-    basement_for: Yup.string().required("Please select option for proposed property").nullable(),
-    protection_for: Yup.string().required("Please select option for protected with doors/windows/grill").nullable(),
-    construction_year: Yup.string().required("Please enter construction year").nullable(),
-    type_condition: Yup.string().required("Please select option for type & construction").nullable(),
+    area_name: Yup.string().required("Please select locality").nullable(),
+    proposer_disability: Yup.string().required("Please select optioin for disability").nullable(),
+    construction_type: Yup.string().required("Please select type of construction").nullable(),
+    proposer_property_type: Yup.string().required("Please select option for proposed property").nullable(),
+    property_protected_type: Yup.string().required("Please select option for protected with doors/windows/grill").nullable(),
+    year_of_construction: Yup.string().required("Please enter construction year").nullable(),
+    pedal_cycle_type: Yup.string().required("Please select option for type & construction").nullable(),
     description: Yup.string().required("Please enter description").nullable(),
     // NOMINEE--------
-    nominee_salutation_id: Yup.string().required("Title is required").nullable(),
-    nominee_name: Yup.string()
+    // nominee_salutation_id: Yup.string().required("Title is required").nullable(),
+    nominee_first_name: Yup.string()
         .required("Nominee Name is required")
         .min(3, function () {
             return "Nominee Name must be 3 characters";
@@ -138,46 +138,6 @@ const vehicleRegistrationValidation = Yup.object().shape({
     relation_with: Yup.string().required(function () {
         return "Please select relation";
     }),
-    appointee_name: Yup.string(function () {
-        return "Please enter appointee name"
-    }).notRequired(function () {
-        return "Please enter appointee name"
-    })
-        .matches(/^[a-zA-Z]+([\s]?[a-zA-Z]+)$/, function () {
-            return "Please enter valid name"
-        }).test(
-            "18YearsChecking",
-            function () {
-                return "Please enter appointee name"
-            },
-            function (value) {
-                const ageObj = new PersonAge();
-                if (ageObj.whatIsMyAge(this.parent.dob) < 18 && !value) {
-                    return false;
-                }
-                return true;
-            }
-        ).min(3, function () {
-            return "Name must be minimum 3 chracters"
-        })
-        .max(40, function () {
-            return "Name must be maximum 40 chracters"
-        }),
-    appointee_relation_with: Yup.string().notRequired(function () {
-        return "Please select relation"
-    }).test(
-        "18YearsChecking",
-        function () {
-            return "Please enter Appointee relation"
-        },
-        function (value) {
-            const ageObj = new PersonAge();
-            if (ageObj.whatIsMyAge(this.parent.dob) < 18 && !value) {
-                return false;
-            }
-            return true;
-        }
-    )
 })
 
 
@@ -188,7 +148,12 @@ class AdditionalDetails_GSB extends Component {
         length: 14,
         fastlanelog: [],
         appointeeFlag: false,
-        is_appointee: 0
+        is_appointee: 0,
+        titleList: [],
+        cycleList: [],
+        cityName:"",
+        stateName: "",
+        serverResponse: []
     }
 
     handleChange = date => {
@@ -207,44 +172,63 @@ class AdditionalDetails_GSB extends Component {
 
 
     componentDidMount() {
-        this.fetchPolicyDetails();
-        console.log("product_id", this.props.match.params)
-
-        // let encryption = new Encryption();
-        // let bc_data = sessionStorage.getItem('bcLoginData') ? sessionStorage.getItem('bcLoginData') : "";
-        // console.log('bc_data',JSON.parse(encryption.decrypt(bc_data)));
+        this.fetchSalutation();
 
     }
 
-    fetchData = () => {
-        const { productId } = this.props.match.params
-        let policyHolder_id = localStorage.getItem("policyHolder_refNo") ? localStorage.getItem("policyHolder_refNo") : 0;
+    fetchSalutation = () => {
+        const formData = new FormData();
         let encryption = new Encryption();
         this.props.loadingStart();
-        axios.get(`sme/details/${policyHolder_id}`)
-            .then(res => {
-                // let decryptResp = JSON.parse(encryption.decrypt(res.data))
-                // console.log("decrypt", decryptResp)
+        let post_data = {
+          'policy_for_flag': '1',
+        }
+        formData.append('enc_data', encryption.encrypt(JSON.stringify(post_data)))
+        axios.post('ipa/titles', formData)
+          .then(res => {
+            let decryptResp = JSON.parse(encryption.decrypt(res.data))
+            console.log("titles-list------ ",decryptResp)
+            let titleList = decryptResp.data.salutationlist
+            this.setState({
+              titleList
+            });
+            this.fetchPedalCycleList();
+          }).
+          catch(err => {
+            this.props.loadingStop();
+            this.setState({
+              titleList: []
+            });
+          })
+      }
 
-                // let policyHolder = decryptResp.data.policyHolder.motorinsurance           
-                // // let fastlanelog = decryptResp.data.policyHolder ? decryptResp.data.policyHolder.fastlanelog : {};
-                // this.setState({ 
-                //     policyHolder
-                // })
-                this.props.loadingStop();
-            })
-            .catch(err => {
-                // handle error
-                this.props.loadingStop();
-            })
-    }
+    fetchPedalCycleList = () => {
+        let encryption = new Encryption();
+        this.props.loadingStart();
+        axios.get('gsb/gsb-pedal-cycle-list')
+          .then(res => {
+            let decryptResp = JSON.parse(encryption.decrypt(res.data))
+            console.log("pedal-cycle-list------ ",decryptResp)
+            let cycleList = decryptResp.data.gsb_cycle_list
+            this.setState({
+                cycleList
+            });
+            this.fetchPolicyDetails();
+          }).
+          catch(err => {
+            this.props.loadingStop();
+            this.setState({
+                cycleList: []
+            });
+          })
+      }
 
     fetchPolicyDetails = () => {
         const { productId } = this.props.match.params;
         let policyHolder_refNo = localStorage.getItem("policyHolder_refNo") ? localStorage.getItem("policyHolder_refNo") : 0;
         let encryption = new Encryption();
         axios
-            .get(`/${policyHolder_refNo}`)
+            .get(`gsb/gsb-policy-details/${policyHolder_refNo}`)
             .then((res) => {
                 let decryptResp = JSON.parse(encryption.decrypt(res.data));
                 let gsb_Details = decryptResp.data && decryptResp.data.policyHolder ? decryptResp.data.policyHolder : null;
@@ -267,10 +251,33 @@ class AdditionalDetails_GSB extends Component {
         const { productId } = this.props.match.params;
         const formData = new FormData();
         let encryption = new Encryption();
+        let policyHolder_id = localStorage.getItem('policyHolder_id') ? localStorage.getItem('policyHolder_id') :0
         let post_data = {
             'menumaster_id': '5',
             'page_name': `AdditionalDetails_GSB/${productId}`,
-            'vehicle_type_id': productId
+            'policy_holder_id': policyHolder_id,
+            'construction_type':values.construction_type,
+            'house_building_name': values.house_building_name,
+            'house_flat_no': values.house_flat_no,
+            'nominee_dob': values.nominee_dob ? moment(values.nominee_dob).format("YYYY-MM-DD") : "" ,
+            'nominee_first_name': values.nominee_first_name,
+            'nominee_last_name': values.nominee_last_name,
+            'nominee_title_id': values.nominee_title_id,
+            'pedal_cycle_type': values.pedal_cycle_type,
+            'area_name': values.area_name,
+            'property_protected_type': values.property_protected_type,
+            'proposer_disability': values.proposer_disability,
+            'proposer_dob': values.proposer_dob ? moment(values.proposer_dob).format("YYYY-MM-DD") : "" ,
+            'proposer_email': values.proposer_email,
+            'proposer_first_name': values.proposer_first_name,
+            'proposer_last_name': values.proposer_last_name,
+            'proposer_mobile': values.proposer_mobile,
+            'proposer_property_type': values.proposer_property_type,
+            'proposer_title_id': values.proposer_title_id,
+            'street_name': values.street_name,
+            'year_of_construction': values.year_of_construction ? moment(values.year_of_construction).format("YYYY-MM-DD") : "",
+            'pincode_id': values.area_name
+
         }
 
         if (sessionStorage.getItem('csc_id')) {
@@ -289,103 +296,81 @@ class AdditionalDetails_GSB extends Component {
             }
         }
 
-        let pol_start_date = moment(values.pol_start_date).format('YYYY-MM-DD HH:mm:ss')
-        let pol_end_date = moment(values.pol_end_date).format('YYYY-MM-DD hh:mm:ss')
-
-        post_data['pol_start_date'] = pol_start_date
-        post_data['pol_end_date'] = pol_end_date
-
         this.props.loadingStart();
-
-        if (this.props.policy_holder_id != null) {
-            post_data['policy_holder_id'] = this.props.policy_holder_id
-            formData.append('enc_data', encryption.encrypt(JSON.stringify(post_data)))
-
-            axios.post('',
-                formData
-            ).then(res => {
-                let decryptResp = JSON.parse(encryption.decrypt(res.data));
-                // console.log('decryptResp-----', decryptResp)
-                if (decryptResp.error === false) {
-                    this.props.loadingStop();
-                    this.props.setDataUpdate({
-                        start_date: values.pol_start_date,
-                        end_date: values.pol_end_date
-                    });
-                    this.props.history.push(`/RiskDetails/${productId}`);
-                } else {
-                    this.props.loadingStop();
-                    swal("Thank you for showing your interest for buying product.Due to some reasons, we are not able to issue the policy online.Please call 1800 22 1111");
-                    actions.setSubmitting(false);
-                }
-            }).
-                catch(err => {
-                    this.props.loadingStop();
-                    let decryptResp = JSON.parse(encryption.decrypt(err.data));
-                    console.log('decryptErr-----', decryptResp)
-                    actions.setSubmitting(false);
-                })
-        } else {
-            formData.append('enc_data', encryption.encrypt(JSON.stringify(post_data)))
-            axios.post('',
-                formData
-            ).then(res => {
-                let decryptResp = JSON.parse(encryption.decrypt(res.data));
-                localStorage.setItem('policy_holder_ref_no', decryptResp.data.policyHolder_refNo);
+        console.log('Post Data-----', post_data)
+        formData.append('enc_data',encryption.encrypt(JSON.stringify(post_data)))
+        axios
+        .post('gsb/set-proposer-with-aditional-info', formData)
+        .then(res => {
+            let decryptResp = JSON.parse(encryption.decrypt(res.data));
+            console.log('decryptResp-----', decryptResp)
+            if (decryptResp.error === false) {
                 this.props.loadingStop();
-                this.props.setData({
-                    start_date: values.pol_start_date,
-                    end_date: values.pol_end_date,
-
-                    policy_holder_id: decryptResp.data.policyHolder_id,
-                    policy_holder_ref_no: decryptResp.data.policyHolder_refNo,
-                    request_data_id: decryptResp.data.request_data_id,
-                    completed_step: decryptResp.data.completedStep,
-                    menumaster_id: decryptResp.data.menumaster_id
-                });
-                this.props.history.push(`/RiskDetails/${productId}`);
-            }).
-                catch(err => {
-                    this.props.loadingStop();
-                    actions.setSubmitting(false);
-                })
-        }
+                // this.props.history.push(`/RiskDetails/${productId}`);
+            } else {
+                this.props.loadingStop();
+                swal("Thank you for showing your interest for buying product.Due to some reasons, we are not able to issue the policy online.Please call 1800 22 1111");
+                actions.setSubmitting(false);
+            }
+        }).
+            catch(err => {
+                this.props.loadingStop();
+                let decryptResp = JSON.parse(encryption.decrypt(err.data));
+                console.log('decryptErr-----', decryptResp)
+                actions.setSubmitting(false);
+            })
     }
+
+    handleChange = (e) => {
+        const {occupationList} = this.state
+        this.setState({
+          serverResponse: [],
+          error: []
+        })
+      }
+
     fetchAreadetails = (e) => {
         let pinCode = e.target.value;
-
+    
         if (pinCode.length == 6) {
-            const formData = new FormData();
-            this.props.loadingStart();
-            // let encryption = new Encryption();
-            const post_data_obj = {
-                pincode: pinCode,
-            };
-            //    formData.append('enc_data',encryption.encrypt(JSON.stringify(post_data_obj)))
-            formData.append("pincode", pinCode);
-            axios
-                .post("pincode-details", formData)
-                .then((res) => {
-                    if (res.data.error === false) {
-                        let stateName =
-                            res.data.data &&
-                                res.data.data[0] &&
-                                res.data.data[0].pinstate.STATE_NM
-                                ? res.data.data[0].pinstate.STATE_NM
-                                : "";
-                        this.setState({
-                            pinDataArr: res.data.data,
-                            stateName,
-                        });
-                        this.props.loadingStop();
-                    } else {
-                        this.props.loadingStop();
-                        swal("Plese enter a valid pincode");
-                    }
-                })
-                .catch((err) => {
-                    this.props.loadingStop();
+          const formData = new FormData();
+          this.props.loadingStart();
+          // let encryption = new Encryption();
+          const post_data_obj = {
+            pincode_id: pinCode,
+          };
+          //    formData.append('enc_data',encryption.encrypt(JSON.stringify(post_data_obj)))
+          formData.append("pincode", pinCode);
+          axios
+            .post("pincode-details", formData)
+            .then((res) => {
+              if (res.data.error === false) {
+                let stateName =
+                  res.data.data &&
+                  res.data.data[0] &&
+                  res.data.data[0].pinstate.STATE_NM
+                    ? res.data.data[0].pinstate.STATE_NM
+                    : "";
+
+                let cityName =
+                    res.data.data &&
+                    res.data.data[0] &&
+                    res.data.data[0].pincity.CITY_NM
+                      ? res.data.data[0].pincity.CITY_NM
+                      : "";
+                this.setState({
+                  pinDataArr: res.data.data,
+                  stateName, cityName
                 });
+                this.props.loadingStop();
+              } else {
+                this.props.loadingStop();
+                swal("Plese enter a valid pincode_id");
+              }
+            })
+            .catch((err) => {
+              this.props.loadingStop();
+            });
         }
     };
 
@@ -398,7 +383,7 @@ class AdditionalDetails_GSB extends Component {
             this.props.loadingStart();
             // let encryption = new Encryption();
             const post_data_obj = {
-                pincode: pinCode,
+                pincode_id: pinCode,
             };
             // formData.append('enc_data',encryption.encrypt(JSON.stringify(post_data_obj)))
             formData.append("pincode", pinCode);
@@ -441,38 +426,38 @@ class AdditionalDetails_GSB extends Component {
 
 
     render() {
-        const { pinDataArr, appointeeFlag, is_appointee, productId } = this.state
+        const { pinDataArr, appointeeFlag, is_appointee, titleList, cycleList, stateName, cityName } = this.state
+        const {productId } = this.props.match.params
         const newInitialValues = Object.assign(initialValues, {
             pol_start_date: this.props.start_date != null ? new Date(this.props.start_date) : null,
             pol_end_date: this.props.end_date != null ? new Date(this.props.end_date) : null,
-            salutation_id: "",
-            first_name: "",
-            last_name: "",
-            date_of_birth: "",
-            mobile: "",
-            email_id: "",
-            disability_for: "",
-            construction_for: "",
-            basement_for: "",
-            protection_for: "",
-            construction_year: "",
-            type_condition: "",
+            proposer_title_id: "",
+            proposer_first_name: "",
+            proposer_last_name: "",
+            proposer_dob: "",
+            proposer_mobile: "",
+            proposer_email: "",
+            proposer_disability: "",
+            construction_type: "",
+            proposer_property_type: "",
+            property_protected_type: "",
+            year_of_construction: "",
+            pedal_cycle_type: "",
             description: "",
             check_box: "",
-            flat_no: "",
+            house_flat_no: "",
             city: "",
-            building_name: "",
+            house_building_name: "",
             street_name: "",
             state_name: "",
-            pincode: "",
             pincode_id: "",
+            area_name: "",
             nominee_salutation_id: "",
-            nominee_name: "",
+            nominee_first_name: "",
             nominee_dob: "",
             relation_with: "",
             appointee_relation_with: ""
         })
-
 
         return (
             <>
@@ -487,22 +472,17 @@ class AdditionalDetails_GSB extends Component {
                                 <section className="brand">
                                     <div className="boxpd">
                                         <Formik initialValues={newInitialValues}
-                                            onSubmit={this.handleSubmit}
-                                            validationSchema={vehicleRegistrationValidation}
+                                             onSubmit={this.handleSubmit}
+                                            // validationSchema={vehicleRegistrationValidation}
                                         >
                                             {({ values, errors, setFieldValue, setFieldTouched, isValid, isSubmitting, touched }) => {
-                                                // console.log('values',values)
+                                                console.log('errors-------- ',errors)
 
                                                 return (
                                                     <Form>
                                                         <div className="brandhead">
                                                             <h4 className="fs-18 m-b-30">Please share a few more details.</h4>
                                                         </div>
-                                                        {/* {console.log('pol_start_date',values.pol_start_date)}                                                                                
-                                            <div className="d-flex justify-content-left">
-                                                <div className="brandhead">
-                                                </div>
-                                            </div> */}
                                                         <div className="brandhead">
                                                             <h4 className="fs-18 m-b-30">PROPOSER DETAILS</h4>
                                                         </div>
@@ -511,18 +491,18 @@ class AdditionalDetails_GSB extends Component {
                                                                 <FormGroup>
                                                                     <div className="formSection">
                                                                         <Field
-                                                                            name='salutation_id'
+                                                                            name='proposer_title_id'
                                                                             component="select"
                                                                             autoComplete="off"
                                                                             className="formGrp"
                                                                         >
                                                                             <option value="">Title</option>
-                                                                            {/* {titleList.map((title, qIndex) => ( 
-                                                            <option value={title.id}>{title.displayvalue}</option>
-                                                            ))} */}
+                                                                            {titleList.map((title, qIndex) => ( 
+                                                                            <option value={title.id}>{title.displayvalue}</option>
+                                                                            ))}
                                                                         </Field>
-                                                                        {errors.salutation_id && touched.salutation_id ? (
-                                                                            <span className="errorMsg">{errors.salutation_id}</span>
+                                                                        {errors.proposer_title_id && touched.proposer_title_id ? (
+                                                                            <span className="errorMsg">{errors.proposer_title_id}</span>
                                                                         ) : null}
                                                                     </div>
                                                                 </FormGroup>
@@ -532,16 +512,16 @@ class AdditionalDetails_GSB extends Component {
                                                                 <FormGroup>
                                                                     <div className="insurerName">
                                                                         <Field
-                                                                            name='first_name'
+                                                                            name='proposer_first_name'
                                                                             type="text"
                                                                             placeholder="First Name"
                                                                             autoComplete="off"
                                                                             onFocus={e => this.changePlaceHoldClassAdd(e)}
                                                                             onBlur={e => this.changePlaceHoldClassRemove(e)}
-                                                                            value={values.first_name}
+                                                                            value={values.proposer_first_name}
                                                                         />
-                                                                        {errors.first_name && touched.first_name ? (
-                                                                            <span className="errorMsg">{errors.first_name}</span>
+                                                                        {errors.proposer_first_name && touched.proposer_first_name ? (
+                                                                            <span className="errorMsg">{errors.proposer_first_name}</span>
                                                                         ) : null}
                                                                     </div>
                                                                 </FormGroup>
@@ -551,16 +531,16 @@ class AdditionalDetails_GSB extends Component {
                                                                 <FormGroup>
                                                                     <div className="insurerName">
                                                                         <Field
-                                                                            name='last_name'
+                                                                            name='proposer_last_name'
                                                                             type="text"
                                                                             placeholder="Last Name"
                                                                             autoComplete="off"
                                                                             onFocus={e => this.changePlaceHoldClassAdd(e)}
                                                                             onBlur={e => this.changePlaceHoldClassRemove(e)}
-                                                                            value={values.last_name}
+                                                                            value={values.proposer_last_name}
                                                                         />
-                                                                        {errors.last_name && touched.last_name ? (
-                                                                            <span className="errorMsg">{errors.last_name}</span>
+                                                                        {errors.proposer_last_name && touched.proposer_last_name ? (
+                                                                            <span className="errorMsg">{errors.proposer_last_name}</span>
                                                                         ) : null}
                                                                     </div>
                                                                 </FormGroup>
@@ -571,7 +551,7 @@ class AdditionalDetails_GSB extends Component {
                                                             <Col sm={12} md={3} lg={2}>
                                                                 <FormGroup>
                                                                     <DatePicker
-                                                                        name="date_of_birth"
+                                                                        name="proposer_dob"
                                                                         dateFormat="dd MMM yyyy"
                                                                         placeholderText="DOB"
                                                                         peekPreviousMonth
@@ -582,14 +562,14 @@ class AdditionalDetails_GSB extends Component {
                                                                         maxDate={new Date(maxDobAdult)}
                                                                         minDate={new Date(minDobAdult)}
                                                                         className="datePckr"
-                                                                        selected={values.date_of_birth}
+                                                                        selected={values.proposer_dob}
                                                                         onChange={(val) => {
-                                                                            setFieldTouched('date_of_birth');
-                                                                            setFieldValue('date_of_birth', val);
+                                                                            setFieldTouched('proposer_dob');
+                                                                            setFieldValue('proposer_dob', val);
                                                                         }}
                                                                     />
-                                                                    {errors.date_of_birth && touched.date_of_birth ? (
-                                                                        <span className="errorMsg">{errors.date_of_birth}</span>
+                                                                    {errors.proposer_dob && touched.proposer_dob ? (
+                                                                        <span className="errorMsg">{errors.proposer_dob}</span>
                                                                     ) : null}
                                                                 </FormGroup>
                                                             </Col>
@@ -598,18 +578,18 @@ class AdditionalDetails_GSB extends Component {
                                                                     <div className="insurerName nmbract">
                                                                         <span>+91</span>
                                                                         <Field
-                                                                            name='mobile'
+                                                                            name='proposer_mobile'
                                                                             type="text"
                                                                             placeholder="Mobile No. "
                                                                             autoComplete="off"
                                                                             onFocus={e => this.changePlaceHoldClassAdd(e)}
                                                                             onBlur={e => this.changePlaceHoldClassRemove(e)}
-                                                                            value={values.mobile}
+                                                                            value={values.proposer_mobile}
                                                                             maxLength="10"
                                                                             className="phoneinput pd-l-25"
                                                                         />
-                                                                        {errors.mobile && touched.mobile ? (
-                                                                            <span className="errorMsg msgpositn">{errors.mobile}</span>
+                                                                        {errors.proposer_mobile && touched.proposer_mobile ? (
+                                                                            <span className="errorMsg msgpositn">{errors.proposer_mobile}</span>
                                                                         ) : null}
                                                                     </div>
                                                                 </FormGroup>
@@ -618,16 +598,16 @@ class AdditionalDetails_GSB extends Component {
                                                                 <FormGroup>
                                                                     <div className="insurerName">
                                                                         <Field
-                                                                            name='email_id'
+                                                                            name='proposer_email'
                                                                             type="email"
                                                                             placeholder="Email "
                                                                             autoComplete="off"
                                                                             onFocus={e => this.changePlaceHoldClassAdd(e)}
                                                                             onBlur={e => this.changePlaceHoldClassRemove(e)}
-                                                                            value={values.email_id}
+                                                                            value={values.proposer_email}
                                                                         />
-                                                                        {errors.email_id && touched.email_id ? (
-                                                                            <span className="errorMsg">{errors.email_id}</span>
+                                                                        {errors.proposer_email && touched.proposer_email ? (
+                                                                            <span className="errorMsg">{errors.proposer_email}</span>
                                                                         ) : null}
                                                                     </div>
                                                                 </FormGroup>
@@ -641,13 +621,13 @@ class AdditionalDetails_GSB extends Component {
                                                                         <label className="customRadio3">
                                                                             <Field
                                                                                 type="radio"
-                                                                                name='disability_for'
+                                                                                name='proposer_disability'
                                                                                 value='1'
                                                                                 key='1'
-                                                                                checked={values.disability_for == '1' ? true : false}
+                                                                                checked={values.proposer_disability == '1' ? true : false}
                                                                                 onChange={() => {
-                                                                                    setFieldTouched('disability_for')
-                                                                                    setFieldValue('disability_for', '1');
+                                                                                    setFieldTouched('proposer_disability')
+                                                                                    setFieldValue('proposer_disability', '1');
                                                                                     this.handleChange(values, setFieldTouched, setFieldValue)
                                                                                 }
                                                                                 }
@@ -659,21 +639,21 @@ class AdditionalDetails_GSB extends Component {
                                                                         <label className="customRadio3">
                                                                             <Field
                                                                                 type="radio"
-                                                                                name='disability_for'
+                                                                                name='proposer_disability'
                                                                                 value='2'
                                                                                 key='1'
-                                                                                checked={values.disability_for == '2' ? true : false}
+                                                                                checked={values.proposer_disability == '2' ? true : false}
                                                                                 onChange={() => {
-                                                                                    setFieldTouched('disability_for')
-                                                                                    setFieldValue('disability_for', '2');
+                                                                                    setFieldTouched('proposer_disability')
+                                                                                    setFieldValue('proposer_disability', '2');
                                                                                     this.handleChange(values, setFieldTouched, setFieldValue)
                                                                                 }
                                                                                 }
                                                                             />
                                                                             <span className="checkmark " /><span className="fs-14"><h7> No</h7></span>
                                                                         </label>
-                                                                        {errors.disability_for && touched.disability_for ? (
-                                                                            <span className="errorMsg">{errors.disability_for}</span>
+                                                                        {errors.proposer_disability && touched.proposer_disability ? (
+                                                                            <span className="errorMsg">{errors.proposer_disability}</span>
                                                                         ) : null}
                                                                     </div>
                                                                 </div>
@@ -690,13 +670,13 @@ class AdditionalDetails_GSB extends Component {
                                                                         <label className="customRadio3">
                                                                             <Field
                                                                                 type="radio"
-                                                                                name='construction_for'
+                                                                                name='construction_type'
                                                                                 value='1'
                                                                                 key='1'
-                                                                                checked={values.construction_for == '1' ? true : false}
+                                                                                checked={values.construction_type == '1' ? true : false}
                                                                                 onChange={() => {
-                                                                                    setFieldTouched('construction_for')
-                                                                                    setFieldValue('construction_for', '1');
+                                                                                    setFieldTouched('construction_type')
+                                                                                    setFieldValue('construction_type', '1');
                                                                                     this.handleChange(values, setFieldTouched, setFieldValue)
                                                                                 }
                                                                                 }
@@ -708,21 +688,21 @@ class AdditionalDetails_GSB extends Component {
                                                                         <label className="customRadio3">
                                                                             <Field
                                                                                 type="radio"
-                                                                                name='construction_for'
+                                                                                name='construction_type'
                                                                                 value='2'
                                                                                 key='1'
-                                                                                checked={values.construction_for == '2' ? true : false}
+                                                                                checked={values.construction_type == '2' ? true : false}
                                                                                 onChange={() => {
-                                                                                    setFieldTouched('construction_for')
-                                                                                    setFieldValue('construction_for', '2');
+                                                                                    setFieldTouched('construction_type')
+                                                                                    setFieldValue('construction_type', '2');
                                                                                     this.handleChange(values, setFieldTouched, setFieldValue)
                                                                                 }
                                                                                 }
                                                                             />
                                                                             <span className="checkmark " /><span className="fs-14"><h7> Kuchha Construction</h7></span>
                                                                         </label>
-                                                                        {errors.construction_for && touched.construction_for ? (
-                                                                            <span className="errorMsg">{errors.construction_for}</span>
+                                                                        {errors.construction_type && touched.construction_type ? (
+                                                                            <span className="errorMsg">{errors.construction_type}</span>
                                                                         ) : null}
                                                                     </div>
                                                                 </div>
@@ -736,13 +716,13 @@ class AdditionalDetails_GSB extends Component {
                                                                         <label className="customRadio3">
                                                                             <Field
                                                                                 type="radio"
-                                                                                name='basement_for'
+                                                                                name='proposer_property_type'
                                                                                 value='1'
                                                                                 key='1'
-                                                                                checked={values.basement_for == '1' ? true : false}
+                                                                                checked={values.proposer_property_type == '1' ? true : false}
                                                                                 onChange={() => {
-                                                                                    setFieldTouched('basement_for')
-                                                                                    setFieldValue('basement_for', '1');
+                                                                                    setFieldTouched('proposer_property_type')
+                                                                                    setFieldValue('proposer_property_type', '1');
                                                                                     this.handleChange(values, setFieldTouched, setFieldValue)
                                                                                 }
                                                                                 }
@@ -754,21 +734,21 @@ class AdditionalDetails_GSB extends Component {
                                                                         <label className="customRadio3">
                                                                             <Field
                                                                                 type="radio"
-                                                                                name='basement_for'
+                                                                                name='proposer_property_type'
                                                                                 value='2'
                                                                                 key='1'
-                                                                                checked={values.basement_for == '2' ? true : false}
+                                                                                checked={values.proposer_property_type == '2' ? true : false}
                                                                                 onChange={() => {
-                                                                                    setFieldTouched('basement_for')
-                                                                                    setFieldValue('basement_for', '2');
+                                                                                    setFieldTouched('proposer_property_type')
+                                                                                    setFieldValue('proposer_property_type', '2');
                                                                                     this.handleChange(values, setFieldTouched, setFieldValue)
                                                                                 }
                                                                                 }
                                                                             />
                                                                             <span className="checkmark " /><span className="fs-14"><h7> No</h7></span>
                                                                         </label>
-                                                                        {errors.basement_for && touched.basement_for ? (
-                                                                            <span className="errorMsg">{errors.basement_for}</span>
+                                                                        {errors.proposer_property_type && touched.proposer_property_type ? (
+                                                                            <span className="errorMsg">{errors.proposer_property_type}</span>
                                                                         ) : null}
                                                                     </div>
                                                                 </div>
@@ -782,13 +762,13 @@ class AdditionalDetails_GSB extends Component {
                                                                         <label className="customRadio3">
                                                                             <Field
                                                                                 type="radio"
-                                                                                name='protection_for'
+                                                                                name='property_protected_type'
                                                                                 value='1'
                                                                                 key='1'
-                                                                                checked={values.protection_for == '1' ? true : false}
+                                                                                checked={values.property_protected_type == '1' ? true : false}
                                                                                 onChange={() => {
-                                                                                    setFieldTouched('protection_for')
-                                                                                    setFieldValue('protection_for', '1');
+                                                                                    setFieldTouched('property_protected_type')
+                                                                                    setFieldValue('property_protected_type', '1');
                                                                                     this.handleChange(values, setFieldTouched, setFieldValue)
                                                                                 }
                                                                                 }
@@ -800,21 +780,21 @@ class AdditionalDetails_GSB extends Component {
                                                                         <label className="customRadio3">
                                                                             <Field
                                                                                 type="radio"
-                                                                                name='protection_for'
+                                                                                name='property_protected_type'
                                                                                 value='2'
                                                                                 key='1'
-                                                                                checked={values.protection_for == '2' ? true : false}
+                                                                                checked={values.property_protected_type == '2' ? true : false}
                                                                                 onChange={() => {
-                                                                                    setFieldTouched('protection_for')
-                                                                                    setFieldValue('protection_for', '2');
+                                                                                    setFieldTouched('property_protected_type')
+                                                                                    setFieldValue('property_protected_type', '2');
                                                                                     this.handleChange(values, setFieldTouched, setFieldValue)
                                                                                 }
                                                                                 }
                                                                             />
                                                                             <span className="checkmark " /><span className="fs-14"><h7> No</h7></span>
                                                                         </label>
-                                                                        {errors.protection_for && touched.protection_for ? (
-                                                                            <span className="errorMsg">{errors.protection_for}</span>
+                                                                        {errors.property_protected_type && touched.property_protected_type ? (
+                                                                            <span className="errorMsg">{errors.property_protected_type}</span>
                                                                         ) : null}
                                                                     </div>
                                                                 </div>
@@ -828,16 +808,16 @@ class AdditionalDetails_GSB extends Component {
                                                                         <FormGroup>
                                                                             <div className="insurerName">
                                                                                 <Field
-                                                                                    name='construction_year'
+                                                                                    name='year_of_construction'
                                                                                     type="text"
                                                                                     placeholder="Year of construction"
                                                                                     autoComplete="off"
                                                                                     onFocus={e => this.changePlaceHoldClassAdd(e)}
                                                                                     onBlur={e => this.changePlaceHoldClassRemove(e)}
-                                                                                    value={values.construction_year}
+                                                                                    value={values.year_of_construction}
                                                                                 />
-                                                                                {errors.construction_year && touched.construction_year ? (
-                                                                                    <span className="errorMsg">{errors.construction_year}</span>
+                                                                                {errors.year_of_construction && touched.year_of_construction ? (
+                                                                                    <span className="errorMsg">{errors.year_of_construction}</span>
                                                                                 ) : null}
                                                                             </div>
                                                                         </FormGroup>
@@ -853,23 +833,19 @@ class AdditionalDetails_GSB extends Component {
                                                                         <FormGroup>
                                                                             <div className="formSection">
                                                                                 <Field
-                                                                                    name="type_condition"
+                                                                                    name="pedal_cycle_type"
                                                                                     component="select"
                                                                                     autoComplete="off"
                                                                                     className="formGrp"
                                                                                 >
-                                                                                    <option value="">Type & Condition</option>
-                                                                                    <option value="1">Gent's Cycle-Brand New</option>
-                                                                                    <option value="2">Gent's Cycle-Moderately Used</option>
-                                                                                    <option value="3">Gent's Cycle-Heavily Used</option>
-                                                                                    <option value="4">Lady's Cycle-Brand New</option>
-                                                                                    <option value="5">Lady's Cycle-Moderately Used</option>
-                                                                                    <option value="6">Lady's Cycle-Heavily Used</option>
-                                                                                    <option value="7">Not applicable</option>
+                                                                                    <option value="">Cycle List</option>
+                                                                                     {cycleList.map((cycleList, qIndex) => ( 
+                                                                                        <option value={cycleList.id}>{cycleList.type_name}</option>
+                                                                                        ))}
                                                                                 </Field>
-                                                                                {errors.type_condition && touched.type_condition ? (
+                                                                                {errors.pedal_cycle_type && touched.pedal_cycle_type ? (
                                                                                     <span className="errorMsg">
-                                                                                        {errors.type_condition}
+                                                                                        {errors.pedal_cycle_type}
                                                                                     </span>
                                                                                 ) : null}
                                                                             </div>
@@ -924,7 +900,7 @@ class AdditionalDetails_GSB extends Component {
                                                                 <FormGroup>
                                                                     <div className="insurerName">
                                                                         <Field
-                                                                            name="flat_no"
+                                                                            name="house_flat_no"
                                                                             type="text"
                                                                             placeholder="House/Flat No."
                                                                             autoComplete="off"
@@ -934,11 +910,11 @@ class AdditionalDetails_GSB extends Component {
                                                                             onBlur={(e) =>
                                                                                 this.changePlaceHoldClassRemove(e)
                                                                             }
-                                                                            value={values.flat_no}
+                                                                            value={values.house_flat_no}
                                                                         />
-                                                                        {errors.flat_no && touched.flat_no ? (
+                                                                        {errors.house_flat_no && touched.house_flat_no ? (
                                                                             <span className="errorMsg">
-                                                                                {errors.flat_no}
+                                                                                {errors.house_flat_no}
                                                                             </span>
                                                                         ) : null}
                                                                     </div>
@@ -948,7 +924,7 @@ class AdditionalDetails_GSB extends Component {
                                                                 <FormGroup>
                                                                     <div className="insurerName">
                                                                         <Field
-                                                                            name="building_name"
+                                                                            name="house_building_name"
                                                                             type="text"
                                                                             placeholder="House/Building Name"
                                                                             autoComplete="off"
@@ -958,12 +934,12 @@ class AdditionalDetails_GSB extends Component {
                                                                             // onBlur={(e) =>
                                                                             //   this.changePlaceHoldClassRemove(e)
                                                                             // }
-                                                                            value={values.building_name}
+                                                                            value={values.house_building_name}
                                                                         />
-                                                                        {errors.building_name &&
-                                                                            touched.building_name ? (
+                                                                        {errors.house_building_name &&
+                                                                            touched.house_building_name ? (
                                                                                 <span className="errorMsg">
-                                                                                    {errors.building_name}
+                                                                                    {errors.house_building_name}
                                                                                 </span>
                                                                             ) : null}
                                                                     </div>
@@ -1001,7 +977,7 @@ class AdditionalDetails_GSB extends Component {
                                                                 <FormGroup>
                                                                     <div className="insurerName">
                                                                         <Field
-                                                                            name="pincode"
+                                                                            name="pincode_id"
                                                                             type="test"
                                                                             placeholder="Pincode"
                                                                             autoComplete="off"
@@ -1013,13 +989,13 @@ class AdditionalDetails_GSB extends Component {
                                                                                 this.changePlaceHoldClassRemove(e)
                                                                             }
                                                                             onKeyUp={(e) => this.fetchAreadetails(e)}
-                                                                            value={values.pincode}
+                                                                            value={values.pincode_id}
                                                                             maxLength="6"
                                                                             onInput={(e) => { }}
                                                                         />
-                                                                        {errors.pincode && touched.pincode ? (
+                                                                        {errors.pincode_id && touched.pincode_id ? (
                                                                             <span className="errorMsg">
-                                                                                {errors.pincode}
+                                                                                {errors.pincode_id}
                                                                             </span>
                                                                         ) : null}
                                                                     </div>
@@ -1029,10 +1005,10 @@ class AdditionalDetails_GSB extends Component {
                                                                 <FormGroup>
                                                                     <div className="formSection">
                                                                         <Field
-                                                                            name="pincode_id"
+                                                                            name="area_name"
                                                                             component="select"
                                                                             autoComplete="off"
-                                                                            value={values.pincode_id}
+                                                                            value={values.area_name}
                                                                             className="formGrp"
                                                                         >
                                                                             <option value="">Locality</option>
@@ -1048,9 +1024,9 @@ class AdditionalDetails_GSB extends Component {
 
                                                                             {/*<option value="area2">Area 2</option>*/}
                                                                         </Field>
-                                                                        {errors.pincode_id && touched.pincode_id ? (
+                                                                        {errors.area_name && touched.area_name ? (
                                                                             <span className="errorMsg">
-                                                                                {errors.pincode_id}
+                                                                                {errors.area_name}
                                                                             </span>
                                                                         ) : null}
                                                                     </div>
@@ -1070,7 +1046,7 @@ class AdditionalDetails_GSB extends Component {
                                                                             onBlur={(e) =>
                                                                                 this.changePlaceHoldClassRemove(e)
                                                                             }
-                                                                            value={values.city}
+                                                                            value={cityName}
                                                                         />
                                                                         {errors.city && touched.city ? (
                                                                             <span className="errorMsg">
@@ -1097,7 +1073,7 @@ class AdditionalDetails_GSB extends Component {
                                                                             onBlur={(e) =>
                                                                                 this.changePlaceHoldClassRemove(e)
                                                                             }
-                                                                            value={values.state_name}
+                                                                            value={stateName}
                                                                         />
                                                                         {errors.state_name &&
                                                                             touched.state_name ? (
@@ -1115,60 +1091,32 @@ class AdditionalDetails_GSB extends Component {
                                                                 <h4 className="fs-18 m-b-30">NOMINEE DETAILS</h4>
                                                             </div>
                                                         </div>
-                                                        {/* <Row>
+                                                        <Row className="m-b-45">
                                                             <Col sm={12} md={3} lg={2}>
                                                                 <FormGroup>
                                                                     <div className="formSection">
                                                                         <Field
-                                                                            name="nominee_salutation_id"
+                                                                            name='nominee_title_id'
                                                                             component="select"
                                                                             autoComplete="off"
                                                                             className="formGrp"
                                                                         >
-                                                                            <option value="">Title</option> */}
-                                                        {/* {titleList.map((title, qIndex) => ( 
-                                            <option value={title.id}>{title.displayvalue}</option>
-                                            ))} */}
-                                                        {/* </Field>
-                                                                        {errors.salutation_id && touched.salutation_id ? (
-                                                                            <span className="errorMsg">{errors.salutation_id}</span>
+                                                                            <option value="">Title</option>
+                                                                            {titleList.map((title, qIndex) => ( 
+                                                                            <option value={title.id}>{title.displayvalue}</option>
+                                                                            ))}
+                                                                        </Field>
+                                                                        {errors.nominee_title_id && touched.nominee_title_id ? (
+                                                                            <span className="errorMsg">{errors.nominee_title_id}</span>
                                                                         ) : null}
                                                                     </div>
                                                                 </FormGroup>
                                                             </Col>
-
                                                             <Col sm={12} md={3} lg={3}>
                                                                 <FormGroup>
                                                                     <div className="insurerName">
                                                                         <Field
-                                                                            name="nominee_name"
-                                                                            type="text"
-                                                                            placeholder="First Name"
-                                                                            autoComplete="off"
-                                                                            onFocus={(e) =>
-                                                                                this.changePlaceHoldClassAdd(e)
-                                                                            }
-                                                                            onBlur={(e) =>
-                                                                                this.changePlaceHoldClassRemove(e)
-                                                                            }
-                                                                            value={values.nominee_name}
-                                                                        />
-                                                                        {errors.nominee_name &&
-                                                                            touched.nominee_name ? (
-                                                                                <span className="errorMsg">
-                                                                                    {errors.nominee_name}
-                                                                                </span>
-                                                                            ) : null}
-                                                                    </div>
-                                                                </FormGroup>
-                                                            </Col>
-                                                        </Row> */}
-                                                        <Row className="m-b-45">
-                                                            <Col sm={12} md={3} lg={3}>
-                                                                <FormGroup>
-                                                                    <div className="insurerName">
-                                                                        <Field
-                                                                            name="nominee_name"
+                                                                            name="nominee_first_name"
                                                                             type="text"
                                                                             placeholder="Nominee Name"
                                                                             autoComplete="off"
@@ -1178,12 +1126,37 @@ class AdditionalDetails_GSB extends Component {
                                                                             onBlur={(e) =>
                                                                                 this.changePlaceHoldClassRemove(e)
                                                                             }
-                                                                            value={values.nominee_name}
+                                                                            value={values.nominee_first_name}
                                                                         />
-                                                                        {errors.nominee_name &&
-                                                                            touched.nominee_name ? (
+                                                                        {errors.nominee_first_name &&
+                                                                            touched.nominee_first_name ? (
                                                                                 <span className="errorMsg">
-                                                                                    {errors.nominee_name}
+                                                                                    {errors.nominee_first_name}
+                                                                                </span>
+                                                                            ) : null}
+                                                                    </div>
+                                                                </FormGroup>
+                                                            </Col>
+                                                            <Col sm={12} md={3} lg={3}>
+                                                                <FormGroup>
+                                                                    <div className="insurerName">
+                                                                        <Field
+                                                                            name="nominee_last_name"
+                                                                            type="text"
+                                                                            placeholder="Nominee Name"
+                                                                            autoComplete="off"
+                                                                            onFocus={(e) =>
+                                                                                this.changePlaceHoldClassAdd(e)
+                                                                            }
+                                                                            onBlur={(e) =>
+                                                                                this.changePlaceHoldClassRemove(e)
+                                                                            }
+                                                                            value={values.nominee_last_name}
+                                                                        />
+                                                                        {errors.nominee_last_name &&
+                                                                            touched.nominee_last_name ? (
+                                                                                <span className="errorMsg">
+                                                                                    {errors.nominee_last_name}
                                                                                 </span>
                                                                             ) : null}
                                                                     </div>
@@ -1316,8 +1289,8 @@ class AdditionalDetails_GSB extends Component {
                                                             <Button className={`backBtn`} type="button" disabled={isSubmitting ? true : false} onClick={this.planInfo.bind(this,productId)}>
                                                                 {isSubmitting ? 'Wait..' : 'Back'}
                                                             </Button>
-                                                            <Button className={`proceedBtn`} type="submit" disabled={isSubmitting ? true : false}>
-                                                                {isSubmitting ? 'Wait..' : 'Convert to policy'}
+                                                            <Button className={`proceedBtn`} type="submit"  >
+                                                                Convert to policy
                                                             </Button>
                                                         </div>
                                                     </Form>

@@ -141,7 +141,7 @@ class arogya_SelectDuration extends Component {
         // let defaultdeductibleSliderValue = 0
         // let defaulttenureSliderValue = 0
         const { productId } = this.props.match.params
-        const { serverResponse, SliderVal} = this.state
+        const { serverResponse, SliderVal } = this.state
         const formData = new FormData();
         let encryption = new Encryption();
 
@@ -171,8 +171,8 @@ class arogya_SelectDuration extends Component {
             'tenure_year': parseInt(tenureSliderVal),
         }
         formData.append('enc_data', encryption.encrypt(JSON.stringify(post_data)))
-        
-        console.log('Handle--submit----',post_data)
+
+        console.log('Handle--submit----', post_data)
         this.props.loadingStart();
         axios
             .post(`/arogya-topup/duration-premium`, formData)
@@ -198,18 +198,18 @@ class arogya_SelectDuration extends Component {
             .then(res => {
                 let decryptResp = JSON.parse(encryption.decrypt(res.data))
                 console.log("decrypt", decryptResp.data.policyHolder)
-                let policyHolderDetails= decryptResp.data.policyHolder
+                let policyHolderDetails = decryptResp.data.policyHolder
                 this.setState({
                     policyHolderDetails: policyHolderDetails,
-                    SliderVal: decryptResp.data.policyHolder && decryptResp.data.policyHolder.arogyatopupsuminsured ? decryptResp.data.policyHolder.arogyatopupsuminsured.insured_amount : 0, 
+                    SliderVal: decryptResp.data.policyHolder && decryptResp.data.policyHolder.arogyatopupsuminsured ? decryptResp.data.policyHolder.arogyatopupsuminsured.insured_amount : 0,
 
-                    deductibleSliderVal: decryptResp.data.policyHolder && decryptResp.data.policyHolder.request_data ? decryptResp.data.policyHolder.request_data.deductible : 0, 
+                    deductibleSliderVal: decryptResp.data.policyHolder && decryptResp.data.policyHolder.request_data ? decryptResp.data.policyHolder.request_data.deductible : 0,
 
                     tenureSliderVal: decryptResp.data.policyHolder && decryptResp.data.policyHolder.request_data ? decryptResp.data.policyHolder.request_data.tenure_year : 0
                 })
                 var values = []
-                let policyDetails = policyHolderDetails && policyHolderDetails.request_data ? policyHolderDetails.request_data : [] 
-                let insured_amount = policyHolderDetails && policyHolderDetails.arogyatopupsuminsured ? policyHolderDetails.arogyatopupsuminsured.insured_amount : [] 
+                let policyDetails = policyHolderDetails && policyHolderDetails.request_data ? policyHolderDetails.request_data : []
+                let insured_amount = policyHolderDetails && policyHolderDetails.arogyatopupsuminsured ? policyHolderDetails.arogyatopupsuminsured.insured_amount : []
 
                 values['polStartDate'] = policyDetails && policyDetails.start_date ? moment(policyDetails.start_date).format("YYYY-MM-DD") : new Date()
                 values['polEndDate'] = policyDetails && policyDetails.end_date ? moment(policyDetails.end_date).format("YYYY-MM-DD") : new Date(moment(values['polStartDate']).add(1, 'years').format("YYYY-MM-DD"))
@@ -353,10 +353,10 @@ class arogya_SelectDuration extends Component {
             // insureValue: policyHolderDetails && policyHolderDetails.request_data && policyHolderDetails.request_data.sum_insured ? Math.floor(policyHolderDetails.request_data.sum_insured) : initialValues.insureValue
             // insureValue: policyHolderDetails && policyHolderDetails.request_data && policyHolderDetails.request_data.sum_insured ? sum_assured[policyHolderDetails.request_data.sum_insured] : initialValues.insureValue,
 
-            slider_sum_insured: SliderVal ? SliderVal : defaultSliderVal, 
+            slider_sum_insured: SliderVal ? SliderVal : defaultSliderVal,
 
             slider_deductible: deductibleSliderVal ? deductibleSliderVal : defaultdeductibleSliderValue,
-            
+
             slider_tenure: tenureSliderVal ? tenureSliderVal : defaulttenureSliderValue,
         })
 
@@ -438,7 +438,7 @@ class arogya_SelectDuration extends Component {
                                                                                 placeholderText="End Date"
                                                                                 disabled={true}
                                                                                 className="datePckr"
-                                                                                selected={addDays(new Date(values.polStartDate), (365*values.slider_tenure)-1 )}
+                                                                                selected={addDays(new Date(values.polStartDate), (365 * values.slider_tenure) - 1)}
                                                                             />
                                                                             {errors.polEndDate && touched.polEndDate ? (
                                                                                 <span className="errorMsg">{errors.polEndDate}</span>
@@ -551,7 +551,7 @@ class arogya_SelectDuration extends Component {
                                                                         <FormGroup>
                                                                             <div className="insurerName">
                                                                                 <Field
-                                                                                    name="select_tenure"
+                                                                                    name="w"
                                                                                     type="text"
                                                                                     placeholder=""
                                                                                     autoComplete="off"
@@ -591,7 +591,7 @@ class arogya_SelectDuration extends Component {
                                                                 <Row>
                                                                     <Col sm={12}>
                                                                         <div className="d-flex justify-content-between align-items-center premium m-b-25">
-                                                                            <p>Your Total Premium for One Year :</p>
+                                                                            <p>Your Total Premium for {tenureSliderVal == 1 ? 'one' : tenureSliderVal == 2 ? 'two' : tenureSliderVal ? 'three' : 'two'} Year :</p>
                                                                             {/* <p><strong>Rs:</strong> { serverResponse ? (serverResponse.message ? 0 : serverResponse.DuePremium ) : 0}</p> */}
                                                                             <p><strong>Rs:</strong> {serverResponse ? serverResponse.DuePremium : 0}</p>
                                                                         </div>
@@ -606,7 +606,7 @@ class arogya_SelectDuration extends Component {
                                                                                 <li>Medicines that you consume during the hospital stay</li>
                                                                                 <li>Road Ambulance Charges</li>
                                                                                 <li>Day Care expenses for 142 daycare procedures</li>
-                                                                                <li>Pre and Post hospitalization expenses up to 30 and 60 days respectively</li>
+                                                                                <li>Pre and Post hospitalization expenses up to 60 and 90 days respectively</li>
                                                                             </ul>
                                                                         </div>
                                                                     </Col>
@@ -632,7 +632,7 @@ class arogya_SelectDuration extends Component {
                                                             <Col sm={12} md={3}>
                                                                 <div className="regisBox grossbox">
                                                                     {/* <h5 className="medihead">Gross Premium : <span>₹ {serverResponse ? (serverResponse.message ? 0 : serverResponse.DuePremium) : 0}</span></h5> */}
-                                                                    <table class="table">
+                                                                    <table className="table">
                                                                         <tbody>
                                                                             <tr>
                                                                                 <td>Gross Premium:</td>

@@ -15,6 +15,7 @@ import axios from "../../shared/axios"
 import swal from 'sweetalert';
 import moment from "moment";
 import Encryption from '../../shared/payload-encryption';
+import ReadMoreReact from 'read-more-react';
 
 
 class TicketStatus extends Component {
@@ -292,7 +293,15 @@ class TicketStatus extends Component {
                                             <b>{userName}</b> posted <span>{moment(selectedTicket.created_at).format('DD/MM/YYYY hh:mm A')}</span> <span className="title truncate"></span>
                                         </div>
                                         <div className="thread-body">
-                                            <div> {selectedTicket.description} </div>
+                                            <div> 
+                                                {/* <ReadMoreReact text={selectedTicket.description} min={2} max={20} />  */}
+                                                <ReadMoreReact 
+                                                    text={selectedTicket.description}
+                                                    min={2}
+                                                    ideal={50}
+                                                    max={50}
+                                                    readMoreText="...Read More"/>
+                                            </div>
                                             <div className="clear"></div>
                                         </div>
                                     </div>
@@ -315,7 +324,16 @@ class TicketStatus extends Component {
                                             <b>{userName}</b> posted <span>{moment(row.created_at).format('DD/MM/YYYY hh:mm A')}</span> <span className="title truncate"></span>
                                         </div>
                                         <div className="thread-body">
-                                            <div> {row.decriptions} </div>
+                                            <div> 
+                                                {row.decriptions && row.decriptions !== "" ? (
+                                                    <ReadMoreReact 
+                                                        text={row.decriptions}
+                                                        min={2}
+                                                        ideal={50}
+                                                        max={50}
+                                                        readMoreText="...Read More"/>
+                                                ) : row.decriptions}
+                                            </div>
                                             <div className="clear"></div>
                                         </div>
                                     </div>
@@ -385,7 +403,8 @@ class TicketStatus extends Component {
                                     </div>
                                     <div class="form-group">
                                         <input type="file" key='1' name="attachment"
-                                            accept=".png, .jpeg, .jpg, .doc, .docx, .xls, .xlsx, .pdf"
+                                            // accept=".png, .jpeg, .jpg, .doc, .docx, .xls, .xlsx, .pdf"
+                                            accept=".jpg,.jpeg,.png,.gif,.pdf,.doc,.docx,.key,.ppt,.pptx,.pps,.ppsx,.odt,.xls,.xlsx,.zip,.html,.bmp,.dib,.txt,.xml,.eml,.csv,.msg,.xps,.htm"
                                             onChange={(e) => {
                                                 const { target } = e
                                                 if (target.value.length > 0) {
