@@ -400,7 +400,10 @@ const AdditionalDetails_GSB = Loadable({
     loader: () => import(/*webpackChunkName: "Products" */"../GSB/AdditionalDetails_GSB"),
     loading: () => loadingContent
 });
-
+const PolicyDetails_GSB = Loadable({
+    loader: () => import(/*webpackChunkName: "Products" */"../GSB/PolicyDetails_GSB"),
+    loading: () => loadingContent
+});
 // ====================================================================
 
 
@@ -549,7 +552,8 @@ class Routes extends Component {
                         
                         {/************ GSB ******************/}
                         <PrivateRoute exact path="/SelectPlan_GSB/:productId" component={SelectPlan_GSB} />
-                        <PrivateRoute exact path="/AdditionalDetails_GSB/:productId" component={AdditionalDetails_GSB} />
+                        <PrivateRoute exact path="/AdditionalDetails_GSB/:productId" component={AdditionalDetails_GSB} /> 
+                        <PrivateRoute exact path="/PolicyDetails_GSB/:productId" component={PolicyDetails_GSB} />
 
                         {/************ Vedvag Payment Gateway ******************/}
                         <PrivateRoute exact path="/Vedvag_gateway/:productId" component={VedvagGateway} />

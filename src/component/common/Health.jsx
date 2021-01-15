@@ -24,6 +24,8 @@ class Health extends Component {
         this.props.history.push(`/Health_KSB/${productId}`);
         if(productId == '12')
         this.props.history.push(`/arogya_Health/${productId}`);
+        if(productId == '14')
+        this.props.history.push(`/SelectPlan_GSB/${productId}`);
     }   
 
     getPolicyList = () => {

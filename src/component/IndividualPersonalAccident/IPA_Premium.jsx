@@ -53,7 +53,8 @@ class IPA_Premium extends Component {
     relationArr: {},
     policyHolder_refNo: queryString.parse(this.props.location.search).access_id ? 
                         queryString.parse(this.props.location.search).access_id : 
-                        localStorage.getItem("policyHolder_refNo")
+                        localStorage.getItem("policyHolder_refNo"),
+    ipaInfo: []
   };
 
   changePlaceHoldClassAdd(e) {
@@ -108,11 +109,11 @@ class IPA_Premium extends Component {
       .then((res) => {
         let decryptResp = JSON.parse(encryption.decrypt(res.data));
 
-        let accidentDetails = decryptResp.data && decryptResp.data.policyHolder ? decryptResp.data.policyHolder : null;
+        let ipaInfo = decryptResp.data && decryptResp.data.policyHolder && decryptResp.data.policyHolder.ipainfo ? decryptResp.data.policyHolder.ipainfo : null;
         let policyHolderDetails = decryptResp.data.policyHolder ? decryptResp.data.policyHolder : [];
-        console.log("---accidentDetails--->>", accidentDetails);
+        console.log("---ipaInfo--->>", ipaInfo);
         this.setState({
-          accidentDetails, policyHolderDetails,
+          ipaInfo, policyHolderDetails,
           nomineeDetails: policyHolderDetails.request_data && policyHolderDetails.request_data.nominee && policyHolderDetails.request_data.nominee[0],
         });
         this.quote() 
@@ -125,11 +126,12 @@ class IPA_Premium extends Component {
 
   quote = () => {
     //console.log('value', value)
-    const {accessToken} = this.state 
+    const {accessToken, ipaInfo} = this.state 
     const formData = new FormData(); 
     this.props.loadingStart();
     const post_data = {
         'id':localStorage.getItem('policyHolder_id'),
+        'occupation_id': ipaInfo ? ipaInfo.occupation_id : ""
         // 'proposer_dob': date_of_birth ,
         // 'sum_insured': values.sumInsured ? sum_insured_array[values.sumInsured] : null
     }
@@ -252,7 +254,7 @@ class IPA_Premium extends Component {
 
   render() {
     const { productId } = this.props.match.params;
-    const { fulQuoteResp, error, show, policyHolderDetails, nomineeDetails, paymentStatus, policyCoverage, relationArr } = this.state;
+    const { fulQuoteResp, error, show, policyHolderDetails, nomineeDetails, paymentStatus, policyCoverage, relationArr, ipaInfo } = this.state;
 
     console.log("policyHolderDetails ", policyHolderDetails)
 

@@ -23,8 +23,8 @@ const initialValues = {
   first_name: "",
   last_name: "",
   date_of_birth: "",
-  insured: "",
-  occupation: "",
+  insured: "1",
+  occupation_id: "",
   gender: "",
   previous_policy_check: "",
   disability: ""
@@ -32,7 +32,7 @@ const initialValues = {
 
 const vehicleRegistrationValidation = Yup.object().shape({
   // insured: Yup.string().required("Please select insured type").nullable(),
-  occupation: Yup.string().required("Please select occupation type"),
+  occupation_id: Yup.string().required("Please select occupation type"),
   gender: Yup.string().required("Please select gender").nullable(),
   insured: Yup.string().required("Please select insured type")
 });
@@ -123,7 +123,7 @@ class AccidentAddDetails extends Component {
     const post_data = {
       'id': localStorage.getItem('policyHolder_id'),
       'proposer_dob': date_of_birth,
-      'sum_insured': ipaInfo ? ipaInfo.sum_insured : null
+      'occupation_id': values.occupation_id,
     }
     let encryption = new Encryption();
     formData.append('enc_data', encryption.encrypt(JSON.stringify(post_data)))
@@ -205,7 +205,7 @@ class AccidentAddDetails extends Component {
       'insured_type_id': values.insured,
       'claim_existing': values.previous_policy_check,
       'existing_physical_disability': values.disability,
-      'occupation_id': values.occupation,
+      'occupation_id': values.occupation_id,
       'proposer_gender': values.gender
     }
     console.log('post_data', post_data);
@@ -263,13 +263,13 @@ class AccidentAddDetails extends Component {
     const newInitialValues = Object.assign(initialValues, {
       pol_start_date: requestedData && requestedData.start_date ? new Date(requestedData.start_date) : new Date(),
       pol_end_date: requestedData && requestedData.end_date ? new Date(requestedData.end_date) : new Date(moment().add(364, "day").calendar()),
-      insured: accidentDetails && accidentDetails.ipainfo && accidentDetails.ipainfo.insured_type_id != 0 ? accidentDetails.ipainfo.insured_type_id : "",
+      insured: accidentDetails && accidentDetails.ipainfo && accidentDetails.ipainfo.insured_type_id != 0 ? accidentDetails.ipainfo.insured_type_id : "1",
       previous_policy_check: 0,
       disability: 0,
       first_name: accidentDetails ? accidentDetails.first_name : "",
       last_name: accidentDetails ? accidentDetails.last_name : "",
       date_of_birth: accidentDetails && accidentDetails.dob ? new Date(accidentDetails.dob) : "",
-      occupation: accidentDetails && accidentDetails.ipainfo && accidentDetails.ipainfo.occupation ? accidentDetails.ipainfo.occupation.id : "",
+      occupation_id: accidentDetails && accidentDetails.ipainfo && accidentDetails.ipainfo.occupation ? accidentDetails.ipainfo.occupation.id : "",
       gender: accidentDetails ? accidentDetails.gender : ""
     });
     console.log("validation_error-------- ", validation_error)
@@ -317,13 +317,6 @@ class AccidentAddDetails extends Component {
                     >
                       {({ values, errors, setFieldValue, setFieldTouched, isValid, isSubmitting, touched }) => {
                         // console.log('values',values)
-                        // if (values) {
-                        //   {
-                        //     occupationList && occupationList.length > 0 && occupationList.map((insure, qIndex) => (
-                        //       insure.id == values.occupation ? insure.decline_status == "Decline" ? swal('Insurance Policy cannot be offered') : '' : ''
-                        //     ))
-                        //   }
-                        // }
 
                         return (
                           <Form>
@@ -531,14 +524,14 @@ class AccidentAddDetails extends Component {
                                 <FormGroup>
                                   <div className="formSection">
                                     <Field
-                                      name="occupation"
+                                      name="occupation_id"
                                       component="select"
                                       autoComplete="off"
                                       className="formGrp"
                                       onChange={(e) => {
-                                        setFieldTouched("occupation");
+                                        setFieldTouched("occupation_id");
                                         setFieldValue(
-                                          "occupation",
+                                          "occupation_id",
                                           e.target.value
                                         );
                                         this.handleChange(e);
@@ -549,9 +542,9 @@ class AccidentAddDetails extends Component {
                                         <option key={qIndex} value={insurer.id} > {insurer.occupation} </option>
                                       ))}
                                     </Field>
-                                    {errors.occupation && touched.occupation ? (
+                                    {errors.occupation_id && touched.occupation_id ? (
                                       <span className="errorMsg">
-                                        {errors.occupation}
+                                        {errors.occupation_id}
                                       </span>
                                     ) : null}
                                   </div>

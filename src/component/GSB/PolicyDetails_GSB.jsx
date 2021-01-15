@@ -110,6 +110,7 @@ class PolicyDetails_GSB extends Component {
     const { productId } = this.props.match.params;
     let policyHolder_refNo = localStorage.getItem("policyHolder_refNo") ? localStorage.getItem("policyHolder_refNo") : 0;
     let encryption = new Encryption();
+    this.props.loadingStart();
     axios
       .get(`gsb/gsb-policy-details/${policyHolder_refNo}`)
       .then((res) => {
@@ -126,7 +127,6 @@ class PolicyDetails_GSB extends Component {
           addressDetails, pincode_Details, policyHolderDetails
         });
         this.fetchCoveragePlan(decryptResp.data.policyHolder, gsb_Details)
-        this.props.loadingStop();
       })
       .catch((err) => {
         // handle error

@@ -16,16 +16,17 @@ import Encryption from '../../shared/payload-encryption';
 import { Formik, Form, Field, ErrorMessage } from 'formik';
 import { changeFormat, get18YearsBeforeDate, PersonAge } from "../../shared/dateFunctions";
 
-const minDate = moment().format();
 // alert(new Date(minDate));
-const maxDate = moment().add(14, 'day');
-const maxDateEnd = moment().add(15, 'day').calendar();
-const minDobAdult = moment(moment().subtract(100, 'years').calendar())
-const maxDobAdult = moment().subtract(18, 'years').calendar();
+const minConstructionDate = new Date(moment(moment().subtract(30, 'years').calendar()).add(1, 'day').calendar());
+// const maxDate = moment().add(15, 'day').calendar();
+const minDobAdult = new Date(moment(moment().subtract(100, 'years').calendar()))
+const maxDobAdult = new Date(moment().subtract(18, 'years').calendar());
+
+const minDobNominee = new Date(moment(moment().subtract(100, 'years').calendar()))
+const maxDobNominee = new Date(moment().subtract(3, 'months').calendar());
 
 const initialValues = {
     policy_type: '1',
-    pol_start_date: null,
     pinDataArr: [],
     proposer_title_id: "",
     proposer_first_name: "",
@@ -48,11 +49,11 @@ const initialValues = {
     state_name: "",
     pincode_id: "",
     area_name: "",
-    nominee_salutation_id: "",
     nominee_first_name: "",
     nominee_dob: null,
     relation_with: "",
-    appointee_relation_with: ""
+    appointee_relation_with: "",
+    nominee_title_id: ""
 
 }
 
@@ -75,53 +76,132 @@ const vehicleRegistrationValidation = Yup.object().shape({
         }).matches(/^[a-zA-Z0-9]+([._\-]?[a-zA-Z0-9]+)*@\w+([-]?\w+)*(\.\w{2,3})+$/, 'Invalid Email Id').nullable(),
     proposer_mobile: Yup.string()
         .matches(/^[6-9][0-9]{9}$/, 'Invalid Mobile number').required('Mobile No. is required').nullable(),
-    house_building_name: Yup.string()
+        
+    house_building_name:  Yup.string().when(["address_flag"], {
+        is: address_flag => address_flag == '0',          
+        then:Yup.string()
         .required("Please enter building name")
         .matches(/^[a-zA-Z0-9][a-zA-Z0-9-/.,-\s]*$/, function () {
             return "Please enter valid building name";
         })
         .nullable(),
+        otherwise: Yup.string()
+    }),
+
     // block_no: Yup.string().required("Please enter Plot number").nullable(),
-    house_flat_no: Yup.string()
+    house_flat_no: Yup.string().when(["address_flag"], {
+        is: address_flag => address_flag == '0', 
+        then: Yup.string()
         .required("Please enter flat number")
         .matches(/^[a-zA-Z0-9][a-zA-Z0-9-/.,-\s]*$/, function () {
             return "Please enter valid flat number";
         })
         .nullable(),
-    city: Yup.string()
+        otherwise: Yup.string()
+    }),
+    city: Yup.string().when(["address_flag"], {
+        is: address_flag => address_flag == '0', 
+        then: Yup.string()
         .required("Please enter city")
         .matches(/^[a-zA-Z0-9][a-zA-Z0-9-/.,-\s]*$/, function () {
             return "Please enter valid city";
         })
         .nullable(),
-    street_name: Yup.string()
+        otherwise: Yup.string()
+    }),
+    street_name: Yup.string().when(["address_flag"], {
+        is: address_flag => address_flag == '0', 
+        then: Yup.string()
         .required("Please enter area name")
         .matches(/^[a-zA-Z0-9][a-zA-Z0-9-/.,-\s]*$/, function () {
             return "Please enter valid area name";
         })
         .nullable(),
-    state_name: Yup.string()
+        otherwise: Yup.string()
+    }),
+    state_name: Yup.string().when(["address_flag"], {
+        is: address_flag => address_flag == '0', 
+        then: Yup.string()
         .required("Please enter state")
         .matches(/^[a-zA-Z0-9][a-zA-Z0-9-/.,-\s]*$/, function () {
             return "Please enter valid state";
         })
         .nullable(),
-    pincode_id: Yup.string()
+        otherwise: Yup.string()
+    }),
+    pincode_id: Yup.string().when(["address_flag"], {
+        is: address_flag => address_flag == '0', 
+        then: Yup.string()
         .required("Pincode is required")
         .matches(/^[0-9]{6}$/, function () {
             return "Please enter valid 6 digit pin code";
         })
         .nullable(),
-    area_name: Yup.string().required("Please select locality").nullable(),
-    proposer_disability: Yup.string().required("Please select optioin for disability").nullable(),
-    construction_type: Yup.string().required("Please select type of construction").nullable(),
-    proposer_property_type: Yup.string().required("Please select option for proposed property").nullable(),
-    property_protected_type: Yup.string().required("Please select option for protected with doors/windows/grill").nullable(),
+        otherwise: Yup.string()
+    }),
+    area_name: Yup.string().when(["address_flag"], {
+        is: address_flag => address_flag == '0', 
+        then: Yup.string().required("Please select locality").nullable(),
+        otherwise: Yup.string()
+    }),
+
+    proposer_disability: Yup.string().required("Please select optioin for disability")
+    .test(
+        "policyIssueChecking",
+        function() {
+            return "Policy cannot be issued"
+        },
+        function (value) {
+            if (value == '1' ) {   
+                return false;    
+            }
+            return true;
+        }
+    ),
+    construction_type: Yup.string().required("Please select type of construction")
+    .test(
+        "policyIssueChecking",
+        function() {
+            return "Policy cannot be issued"
+        },
+        function (value) {
+            if (value == '0' ) {   
+                return false;    
+            }
+            return true;
+        }
+    ),
+    proposer_property_type: Yup.string().required("Please select option for proposed property")
+    .test(
+        "policyIssueChecking",
+        function() {
+            return "Policy cannot be issued"
+        },
+        function (value) {
+            if (value == '1' ) {   
+                return false;    
+            }
+            return true;
+        }
+    ),
+    property_protected_type: Yup.string().required("Please select option for protected with doors/windows/grill")
+    .test(
+        "policyIssueChecking",
+        function() {
+            return "Policy cannot be issued"
+        },
+        function (value) {
+            if (value == '0' ) {   
+                return false;    
+            }
+            return true;
+        }
+    ),
     year_of_construction: Yup.string().required("Please enter construction year").nullable(),
     pedal_cycle_type: Yup.string().required("Please select option for type & construction").nullable(),
-    pedal_cycle_description: Yup.string().required("Please enter description").nullable(),
+    pedal_cycle_description: Yup.string().notRequired("Please enter description").nullable(),
     // NOMINEE--------
-    // nominee_salutation_id: Yup.string().required("Title is required").nullable(),
+    nominee_title_id: Yup.string().required('Title is required').nullable(),
     nominee_first_name: Yup.string()
         .required("Nominee Name is required")
         .min(3, function () {
@@ -153,7 +233,10 @@ class AdditionalDetails_GSB extends Component {
         cycleList: [],
         cityName:"",
         stateName: "",
-        serverResponse: []
+        serverResponse: [],
+        riskAddressDetails: [],
+        commAddressDetails: [],
+        address_flag: "0"
     }
 
     handleChange = date => {
@@ -232,10 +315,17 @@ class AdditionalDetails_GSB extends Component {
             .then((res) => {
                 let decryptResp = JSON.parse(encryption.decrypt(res.data));
                 let gsb_Details = decryptResp.data && decryptResp.data.policyHolder ? decryptResp.data.policyHolder : null;
-                console.log("---gsb_Details--->>", gsb_Details);
+                let riskAddressDetails = gsb_Details && gsb_Details.gsbinfo ? JSON.parse(gsb_Details.gsbinfo.risk_address) : null
+                let commAddressDetails = gsb_Details ? JSON.parse(gsb_Details.address) : null
+                let nomineeDetails = decryptResp.data.policyHolder ? decryptResp.data.policyHolder.request_data.nominee[0] : {}
+                console.log("---GSB info--->>", decryptResp);
                 this.setState({
-                    gsb_Details
+                    gsb_Details, riskAddressDetails, commAddressDetails,
+                    address_flag :  gsb_Details && gsb_Details.gsbinfo ? gsb_Details.gsbinfo.address_flag : "0",
+                    is_appointee: nomineeDetails ? nomineeDetails.is_appointee : ""
                 });
+                let pincode = gsb_Details && gsb_Details.gsbinfo && gsb_Details.gsbinfo.address_flag == '1' ? gsb_Details.gsbinfo.pincode : gsb_Details ? gsb_Details.pincode : ""
+                this.fetchAreadetailsBack(pincode)
                 this.props.loadingStop();
             })
             .catch((err) => {
@@ -277,7 +367,11 @@ class AdditionalDetails_GSB extends Component {
             'street_name': values.street_name,
             'year_of_construction': values.year_of_construction ? moment(values.year_of_construction).format("YYYY-MM-DD") : "",
             'pincode_id': values.area_name,
-            'relation_with': values.relation_with
+            'relation_with': values.relation_with,
+            'address_flag': values.address_flag,
+            'appointee_name': values.appointee_name,
+            'appointee_relation_with': values.appointee_relation_with,
+            'is_appointee': this.state.is_appointee
 
         }
 
@@ -307,7 +401,7 @@ class AdditionalDetails_GSB extends Component {
             console.log('decryptResp-----', decryptResp)
             if (decryptResp.error === false) {
                 this.props.loadingStop();
-                // this.props.history.push(`/RiskDetails/${productId}`);
+                this.props.history.push(`/PolicyDetails_GSB/${productId}`);
             } else {
                 this.props.loadingStop();
                 swal("Thank you for showing your interest for buying product.Due to some reasons, we are not able to issue the policy online.Please call 1800 22 1111");
@@ -323,7 +417,7 @@ class AdditionalDetails_GSB extends Component {
     }
 
 
-    fetchAreadetails = (e) => {
+    fetchAreadetails = (e, setFieldValue, setFieldTouched) => {
         let pinCode = e.target.value;
     
         if (pinCode.length == 6) {
@@ -356,6 +450,11 @@ class AdditionalDetails_GSB extends Component {
                   pinDataArr: res.data.data,
                   stateName, cityName
                 });
+                setFieldValue("state_name", stateName);
+                setFieldTouched("state_name");
+                setFieldValue("city", cityName);
+                setFieldTouched("city");
+
                 this.props.loadingStop();
               } else {
                 this.props.loadingStop();
@@ -368,8 +467,8 @@ class AdditionalDetails_GSB extends Component {
         }
     };
 
-    fetchAreadetailsBack = (pincode_input) => {
-        let pinCode = pincode_input.toString();
+    fetchAreadetailsBack = (pincode_input,setFieldValue, setFieldTouched) => {
+        let pinCode = pincode_input ? pincode_input.toString() : "";
 
         if (pinCode != null && pinCode != "" && pinCode.length == 6) {
             console.log("fetchAreadetailsBack pinCode", pinCode);
@@ -390,10 +489,18 @@ class AdditionalDetails_GSB extends Component {
                             res.data.data[0].pinstate.STATE_NM
                             ? res.data.data[0].pinstate.STATE_NM
                             : "";
+                    let cityName =
+                        res.data.data &&
+                            res.data.data[0] &&
+                            res.data.data[0].pincity.CITY_NM
+                              ? res.data.data[0].pincity.CITY_NM
+                              : "";
+
                     this.setState({
                         pinDataArr: res.data.data,
-                        stateName,
+                        stateName, cityName
                     });
+
                     this.props.loadingStop();
                 })
                 .catch((err) => {
@@ -420,39 +527,42 @@ class AdditionalDetails_GSB extends Component {
 
 
     render() {
-        const { pinDataArr, appointeeFlag, is_appointee, titleList, cycleList, stateName, cityName } = this.state
+        const { pinDataArr, appointeeFlag, is_appointee, titleList, cycleList, stateName, cityName, gsb_Details, 
+                riskAddressDetails, commAddressDetails, address_flag } = this.state
         const {productId } = this.props.match.params
         const newInitialValues = Object.assign(initialValues, {
-            pol_start_date: this.props.start_date != null ? new Date(this.props.start_date) : null,
-            pol_end_date: this.props.end_date != null ? new Date(this.props.end_date) : null,
-            proposer_title_id: "",
-            proposer_first_name: "",
-            proposer_last_name: "",
-            proposer_dob: "",
-            proposer_mobile: "",
-            proposer_email: "",
-            proposer_disability: "",
-            construction_type: "",
-            proposer_property_type: "",
-            property_protected_type: "",
-            year_of_construction: "",
-            pedal_cycle_type: "",
-            pedal_cycle_description: "",
+            proposer_title_id: gsb_Details ? gsb_Details.salutation_id : "",
+            proposer_first_name: gsb_Details ? gsb_Details.first_name : "",
+            proposer_last_name: gsb_Details ? gsb_Details.last_name : "",
+            proposer_dob: gsb_Details && gsb_Details.dob ? new Date(gsb_Details.dob) : "",
+            proposer_mobile: gsb_Details ? gsb_Details.mobile : "",
+            proposer_email: gsb_Details ? gsb_Details.email_id : "",
+            proposer_disability: gsb_Details && gsb_Details.gsbinfo ? gsb_Details.gsbinfo.proposer_disability : "",
+            construction_type: gsb_Details && gsb_Details.gsbinfo ? gsb_Details.gsbinfo.construction_type : "",
+            proposer_property_type: gsb_Details && gsb_Details.gsbinfo ? gsb_Details.gsbinfo.proposer_property_type : "",
+            property_protected_type: gsb_Details && gsb_Details.gsbinfo ? gsb_Details.gsbinfo.property_protected_type : "",
+            year_of_construction: gsb_Details && gsb_Details.gsbinfo && gsb_Details.gsbinfo.year_of_construction ? new Date(moment(gsb_Details.gsbinfo.year_of_construction).format("YYYY-MM-DD")) : "",
+            pedal_cycle_type: gsb_Details && gsb_Details.gsbinfo ? gsb_Details.gsbinfo.pedal_cycle_type : "",
+            pedal_cycle_description: gsb_Details && gsb_Details.gsbinfo ? gsb_Details.gsbinfo.pedal_cycle_description : "",
             check_box: "0",
-            house_flat_no: "",
-            city: "",
-            house_building_name: "",
-            street_name: "",
-            state_name: "",
-            pincode_id: "",
-            area_name: "",
-            nominee_salutation_id: "",
-            nominee_first_name: "",
-            nominee_dob: "",
-            relation_with: "",
-            appointee_relation_with: ""
+            house_flat_no: address_flag == '1' ? riskAddressDetails.house_flat_no : commAddressDetails ? commAddressDetails.house_flat_no : "" ,
+            city: address_flag == '1' ? riskAddressDetails.city : gsb_Details ? gsb_Details.city : "" ,
+            house_building_name: address_flag == '1' ? riskAddressDetails.house_building_name : commAddressDetails ? commAddressDetails.house_building_name : "" ,
+            street_name: address_flag == '1' ? riskAddressDetails.area_name : commAddressDetails ? commAddressDetails.street_name : "" ,
+            state_name: address_flag == '1' ? riskAddressDetails.state : gsb_Details ? gsb_Details.state : "" ,
+            pincode_id: address_flag == '1' ? riskAddressDetails.pincode : gsb_Details ? gsb_Details.pincode : "" ,
+            area_name: address_flag == '1' ? gsb_Details && gsb_Details.gsbinfo ?  gsb_Details.gsbinfo.pincode_id : "" : gsb_Details ? gsb_Details.pincode_id : ""  ,
+            nominee_title_id: gsb_Details && gsb_Details.request_data && gsb_Details.request_data.nominee && gsb_Details.request_data.nominee.length>0 ? gsb_Details.request_data.nominee[0].title_id : "",
+            nominee_first_name: gsb_Details && gsb_Details.request_data && gsb_Details.request_data.nominee && gsb_Details.request_data.nominee.length>0 ? gsb_Details.request_data.nominee[0].first_name : "",
+            nominee_dob: gsb_Details && gsb_Details.request_data && gsb_Details.request_data.nominee && gsb_Details.request_data.nominee.length>0 && gsb_Details.request_data.nominee[0].dob ? new Date(moment(gsb_Details.request_data.nominee[0].dob).format("YYYY-MM-DD")) : "",
+            relation_with: gsb_Details && gsb_Details.request_data && gsb_Details.request_data.nominee && gsb_Details.request_data.nominee.length>0 ? gsb_Details.request_data.nominee[0].relation_with : "",
+            nominee_last_name: gsb_Details && gsb_Details.request_data && gsb_Details.request_data.nominee && gsb_Details.request_data.nominee.length>0 ? gsb_Details.request_data.nominee[0].last_name : "",
+            address_flag: gsb_Details && gsb_Details.gsbinfo ? gsb_Details.gsbinfo.address_flag : "",
+            'appointee_name': gsb_Details && gsb_Details.request_data && gsb_Details.request_data.nominee && gsb_Details.request_data.nominee.length>0 ? gsb_Details.request_data.nominee[0].appointee_name : "",
+            'appointee_relation_with': gsb_Details && gsb_Details.request_data && gsb_Details.request_data.nominee && gsb_Details.request_data.nominee.length>0 ? gsb_Details.request_data.nominee[0].appointee_relation_with : "",
+            'is_appointee': this.state.is_appointee
         })
-
+console.log("address_flag------- ", address_flag)
         return (
             <>
                 <BaseComponent>
@@ -467,10 +577,10 @@ class AdditionalDetails_GSB extends Component {
                                     <div className="boxpd">
                                         <Formik initialValues={newInitialValues}
                                              onSubmit={this.handleSubmit}
-                                            // validationSchema={vehicleRegistrationValidation}
+                                            validationSchema={vehicleRegistrationValidation}
                                         >
                                             {({ values, errors, setFieldValue, setFieldTouched, isValid, isSubmitting, touched }) => {
-                                                console.log('errors-------- ',errors)
+                                                console.log('values-------- ',values)
 
                                                 return (
                                                     <Form>
@@ -553,8 +663,8 @@ class AdditionalDetails_GSB extends Component {
                                                                         showMonthDropdown
                                                                         showYearDropdown
                                                                         dropdownMode="select"
-                                                                        maxDate={new Date(maxDobAdult)}
-                                                                        minDate={new Date(minDobAdult)}
+                                                                        maxDate={maxDobAdult}
+                                                                        minDate={minDobAdult}
                                                                         className="datePckr"
                                                                         selected={values.proposer_dob}
                                                                         onChange={(val) => {
@@ -634,12 +744,12 @@ class AdditionalDetails_GSB extends Component {
                                                                             <Field
                                                                                 type="radio"
                                                                                 name='proposer_disability'
-                                                                                value='2'
+                                                                                value='0'
                                                                                 key='1'
-                                                                                checked={values.proposer_disability == '2' ? true : false}
+                                                                                checked={values.proposer_disability == '0' ? true : false}
                                                                                 onChange={() => {
                                                                                     setFieldTouched('proposer_disability')
-                                                                                    setFieldValue('proposer_disability', '2');
+                                                                                    setFieldValue('proposer_disability', '0');
                                                                                     this.handleChange(values, setFieldTouched, setFieldValue)
                                                                                 }
                                                                                 }
@@ -683,12 +793,12 @@ class AdditionalDetails_GSB extends Component {
                                                                             <Field
                                                                                 type="radio"
                                                                                 name='construction_type'
-                                                                                value='2'
+                                                                                value='0'
                                                                                 key='1'
-                                                                                checked={values.construction_type == '2' ? true : false}
+                                                                                checked={values.construction_type == '0' ? true : false}
                                                                                 onChange={() => {
                                                                                     setFieldTouched('construction_type')
-                                                                                    setFieldValue('construction_type', '2');
+                                                                                    setFieldValue('construction_type', '0');
                                                                                     this.handleChange(values, setFieldTouched, setFieldValue)
                                                                                 }
                                                                                 }
@@ -729,12 +839,12 @@ class AdditionalDetails_GSB extends Component {
                                                                             <Field
                                                                                 type="radio"
                                                                                 name='proposer_property_type'
-                                                                                value='2'
+                                                                                value='0'
                                                                                 key='1'
-                                                                                checked={values.proposer_property_type == '2' ? true : false}
+                                                                                checked={values.proposer_property_type == '0' ? true : false}
                                                                                 onChange={() => {
                                                                                     setFieldTouched('proposer_property_type')
-                                                                                    setFieldValue('proposer_property_type', '2');
+                                                                                    setFieldValue('proposer_property_type', '0');
                                                                                     this.handleChange(values, setFieldTouched, setFieldValue)
                                                                                 }
                                                                                 }
@@ -775,12 +885,12 @@ class AdditionalDetails_GSB extends Component {
                                                                             <Field
                                                                                 type="radio"
                                                                                 name='property_protected_type'
-                                                                                value='2'
+                                                                                value='0'
                                                                                 key='1'
-                                                                                checked={values.property_protected_type == '2' ? true : false}
+                                                                                checked={values.property_protected_type == '0' ? true : false}
                                                                                 onChange={() => {
                                                                                     setFieldTouched('property_protected_type')
-                                                                                    setFieldValue('property_protected_type', '2');
+                                                                                    setFieldValue('property_protected_type', '0');
                                                                                     this.handleChange(values, setFieldTouched, setFieldValue)
                                                                                 }
                                                                                 }
@@ -799,22 +909,29 @@ class AdditionalDetails_GSB extends Component {
                                                                 <h7>Year of construction</h7>
                                                                 <div className="d-inline-flex m-b-16 m-l-20">
                                                                     <div className="p-r-25">
-                                                                        <FormGroup>
-                                                                            <div className="insurerName">
-                                                                                <Field
-                                                                                    name='year_of_construction'
-                                                                                    type="text"
-                                                                                    placeholder="Year of construction"
-                                                                                    autoComplete="off"
-                                                                                    onFocus={e => this.changePlaceHoldClassAdd(e)}
-                                                                                    onBlur={e => this.changePlaceHoldClassRemove(e)}
-                                                                                    value={values.year_of_construction}
-                                                                                />
-                                                                                {errors.year_of_construction && touched.year_of_construction ? (
-                                                                                    <span className="errorMsg">{errors.year_of_construction}</span>
-                                                                                ) : null}
-                                                                            </div>
-                                                                        </FormGroup>
+                                                                    <FormGroup>
+                                                                        <DatePicker
+                                                                            name="year_of_construction"
+                                                                            dateFormat="dd MMM yyyy"
+                                                                            placeholderText="Year of construction"
+                                                                            minDate={minConstructionDate}
+                                                                            // maxDate={new Date()}
+                                                                            peekPreviousMonth
+                                                                            peekPreviousYear
+                                                                            showMonthDropdown
+                                                                            showYearDropdown
+                                                                            dropdownMode="select"
+                                                                            className="datePckr inputfs12"
+                                                                            selected={values.year_of_construction}
+                                                                            onChange={(val) => {
+                                                                                setFieldTouched('year_of_construction');
+                                                                                setFieldValue('year_of_construction', val);
+                                                                                }}
+                                                                        />
+                                                                        {errors.year_of_construction && touched.year_of_construction ? (
+                                                                            <span className="errorMsg">{errors.year_of_construction}</span>
+                                                                        ) : null}  
+                                                                    </FormGroup>
                                                                     </div>
                                                                 </div>
                                                             </div>
@@ -855,6 +972,7 @@ class AdditionalDetails_GSB extends Component {
                                                                                     type="text"
                                                                                     placeholder="Description"
                                                                                     autoComplete="off"
+                                                                                    maxLength = {50}
                                                                                     onFocus={e => this.changePlaceHoldClassAdd(e)}
                                                                                     onBlur={e => this.changePlaceHoldClassRemove(e)}
                                                                                     value={values.pedal_cycle_description}
@@ -875,30 +993,37 @@ class AdditionalDetails_GSB extends Component {
                                                         <div className="brandhead">
                                                             <h4 className="fs-18 m-b-30">COMMUNICATION ADDRESS</h4>
                                                         </div>
-                                                        <label className="customCheckBox formGrp formGrp">is communication address same as risk location address
+                                                        <label className="customCheckBox">is communication address same as risk location address
                                                             <Field
                                                                 type="checkbox"
                                                                 name="address_flag"
                                                                 value="1"
                                                                 className="user-self"
-                                                                onClick={(e) => {
-                                                                }}
-                                                                checked={values.address_flag}
-                                                                value={values.address_flag}
+                                                                // value={values.address_flag}
                                                                 onChange={(e) => {
                                                                     if (e.target.checked === true) {
-                                                                        setFieldValue('address_flag', e.target.value);
+                                                                        setFieldValue('address_flag', e.target.value); 
+                                                                        setFieldValue(`house_flat_no`, riskAddressDetails.house_flat_no);
+                                                                        setFieldValue(`city`, riskAddressDetails.city);
+                                                                        setFieldValue(`house_building_name`, riskAddressDetails.house_building_name);
+                                                                        setFieldValue(`street_name`, riskAddressDetails.area_name);
+                                                                        setFieldValue(`state_name`, riskAddressDetails.state_name);
+                                                                        setFieldValue(`pincode_id`, riskAddressDetails.pincode_id);
+                                                                        setFieldValue(`area_name`,  gsb_Details && gsb_Details.gsbinfo && gsb_Details.gsbinfo.pincode_id);
                                                                         this.setState({
                                                                             address_flag: e.target.value
                                                                         })
+                                                                        this.fetchAreadetailsBack(riskAddressDetails.pincode)
                                                                         
                                                                     } else {
-                                                                        setFieldValue('address_flag', '0');   
+                                                                        setFieldValue('address_flag', '0'); 
                                                                         this.setState({
                                                                             address_flag: 0
-                                                                        })                                                         
-                                                                    }
+                                                                        })       
+                                                                        this.fetchAreadetailsBack(gsb_Details && gsb_Details.pincode)                                                  
+                                                                    }  
                                                                 }}
+                                                                checked={values.address_flag == '1' ? true : false}
                                                             />
                                                             {errors.address_flag && touched.address_flag ? (
                                                                 <span className="errorMsg">
@@ -923,7 +1048,7 @@ class AdditionalDetails_GSB extends Component {
                                                                             onBlur={(e) =>
                                                                                 this.changePlaceHoldClassRemove(e)
                                                                             }
-                                                                            value={values.house_flat_no}
+                                                                            value={address_flag == '1' ? riskAddressDetails.house_flat_no : values.house_flat_no}
                                                                         />
                                                                         {errors.house_flat_no && touched.house_flat_no ? (
                                                                             <span className="errorMsg">
@@ -947,7 +1072,7 @@ class AdditionalDetails_GSB extends Component {
                                                                             // onBlur={(e) =>
                                                                             //   this.changePlaceHoldClassRemove(e)
                                                                             // }
-                                                                            value={values.house_building_name}
+                                                                            value={address_flag == '1' ? riskAddressDetails.house_building_name : values.house_building_name}
                                                                         />
                                                                         {errors.house_building_name &&
                                                                             touched.house_building_name ? (
@@ -972,7 +1097,7 @@ class AdditionalDetails_GSB extends Component {
                                                                             onBlur={(e) =>
                                                                                 this.changePlaceHoldClassRemove(e)
                                                                             }
-                                                                            value={values.street_name}
+                                                                            value={address_flag == '1' ? riskAddressDetails.area_name : values.street_name}
                                                                         />
                                                                         {errors.street_name &&
                                                                             touched.street_name ? (
@@ -1001,10 +1126,9 @@ class AdditionalDetails_GSB extends Component {
                                                                             onBlur={(e) =>
                                                                                 this.changePlaceHoldClassRemove(e)
                                                                             }
-                                                                            onKeyUp={(e) => this.fetchAreadetails(e)}
-                                                                            value={values.pincode_id}
+                                                                            onKeyUp={(e) => this.fetchAreadetails(e, setFieldValue, setFieldTouched)}
+                                                                            value={address_flag == '1' ? riskAddressDetails.pincode : values.pincode_id}
                                                                             maxLength="6"
-                                                                            onInput={(e) => { }}
                                                                         />
                                                                         {errors.pincode_id && touched.pincode_id ? (
                                                                             <span className="errorMsg">
@@ -1021,7 +1145,7 @@ class AdditionalDetails_GSB extends Component {
                                                                             name="area_name"
                                                                             component="select"
                                                                             autoComplete="off"
-                                                                            value={values.area_name}
+                                                                            value={address_flag == '1' ? gsb_Details && gsb_Details.gsbinfo ?  gsb_Details.gsbinfo.pincode_id: "" : values.area_name}
                                                                             className="formGrp"
                                                                         >
                                                                             <option value="">Locality</option>
@@ -1059,7 +1183,7 @@ class AdditionalDetails_GSB extends Component {
                                                                             onBlur={(e) =>
                                                                                 this.changePlaceHoldClassRemove(e)
                                                                             }
-                                                                            value={cityName}
+                                                                            value={address_flag == '1' ? riskAddressDetails.city : values.city}
                                                                         />
                                                                         {errors.city && touched.city ? (
                                                                             <span className="errorMsg">
@@ -1086,7 +1210,7 @@ class AdditionalDetails_GSB extends Component {
                                                                             onBlur={(e) =>
                                                                                 this.changePlaceHoldClassRemove(e)
                                                                             }
-                                                                            value={stateName}
+                                                                            value={address_flag == '1' ? riskAddressDetails.state : values.state_name}
                                                                         />
                                                                         {errors.state_name &&
                                                                             touched.state_name ? (
@@ -1159,7 +1283,7 @@ class AdditionalDetails_GSB extends Component {
                                                                         <Field
                                                                             name="nominee_last_name"
                                                                             type="text"
-                                                                            placeholder="Nominee Name"
+                                                                            placeholder="Nominee Last Name"
                                                                             autoComplete="off"
                                                                             onFocus={(e) =>
                                                                                 this.changePlaceHoldClassAdd(e)
@@ -1191,13 +1315,14 @@ class AdditionalDetails_GSB extends Component {
                                                                         showMonthDropdown
                                                                         showYearDropdown
                                                                         dropdownMode="select"
-                                                                        maxDate={new Date(maxDobAdult)}
-                                                                        minDate={new Date(minDobAdult)}
+                                                                        maxDate={maxDobNominee}
+                                                                        minDate={minDobNominee}
                                                                         className="datePckr"
                                                                         selected={values.nominee_dob}
                                                                         onChange={(val) => {
                                                                             setFieldTouched('nominee_dob');
                                                                             setFieldValue('nominee_dob', val);
+                                                                            this.ageCheck(val)
                                                                         }}
                                                                     />
                                                                     {errors.nominee_dob && touched.nominee_dob ? (
