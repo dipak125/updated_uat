@@ -431,29 +431,12 @@ class arogya_NomineeDetails extends Component {
                                                                     className="formGrp"
                                                                 >
                                                                 <option value="">Relation with Primary Insured</option>
-                                                                {self_selected ? '': <option value="1">Self</option>}
+                                                                {/* {self_selected ? '': <option value="1">Self</option>} */}
                                                                 <option value="2">Spouse</option>
                                                                 <option value="3">Son</option>
                                                                 <option value="4">Daughter</option>
                                                                 <option value="5">Father</option>
                                                                 <option value="6">Mother</option>
-                                                                <option value="7">Father In Law</option>
-                                                                <option value="8">Mother In Law</option>
-                                                                <option value="9">Brother</option>
-                                                                <option value="10">Sister</option>
-                                                                <option value="11">Grandfather</option>
-                                                                <option value="12">Grandmother</option>
-                                                                <option value="13">Husband</option>
-                                                                <option value="14">Wife</option>
-                                                                <option value="15">Brother in law</option>
-                                                                <option value="16">Sister In Law</option>
-                                                                <option value="17">Uncle</option>
-                                                                <option value="18">Aunty</option>
-                                                                <option value="19">Ex-Wife</option>
-                                                                <option value="20">Ex-Husband</option>
-                                                                <option value="21">Employee</option>
-                                                                <option value="22">Niece</option>
-                                                                <option value="23">Nephew</option>
                                                                 </Field>     
                                                                 {errors.relation_with && touched.relation_with ? (
                                                                     <span className="errorMsg">{errors.relation_with}</span>
@@ -522,12 +505,12 @@ class arogya_NomineeDetails extends Component {
                                                                         className="formGrp"
                                                                     >
                                                                     <option value="">Relation with Nominee</option>
-                                                                    {self_selected ? '':<option value="1">Self</option>}
+                                                                    {/* {self_selected ? '':<option value="1">Self</option>} */}
                                                                     <option value="5">Father</option>
                                                                     <option value="6">Mother</option>
                                                                     <option value="11">Grandfather</option>
                                                                     <option value="12">Grandmother</option>
-                                                                    <option value="17">Unlce</option>
+                                                                    <option value="17">Uncle</option>
                                                                     <option value="18">Aunty</option>
                                                                     </Field>     
                                                                     {errors.appointee_relation_with && touched.appointee_relation_with ? (
