@@ -86,7 +86,7 @@ class PolicyDetails_GSB extends Component {
     purchaseData: [],
     error1: [],
     show: false,
-    refNumber: "",
+    refNumber: localStorage.getItem("policyHolder_refNo"),
     paymentStatus: [],
     nomineedetails: [],
     policyCoverage: []

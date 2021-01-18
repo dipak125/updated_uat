@@ -73,13 +73,13 @@ const validateAddress =  Yup.object().shape({
     address2: Yup.string()
         .required(function() {
             return "Enter building name / number"
-        }).matches(/^[a-zA-Z0-9][a-zA-Z0-9-\s]*$/, function() {
+        }).matches(/^[a-zA-Z0-9]+([\s]?[a-zA-Z0-9]+)*$/, function() {
             return "Invalid building name / number"
         }),
     address3: Yup.string()
         .required(function() {
             return "Enter street name"
-        }).matches(/^[a-zA-Z0-9][a-zA-Z0-9-\s]*$/, function() {
+        }).matches(/^[a-zA-Z0-9]+([\s]?[a-zA-Z0-9]+)*$/, function() {
             return "Invalid street name"
         }),
     email:Yup.string().email().required('Email is required').min(8, function() {
@@ -588,6 +588,15 @@ class arogya_Address extends Component {
         })
     
     }
+
+    toCamelCase = (str) => {
+        let stringLength = str.length
+        let subString = str.substring(1, stringLength)
+        let firstString = str.substring(0, 1)
+        firstString = firstString.toUpperCase()
+        let formatVal = firstString+subString
+        return formatVal
+    }
     
     
     render() {
@@ -638,7 +647,7 @@ class arogya_Address extends Component {
                                     return (
                                     <Form>
                                         <div className="d-flex flex-column flex-sm-column flex-md-column flex-lg-row justify-content-left m-b-15">
-                                        {/* <div className="proposr prsres m-r-60"><p>Is the Proposer same as insured</p></div>
+                                        <div className="proposr prsres m-r-60"><p>Is the Proposer same as insured</p></div>
                                             <div className="d-inline-flex">
                                                 <div className="p-r-25">
                                                     <label className="customRadio3">
@@ -677,7 +686,7 @@ class arogya_Address extends Component {
                                                     ) : null}
                                                     </label>
                                                 </div>
-                                            </div> */}
+                                            </div>
                                         </div>
                                         <Row>
                                         <Col sm={12} md={9} lg={9}>
@@ -803,7 +812,9 @@ class arogya_Address extends Component {
                                             {familyMembers && familyMembers.length>0 && familyMembers.map((resource,index)=> 
                                                     <div className="d-flex justify-content-left prsnlinfo" key={index}>
                                                         <div className="W12" >
-                                                            <strong>{resource.relation_with}</strong>
+                                                            <strong>
+                                                            {resource.relation_with == "motherInLaw" ? "Mother In Law" : resource.relation_with == "fatherInLaw" ? "Father In Law" : this.toCamelCase(resource.relation_with)}
+                                                            </strong>
                                                             <Row></Row>
                                                             <Field
                                                                 name={`family_members.${index}.family_member_id`}

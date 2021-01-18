@@ -112,7 +112,7 @@ class arogya_MedicalDetails extends Component {
 
        let familyMembers=document.getElementsByClassName(`familyMembers${question_id[0]}`)
        let answerStr = value;
-
+       console.log('aaaaa123344======>',familyMembers)
        if(answerStr=='n'){
             let family_members = this.state.family_members
             let arr_data = []
@@ -134,6 +134,7 @@ class arogya_MedicalDetails extends Component {
                 'policy_holder_id':policy_holder_id
             }   
             formData.append('enc_data',encryption.encrypt(JSON.stringify(post_data)))
+            console.log("post_data-N------------- ", post_data)
             this.props.loadingStart();
             axios
                 .post(`/arogya-topup/medical-question`, formData)
@@ -198,23 +199,24 @@ class arogya_MedicalDetails extends Component {
         }
 
         let qlength = this.state.questionList ? this.state.questionList.length:0;
-        console.log("qlength---0-- ", values.question_id_4)
-
         if( qlength == 4 && values.question_id_4 == 'y'){
             this.showRestriction('y');
             return false
-        }       
-
-        let q = questionClass.length/2
-
-        if(count == q && checkFamily.length >= selectCheck.length){
-            if(this.state.isForwarded){
-                this.props.history.push(`/arogya_SelectDuration/${productId}`);
-            }            
-        }
-        else{
-            swal('Please answer all of the questions');
-        }
+        }    
+        else {
+            let q = questionClass.length/2
+            if(count == q && checkFamily.length >= selectCheck.length){
+                if(this.state.isForwarded){
+                    this.props.history.push(`/arogya_SelectDuration/${productId}`);
+                }            
+            }
+            else if(count == q && checkFamily.length < selectCheck.length){
+                swal('Please select family members');        
+            }
+            else{
+                swal('Please answer all of the questions');
+            }
+        } 
     }
 
     getQuestionList = () => {
@@ -353,9 +355,6 @@ class arogya_MedicalDetails extends Component {
              selected_family_members
          })
 
-        // formData.append('policy_holder_id', localStorage.getItem('policyHolder_id'));
-        // formData.append('question_id',classId);
-        // formData.append('answer','y');
          let arr_data = []
          for(let i=0;i<selected_family_members.length;i++){
             let arr_selected = selected_family_members[i].split('~')
@@ -375,10 +374,10 @@ class arogya_MedicalDetails extends Component {
          }
          let encryption = new Encryption();
         formData.append('enc_data',encryption.encrypt(JSON.stringify(post_data)))   
-
+        console.log("post_data---setAnswer------- ", post_data)
         this.props.loadingStart();
                 axios
-                    .post(`/medical-question`, formData)
+                    .post(`/arogya-topup/medical-question`, formData)
                     .then(res => {
                         // this.getQuestionList();
                         // this.getPolicyHolderDetails();
@@ -486,9 +485,9 @@ class arogya_MedicalDetails extends Component {
                                                         setFieldValue(`question_id_${question.id}`, e.target.value);
                                                         this.handleChangeSubmit(`question_id_${question.id}`,e.target.value)
                                                         //this.setState({ showImg: !this.state.showImg })
-                                                        if(qIndex == qlength -1){
-                                                            this.showRestriction('y');
-                                                        } 
+                                                        // if(qIndex == qlength -1){
+                                                        //     this.showRestriction('y');
+                                                        // } 
                                                     }}
                                                     checked={values[`question_id_${question.id}`] == 'y' ? true : false}
                                                 />
@@ -567,7 +566,7 @@ class arogya_MedicalDetails extends Component {
                                              <label for={`family_members.${question.id}.${index}.${resource.relation_with}`}> <img src={require('../../assets/images/self.svg')} alt=""/>{this.capitalize(resource.relation_with)}</label>
                                              : <label for={`family_members.${question.id}.${index}.${resource.relation_with}`}><img src={require('../../assets/images/Spouse.svg')} alt=""/>{this.capitalize(resource.relation_with)}</label>}
                                             </> :
-                                            resource.relation_with == 'child1' || resource.relation_with == 'child2' ||  resource.relation_with == 'child3' ?
+                                            resource.relation_with == 'child1' || resource.relation_with == 'child2' ||  resource.relation_with == 'child3' ||  resource.relation_with == 'child4' ?
                                             <>
                                             <input type="checkbox"
                                             className={`familyMembers${question.id}`}

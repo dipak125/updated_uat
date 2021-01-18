@@ -21,7 +21,7 @@ import Encryption from '../../shared/payload-encryption';
 const minDobAdult = moment(moment().subtract(56, 'years').calendar()).add(1, 'day').calendar()
 const maxDobAdult = moment().subtract(18, 'years').calendar();
 
-const minDobChild = moment(moment().subtract(26, 'years').calendar()).add(1, 'day').calendar()
+const minDobChild = moment(moment().subtract(56, 'years').calendar()).add(1, 'day').calendar()
 const maxDobChild = moment().subtract(3, 'months').calendar();
 
 const initialValues = {
@@ -174,52 +174,14 @@ const validateFamilyMembers  = Yup.object().shape({
         then: Yup.string().required('Child 1 DOB field is required').test(
             "3monthsChecking",
             function() {
-                return "Age should be minimum 3 months and maximum 25 years"
+                return "Age should be minimum 3 months and maximum 56 years"
             },
             function (value) {
                 if (value) {
                     const ageObj = new PersonAge();
-                    return ageObj.whatIsMyAge(value) < 26 && ageObj.whatIsMyAgeMonth(value) >=3 ;
+                    return ageObj.whatIsMyAge(value) < 57 && ageObj.whatIsMyAgeMonth(value) >=3 ;
                 }
                 return true;
-            }
-        ).test(
-            "1yearAgeDiffChecking",
-            function() {
-                return "Self and child age difference should be 1 year"
-            },
-            function (value) {
-                if(typeof this.parent.dob_0 != 'undefined'){
-                    var ageDiff = Math.floor(Math.abs(moment(value).diff(this.parent.dob_0, 'years', true)));
-                    if (ageDiff <= 0 ) {   
-                        return false;    
-                    }
-                    else{
-                        return true;
-                    }                    
-                }
-                else{
-                    return true;
-                }
-            }
-        ).test(
-            "1yearAgeDiffChecking",
-            function() {
-                return "Spouse and child age difference should be 1 year"
-            },
-            function (value) {
-                if(typeof this.parent.dob_1 != 'undefined'){
-                var ageDiff = Math.floor(Math.abs(moment(value).diff(this.parent.dob_1, 'years', true)));
-                    if (ageDiff <= 0 ) {   
-                        return false;    
-                    }
-                    else{
-                        return true;
-                    }                
-                }
-                else{
-                    return true;
-                }   
             }
         ).test(
             "greaterAgeDiffChecking",
@@ -259,6 +221,44 @@ const validateFamilyMembers  = Yup.object().shape({
                 else{
                     return true;
                 }
+            }
+        ).test(
+            "18yearAgeDiffChecking",
+            function() {
+                return "Self and child age difference should be 18 year"
+            },
+            function (value) {
+                if(typeof this.parent.dob_0 != 'undefined'){
+                    var ageDiff = Math.floor(Math.abs(moment(value).diff(this.parent.dob_0, 'years', true)));
+                    if (ageDiff <= 17 ) {   
+                        return false;    
+                    }
+                    else{
+                        return true;
+                    }                    
+                }
+                else{
+                    return true;
+                }
+            }
+        ).test(
+            "18yearAgeDiffChecking",
+            function() {
+                return "Spouse and child age difference should be 18 year"
+            },
+            function (value) {
+                if(typeof this.parent.dob_1 != 'undefined'){
+                var ageDiff = Math.floor(Math.abs(moment(value).diff(this.parent.dob_1, 'years', true)));
+                    if (ageDiff <= 17 ) {   
+                        return false;    
+                    }
+                    else{
+                        return true;
+                    }                
+                }
+                else{
+                    return true;
+                }   
             }
         ),
         
@@ -275,50 +275,14 @@ const validateFamilyMembers  = Yup.object().shape({
         then: Yup.string().required('Child 2 DOB field is required').test(
             "3monthsChecking",
             function() {
-                return "Age should be minimum 3 months and maximum 25 years"
+                return "Age should be minimum 3 months and maximum 56 years"
             },
             function (value) {
                 if (value) {
                     const ageObj = new PersonAge();
-                    return ageObj.whatIsMyAge(value) < 26 && ageObj.whatIsMyAgeMonth(value) >=3;
+                    return ageObj.whatIsMyAge(value) < 57 && ageObj.whatIsMyAgeMonth(value) >=3;
                 }
                 return true;
-            }
-        ).test(
-            "1yearAgeDiffChecking",
-            function() {
-                return "Self and child age difference should be 1 year"
-            },
-            function (value) {
-                if(typeof this.parent.dob_0 != 'undefined'){
-                    var ageDiff = Math.floor(Math.abs(moment(this.parent.dob_0).diff(value, 'years', true)));
-                    if (ageDiff <= 0 ) {   
-                        return false;    
-                    }
-                    return true;
-                }
-                else {
-                    return true
-                }
-            }
-        ).test(
-            "1yearAgeDiffChecking",
-            function() {
-                return "Spouse and child age difference should be 1 year"
-            },
-            function (value) {
-                if(typeof this.parent.dob_1 != 'undefined'){
-                var ageDiff = Math.floor(Math.abs(moment(value).diff(this.parent.dob_1, 'years', true)));
-                    if (ageDiff <= 0 ) {   
-                        return false;    
-                    }
-                    else{
-                        return true;
-                    }                
-                }
-                else{
-                    return true;
-                }   
             }
         ).test(
             "greaterAgeDiffChecking",
@@ -358,6 +322,42 @@ const validateFamilyMembers  = Yup.object().shape({
                 else{
                     return true;
                 }
+            }
+        ).test(
+            "18yearAgeDiffChecking",
+            function() {
+                return "Self and child age difference should be 18 year"
+            },
+            function (value) {
+                if(typeof this.parent.dob_0 != 'undefined'){
+                    var ageDiff = Math.floor(Math.abs(moment(this.parent.dob_0).diff(value, 'years', true)));
+                    if (ageDiff <= 17 ) {   
+                        return false;    
+                    }
+                    return true;
+                }
+                else {
+                    return true
+                }
+            }
+        ).test(
+            "18yearAgeDiffChecking",
+            function() {
+                return "Spouse and child age difference should be 18 year"
+            },
+            function (value) {
+                if(typeof this.parent.dob_1 != 'undefined'){
+                var ageDiff = Math.floor(Math.abs(moment(value).diff(this.parent.dob_1, 'years', true)));
+                    if (ageDiff <= 17 ) {   
+                        return false;    
+                    }
+                    else{
+                        return true;
+                    }                
+                }
+                else{
+                    return true;
+                }   
             }
         ),
         othewise: Yup.string()
@@ -373,50 +373,14 @@ const validateFamilyMembers  = Yup.object().shape({
         then: Yup.string().required('Child 3 DOB field is required').test(
             "3monthsChecking",
             function() {
-                return "Age should be minimum 3 months and maximum 25 years"
+                return "Age should be minimum 3 months and maximum 56 years"
             },
             function (value) {
                 if (value) {
                     const ageObj = new PersonAge();
-                    return ageObj.whatIsMyAge(value) < 26 && ageObj.whatIsMyAgeMonth(value) >=3 ;
+                    return ageObj.whatIsMyAge(value) < 57 && ageObj.whatIsMyAgeMonth(value) >=3 ;
                 }
                 return true;
-            }
-        ).test(
-            "1yearAgeDiffChecking",
-            function() {
-                return "Self and child age difference should be 1 year"
-            },
-            function (value) {
-                if(typeof this.parent.dob_0 != 'undefined'){
-                    var ageDiff = Math.floor(Math.abs(moment(this.parent.dob_0).diff(value, 'years', true)));
-                    if (ageDiff <= 0 ) {   
-                        return false;    
-                    }
-                    return true;
-                }
-                else {
-                    return true
-                }
-            }
-        ).test(
-            "1yearAgeDiffChecking",
-            function() {
-                return "Spouse and child age difference should be 1 year"
-            },
-            function (value) {
-                if(typeof this.parent.dob_1 != 'undefined'){
-                var ageDiff = Math.floor(Math.abs(moment(value).diff(this.parent.dob_1, 'years', true)));
-                    if (ageDiff <= 0 ) {   
-                        return false;    
-                    }
-                    else{
-                        return true;
-                    }                
-                }
-                else{
-                    return true;
-                }   
             }
         ).test(
             "greaterAgeDiffChecking",
@@ -456,6 +420,42 @@ const validateFamilyMembers  = Yup.object().shape({
                 else{
                     return true;
                 }
+            }
+        ).test(
+            "18yearAgeDiffChecking",
+            function() {
+                return "Self and child age difference should be 18 year"
+            },
+            function (value) {
+                if(typeof this.parent.dob_0 != 'undefined'){
+                    var ageDiff = Math.floor(Math.abs(moment(this.parent.dob_0).diff(value, 'years', true)));
+                    if (ageDiff <= 17 ) {   
+                        return false;    
+                    }
+                    return true;
+                }
+                else {
+                    return true
+                }
+            }
+        ).test(
+            "18yearAgeDiffChecking",
+            function() {
+                return "Spouse and child age difference should be 18 year"
+            },
+            function (value) {
+                if(typeof this.parent.dob_1 != 'undefined'){
+                var ageDiff = Math.floor(Math.abs(moment(value).diff(this.parent.dob_1, 'years', true)));
+                    if (ageDiff <= 17 ) {   
+                        return false;    
+                    }
+                    else{
+                        return true;
+                    }                
+                }
+                else{
+                    return true;
+                }   
             }
         ),
         othewise: Yup.string()
@@ -471,50 +471,14 @@ const validateFamilyMembers  = Yup.object().shape({
         then: Yup.string().required('Child 4 DOB field is required').test(
             "3monthsChecking",
             function() {
-                return "Age should be minimum 3 months and maximum 25 years"
+                return "Age should be minimum 3 months and maximum 56 years"
             },
             function (value) {
                 if (value) {
                     const ageObj = new PersonAge();
-                    return ageObj.whatIsMyAge(value) < 26 && ageObj.whatIsMyAgeMonth(value) >=3 ;
+                    return ageObj.whatIsMyAge(value) < 57 && ageObj.whatIsMyAgeMonth(value) >=3 ;
                 }
                 return true;
-            }
-        ).test(
-            "1yearAgeDiffChecking",
-            function() {
-                return "Self and child age difference should be 1 year"
-            },
-            function (value) {
-                if(typeof this.parent.dob_0 != 'undefined'){
-                    var ageDiff = Math.floor(Math.abs(moment(this.parent.dob_0).diff(value, 'years', true)));
-                    if (ageDiff <= 0 ) {   
-                        return false;    
-                    }
-                    return true;
-                }
-                else {
-                    return true
-                }
-            }
-        ).test(
-            "1yearAgeDiffChecking",
-            function() {
-                return "Spouse and child age difference should be 1 year"
-            },
-            function (value) {
-                if(typeof this.parent.dob_1 != 'undefined'){
-                var ageDiff = Math.floor(Math.abs(moment(value).diff(this.parent.dob_1, 'years', true)));
-                    if (ageDiff <= 0 ) {   
-                        return false;    
-                    }
-                    else{
-                        return true;
-                    }                
-                }
-                else{
-                    return true;
-                }   
             }
         ).test(
             "greaterAgeDiffChecking",
@@ -554,6 +518,42 @@ const validateFamilyMembers  = Yup.object().shape({
                 else{
                     return true;
                 }
+            }
+        ).test(
+            "18yearAgeDiffChecking",
+            function() {
+                return "Self and child age difference should be 18 year"
+            },
+            function (value) {
+                if(typeof this.parent.dob_0 != 'undefined'){
+                    var ageDiff = Math.floor(Math.abs(moment(this.parent.dob_0).diff(value, 'years', true)));
+                    if (ageDiff <= 17 ) {   
+                        return false;    
+                    }
+                    return true;
+                }
+                else {
+                    return true
+                }
+            }
+        ).test(
+            "18yearAgeDiffChecking",
+            function() {
+                return "Spouse and child age difference should be 18 year"
+            },
+            function (value) {
+                if(typeof this.parent.dob_1 != 'undefined'){
+                var ageDiff = Math.floor(Math.abs(moment(value).diff(this.parent.dob_1, 'years', true)));
+                    if (ageDiff <= 17 ) {   
+                        return false;    
+                    }
+                    else{
+                        return true;
+                    }                
+                }
+                else{
+                    return true;
+                }   
             }
         ),
         othewise: Yup.string()
@@ -576,30 +576,6 @@ const validateFamilyMembers  = Yup.object().shape({
                 if (value) {
                     const ageObj = new PersonAge();
                     return ageObj.whatIsMyAge(value) < 56 && ageObj.whatIsMyAge(value) >= 18;
-                }
-                return true;
-            }
-        ).test(
-            "1yearAgeDiffChecking",
-            function() {
-                return "Self and father age difference should be 1 year"
-            },
-            function (value) {              
-                var ageDiff = Math.floor(Math.abs(moment(this.parent.dob_0).diff(value, 'years', true)));
-                if (ageDiff <= 0 ) {   
-                    return false;    
-                }
-                return true;
-            }
-        ).test(
-            "1yearAgeDiffChecking",
-            function() {
-                return "Spouse and father difference should be 1 year"
-            },
-            function (value) {
-                var ageDiff = Math.floor(Math.abs(moment(this.parent.dob_1).diff(value, 'years', true)));
-                if (ageDiff <= 0 ) {   
-                    return false;    
                 }
                 return true;
             }
@@ -642,6 +618,30 @@ const validateFamilyMembers  = Yup.object().shape({
                     return true;
                 }
             }
+        ).test(
+            "18yearAgeDiffChecking",
+            function() {
+                return "Self and father age difference should be 18 year"
+            },
+            function (value) {              
+                var ageDiff = Math.floor(Math.abs(moment(this.parent.dob_0).diff(value, 'years', true)));
+                if (ageDiff <= 17 ) {   
+                    return false;    
+                }
+                return true;
+            }
+        ).test(
+            "18yearAgeDiffChecking",
+            function() {
+                return "Spouse and father difference should be 18 year"
+            },
+            function (value) {
+                var ageDiff = Math.floor(Math.abs(moment(this.parent.dob_1).diff(value, 'years', true)));
+                if (ageDiff <= 17 ) {   
+                    return false;    
+                }
+                return true;
+            }
         ),
         othewise: Yup.string()
     }),
@@ -658,30 +658,6 @@ const validateFamilyMembers  = Yup.object().shape({
                 if (value) {
                     const ageObj = new PersonAge();
                     return ageObj.whatIsMyAge(value) < 56 && ageObj.whatIsMyAge(value) >= 18;
-                }
-                return true;
-            }
-        ).test(
-            "1yearAgeDiffChecking",
-            function() {
-                return "Self and mother age difference should be 1 year"
-            },
-            function (value) {
-                var ageDiff = Math.floor(Math.abs(moment(this.parent.dob_0).diff(value, 'years', true)));
-                if (ageDiff <= 0 ) {   
-                    return false;    
-                }
-                return true;
-            }
-        ).test(
-            "1yearAgeDiffChecking",
-            function() {
-                return "Spouse and mother difference should be 1 year"
-            },
-            function (value) {
-                var ageDiff = Math.floor(Math.abs(moment(this.parent.dob_1).diff(value, 'years', true)));
-                if (ageDiff <= 0 ) {   
-                    return false;    
                 }
                 return true;
             }
@@ -724,6 +700,30 @@ const validateFamilyMembers  = Yup.object().shape({
                     return true;
                 }
             }
+        ).test(
+            "18yearAgeDiffChecking",
+            function() {
+                return "Self and mother age difference should be 18 year"
+            },
+            function (value) {
+                var ageDiff = Math.floor(Math.abs(moment(this.parent.dob_0).diff(value, 'years', true)));
+                if (ageDiff <= 17 ) {   
+                    return false;    
+                }
+                return true;
+            }
+        ).test(
+            "18yearAgeDiffChecking",
+            function() {
+                return "Spouse and mother difference should be 18 year"
+            },
+            function (value) {
+                var ageDiff = Math.floor(Math.abs(moment(this.parent.dob_1).diff(value, 'years', true)));
+                if (ageDiff <= 17 ) {   
+                    return false;    
+                }
+                return true;
+            }
         ),
         othewise: Yup.string()
     }),
@@ -740,30 +740,6 @@ const validateFamilyMembers  = Yup.object().shape({
                 if (value) {
                     const ageObj = new PersonAge();
                     return ageObj.whatIsMyAge(value) < 56 && ageObj.whatIsMyAge(value) >= 18;
-                }
-                return true;
-            }
-        ).test(
-            "1yearAgeDiffChecking",
-            function() {
-                return "Spouse and father-in-law age difference should be 1 year"
-            },
-            function (value) {
-                var ageDiff = Math.floor(Math.abs(moment(this.parent.dob_1).diff(value, 'years', true)));
-                if (ageDiff <= 0 ) {   
-                    return false;    
-                }
-                return true;
-            }
-        ).test(
-            "1yearAgeDiffChecking",
-            function() {
-                return "Self and father-in-law age difference should be 1 year"
-            },
-            function (value) {
-                var ageDiff = Math.floor(Math.abs(moment(this.parent.dob_0).diff(value, 'years', true)));
-                if (ageDiff <= 0 ) {   
-                    return false;    
                 }
                 return true;
             }
@@ -806,6 +782,30 @@ const validateFamilyMembers  = Yup.object().shape({
                     return true;
                 }
             }
+        ).test(
+            "18yearAgeDiffChecking",
+            function() {
+                return "Spouse and father-in-law age difference should be 18 year"
+            },
+            function (value) {
+                var ageDiff = Math.floor(Math.abs(moment(this.parent.dob_1).diff(value, 'years', true)));
+                if (ageDiff <= 17 ) {   
+                    return false;    
+                }
+                return true;
+            }
+        ).test(
+            "18yearAgeDiffChecking",
+            function() {
+                return "Self and father-in-law age difference should be 18 year"
+            },
+            function (value) {
+                var ageDiff = Math.floor(Math.abs(moment(this.parent.dob_0).diff(value, 'years', true)));
+                if (ageDiff <= 17 ) {   
+                    return false;    
+                }
+                return true;
+            }
         ),
         othewise: Yup.string()
     }),
@@ -821,30 +821,6 @@ const validateFamilyMembers  = Yup.object().shape({
                 if (value) {
                     const ageObj = new PersonAge();
                     return ageObj.whatIsMyAge(value) < 56 && ageObj.whatIsMyAge(value) >= 18;
-                }
-                return true;
-            }
-        ).test(
-            "1yearAgeDiffChecking",
-            function() {
-                return "Spouse and mother-in-law age difference should be 1 year"
-            },
-            function (value) {
-                var ageDiff = Math.floor(Math.abs(moment(this.parent.dob_1).diff(value, 'years', true)));
-                if (ageDiff <= 0 ) {   
-                    return false;    
-                }
-                return true;
-            }
-        ).test(
-            "1yearAgeDiffChecking",
-            function() {
-                return "Self and mother-in-law age difference should be 1 year"
-            },
-            function (value) {
-                var ageDiff = Math.floor(Math.abs(moment(this.parent.dob_0).diff(value, 'years', true)));
-                if (ageDiff <= 0 ) {   
-                    return false;    
                 }
                 return true;
             }
@@ -886,6 +862,30 @@ const validateFamilyMembers  = Yup.object().shape({
                 else{
                     return true;
                 }
+            }
+        ).test(
+            "18yearAgeDiffChecking",
+            function() {
+                return "Spouse and mother-in-law age difference should be 18 year"
+            },
+            function (value) {
+                var ageDiff = Math.floor(Math.abs(moment(this.parent.dob_1).diff(value, 'years', true)));
+                if (ageDiff <= 17 ) {   
+                    return false;    
+                }
+                return true;
+            }
+        ).test(
+            "18yearAgeDiffChecking",
+            function() {
+                return "Self and mother-in-law age difference should be 18 year"
+            },
+            function (value) {
+                var ageDiff = Math.floor(Math.abs(moment(this.parent.dob_0).diff(value, 'years', true)));
+                if (ageDiff <= 17 ) {   
+                    return false;    
+                }
+                return true;
             }
         ),
         othewise: Yup.string()

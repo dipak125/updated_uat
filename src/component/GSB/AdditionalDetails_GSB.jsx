@@ -53,7 +53,10 @@ const initialValues = {
     nominee_dob: null,
     relation_with: "",
     appointee_relation_with: "",
-    nominee_title_id: ""
+    nominee_title_id: "",
+    nominee_last_name: "",
+    appointee_name: "",
+    appointee_relation_with: ""
 
 }
 
@@ -198,7 +201,7 @@ const vehicleRegistrationValidation = Yup.object().shape({
         }
     ),
     year_of_construction: Yup.string().required("Please enter construction year").nullable(),
-    pedal_cycle_type: Yup.string().required("Please select option for type & construction").nullable(),
+    pedal_cycle_type: Yup.string().required("Please select cycle list").nullable(),
     pedal_cycle_description: Yup.string().notRequired("Please enter description").nullable(),
     // NOMINEE--------
     nominee_title_id: Yup.string().required('Title is required').nullable(),
@@ -217,6 +220,51 @@ const vehicleRegistrationValidation = Yup.object().shape({
     nominee_dob: Yup.date().required("Please enter date of birth").nullable(),
     relation_with: Yup.string().required(function () {
         return "Please select relation";
+    }),
+    appointee_name: Yup.string().when(['is_appointee'], {
+        is: is_appointee => is_appointee == '1',       
+        then: Yup.string().notRequired("Please enter appointee name")
+                .min(3, function() {
+                    return "Name must be minimum 3 characters"
+                })
+                .max(40, function() {
+                    return "Name must be maximum 40 characters"
+                })        
+                .matches(/^[a-zA-Z]+([\s]?[a-zA-Z]+)([\s]?[a-zA-Z]+)$/, function() {
+                    return "Please enter valid name"
+                }).test(
+                    "18YearsChecking",
+                    function() {
+                        return "Please enter appointee name"
+                    },
+                    function (value) {
+                        const ageObj = new PersonAge();
+                        if (ageObj.whatIsMyAge(this.parent.nominee_dob) < 18 && !value) {   
+                            return false  
+                        }
+                        return true;
+                    }
+                ),
+        otherwise: Yup.string().nullable()
+    }),
+
+    appointee_relation_with: Yup.string().when(['is_appointee'], {
+        is: is_appointee => is_appointee == '1',       
+        then: Yup.string().notRequired("Please select relation")
+                .test(
+                    "18YearsChecking",
+                    function() {
+                        return 'Apppointee relation is required'
+                    },
+                    function (value) {
+                        const ageObj = new PersonAge();
+                        if (ageObj.whatIsMyAge(this.parent.nominee_dob) < 18 && !value) {   
+                            return false;    
+                        }
+                        return true;
+                    }
+                ),
+        otherwise: Yup.string().nullable()
     }),
 })
 
@@ -270,7 +318,7 @@ class AdditionalDetails_GSB extends Component {
         axios.post('ipa/titles', formData)
           .then(res => {
             let decryptResp = JSON.parse(encryption.decrypt(res.data))
-            console.log("titles-list------ ",decryptResp)
+            // console.log("titles-list------ ",decryptResp)
             let titleList = decryptResp.data.salutationlist
             this.setState({
               titleList
@@ -291,7 +339,7 @@ class AdditionalDetails_GSB extends Component {
         axios.get('gsb/gsb-pedal-cycle-list')
           .then(res => {
             let decryptResp = JSON.parse(encryption.decrypt(res.data))
-            console.log("pedal-cycle-list------ ",decryptResp)
+            // console.log("pedal-cycle-list------ ",decryptResp)
             let cycleList = decryptResp.data.gsb_cycle_list
             this.setState({
                 cycleList
@@ -371,7 +419,8 @@ class AdditionalDetails_GSB extends Component {
             'address_flag': values.address_flag,
             'appointee_name': values.appointee_name,
             'appointee_relation_with': values.appointee_relation_with,
-            'is_appointee': this.state.is_appointee
+            'is_appointee': this.state.is_appointee,
+            'pedal_cycle_description': values.pedal_cycle_description
 
         }
 
@@ -531,7 +580,7 @@ class AdditionalDetails_GSB extends Component {
                 riskAddressDetails, commAddressDetails, address_flag } = this.state
         const {productId } = this.props.match.params
         const newInitialValues = Object.assign(initialValues, {
-            proposer_title_id: gsb_Details ? gsb_Details.salutation_id : "",
+            proposer_title_id: gsb_Details && gsb_Details.salutation_id != '0'? gsb_Details.salutation_id : "",
             proposer_first_name: gsb_Details ? gsb_Details.first_name : "",
             proposer_last_name: gsb_Details ? gsb_Details.last_name : "",
             proposer_dob: gsb_Details && gsb_Details.dob ? new Date(gsb_Details.dob) : "",
@@ -551,18 +600,18 @@ class AdditionalDetails_GSB extends Component {
             street_name: address_flag == '1' ? riskAddressDetails.area_name : commAddressDetails ? commAddressDetails.street_name : "" ,
             state_name: address_flag == '1' ? riskAddressDetails.state : gsb_Details ? gsb_Details.state : "" ,
             pincode_id: address_flag == '1' ? riskAddressDetails.pincode : gsb_Details ? gsb_Details.pincode : "" ,
-            area_name: address_flag == '1' ? gsb_Details && gsb_Details.gsbinfo ?  gsb_Details.gsbinfo.pincode_id : "" : gsb_Details ? gsb_Details.pincode_id : ""  ,
+            area_name: address_flag == '1' ? gsb_Details && gsb_Details.gsbinfo &&  gsb_Details.gsbinfo.pincode_id != '0' ?  gsb_Details.gsbinfo.pincode_id : "" : gsb_Details && gsb_Details.pincode_id != '0' ? gsb_Details.pincode_id : ""  ,
             nominee_title_id: gsb_Details && gsb_Details.request_data && gsb_Details.request_data.nominee && gsb_Details.request_data.nominee.length>0 ? gsb_Details.request_data.nominee[0].title_id : "",
             nominee_first_name: gsb_Details && gsb_Details.request_data && gsb_Details.request_data.nominee && gsb_Details.request_data.nominee.length>0 ? gsb_Details.request_data.nominee[0].first_name : "",
             nominee_dob: gsb_Details && gsb_Details.request_data && gsb_Details.request_data.nominee && gsb_Details.request_data.nominee.length>0 && gsb_Details.request_data.nominee[0].dob ? new Date(moment(gsb_Details.request_data.nominee[0].dob).format("YYYY-MM-DD")) : "",
             relation_with: gsb_Details && gsb_Details.request_data && gsb_Details.request_data.nominee && gsb_Details.request_data.nominee.length>0 ? gsb_Details.request_data.nominee[0].relation_with : "",
             nominee_last_name: gsb_Details && gsb_Details.request_data && gsb_Details.request_data.nominee && gsb_Details.request_data.nominee.length>0 ? gsb_Details.request_data.nominee[0].last_name : "",
             address_flag: gsb_Details && gsb_Details.gsbinfo ? gsb_Details.gsbinfo.address_flag : "",
-            'appointee_name': gsb_Details && gsb_Details.request_data && gsb_Details.request_data.nominee && gsb_Details.request_data.nominee.length>0 ? gsb_Details.request_data.nominee[0].appointee_name : "",
-            'appointee_relation_with': gsb_Details && gsb_Details.request_data && gsb_Details.request_data.nominee && gsb_Details.request_data.nominee.length>0 ? gsb_Details.request_data.nominee[0].appointee_relation_with : "",
-            'is_appointee': this.state.is_appointee
+            appointee_name: gsb_Details && gsb_Details.request_data && gsb_Details.request_data.nominee && gsb_Details.request_data.nominee.length>0 ? gsb_Details.request_data.nominee[0].appointee_name : "",
+            appointee_relation_with: gsb_Details && gsb_Details.request_data && gsb_Details.request_data.nominee && gsb_Details.request_data.nominee.length>0 ? gsb_Details.request_data.nominee[0].appointee_relation_with : "",
+            is_appointee: this.state.is_appointee
         })
-console.log("address_flag------- ", address_flag)
+console.log("newInitialValues------- ", newInitialValues)
         return (
             <>
                 <BaseComponent>
@@ -580,7 +629,7 @@ console.log("address_flag------- ", address_flag)
                                             validationSchema={vehicleRegistrationValidation}
                                         >
                                             {({ values, errors, setFieldValue, setFieldTouched, isValid, isSubmitting, touched }) => {
-                                                console.log('values-------- ',values)
+                                                console.log('errors-------- ',errors)
 
                                                 return (
                                                     <Form>
@@ -993,7 +1042,7 @@ console.log("address_flag------- ", address_flag)
                                                         <div className="brandhead">
                                                             <h4 className="fs-18 m-b-30">COMMUNICATION ADDRESS</h4>
                                                         </div>
-                                                        <label className="customCheckBox">is communication address same as risk location address
+                                                        <label className="customCheckBox">Is communication address same as risk location address
                                                             <Field
                                                                 type="checkbox"
                                                                 name="address_flag"
