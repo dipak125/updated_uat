@@ -212,7 +212,7 @@ class arogya_SelectDuration extends Component {
                 let insured_amount = policyHolderDetails && policyHolderDetails.arogyatopupsuminsured ? policyHolderDetails.arogyatopupsuminsured.insured_amount : []
 
                 values['polStartDate'] = policyDetails && policyDetails.start_date ? moment(policyDetails.start_date).format("YYYY-MM-DD") : new Date()
-                values['polEndDate'] = policyDetails && policyDetails.end_date ? moment(policyDetails.end_date).format("YYYY-MM-DD") : new Date(moment(values['polStartDate']).add(1, 'years').format("YYYY-MM-DD"))
+                values['polEndDate'] = policyDetails && policyDetails.end_date ? moment(policyDetails.end_date).format("YYYY-MM-DD") : moment(addDays(new Date(), (365 * 2) - 1)).format("YYYY-MM-DD")
                 values['slider_sum_insured'] = insured_amount ? parseInt(insured_amount) : defaultSliderVal
                 values['slider_deductible'] = policyDetails && policyDetails.deductible ? parseInt(policyDetails.deductible) : defaultdeductibleSliderValue
                 values['slider_tenure'] = policyDetails && policyDetails.tenure_year ? parseInt(policyDetails.tenure_year) : defaulttenureSliderValue
@@ -257,7 +257,7 @@ class arogya_SelectDuration extends Component {
         let tenureSliderVal = values.slider_tenure ? values.slider_tenure : 0
         const formData = new FormData();
         this.props.loadingStart();
-
+        console.log("values--------------- ", values)
         const post_data = {
             'policy_reference_no': localStorage.getItem('policyHolder_refNo'),
             'start_date': polStartDate,
@@ -348,8 +348,8 @@ class arogya_SelectDuration extends Component {
 
 
         const newInitialValues = Object.assign(initialValues, {
-            polStartDate: start_date ? start_date : new Date,
-            polEndDate: end_date ? end_date : new Date(moment().add(1, 'years').format("YYYY-MM-DD")),
+            polStartDate: start_date ? start_date : new Date(),
+            polEndDate: end_date ? end_date : addDays(start_date ? new Date(start_date) : new Date(), (365 * 2) - 1),
             // insureValue: policyHolderDetails && policyHolderDetails.request_data && policyHolderDetails.request_data.sum_insured ? Math.floor(policyHolderDetails.request_data.sum_insured) : initialValues.insureValue
             // insureValue: policyHolderDetails && policyHolderDetails.request_data && policyHolderDetails.request_data.sum_insured ? sum_assured[policyHolderDetails.request_data.sum_insured] : initialValues.insureValue,
 
@@ -363,8 +363,6 @@ class arogya_SelectDuration extends Component {
         const errMsg = error && error.message ? (
             <span className="errorMsg"><h6><strong>Thank you for showing your interest for buying product.Due to some reasons, we are not able to issue the policy online.Please call 1800 22 1111</strong></h6></span>
         ) : null
-
-        console.log("serverResponse--------------- ", serverResponse)
 
         return (
             <>
@@ -386,7 +384,7 @@ class arogya_SelectDuration extends Component {
                                             validationSchema={validateDuration}
                                         >
                                             {({ values, errors, setFieldValue, setFieldTouched, isValid, isSubmitting, touched }) => {
-                                                console.log("errors--------------- ", errors)
+                                               console.log("values----------------- ", values)
                                                 return (
                                                     <Form>
                                                         <Row>
@@ -414,7 +412,7 @@ class arogya_SelectDuration extends Component {
                                                                                 onChange={(value) => {
                                                                                     setFieldTouched("polStartDate");
                                                                                     setFieldValue("polStartDate", value);
-                                                                                    setFieldValue("polEndDate", addDays(new Date(), 364));
+                                                                                    setFieldValue("polEndDate", addDays(new Date(values.polStartDate), (365 * values.slider_tenure) - 1));
                                                                                     this.handleChange(value);
                                                                                 }}
                                                                                 selected={values.polStartDate}
@@ -579,6 +577,10 @@ class arogya_SelectDuration extends Component {
                                                                                 onChange={(e) => {
                                                                                     setFieldTouched("slider_tenure");
                                                                                     setFieldValue("slider_tenure", e.target.value);
+                                                                                    setFieldTouched("polStartDate");
+                                                                                    setFieldValue("polStartDate", values.polStartDate);
+                                                                                    setFieldTouched("polEndDate");
+                                                                                    setFieldValue("polEndDate", addDays(new Date(values.polStartDate), (365 * e.target.value) - 1));
                                                                                     this.tenureSliderValue(e.target.value)
                                                                                 }}
                                                                             />

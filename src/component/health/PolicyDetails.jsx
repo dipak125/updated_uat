@@ -231,6 +231,26 @@ class PolicyDetails extends Component {
       this.props.history.push(`/Vedvag_gateway/${this.props.match.params.productId}?access_id=${this.state.policyHolder_refNo}`);
     }
   }
+  
+
+  sendPaymentLink = () => {
+    let encryption = new Encryption();
+    const formData = new FormData();
+    let policyHolder_refNo = localStorage.getItem("policyHolder_refNo") ? localStorage.getItem("policyHolder_refNo") : 0;
+    formData.append('reference_no', policyHolder_refNo)
+
+    this.props.loadingStart();
+    axios
+      .post("send-payment-link", formData)
+      .then((res) => {
+        swal(res.data.msg)
+        this.props.loadingStop();
+      })
+      .catch((err) => {
+        this.props.loadingStop();
+      });
+  };
+
 
 
   payment = () => {
@@ -510,7 +530,7 @@ paypoint_payment = () => {
                                                   </FormGroup>
                                               </Col>
                                           </Row>
-
+                                          <Row>&nbsp;</Row>
                                           <div className="d-flex justify-content-left resmb">
                                             <Button
                                               className="backBtn"
@@ -518,6 +538,8 @@ paypoint_payment = () => {
                                             >
                                               Back
                                             </Button>
+                                            <Button type="button" className="proceedBtn" onClick = {this.sendPaymentLink.bind(this)}>  Send Payment Link  </Button>
+                                            &nbsp;&nbsp;&nbsp;&nbsp;
                                           {fulQuoteResp.QuotationNo && values.gateway != "" ? 
                                             <Button type="submit"
                                               className="proceedBtn"

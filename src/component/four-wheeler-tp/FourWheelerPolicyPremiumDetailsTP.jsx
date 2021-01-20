@@ -226,6 +226,25 @@ class Premium extends Component {
     
 }
 
+sendPaymentLink = () => {
+    let encryption = new Encryption();
+    const formData = new FormData();
+    let policyHolder_refNo = localStorage.getItem("policyHolder_refNo") ? localStorage.getItem("policyHolder_refNo") : 0;
+    formData.append('reference_no', policyHolder_refNo)
+
+    this.props.loadingStart();
+    axios
+      .post("send-payment-link", formData)
+      .then((res) => {
+        swal(res.data.msg)
+        this.props.loadingStop();
+      })
+      .catch((err) => {
+        this.props.loadingStop();
+      });
+  };
+
+
 
     componentDidMount() {
         // this.fetchData()
@@ -658,9 +677,12 @@ class Premium extends Component {
                                                                     </FormGroup>
                                                                 </Col>
                                                             </Row>
-
+                                                            <Row>&nbsp;</Row>
                                                             <div className="d-flex justify-content-left resmb">
                                                                 <Button className="backBtn" type="button" onClick={this.additionalDetails.bind(this, productId)}>Back</Button>
+                                                                <Button type="button" className="proceedBtn" onClick = {this.sendPaymentLink.bind(this)}>  Send Payment Link  </Button>
+                                                                &nbsp;&nbsp;&nbsp;&nbsp;
+
                                                                 {fulQuoteResp.QuotationNo && values.gateway != "" ?
                                                                     <Button type="submit"
                                                                         className="proceedBtn"
@@ -698,7 +720,8 @@ class Premium extends Component {
 
 
 
-                            </div> : step_completed == "" ? "Forbidden" : null }
+                            </div> 
+                            : step_completed == "" ? "Forbidden" : null }
                             <Footer />
                         </div>
                     </div>

@@ -85,7 +85,7 @@ class Others extends Component {
                                 (<tbody>
                                     {health_list.map((part, partIndex) => ( 
                                     <tr key={partIndex}>
-                                        <td className="W-10"><img src={require(`../../assets/images/sme_fire_uw.svg`)} alt="" /></td>
+                                        <td className="W-10"><img src={require(`../../assets/images/${part.logo}`)} alt="" /></td>
                                         <td className="W-70">{part.name}</td>
                                         <td className="W-10 text-right"> <button className="buy" onClick= {this.buy_policy.bind(this, part.id )} >Buy</button></td>
                                         {/* {(part.product != 'Arogya Sanjeevani') ? (<td className="W-10 text-right"> <button className="renew">Renew</button></td>):null} */}

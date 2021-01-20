@@ -17,12 +17,16 @@ import axios from "../../shared/axios";
 import { withRouter, Link, Route } from "react-router-dom";
 import { loaderStart, loaderStop } from "../../store/actions/loader";
 import { connect } from "react-redux";
-// import { Formik, Form, Field, ErrorMessage, FieldArray } from 'formik'
 import moment from "moment";
 import swal from 'sweetalert';
 import Encryption from '../../shared/payload-encryption';
 import queryString from 'query-string';
+import { Formik, Form, Field, ErrorMessage } from "formik";
 
+
+const initialValue = {
+  gateway : ""
+};
 
 const genderArr = {
   m: "Male",
@@ -199,6 +203,24 @@ class arogya_PolicyDetails extends Component {
       }
   }
 }
+
+sendPaymentLink = () => {
+  let encryption = new Encryption();
+  const formData = new FormData();
+  let policyHolder_refNo = localStorage.getItem("policyHolder_refNo") ? localStorage.getItem("policyHolder_refNo") : 0;
+  formData.append('reference_no', policyHolder_refNo)
+
+  this.props.loadingStart();
+  axios
+    .post("send-payment-link", formData)
+    .then((res) => {
+      swal(res.data.msg)
+      this.props.loadingStop();
+    })
+    .catch((err) => {
+      this.props.loadingStop();
+    });
+};
 
 
   payment = () => {
@@ -463,190 +485,249 @@ paypoint_payment = () => {
                 <h4 className="text-center mt-3 mb-3">
                   Arogya Top Up Policy
                 </h4>
-                <section className="brand">
-                  <div className="boxpd">
-                    <div className="d-flex justify-content-left carloan">
-                      <h4> Details of your Policy Premium</h4>
-                    </div>
-                    <div className="brandhead m-b-30">
-                      <h5>{errMsg}</h5>
-                      <h5>{paymentErrMsg}</h5>
-                      <h4>
-                        Policy Reference Number {policyHolderDetails && policyHolderDetails.request_data ? policyHolderDetails.request_data.quote_id : null}
-                      </h4>
-                    </div>
+                <Formik initialValues={initialValue} onSubmit={this.handleSubmit}
+                    // validationSchema={validatePremium}
+                    >
+                        {({ values, errors, setFieldValue, setFieldTouched, isValid, isSubmitting, touched }) => {
 
-                    <Row>
-                      <Col sm={12} md={9} lg={18}>
-                        <div className="rghtsideTrigr">
-                          <Collapsible trigger="Arogya Top Up Policy, SBI General Insurance Company Limited"  open= {true}>
-                            <div className="listrghtsideTrigr">
-                              <Row>
-                                <Col sm={12} md={3}>
-                                  <FormGroup>Sum Insured:</FormGroup>
-                                </Col>
-                                <Col sm={12} md={3}>
-                                  <FormGroup>
-                                    <strong>Rs:</strong>{" "}
-                                    {policyHolderDetails && policyHolderDetails.request_data ? Math.round(policyHolderDetails.request_data.sum_insured) : null}
-                                  </FormGroup>
-                                </Col>
-                                <Col sm={12} md={3}>
-                                  <FormGroup>Applicable Taxes:</FormGroup>
-                                </Col>
-                                <Col sm={12} md={3}>
-                                  <FormGroup>
-                                    <strong>Rs:</strong>{" "}
-                                    {policyHolderDetails && policyHolderDetails.request_data ? Math.round(policyHolderDetails.request_data.service_tax) : null}
-                                  </FormGroup>
-                                </Col>
-                                <Col sm={12} md={3}>
-                                  <FormGroup>Gross Premium:</FormGroup>
-                                </Col>
-                                <Col sm={12} md={3}>
-                                  <FormGroup>
-                                    <strong>Rs:</strong>{" "}
-                                    {policyHolderDetails && policyHolderDetails.request_data ? Math.round(policyHolderDetails.request_data.gross_premium) : null}
-                                  </FormGroup>
-                                </Col>
-                                <Col sm={12} md={3}>
-                                  <FormGroup>Net Premium:</FormGroup>
-                                </Col>
-                                <Col sm={12} md={3}>
-                                  <FormGroup>
-                                    <strong>Rs:</strong>{" "}
-                                    {policyHolderDetails && policyHolderDetails.request_data ? Math.round(policyHolderDetails.request_data.net_premium) : null}
-                                  </FormGroup>
-                                </Col>
-                              </Row>
-                            </div>
-                          </Collapsible>
-                        </div>
-
-                        <div className="rghtsideTrigr">
-                          <Collapsible trigger=" Member Details">
-                            <div className="listrghtsideTrigr">{items}</div>
-                          </Collapsible>
-                        </div>
-
-                        <div className="rghtsideTrigr">
-                          <Collapsible trigger=" Contact information">
-                            <div className="listrghtsideTrigr">
-                              <div className="d-flex justify-content-end carloan">
-                                <Link to ={`/arogya_Address/${productId}`}> Edit</Link>
-                              </div>
-                              <Row>
-                                <Col sm={12} md={18}>
-
-                                  <Row>
-                                    <Col sm={12} md={3}>
-                                      Mobile number:
-                                    </Col>
-                                    <Col sm={12} md={9}>
-                                      {policyHolderDetails.mobile}
-                                    </Col>
-                                  </Row>
-                                  <Row>
-                                    <Col sm={12} md={3}>
-                                     &nbsp;
-                                    </Col>
-                                  </Row>
-                                  <Row>
-                                    <Col sm={12} md={3}>
-                                      Email:
-                                    </Col>
-                                    <Col sm={12} md={6}>
-                                      {policyHolderDetails.email_id}
-                                    </Col>
-                                  </Row>
-                                  <Row>
-                                    <Col sm={12} md={3}>
-                                     &nbsp;
-                                    </Col>
-                                  </Row>
-                                  <Row >
-                                    <Col sm={12} md={3}>
-                                      Address:
-                                    </Col>
-                                    <Col sm={12} md={6}>
-                                      {AddressDetails} 
-                                    </Col>
-                                  </Row>
-                                  
-                                  <Row>
-                                    <Col sm={12} md={3}>
-                                      Pincode:
-                                    </Col>
-                                    <Col sm={12} md={9}>
-                                      {PincodeDetails}
-                                    </Col>
-                                  </Row>
-
-                                </Col>
-                              </Row>
-                            </div>
-                          </Collapsible>
-                        </div>
-
-                        <div className="rghtsideTrigr m-b-40">
-                          <Collapsible trigger=" Nominee Details">
-                            <div className="listrghtsideTrigr">{nominee}</div>
-                            {nomineedetails && nomineedetails.is_appointee == '1'  ? 
-                            <div className="listrghtsideTrigr">{appointee}</div> 
-                            : null}
-                            
-                          </Collapsible>
-                        </div>
-
-                        <Row>
-                            <Col sm={12} md={6}>
-                            </Col>
-                              <Col sm={12} md={6}>
-                                  <FormGroup>
-                                  <div className="paymntgatway">
-                                      Select Payment Gateway
-                                      <div>
-                                      <img src={require('../../assets/images/green-check.svg')} alt="" className="m-r-10" />
-                                      { policyHolderDetails && policyHolderDetails.bcmaster && policyHolderDetails.bcmaster.paymentgateway && policyHolderDetails.bcmaster.paymentgateway.logo ? <img src={require('../../assets/images/'+ policyHolderDetails.bcmaster.paymentgateway.logo)} alt="" /> :
-                                      null
-                                      }
+                            return (
+                                <Form>
+                                  <section className="brand">
+                                    <div className="boxpd">
+                                      <div className="d-flex justify-content-left carloan">
+                                        <h4> Details of your Policy Premium</h4>
                                       </div>
-                                  </div>
-                                  </FormGroup>
-                              </Col>
-                        </Row>
+                                      <div className="brandhead m-b-30">
+                                        <h5>{errMsg}</h5>
+                                        <h5>{paymentErrMsg}</h5>
+                                        <h4>
+                                          Policy Reference Number {policyHolderDetails && policyHolderDetails.request_data ? policyHolderDetails.request_data.quote_id : null}
+                                        </h4>
+                                      </div>
 
-                        <div className="d-flex justify-content-left resmb">
-                          <button
-                            className="backBtn"
-                            onClick={this.nomineeDetails.bind(this, productId)}
-                          >
-                            Back
-                          </button>
-                        {fulQuoteResp.QuotationNo ? 
-                          <button
-                            className="proceedBtn"
-                            type="button"
-                            onClick= {this.handleSubmit }
-                          >
-                            Make Payment
-                          </button> : null
-                        } 
-                        </div>
-                      </Col>
+                                      <Row>
+                                        <Col sm={12} md={9} lg={18}>
+                                          <div className="rghtsideTrigr">
+                                            <Collapsible trigger="Arogya Top Up Policy, SBI General Insurance Company Limited"  open= {true}>
+                                              <div className="listrghtsideTrigr">
+                                                <Row>
+                                                  <Col sm={12} md={3}>
+                                                    <FormGroup>Sum Insured:</FormGroup>
+                                                  </Col>
+                                                  <Col sm={12} md={3}>
+                                                    <FormGroup>
+                                                      <strong>Rs:</strong>{" "}
+                                                      {policyHolderDetails && policyHolderDetails.request_data ? Math.round(policyHolderDetails.request_data.sum_insured) : null}
+                                                    </FormGroup>
+                                                  </Col>
+                                                  <Col sm={12} md={3}>
+                                                    <FormGroup>Applicable Taxes:</FormGroup>
+                                                  </Col>
+                                                  <Col sm={12} md={3}>
+                                                    <FormGroup>
+                                                      <strong>Rs:</strong>{" "}
+                                                      {policyHolderDetails && policyHolderDetails.request_data ? Math.round(policyHolderDetails.request_data.service_tax) : null}
+                                                    </FormGroup>
+                                                  </Col>
+                                                  <Col sm={12} md={3}>
+                                                    <FormGroup>Gross Premium:</FormGroup>
+                                                  </Col>
+                                                  <Col sm={12} md={3}>
+                                                    <FormGroup>
+                                                      <strong>Rs:</strong>{" "}
+                                                      {policyHolderDetails && policyHolderDetails.request_data ? Math.round(policyHolderDetails.request_data.gross_premium) : null}
+                                                    </FormGroup>
+                                                  </Col>
+                                                  <Col sm={12} md={3}>
+                                                    <FormGroup>Net Premium:</FormGroup>
+                                                  </Col>
+                                                  <Col sm={12} md={3}>
+                                                    <FormGroup>
+                                                      <strong>Rs:</strong>{" "}
+                                                      {policyHolderDetails && policyHolderDetails.request_data ? Math.round(policyHolderDetails.request_data.net_premium) : null}
+                                                    </FormGroup>
+                                                  </Col>
+                                                </Row>
+                                              </div>
+                                            </Collapsible>
+                                          </div>
 
-                      <Col sm={12} md={3}>
-                        <div className="regisBox">
-                          <h3 className="medihead">
-                            Assurance of Insurance. Everywhere in India, for
-                            every Indian{" "}
-                          </h3>
-                        </div>
-                      </Col>
-                    </Row>
-                  </div>
-                </section>
-                <Footer />
+                                          <div className="rghtsideTrigr">
+                                            <Collapsible trigger=" Member Details">
+                                              <div className="listrghtsideTrigr">{items}</div>
+                                            </Collapsible>
+                                          </div>
+
+                                          <div className="rghtsideTrigr">
+                                            <Collapsible trigger=" Contact information">
+                                              <div className="listrghtsideTrigr">
+                                                <div className="d-flex justify-content-end carloan">
+                                                  <Link to ={`/arogya_Address/${productId}`}> Edit</Link>
+                                                </div>
+                                                <Row>
+                                                  <Col sm={12} md={18}>
+
+                                                    <Row>
+                                                      <Col sm={12} md={3}>
+                                                        Mobile number:
+                                                      </Col>
+                                                      <Col sm={12} md={9}>
+                                                        {policyHolderDetails.mobile}
+                                                      </Col>
+                                                    </Row>
+                                                    <Row>
+                                                      <Col sm={12} md={3}>
+                                                      &nbsp;
+                                                      </Col>
+                                                    </Row>
+                                                    <Row>
+                                                      <Col sm={12} md={3}>
+                                                        Email:
+                                                      </Col>
+                                                      <Col sm={12} md={6}>
+                                                        {policyHolderDetails.email_id}
+                                                      </Col>
+                                                    </Row>
+                                                    <Row>
+                                                      <Col sm={12} md={3}>
+                                                      &nbsp;
+                                                      </Col>
+                                                    </Row>
+                                                    <Row >
+                                                      <Col sm={12} md={3}>
+                                                        Address:
+                                                      </Col>
+                                                      <Col sm={12} md={6}>
+                                                        {AddressDetails} 
+                                                      </Col>
+                                                    </Row>
+                                                    
+                                                    <Row>
+                                                      <Col sm={12} md={3}>
+                                                        Pincode:
+                                                      </Col>
+                                                      <Col sm={12} md={9}>
+                                                        {PincodeDetails}
+                                                      </Col>
+                                                    </Row>
+
+                                                  </Col>
+                                                </Row>
+                                              </div>
+                                            </Collapsible>
+                                          </div>
+
+                                          <div className="rghtsideTrigr m-b-40">
+                                            <Collapsible trigger=" Nominee Details">
+                                              <div className="listrghtsideTrigr">{nominee}</div>
+                                              {nomineedetails && nomineedetails.is_appointee == '1'  ? 
+                                              <div className="listrghtsideTrigr">{appointee}</div> 
+                                              : null}
+                                              
+                                            </Collapsible>
+                                          </div>
+
+                                          <Row>
+                                              <Col sm={12} md={6}>
+                                              </Col>
+                                                <Col sm={12} md={6}>
+                                                    <FormGroup>
+                                                    <div className="paymntgatway">
+                                                          Select Payment Gateway
+                                                          <div>
+                                                          {/* <img src={require('../../assets/images/green-check.svg')} alt="" className="m-r-10" /> */}
+                                                          <label className="customRadio3">
+                                                          <Field
+                                                              type="radio"
+                                                              name='gateway'                                            
+                                                              value='1'
+                                                              key='1'  
+                                                              onChange={(e) => {
+                                                                  setFieldValue(`gateway`, e.target.value);
+                                                              }}
+                                                              checked={values.gateway == '1' ? true : false}
+                                                          />
+                                                              <span className="checkmark " /><span className="fs-14"> 
+                                                          
+                                                                  { policyHolderDetails && policyHolderDetails.bcmaster && policyHolderDetails.bcmaster.paymentgateway && policyHolderDetails.bcmaster.paymentgateway.logo ? <img src={require('../../assets/images/'+ policyHolderDetails.bcmaster.paymentgateway.logo)} alt="" /> :
+                                                                  null
+                                                                  }
+                                                              </span>
+                                                          </label>
+                                                          </div>
+
+                                                          {policyHolderDetails.bcmaster && policyHolderDetails.bcmaster.id === 2 ?
+                                                          <div>
+                                                          <label className="customRadio3">
+                                                          <Field
+                                                              type="radio"
+                                                              name='gateway'                                            
+                                                              value='2'
+                                                              key='1'  
+                                                              onChange={(e) => {
+                                                                  setFieldValue(`gateway`, e.target.value);
+                                                              }}
+                                                              checked={values.gateway == '2' ? true : false}
+                                                          />
+                                                              <span className="checkmark " /><span className="fs-14"> 
+                                                          
+                                                                  { policyHolderDetails.bcmaster && policyHolderDetails.bcmaster.id === 2 ? <img src={require('../../assets/images/vedavaag.png')} alt="" /> :
+                                                                  null
+                                                                  }
+                                                              </span>
+                                                          </label>
+                                                          </div> : null }
+                                                    </div>
+                                                  </FormGroup>
+                                              </Col>
+                                          </Row>
+                                          <Row>&nbsp;</Row>
+
+                                          <Row>
+                                          <div className="d-flex justify-content-left resmb">
+                                            <button
+                                              className="backBtn"
+                                              onClick={this.nomineeDetails.bind(this, productId)}
+                                            >
+                                              Back
+                                            </button>
+                                            <Button type="button"
+                                              className="proceedBtn"
+                                              onClick = {this.sendPaymentLink.bind(this)}
+                                            > 
+                                              Send Payment Link 
+                                            </Button>
+                                            &nbsp;&nbsp;&nbsp;&nbsp;
+
+                                          {fulQuoteResp.QuotationNo ? 
+                                            <button
+                                              className="proceedBtn"
+                                              type="button"
+                                              onClick= {this.handleSubmit }
+                                            >
+                                              Make Payment
+                                            </button> : null
+                                          } 
+                                          </div>
+                                          </Row>
+                                        </Col>
+
+                                        <Col sm={12} md={3}>
+                                          <div className="regisBox">
+                                            <h3 className="medihead">
+                                              Assurance of Insurance. Everywhere in India, for
+                                              every Indian{" "}
+                                            </h3>
+                                          </div>
+                                        </Col>
+                                      </Row>
+                                    </div>
+                                  </section>
+                                </Form>
+                               );
+                           }}
+                     </Formik>
+                  <Footer />
               </div>
             </div>
           </div>

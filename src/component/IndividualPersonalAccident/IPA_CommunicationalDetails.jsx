@@ -154,48 +154,47 @@ const IPA__Validation = Yup.object().shape({
   relation_with: Yup.string().required(function () {
     return "Please select relation";
   }),
-  //  appointee_dob: Yup.date().required(function() {
-  //       return "Date should not be future date"
-  //       }).test(
-  //           "18YearsChecking",
-  //           function() {
-  //               return "Appointee age should be more than 18 years"
-  //           },
-  //           function (value) {
-  //               const ageObj = new PersonAge();
-  //               if (value) {
-  //                   const age_Obj = new PersonAge();
-  //                   return age_Obj.whatIsMyAge(value) >= 18;
-  //               }
-  //               return true;
-  //           }
-  //       ).test(
-  //           "18YearsChecking",
-  //           function() {
-  //               return "Please enter Appointee date of birth"
-  //           },
-  //           function (value) {
-  //               const ageObj = new PersonAge();
-  //               if (ageObj.whatIsMyAge(this.parent.dob) < 18) {   
-  //                   return ageObj.whatIsMyAge(value) >= 18;    
-  //               }
-  //               return true;
-  //           }
-  //       ),
+
   appointee_name: Yup.string()
-    .matches(/^[a-zA-Z]+([\s]+[a-zA-Z])$/, function () {
-      return "Please enter full name"
-    }).test(
+    .test(
       "18YearsChecking",
       function () {
         return "Please enter appointee name"
       },
       function (value) {
         const ageObj = new PersonAge();
-        console.log("this.parent.nominee_dob------ ", ageObj.whatIsMyAge(this.parent.nominee_dob))
         if (ageObj.whatIsMyAge(this.parent.nominee_dob) < 18 && !value) {
           return false;
         }
+        return true;
+      }
+    )
+    .test(
+      "FirstNameCheck",
+      function () {
+        return "Please enter First Name"
+      },
+      function (value) {       
+        if(value) {
+          var spaceCount = (value.split(" "));
+          if(spaceCount.length >= 1  && spaceCount[0] == "" ) {        
+                return false
+            }
+        }      
+        return true;
+      }
+    ).test(
+      "LastNameCheck",
+      function () {
+        return "Please enter Last Name"
+      },
+      function (value) {
+        if(value) {
+          var spaceCount = (value.split(" "));
+          if(spaceCount.length == 2 && spaceCount[1] == "") {        
+                return false
+            }
+        }      
         return true;
       }
     ).min(3, function () {
@@ -203,6 +202,9 @@ const IPA__Validation = Yup.object().shape({
     })
     .max(40, function () {
       return "Name must be maximum 40 chracters"
+    })
+    .matches(/^[a-zA-Z]+([\s]?[a-zA-Z]+)$/, function () {
+      return "Please enter full name"
     })
     .nullable(),
 
@@ -299,7 +301,6 @@ class AccidentAdditionalDetails extends Component {
 
         });
         let pincodeArea = pincodeRESP && pincodeRESP.PIN_CD ? pincodeRESP.PIN_CD : ""
-        console.log('pincodeArea------>>', pincodeArea)
         this.fetchAreadetailsBack(pincodeArea)
         this.props.loadingStop();
       })
@@ -326,11 +327,11 @@ class AccidentAdditionalDetails extends Component {
       'date_of_birth': date_of_birth,
       'email_id': values.email_id,
       'house_building_name': values.building_name,
-      'city': values.city,
+      // 'city': values.city,
       'plot_no': values.plot_no,
       'street': values.street_name,
-      'pincode': values.pincode,
-      'pincode_id': values.pincode_id,
+      // 'pincode': values.pincode,
+      // 'pincode_id': values.pincode_id,
       'nominee_first_name': values.nominee_first_name,
       'nominee_last_name': values.nominee_last_name,
       'nominee_title_id': values.nominee_salutation_id,
@@ -736,6 +737,7 @@ class AccidentAdditionalDetails extends Component {
                                       placeholder="Pincode"
                                       autoComplete="off"
                                       maxLength="6"
+                                      disabled = {true}
                                       onFocus={(e) =>
                                         this.changePlaceHoldClassAdd(e)
                                       }
@@ -745,7 +747,6 @@ class AccidentAdditionalDetails extends Component {
                                       onKeyUp={(e) => this.fetchAreadetails(e)}
                                       value={values.pincode}
                                       maxLength="6"
-                                      onInput={(e) => { }}
                                     />
                                     {errors.pincode && touched.pincode ? (
                                       <span className="errorMsg">
@@ -764,6 +765,7 @@ class AccidentAdditionalDetails extends Component {
                                       autoComplete="off"
                                       value={values.pincode_id}
                                       className="formGrp"
+                                      disabled = {true}
                                     >
                                       <option value="">Select Area</option>
                                       {pinDataArr &&
@@ -871,6 +873,7 @@ class AccidentAdditionalDetails extends Component {
                                       type="text"
                                       placeholder="City"
                                       autoComplete="off"
+                                      disabled = {true}
                                       onFocus={(e) =>
                                         this.changePlaceHoldClassAdd(e)
                                       }

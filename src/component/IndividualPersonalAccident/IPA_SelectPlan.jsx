@@ -20,7 +20,8 @@ const minDobAdult = moment(moment().subtract(65, 'years').calendar()).format("YY
 const maxDobAdult = moment().subtract(18, 'years').format("YYYY-MM-DD");
 
 const initialValues = {
-    titleList: []
+    titleList: [],
+    pinDataArr: [],
 };
 
 const sum_insured_array = {
@@ -119,6 +120,8 @@ class AccidentSelectPlan extends Component {
           'proposer_dob' : date_of_birth,
           'proposer_mobile' : values.mobile,
           'proposer_email' : values.email_id,
+          'pincode': values.pincode,
+          'pincode_id': values.pincode_id,
           // 'proposer_gender' : 'm'
       }
       let policyHolder_id = localStorage.getItem('policyHolder_id') ? localStorage.getItem('policyHolder_id') :0
@@ -206,12 +209,16 @@ class AccidentSelectPlan extends Component {
       .get(`ipa/details/${policyHolder_refNo}`)
       .then((res) => {
         let decryptResp = JSON.parse(encryption.decrypt(res.data));
-        // console.log("decrypt---accidentDetails--->>", decryptResp);
         let accidentDetails = decryptResp.data && decryptResp.data.policyHolder ? decryptResp.data.policyHolder : null;
+        let pincodeRESP = accidentDetails && accidentDetails.pincode_response ? JSON.parse(accidentDetails.pincode_response) : {};
         console.log("---accidentDetails--->>", accidentDetails);
+
         this.setState({
-          accidentDetails
+          accidentDetails, pincodeRESP
         });
+
+        let pincodeArea = pincodeRESP && pincodeRESP.PIN_CD ? pincodeRESP.PIN_CD : ""
+        this.fetchAreadetailsBack(pincodeArea)
         this.props.loadingStop();
       })
       .catch((err) => {
@@ -220,9 +227,81 @@ class AccidentSelectPlan extends Component {
       });
   };
 
+  fetchAreadetails = (e) => {
+    let pinCode = e.target.value;
+
+    if (pinCode.length == 6) {
+      const formData = new FormData();
+      this.props.loadingStart();
+      // let encryption = new Encryption();
+      const post_data_obj = {
+        pincode: pinCode,
+      };
+      //    formData.append('enc_data',encryption.encrypt(JSON.stringify(post_data_obj)))
+      formData.append("pincode", pinCode);
+      axios
+        .post("pincode-details", formData)
+        .then((res) => {
+          if (res.data.error === false) {
+            let stateName =
+              res.data.data &&
+                res.data.data[0] &&
+                res.data.data[0].pinstate.STATE_NM
+                ? res.data.data[0].pinstate.STATE_NM
+                : "";
+            this.setState({
+              pinDataArr: res.data.data,
+              stateName,
+            });
+            this.props.loadingStop();
+          } else {
+            this.props.loadingStop();
+            swal("Plese enter a valid pincode");
+          }
+        })
+        .catch((err) => {
+          this.props.loadingStop();
+        });
+    }
+  };
+
+  fetchAreadetailsBack = (pincode_input) => {
+    let pinCode = pincode_input.toString();
+
+    if (pinCode != null && pinCode != "" && pinCode.length == 6) {
+      console.log("fetchAreadetailsBack pinCode", pinCode);
+      const formData = new FormData();
+      this.props.loadingStart();
+      // let encryption = new Encryption();
+      const post_data_obj = {
+        pincode: pinCode,
+      };
+      // formData.append('enc_data',encryption.encrypt(JSON.stringify(post_data_obj)))
+      formData.append("pincode", pinCode);
+      axios
+        .post("pincode-details", formData)
+        .then((res) => {
+          let stateName =
+            res.data.data &&
+              res.data.data[0] &&
+              res.data.data[0].pinstate.STATE_NM
+              ? res.data.data[0].pinstate.STATE_NM
+              : "";
+          this.setState({
+            pinDataArr: res.data.data,
+            stateName,
+          });
+          this.props.loadingStop();
+        })
+        .catch((err) => {
+          this.props.loadingStop();
+        });
+    }
+  };
+
 
   render() {
-    const {titleList, accidentDetails, serverResponse, validation_error, error} = this.state;
+    const {titleList, accidentDetails, serverResponse, validation_error, error, pinDataArr, pincodeRESP} = this.state;
     const newInitialValues = Object.assign(initialValues, {
       sumInsured: accidentDetails && accidentDetails.ipainfo ? accidentDetails.ipainfo.sum_insured == 100000 ? 1 : accidentDetails.ipainfo.sum_insured == 200000 ? 2 : accidentDetails.ipainfo.sum_insured == 300000 ? 3 : accidentDetails.ipainfo.sum_insured == 400000 ? 4 : accidentDetails.ipainfo.sum_insured == 500000 ? 5 : 0 : null,
       salutation_id: accidentDetails && accidentDetails.ipainfo ? accidentDetails.ipainfo.ipatitle.id : "",
@@ -231,7 +310,9 @@ class AccidentSelectPlan extends Component {
       date_of_birth: accidentDetails && accidentDetails.dob ? new Date(accidentDetails.dob) : null,
       mobile: accidentDetails ? accidentDetails.mobile : "",
       email_id: accidentDetails ? accidentDetails.email_id : "",
-      proposer_gender: accidentDetails ? accidentDetails.gender : ""
+      proposer_gender: accidentDetails ? accidentDetails.gender : "",
+      pincode: accidentDetails ? accidentDetails.pincode : "",
+      pincode_id: pincodeRESP && pincodeRESP.id ? pincodeRESP.id : "",
     });
 
     const errMsg =  error && error.message ? (            
@@ -469,6 +550,69 @@ class AccidentSelectPlan extends Component {
                                             </FormGroup>
                                         </Col>                        
                                 </Row>
+                                <Row>
+                                  <Col sm={6} md={3} lg={4}>
+                                    <FormGroup>
+                                      <div className="insurerName">
+                                        <Field
+                                          name="pincode"
+                                          type="test"
+                                          placeholder="Pincode"
+                                          autoComplete="off"
+                                          maxLength="6"
+                                          onFocus={(e) =>
+                                            this.changePlaceHoldClassAdd(e)
+                                          }
+                                          onBlur={(e) =>
+                                            this.changePlaceHoldClassRemove(e)
+                                          }
+                                          onKeyUp={(e) => this.fetchAreadetails(e)}
+                                          value={values.pincode}
+                                          maxLength="6"
+                                          onInput={(e) => { }}
+                                        />
+                                        {errors.pincode && touched.pincode ? (
+                                          <span className="errorMsg">
+                                            {errors.pincode}
+                                          </span>
+                                        ) : null}
+                                      </div>
+                                    </FormGroup>
+                                  </Col>
+                                  <Col sm={6} md={3} lg={4}>
+                                    <FormGroup>
+                                      <div className="formSection">
+                                        <Field
+                                          name="pincode_id"
+                                          component="select"
+                                          autoComplete="off"
+                                          value={values.pincode_id}
+                                          className="formGrp"
+                                        >
+                                          <option value="">Select Area</option>
+                                          {pinDataArr &&
+                                            pinDataArr.length > 0 &&
+                                            pinDataArr.map((resource, rindex) => (
+                                              <option key={rindex} value={resource.id}>
+                                                {
+                                                  resource.LCLTY_SUBRB_TALUK_TEHSL_NM
+                                                }
+                                              </option>
+                                            ))}
+
+                                          {/*<option value="area2">Area 2</option>*/}
+                                        </Field>
+                                        {errors.pincode_id && touched.pincode_id ? (
+                                          <span className="errorMsg">
+                                            {errors.pincode_id}
+                                          </span>
+                                        ) : null}
+                                      </div>
+                                    </FormGroup>
+                                  </Col>
+
+                                </Row>
+                            
                                 <Row>
                                 </Row>
 

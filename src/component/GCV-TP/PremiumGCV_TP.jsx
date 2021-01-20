@@ -228,7 +228,26 @@ class PremiumGCV extends Component {
             });
         })
     
-}
+    }
+
+    sendPaymentLink = () => {
+        let encryption = new Encryption();
+        const formData = new FormData();
+        let policyHolder_refNo = localStorage.getItem("policyHolder_refNo") ? localStorage.getItem("policyHolder_refNo") : 0;
+        formData.append('reference_no', policyHolder_refNo)
+
+        this.props.loadingStart();
+        axios
+        .post("send-payment-link", formData)
+        .then((res) => {
+            swal(res.data.msg)
+            this.props.loadingStop();
+        })
+        .catch((err) => {
+            this.props.loadingStop();
+        });
+    };
+
 
 
     componentDidMount() {
@@ -626,15 +645,6 @@ class PremiumGCV extends Component {
                                                             </Col>
                                                                 <Col sm={12} md={6}>
                                                                     <FormGroup>
-                                                                    {/* <div className="paymntgatway">
-                                                                        Select Payment Gateway
-                                                                        <div>
-                                                                        <img src={require('../../assets/images/green-check.svg')} alt="" className="m-r-10" />
-                                                                        { policyHolder && policyHolder.bcmaster && policyHolder.bcmaster.paymentgateway && policyHolder.bcmaster.paymentgateway.logo ? <img src={require('../../assets/images/'+ policyHolder.bcmaster.paymentgateway.logo)} alt="" /> :
-                                                                        null
-                                                                        }
-                                                                        </div>
-                                                                    </div> */}
                                                                      <div className="paymntgatway">
                                                                         Select Payment Gateway
                                                                         <div>
@@ -685,9 +695,11 @@ class PremiumGCV extends Component {
                                                                 </Col>
                                                             </Row>
 
-                                                    
+                                                            <Row>&nbsp;</Row>
                                                             <div className="d-flex justify-content-left resmb">
                                                                 <Button className="backBtn" type="button" onClick={this.additionalDetails.bind(this, productId)}>Back</Button>
+                                                                <Button type="button" className="proceedBtn" onClick = {this.sendPaymentLink.bind(this)}>  Send Payment Link  </Button>
+                                                                &nbsp;&nbsp;&nbsp;&nbsp;
                                                                 {fulQuoteResp.QuotationNo && values.gateway != "" ?
                                                                     <Button type="submit"
                                                                         className="proceedBtn"
@@ -708,23 +720,6 @@ class PremiumGCV extends Component {
                                         );
                                     }}
                                 </Formik>
-                                {/* <Modal className="" bsSize="md"
-                                    show={show}
-                                    onHide={this.handleClose}>
-                                    <div className="otpmodal">
-                                        <Modal.Body>
-                                            <Otp
-                                                quoteNo={fulQuoteResp.QuotationNo}
-                                                duePremium={fulQuoteResp.DuePremium}
-                                                refNumber={refNumber}
-                                                whatsapp={whatsapp}
-                                                reloadPage={(e) => this.payment(e)}
-                                            />
-                                        </Modal.Body>
-                                    </div>
-                                </Modal> */}
-
-
 
                             </div> : step_completed == "" ? "Forbidden" : null }
                             <Footer />

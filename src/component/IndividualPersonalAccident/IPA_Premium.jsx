@@ -99,6 +99,26 @@ class IPA_Premium extends Component {
       });
   };
 
+  
+  sendPaymentLink = () => {
+    let encryption = new Encryption();
+    const formData = new FormData();
+    let policyHolder_refNo = localStorage.getItem("policyHolder_refNo") ? localStorage.getItem("policyHolder_refNo") : 0;
+    formData.append('reference_no', policyHolder_refNo)
+
+    this.props.loadingStart();
+    axios
+      .post("send-payment-link", formData)
+      .then((res) => {
+        swal(res.data.msg)
+        this.props.loadingStop();
+      })
+      .catch((err) => {
+        this.props.loadingStop();
+      });
+  };
+
+
   fetchData = () => {
     const { productId } = this.props.match.params;
     let policyHolder_refNo = localStorage.getItem("policyHolder_refNo") ? localStorage.getItem("policyHolder_refNo") : 0;
@@ -137,7 +157,7 @@ class IPA_Premium extends Component {
     }
     let encryption = new Encryption();
     formData.append('enc_data',encryption.encrypt(JSON.stringify(post_data)))
-
+console.log("post_data---quote--- ", post_data)
     axios
       .post(`/fullQuoteServiceIPA`, formData)
       .then(res => { 
@@ -622,13 +642,22 @@ class IPA_Premium extends Component {
                                             >
                                               Back
                                             </Button>
+
+                                            <Button type="button"
+                                              className="proceedBtn"
+                                              onClick = {this.sendPaymentLink.bind(this)}
+                                            > 
+                                              Send Payment Link 
+                                            </Button>
+                                            &nbsp;&nbsp;&nbsp;&nbsp;
+
                                           {fulQuoteResp.QuotationNo && values.gateway != "" ? 
                                             <Button type="submit"
                                               className="proceedBtn"
                                             >
                                               Make Payment
                                             </Button> : null
-                                          } 
+                                          }                                     
                                           </div>
                                         </Col>
 
