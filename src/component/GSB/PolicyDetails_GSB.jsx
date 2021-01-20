@@ -189,7 +189,7 @@ fullQuote = (values, actions) => {
       else if (res.data.PolicyObject && res.data.UnderwritingResult && res.data.UnderwritingResult.Status == "Fail") {
         this.setState({
           fulQuoteResp: res.data.PolicyObject,
-          serverResponse: res.data.PolicyObject,
+          serverResponse: [],
           validation_error: [],
           error: { "message": 1 }
         })

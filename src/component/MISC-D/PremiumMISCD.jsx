@@ -314,9 +314,27 @@ class PremiumMISCD extends Component {
             this.setState({
                 relation: []
             });
-        })
+        })   
+    }
+
+    sendPaymentLink = () => {
+        let encryption = new Encryption();
+        const formData = new FormData();
+        let policyHolder_refNo = localStorage.getItem("policyHolder_refNo") ? localStorage.getItem("policyHolder_refNo") : 0;
+        formData.append('reference_no', policyHolder_refNo)
     
-}
+        this.props.loadingStart();
+        axios
+          .post("send-payment-link", formData)
+          .then((res) => {
+            swal(res.data.msg)
+            this.props.loadingStop();
+          })
+          .catch((err) => {
+            this.props.loadingStop();
+          });
+      };
+    
 
 
     componentDidMount() {
@@ -766,9 +784,11 @@ class PremiumMISCD extends Component {
                                                                 </Col>
                                                             </Row>
 
-                                                            
+                                                            <Row>&nbsp;</Row>
                                                             <div className="d-flex justify-content-left resmb">
                                                                 <Button className="backBtn" type="button" onClick={this.additionalDetails.bind(this, productId)}>Back</Button>
+                                                                <Button type="button" className="proceedBtn" onClick = {this.sendPaymentLink.bind(this)}>  Send Payment Link  </Button>
+                                                                &nbsp;&nbsp;&nbsp;&nbsp;
                                                                 
                                                                 {smsButton === true ?
                                                                 <Button className="backBtn" type="button" onClick={this.handleModal.bind(this)}>Send consent SMS & e-mail</Button>

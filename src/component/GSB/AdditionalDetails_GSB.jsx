@@ -520,7 +520,7 @@ class AdditionalDetails_GSB extends Component {
         let pinCode = pincode_input ? pincode_input.toString() : "";
 
         if (pinCode != null && pinCode != "" && pinCode.length == 6) {
-            console.log("fetchAreadetailsBack pinCode", pinCode);
+            
             const formData = new FormData();
             this.props.loadingStart();
             // let encryption = new Encryption();
@@ -550,11 +550,19 @@ class AdditionalDetails_GSB extends Component {
                         stateName, cityName
                     });
 
+                    if(setFieldValue) {
+                        setFieldTouched("state_name")
+                        setFieldTouched("pincode_id")
+                        setFieldValue(`state_name`,stateName);
+                        setFieldValue(`pincode_id`,pincode_input);
+                    }       
+
                     this.props.loadingStop();
                 })
                 .catch((err) => {
                     this.props.loadingStop();
                 });
+                      
         }
     };
     ageCheck = (value) => {
@@ -964,7 +972,7 @@ console.log("newInitialValues------- ", newInitialValues)
                                                                             dateFormat="dd MMM yyyy"
                                                                             placeholderText="Year of construction"
                                                                             minDate={minConstructionDate}
-                                                                            // maxDate={new Date()}
+                                                                            maxDate={new Date()}
                                                                             peekPreviousMonth
                                                                             peekPreviousYear
                                                                             showMonthDropdown
@@ -1069,7 +1077,22 @@ console.log("newInitialValues------- ", newInitialValues)
                                                                         this.setState({
                                                                             address_flag: 0
                                                                         })       
-                                                                        this.fetchAreadetailsBack(gsb_Details && gsb_Details.pincode)                                                  
+                                                                        setFieldTouched("house_flat_no")
+                                                                        setFieldTouched("city")
+                                                                        setFieldTouched("house_building_name")
+                                                                        setFieldTouched("street_name")
+                                                                        setFieldTouched("state_name")
+                                                                        setFieldTouched("pincode_id")
+                                                                        setFieldTouched("area_name")
+ 
+                                                                        // setFieldValue(`house_flat_no`,"");
+                                                                        // setFieldValue(`city`, "");
+                                                                        // setFieldValue(`house_building_name`,"");
+                                                                        // setFieldValue(`street_name`,"");
+                                                                        // setFieldValue(`state_name`,"");
+                                                                        // setFieldValue(`pincode_id`,"");
+                                                                        // setFieldValue(`area_name`,"");
+                                                                        this.fetchAreadetailsBack(gsb_Details && gsb_Details.pincode, setFieldValue, setFieldTouched)                                                  
                                                                     }  
                                                                 }}
                                                                 checked={values.address_flag == '1' ? true : false}
