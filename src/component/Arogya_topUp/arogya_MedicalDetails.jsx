@@ -172,6 +172,13 @@ class arogya_MedicalDetails extends Component {
 
     capitalize = (s) => {
         if (typeof s !== 'string') return ''
+        console.log("typeof-------------- ", s)
+        if(s == "fatherInLaw") {
+            s = "Father In Law"
+        }
+        if( s == "motherInLaw") {
+            s = "Mother In Law"
+        }
         return s.charAt(0).toUpperCase() + s.slice(1)
     }
 
