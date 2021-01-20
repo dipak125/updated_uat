@@ -75,20 +75,20 @@ const validateFamilyMembers  = Yup.object().shape({
     
     looking_for_1 : Yup.string(),
     looking_for_6 : Yup.string(),
-    looking_for_0: Yup.string().when(['looking_for_2'], {
-        is: looking_for_2 => looking_for_2 == 'child1',       
+    looking_for_0: Yup.string().when(['looking_for_2','cover_type_id'], {
+        is: (looking_for_2,cover_type_id) => (looking_for_2 == 'child1' && cover_type_id == '3'),       
         then: Yup.string().required('Please select self'),
         othewise: Yup.string()
-    }).when(['looking_for_3'], {
-        is: looking_for_3 => looking_for_3 == 'child2',       
+    }).when(['looking_for_3','cover_type_id'], {
+        is: (looking_for_3,cover_type_id) => (looking_for_3 == 'child2' && cover_type_id == '3'),       
         then: Yup.string().required('Please select self'),
         othewise: Yup.string()
-    }).when(['looking_for_4'], {
-        is: looking_for_4 => looking_for_4 == 'child3',       
+    }).when(['looking_for_4','cover_type_id'], {
+        is: (looking_for_4,cover_type_id) => (looking_for_4 == 'child3' && cover_type_id == '3'),       
         then: Yup.string().required('Please select self'),
         othewise: Yup.string()
-    }).when(['looking_for_5'], {
-        is: looking_for_5 => looking_for_5 == 'child4',       
+    }).when(['looking_for_5','cover_type_id'], {
+        is: (looking_for_5,cover_type_id) => (looking_for_5 == 'child4' && cover_type_id == '3'),       
         then: Yup.string().required('Please select self'),
         othewise: Yup.string()
     }).when(['looking_for_1','looking_for_6','cover_type_id'], {

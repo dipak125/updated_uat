@@ -291,6 +291,20 @@ class arogya_SelectDuration extends Component {
                         error: { "message": 1 }
                     })
                 }
+                else if (res.data.code && res.data.message && ((res.data.code == "validation failed" && res.data.message == "validation failed") || (res.data.code == "Policy Validation Error" && res.data.message == "Policy Validation Error"))) {
+                    var validationErrors = []
+                    for (const x in res.data.messages) {
+                      validationErrors.push(res.data.messages[x].message)
+                    }
+                    this.setState({
+                      fulQuoteResp: [],
+                      validation_error: validationErrors,
+                      error: [],
+                      serverResponse: []
+                    });
+                    // swal(res.data.data.messages[0].message)
+                    this.props.loadingStop();
+                  }
                 else {
                     this.setState({
                         fulQuoteResp: [],
@@ -338,7 +352,7 @@ class arogya_SelectDuration extends Component {
 
     render() {
         const { productId } = this.props.match.params
-        const { policyHolderDetails, serverResponse, error, EndDate, endDateFlag } = this.state
+        const { policyHolderDetails, serverResponse, error, EndDate, endDateFlag, validation_error } = this.state
         const request_data = policyHolderDetails ? policyHolderDetails.request_data : null;
         let start_date = request_data && request_data.start_date ? new Date(request_data.start_date) : '';
         const { SliderVal, deductibleSliderVal, tenureSliderVal } = this.state
@@ -364,6 +378,19 @@ class arogya_SelectDuration extends Component {
             <span className="errorMsg"><h6><strong>Thank you for showing your interest for buying product.Due to some reasons, we are not able to issue the policy online.Please call 1800 22 1111</strong></h6></span>
         ) : null
 
+        const validationErrors = 
+            validation_error ? (
+                validation_error.map((errors, qIndex) => (
+                    <span className="errorMsg"> 
+                        <strong>
+                            <li>
+                                {errors}
+                            </li>
+                        </strong>
+                    </span>
+                ))        
+        ): null;
+
         return (
             <>
                 <BaseComponent>
@@ -376,6 +403,8 @@ class arogya_SelectDuration extends Component {
                                 <h4 className="text-center mt-3 mb-3">Arogya Top Up Policy</h4>
                                 <section className="brand">
                                     <div className="boxpd">
+                                        <div>{errMsg}</div>
+                                        <div><span className="errorMsg">{validationErrors ? "Errors :" : null}</span> <ul>{validationErrors}</ul></div>
                                         <div className="d-flex justify-content-left carloan m-b-25">
                                             <h4> Select the duration for your Health Insurance</h4>
                                         </div>
