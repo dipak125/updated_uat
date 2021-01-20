@@ -112,7 +112,6 @@ class arogya_MedicalDetails extends Component {
 
        let familyMembers=document.getElementsByClassName(`familyMembers${question_id[0]}`)
        let answerStr = value;
-       console.log('aaaaa123344======>',familyMembers)
        if(answerStr=='n'){
             let family_members = this.state.family_members
             let arr_data = []
@@ -172,7 +171,6 @@ class arogya_MedicalDetails extends Component {
 
     capitalize = (s) => {
         if (typeof s !== 'string') return ''
-        console.log("typeof-------------- ", s)
         if(s == "fatherInLaw") {
             s = "Father In Law"
         }
@@ -194,15 +192,16 @@ class arogya_MedicalDetails extends Component {
                let familyMembers=`familyMembers${classId}`
                let familyMembersClass = document.getElementsByClassName(familyMembers);
                 if(questionClass[i].value == 'y'){
-                    selectCheck.push(questionClass[i].value)
+                    selectCheck.push(questionClass[i].value)       
                 }
                for(let j=0;j<familyMembersClass.length;j++){
-                    if(familyMembersClass[j].checked){                        
+                    if(familyMembersClass[j].checked && questionClass[i].value == 'y'){                        
                         checkFamily.push(true)
-                    }   
+                         break
+                    }          
                }  
-               count++;              
-            }                
+               count++;                   
+            }           
         }
 
         let qlength = this.state.questionList ? this.state.questionList.length:0;
@@ -212,7 +211,12 @@ class arogya_MedicalDetails extends Component {
         }    
         else {
             let q = questionClass.length/2
-            if(count == q && checkFamily.length >= selectCheck.length){
+            // console.log("selectCheck------------- ", selectCheck) 
+            // console.log("checkFamily------------- ", checkFamily)
+            // console.log("checkFamily----q--------- ", q)
+            // console.log("count----q--------- ", count)
+            
+            if(count == q && checkFamily.length == selectCheck.length){
                 if(this.state.isForwarded){
                     this.props.history.push(`/arogya_SelectDuration/${productId}`);
                 }            
@@ -420,8 +424,7 @@ class arogya_MedicalDetails extends Component {
                 question_answer.map((answer, aIndex) => {
                 initialValues[`question_id_${answer.question_id}`] = answer.response;
                 initialValues[`family_members_${answer.question_id}`] = answer.family_members;
-                selectedQuestion[answer.question_id] = answer.response == 'y' ? answer.family_members.split(' ') : null  
-                                
+                selectedQuestion[answer.question_id] = answer.response == 'y' ? answer.family_members.split(' ') : null                               
             })
             }
             else {
@@ -431,9 +434,7 @@ class arogya_MedicalDetails extends Component {
             }    
             initialValues[`show_question_id_${question.id}`]=false
             initialValues[`famArr`]=famArr
-
         })
-
     }
 
     
@@ -627,22 +628,6 @@ class arogya_MedicalDetails extends Component {
                                         }
                                          </>
                                     ))}
-                                   
-                                    
-
-                                    
-                                   {/* <input type="checkbox"
-                                    name="cigrate_smokeSpouse"
-                                    value="1" id="cigrate_smokeSpouse"/>
-                                    <label for="cigrate_smokeSpouse"> <img src={require('../../assets/images/Spouse.svg')} alt=""/>Spouse</label>
-                                    
-
-                                    
-                                    <input type="checkbox"
-                                    name="cigrate_smokeChild_1"
-                                    value="1" id="cigrate_smokeChild_1"/>
-                                    <label for="cigrate_smokeChild_1"> <img src={require('../../assets/images/kids-boy.svg')} alt=""/>Child</label>*/}
-                                    
                                         </div>
                                         :null
                                           
