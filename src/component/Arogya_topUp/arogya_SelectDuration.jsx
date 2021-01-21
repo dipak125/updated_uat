@@ -213,10 +213,10 @@ class arogya_SelectDuration extends Component {
 
                 values['polStartDate'] = policyDetails && policyDetails.start_date ? moment(policyDetails.start_date).format("YYYY-MM-DD") : new Date()
                 values['polEndDate'] = policyDetails && policyDetails.end_date ? moment(policyDetails.end_date).format("YYYY-MM-DD") : moment(addDays(new Date(), (365 * 2) - 1)).format("YYYY-MM-DD")
-                values['slider_sum_insured'] = insured_amount ? parseInt(insured_amount) : defaultSliderVal
+                values['slider_sum_insured'] = insured_amount && insured_amount.length > 0 ? parseInt(insured_amount) : defaultSliderVal
                 values['slider_deductible'] = policyDetails && policyDetails.deductible ? parseInt(policyDetails.deductible) : defaultdeductibleSliderValue
                 values['slider_tenure'] = policyDetails && policyDetails.tenure_year ? parseInt(policyDetails.tenure_year) : defaulttenureSliderValue
-
+                
                 this.quote(values)
             })
             .catch(err => {
@@ -413,7 +413,7 @@ class arogya_SelectDuration extends Component {
                                             validationSchema={validateDuration}
                                         >
                                             {({ values, errors, setFieldValue, setFieldTouched, isValid, isSubmitting, touched }) => {
-                                               console.log("values----------------- ", values)
+                                            //    console.log("values----------------- ", values)
                                                 return (
                                                     <Form>
                                                         <Row>

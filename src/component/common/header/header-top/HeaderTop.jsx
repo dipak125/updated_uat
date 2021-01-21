@@ -37,7 +37,10 @@ class HeaderTop extends Component {
 
     componentWillUpdate(nextProps, nextState) {
         // logo = sessionStorage.getItem('logo') && sessionStorage.getItem('logo') != "undefined" ? sessionStorage.getItem('logo') : ""
-        
+        window.history.pushState(null, null, window.location.href);
+        window.onpopstate = function () {
+          window.history.go(1);
+        };
     }
 
     fetchPhrases = () => {

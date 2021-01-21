@@ -263,16 +263,21 @@ class ThankYouPage extends Component {
   componentDidMount() {      
     const { policyId } = this.props.match.params
     this.fetchData()
+ 
+  }
+
+  componentWillUpdate(nextProps, nextState) {
     window.history.pushState(null, null, window.location.href);
     window.onpopstate = function () {
       window.history.go(1);
     };
+}
 
-  }
   render() {
     const { policyId } = this.props.match.params
     const { vehicletype } = this.state
-    
+
+
     return (
       <>
         <BaseComponent>

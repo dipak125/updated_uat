@@ -203,8 +203,8 @@ const IPA__Validation = Yup.object().shape({
     .max(40, function () {
       return "Name must be maximum 40 chracters"
     })
-    .matches(/^[a-zA-Z]+([\s]?[a-zA-Z]+)$/, function () {
-      return "Please enter full name"
+    .matches(/^[a-zA-Z]+[\s]+[a-zA-Z]+$/, function () {
+      return "Please enter valid name"
     })
     .nullable(),
 
