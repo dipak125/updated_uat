@@ -205,7 +205,7 @@ class arogya_MedicalDetails extends Component {
         }
 
         let qlength = this.state.questionList ? this.state.questionList.length:0;
-        if( qlength == 4 && values.question_id_4 == 'y'){
+        if( qlength == 4 && values.question_id_8 == 'y'){
             this.showRestriction('y');
             return false
         }    
@@ -265,8 +265,7 @@ class arogya_MedicalDetails extends Component {
                         famArr[cnt] = `${question_answer[i].question_id}~${family_members[j]}`
                         cnt++
                     }                         
-                }
-               
+                }              
             }
         }
         return famArr;

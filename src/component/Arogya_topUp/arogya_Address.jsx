@@ -512,7 +512,6 @@ class arogya_Address extends Component {
         Object.assign(formObj,formArr);
         let encryption = new Encryption();
         formData.append('enc_data',encryption.encrypt(JSON.stringify(formObj)))
-
         this.props.loadingStart();
         axios
         .post(`arogya-topup/insured-member-details`, formData)
@@ -525,7 +524,7 @@ class arogya_Address extends Component {
            // }        
         })
         .catch(err => {
-            let decryptResp = err.data
+            let decryptResp = JSON.parse(encryption.decrypt(err.data))
             console.log("decrypt---Err---", decryptResp)
             if(err.status == 401) {
                 swal("Session out. Please login")

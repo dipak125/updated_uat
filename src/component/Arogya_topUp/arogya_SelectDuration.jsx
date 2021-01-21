@@ -209,11 +209,11 @@ class arogya_SelectDuration extends Component {
                 })
                 var values = []
                 let policyDetails = policyHolderDetails && policyHolderDetails.request_data ? policyHolderDetails.request_data : []
-                let insured_amount = policyHolderDetails && policyHolderDetails.arogyatopupsuminsured ? policyHolderDetails.arogyatopupsuminsured.insured_amount : []
+                let insuredAmountDetails = policyHolderDetails && policyHolderDetails.arogyatopupsuminsured ? policyHolderDetails.arogyatopupsuminsured : {}
 
                 values['polStartDate'] = policyDetails && policyDetails.start_date ? moment(policyDetails.start_date).format("YYYY-MM-DD") : new Date()
                 values['polEndDate'] = policyDetails && policyDetails.end_date ? moment(policyDetails.end_date).format("YYYY-MM-DD") : moment(addDays(new Date(), (365 * 2) - 1)).format("YYYY-MM-DD")
-                values['slider_sum_insured'] = insured_amount && insured_amount.length > 0 ? parseInt(insured_amount) : defaultSliderVal
+                values['slider_sum_insured'] = insuredAmountDetails && insuredAmountDetails.insured_amount ? parseInt(insuredAmountDetails.insured_amount) : defaultSliderVal
                 values['slider_deductible'] = policyDetails && policyDetails.deductible ? parseInt(policyDetails.deductible) : defaultdeductibleSliderValue
                 values['slider_tenure'] = policyDetails && policyDetails.tenure_year ? parseInt(policyDetails.tenure_year) : defaulttenureSliderValue
                 
