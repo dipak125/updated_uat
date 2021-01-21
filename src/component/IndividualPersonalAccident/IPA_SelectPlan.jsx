@@ -22,6 +22,8 @@ const maxDobAdult = moment().subtract(18, 'years').format("YYYY-MM-DD");
 const initialValues = {
     titleList: [],
     pinDataArr: [],
+    pincode: "",
+    pincode_id: ""
 };
 
 const sum_insured_array = {
@@ -41,17 +43,17 @@ const vehicleRegistrationValidation = Yup.object().shape({
   .matches(/^[A-Za-z]+$/, function() {
       return "Please enter valid last name"
   }).nullable(),
-  // last_name: Yup.string().required('Name is required').nullable(),
   date_of_birth: Yup.date().required("Please enter date of birth").nullable(),
-  // email_id: Yup.string().email().min(8, function() {
-  //     return "Email must be minimum 8 characters"
-  // })
-  // .max(75, function() {
-  //     return "Email must be maximum 75 characters"
-  // }).matches(/^[a-zA-Z0-9]+([._\-]?[a-zA-Z0-9]+)*@\w+([-]?\w+)*(\.\w{2,3})+$/,'Invalid Email Id').nullable(),
+  email_id: Yup.string().email("Enter valid email").min(8, function() {
+      return "Email must be minimum 8 characters"
+  })
+  .max(75, function() {
+      return "Email must be maximum 75 characters"
+  }).matches(/^[a-zA-Z0-9]+([._\-]?[a-zA-Z0-9]+)*@\w+([-]?\w+)*(\.\w{2,3})+$/,'Invalid Email Id').nullable(),
   mobile: Yup.string()
   .matches(/^[6-9][0-9]{9}$/,'Invalid Mobile number').required('Mobile No. is required').nullable(),
-  // gender: Yup.string().required("Please select gender").nullable(),
+  pincode: Yup.string().required("Please enter pincode"),
+  pincode_id: Yup.string().required('Location is required').nullable(),
   sumInsured: Yup.number().required("Please select sum insured").nullable()
 });
 
