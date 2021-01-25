@@ -244,6 +244,24 @@ fullQuote = (values, actions) => {
   }
 }
 
+sendPaymentLink = () => {
+  let encryption = new Encryption();
+  const formData = new FormData();
+  let policyHolder_refNo = localStorage.getItem("policyHolder_refNo") ? localStorage.getItem("policyHolder_refNo") : 0;
+  formData.append('reference_no', policyHolder_refNo)
+
+  this.props.loadingStart();
+  axios
+    .post("send-payment-link", formData)
+    .then((res) => {
+      swal(res.data.msg)
+      this.props.loadingStop();
+    })
+    .catch((err) => {
+      this.props.loadingStop();
+    });
+};
+
 
   payment = () => {
     const { refNumber } = this.state;
@@ -631,6 +649,8 @@ paypoint_payment = () => {
                                             >
                                               Back
                                             </button>
+                                            <Button type="button" className="proceedBtn" onClick = {this.sendPaymentLink.bind(this)}>  Send Payment Link  </Button>
+                                              &nbsp;&nbsp;&nbsp;&nbsp;
                                           {fulQuoteResp.QuotationNo ? 
                                             <button
                                               className="proceedBtn"

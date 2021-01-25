@@ -205,7 +205,8 @@ class AccidentAdditionalDetails extends Component {
     is_appointee: 0,
     request_data: [],
     nominee_age: "",
-    nomineeRelation: []
+    nomineeRelation: [],
+    titleNomineeList: []
   };
 
   changePlaceHoldClassAdd(e) {
@@ -384,7 +385,6 @@ class AccidentAdditionalDetails extends Component {
     let pinCode = pincode_input.toString();
 
     if (pinCode != null && pinCode != "" && pinCode.length == 6) {
-      console.log("fetchAreadetailsBack pinCode", pinCode);
       const formData = new FormData();
       this.props.loadingStart();
       // let encryption = new Encryption();
@@ -439,6 +439,27 @@ class AccidentAdditionalDetails extends Component {
       })
   }
 
+  // fetchNomineeSalutation = (pincodeArea) => {
+  //   const formData = new FormData();
+  //   let encryption = new Encryption();
+  //   this.props.loadingStart();
+  //   axios.get('ipa/ipa-nominee-titles')
+  //     .then(res => {
+  //       let decryptResp = JSON.parse(encryption.decrypt(res.data))
+  //       let titleNomineeList = decryptResp.data.ipanomineetitles
+  //       this.setState({
+  //         titleNomineeList
+  //       });
+  //       this.fetchAreadetailsBack(pincodeArea)
+  //     }).
+  //     catch(err => {
+  //       this.props.loadingStop();
+  //       this.setState({
+  //         titleNomineeList: []
+  //       });
+  //     })
+  // }
+
   AddDetails = (productId) => {
     this.props.history.push(`/AccidentAddDetails/${productId}`);
   };
@@ -446,7 +467,6 @@ class AccidentAdditionalDetails extends Component {
   ageCheck = (value) => {
     const ageObj = new PersonAge();
     let age = ageObj.whatIsMyAge(value)
-    console.log("ageCheck---->>", age)
     if (age < 18) {
       this.setState({
         appointeeFlag: true,
@@ -459,20 +479,20 @@ class AccidentAdditionalDetails extends Component {
         is_appointee: 0
       })
     }
-    // console.log('is_appointee------->>',this.is_appointee)
   }
+
+
   ageCheckValue = (value) => {
     const ageObj = new PersonAge();
     let nominee_age = ageObj.whatIsMyAge(value)
     this.setState({
       nominee_age
     })
-    // console.log("ageCheckValue---->>",ageValue)
   }
 
 
   render() {
-    const { pinDataArr, titleList, appointeeFlag, is_appointee, accidentDetails, address, pincodeRESP, nomineeRelation } = this.state;
+    const { pinDataArr, titleList, appointeeFlag, is_appointee, accidentDetails, address, pincodeRESP, nomineeRelation, titleNomineeList } = this.state;
     const { productId } = this.props.match.params;
     const newInitialValues = Object.assign(initialValues, {
       salutation_id: accidentDetails && accidentDetails.ipainfo ? accidentDetails.ipainfo.ipatitle.id : "",
@@ -525,8 +545,7 @@ class AccidentAdditionalDetails extends Component {
                       validationSchema={IPA__Validation}
                     >
                       {({ values, errors, setFieldValue, setFieldTouched, isValid, isSubmitting, touched }) => {
-                        // console.log('values',values)
-                        console.log("errors---------- ", errors)
+
                         return (
                           <Form>
                             <h4 className="text mt-3 mb-3">
@@ -975,7 +994,7 @@ class AccidentAdditionalDetails extends Component {
                                 </FormGroup>
                               </Col>
                             </Row>
-                            <Row className="m-b-45">
+                            <Row >
                               <Col sm={6} md={3} lg={3}>
                                 <FormGroup>
                                   <DatePicker
@@ -1047,7 +1066,7 @@ class AccidentAdditionalDetails extends Component {
                                 </FormGroup>
                               </Col> 
                             </Row>  
-                            <Row>
+                            <Row className="m-b-45">
                             <Col sm={6} md={3} lg={3}>
                                 <FormGroup>
                                   <div className="formSection">
@@ -1072,6 +1091,7 @@ class AccidentAdditionalDetails extends Component {
                                 </FormGroup>
                               </Col>
                             </Row>
+                           
                             {appointeeFlag || is_appointee == "1" ? (
                               <div>
                                 <div className="d-flex justify-content-left carloan m-b-25">
