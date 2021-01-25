@@ -163,6 +163,24 @@ class Premium_sme extends Component {
 
     }
 
+    sendPaymentLink = () => {
+        let encryption = new Encryption();
+        const formData = new FormData();
+        let policyHolder_refNo = localStorage.getItem("policyHolder_refNo") ? localStorage.getItem("policyHolder_refNo") : 0;
+        formData.append('reference_no', policyHolder_refNo)
+      
+        this.props.loadingStart();
+        axios
+          .post("send-payment-link", formData)
+          .then((res) => {
+            swal(res.data.msg)
+            this.props.loadingStop();
+          })
+          .catch((err) => {
+            this.props.loadingStop();
+          });
+      };
+
     fetchPolicyDetails=()=>{
         let policy_holder_ref_no = localStorage.getItem("policy_holder_ref_no") ? localStorage.getItem("policy_holder_ref_no"):0;
         let encryption = new Encryption();
@@ -684,6 +702,8 @@ class Premium_sme extends Component {
 
                                                             <div className="d-flex justify-content-left resmb">
                                                                 <Button className="backBtn" type="button" onClick={this.additionalDetails.bind(this,productId)}>Back</Button>
+                                                                <Button type="button" className="proceedBtn" onClick = {this.sendPaymentLink.bind(this)}>  Send Payment Link  </Button>
+                                                                &nbsp;&nbsp;&nbsp;&nbsp;
                                                                 {this.state.quoteId && this.state.quoteId != '' && values.gateway != "" ?
                                                                     <Button type="submit"
                                                                         className="proceedBtn"  type="submit"  disabled={isSubmitting ? true : false}>

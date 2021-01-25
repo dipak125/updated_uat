@@ -190,11 +190,11 @@ class TicketCount extends Component {
                             className="ticketTable"
                         >
 
-                            <TableHeaderColumn width='100px' dataField='ticket_no' isKey={true} dataFormat={actionFormatter(this)} >Ticket No.</TableHeaderColumn>
-                            <TableHeaderColumn width='120px' dataField="status" tdStyle={{ whiteSpace: 'normal' }} >Status</TableHeaderColumn>
-                            <TableHeaderColumn width='100px' dataField='area' >Subject</TableHeaderColumn>
-                            <TableHeaderColumn width='120px' dataField="created_at" dataFormat={cell => moment(cell).format('DD/MM/YYYY hh:mm A')} tdStyle={{ whiteSpace: 'normal' }} >Date Logged</TableHeaderColumn>
-                            <TableHeaderColumn width='100px' dataField='id' dataFormat={getStatus(this)} >Get Status</TableHeaderColumn>
+                            <TableHeaderColumn filter={{ type: 'TextFilter' }} width='100px' dataField='ticket_no' isKey={true} dataFormat={actionFormatter(this)} >Ticket No.</TableHeaderColumn>
+                            <TableHeaderColumn filter={{ type: 'TextFilter' }} width='100px' dataField="status" tdStyle={{ whiteSpace: 'normal' }} >Status</TableHeaderColumn>
+                            <TableHeaderColumn filter={{ type: 'TextFilter' }} width='100px' dataField='area' >Subject</TableHeaderColumn>
+                            <TableHeaderColumn filter={{ type: 'TextFilter' }} width='120px' dataField="created_at" dataFormat={cell => moment(cell).format('DD/MM/YYYY hh:mm A')} tdStyle={{ whiteSpace: 'normal' }} >Date Logged</TableHeaderColumn>
+                            <TableHeaderColumn width='100px' dataField='id' dataFormat={getStatus(this)} ></TableHeaderColumn>
 
                         </BootstrapTable>
                     }

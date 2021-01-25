@@ -19,6 +19,18 @@ import ReactHtmlParser from 'react-html-parser';
 import ReadMoreReact from 'read-more-react';
 
 
+const ticketValidation = Yup.object().shape({
+
+    description: Yup.string().required('Issue Summery is required')
+        .min(12, function () {
+        return "Minimum 5 characters required";
+      })
+        .max(1000, function () {
+            return "Characters limit exceeds 1000";
+    }),
+})
+
+
 class TicketStatus extends Component {
 
     state = {
@@ -57,26 +69,30 @@ class TicketStatus extends Component {
             });
     }
 
-    updateStatus = (status) => {
-        const formData = new FormData();
-        formData.append('ticket_id', this.props.ticketId)  
-        formData.append('status', status)  
+
+    getCurrentStatus = (row) => {
+        const formData = new FormData(); 
+        formData.append('ticket_id', row.ticketid_Internal) 
+
         this.props.loadingStart();
-        axios
-            .post(`help-ticket/update-incident`, formData)
-            .then(res => {
-                swal(res.data.msg)
-                // this.setState({
-                //     details: res.data.data
-                // });
-                this.props.loadingStop();
-            })
-            .catch(err => {
-                // this.setState({
-                //     details: []
-                // });
-                this.props.loadingStop();
-            });
+        axios.post('help-ticket/incident-details',formData)
+        .then(res=>{
+            if(res.data.error == false) {
+                swal(`Status: ${res.data.data.currentStatus}`)
+                .then((willUpdate) =>{
+                    if(willUpdate) {
+                        this.getTickets(1)
+                    }
+                } )
+            }   
+            else{
+                this.getTickets(1)
+            }             
+            this.props.loadingStop();
+        }).
+        catch(err=>{
+            this.props.loadingStop();
+        })  
     }
 
     fileUpload = async (uploadFile) => {
@@ -176,6 +192,29 @@ class TicketStatus extends Component {
             }
         }
 
+    
+    ticketReopen = (values, { resetForm }) => {
+        const formData = new FormData();
+        formData.append('ticket_id', this.props.ticketId);
+        formData.append('description', values.description);
+        
+        axios
+        .post("help-ticket/reopen-incident", formData)
+        .then(res1 => {
+            swal("Ticket reopened sucessfully "+ `\nTicket No.  ${this.props.ticketId}`, {
+                icon: "success"
+            }).then(() => {
+                this.props.loadingStop();
+                resetForm();
+                this.getCurrentStatus(this.props.selectedTicket)
+            });
+        })
+        .catch(err1 => {
+            console.log("Attach fail", err1);
+            this.props.loadingStop();
+        });
+    }
+
 
     componentDidMount() {
         this.getDetails();
@@ -204,7 +243,8 @@ class TicketStatus extends Component {
                         description: '',
                         status: selectedTicket.status
                     }}
-                    onSubmit={this.fileAttachment}
+                    validationSchema={ticketValidation}
+                    onSubmit={selectedTicket.status == "Resolved" ? this.ticketReopen : this.fileAttachment} 
                     >
                     {({ errors, status, touched, values, setFieldValue, setFieldTouched }) => (
                         <Form>
@@ -216,7 +256,7 @@ class TicketStatus extends Component {
                                             <Row>
                                                 <Col sm={12} md={3}><div className="first">Ticket Status:</div></Col>
                                                 <Col sm={12} md={9}><div>{selectedTicket.status}</div></Col>
-                                                {/*<Col sm={12} md={4}><div className="formSection">
+                                                {/* <Col sm={12} md={4}><div className="formSection">
                                                      <Field
                                                         name='status'
                                                         component="select"
@@ -229,12 +269,12 @@ class TicketStatus extends Component {
                                                             this.updateStatus(e.target.value)
                                                         }}                                      
                                                     >
-                                                        <option value="">-----</option>
-                                                        <option value="Created">Created</option>
-                                                        <option value="Pending">Pending</option>
-                                                        <option value="In-Progress">In-Progress</option>
-                                                        <option value="Closed">Closed</option>
-                                                        <option value="Resolved">Resolved</option>
+                                                        <option disabled = {selectedTicket.status == "Resolved" ? true : false} value="Reopen">Reopen</option>
+                                                        <option disabled = {true} value="Created">Created</option>
+                                                        <option disabled = {true} value="Pending">Pending</option>
+                                                        <option disabled = {true} value="In-Progress">In-Progress</option>
+                                                        <option disabled = {true} value="Closed">Closed</option>
+                                                        <option disabled = {true} value="Resolved">Resolved</option>
 
                                                          {goodscarriedtypes.map((subVehicle, qIndex) => ( 
                                                             <option value= {subVehicle.id}>{subVehicle.goodscarriedtype}</option>
@@ -242,7 +282,7 @@ class TicketStatus extends Component {
                                             
                                                     </Field> 
                                                     </div>
-                                                </Col>*/}
+                                                </Col> */}
                                             </Row>
                                             <Row>
                                                 <Col sm={12} md={3}><div>Department:</div></Col>
@@ -398,7 +438,7 @@ class TicketStatus extends Component {
                                                     />
                                                 }
                                             />
-                                            <ErrorMessage name="description" component="div" className="invalid-feedback" />
+                                            <ErrorMessage name="description" component="div" className="errorMsg" /> 
                                         </FormGroup>
                                     </div>
                                     <div class="form-group">
@@ -416,7 +456,12 @@ class TicketStatus extends Component {
                                 </div>
 
                                 <div className="form-group">
-                                    <button type="submit" className="btn btn-success mr-2">Post Reply</button>
+                                    {selectedTicket.status != "Resolved" ?
+                                    <button type="submit" className="btn btn-success mr-2">Post Reply</button> : null
+                                    }
+                                    {selectedTicket.status == "Resolved" ?
+                                    <button type="submit" className="btn btn-success mr-2">Reopen</button> : null
+                                    }
                                     <button type="reset" className="btn btn-primary mr-2">Reset</button>
                                     <button className="btn btn-info" onClick={this.props.updateViewTicket}>Cancel</button>
                                 </div>

@@ -15,6 +15,40 @@ import axios from "../../shared/axios"
 import swal from 'sweetalert';
 import Encryption from '../../shared/payload-encryption';
 
+const newInnitialValues = { 
+    caller_email: '', 
+    description: '',
+    title: '',
+    mobile: ''
+}
+
+const ticketValidation = Yup.object().shape({
+    caller_email: Yup.string().required("Email-id required").email()
+    .min(8, function () {
+        return "Email must be minimum 8 characters"
+      })
+        .max(75, function () {
+          return "Email must be maximum 75 characters"
+        }).matches(/^[a-zA-Z0-9]+([._\-]?[a-zA-Z0-9]+)*@\w+([-]?\w+)*(\.\w{2,3})+$/, 'Invalid Email Id'),
+    description: Yup.string().required('Issue Summery is required')
+        .min(12, function () {
+        return "Minimum 5 characters required";
+      })
+        .max(1000, function () {
+            return "Characters limit exceeds 1000";
+    }),
+
+    title: Yup.string().required('Issue Title is required')
+        .min(5, function () {
+        return "Minimum 5 characters required";
+    })
+        .max(255, function () {
+            return "Characters limit exceeds 255";
+    }),
+
+    mobile: Yup.string().required("Mobile number required")
+     .matches(/^[6-9][0-9]{9}$/,'Invalid Mobile number').required('Mobile No. is required'),
+})
 
 class NewTicket extends Component {
 
@@ -207,11 +241,8 @@ class NewTicket extends Component {
 
                     <div className="justify-content-left opntckt">
                         <Formik
-                            initialValues={{ caller_email: '', description: '' }}
-                            validationSchema={Yup.object().shape({
-                                caller_email: Yup.string().email('Enter a valid Email Id').required('Email Id is required'),
-                                description: Yup.string().required('Issue Summery is required')
-                            })}
+                            initialValues={newInnitialValues}
+                            validationSchema={ticketValidation}
                             onSubmit={this.handleSubmit}
                         >
                             {({ errors, status, touched, values }) => (
@@ -231,10 +262,7 @@ class NewTicket extends Component {
                                                             value={values.caller_email}
                                                             style={{width: '100%'}}
                                                         />
-                                                        {errors.caller_email && touched.caller_email ? (
-                                                            <span className="errorMsg">{errors.caller_email}</span>
-                                                        ) : null}
-                                                        <ErrorMessage name="caller_email" component="div" className="invalid-feedback" />
+                                                        <ErrorMessage name="caller_email" component="div" className="errorMsg" />
                                                 </FormGroup>
                                             </Col>
                                         </Row>
@@ -252,10 +280,7 @@ class NewTicket extends Component {
                                                             value={values.mobile}
                                                             style={{width: '100%'}}
                                                         />
-                                                        {errors.mobile && touched.mobile ? (
-                                                            <span className="errorMsg">{errors.mobile}</span>
-                                                        ) : null}
-                                                        <ErrorMessage name="mobile" component="div" className="invalid-feedback" />
+                                                        <ErrorMessage name="mobile" component="div" className="errorMsg" />
                                                 </FormGroup>
                                             </Col>
                                         </Row>
@@ -283,10 +308,7 @@ class NewTicket extends Component {
 
                                                         
                                                     </Field>
-                                                        {errors.area && touched.area ? (
-                                                            <span className="errorMsg">{errors.area}</span>
-                                                        ) : null}
-                                                        <ErrorMessage name="area" component="div" className="invalid-feedback" />
+                                                        <ErrorMessage name="area" component="div" className="errorMsg" />
                                                 </FormGroup>
                                             </Col>
                                         </Row>                                      
@@ -306,10 +328,7 @@ class NewTicket extends Component {
                                                             value={values.title}
                                                             style={{width: '100%'}}
                                                         />
-                                                        {errors.title && touched.title ? (
-                                                            <span className="errorMsg">{errors.title}</span>
-                                                        ) : null}
-                                                        <ErrorMessage name="title" component="div" className="invalid-feedback" />
+                                                        <ErrorMessage name="title" component="div" className="errorMsg" />
                                                 </FormGroup>
                                             </Col>
                                         </Row>
@@ -355,8 +374,8 @@ class NewTicket extends Component {
                                                     />
                                                 }
                                             />
-                                            <ErrorMessage name="description" component="div" className="invalid-feedback" />
-                                        </FormGroup>
+                                            <ErrorMessage name="description" component="div" className="errorMsg" /> 
+                                        </FormGroup> 
                                     </div>
                                     <div class="form-group">
                                         <input type="file" key='1' name="attachment"
