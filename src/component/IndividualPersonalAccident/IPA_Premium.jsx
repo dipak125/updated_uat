@@ -16,6 +16,7 @@ import moment from "moment";
 import Collapsible from "react-collapsible";
 import queryString from 'query-string';
 
+
 const initialValue = {
   gateway : ""
 };
@@ -67,10 +68,13 @@ class IPA_Premium extends Component {
     e.target.value.length === 0 && element.classList.remove("active");
   }
 
+
   componentDidMount() {
     this.fetchNomineeRel();
+    // createHistory.replace("/Dashboard")
     // this.fetchInsurance();
   }
+  
 
   fetchNomineeRel = () => {
     const { productId } = this.props.match.params;
@@ -258,7 +262,7 @@ console.log("post_data---quote--- ", post_data)
 
   payment = () => {
     const { policyHolder_refNo } = this.state;
-    window.location = `${process.env.REACT_APP_PAYMENT_URL}/ConnectPG/payment_motor.php?refrence_no=${policyHolder_refNo}`
+    window.location = `${process.env.REACT_APP_PAYMENT_URL}/ConnectPG/payment.php?refrence_no=${policyHolder_refNo}`
   }
 
   Razor_payment = () => {

@@ -27,10 +27,11 @@ class SideNav extends Component {
     axios
       .post("/logout", formData)
       .then((res) => {
+        this.props.logout();
         localStorage.removeItem("cons_reg_info");
         // window.location = `${res.data.data.logout_url}`
         this.props.history.push(`/logout`);
-        this.props.logout();
+        
       })
       .catch((err) => {
         this.props.logout();

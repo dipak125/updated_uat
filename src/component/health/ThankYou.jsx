@@ -55,17 +55,6 @@ class ThankYouPage extends Component {
     pom.click(); 
     window.URL.revokeObjectURL(url);
 
-
-    localStorage.removeItem("policyHolder_id");
-    localStorage.removeItem("policyHolder_refNo");
-    localStorage.removeItem("policy_type");
-    localStorage.removeItem("brandEdit");
-    localStorage.removeItem("newBrandEdit");
-    sessionStorage.removeItem('pan_data');
-    sessionStorage.removeItem('email_data');
-    sessionStorage.removeItem('proposed_insured');
-    sessionStorage.removeItem('display_looking_for');
-    sessionStorage.removeItem('display_dob');
   }
 
   //-----------------------------------Custom PDF End----------------------------------------
@@ -172,16 +161,6 @@ class ThankYouPage extends Component {
         .post(`/generate-pdf`, formData)
         .then(res => {
           this.props.loadingStop();
-          localStorage.removeItem("policyHolder_id");
-          localStorage.removeItem("policyHolder_refNo");
-          localStorage.removeItem("policy_type");
-          localStorage.removeItem("brandEdit");
-          localStorage.removeItem("newBrandEdit");
-          sessionStorage.removeItem('pan_data');
-          sessionStorage.removeItem('email_data');
-          sessionStorage.removeItem('proposed_insured');
-          sessionStorage.removeItem('display_looking_for');
-          sessionStorage.removeItem('display_dob');
           this.downloadDoc(res.data.data.uploded_path)
         })
         .catch(err => {
@@ -248,10 +227,29 @@ class ThankYouPage extends Component {
             let decryptResp = JSON.parse(encryption.decrypt(res.data))
             console.log("decrypt", decryptResp)
             let vehicletype = decryptResp.data.policyHolder && decryptResp.data.policyHolder.vehiclebrandmodel ? decryptResp.data.policyHolder.vehiclebrandmodel.vehicletype : {};
-
+            
+            localStorage.removeItem("policyHolder_id");
+            localStorage.removeItem("policyHolder_refNo");
+            localStorage.removeItem("policy_type");
+            localStorage.removeItem("brandEdit");
+            localStorage.removeItem("newBrandEdit");
+            sessionStorage.removeItem('pan_data');
+            sessionStorage.removeItem('email_data');
+            sessionStorage.removeItem('proposed_insured');
+            sessionStorage.removeItem('display_looking_for');
+            sessionStorage.removeItem('display_dob');
+            
             this.setState({
                 vehicletype       
             })
+
+            setTimeout(
+              function() {
+                this.noBackButton()
+              }
+              .bind(this),
+              300
+          );
         })
         .catch(err => {
             // handle error
@@ -263,13 +261,14 @@ class ThankYouPage extends Component {
   componentDidMount() {      
     const { policyId } = this.props.match.params
     this.fetchData()
- 
+
   }
 
-  componentWillUpdate(nextProps, nextState) {
-    window.history.pushState(null, null, window.location.href);
+  noBackButton() {
+    window.history.replaceState(null, null, window.location.href);
     window.onpopstate = function () {
       window.history.go(1);
+      // e.preventDefault()
     };
 }
 

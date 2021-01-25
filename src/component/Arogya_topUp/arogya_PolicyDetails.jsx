@@ -699,7 +699,7 @@ paypoint_payment = () => {
                                             </Button>
                                             &nbsp;&nbsp;&nbsp;&nbsp;
 
-                                          {fulQuoteResp.QuotationNo ? 
+                                          {fulQuoteResp.QuotationNo && values.gateway != "" ? 
                                             <button
                                               className="proceedBtn"
                                               type="button"

@@ -51,47 +51,13 @@ const minDobAppointee = moment(moment().subtract(111, 'years').calendar()).add(1
 const maxDobAppointee = moment().subtract(3, 'months').calendar();
 // VALIDATION :-----------------------
 const IPA__Validation = Yup.object().shape({
-  // salutation_id: Yup.string().required("Title is required").nullable(),
-  // first_name: Yup.string()
-  //   .required("First Name is required")
-  //   .min(3, function () {
-  //     return "First name must be 3 characters";
-  //   })
-  //   .max(40, function () {
-  //     return "Full name must be maximum 40 characters";
-  //   })
-  //   .matches(/^[A-Za-z]+$/, function () {
-  //     return "Please enter valid first name";
-  //   })
-  //   .nullable(),
-  // last_name: Yup.string()
-  //   .required("Last Name is required")
-  //   .min(1, function () {
-  //     return "Last name must be 1 characters";
-  //   })
-  //   .max(40, function () {
-  //     return "Full name must be maximum 40 characters";
-  //   })
-  //   .matches(/^[A-Za-z]+$/, function () {
-  //     return "Please enter valid last name";
-  //   })
-  //   .nullable(),
-  // // last_name: Yup.string().required('Name is required').nullable(),
-  // date_of_birth: Yup.date().required("Please enter date of birth").nullable(),
-
   email_id: Yup.string().email().min(8, function () {
     return "Email must be minimum 8 characters"
   })
     .max(75, function () {
       return "Email must be maximum 75 characters"
     }).matches(/^[a-zA-Z0-9]+([._\-]?[a-zA-Z0-9]+)*@\w+([-]?\w+)*(\.\w{2,3})+$/, 'Invalid Email Id').nullable(),
-  // mobile: Yup.string()
-  // .matches(/^[6-9][0-9]{9}$/,'Invalid Mobile number').required('Mobile No. is required').nullable(),
-  // pan_no: Yup.string()
-  // .matches(/^[A-Z]{3}[CPHFATBLJG]{1}[A-Z]{1}[0-9]{4}[A-Z]{1}$/,'Invalid PAN number') .nullable(),
-  // gstn_no: Yup.string()
-  // .matches(/^[0-9]{2}[A-Z]{3}[CPHFATBLJG]{1}[A-Z]{1}[0-9]{4}[A-Z]{1}[0-9]{1}[A-Z]{1}[0-9]{1}$/,'Invalid GSTIN').nullable(),
-  //11AAACC7777A7A7
+
   building_name: Yup.string()
     .required("Please enter Building name")
     .matches(/^[a-zA-Z0-9][a-zA-Z0-9-/.,-\s]*$/, function () {
@@ -154,8 +120,18 @@ const IPA__Validation = Yup.object().shape({
   relation_with: Yup.string().required(function () {
     return "Please select relation";
   }),
+  nominee_gender: Yup.string().required("Nominee gender required"),
 
   appointee_name: Yup.string()
+  .min(3, function () {
+    return "Name must be minimum 3 chracters"
+  })
+  .max(40, function () {
+    return "Name must be maximum 40 chracters"
+  }) 
+  .matches(/^[a-zA-Z\s]*$/, function () {
+    return "Please enter valid name"
+  })
     .test(
       "18YearsChecking",
       function () {
@@ -194,18 +170,13 @@ const IPA__Validation = Yup.object().shape({
           if(spaceCount.length == 2 && spaceCount[1] == "") {        
                 return false
             }
+          else if(spaceCount.length == 1 ) {        
+              return false
+          }
         }      
         return true;
       }
-    ).min(3, function () {
-      return "Name must be minimum 3 chracters"
-    })
-    .max(40, function () {
-      return "Name must be maximum 40 chracters"
-    })
-    .matches(/^[a-zA-Z]+[\s]+[a-zA-Z]+$/, function () {
-      return "Please enter valid name"
-    })
+    )
     .nullable(),
 
 
@@ -331,7 +302,7 @@ class AccidentAdditionalDetails extends Component {
       'plot_no': values.plot_no,
       'street': values.street_name,
       // 'pincode': values.pincode,
-      // 'pincode_id': values.pincode_id,
+      'nominee_gender': values.nominee_gender,
       'nominee_first_name': values.nominee_first_name,
       'nominee_last_name': values.nominee_last_name,
       'nominee_title_id': values.nominee_salutation_id,
@@ -522,6 +493,7 @@ class AccidentAdditionalDetails extends Component {
       nominee_last_name: (accidentDetails && accidentDetails.request_data) && accidentDetails.request_data.nominee.length > 0 ? accidentDetails.request_data.nominee[0].last_name : "",
       nominee_dob: (accidentDetails && accidentDetails.request_data) && accidentDetails.request_data.nominee.length > 0 ? new Date(accidentDetails.request_data.nominee[0].dob) : null,
       relation_with: (accidentDetails && accidentDetails.request_data) && accidentDetails.request_data.nominee.length > 0 ? accidentDetails.request_data.nominee[0].relation_with : "",
+      nominee_gender: (accidentDetails && accidentDetails.request_data) && accidentDetails.request_data.nominee.length > 0 ? accidentDetails.request_data.nominee[0].gender : "",
       is_appointee: is_appointee,
       appointee_name: (accidentDetails && accidentDetails.request_data) && accidentDetails.request_data.nominee.length > 0 ? accidentDetails.request_data.nominee[0].appointee_name : "",
       appointee_dob: (accidentDetails && accidentDetails.request_data) && accidentDetails.request_data.nominee.length > 0 ? new Date(accidentDetails.request_data.nominee[0].appointee_dob) : "",
@@ -1073,6 +1045,31 @@ class AccidentAdditionalDetails extends Component {
                                       ) : null}
                                   </div>
                                 </FormGroup>
+                              </Col> 
+                            </Row>  
+                            <Row>
+                            <Col sm={6} md={3} lg={3}>
+                                <FormGroup>
+                                  <div className="formSection">
+                                    <Field
+                                      name="nominee_gender"
+                                      placeholder="Nominee Gender"
+                                      component="select"
+                                      autoComplete="off"
+                                      className="formGrp"
+                                      value={values.nominee_gender}
+                                    >
+                                      <option value="">Select Nominee Gender</option>
+                                      <option value="m">Male</option>
+                                      <option value="f">Female</option>
+                                    </Field>
+                                    {errors.nominee_gender && touched.nominee_gender ? (
+                                      <span className="errorMsg">
+                                        {errors.nominee_gender}
+                                      </span>
+                                    ) : null}
+                                  </div>
+                                </FormGroup>
                               </Col>
                             </Row>
                             {appointeeFlag || is_appointee == "1" ? (
@@ -1106,35 +1103,7 @@ class AccidentAdditionalDetails extends Component {
                                       </div>
                                     </FormGroup>
                                   </Col>
-                                  {/* <Col sm={6} md={3} lg={3}>
-                                <FormGroup>
-                                  <DatePicker
-                                    name="appointee_dob"
-                                    dateFormat="dd MMM yyyy"
-                                    placeholderText="DOB"
-                                    peekPreviousMonth
-                                    peekPreviousYear
-                                    showMonthDropdown
-                                    showYearDropdown
-                                    dropdownMode="select"
-                                    maxDate={new Date(maxDobAppointee)}
-                                    minDate={new Date(minDobAppointee)}
-                                    className="datePckr"
-                                    onChange={(value) => {
-                                      setFieldTouched("appointee_dob");
-                                      setFieldValue("appointee_dob", value);
-                                      // this.ageCheck(value);
-                                    }}
-                                    selected={values.appointee_dob}
-                                  />
-                                  {errors.appointee_dob && touched.appointee_dob ? (
-                                    <span className="errorMsg">
-                                      {errors.appointee_dob}
-                                    </span>
-                                  ) : null}
-                                </FormGroup>
-                              </Col> */}
-
+                                  
                                   <Col sm={6} md={3} lg={3}>
                                     <FormGroup>
                                       <div className="formSection">
