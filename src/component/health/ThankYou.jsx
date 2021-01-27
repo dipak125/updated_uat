@@ -258,6 +258,19 @@ class ThankYouPage extends Component {
 }
 
 
+downloadWording = () => {
+  let file_path = `${process.env.REACT_APP_PAYMENT_URL}/policy_pdf_download.php?ipa_wording=1`
+  const url = file_path;
+  const pom = document.createElement('a');
+
+  pom.style.display = 'none';
+  pom.href = url;
+  document.body.appendChild(pom);
+  pom.click(); 
+  window.URL.revokeObjectURL(url);
+}
+
+
   componentDidMount() {      
     const { policyId } = this.props.match.params
     this.fetchData()
@@ -266,9 +279,9 @@ class ThankYouPage extends Component {
 
   noBackButton() {
     window.history.replaceState(null, null, window.location.href);
-    window.onpopstate = function () {
+    window.onpopstate = function (e) {
       window.history.go(1);
-      // e.preventDefault()
+      e.preventDefault()
     };
 }
 
@@ -297,6 +310,11 @@ class ThankYouPage extends Component {
                             <button className="policy m-l-20" onClick={this.generateDoc}>Policy Copy </button>
                             :
                             <button className="policy m-l-20" onClick={this.getAccessToken}>Policy Copy </button>
+                        }
+                        {vehicletype.id == 13 ?
+                            <button className="policy m-l-20" onClick={this.downloadWording}>Policy Wording </button>
+                            :
+                           null
                         }
                         </div>
                     </div>
