@@ -219,7 +219,7 @@ class RiskDetails extends Component {
                 }
             );
             const {productId} = this.props.match.params;
-            console.log("Fire_sum_insured-------",Fire_sum_insured)
+            // console.log("Fire_sum_insured-------",Fire_sum_insured)
             this.props.loadingStop()
             this.setState({ Fire_sum_insured : Fire_sum_insured })
             
@@ -243,7 +243,7 @@ class RiskDetails extends Component {
         let policy_holder_ref_no = localStorage.getItem("policy_holder_ref_no") ? localStorage.getItem("policy_holder_ref_no"):0;
         let encryption = new Encryption();
 
-        if(this.props.policy_holder_ref_no == null && policy_holder_ref_no != ''){
+        // if(this.props.policy_holder_ref_no == null && policy_holder_ref_no != ''){
             
             this.props.loadingStart();
             axios.get(`sme/details/${policy_holder_ref_no}`)
@@ -259,7 +259,8 @@ class RiskDetails extends Component {
                         policy_holder_ref_no:policy_holder_ref_no,
                         request_data_id:decryptResp.data.policyHolder.request_data.id,
                         completed_step:decryptResp.data.policyHolder.step_no,
-                        menumaster_id:decryptResp.data.policyHolder.menumaster_id
+                        menumaster_id:decryptResp.data.policyHolder.menumaster_id,
+                        payment_link_status: decryptResp.data.policyHolder && decryptResp.data.policyHolder.bcmaster ? decryptResp.data.policyHolder.bcmaster.eligible_for_payment_link : 0
                     });
                 }
 
@@ -338,7 +339,7 @@ class RiskDetails extends Component {
             .catch(err => {
                 this.props.loadingStop();
             })
-        }
+        // }
         
     }
 
@@ -355,7 +356,7 @@ class RiskDetails extends Component {
         
     }
     Registration_SME = (productId) => {
-        console.log('Product-----id',productId)
+        // console.log('Product-----id',productId)
         this.props.history.push(`/Registration_SME/${productId}`);
     }
 

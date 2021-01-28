@@ -92,9 +92,10 @@ class PolicyDetails extends Component {
       .get(`ksb/details/${policyHolder_refNo}`)
       .then((res) => {
         var policyHolderDetails = res.data.data.policyHolder ? res.data.data.policyHolder : []
+        let bcMaster = res.data.data.policyHolder ? res.data.data.policyHolder.bcmaster : {};
 
         this.setState({
-          policyHolderDetails: policyHolderDetails,
+          policyHolderDetails: policyHolderDetails,bcMaster,
           nomineeDetails: policyHolderDetails.request_data && policyHolderDetails.request_data.nominee && policyHolderDetails.request_data.nominee[0],
           familyMember: res.data.data.policyHolder.request_data.family_members,
           refNumber: res.data.data.policyHolder.reference_no,
@@ -159,6 +160,24 @@ class PolicyDetails extends Component {
       });
   };
 
+  sendPaymentLink = () => {
+    let encryption = new Encryption();
+    const formData = new FormData();
+    let policyHolder_refNo = localStorage.getItem("policyHolder_refNo") ? localStorage.getItem("policyHolder_refNo") : 0;
+    formData.append('reference_no', policyHolder_refNo)
+  
+    this.props.loadingStart();
+    axios
+      .post("send-payment-link", formData)
+      .then((res) => {
+        swal(res.data.msg)
+        this.props.loadingStop();
+      })
+      .catch((err) => {
+        this.props.loadingStop();
+      });
+  };
+
   handleSubmit = (values) => {
     const {policyHolderDetails} = this.state
     if(policyHolderDetails && policyHolderDetails.bcmaster && policyHolderDetails.bcmaster.paymentgateway && policyHolderDetails.bcmaster.paymentgateway.slug && values.gateway == 1) {
@@ -199,7 +218,7 @@ class PolicyDetails extends Component {
 
   render() {
     const { productId } = this.props.match.params;
-    const { fulQuoteResp, error, show, policyHolderDetails, refNumber, paymentStatus, nomineeDetails } = this.state;
+    const { fulQuoteResp, error, show, policyHolderDetails, refNumber, paymentStatus, nomineeDetails, bcMaster } = this.state;
 
     console.log("policyHolderDetails ", policyHolderDetails)
     const items =
@@ -541,6 +560,13 @@ class PolicyDetails extends Component {
                                             >
                                               Back
                                             </Button>
+                                          
+                                            {bcMaster && bcMaster.eligible_for_payment_link == 1 ?
+                                              <div>
+                                              <Button type="button" className="proceedBtn" onClick = {this.sendPaymentLink.bind(this)}>  Send Payment Link  </Button>
+                                              &nbsp;&nbsp;&nbsp;&nbsp;
+                                              </div> : null }
+
                                           {fulQuoteResp.QuotationNo && values.gateway != "" ? 
                                             <Button type="submit"
                                               className="proceedBtn"

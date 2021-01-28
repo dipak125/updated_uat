@@ -113,11 +113,11 @@ class PremiumGCV extends Component {
                 let policyHolder = decryptResp.data.policyHolder ? decryptResp.data.policyHolder : [];
                 let vehicleDetails = decryptResp.data.policyHolder ? decryptResp.data.policyHolder.vehiclebrandmodel : {};
                 let previousPolicy = decryptResp.data.policyHolder ? decryptResp.data.policyHolder.previouspolicy : {};
-                let request_data = decryptResp.data.policyHolder ? decryptResp.data.policyHolder.request_data : {}
+                let bcMaster = decryptResp.data.policyHolder ? decryptResp.data.policyHolder.bcmaster : {};
                 let step_completed = decryptResp.data.policyHolder ? decryptResp.data.policyHolder.step_no : "";
 		        let dateDiff = 0
                 this.setState({
-                    motorInsurance,vehicleDetails,step_completed,policyHolder,
+                    motorInsurance,vehicleDetails,step_completed,policyHolder,bcMaster,
                     refNumber: decryptResp.data.policyHolder.reference_no,
                     paymentStatus: decryptResp.data.policyHolder.payment ? decryptResp.data.policyHolder.payment[0] : [],
                     memberdetails : decryptResp.data.policyHolder ? decryptResp.data.policyHolder : [],
@@ -256,7 +256,8 @@ class PremiumGCV extends Component {
     }
 
     render() {
-        const { policyHolder, show, fulQuoteResp, motorInsurance, error, error1, refNumber, paymentStatus, relation, memberdetails,nomineedetails, vehicleDetails, step_completed } = this.state
+        const { policyHolder, show, fulQuoteResp, motorInsurance, error, error1, refNumber, bcMaster,
+            paymentStatus, relation, memberdetails,nomineedetails, vehicleDetails, step_completed } = this.state
         const { productId } = this.props.match.params
 
         const errMsg =
@@ -698,8 +699,13 @@ class PremiumGCV extends Component {
                                                             <Row>&nbsp;</Row>
                                                             <div className="d-flex justify-content-left resmb">
                                                                 <Button className="backBtn" type="button" onClick={this.additionalDetails.bind(this, productId)}>Back</Button>
-                                                                <Button type="button" className="proceedBtn" onClick = {this.sendPaymentLink.bind(this)}>  Send Payment Link  </Button>
-                                                                &nbsp;&nbsp;&nbsp;&nbsp;
+                                                                
+                                                                {bcMaster && bcMaster.eligible_for_payment_link == 1 ?
+                                                                    <div>
+                                                                    <Button type="button" className="proceedBtn" onClick = {this.sendPaymentLink.bind(this)}>  Send Payment Link  </Button>
+                                                                    &nbsp;&nbsp;&nbsp;&nbsp;
+                                                                    </div> : null }
+                                                                
                                                                 {fulQuoteResp.QuotationNo && values.gateway != "" ?
                                                                     <Button type="submit"
                                                                         className="proceedBtn"

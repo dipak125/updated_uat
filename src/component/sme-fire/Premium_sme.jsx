@@ -166,7 +166,7 @@ class Premium_sme extends Component {
     sendPaymentLink = () => {
         let encryption = new Encryption();
         const formData = new FormData();
-        let policyHolder_refNo = localStorage.getItem("policyHolder_refNo") ? localStorage.getItem("policyHolder_refNo") : 0;
+        let policyHolder_refNo = localStorage.getItem("policy_holder_ref_no") ? localStorage.getItem("policy_holder_ref_no") : 0;
         formData.append('reference_no', policyHolder_refNo)
       
         this.props.loadingStart();
@@ -200,10 +200,9 @@ class Premium_sme extends Component {
                         policy_holder_ref_no:policy_holder_ref_no,
                         request_data_id:decryptResp.data.policyHolder.request_data.id,
                         completed_step:decryptResp.data.policyHolder.step_no,
-                        menumaster_id:decryptResp.data.policyHolder.menumaster_id
+                        menumaster_id:decryptResp.data.policyHolder.menumaster_id,
+                        payment_link_status: decryptResp.data.policyHolder && decryptResp.data.policyHolder.bcmaster ? decryptResp.data.policyHolder.bcmaster.eligible_for_payment_link : 0
                     });
-
-                    
 
                 }
 
@@ -702,8 +701,13 @@ class Premium_sme extends Component {
 
                                                             <div className="d-flex justify-content-left resmb">
                                                                 <Button className="backBtn" type="button" onClick={this.additionalDetails.bind(this,productId)}>Back</Button>
-                                                                <Button type="button" className="proceedBtn" onClick = {this.sendPaymentLink.bind(this)}>  Send Payment Link  </Button>
-                                                                &nbsp;&nbsp;&nbsp;&nbsp;
+                                                               
+                                                                { this.props.payment_link_status == 1 ?
+                                                                    <div>
+                                                                    <Button type="button" className="proceedBtn" onClick = {this.sendPaymentLink.bind(this)}>  Send Payment Link  </Button>
+                                                                    &nbsp;&nbsp;&nbsp;&nbsp;
+                                                                    </div> : null }
+
                                                                 {this.state.quoteId && this.state.quoteId != '' && values.gateway != "" ?
                                                                     <Button type="submit"
                                                                         className="proceedBtn"  type="submit"  disabled={isSubmitting ? true : false}>
@@ -790,6 +794,8 @@ const mapStateToProps = (state) => {
         Previous_Policy_No:state.sme_fire.Previous_Policy_No,
         insurance_company_id:state.sme_fire.insurance_company_id,
         previous_city:state.sme_fire.previous_city,
+
+        payment_link_status: state.sme_fire.payment_link_status
     };
 };
 

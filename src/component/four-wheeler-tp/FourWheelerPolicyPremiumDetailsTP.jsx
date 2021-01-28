@@ -114,9 +114,10 @@ class Premium extends Component {
                 let vehicleDetails = decryptResp.data.policyHolder ? decryptResp.data.policyHolder.vehiclebrandmodel : {};
                 let step_completed = decryptResp.data.policyHolder ? decryptResp.data.policyHolder.step_no : "";
                 let policyHolder = decryptResp.data.policyHolder ? decryptResp.data.policyHolder : [];
+                let bcMaster = decryptResp.data.policyHolder ? decryptResp.data.policyHolder.bcmaster : {};
 
                 this.setState({
-                    motorInsurance,vehicleDetails,step_completed,policyHolder,
+                    motorInsurance,vehicleDetails,step_completed,policyHolder, bcMaster,
                     refNumber: decryptResp.data.policyHolder.reference_no,
                     paymentStatus: decryptResp.data.policyHolder.payment ? decryptResp.data.policyHolder.payment[0] : [],
                     memberdetails : decryptResp.data.policyHolder ? decryptResp.data.policyHolder : [],
@@ -252,7 +253,7 @@ sendPaymentLink = () => {
     }
 
     render() {
-        const { policyHolder, show, fulQuoteResp, motorInsurance, error, error1, refNumber, 
+        const { policyHolder, show, fulQuoteResp, motorInsurance, error, error1, refNumber, bcMaster,
             paymentStatus, relation, memberdetails,nomineedetails,vehicleDetails,step_completed } = this.state
         const { productId } = this.props.match.params
 
@@ -619,15 +620,6 @@ sendPaymentLink = () => {
                                                             </Col>
                                                                 <Col sm={12} md={6}>
                                                                     <FormGroup>
-                                                                    {/* <div className="paymntgatway">
-                                                                        Select Payment Gateway
-                                                                        <div>
-                                                                        <img src={require('../../assets/images/green-check.svg')} alt="" className="m-r-10" />
-                                                                        { policyHolder && policyHolder.bcmaster && policyHolder.bcmaster.paymentgateway && policyHolder.bcmaster.paymentgateway.logo ? <img src={require('../../assets/images/'+ policyHolder.bcmaster.paymentgateway.logo)} alt="" /> :
-                                                                        null
-                                                                        }
-                                                                        </div>
-                                                                    </div> */}
                                                                      <div className="paymntgatway">
                                                                         Select Payment Gateway
                                                                         <div>
@@ -680,8 +672,12 @@ sendPaymentLink = () => {
                                                             <Row>&nbsp;</Row>
                                                             <div className="d-flex justify-content-left resmb">
                                                                 <Button className="backBtn" type="button" onClick={this.additionalDetails.bind(this, productId)}>Back</Button>
-                                                                <Button type="button" className="proceedBtn" onClick = {this.sendPaymentLink.bind(this)}>  Send Payment Link  </Button>
-                                                                &nbsp;&nbsp;&nbsp;&nbsp;
+                                                                
+                                                                {bcMaster && bcMaster.eligible_for_payment_link == 1 ?
+                                                                    <div>
+                                                                    <Button type="button" className="proceedBtn" onClick = {this.sendPaymentLink.bind(this)}>  Send Payment Link  </Button>
+                                                                    &nbsp;&nbsp;&nbsp;&nbsp;
+                                                                    </div> : null }
 
                                                                 {fulQuoteResp.QuotationNo && values.gateway != "" ?
                                                                     <Button type="submit"

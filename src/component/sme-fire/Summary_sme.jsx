@@ -121,7 +121,8 @@ class Summary_sme extends Component {
                         policy_holder_ref_no:policy_holder_ref_no,
                         request_data_id:decryptResp.data.policyHolder.request_data.id,
                         completed_step:decryptResp.data.policyHolder.step_no,
-                        menumaster_id:decryptResp.data.policyHolder.menumaster_id
+                        menumaster_id:decryptResp.data.policyHolder.menumaster_id,
+                        payment_link_status: decryptResp.data.policyHolder && decryptResp.data.policyHolder.bcmaster ? decryptResp.data.policyHolder.bcmaster.eligible_for_payment_link : 0
                     });
 
                     

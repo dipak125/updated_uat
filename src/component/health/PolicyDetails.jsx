@@ -91,12 +91,15 @@ class PolicyDetails extends Component {
     axios
       .get(`/policy-holder/${localStorage.getItem("policyHolder_id")}`)
       .then((res) => {
+        let bcMaster = res.data.data.policyHolder ? res.data.data.policyHolder.bcmaster : {};
 
         this.setState({
           policyHolderDetails: res.data.data.policyHolder ? res.data.data.policyHolder : [],
           familyMember: res.data.data.policyHolder.request_data.family_members,
           refNumber: res.data.data.policyHolder.reference_no,
-          paymentStatus: res.data.data.policyHolder.payment ? res.data.data.policyHolder.payment[0] : []
+          paymentStatus: res.data.data.policyHolder.payment ? res.data.data.policyHolder.payment[0] : [],
+          bcMaster
+
         });
         this.getAccessToken(
           res.data.data.policyHolder,
@@ -145,12 +148,14 @@ class PolicyDetails extends Component {
     axios
       .get(`/health-policy/${ref_no}`)
       .then((res) => {
+        let bcMaster = res.data.data.policyHolder ? res.data.data.policyHolder.bcmaster : {};
 
         this.setState({
           policyHolderDetails: res.data.data.policyHolder ? res.data.data.policyHolder : [],
           familyMember: res.data.data.policyHolder.request_data.family_members,
           refNumber: res.data.data.policyHolder.reference_no,
-          paymentStatus: res.data.data.policyHolder.payment ? res.data.data.policyHolder.payment[0] : []
+          paymentStatus: res.data.data.policyHolder.payment ? res.data.data.policyHolder.payment[0] : [],
+          bcMaster
         });
         this.getAccessToken(
           res.data.data.policyHolder,
@@ -277,7 +282,7 @@ paypoint_payment = () => {
 
   render() {
     const { productId } = this.props.match.params;
-    const { fulQuoteResp, error, show, policyHolderDetails, refNumber, paymentStatus } = this.state;
+    const { fulQuoteResp, error, show, policyHolderDetails, refNumber, paymentStatus, bcMaster } = this.state;
 
     console.log("policyHolderDetails ", policyHolderDetails)
     const items =
@@ -538,8 +543,13 @@ paypoint_payment = () => {
                                             >
                                               Back
                                             </Button>
-                                            <Button type="button" className="proceedBtn" onClick = {this.sendPaymentLink.bind(this)}>  Send Payment Link  </Button>
-                                            &nbsp;&nbsp;&nbsp;&nbsp;
+
+                                            {bcMaster && bcMaster.eligible_for_payment_link == 1 ?
+                                              <div>
+                                              <Button type="button" className="proceedBtn" onClick = {this.sendPaymentLink.bind(this)}>  Send Payment Link  </Button>
+                                              &nbsp;&nbsp;&nbsp;&nbsp;
+                                              </div> : null }
+
                                           {fulQuoteResp.QuotationNo && values.gateway != "" ? 
                                             <Button type="submit"
                                               className="proceedBtn"

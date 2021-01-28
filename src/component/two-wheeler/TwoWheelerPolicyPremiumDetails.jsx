@@ -14,6 +14,7 @@ import * as Yup from "yup";
 import Encryption from '../../shared/payload-encryption';
 import queryString from 'query-string';
 import fuel from '../common/FuelTypes';
+import swal from 'sweetalert';
 
 const initialValue = {
     gateway : ""
@@ -117,9 +118,10 @@ class Premium extends Component {
                 let policyHolder = decryptResp.data.policyHolder ? decryptResp.data.policyHolder : [];
                 let vehicleDetails = decryptResp.data.policyHolder ? decryptResp.data.policyHolder.vehiclebrandmodel : {};
                 let step_completed = decryptResp.data.policyHolder ? decryptResp.data.policyHolder.step_no : "";
+                let bcMaster = decryptResp.data.policyHolder ? decryptResp.data.policyHolder.bcmaster : {};
 
                 this.setState({
-                    motorInsurance,policyHolder,vehicleDetails,step_completed,
+                    motorInsurance,policyHolder,vehicleDetails,step_completed,bcMaster,
                     refNumber: decryptResp.data.policyHolder.reference_no,
                     paymentStatus: decryptResp.data.policyHolder.payment ? decryptResp.data.policyHolder.payment[0] : [],
                     memberdetails : decryptResp.data.policyHolder ? decryptResp.data.policyHolder : [],
@@ -234,7 +236,26 @@ class Premium extends Component {
             });
         })
     
-}
+    }
+
+    sendPaymentLink = () => {
+        let encryption = new Encryption();
+        const formData = new FormData();
+        let policyHolder_refNo = localStorage.getItem("policyHolder_refNo") ? localStorage.getItem("policyHolder_refNo") : 0;
+        formData.append('reference_no', policyHolder_refNo)
+      
+        this.props.loadingStart();
+        axios
+          .post("send-payment-link", formData)
+          .then((res) => {
+            swal(res.data.msg)
+            this.props.loadingStop();
+          })
+          .catch((err) => {
+            this.props.loadingStop();
+          });
+      };
+      
 
 
     componentDidMount() {
@@ -244,7 +265,7 @@ class Premium extends Component {
 
     render() {
         const { policyHolder, whatsapp, show, fulQuoteResp, motorInsurance, error, error1, refNumber, 
-            paymentStatus, relation, memberdetails,nomineedetails, vehicleDetails,step_completed } = this.state
+            paymentStatus, relation, memberdetails,nomineedetails, vehicleDetails,step_completed, bcMaster } = this.state
         const { productId } = this.props.match.params
 
         const errMsg =
@@ -668,6 +689,13 @@ class Premium extends Component {
 
                                                             <div className="d-flex justify-content-left resmb">
                                                                 <Button className="backBtn" type="button" onClick={this.additionalDetails.bind(this, productId)}>Back</Button>
+                                                                
+                                                                {bcMaster && bcMaster.eligible_for_payment_link == 1 ?
+                                                                <div>
+                                                                <Button type="button" className="proceedBtn" onClick = {this.sendPaymentLink.bind(this)}>  Send Payment Link  </Button>
+                                                                &nbsp;&nbsp;&nbsp;&nbsp;
+                                                                </div> : null }
+
                                                                 {fulQuoteResp.QuotationNo && values.gateway != "" ?
                                                                     <Button type="submit"
                                                                         className="proceedBtn"

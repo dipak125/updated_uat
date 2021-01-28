@@ -64,8 +64,8 @@ function nameFormatter(cell, row){
 }
 
 const statusFormatter = (refObj) => (cell,row) => {
-    return (
-        <div>Quote Issued</div>
+    return ( 
+        cell.payment_link_status == 1 ? <div> Payment link sent</div> : <div> Quote Issued</div>
     )
 }
 
@@ -220,8 +220,6 @@ class QuoteSearch extends Component {
                                     <TableHeaderColumn width='95px'  dataField='created_at' dataFormat={(cell) => (cell !== '0000-00-00 00:00:00' ? moment(cell).format("DD-MM-YYYY") : '')} dataAlign="center" dataSort>Quote Issue Date</TableHeaderColumn>
                                     <TableHeaderColumn width='100px' dataAlign="center" dataField="request_data" dataFormat={premiumFormatter} > Premium</TableHeaderColumn>
                                     <TableHeaderColumn width='100px'  dataField="request_data" dataAlign="center" dataFormat={statusFormatter(this)} >Status</TableHeaderColumn>
-
-                                    
 
                                 </BootstrapTable>
                                 </div>

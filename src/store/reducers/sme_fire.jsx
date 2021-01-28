@@ -15,6 +15,7 @@ const initialState = {
         request_data_id:null,
         menumaster_id:null,
         completed_step:null,
+        payment_link_status: null,
 
         start_date:null,
         end_date:null,
@@ -67,7 +68,8 @@ const sme = ( state = initialState, action) => {
             policy_holder_ref_no:action.payload.policy_holder_ref_no,
             request_data_id:action.payload.request_data_id,
             completed_step:action.payload.completed_step,
-            menumaster_id:action.payload.menumaster_id}
+            menumaster_id:action.payload.menumaster_id,
+            payment_link_status: action.payload.payment_link_status}
 
         case SME_FIRE_UPDATE: return {...state, 
             start_date:action.payload.start_date,

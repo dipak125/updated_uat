@@ -120,10 +120,11 @@ class PolicyDetails_GSB extends Component {
         let requested_Data = decryptResp.data && decryptResp.data.policyHolder.request_data ? decryptResp.data.policyHolder.request_data : null;
         let addressDetails = policyHolderDetails ? JSON.parse(policyHolderDetails.address) : null
         let pincode_Details = gsb_Details ? JSON.parse(gsb_Details.pincode_response) : null
+        let bcMaster = decryptResp.data.policyHolder ? decryptResp.data.policyHolder.bcmaster : {};
         
         console.log("---gsb_Details--->>", decryptResp.data.policyHolder);
         this.setState({
-          gsb_Details, requested_Data, 
+          gsb_Details, requested_Data, bcMaster, 
           addressDetails, pincode_Details, policyHolderDetails
         });
         this.fetchCoveragePlan(decryptResp.data.policyHolder, gsb_Details)
@@ -284,7 +285,7 @@ paypoint_payment = () => {
 
   render() {
     const { productId } = this.props.match.params;
-    const { fulQuoteResp, addressDetails, error, show, policyHolderDetails, nomineedetails, paymentStatus, policyCoverage } = this.state;
+    const { fulQuoteResp, addressDetails, error, show, policyHolderDetails, nomineedetails, paymentStatus, policyCoverage, bcMaster } = this.state;
 
     const AddressDetails = addressDetails ? (
         <div>
@@ -649,8 +650,13 @@ paypoint_payment = () => {
                                             >
                                               Back
                                             </button>
-                                            <Button type="button" className="proceedBtn" onClick = {this.sendPaymentLink.bind(this)}>  Send Payment Link  </Button>
+
+                                            {bcMaster && bcMaster.eligible_for_payment_link == 1 ?
+                                              <div>
+                                              <Button type="button" className="proceedBtn" onClick = {this.sendPaymentLink.bind(this)}>  Send Payment Link  </Button>
                                               &nbsp;&nbsp;&nbsp;&nbsp;
+                                              </div> : null }
+
                                           {fulQuoteResp.QuotationNo ? 
                                             <button
                                               className="proceedBtn"

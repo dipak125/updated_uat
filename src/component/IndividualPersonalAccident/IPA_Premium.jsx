@@ -133,11 +133,12 @@ class IPA_Premium extends Component {
       .then((res) => {
         let decryptResp = JSON.parse(encryption.decrypt(res.data));
 
+        let bcMaster = decryptResp.data.policyHolder ? decryptResp.data.policyHolder.bcmaster : {};
         let ipaInfo = decryptResp.data && decryptResp.data.policyHolder && decryptResp.data.policyHolder.ipainfo ? decryptResp.data.policyHolder.ipainfo : null;
         let policyHolderDetails = decryptResp.data.policyHolder ? decryptResp.data.policyHolder : [];
         console.log("---ipaInfo--->>", ipaInfo);
         this.setState({
-          ipaInfo, policyHolderDetails,
+          ipaInfo, policyHolderDetails, bcMaster,
           nomineeDetails: policyHolderDetails.request_data && policyHolderDetails.request_data.nominee && policyHolderDetails.request_data.nominee[0],
         });
         this.quote() 
@@ -278,7 +279,7 @@ console.log("post_data---quote--- ", post_data)
 
   render() {
     const { productId } = this.props.match.params;
-    const { fulQuoteResp, error, show, policyHolderDetails, nomineeDetails, paymentStatus, policyCoverage, relationArr, ipaInfo } = this.state;
+    const { fulQuoteResp, error, show, policyHolderDetails, nomineeDetails, paymentStatus, policyCoverage, relationArr, ipaInfo, bcMaster } = this.state;
 
     console.log("policyHolderDetails ", policyHolderDetails)
 
@@ -647,13 +648,11 @@ console.log("post_data---quote--- ", post_data)
                                               Back
                                             </Button>
 
-                                            <Button type="button"
-                                              className="proceedBtn"
-                                              onClick = {this.sendPaymentLink.bind(this)}
-                                            > 
-                                              Send Payment Link 
-                                            </Button>
-                                            &nbsp;&nbsp;&nbsp;&nbsp;
+                                            {/* {bcMaster && bcMaster.eligible_for_payment_link == 1 ?
+                                              <div>
+                                              <Button type="button" className="proceedBtn" onClick = {this.sendPaymentLink.bind(this)}>  Send Payment Link  </Button>
+                                              &nbsp;&nbsp;&nbsp;&nbsp;
+                                              </div> : null } */}
 
                                           {fulQuoteResp.QuotationNo && values.gateway != "" ? 
                                             <Button type="submit"

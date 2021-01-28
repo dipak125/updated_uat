@@ -20,7 +20,8 @@ export const setSmeData = ( request ) => {
                 policy_holder_ref_no:request.policy_holder_ref_no,
                 request_data_id:request.request_data_id,
                 completed_step:request.completed_step,
-                menumaster_id:request.menumaster_id
+                menumaster_id:request.menumaster_id,
+                payment_link_status: request.payment_link_status
             }
         });
     }

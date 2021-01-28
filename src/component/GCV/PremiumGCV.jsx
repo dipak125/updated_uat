@@ -125,9 +125,11 @@ class PremiumGCV extends Component {
                 let previousPolicy = decryptResp.data.policyHolder ? decryptResp.data.policyHolder.previouspolicy : {};
                 let request_data = decryptResp.data.policyHolder ? decryptResp.data.policyHolder.request_data : {}
                 let step_completed = decryptResp.data.policyHolder ? decryptResp.data.policyHolder.step_no : "";
-		let dateDiff = 0
+                let bcMaster = decryptResp.data.policyHolder ? decryptResp.data.policyHolder.bcmaster : {};
+                let dateDiff = 0
+                
                 this.setState({
-                    motorInsurance,policyHolder,vehicleDetails,previousPolicy,request_data,step_completed,
+                    motorInsurance,policyHolder,vehicleDetails,previousPolicy,request_data,step_completed, bcMaster,
                     refNumber: decryptResp.data.policyHolder.reference_no,
                     paymentStatus: decryptResp.data.policyHolder.payment ? decryptResp.data.policyHolder.payment[0] : [],
                     memberdetails : decryptResp.data.policyHolder ? decryptResp.data.policyHolder : [],
@@ -348,7 +350,8 @@ class PremiumGCV extends Component {
     }
 
     render() {
-        const { policyHolder, show, fulQuoteResp, motorInsurance, error, error1, refNumber, paymentStatus, relation, memberdetails,nomineedetails, vehicleDetails, breakin_flag, step_completed } = this.state
+        const { policyHolder, show, fulQuoteResp, motorInsurance, error, error1, refNumber, paymentStatus, bcMaster,
+             relation, memberdetails,nomineedetails, vehicleDetails, breakin_flag, step_completed, request_data } = this.state
         const { productId } = this.props.match.params
 
         const errMsg =
@@ -790,8 +793,12 @@ class PremiumGCV extends Component {
                                                             <Row>&nbsp;</Row>
                                                             <div className="d-flex justify-content-left resmb">
                                                                 <Button className="backBtn" type="button" onClick={this.additionalDetails.bind(this, productId)}>Back</Button>
+                                                                
+                                                                {bcMaster && bcMaster.eligible_for_payment_link == 1 ?
+                                                                <div>
                                                                 <Button type="button" className="proceedBtn" onClick = {this.sendPaymentLink.bind(this)}>  Send Payment Link  </Button>
                                                                 &nbsp;&nbsp;&nbsp;&nbsp;
+                                                                </div> : null }
 
                                                                 {fulQuoteResp.QuotationNo && breakin_flag == 0 && values.gateway != "" ?
                                                                     <Button type="submit"

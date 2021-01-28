@@ -117,6 +117,7 @@ class arogya_PolicyDetails extends Component {
         let decryptResp = JSON.parse(encryption.decrypt(res.data))
         let addressArray = JSON.parse(decryptResp.data.policyHolder.address)
         console.log("decrypt-----", decryptResp)
+        let bcMaster = decryptResp.data.policyHolder ? decryptResp.data.policyHolder.bcmaster : {};
 
         this.setState({
           policyHolderDetails: decryptResp.data.policyHolder ? decryptResp.data.policyHolder : [],
@@ -124,7 +125,9 @@ class arogya_PolicyDetails extends Component {
           familyMember: decryptResp.data.policyHolder.request_data.family_members,
           refNumber: decryptResp.data.policyHolder.reference_no,
           paymentStatus: decryptResp.data.policyHolder.payment ? decryptResp.data.policyHolder.payment[0] : [],
-          nomineedetails: decryptResp.data.policyHolder ? decryptResp.data.policyHolder.request_data.nominee[0]:[]
+          nomineedetails: decryptResp.data.policyHolder ? decryptResp.data.policyHolder.request_data.nominee[0]:[],
+          bcMaster
+          
         });
         this.fullQuote( decryptResp.data.policyHolder );
       })
@@ -244,10 +247,7 @@ paypoint_payment = () => {
 
   render() {
     const { productId } = this.props.match.params;
-    const { fulQuoteResp, addressArray, error, show, policyHolderDetails, nomineedetails, paymentStatus } = this.state;
-
-    console.log("addressArray===================== ", addressArray ? addressArray : "")
-    console.log("policyHolderDetails===================== ", policyHolderDetails ? policyHolderDetails : "")
+    const { fulQuoteResp, addressArray, error, show, policyHolderDetails, nomineedetails, paymentStatus,bcMaster } = this.state;
 
     const AddressDetails = addressArray ? (
         <div>
@@ -691,13 +691,11 @@ paypoint_payment = () => {
                                             >
                                               Back
                                             </button>
-                                            <Button type="button"
-                                              className="proceedBtn"
-                                              onClick = {this.sendPaymentLink.bind(this)}
-                                            > 
-                                              Send Payment Link 
-                                            </Button>
+                                          {bcMaster && bcMaster.eligible_for_payment_link == 1 ?
+                                            <div>
+                                            <Button type="button" className="proceedBtn" onClick = {this.sendPaymentLink.bind(this)}>  Send Payment Link  </Button>
                                             &nbsp;&nbsp;&nbsp;&nbsp;
+                                            </div> : null }
 
                                           {fulQuoteResp.QuotationNo && values.gateway != "" ? 
                                             <button

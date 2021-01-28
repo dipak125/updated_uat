@@ -109,7 +109,8 @@ class Registration_sme extends Component {
                         policy_holder_ref_no:policy_holder_ref_no,
                         request_data_id:decryptResp.data.policyHolder.request_data.id,
                         completed_step:decryptResp.data.policyHolder.step_no,
-                        menumaster_id:decryptResp.data.policyHolder.menumaster_id
+                        menumaster_id:decryptResp.data.policyHolder.menumaster_id,
+                        payment_link_status: decryptResp.data.policyHolder && decryptResp.data.policyHolder.bcmaster ? decryptResp.data.policyHolder.bcmaster.eligible_for_payment_link : 0
                     });
 
                     
@@ -272,7 +273,7 @@ class Registration_sme extends Component {
                     policy_holder_ref_no:decryptResp.data.policyHolder_refNo,
                     request_data_id:decryptResp.data.request_data_id,
                     completed_step:decryptResp.data.completedStep,
-                    menumaster_id:decryptResp.data.menumaster_id
+                    menumaster_id:decryptResp.data.menumaster_id,
                 });
                 this.props.history.push(`/RiskDetails/${productId}`);
             }).
