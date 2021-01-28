@@ -68,6 +68,7 @@ class TicketCount extends Component {
         this.getTickets(1);
     }
 
+
     getCurrentStatus = (row) => {
         const formData = new FormData(); 
         formData.append('ticket_id', row.ticketid_Internal) 
@@ -132,7 +133,7 @@ class TicketCount extends Component {
     }
 
     ticketDetails = (ticketId, row) => {
-        this.setState({ ticketId: ticketId, viewTicket: true , selectedTicket: row})
+        this.setState({ ticketId: ticketId, viewTicket: true , selectedTicket: row})  
     }
 
     updateViewTicket = () => {
@@ -140,6 +141,7 @@ class TicketCount extends Component {
         this.setState({
             viewTicket: !viewTicket
         })
+        this.getTickets(1);
     }
 
     render() {

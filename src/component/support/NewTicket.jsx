@@ -19,7 +19,8 @@ const newInnitialValues = {
     caller_email: '', 
     description: '',
     title: '',
-    mobile: ''
+    mobile: '',
+    area: "PDF related issues"
 }
 
 const ticketValidation = Yup.object().shape({

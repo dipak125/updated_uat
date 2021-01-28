@@ -78,15 +78,15 @@ class TicketStatus extends Component {
         axios.post('help-ticket/incident-details',formData)
         .then(res=>{
             if(res.data.error == false) {
-                swal(`Status: ${res.data.data.currentStatus}`)
+                swal(`Current Status: ${res.data.data.currentStatus}`)
                 .then((willUpdate) =>{
                     if(willUpdate) {
-                        this.getTickets(1)
+                        this.getDetails()
                     }
                 } )
             }   
             else{
-                this.getTickets(1)
+                this.getDetails()
             }             
             this.props.loadingStop();
         }).
@@ -152,7 +152,8 @@ class TicketStatus extends Component {
                         }).then(() => {
                             this.props.loadingStop();
                             resetForm();
-                            this.getDetails()
+                            // this.getDetails()
+                            this.props.updateViewTicket()
                         });
                     })
                     .catch(err1 => {
@@ -182,7 +183,8 @@ class TicketStatus extends Component {
                         }).then(() => {
                             this.props.loadingStop();
                             resetForm();
-                            this.getDetails()
+                            // this.getDetails()
+                            this.props.updateViewTicket()
                         });
                     })
                     .catch(err1 => {
@@ -201,13 +203,22 @@ class TicketStatus extends Component {
         axios
         .post("help-ticket/reopen-incident", formData)
         .then(res1 => {
-            swal("Ticket reopened sucessfully "+ `\nTicket No.  ${this.props.ticketId}`, {
-                icon: "success"
-            }).then(() => {
-                this.props.loadingStop();
+            if(res1.data.error == false) {
+                swal("Ticket reopened sucessfully "+ `\nTicket No.  ${this.props.ticketId}`, {
+                    icon: "success"
+                }).then(() => {
+                    this.props.loadingStop();
+                    resetForm();
+                    this.getCurrentStatus(this.props.selectedTicket)
+                });
+            }
+            else{
+                swal(res1.data.msg, {
+                    icon: "error"
+                })
                 resetForm();
                 this.getCurrentStatus(this.props.selectedTicket)
-            });
+            }        
         })
         .catch(err1 => {
             console.log("Attach fail", err1);
