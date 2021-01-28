@@ -344,6 +344,28 @@ class AdditionalDetails_GSB extends Component {
             this.setState({
                 cycleList
             });
+            this.fetchRelationshipList();
+          }).
+          catch(err => {
+            this.props.loadingStop();
+            this.setState({
+                cycleList: []
+            });
+          })
+      }
+
+      fetchRelationshipList = () => {
+        let encryption = new Encryption();
+        this.props.loadingStart();
+        axios.get('gsb/gsb-relation-list')
+          .then(res => {
+            let decryptResp = JSON.parse(encryption.decrypt(res.data))
+            console.log("pedal-Relation-list------ ",decryptResp)
+            let nomineeRelation = decryptResp.data.relation_nominee_appointee ? decryptResp.data.relation_nominee_appointee.nominee_relations : []
+            let appointeeRelation = decryptResp.data.relation_nominee_appointee ? decryptResp.data.relation_nominee_appointee.appointee_relations : []
+            this.setState({
+                nomineeRelation , appointeeRelation
+            });
             this.fetchPolicyDetails();
           }).
           catch(err => {
@@ -585,7 +607,7 @@ class AdditionalDetails_GSB extends Component {
 
     render() {
         const { pinDataArr, appointeeFlag, is_appointee, titleList, cycleList, stateName, cityName, gsb_Details, 
-                riskAddressDetails, commAddressDetails, address_flag } = this.state
+                riskAddressDetails, commAddressDetails, address_flag, nomineeRelation , appointeeRelation } = this.state
         const {productId } = this.props.match.params
         const newInitialValues = Object.assign(initialValues, {
             proposer_title_id: gsb_Details && gsb_Details.salutation_id != '0'? gsb_Details.salutation_id : "",
@@ -619,7 +641,7 @@ class AdditionalDetails_GSB extends Component {
             appointee_relation_with: gsb_Details && gsb_Details.request_data && gsb_Details.request_data.nominee && gsb_Details.request_data.nominee.length>0 ? gsb_Details.request_data.nominee[0].appointee_relation_with : "",
             is_appointee: this.state.is_appointee
         })
-console.log("newInitialValues------- ", newInitialValues)
+// console.log("newInitialValues------- ", newInitialValues)
         return (
             <>
                 <BaseComponent>
@@ -637,7 +659,7 @@ console.log("newInitialValues------- ", newInitialValues)
                                             validationSchema={vehicleRegistrationValidation}
                                         >
                                             {({ values, errors, setFieldValue, setFieldTouched, isValid, isSubmitting, touched }) => {
-                                                console.log('errors-------- ',errors)
+                                                // console.log('errors-------- ',errors)
 
                                                 return (
                                                     <Form>
@@ -1413,14 +1435,9 @@ console.log("newInitialValues------- ", newInitialValues)
                                                                             className="formGrp"
                                                                         >
                                                                             <option value="">Relation with Primary Insured</option>
-                                                                            <option value="1">Self</option>
-                                                                            <option value="2">Spouse</option>
-                                                                            <option value="3">Son</option>
-                                                                            <option value="4">Daughter</option>
-                                                                            <option value="5">Father</option>
-                                                                            <option value="6">Mother</option>
-                                                                            <option value="7">Father In Law</option>
-                                                                            <option value="8">Mother In Law</option>
+                                                                            {nomineeRelation && nomineeRelation.map((title, qIndex) => ( 
+                                                                            <option value={title.id}>{title.name}</option>
+                                                                            ))}
                                                                         </Field>
                                                                         {errors.relation_with &&
                                                                             touched.relation_with ? (
@@ -1475,18 +1492,9 @@ console.log("newInitialValues------- ", newInitialValues)
                                                                                     className="formGrp"
                                                                                 >
                                                                                     <option value="">Relation with Nominee</option>
-                                                                                    {/* {self_selected ? ( */}
-                                                                                    {/* "" */}
-                                                                                    {/* ) : ( */}
-                                                                                    <option value="1">Self</option>
-                                                                                    {/* )} */}
-                                                                                    <option value="2">Spouse</option>
-                                                                                    <option value="3">Son</option>
-                                                                                    <option value="4">Daughter</option>
-                                                                                    <option value="5">Father</option>
-                                                                                    <option value="6">Mother</option>
-                                                                                    <option value="7">Father In Law</option>
-                                                                                    <option value="8">Mother In Law</option>
+                                                                                    {appointeeRelation && appointeeRelation.map((title, qIndex) => ( 
+                                                                                    <option value={title.id}>{title.name}</option>
+                                                                                    ))}
                                                                                 </Field>
                                                                                 {errors.appointee_relation_with &&
                                                                                     touched.appointee_relation_with ? (

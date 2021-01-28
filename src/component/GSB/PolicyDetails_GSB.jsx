@@ -23,6 +23,7 @@ import swal from 'sweetalert';
 import Encryption from '../../shared/payload-encryption';
 import queryString from 'query-string';
 import { Formik, Form, Field, ErrorMessage } from "formik";
+import { faYelp } from "@fortawesome/free-brands-svg-icons";
 
 const initialValue = {
   gateway : ""
@@ -33,31 +34,31 @@ const genderArr = {
   f: "Female",
 };
 
-const relationArr = {
-1:"Self",
-2:"Spouse",
-3:"Son",
-4:"Daughter",
-5:"Father",
-6:"Mother",
-7:"Father In Law",
-8:"Mother In Law",
-9:"Brother",
-10:"Sister",
-11:"Grandfather",
-12:"Grandmother",
-13:"Husband",
-14:"Wife",
-15:"Brother In Law",
-16:"Sister In Law",
-17:"Uncle",
-18:"Aunty",
-19:"Ex-Wife",
-20:"Ex-Husband",
-21:"Employee",
-22:"Niece",
-23:"Nephew"
-}
+// const relationArr = {
+// 1:"Self",
+// 2:"Spouse",
+// 3:"Son",
+// 4:"Daughter",
+// 5:"Father",
+// 6:"Mother",
+// 7:"Father In Law",
+// 8:"Mother In Law",
+// 9:"Brother",
+// 10:"Sister",
+// 11:"Grandfather",
+// 12:"Grandmother",
+// 13:"Husband",
+// 14:"Wife",
+// 15:"Brother In Law",
+// 16:"Sister In Law",
+// 17:"Uncle",
+// 18:"Aunty",
+// 19:"Ex-Wife",
+// 20:"Ex-Husband",
+// 21:"Employee",
+// 22:"Niece",
+// 23:"Nephew"
+// }
 
 const insuredRelationArr = {
   self:"Self",
@@ -89,7 +90,9 @@ class PolicyDetails_GSB extends Component {
     refNumber: localStorage.getItem("policyHolder_refNo"),
     paymentStatus: [],
     nomineedetails: [],
-    policyCoverage: []
+    policyCoverage: [],
+    NomineeRelationArr: {},
+    AppointeeRelationArr: {}
   };
 
   handleClose = () => {
@@ -103,6 +106,70 @@ class PolicyDetails_GSB extends Component {
 
   nomineeDetails = (productId) => {
     this.props.history.push(`/AdditionalDetails_GSB/${productId}`);
+  };
+
+  fetchNomineeRel = () => {
+    const { productId } = this.props.match.params;
+    let encryption = new Encryption();
+    this.props.loadingStart();
+    axios
+      .get('gsb/gsb-relation-list')
+      .then((res) => {
+        let decryptResp = JSON.parse(encryption.decrypt(res.data));
+        console.log("decrypt--fetchSubVehicle------ ", decryptResp);
+        if(decryptResp.error == false) {
+          let nomineeRelation = decryptResp.data.relation_nominee_appointee.nominee_relations;
+          let appointeeRelation = decryptResp.data.relation_nominee_appointee.appointee_relations;
+          let NomineeRelationArr = []
+          let AppointeeRelationArr = []
+          for (const x in nomineeRelation) {
+            NomineeRelationArr[nomineeRelation[x].id] = nomineeRelation[x].name
+          }
+          // for (const y in appointeeRelation) {
+          //   AppointeeRelationArr[appointeeRelation[y].id] = appointeeRelation[faYelp].name
+          // }
+          this.setState({
+          nomineeRelation, NomineeRelationArr, AppointeeRelationArr
+        });
+        this.fetchData();
+        }      
+      })
+      .catch((err) => {
+        // handle error
+        this.props.loadingStop();
+      });
+  };
+  fetchAppointeeRel = () => {
+    const { productId } = this.props.match.params;
+    let encryption = new Encryption();
+    this.props.loadingStart();
+    axios
+      .get('gsb/gsb-relation-list')
+      .then((res) => {
+        let decryptResp = JSON.parse(encryption.decrypt(res.data));
+        console.log("decrypt--fetchSubVehicle------ ", decryptResp);
+        if(decryptResp.error == false) {
+          // let nomineeRelation = decryptResp.data.relation_nominee_appointee.nominee_relations;
+          let appointeeRelation = decryptResp.data.relation_nominee_appointee.appointee_relations;
+          // let NomineeRelationArr = []
+          let AppointeeRelationArr = []
+          // for (const x in nomineeRelation) {
+          //   NomineeRelationArr[nomineeRelation[x].id] = nomineeRelation[x].name
+          // }
+          for (const y in appointeeRelation) {
+            AppointeeRelationArr[appointeeRelation[y].id] = appointeeRelation[y].name
+          }
+          this.setState({
+          // nomineeRelation, NomineeRelationArr,
+           AppointeeRelationArr
+        });
+        this.fetchData();
+        }      
+      })
+      .catch((err) => {
+        // handle error
+        this.props.loadingStop();
+      });
   };
 
 
@@ -124,7 +191,7 @@ class PolicyDetails_GSB extends Component {
         
         console.log("---gsb_Details--->>", decryptResp.data.policyHolder);
         this.setState({
-          gsb_Details, requested_Data, bcMaster, 
+          gsb_Details, requested_Data, bcMaster,
           addressDetails, pincode_Details, policyHolderDetails
         });
         this.fetchCoveragePlan(decryptResp.data.policyHolder, gsb_Details)
@@ -281,12 +348,15 @@ paypoint_payment = () => {
 
   componentDidMount() {
   this.fetchPolicyDetails();
+  this.fetchNomineeRel();
+  this.fetchAppointeeRel();
   }
 
   render() {
     const { productId } = this.props.match.params;
-    const { fulQuoteResp, addressDetails, error, show, policyHolderDetails, nomineedetails, paymentStatus, policyCoverage, bcMaster } = this.state;
-
+    const { fulQuoteResp, addressDetails, error, show, policyHolderDetails, nomineedetails, paymentStatus, policyCoverage, bcMaster, NomineeRelationArr, AppointeeRelationArr } = this.state;
+    const Is_appo = policyHolderDetails.request_data ? policyHolderDetails.request_data.nominee[0].is_appointee : null
+    console.log('Is-appoo-----',Is_appo)
     const AddressDetails = addressDetails ? (
         <div>
           <Row>
@@ -342,7 +412,7 @@ paypoint_payment = () => {
                 </Col>
                 <Col sm={12} md={6}>
                   <FormGroup>
-                  { relationArr[member.relation_with] }
+                  { NomineeRelationArr[member.relation_with] }
                   </FormGroup>
                 </Col>
               </Row>
@@ -377,19 +447,19 @@ paypoint_payment = () => {
                 </Col>
                 <Col sm={12} md={6}>
                   <FormGroup>
-                  { relationArr[member.appointee_relation_with] }
+                  { AppointeeRelationArr[member.appointee_relation_with] }
                   </FormGroup>
                 </Col>
               </Row>
 
-              <Row>
+              {/* <Row>
                 <Col sm={12} md={6}>
                   <FormGroup>Gender</FormGroup>
                 </Col>
                 <Col sm={12} md={6}>
                   <FormGroup>{genderArr[member.gender]}</FormGroup>
                 </Col>
-              </Row>
+              </Row> */}
             </Col>
           </Row>
           <Row>
@@ -581,9 +651,9 @@ paypoint_payment = () => {
                                           <div className="rghtsideTrigr m-b-40">
                                             <Collapsible trigger=" Nominee Details">
                                               <div className="listrghtsideTrigr">{nominee}</div>
-                                              {nomineedetails && nomineedetails.is_appointee == '1'  ? 
+                                              {Is_appo == '1'  ? 
                                               <div className="listrghtsideTrigr">{appointee}</div> 
-                                              : null}
+                                              : null} 
                                               
                                             </Collapsible>
                                           </div>
