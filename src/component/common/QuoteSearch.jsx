@@ -64,8 +64,8 @@ function nameFormatter(cell, row){
 }
 
 const statusFormatter = (refObj) => (cell,row) => {
-    return (
-        <div>Quote Issued</div>
+    return ( 
+        cell.payment_link_status == 1 ? <div> Payment link sent</div> : <div> Quote Issued</div>
     )
 }
 
