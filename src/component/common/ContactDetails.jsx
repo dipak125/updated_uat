@@ -7,14 +7,13 @@ import { loaderStart, loaderStop } from "../../store/actions/loader";
 
 const initialValues = {};
   
-
 class ContactDetails extends Component {
 
     state = {
         doc_list: [
             {
                 "id": "2",
-                "product": "Contact details of Sales Manager",
+                "product": "ContactSalesManager",
                 "image" : "Miscellaneous-car.svg"
               }          
           ]
@@ -66,6 +65,7 @@ class ContactDetails extends Component {
 
     render() {
         const { doc_list } = this.state;
+        let phrases = localStorage.getItem("phrases") ? JSON.parse(localStorage.getItem("phrases")) : null
         return (
             <Row>
                 <Col sm={12}>
@@ -76,8 +76,8 @@ class ContactDetails extends Component {
                                 {doc_list.map((doc, docIndex) => ( 
                                     <tr key={docIndex}>
                                         {/* <td className="W-10"><img src={require(`../../assets/images/${doc.image}`)} alt="" /></td> */}
-                                        <td className="W-70">{doc.product}</td>
-                                        <td className="W-10 text-right"> <button className="buy" onClick= {this.dload_doc.bind(this, doc.id )} >View</button></td>
+                                        <td className="W-70">{phrases[doc.product]}</td>
+                                        <td className="W-10 text-right"> <button className="buy" onClick= {this.dload_doc.bind(this, doc.id )} >{phrases['View']}</button></td>
                                     </tr>
                                 ))
                                 }

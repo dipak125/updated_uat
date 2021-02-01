@@ -12,7 +12,10 @@ import { loaderStart, loaderStop } from "../../store/actions/loader";
 import { connect } from "react-redux";
 import moment from "moment";
 
+
 const actionFormatter = (refObj) => (cell, row, enumObject) => {
+    let phrases = localStorage.getItem("phrases") ? JSON.parse(localStorage.getItem("phrases")) : null
+    console.log("phrases------>",phrases.GetStatus)
     if(row.break_in_status == "Vehicle Recommended and Reports Uploaded"){
         return (
             <LinkWithTooltip
@@ -22,7 +25,7 @@ const actionFormatter = (refObj) => (cell, row, enumObject) => {
                 }
                 id="tooltip-1"
             >               
-                Approved 
+                {phrases['Approved']} 
             </LinkWithTooltip>
         )
     }
@@ -36,7 +39,7 @@ const actionFormatter = (refObj) => (cell, row, enumObject) => {
                 id="tooltip-1"
             >
                 <Button type="button" >
-                    Get Status
+                    {phrases['GetStatus']}
                 </Button> 
             </LinkWithTooltip>
         )
@@ -128,6 +131,7 @@ class BreakinList extends Component {
 
     render() {
         const { breakinList } = this.state
+        let phrases = localStorage.getItem("phrases") ? JSON.parse(localStorage.getItem("phrases")) : null
         const options = {
             // afterColumnFilter: this.afterColumnFilter,
             // onExportToCSV: this.onExportToCSV,
@@ -146,13 +150,13 @@ class BreakinList extends Component {
             sizePerPage: 10,  // which size per page you want to locate as default
             pageStartIndex: 1, // where to start counting the pages
             paginationSize: 3,  // the pagination bar size.
-            prePage: 'Prev', // Previous page button text
-            nextPage: 'Next', // Next page button text
-            firstPage: 'First', // First page button text
-            lastPage: 'Last', // Last page button text
+            prePage: phrases['Prev'], // Previous page button text
+            nextPage: phrases['Next'], // Next page button text
+            firstPage: phrases['First'], // First page button text
+            lastPage: phrases['Last'], // Last page button text
             paginationShowsTotal: this.renderShowsTotal,  // Accept bool or function
-            paginationPosition: 'bottom',  // default is bottom, top and both is all available
-            noDataText: 'No Data'
+            paginationPosition: phrases['bottom'],  // default is bottom, top and both is all available
+            noDataText: phrases['NoData']
 
         };
         return (
@@ -163,9 +167,9 @@ class BreakinList extends Component {
                             <SideNav />
                         </div>
                         <div className="col-sm-12 col-md-12 col-lg-10 col-xl-10 infobox">
-                        <h4 className="text-center mt-3 mb-3">SBI General Insurance Company Limited</h4>
+                        <h4 className="text-center mt-3 mb-3">{phrases['SBIGICL']}</h4>
                         <div className="contBox m-b-45 tickedTable">
-                            <h4 className="text-center mt-3 mb-3">Break In</h4>  
+                            <h4 className="text-center mt-3 mb-3">{phrases['BreakIn']}</h4>  
                             <div className="customInnerTable">
                                 <BootstrapTable ref="table"
                                     data={breakinList}
@@ -176,14 +180,14 @@ class BreakinList extends Component {
                                     wrapperClasses="table-responsive"
                                 >
 
-                                    <TableHeaderColumn width='200px' dataField='breakin' dataFormat={breakinFormatter} isKey dataSort>choice No</TableHeaderColumn>
-                                    <TableHeaderColumn width='100px' dataField="vehiclebrandmodel" dataFormat={productFormatter} >Product</TableHeaderColumn>
-                                    <TableHeaderColumn width='100px' dataField="breakin" dataFormat={(cell) => (cell && cell.created_at !== '0000-00-00 00:00:00' ? moment(cell.created_at).format("DD-MM-YYYY") : '')}>Inspection Date</TableHeaderColumn>
-                                    <TableHeaderColumn width='100px' dataField="request_data" dataFormat={premiumFormatter} >Premium</TableHeaderColumn>
+                                    <TableHeaderColumn width='200px' dataField='breakin' dataFormat={breakinFormatter} isKey dataSort>{phrases['choiceNo']}</TableHeaderColumn>
+                                    <TableHeaderColumn width='100px' dataField="vehiclebrandmodel" dataFormat={productFormatter} >{phrases['Product']}</TableHeaderColumn>
+                                    <TableHeaderColumn width='100px' dataField="breakin" dataFormat={(cell) => (cell && cell.created_at !== '0000-00-00 00:00:00' ? moment(cell.created_at).format("DD-MM-YYYY") : '')}>{phrases['InspectionDate']}</TableHeaderColumn>
+                                    <TableHeaderColumn width='100px' dataField="request_data" dataFormat={premiumFormatter} >{phrases['Premium']}</TableHeaderColumn>
                                     {/* <TableHeaderColumn width='200px' dataField="break_in_status"  dataFormat={(cell) => (cell == 1 ? "Approval pending" : "Approved")} >Status</TableHeaderColumn> */}
-                                    <TableHeaderColumn width='200px' dataField="break_in_status" >Status</TableHeaderColumn>
-                                    <TableHeaderColumn width='100px' dataField="request_data" dataFormat={(cell) =>(cell.quote_id) } >Quotatioin No.</TableHeaderColumn>
-                                    <TableHeaderColumn width='150px' dataField="getstatus" dataAlign="center" dataFormat={ actionFormatter(this) }>Status</TableHeaderColumn>
+                                    <TableHeaderColumn width='200px' dataField="break_in_status" >{phrases['Status']}</TableHeaderColumn>
+                                    <TableHeaderColumn width='100px' dataField="request_data" dataFormat={(cell) =>(cell.quote_id) } >{phrases['QuotatioinNo']}.</TableHeaderColumn>
+                                    <TableHeaderColumn width='150px' dataField="getstatus" dataAlign="center" dataFormat={ actionFormatter(this) }>{phrases['Status']}</TableHeaderColumn>
 
                                 </BootstrapTable>
                             </div>

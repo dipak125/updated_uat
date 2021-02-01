@@ -228,7 +228,7 @@ class PremiumGCV extends Component {
             });
         })
     
-    }
+}
 
     sendPaymentLink = () => {
         let encryption = new Encryption();
@@ -259,6 +259,7 @@ class PremiumGCV extends Component {
         const { policyHolder, show, fulQuoteResp, motorInsurance, error, error1, refNumber, bcMaster,
             paymentStatus, relation, memberdetails,nomineedetails, vehicleDetails, step_completed } = this.state
         const { productId } = this.props.match.params
+        let phrases = localStorage.getItem("phrases") ? JSON.parse(localStorage.getItem("phrases")) : null
 
         const errMsg =
             error && error.message ? (
@@ -294,7 +295,7 @@ class PremiumGCV extends Component {
                             </div>
                             { step_completed >= '4' && vehicleDetails.vehicletype_id == '7' ?
                             <div className="col-sm-12 col-md-12 col-lg-10 col-xl-10 infobox">
-                                <h4 className="text-center mt-3 mb-3">SBI General Insurance Company Limited</h4>
+                                <h4 className="text-center mt-3 mb-3">{phrases['SBIGICL']}</h4>
                                 <Formik initialValues={initialValue} onSubmit={this.handleSubmit}
                                 validationSchema={validatePremium}
                                 >
@@ -305,26 +306,26 @@ class PremiumGCV extends Component {
                                                 <section className="brand m-t-11 m-b-25">
                                                     <div className="d-flex justify-content-left">
                                                         <div className="brandhead m-b-10">
-                                                            <h4>The Summary of your Policy Premium Details is as below </h4>
+                                                            <h4>{phrases['PremiumDetails']} </h4>
                                                         </div>
                                                     </div>
                                                     <div className="brandhead m-b-30">
                                                         <h5>{errMsg}</h5>
                                                         <h5>{paymentErrMsg}</h5>
                                                         <h4>
-                                                            Policy Reference Number {fulQuoteResp.QuotationNo}
+                                                        {phrases['PolRefNumber']} {fulQuoteResp.QuotationNo}
                                                         </h4>
                                                     </div>
 
                                                     <Row>
                                                         <Col sm={12} md={9} lg={9}>
                                                             <div className="rghtsideTrigr">
-                                                                <Collapsible trigger="Retail Motor Policy" open= {true}>
+                                                                <Collapsible trigger={phrases['RMPolicy']} open= {true}>
                                                                     <div className="listrghtsideTrigr">
                                                                         <Row>
                                                                             <Col sm={12} md={3}>
                                                                                 <div className="motopremium">
-                                                                                    Premium:
+                                                                                {phrases['Premium']}:
                                                                                 </div>
                                                                             </Col>
 
@@ -337,7 +338,7 @@ class PremiumGCV extends Component {
 
                                                                             <Col sm={12} md={3}>
                                                                                 <div className="motopremium">
-                                                                                    Gross Premium:
+                                                                                {phrases['GrossPremium']}:
                                                                     </div>
                                                                             </Col>
 
@@ -350,7 +351,7 @@ class PremiumGCV extends Component {
 
                                                                             <Col sm={12} md={3}>
                                                                                 <div className="motopremium">
-                                                                                    GST:
+                                                                                {phrases['GST']}:
                                                                     </div>
                                                                             </Col>
 
@@ -367,18 +368,18 @@ class PremiumGCV extends Component {
                                                             </div>
 
                                                             <div className="rghtsideTrigr m-b-30">
-                                                                <Collapsible trigger="Member Details" >
+                                                                <Collapsible trigger={phrases['MemberDetails']} >
                                                                     <div className="listrghtsideTrigr">
                                                                         {memberdetails ?
 
                                                                                 <div>
-                                                                                    <strong>Owner Details </strong>
+                                                                                    <strong>{phrases['OwnerDetails']} </strong>
                                                                                     <br/>
                                                                                        <Row>
                                                                                         <Col sm={12} md={6}>
                                                                                             <Row>
                                                                                                 <Col sm={12} md={6}>
-                                                                                                {motorInsurance.policy_for == '1' ?  <FormGroup>Name:</FormGroup> : <FormGroup>Company Name:</FormGroup> }
+                                                                                                {motorInsurance.policy_for == '1' ?  <FormGroup>{phrases['Name']}:</FormGroup> : <FormGroup>Company Name:</FormGroup> }
                                                                                                 </Col>
                                                                                                 <Col sm={12} md={6}>
                                                                                                     <FormGroup>{memberdetails.first_name }</FormGroup>
@@ -387,7 +388,7 @@ class PremiumGCV extends Component {
                                                                                             {motorInsurance.policy_for == '1' ?     
                                                                                                 <Row>
                                                                                                     <Col sm={12} md={6}>
-                                                                                                        <FormGroup>Date Of Birth:</FormGroup>
+                                                                                                        <FormGroup>{phrases['DateOfBirth']}:</FormGroup>
                                                                                                     </Col>
                                                                                                     <Col sm={12} md={6}>
                                                                                                         <FormGroup>{ memberdetails ? moment(memberdetails.dob).format("DD-MM-YYYY") : null}</FormGroup>
@@ -395,7 +396,7 @@ class PremiumGCV extends Component {
                                                                                                 </Row> : 
                                                                                                 <Row>
                                                                                                 <Col sm={12} md={6}>
-                                                                                                    <FormGroup>Date Of Incorporation:</FormGroup>
+                                                                                                    <FormGroup>{phrases['DateOfIncorporation']}:</FormGroup>
                                                                                                 </Col>
                                                                                                 <Col sm={12} md={6}>
                                                                                                     <FormGroup>{ memberdetails ? moment(memberdetails.date_of_incorporation).format("DD-MM-YYYY") : null}</FormGroup>
@@ -403,7 +404,7 @@ class PremiumGCV extends Component {
                                                                                             </Row>}
                                                                                             <Row>
                                                                                                 <Col sm={12} md={6}>
-                                                                                                    <FormGroup>Mobile No:</FormGroup>
+                                                                                                    <FormGroup>{phrases['MobileNo']}:</FormGroup>
                                                                                                 </Col>
                                                                                                 <Col sm={12} md={6}>
                                                                                                     <FormGroup>{memberdetails.mobile}</FormGroup>
@@ -411,7 +412,7 @@ class PremiumGCV extends Component {
                                                                                             </Row>
                                                                                             <Row>
                                                                                                 <Col sm={12} md={6}>
-                                                                                                    <FormGroup>Email Id:</FormGroup>
+                                                                                                    <FormGroup>{phrases['EmailId']}:</FormGroup>
                                                                                                 </Col>
                                                                                                 <Col sm={12} md={6}>
                                                                                                     <FormGroup>{memberdetails.email_id}</FormGroup>
@@ -420,7 +421,7 @@ class PremiumGCV extends Component {
                                                                                             {motorInsurance.policy_for == '1' ?
                                                                                                 <Row>
                                                                                                     <Col sm={12} md={6}>
-                                                                                                        <FormGroup>Gender</FormGroup>
+                                                                                                        <FormGroup>{phrases['Gender']}</FormGroup>
                                                                                                     </Col>
                                                                                                     <Col sm={12} md={6}>
                                                                                                         <FormGroup>{memberdetails.gender == "m" ? "Male" : "Female"}</FormGroup>
@@ -428,7 +429,7 @@ class PremiumGCV extends Component {
                                                                                                 </Row> :
                                                                                                 <Row>
                                                                                                     <Col sm={12} md={6}>
-                                                                                                        <FormGroup>GSTIN:</FormGroup>
+                                                                                                        <FormGroup>{phrases['GSTIN']}:</FormGroup>
                                                                                                     </Col>
                                                                                                     <Col sm={12} md={6}>
                                                                                                         <FormGroup>{memberdetails.gstn_no}</FormGroup>
@@ -450,7 +451,7 @@ class PremiumGCV extends Component {
                                                                                     <Col sm={12} md={6}>
                                                                                         <Row>
                                                                                             <Col sm={12} md={6}>
-                                                                                                <FormGroup>Name:</FormGroup>
+                                                                                                <FormGroup>{phrases['Name']}:</FormGroup>
                                                                                             </Col>
                                                                                             <Col sm={12} md={6}>
                                                                                                 <FormGroup>{nomineedetails ? nomineedetails.first_name : null}</FormGroup>
@@ -459,7 +460,7 @@ class PremiumGCV extends Component {
 
                                                                                     <Row>
                                                                                         <Col sm={12} md={6}>
-                                                                                            <FormGroup>Date Of Birth:</FormGroup>
+                                                                                            <FormGroup>{phrases['DateOfBirth']}:</FormGroup>
                                                                                         </Col>
                                                                                         <Col sm={12} md={6}>
                                                                                             <FormGroup>{ nomineedetails ? moment(nomineedetails.dob).format("DD-MM-YYYY") : null}</FormGroup>
@@ -468,7 +469,7 @@ class PremiumGCV extends Component {
 
                                                                                     <Row>
                                                                                         <Col sm={12} md={6}>
-                                                                                            <FormGroup>Relation With Proposer:</FormGroup>
+                                                                                            <FormGroup>{phrases['ProposerRelation']}:</FormGroup>
                                                                                         </Col>
                                                                                         <Col sm={12} md={6}>
                                                                                         {nomineedetails && relation.map((relations, qIndex) => 
@@ -480,7 +481,7 @@ class PremiumGCV extends Component {
 
                                                                                     <Row>
                                                                                         <Col sm={12} md={6}>
-                                                                                            <FormGroup>Gender</FormGroup>
+                                                                                            <FormGroup>{phrases['Gender']}</FormGroup>
                                                                                         </Col>
                                                                                         <Col sm={12} md={6}>
                                                                                             <FormGroup>{nomineedetails && nomineedetails.gender == "m" ? "Male" : "Female"}</FormGroup>
@@ -495,13 +496,13 @@ class PremiumGCV extends Component {
 
                                                                         {motorInsurance.policy_for == '1' && nomineedetails && nomineedetails.is_appointee == '1' && motorInsurance.pa_flag == '1' ?      
                                                                             <div>
-                                                                            <strong>Appointee Details :</strong>
+                                                                            <strong>{phrases['AppoDetails']} :</strong>
                                                                                 <br/>
                                                                                 <Row>
                                                                                     <Col sm={12} md={6}>
                                                                                         <Row>
                                                                                             <Col sm={12} md={6}>
-                                                                                                <FormGroup>Name:</FormGroup>
+                                                                                                <FormGroup>{phrases['Name']}:</FormGroup>
                                                                                             </Col>
                                                                                             <Col sm={12} md={6}>
                                                                                                 <FormGroup>{nomineedetails && nomineedetails.appointee_name ? nomineedetails.appointee_name : null}</FormGroup>
@@ -510,7 +511,7 @@ class PremiumGCV extends Component {
 
                                                                                         <Row>
                                                                                             <Col sm={12} md={6}>
-                                                                                                <FormGroup>Relation With Nominee:</FormGroup>
+                                                                                                <FormGroup>{phrases['RelationNominee']}:</FormGroup>
                                                                                             </Col>
                                                                                             <Col sm={12} md={6}>
                                                                                             {nomineedetails && nomineedetails.appointee_relation_with && relation.map((relations, qIndex) => 
@@ -531,7 +532,7 @@ class PremiumGCV extends Component {
                                                             </div>
 
                                                             <div className="rghtsideTrigr m-b-30">
-                                                                <Collapsible trigger="Vehicle Details" >
+                                                                <Collapsible trigger={phrases['VehicleDetails']} >
                                                                     <div className="listrghtsideTrigr">
                                                                         {memberdetails ?
 
@@ -540,7 +541,7 @@ class PremiumGCV extends Component {
                                                                                         <Col sm={12} md={6}>
                                                                                             <Row>
                                                                                                 <Col sm={12} md={6}>
-                                                                                                    <FormGroup>Registration No:</FormGroup>
+                                                                                                    <FormGroup>{phrases['RegNo']}:</FormGroup>
                                                                                                 </Col>
                                                                                                 <Col sm={12} md={6}>
                                                                                                     <FormGroup>{motorInsurance && motorInsurance.registration_no}</FormGroup>
@@ -549,7 +550,7 @@ class PremiumGCV extends Component {
 
                                                                                             <Row>
                                                                                                 <Col sm={12} md={6}>
-                                                                                                    <FormGroup>Car Brand:</FormGroup>
+                                                                                                    <FormGroup>{phrases['Brand']}:</FormGroup>
                                                                                                 </Col>
                                                                                                 <Col sm={12} md={6}>
                                                                                                     <FormGroup>{vehicleDetails && vehicleDetails.vehiclebrand && vehicleDetails.vehiclebrand.name ? vehicleDetails.vehiclebrand.name : ""}</FormGroup>
@@ -557,7 +558,7 @@ class PremiumGCV extends Component {
                                                                                             </Row>
                                                                                             <Row>
                                                                                                 <Col sm={12} md={6}>
-                                                                                                    <FormGroup>Car Model</FormGroup>
+                                                                                                    <FormGroup>{phrases['Model']}</FormGroup>
                                                                                                 </Col>
                                                                                                 <Col sm={12} md={6}>
                                                                                                     <FormGroup>{vehicleDetails && vehicleDetails.vehiclemodel && vehicleDetails.vehiclemodel.description ? vehicleDetails.vehiclemodel.description+" "+vehicleDetails.varientmodel.varient : ""}</FormGroup>
@@ -565,7 +566,7 @@ class PremiumGCV extends Component {
                                                                                             </Row>
                                                                                             <Row>
                                                                                                 <Col sm={12} md={6}>
-                                                                                                    <FormGroup>Variant</FormGroup>
+                                                                                                    <FormGroup>{phrases['Variant']}</FormGroup>
                                                                                                 </Col>
                                                                                                 <Col sm={12} md={6}>
                                                                                                     <FormGroup>{vehicleDetails && vehicleDetails.varientmodel && vehicleDetails.varientmodel.varient ? vehicleDetails.varientmodel.varient : ""}</FormGroup>
@@ -573,7 +574,7 @@ class PremiumGCV extends Component {
                                                                                             </Row>
                                                                                             <Row>
                                                                                                 <Col sm={12} md={6}>
-                                                                                                    <FormGroup>Chassis Number</FormGroup>
+                                                                                                    <FormGroup>{phrases['ChassisNumber']}</FormGroup>
                                                                                                 </Col>
                                                                                                 <Col sm={12} md={6}>
                                                                                                     <FormGroup>{motorInsurance && motorInsurance.chasis_no  ? motorInsurance.chasis_no : ""}</FormGroup>
@@ -581,7 +582,7 @@ class PremiumGCV extends Component {
                                                                                             </Row>
                                                                                             <Row>
                                                                                                 <Col sm={12} md={6}>
-                                                                                                    <FormGroup>Engine Number</FormGroup>
+                                                                                                    <FormGroup>{phrases['EngineNumber']}</FormGroup>
                                                                                                 </Col>
                                                                                                 <Col sm={12} md={6}>
                                                                                                 <FormGroup>{motorInsurance && motorInsurance.engine_no  ? motorInsurance.engine_no : ""}</FormGroup>
@@ -589,7 +590,7 @@ class PremiumGCV extends Component {
                                                                                             </Row>
                                                                                             <Row>
                                                                                                 <Col sm={12} md={6}>
-                                                                                                    <FormGroup>Fuel Type</FormGroup>
+                                                                                                    <FormGroup>{phrases['Fuel']}</FormGroup>
                                                                                                 </Col>
                                                                                                 <Col sm={12} md={6}>
                                                                                                     <FormGroup>{vehicleDetails && vehicleDetails.varientmodel && vehicleDetails.varientmodel.fuel_type ? fuel[parseInt(vehicleDetails.varientmodel.fuel_type)] : null}</FormGroup>
@@ -598,7 +599,7 @@ class PremiumGCV extends Component {
 
                                                                                             <Row>
                                                                                                 <Col sm={12} md={6}>
-                                                                                                    <FormGroup>Seating</FormGroup>
+                                                                                                    <FormGroup>{phrases['Seating']}</FormGroup>
                                                                                                 </Col>
                                                                                                 <Col sm={12} md={6}>
                                                                                                     <FormGroup>{vehicleDetails && vehicleDetails.varientmodel && vehicleDetails.varientmodel.seating ? vehicleDetails.varientmodel.seating : null}</FormGroup>
@@ -607,7 +608,7 @@ class PremiumGCV extends Component {
 
                                                                                             <Row>
                                                                                                 <Col sm={12} md={6}>
-                                                                                                    <FormGroup>Body Style</FormGroup>
+                                                                                                    <FormGroup>{phrases['BodyStyle']}</FormGroup>
                                                                                                 </Col>
                                                                                                 <Col sm={12} md={6}>
                                                                                                     <FormGroup>{vehicleDetails && vehicleDetails.varientmodel && vehicleDetails.varientmodel.body_style ? vehicleDetails.varientmodel.body_style : null}</FormGroup>
@@ -616,7 +617,7 @@ class PremiumGCV extends Component {
 
                                                                                             <Row>
                                                                                                 <Col sm={12} md={6}>
-                                                                                                    <FormGroup>Gross Vehicle Weight</FormGroup>
+                                                                                                    <FormGroup>{phrases['GrossVehicleWeight']}</FormGroup>
                                                                                                 </Col>
                                                                                                 <Col sm={12} md={6}>
                                                                                                     <FormGroup>{vehicleDetails && vehicleDetails.varientmodel && vehicleDetails.varientmodel.gross_vechicle_weight ? vehicleDetails.varientmodel.gross_vechicle_weight : null}</FormGroup>
@@ -646,6 +647,15 @@ class PremiumGCV extends Component {
                                                             </Col>
                                                                 <Col sm={12} md={6}>
                                                                     <FormGroup>
+                                                                    {/* <div className="paymntgatway">
+                                                                        Select Payment Gateway
+                                                                        <div>
+                                                                        <img src={require('../../assets/images/green-check.svg')} alt="" className="m-r-10" />
+                                                                        { policyHolder && policyHolder.bcmaster && policyHolder.bcmaster.paymentgateway && policyHolder.bcmaster.paymentgateway.logo ? <img src={require('../../assets/images/'+ policyHolder.bcmaster.paymentgateway.logo)} alt="" /> :
+                                                                        null
+                                                                        }
+                                                                        </div>
+                                                                    </div> */}
                                                                      <div className="paymntgatway">
                                                                         Select Payment Gateway
                                                                         <div>
@@ -698,19 +708,17 @@ class PremiumGCV extends Component {
 
                                                             <Row>&nbsp;</Row>
                                                             <div className="d-flex justify-content-left resmb">
-                                                                <Button className="backBtn" type="button" onClick={this.additionalDetails.bind(this, productId)}>Back</Button>
-                                                                
-                                                                {bcMaster && bcMaster.eligible_for_payment_link == 1 ?
+                                                                <Button className="backBtn" type="button" onClick={this.additionalDetails.bind(this, productId)}>{phrases['Back']}</Button>
+ 								{bcMaster && bcMaster.eligible_for_payment_link == 1 ?
                                                                     <div>
                                                                     <Button type="button" className="proceedBtn" onClick = {this.sendPaymentLink.bind(this)}>  Send Payment Link  </Button>
                                                                     &nbsp;&nbsp;&nbsp;&nbsp;
                                                                     </div> : null }
-                                                                
                                                                 {fulQuoteResp.QuotationNo && values.gateway != "" ?
                                                                     <Button type="submit"
                                                                         className="proceedBtn"
                                                                     >
-                                                                        Make Payment
+                                                                        {phrases['MakePayment']}
                                                                 </Button> 
                                                             : null}
                                                             </div>

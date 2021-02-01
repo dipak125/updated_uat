@@ -81,12 +81,14 @@ class TicketStatus extends Component {
                 swal(`Current Status: ${res.data.data.currentStatus}`)
                 .then((willUpdate) =>{
                     if(willUpdate) {
-                        this.getDetails()
+                        // this.getDetails()
+                        this.props.updateViewTicket()
                     }
                 } )
             }   
             else{
-                this.getDetails()
+                // this.getDetails()
+                this.props.updateViewTicket()
             }             
             this.props.loadingStop();
         }).
@@ -147,7 +149,7 @@ class TicketStatus extends Component {
                     .post("help-ticket/insert-post", formData)
                     .then(res1 => {
                         console.log("Attach Upload", res1);
-                        swal("Reply posted sucessfully "+ `\nTicket No.  ${this.props.ticketId}`, {
+                        swal("Reply posted sucessfully "+ `\nTicket No.  ${res1.data.data.ticket_no}`, {
                             icon: "success"
                         }).then(() => {
                             this.props.loadingStop();
@@ -178,7 +180,7 @@ class TicketStatus extends Component {
                     .post("help-ticket/insert-post", formData)
                     .then(res1 => {
                         console.log("Attach Upload", res1);
-                        swal("Reply posted sucessfully "+ `\nTicket No.  ${this.props.ticketId}`, {
+                        swal("Reply posted sucessfully "+ `\nTicket No.  ${res1.data.data.ticket_no}`, {
                             icon: "success"
                         }).then(() => {
                             this.props.loadingStop();
@@ -204,7 +206,7 @@ class TicketStatus extends Component {
         .post("help-ticket/reopen-incident", formData)
         .then(res1 => {
             if(res1.data.error == false) {
-                swal("Ticket reopened sucessfully "+ `\nTicket No.  ${this.props.ticketId}`, {
+                swal("Ticket reopened sucessfully "+ `\nTicket No.  ${res1.data.data.ticket_no}`, {
                     icon: "success"
                 }).then(() => {
                     this.props.loadingStop();
@@ -370,7 +372,7 @@ class TicketStatus extends Component {
                                     <span className="avatar">
                                         <img className="avatar" alt="Avatar" src="//www.gravatar.com/avatar/c4b67d2401af1361e3b91f250ebc5b1b?s=80&amp;d=mm" />    </span>
                                     <div className="header-panel">
-                                        <div className="header">
+                                        <div className= {row.is_solution == '0' ? "header" : "header_reply"}>
                                             <b>{row.name}</b> posted <span>{moment(row.created_at).format('DD/MM/YYYY hh:mm A')}</span> <span className="title truncate"></span>
                                         </div>
                                         <div className="thread-body">

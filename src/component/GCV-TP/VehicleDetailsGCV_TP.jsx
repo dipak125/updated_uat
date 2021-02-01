@@ -640,9 +640,10 @@ class VehicleDetailsGCV extends Component {
             valid_previous_policy: motorInsurance && (motorInsurance.valid_previous_policy == 0 || motorInsurance.valid_previous_policy == 1) ? motorInsurance.valid_previous_policy : ""
 
         });
+        let phrases = localStorage.getItem("phrases") ? JSON.parse(localStorage.getItem("phrases")) : null
 
         const inputCustomerID = {
-            placeholder: "Search City",
+            placeholder: phrases['SearchCity'],
             value: CustomerID ? CustomerID : RTO_location,
             onChange: this.onChangeCustomerID
           };
@@ -657,11 +658,11 @@ class VehicleDetailsGCV extends Component {
                         <SideNav />
                     </div>
                 <div className="col-sm-12 col-md-12 col-lg-10 col-xl-10 infobox">
-                <h4 className="text-center mt-3 mb-3">SBI General Insurance Company Limited</h4>
+                <h4 className="text-center mt-3 mb-3">{phrases['SBIGICL']}</h4>
                 <section className="brand m-b-25">
                     <div className="d-flex justify-content-left">
                         <div className="brandhead">
-                            <h4 className="fs-18 m-b-30">Please share your vehicle details.</h4>
+                            <h4 className="fs-18 m-b-30">{phrases['VehicleDetails']}.</h4>
                         </div>
                     </div>
                     <div className="brand-bg">
@@ -676,7 +677,7 @@ class VehicleDetailsGCV extends Component {
                                                     <Col sm={12} md={6} lg={6}>
                                                         <FormGroup>
                                                             <div className="fs-18">
-                                                                First Purchase/Registration Date
+                                                            {phrases['FirstRegDate']}
                                                             </div>
                                                         </FormGroup>
                                                     </Col>
@@ -688,7 +689,7 @@ class VehicleDetailsGCV extends Component {
                                                                 minDate={values.policy_type_id == '1' ? new Date(minRegnDateNew) : new Date(minRegnDate)}
                                                                 maxDate={values.policy_type_id == '1' ? new Date() : new Date(maxDate)}
                                                                 dateFormat="dd MMM yyyy"
-                                                                placeholderText="Registration Date"
+                                                                placeholderText={phrases['RegDate']}
                                                                 peekPreviousMonth
                                                                 peekPreviousYear
                                                                 showMonthDropdown
@@ -717,7 +718,7 @@ class VehicleDetailsGCV extends Component {
                                                     <Col sm={12} md={4} lg={4}>
                                                         <FormGroup>
                                                             <div className="fs-18">
-                                                                Registration City
+                                                            {phrases['RegCity']}
                                                          </div>
                                                         </FormGroup>
                                                     </Col>
@@ -756,7 +757,7 @@ class VehicleDetailsGCV extends Component {
                                                                     value = {values.goodscarriedtypes_id}
                                                                     // value={ageObj.whatIsCurrentMonth(values.registration_date) < 7 ? 6 : values.previous_policy_name}
                                                                 >
-                                                                    <option value="">Select Type of goods carried</option>
+                                                                    <option value="">{phrases['GCVGoodsType']}</option>
                                                                     {goodscarriedtypes.map((subVehicle, qIndex) => ( 
                                                                         <option value= {subVehicle.id}>{subVehicle.goodscarriedtype}</option>
                                                                     ))}
@@ -780,7 +781,7 @@ class VehicleDetailsGCV extends Component {
                                                                     value = {values.averagemonthlyusages_id}
                                                                     // value={ageObj.whatIsCurrentMonth(values.registration_date) < 7 ? 6 : values.previous_policy_name}
                                                                 >
-                                                                    <option value="">Average Monthly use of Vehicle</option>
+                                                                    <option value="">{phrases['GCVMonthlyUse']}</option>
                                                                     {averagemonthlyusages.map((monthlyusages, qIndex) => ( 
                                                                         <option value= {monthlyusages.id}>{monthlyusages.usage_description}</option>
                                                                     ))}
@@ -803,7 +804,7 @@ class VehicleDetailsGCV extends Component {
                                                                     value = {values.permittypes_id}
                                                                     // value={ageObj.whatIsCurrentMonth(values.registration_date) < 7 ? 6 : values.previous_policy_name}
                                                                 >
-                                                                    <option value="">Select Type of permit</option>
+                                                                    <option value="">{phrases['GCVPermit']}</option>
                                                                     {permittypes.map((permittype, qIndex) => ( 
                                                                         <option value= {permittype.id}>{permittype.permittype}</option>
                                                                     ))}
@@ -831,7 +832,7 @@ class VehicleDetailsGCV extends Component {
                                                         <Col sm={12}>
                                                             <FormGroup>
                                                                 <div className="carloan">
-                                                                    <h4> Do you have a valid Insurance policy ? </h4>
+                                                                    <h4> {phrases['GCVValidPolicy']}  ? </h4>
                                                                 </div>
                                                             </FormGroup>
                                                         </Col>
@@ -854,7 +855,7 @@ class VehicleDetailsGCV extends Component {
                                                                         }}
                                                                         checked={values.valid_previous_policy == '0' ? true : false}
                                                                     />
-                                                                        <span className="checkmark " /><span className="fs-14"> No</span>
+                                                                    <span className="checkmark " /><span className="fs-14"> {phrases['No']}</span>
                                                                     </label>
                                                                 </div>
 
@@ -872,7 +873,7 @@ class VehicleDetailsGCV extends Component {
                                                                         checked={values.valid_previous_policy == '1' ? true : false}
                                                                     />
                                                                         <span className="checkmark" />
-                                                                        <span className="fs-14">Yes</span>
+                                                                        <span className="fs-14">{phrases['Yes']}</span>
                                                                     </label>
                                                                     {errors.valid_previous_policy && touched.valid_previous_policy ? (
                                                                     <span className="errorMsg">{errors.valid_previous_policy}</span>
@@ -898,7 +899,7 @@ class VehicleDetailsGCV extends Component {
                                                     <Col sm={12}>
                                                         <FormGroup>
                                                             <div className="carloan">
-                                                                <h4> Previous Policy Details</h4>
+                                                                <h4> {phrases['PPD']}</h4>
                                                             </div>
                                                         </FormGroup>
                                                     </Col>
@@ -913,7 +914,7 @@ class VehicleDetailsGCV extends Component {
                                                                 minDate={new Date(minDate)}
                                                                 maxDate={new Date(maxDatePYP)}
                                                                 dateFormat="dd MMM yyyy"
-                                                                placeholderText="Previous policy start date"
+                                                                placeholderText={phrases['PPSD']}
                                                                 peekPreviousMonth
                                                                 autoComplete="off"
                                                                 peekPreviousYear
@@ -944,7 +945,7 @@ class VehicleDetailsGCV extends Component {
                                                             <DatePicker
                                                                 name="previous_end_date"
                                                                 dateFormat="dd MMM yyyy"
-                                                                placeholderText="Previous policy end date"
+                                                                placeholderText={phrases['PPED']}
                                                                 disabled = {true}
                                                                 dropdownMode="select"
                                                                 className="datePckr inputfs12"
@@ -970,9 +971,9 @@ class VehicleDetailsGCV extends Component {
                                                                     value = {values.previous_policy_name}
                                                                     // value={ageObj.whatIsCurrentMonth(values.registration_date) < 7 ? 6 : values.previous_policy_name}
                                                                 >
-                                                                    <option value="">Select Policy Type</option>
-                                                                    <option value="1">Package</option>
-                                                                    <option value="2">Liability Only</option>  
+                                                                <option value="">{phrases['SPT']}</option>
+                                                                <option value="1">{phrases['Package']}</option>
+                                                                <option value="2">{phrases['LiabilityOnly']}</option> 
                                                         
                                                                 </Field>
                                                                 {errors.previous_policy_name && touched.previous_policy_name ? (
@@ -993,7 +994,7 @@ class VehicleDetailsGCV extends Component {
                                                             autoComplete="off"                                                                        
                                                             className="formGrp"
                                                         >
-                                                            <option value="">Select Insurer Company</option>
+                                                            <option value="">{phrases['SelectInsurer']}</option>
                                                             {insurerList.map((insurer, qIndex) => ( 
                                                                 <option value= {insurer.Id}>{insurer.name}</option>
                                                             ))}
@@ -1011,7 +1012,7 @@ class VehicleDetailsGCV extends Component {
                                                                 <Field
                                                                     name="previous_city"
                                                                     type="text"
-                                                                    placeholder="Previous Insurer Address"
+                                                                    placeholder={phrases['PInsurerAddress']}
                                                                     autoComplete="off"
                                                                     onFocus={e => this.changePlaceHoldClassAdd(e)}
                                                                     onBlur={e => this.changePlaceHoldClassRemove(e)}
@@ -1031,7 +1032,7 @@ class VehicleDetailsGCV extends Component {
                                                                 <Field
                                                                     name="previous_policy_no"
                                                                     type="text"
-                                                                    placeholder="Previous Policy Number"
+                                                                    placeholder={phrases['PPolicyNumber']}
                                                                     autoComplete="off"
                                                                     maxLength="28"
                                                                     onFocus={e => this.changePlaceHoldClassAdd(e)}
@@ -1060,10 +1061,10 @@ class VehicleDetailsGCV extends Component {
 
                                                 <div className="d-flex justify-content-left resmb">
                                                 <Button className={`backBtn`} type="button"  disabled={isSubmitting ? true : false} onClick= {this.selectBrand.bind(this,productId)}>
-                                                    {isSubmitting ? 'Wait..' : 'Back'}
+                                                    {isSubmitting ? phrases['Wait'] : phrases['Back']}
                                                 </Button> 
                                                 <Button className={`proceedBtn`} type="submit"  disabled={isSubmitting ? true : false}>
-                                                    {isSubmitting ? 'Wait..' : 'Next'}
+                                                    {isSubmitting ? phrases['Wait'] : phrases['Next']}
                                                 </Button> 
                                                 </div>
 
@@ -1073,41 +1074,41 @@ class VehicleDetailsGCV extends Component {
                                                 <div className="regisBox">
                                                     <div className="d-flex justify-content-between flex-lg-row flex-md-column m-b-25">
 
-                                                        <div className="txtRegistr resmb-15">Registration No.<br />
+                                                        <div className="txtRegistr resmb-15">{phrases['RegNo']}.<br />
                                                             {motorInsurance && motorInsurance.registration_no}</div>
 
-                                                        <div> <button type="button" className="rgistrBtn" onClick={this.registration.bind(this, productId)}>Edit</button></div>
+                                                        <div> <button type="button" className="rgistrBtn" onClick={this.registration.bind(this, productId)}>{phrases['Edit']}</button></div>
                                                     </div>
 
 
 
                                                     <div className="d-flex justify-content-between flex-lg-row flex-md-column m-b-25">
-                                                        <div className="txtRegistr resmb-15">GCV Brand
+                                                        <div className="txtRegistr resmb-15">{phrases['GCVBrand']}
                                                             - <strong>{vehicleDetails && vehicleDetails.vehiclebrand && vehicleDetails.vehiclebrand.name ? vehicleDetails.vehiclebrand.name : ""}</strong>
                                                         </div>
 
-                                                        <div> <button type="button" className="rgistrBtn" onClick={this.selectBrand.bind(this, productId)}>Edit</button></div>
+                                                        <div> <button type="button" className="rgistrBtn" onClick={this.selectBrand.bind(this, productId)}>{phrases['Edit']}</button></div>
                                                     </div>
 
                                                     <div className="d-flex justify-content-between flex-lg-row flex-md-column m-b-25">
-                                                        <div className="txtRegistr">GCV Model<br />
+                                                        <div className="txtRegistr">{phrases['GCVModel']}<br />
                                                         <strong>{vehicleDetails && vehicleDetails.vehiclemodel && vehicleDetails.vehiclemodel.description ? vehicleDetails.vehiclemodel.description+" "+vehicleDetails.varientmodel.varient : ""}</strong></div>
 
-                                                        <div> <button type="button" className="rgistrBtn" onClick={this.selectVehicleBrand.bind(this, productId)}>Edit</button></div>
+                                                        <div> <button type="button" className="rgistrBtn" onClick={this.selectVehicleBrand.bind(this, productId)}>{phrases['Edit']}</button></div>
                                                     </div>
 
                                                     <div className="d-flex justify-content-between flex-lg-row flex-md-column m-b-25">
-                                                        <div className="txtRegistr">Seating<br />
+                                                        <div className="txtRegistr">{phrases['Seating']}<br />
                                                             <strong>{ vehicleDetails && vehicleDetails.varientmodel && vehicleDetails.varientmodel.seating ? vehicleDetails.varientmodel.seating: ""}</strong></div>
                                                     </div>
 
                                                     <div className="d-flex justify-content-between flex-lg-row flex-md-column m-b-25">
-                                                        <div className="txtRegistr">GVW<br />
+                                                        <div className="txtRegistr">{phrases['GVW']}<br />
                                                             <strong>{ vehicleDetails && vehicleDetails.varientmodel && vehicleDetails.varientmodel.gross_vechicle_weight ? vehicleDetails.varientmodel.gross_vechicle_weight : ""}</strong></div>
                                                     </div>
 
                                                     <div className="d-flex justify-content-between flex-lg-row flex-md-column m-b-25">
-                                                        <div className="txtRegistr">Fuel Type<br />
+                                                        <div className="txtRegistr">{phrases['Fuel']}<br />
                                                         <strong>{vehicleDetails && vehicleDetails.varientmodel && vehicleDetails.varientmodel.fueltype ? fuel[vehicleDetails.varientmodel.fueltype.id] : null} </strong></div>
 
                                                     </div>

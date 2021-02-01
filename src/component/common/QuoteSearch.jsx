@@ -64,8 +64,8 @@ function nameFormatter(cell, row){
 }
 
 const statusFormatter = (refObj) => (cell,row) => {
-    return ( 
-        cell.payment_link_status == 1 ? <div> Payment link sent</div> : <div> Quote Issued</div>
+    return (
+        <div>Quote Issued</div>
     )
 }
 
@@ -170,6 +170,7 @@ class QuoteSearch extends Component {
 
     render() {
         const { statusCount, policyHolder, products } = this.state
+        let phrases = localStorage.getItem("phrases") ? JSON.parse(localStorage.getItem("phrases")) : null
         var totalRecord = statusCount ? statusCount.totalRecord : 1
         var page_no = statusCount ? statusCount.page_no : 1 
 
@@ -179,8 +180,8 @@ class QuoteSearch extends Component {
             page: parseInt(page_no),  // which page you want to show as default
             sizePerPage: 10,
             paginationShowsTotal: this.renderShowsTotal,  // Accept bool or function
-            prePage: 'Prev', // Previous page button text
-            nextPage: 'Next', // Next page button text
+            prePage: phrases['Prev'], // Previous page button text
+            nextPage: phrases['Next'], // Next page button text
             hideSizePerPage: true,
             remote: true,
             showTotal: true,
@@ -197,9 +198,9 @@ class QuoteSearch extends Component {
                             <SideNav />
                         </div>
                         <div className="col-sm-12 col-md-12 col-lg-10 col-xl-10 infobox">
-                        <h4 className="text-center mt-3 mb-3">SBI General Insurance Company Limited</h4>
+                        <h4 className="text-center mt-3 mb-3">{phrases['SBIGICL']}</h4>
                             <div className="contBox m-b-45 tickedTable">
-                            <h4 className="text-center mt-3 mb-3">Quote History</h4>                           
+                            <h4 className="text-center mt-3 mb-3">{phrases['QuoteHistory']}</h4>                           
 
                                 {policyHolder ? 
                                 <div className="customInnerTable">
@@ -214,12 +215,14 @@ class QuoteSearch extends Component {
                                     wrapperClasses="table-responsive"
                                 >
 
-                                    <TableHeaderColumn width='195px'  dataField="request_data" dataAlign="center" dataFormat={ actionFormatter(this)} isKey >Quote Number</TableHeaderColumn>
-                                    <TableHeaderColumn width='100px'  dataField="request_data" dataAlign="center" dataFormat={ nameFormatter} >Proposer Name</TableHeaderColumn>
-                                    <TableHeaderColumn width='100px'  dataField="vehiclebrandmodel" dataAlign="center" dataFormat={productFormatter} >Product</TableHeaderColumn>
-                                    <TableHeaderColumn width='95px'  dataField='created_at' dataFormat={(cell) => (cell !== '0000-00-00 00:00:00' ? moment(cell).format("DD-MM-YYYY") : '')} dataAlign="center" dataSort>Quote Issue Date</TableHeaderColumn>
-                                    <TableHeaderColumn width='100px' dataAlign="center" dataField="request_data" dataFormat={premiumFormatter} > Premium</TableHeaderColumn>
-                                    <TableHeaderColumn width='100px'  dataField="request_data" dataAlign="center" dataFormat={statusFormatter(this)} >Status</TableHeaderColumn>
+                                    <TableHeaderColumn width='195px'  dataField="request_data" dataAlign="center" dataFormat={ actionFormatter(this)} isKey >{phrases['QuoteNumber']}</TableHeaderColumn>
+                                    <TableHeaderColumn width='100px'  dataField="request_data" dataAlign="center" dataFormat={ nameFormatter} >{phrases['ProposerName']}</TableHeaderColumn>
+                                    <TableHeaderColumn width='100px'  dataField="vehiclebrandmodel" dataAlign="center" dataFormat={productFormatter} >{phrases['Product']}</TableHeaderColumn>
+                                    <TableHeaderColumn width='95px'  dataField='created_at' dataFormat={(cell) => (cell !== '0000-00-00 00:00:00' ? moment(cell).format("DD-MM-YYYY") : '')} dataAlign="center" dataSort>{phrases['QuoteIssueDate']}</TableHeaderColumn>
+                                    <TableHeaderColumn width='100px' dataAlign="center" dataField="request_data" dataFormat={premiumFormatter} > {phrases['Premium']}</TableHeaderColumn>
+                                    <TableHeaderColumn width='100px'  dataField="request_data" dataAlign="center" dataFormat={statusFormatter(this)} >{phrases['Status']}</TableHeaderColumn>
+
+                                    
 
                                 </BootstrapTable>
                                 </div>

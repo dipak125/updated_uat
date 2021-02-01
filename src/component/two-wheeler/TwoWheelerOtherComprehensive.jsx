@@ -61,6 +61,7 @@ const Coverage = {
     "TOTALOD": "Total Own Damage"
 }
 
+
 class TwoWheelerOtherComprehensive extends Component {
 
     constructor(props) {
@@ -340,6 +341,7 @@ class TwoWheelerOtherComprehensive extends Component {
         let csc_data = localStorage.getItem('users') ? localStorage.getItem('users') : "";
         let csc_user_type = "";
         let bc_data = sessionStorage.getItem('bcLoginData') ? sessionStorage.getItem('bcLoginData') : "";
+        let phrases = localStorage.getItem("phrases") ? JSON.parse(localStorage.getItem("phrases")) : null
 
         if(csc_data && sessionStorage.getItem('csc_id')) {
             let encryption = new Encryption();
@@ -475,6 +477,7 @@ class TwoWheelerOtherComprehensive extends Component {
         let max_IDV_suggested = PolicyArray.length > 0 ? PolicyArray[0].PolicyRiskList[0].MaxIDV_Suggested : 0
         let minIDV = min_IDV_suggested
         let maxIDV = PolicyArray.length > 0 ? Math.floor(max_IDV_suggested) : null
+        let phrases = localStorage.getItem("phrases") ? JSON.parse(localStorage.getItem("phrases")) : null
 
         if(Number.isInteger(min_IDV_suggested) == false ) {
             minIDV = PolicyArray.length > 0 ? Math.floor(PolicyArray[0].PolicyRiskList[0].MinIDV_Suggested) : null           
@@ -583,12 +586,12 @@ class TwoWheelerOtherComprehensive extends Component {
                                 <SideNav />
                             </div>
                             <div className="col-sm-12 col-md-12 col-lg-10 col-xl-10 infobox">
-                                <h4 className="text-center mt-3 mb-3">SBI General Insurance Company Limited</h4>
+                                <h4 className="text-center mt-3 mb-3">{phrases['SBIGICL']}</h4>
                                 { step_completed >= '2' && vehicleDetails.vehicletype_id == '4' ?
                                 <section className="brand colpd m-b-25">
                                     <div className="d-flex justify-content-left">
                                         <div className="brandhead m-b-10">
-                                            <h4 className="m-b-30">Covers your Two Wheeler + Damage to Others (Comprehensive)</h4>
+                                            <h4 className="m-b-30">{phrases['CoversComprehensive']}</h4>
                                             <h5>{errMsg}</h5>
                                         </div>
                                     </div>
@@ -603,7 +606,7 @@ console.log("values----- ", values)
                                                     <Row>
                                                         <Col sm={12} md={9} lg={9}>
                                                             <div className="rghtsideTrigr W-90 m-b-30">
-                                                                <Collapsible trigger="Default Covered Coverages & Benefit" open={true}>
+                                                                <Collapsible trigger={phrases['DefaultCovered']} open={true}>
                                                                     <div className="listrghtsideTrigr">
                                                                     {policyCoverageList}
                                                                     {ncb_Discount}
@@ -614,7 +617,7 @@ console.log("values----- ", values)
                                                                 <Col sm={12} md={4} lg={4}>
                                                                     <FormGroup>
                                                                         <div className="insurerName">
-                                                                            <span className="fs-16">Insured Declared Value</span>
+                                                                            <span className="fs-16">{phrases['IDValue']}</span>
                                                                         </div>
                                                                     </FormGroup>
                                                                 </Col>
@@ -662,7 +665,7 @@ console.log("values----- ", values)
                                                             <Row>
                                                                 <Col sm={12} md={12} lg={12}>
                                                                     <FormGroup>
-                                                                        <span className="fs-18"> Add  more coverage to your plan.</span>
+                                                                        <span className="fs-18"> {phrases['AddMoreCoverage']}</span>
                                                                     </FormGroup>
                                                                 </Col>
                                                             </Row> : null }
@@ -710,7 +713,7 @@ console.log("values----- ", values)
                                                                                         this.handleChange()
                                                                                     }}
                                                                                 >
-                                                                                    <option value="">Select Sum Insured</option>
+                                                                                    <option value="">{phrases['SSI']}</option>
                                                                                     <option value="50000">50000</option>
                                                                                     <option value="100000">100000</option>  
                                                                         
@@ -727,26 +730,26 @@ console.log("values----- ", values)
                                                             
                                                             <div className="d-flex justify-content-left resmb">
                                                                 <Button className={`backBtn`} type="button" onClick={this.vehicleDetails.bind(this, productId)}>
-                                                                    Back
+                                                                {phrases['Back']}
                                                                 </Button>
                                                                 {serverResponse && serverResponse != "" ? (serverResponse.message ?
                                                                     <Button className={`proceedBtn`} type="submit"  >
-                                                                        Recalculate
+                                                                        {phrases['Recalculate']}
                                                                     </Button> : <Button className={`proceedBtn`} type="submit"  >
-                                                                        Continue
+                                                                    {phrases['Continue']}
                                                                     </Button>) : <Button className={`proceedBtn`} type="submit"  >
-                                                                        Recalculate
+                                                                        {phrases['Recalculate']}
                                                                     </Button>}
                                                             </div>
                                                         </Col>
 
                                                         <Col sm={12} md={3}>
                                                             <div className="justify-content-left regisBox">
-                                                                <h3 className="premamnt"> Total Premium Amount</h3>
+                                                                <h3 className="premamnt"> {phrases['TPAmount']}</h3>
                                                                 <div className="rupee"> ₹ {fulQuoteResp.DuePremium ? fulQuoteResp.DuePremium : 0}</div>
                                                                 <div className="text-center">
                                                                     <Button className={`brkbtn`} type="button" onClick={this.handleShow}>
-                                                                        Breakup
+                                                                        {phrases['Breakup']}
                                                                     </Button>
                                                                 </div>
                                                             </div>
@@ -767,14 +770,14 @@ console.log("values----- ", values)
                     show={this.state.show}
                     onHide={this.handleClose}>
                     <Modal.Header closeButton className="custmModlHead modalhd">
-                        <h3>Premium breakup </h3>
+                        <h3>{phrases['PremiumBreakup']} </h3>
                     </Modal.Header>
                     <Modal.Body>
 
                         <table class="table table-bordered">
                             <thead>
                                 <tr>
-                                    <th>Premium:</th>
+                                    <th>{phrases['Premium']}:</th>
                                     <th>₹ {fulQuoteResp.DuePremium}</th>
                                 </tr>
                             </thead>
@@ -782,17 +785,17 @@ console.log("values----- ", values)
                                 {premiumBreakup}
                                 {ncbDiscount != 0 ? (
                                 <tr>
-                                    <td>NCB Discount:</td>
+                                    <td>{phrases['NCBDiscount']}:</td>
                                     <td>₹ -{Math.round(ncbDiscount)}</td>
                                 </tr>
                                 ) : ""}
                                 
                                 <tr>
-                                    <td>Gross Premium:</td>
+                                    <td>{phrases['GrossPremium']}:</td>
                                     <td>₹ {Math.round(fulQuoteResp.BeforeVatPremium)}</td>
                                 </tr>
                                 <tr>
-                                    <td>GST:</td>
+                                    <td>{phrases['GST']}:</td>
                                     <td>₹ {Math.round(fulQuoteResp.TGST)}</td>
                                 </tr>
                                 

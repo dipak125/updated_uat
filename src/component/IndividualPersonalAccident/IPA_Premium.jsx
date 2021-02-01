@@ -648,11 +648,11 @@ console.log("post_data---quote--- ", post_data)
                                               Back
                                             </Button>
 
-                                            {/* {bcMaster && bcMaster.eligible_for_payment_link == 1 ?
+                                            {bcMaster && bcMaster.eligible_for_payment_link == 1 ?
                                               <div>
                                               <Button type="button" className="proceedBtn" onClick = {this.sendPaymentLink.bind(this)}>  Send Payment Link  </Button>
                                               &nbsp;&nbsp;&nbsp;&nbsp;
-                                              </div> : null } */}
+                                              </div> : null }
 
                                           {fulQuoteResp.QuotationNo && values.gateway != "" ? 
                                             <Button type="submit"

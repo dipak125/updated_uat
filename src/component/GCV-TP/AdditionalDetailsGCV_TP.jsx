@@ -662,6 +662,7 @@ class AdditionalDetailsGCV extends Component {
             bankDetails,policyHolder, stateName, pinDataArr, quoteId, addressDetails, relation,step_completed,vehicleDetails,request_data} = this.state
         const {productId} = this.props.match.params 
         
+        let phrases = localStorage.getItem("phrases") ? JSON.parse(localStorage.getItem("phrases")) : null
 
         let newInitialValues = Object.assign(initialValue, {
             first_name: policyHolder && policyHolder.first_name ? policyHolder.first_name : "",
@@ -696,7 +697,7 @@ class AdditionalDetailsGCV extends Component {
 
         const quoteNumber =
         quoteId ? (
-            <h4>You are just one steps away in getting your policy ready and your Quotation Number: {quoteId}. Please share a few more details. </h4>
+            <h4>{phrases['PolicyReady']}: {quoteId}. {phrases['MoreDetails']}. </h4>
         ) : null;
 
         
@@ -709,7 +710,7 @@ class AdditionalDetailsGCV extends Component {
                         <SideNav />
                     </div>
                 <div className="col-sm-12 col-md-12 col-lg-10 col-xl-10 infobox">
-                <h4 className="text-center mt-3 mb-3">SBI General Insurance Company Limited</h4>
+                <h4 className="text-center mt-3 mb-3">{phrases['SBIGICL']}</h4>
                 { step_completed >= '4' && vehicleDetails.vehicletype_id == '7' ?
                 <section className="brand m-b-25">
                     <div className="brand-bg">
@@ -728,7 +729,7 @@ class AdditionalDetailsGCV extends Component {
                             {quoteNumber}
                             </div>
                                 <div className="d-flex justify-content-left carloan">
-                                    <h4> Taken Vehicle Loan</h4>
+                                    <h4>  {phrases['VehicleLoan']}</h4>
                                 </div>
 
                                 <Row>
@@ -747,7 +748,7 @@ class AdditionalDetailsGCV extends Component {
                                                     }}
                                                     checked={values.is_carloan == '1' ? true : false}
                                                 />
-                                                    <span className="checkmark " /><span className="fs-14"> Yes</span>
+                                                    <span className="checkmark " /><span className="fs-14"> {phrases['Yes']}</span>
                                                 </label>
                                             </div>
 
@@ -765,7 +766,7 @@ class AdditionalDetailsGCV extends Component {
                                                     checked={values.is_carloan == '0' ? true : false}
                                                 />
                                                     <span className="checkmark" />
-                                                    <span className="fs-14">No</span>
+                                                    <span className="fs-14">{phrases['No']}</span>
                                                 </label>
                                                 {errors.is_carloan && touched.is_carloan ? (
                                                 <span className="errorMsg">{errors.is_carloan}</span>
@@ -781,7 +782,7 @@ class AdditionalDetailsGCV extends Component {
                                             <Field
                                                     name='bank_name'
                                                     type="text"
-                                                    placeholder="Bank Name"
+                                                    placeholder={phrases["BankName"]}
                                                     autoComplete="off"
                                                     onFocus={e => this.changePlaceHoldClassAdd(e)}
                                                     onBlur={e => this.changePlaceHoldClassRemove(e)}
@@ -799,7 +800,7 @@ class AdditionalDetailsGCV extends Component {
                                             <Field
                                                     name='bank_branch'
                                                     type="text"
-                                                    placeholder="Bank Branch"
+                                                    placeholder={phrases["BankBranch"]}
                                                     autoComplete="off"
                                                     onFocus={e => this.changePlaceHoldClassAdd(e)}
                                                     onBlur={e => this.changePlaceHoldClassRemove(e)}
@@ -818,7 +819,7 @@ class AdditionalDetailsGCV extends Component {
                                 </Row>
 
                                 <div className="d-flex justify-content-left carloan">
-                                    <h4> Owners Details</h4>
+                                    <h4>{phrases['OwnersDetails']}</h4>
                                 </div>
 
                                 <Row>
@@ -832,7 +833,7 @@ class AdditionalDetailsGCV extends Component {
                                                 autoComplete="off"                                                                        
                                                 className="formGrp"
                                             >
-                                                <option value="">Title</option>
+                                                <option value="">{phrases['Title']}</option>
                                                 {titleList.map((title, qIndex) => ( 
                                                 <option value={title.id}>{title.displayvalue}</option>
                                                 ))}
@@ -851,7 +852,7 @@ class AdditionalDetailsGCV extends Component {
                                             <Field
                                                 name='first_name'
                                                 type="text"
-                                                placeholder={values.policy_for == '2' ? "Company Name" : "Full Name"}
+                                                placeholder={values.policy_for == '2' ? phrases['CompanyName'] : phrases['FullName']}
                                                 autoComplete="off"
                                                 onFocus={e => this.changePlaceHoldClassAdd(e)}
                                                 onBlur={e => this.changePlaceHoldClassRemove(e)}
@@ -870,7 +871,7 @@ class AdditionalDetailsGCV extends Component {
                                                 <Field
                                                     name='gstn_no'
                                                     type="text"
-                                                    placeholder= "GSTIN"
+                                                    placeholder= {phrases['GSTIN']}
                                                     autoComplete="off"
                                                     onFocus={e => this.changePlaceHoldClassAdd(e)}
                                                     onBlur={e => this.changePlaceHoldClassRemove(e)}
@@ -893,9 +894,9 @@ class AdditionalDetailsGCV extends Component {
                                                 autoComplete="off"                                                                        
                                                 className="formGrp"
                                             >
-                                            <option value="">Select gender</option>
-                                                <option value="m">Male</option>
-                                                <option value="f">Female</option>
+                                            <option value="">{phrases['SelectGender']}</option>
+                                                <option value="m">{phrases['Male']}</option>
+                                                <option value="f">{phrases['Female']}</option>
                                             </Field>     
                                             {errors.gender && touched.gender ? (
                                             <span className="errorMsg">{errors.gender}</span>
@@ -914,7 +915,7 @@ class AdditionalDetailsGCV extends Component {
                                         <DatePicker
                                             name="dob"
                                             dateFormat="dd MMM yyyy"
-                                            placeholderText="DOB"
+                                            placeholderText={phrases["DOB"]}
                                             peekPreviousMonth
                                             peekPreviousYear
                                             showMonthDropdown
@@ -941,7 +942,7 @@ class AdditionalDetailsGCV extends Component {
                                         <DatePicker
                                             name="date_of_incorporation"
                                             dateFormat="dd MMM yyyy"
-                                            placeholderText="Incorporation Date"
+                                            placeholderText={phrases['IncorporationDate']}
                                             peekPreviousMonth
                                             peekPreviousYear
                                             showMonthDropdown
@@ -969,7 +970,7 @@ class AdditionalDetailsGCV extends Component {
                                             <Field
                                                 name='phone'
                                                 type="text"
-                                                placeholder="Mobile No. "
+                                                placeholder={phrases['Mobile']}
                                                 autoComplete="off"
                                                 onFocus={e => this.changePlaceHoldClassAdd(e)}
                                                 onBlur={e => this.changePlaceHoldClassRemove(e)}
@@ -989,7 +990,7 @@ class AdditionalDetailsGCV extends Component {
                                             <Field
                                                 name='address'
                                                 type="text"
-                                                placeholder="Address "
+                                                placeholder={phrases['Address']}
                                                 autoComplete="off"
                                                 onFocus={e => this.changePlaceHoldClassAdd(e)}
                                                 onBlur={e => this.changePlaceHoldClassRemove(e)}
@@ -1011,7 +1012,7 @@ class AdditionalDetailsGCV extends Component {
                                             <Field
                                                 name="pincode"
                                                 type="test"
-                                                placeholder="Pincode"
+                                                placeholder={phrases['Pincode']}
                                                 autoComplete="off"
                                                 maxlength = "6"
                                                 onFocus={e => this.changePlaceHoldClassAdd(e)}
@@ -1043,7 +1044,7 @@ class AdditionalDetailsGCV extends Component {
                                                     value={values.pincode_id}
                                                     className="formGrp"
                                                 >
-                                                <option value="">Select Area</option>
+                                                <option value="">{phrases['SelectArea']}</option>
                                                 {pinDataArr && pinDataArr.length > 0 && pinDataArr.map((resource,rindex)=>
                                                     <option value={resource.id}>{resource.LCLTY_SUBRB_TALUK_TEHSL_NM}</option>
                                                 )}
@@ -1063,7 +1064,7 @@ class AdditionalDetailsGCV extends Component {
                                                 <Field
                                                     name="state"
                                                     type="text"
-                                                    placeholder="State"
+                                                    placeholder={phrases['State']}
                                                     autoComplete="off"
                                                     onFocus={e => this.changePlaceHoldClassAdd(e)}
                                                     onBlur={e => this.changePlaceHoldClassRemove(e)}
@@ -1090,7 +1091,7 @@ class AdditionalDetailsGCV extends Component {
                                                 value={values.org_level}
                                                 className="formGrp"
                                             >
-                                            <option value="">Select Organization Level</option>
+                                            <option value="">{phrases['Organization']}</option>
                                             <option value="1">Corporate Public</option> 
                                             <option value="2">Corporate (PSU)</option>        
                                             <option value="3">Corporate (Private)</option>        
@@ -1116,7 +1117,7 @@ class AdditionalDetailsGCV extends Component {
                                             <Field
                                                 name='email'
                                                 type="email"
-                                                placeholder="Email "
+                                                placeholder={phrases['Email']}
                                                 autoComplete="off"
                                                 onFocus={e => this.changePlaceHoldClassAdd(e)}
                                                 onBlur={e => this.changePlaceHoldClassRemove(e)}
@@ -1138,7 +1139,7 @@ class AdditionalDetailsGCV extends Component {
                                             <Field
                                                 name='pancard'
                                                 type="text"
-                                                placeholder="PAN Card No. "
+                                                placeholder={phrases['PAN']}
                                                 autoComplete="off"
                                                 onFocus={e => this.changePlaceHoldClassAdd(e)}
                                                 onBlur={e => this.changePlaceHoldClassRemove(e)}
@@ -1160,7 +1161,7 @@ class AdditionalDetailsGCV extends Component {
                                             <Field
                                                 name='email'
                                                 type="email"
-                                                placeholder="Email "
+                                                placeholder={phrases['Email']}
                                                 autoComplete="off"
                                                 onFocus={e => this.changePlaceHoldClassAdd(e)}
                                                 onBlur={e => this.changePlaceHoldClassRemove(e)}
@@ -1181,7 +1182,7 @@ class AdditionalDetailsGCV extends Component {
                                 {motorInsurance && motorInsurance.policy_for == '1' && motorInsurance.pa_flag == '1' ?
                                 <Fragment>
                                 <div className="d-flex justify-content-left carloan">
-                                    <h4> Nominee Details</h4>
+                                    <h4> {phrases['NomineeName']}</h4>
                                 </div>
 
                                 <Row>
@@ -1191,7 +1192,7 @@ class AdditionalDetailsGCV extends Component {
                                             <Field
                                                 name='nominee_first_name'
                                                 type="text"
-                                                placeholder="Nominee Name"
+                                                placeholder={phrases['NomineeName']}
                                                 autoComplete="off"
                                                 onFocus={e => this.changePlaceHoldClassAdd(e)}
                                                 onBlur={e => this.changePlaceHoldClassRemove(e)}
@@ -1212,9 +1213,9 @@ class AdditionalDetailsGCV extends Component {
                                                 autoComplete="off"                                                                        
                                                 className="formGrp"
                                             >
-                                            <option value="">Select gender</option>
-                                                <option value="m">Male</option>
-                                                <option value="f">Female</option>
+                                            <option value="">{phrases['SelectGender']}</option>
+                                                <option value="m">{phrases['Male']}</option>
+                                                <option value="f">{phrases['Female']}</option>
                                             </Field>     
                                             {errors.nominee_gender && touched.nominee_gender ? (
                                             <span className="errorMsg">{errors.nominee_gender}</span>
@@ -1227,7 +1228,7 @@ class AdditionalDetailsGCV extends Component {
                                         <DatePicker
                                             name="nominee_dob"
                                             dateFormat="dd MMM yyyy"
-                                            placeholderText="DOB"
+                                            placeholderText={phrases['DOB']}
                                             peekPreviousMonth
                                             peekPreviousYear
                                             showMonthDropdown
@@ -1261,7 +1262,7 @@ class AdditionalDetailsGCV extends Component {
                                                 value={values.nominee_relation_with}
                                                 className="formGrp"
                                             >
-                                            <option value="">Relation with Primary Insured</option>
+                                            <option value="">{phrases['PrimaryRelation']}</option>
                                            { relation.map((relations, qIndex) => 
                                            relations.id != 1 ?
                                             <option value={relations.id}>{relations.name}</option> : null                                
@@ -1280,7 +1281,7 @@ class AdditionalDetailsGCV extends Component {
                                             <h4> </h4>
                                         </div>
                                         <div className="d-flex justify-content-left carloan">
-                                            <h4> Appointee  Details</h4>
+                                            <h4> {phrases['AppoDetails']}</h4>
                                         </div>
                                         <Row className="m-b-45">
                                             <Col sm={12} md={4} lg={4}>
@@ -1312,7 +1313,7 @@ class AdditionalDetailsGCV extends Component {
                                                             value={values.appointee_relation_with}
                                                             className="formGrp"
                                                         >
-                                                        <option value="">Relation with Nominee</option>
+                                                        <option value="">{phrases['NomineeRelation']}</option>
                                                         { relation.map((relations, qIndex) => 
                                                             <option value={relations.id}>{relations.name}</option>                                        
                                                         )}
@@ -1335,7 +1336,7 @@ class AdditionalDetailsGCV extends Component {
                                     <Col sm={12} md={4} lg={4}>
                                         <FormGroup>
                                             <div className="insurerName">
-                                                <h4 className="fs-16">Do you have EIA account
+                                                <h4 className="fs-16">{phrases['EIANumber']}
                                                     <OverlayTrigger overlay={<Tooltip id="tooltip-disabled">{eia_desc}</Tooltip>}>
                                                         <a className="infoIcon"><img src={require('../../assets/images/i.svg')} alt="" className="premtool" /></a>
                                                     </OverlayTrigger>
@@ -1359,7 +1360,7 @@ class AdditionalDetailsGCV extends Component {
                                                         }}
                                                         checked={values.is_eia_account == '1' ? true : false}
                                                     />
-                                                        <span className="checkmark " /><span className="fs-14"> Yes</span>
+                                                    <span className="checkmark " /><span className="fs-14"> {phrases['Yes']}</span>
                                                     </label>
                                                 </div>
 
@@ -1377,7 +1378,7 @@ class AdditionalDetailsGCV extends Component {
                                                         checked={values.is_eia_account == '0' ? true : false}
                                                     />
                                                         <span className="checkmark" />
-                                                        <span className="fs-14">No</span>
+                                                        <span className="fs-14">{phrases['No']}</span>
                                                         {errors.is_eia_account && touched.is_eia_account ? (
                                                         <span className="errorMsg">{errors.is_eia_account}</span>
                                                     ) : null}
@@ -1394,7 +1395,7 @@ class AdditionalDetailsGCV extends Component {
                                             <Field
                                                 name="eia_no"
                                                 type="text"
-                                                placeholder="EIA Number"
+                                                placeholder={phrases['EIANumber']}
                                                 autoComplete="off"
                                                 value = {values.eia_no}
                                                 maxLength="13"

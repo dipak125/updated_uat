@@ -433,7 +433,6 @@ class OtherComprehensiveGCV extends Component {
     sliderValue = (value) => {
         this.setState({
             sliderVal: value,
-            bodySliderVal: '',
             serverResponse: [],
             error: []
         })
@@ -442,7 +441,6 @@ class OtherComprehensiveGCV extends Component {
     bodySliderValue = (value) => {
         this.setState({
             bodySliderVal: value,
-            sliderVal: '',
             serverResponse: [],
             error: []
         })
@@ -750,14 +748,16 @@ class OtherComprehensiveGCV extends Component {
         const post_data = {
             'ref_no':localStorage.getItem('policyHolder_refNo'),
             'access_token':access_token,
+            'idv_value': sliderVal ? sliderVal : defaultSliderValue.toString(),
             'policy_type': motorInsurance.policy_type,
             'add_more_coverage': add_more_coverage.toString(),
             'PA_Cover': values.PA_flag ? values.PA_Cover : "0",
             'coverage_data': JSON.stringify(coverage_data),
+            'body_idv_value' : bodySliderVal ? bodySliderVal : defaultBodySliderValue,
             'trailer_array' : values.trailer_array,
-            'fuel_type' : values.fuel_type ? values.fuel_type : (vehicleDetails && vehicleDetails.varientmodel && vehicleDetails.varientmodel.fueltype  ? vehicleDetails.varientmodel.fueltype.id : ""),
-            'idv_value': sliderVal ? sliderVal : 0,
-            'body_idv_value' : bodySliderVal ? bodySliderVal : 0
+            'fuel_type' : values.fuel_type ? values.fuel_type : (vehicleDetails && vehicleDetails.varientmodel && vehicleDetails.varientmodel.fueltype  ? vehicleDetails.varientmodel.fueltype.id : "")
+            // 'cng_kit': cng_kit_flag,
+            // 'cngKit_Cost': cngKit_Cost
         }
 
         total_idv = parseInt(other_idv) + parseInt(post_data.idv_value)+parseInt(post_data.body_idv_value)
@@ -1246,6 +1246,7 @@ class OtherComprehensiveGCV extends Component {
         let max_IDV_suggested = PolicyArray.length > 0 ? PolicyArray[0].PolicyRiskList[0].MaxIDV_Suggested : 0
         let minIDV = min_IDV_suggested
         let maxIDV = PolicyArray.length > 0 ? Math.floor(max_IDV_suggested) : null
+        let phrases = localStorage.getItem("phrases") ? JSON.parse(localStorage.getItem("phrases")) : null
 
         if(Number.isInteger(min_IDV_suggested) == false ) {
             minIDV = PolicyArray.length > 0 ? Math.floor(PolicyArray[0].PolicyRiskList[0].MinIDV_Suggested) : null           
@@ -1256,11 +1257,7 @@ class OtherComprehensiveGCV extends Component {
         let minBodyIDV = 0
         let maxBodyIDV = PolicyArray.length > 0 ? Math.round(PolicyArray[0].PolicyRiskList[0].IDV_Suggested/5) : 0
         let defaultBodySliderValue =  motorInsurance && motorInsurance.body_idv_value ? Math.round(motorInsurance.body_idv_value) : 0
-        //let defaultBodySliderValue =  bodySliderVal ? bodySliderVal : 0
         let bodySliderValue = bodySliderVal
-
-        console.log("sliderVal", this.state.sliderVal)
-        console.log("bodySliderVal", this.state.bodySliderVal)
 
         let covList = motorInsurance && motorInsurance.add_more_coverage ? motorInsurance.add_more_coverage.split(",") : ""
         let newInnitialArray = {}
@@ -1499,11 +1496,11 @@ class OtherComprehensiveGCV extends Component {
                         <SideNav />
                     </div>
                 <div className="col-sm-12 col-md-12 col-lg-10 col-xl-10 infobox">
-                <h4 className="text-center mt-3 mb-3">SBI General Insurance Company Limited</h4>
+                <h4 className="text-center mt-3 mb-3">{phrases['SBIGICL']}</h4>
                 <section className="brand colpd m-b-25">
                     <div className="d-flex justify-content-left">
                         <div className="brandhead m-b-10">
-                            <h4 className="m-b-30">Covers your Vehicle + Damage to Others (Comprehensive)</h4>
+                            <h4 className="m-b-30">{phrases['GSBVehicleDamage']}</h4>
                             <h5>{errMsg}</h5>
                         </div>
                     </div>
@@ -1517,7 +1514,7 @@ class OtherComprehensiveGCV extends Component {
                         <Row>
                             <Col sm={12} md={9} lg={9}>
                                 <div className="rghtsideTrigr W-90 m-b-30">
-                                    <Collapsible trigger="Default Covered Coverages & Benefit" open= {true}>
+                                    <Collapsible trigger={phrases['DefaultCovered']} open= {true}>
                                         <div className="listrghtsideTrigr">
                                             {policyCoverageList}
                                             {/* {ncbStr} */}
@@ -1532,7 +1529,7 @@ class OtherComprehensiveGCV extends Component {
                                 <Col sm={12} md={5} lg={5}>
                                     <FormGroup>
                                         <div className="insurerName">
-                                        Registration No:
+                                        {phrases['RegNo']}
                                         </div>
                                     </FormGroup>
                                 </Col>
@@ -1578,7 +1575,7 @@ class OtherComprehensiveGCV extends Component {
                                             <Col sm={12} md={5} lg={6}>
                                                 <FormGroup>
                                                     <div className="insurerName">
-                                                    Please Enter Last 5 digits of Chassis no.
+                                                    {phrases['ChassisNo']}.
                                                     </div>
                                                 </FormGroup>
                                             </Col>
@@ -1608,7 +1605,7 @@ class OtherComprehensiveGCV extends Component {
                                                 </FormGroup>
                                             </Col>
                                             <Col sm={12} md={1} lg={2}>
-                                                <Button className="btn btn-primary vrifyBtn" onClick= {!errors.chasis_no_last_part ? this.getVahanDetails.bind(this,values, setFieldTouched, setFieldValue, errors) : null}>Verify</Button>
+                                                <Button className="btn btn-primary vrifyBtn" onClick= {!errors.chasis_no_last_part ? this.getVahanDetails.bind(this,values, setFieldTouched, setFieldValue, errors) : null}>{phrases['Verify']}</Button>
                                                 {errors.vahanVerify ? (
                                                         <span className="errorMsg">{errors.vahanVerify}</span>
                                                     ) : null}       
@@ -1625,7 +1622,7 @@ class OtherComprehensiveGCV extends Component {
                                             <Field
                                                 name="engine_no"
                                                 type="text"
-                                                placeholder="Engine Number"
+                                                placeholder={phrases["EngineNumber"]}
                                                 autoComplete="off"
                                                 onFocus={e => this.changePlaceHoldClassAdd(e)}
                                                 onBlur={e => this.changePlaceHoldClassRemove(e)}
@@ -1648,7 +1645,7 @@ class OtherComprehensiveGCV extends Component {
                                             <Field
                                                 name="chasis_no"
                                                 type="text"
-                                                placeholder="Chasis Number"
+                                                placeholder={phrases["ChasisNumber"]}
                                                 autoComplete="off"
                                                 onFocus={e => this.changePlaceHoldClassAdd(e)}
                                                 onBlur={e => this.changePlaceHoldClassRemove(e)}
@@ -1672,7 +1669,7 @@ class OtherComprehensiveGCV extends Component {
                                 <Col sm={12} md={4} lg={4}>
                                     <FormGroup>
                                         <div className="insurerName">
-                                            Insured Declared Value
+                                            {phrases['IDV']}
                                         </div>
                                     </FormGroup>
                                 </Col>
@@ -1722,7 +1719,7 @@ class OtherComprehensiveGCV extends Component {
                                 <Col sm={12} md={4} lg={4}>
                                     <FormGroup>
                                         <div className="insurerName">
-                                            Body IDV
+                                            {phrases['BodyIDV']}
                                         </div>
                                     </FormGroup>
                                 </Col>
@@ -1807,7 +1804,7 @@ class OtherComprehensiveGCV extends Component {
                             <Row>
                                 <Col sm={12} md={12} lg={12}>
                                     <FormGroup>
-                                        <span className="fs-18"> Add  more coverage to your plan.</span>
+                                        <span className="fs-18"> {phrases['AddMoreCoverage']}.</span>
                                     </FormGroup>
                                 </Col>
                             </Row>
@@ -1913,7 +1910,7 @@ class OtherComprehensiveGCV extends Component {
                                                             this.handleNoOfClaims(values, e.target.value)
                                                         }}
                                                     >
-                                                        <option value="">No of Trailer</option>
+                                                        <option value="">{phrases['NoOfTrailer']}</option>
                                                         {JSON.parse(coverage.covarage_value).value.length > 0 && JSON.parse(coverage.covarage_value).value.map((insurer, qIndex) => (
                                                                 <option value= {insurer}>{insurer}</option>
                                                             ))}  
@@ -1931,7 +1928,7 @@ class OtherComprehensiveGCV extends Component {
                                                     <Field
                                                         name="B00007_description"
                                                         type="text"
-                                                        placeholder="Trailer IDV"
+                                                        placeholder={phrases['TrailerIDV']}
                                                         autoComplete="off"
                                                         maxLength="8"
                                                         onFocus={e => this.changePlaceHoldClassAdd(e)}
@@ -2026,7 +2023,7 @@ class OtherComprehensiveGCV extends Component {
                                                             this.handleChange()
                                                         }}
                                                     >
-                                                        <option value="">Select</option>
+                                                        <option value="">{phrases['Select']}</option>
                                                         {JSON.parse(coverage.covarage_value).value.length > 0 && JSON.parse(coverage.covarage_value).value.map((insurer, qIndex) => (
                                                                 <option value= {insurer}>{insurer}</option>
                                                             ))} 
@@ -2044,7 +2041,7 @@ class OtherComprehensiveGCV extends Component {
                                                     <Field
                                                         name="B00073_description"
                                                         type="text"
-                                                        placeholder="No of paid drivers"
+                                                        placeholder={phrases['PaidDrivers']}
                                                         autoComplete="off"
                                                         maxLength="1"
                                                         onFocus={e => this.changePlaceHoldClassAdd(e)}
@@ -2071,7 +2068,7 @@ class OtherComprehensiveGCV extends Component {
                                                     <Field
                                                         name="B00003_value"
                                                         type="text"
-                                                        placeholder="Value of Accessory"
+                                                        placeholder={phrases['ValueOfAccessory']}
                                                         autoComplete="off"
                                                         maxLength="8"
                                                         onFocus={e => this.changePlaceHoldClassAdd(e)}
@@ -2095,7 +2092,7 @@ class OtherComprehensiveGCV extends Component {
                                                     <Field
                                                         name="B00003_description"
                                                         type="text"
-                                                        placeholder="Accessory description"
+                                                        placeholder={phrases['AccessoryDescription']}
                                                         autoComplete="off"
                                                         // maxLength="28"
                                                         onFocus={e => this.changePlaceHoldClassAdd(e)}
@@ -2122,7 +2119,7 @@ class OtherComprehensiveGCV extends Component {
                                                     <Field
                                                         name="B00004_value"
                                                         type="text"
-                                                        placeholder="Value of Accessory"
+                                                        placeholder={phrases['ValueOfAccessory']}
                                                         autoComplete="off"
                                                         maxLength="8"
                                                         onFocus={e => this.changePlaceHoldClassAdd(e)}
@@ -2146,7 +2143,7 @@ class OtherComprehensiveGCV extends Component {
                                                     <Field
                                                         name="B00004_description"
                                                         type="text"
-                                                        placeholder="Accessory description"
+                                                        placeholder={phrases['AccessoryDescription']}
                                                         autoComplete="off"
                                                         // maxLength="28"
                                                         onFocus={e => this.changePlaceHoldClassAdd(e)}
@@ -2210,7 +2207,7 @@ class OtherComprehensiveGCV extends Component {
                                                             this.handleChange()
                                                         }}
                                                     >
-                                                        <option value="">Select</option>
+                                                        <option value="">{phrases['Select']}</option>
                                                         {coverage.covarage_value != null && JSON.parse(coverage.covarage_value).value.length > 0 && JSON.parse(coverage.covarage_value).value.map((insurer, qIndex) => (
                                                             <option value= {insurer}>{insurer}</option>
                                                         ))} 
@@ -2241,7 +2238,7 @@ class OtherComprehensiveGCV extends Component {
                                                             this.handleChange()
                                                         }}
                                                     >
-                                                        <option value="">Select</option>
+                                                        <option value="">{phrases['Select']}</option>
                                                         {coverage.covarage_value != null && JSON.parse(coverage.covarage_value).value.length > 0 && JSON.parse(coverage.covarage_value).value.map((insurer, qIndex) => (
                                                             <option value= {insurer}>{insurer}</option>
                                                         ))}  
@@ -2272,7 +2269,7 @@ class OtherComprehensiveGCV extends Component {
                                                             this.handleChange()
                                                         }}
                                                     >
-                                                        <option value="">Enter No. of Drivers</option>
+                                                        <option value="">{phrases['NoOfDrivers']}</option>
                                                         {coverage.covarage_value != null && JSON.parse(coverage.covarage_value).value.length > 0 && JSON.parse(coverage.covarage_value).value.map((insurer, qIndex) => (
                                                             <option value= {insurer}>{insurer}</option>
                                                         ))} 
@@ -2295,7 +2292,7 @@ class OtherComprehensiveGCV extends Component {
                                                 <Field
                                                     name="B00012_value"
                                                     type="text"
-                                                    placeholder="Enter No. of Employees"
+                                                    placeholder={phrases['NoOfEmployees']}
                                                     autoComplete="off"
                                                     maxLength="1"
                                                     onFocus={e => this.changePlaceHoldClassAdd(e)}
@@ -2323,7 +2320,7 @@ class OtherComprehensiveGCV extends Component {
                                                 <Field
                                                     name="B00069_value"
                                                     type="text"
-                                                    placeholder="Enter No. of Person"
+                                                    placeholder={phrases['NoOfPerson']}
                                                     autoComplete="off"
                                                     maxLength="1"
                                                     onFocus={e => this.changePlaceHoldClassAdd(e)}
@@ -2351,7 +2348,7 @@ class OtherComprehensiveGCV extends Component {
                                                 <Field
                                                     name="B00018_value"
                                                     type="text"
-                                                    placeholder="Value should be 16L to 50L"
+                                                    placeholder={phrases['ValueShould']}
                                                     autoComplete="off"
                                                     maxLength="7"
                                                     onFocus={e => this.changePlaceHoldClassAdd(e)}
@@ -2379,7 +2376,7 @@ class OtherComprehensiveGCV extends Component {
                                                 <Field
                                                     name="B00070_value"
                                                     type="text"
-                                                    placeholder="Enter No. of workman"
+                                                    placeholder={phrases['NoOfWorkman']}
                                                     autoComplete="off"
                                                     maxLength="1"
                                                     onFocus={e => this.changePlaceHoldClassAdd(e)}
@@ -2417,7 +2414,7 @@ class OtherComprehensiveGCV extends Component {
                                                             this.handleChange()
                                                         }}
                                                     >
-                                                        <option value="">Select</option>
+                                                        <option value="">{phrases['Select']}</option>
                                                         {coverage.covarage_value != null && JSON.parse(coverage.covarage_value).value.length > 0 && JSON.parse(coverage.covarage_value).value.map((insurer, qIndex) => (
                                                             <option value= {insurer}>{insurer}</option>
                                                         ))} 
@@ -2444,7 +2441,7 @@ class OtherComprehensiveGCV extends Component {
                                             </div>
                                             <div className="col-md-15">
                                                 <div className="brandhead"> 
-                                                    I/we hold a valid and effective PUC and/or fitness certificate, as applicable, for the vehicle mentioned herein and undertake to renew the same during the policy period
+                                                {phrases['EffectivePUC']}
                                                     <div className="carloan">
                                                         <h4> </h4>
                                                     </div>
@@ -2463,7 +2460,7 @@ class OtherComprehensiveGCV extends Component {
                                                                         }  
                                                                         }
                                                                     />
-                                                                    <span className="checkmark " /><span className="fs-14"> Yes</span>
+                                                                    <span className="checkmark " /><span className="fs-14"> {phrases['Yes']}</span>
                                                                 </label>
                                                             </div>
                                                             <div className="p-r-25">
@@ -2480,7 +2477,7 @@ class OtherComprehensiveGCV extends Component {
                                                                         }  
                                                                         }
                                                                     />
-                                                                    <span className="checkmark " /><span className="fs-14"> No</span>
+                                                                    <span className="checkmark " /><span className="fs-14"> {phrases['No']}</span>
                                                                 </label>
                                                                 {errors.puc && touched.puc ? (
                                                                     <span className="errorMsg">{errors.puc}</span>
@@ -2496,16 +2493,16 @@ class OtherComprehensiveGCV extends Component {
                                 
                                 <div className="d-flex justify-content-left resmb">
                                     <Button className={`backBtn`} type="button"  onClick= {this.vehicleDetails.bind(this,productId)}>
-                                        Back
+                                        {phrases['Back']}
                                     </Button> 
 
                                         { serverResponse && serverResponse != "" ? (serverResponse.message ? 
                                         <Button className={`proceedBtn`} type="submit"  >
-                                            Recalculate
+                                            {phrases['Recalculate']}
                                         </Button> : (values.puc == '1' ?  <Button className={`proceedBtn`} type="submit"  >
-                                            Continue
+                                            {phrases['Continue']}
                                         </Button>  : null)) : <Button className={`proceedBtn`} type="submit"  >
-                                            Recalculate
+                                            {phrases['Recalculate']}
                                         </Button>}
 
                                     </div>
@@ -2513,11 +2510,11 @@ class OtherComprehensiveGCV extends Component {
 
                                 <Col sm={12} md={3}>
                                     <div className="justify-content-left regisBox">
-                                        <h3 className="premamnt"> Total Premium Amount</h3>
+                                        <h3 className="premamnt"> {phrases['TPAmount']}</h3>
                                         <div className="rupee"> ₹ {fulQuoteResp.DuePremium}</div>
                                         <div className="text-center">
                                             <Button className={`brkbtn`} type="button" onClick= {this.handleShow}>
-                                            Breakup
+                                            {phrases['Breakup']}
                                             </Button> 
                                             </div>
                                     </div>
@@ -2538,14 +2535,14 @@ class OtherComprehensiveGCV extends Component {
                     onHide={this.handleClose}>
                     <Modal.Header closeButton className="custmModlHead modalhd">
                         <div className="cntrbody">
-                            <h3>Premium breakup </h3>                           
+                            <h3>{phrases['PremiumBreakup']} </h3>                           
                         </div>
                     </Modal.Header>
                     <Modal.Body>
                     <table class="table table-bordered">
                             <thead>
                                 <tr>
-                                    <th>Premium:</th>
+                                    <th>{phrases['Premium']}:</th>
                                     <th>₹ {fulQuoteResp.DuePremium}</th>
                                 </tr>
                             </thead>

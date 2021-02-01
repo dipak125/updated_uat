@@ -612,6 +612,7 @@ class TwoWheelerAdditionalDetails extends Component {
         const {showLoan, is_eia_account, is_loan_account, nomineeDetails, motorInsurance,appointeeFlag, is_appointee,
             bankDetails,policyHolder, stateName, pinDataArr, quoteId, addressDetails, relation,step_completed,vehicleDetails} = this.state
         const {productId} = this.props.match.params 
+        let phrases = localStorage.getItem("phrases") ? JSON.parse(localStorage.getItem("phrases")) : null
 
         let newInitialValues = Object.assign(initialValue, {
             first_name: policyHolder && policyHolder.first_name ? policyHolder.first_name : "",
@@ -644,7 +645,7 @@ class TwoWheelerAdditionalDetails extends Component {
 
         const quoteNumber =
         quoteId ? (
-            <h4>You are just one steps away in getting your policy ready and your Quotation Number: {quoteId}. Please share a few more details. </h4>
+            <h4>{phrases['PolicyReady']}: {quoteId}. {phrases['MoreDetails']}. </h4>
         ) : null;
 
         
@@ -657,7 +658,7 @@ class TwoWheelerAdditionalDetails extends Component {
                         <SideNav />
                     </div>
                 <div className="col-sm-12 col-md-12 col-lg-10 col-xl-10 infobox">
-                <h4 className="text-center mt-3 mb-3">SBI General Insurance Company Limited</h4>
+                <h4 className="text-center mt-3 mb-3">{phrases['SBIGICL']}</h4>
                 { step_completed >= '4' && vehicleDetails.vehicletype_id == '6' ?
                 <section className="brand m-b-25">
                     <div className="brand-bg">
@@ -677,7 +678,7 @@ class TwoWheelerAdditionalDetails extends Component {
                                 </div>
 
                                 <div className="d-flex justify-content-left carloan">
-                                    <h4> Taken 4-wheeler Loan</h4>
+                                    <h4> {phrases['FourWheelLoan']}</h4>
                                 </div>
                                 <Row>
                                     <Col sm={12} md={4} lg={4}>
@@ -695,7 +696,7 @@ class TwoWheelerAdditionalDetails extends Component {
                                                     }}
                                                     checked={values.is_carloan == '1' ? true : false}
                                                 />
-                                                    <span className="checkmark " /><span className="fs-14"> Yes</span>
+                                                    <span className="checkmark " /><span className="fs-14"> {phrases['Yes']}</span>
                                                 </label>
                                             </div>
 
@@ -713,7 +714,7 @@ class TwoWheelerAdditionalDetails extends Component {
                                                     checked={values.is_carloan == '0' ? true : false}
                                                 />
                                                     <span className="checkmark" />
-                                                    <span className="fs-14">No</span>
+                                                    <span className="fs-14">{phrases['No']}</span>
                                                 </label>
                                                 {errors.is_carloan && touched.is_carloan ? (
                                                 <span className="errorMsg">{errors.is_carloan}</span>
@@ -729,7 +730,7 @@ class TwoWheelerAdditionalDetails extends Component {
                                             <Field
                                                     name='bank_name'
                                                     type="text"
-                                                    placeholder="Bank Name"
+                                                    placeholder={phrases['BankName']}
                                                     autoComplete="off"
                                                     onFocus={e => this.changePlaceHoldClassAdd(e)}
                                                     onBlur={e => this.changePlaceHoldClassRemove(e)}
@@ -747,7 +748,7 @@ class TwoWheelerAdditionalDetails extends Component {
                                             <Field
                                                     name='bank_branch'
                                                     type="text"
-                                                    placeholder="Bank Branch"
+                                                    placeholder={phrases['BankBranch']}
                                                     autoComplete="off"
                                                     onFocus={e => this.changePlaceHoldClassAdd(e)}
                                                     onBlur={e => this.changePlaceHoldClassRemove(e)}
@@ -766,7 +767,7 @@ class TwoWheelerAdditionalDetails extends Component {
                                 </Row>
 
                                 <div className="d-flex justify-content-left carloan">
-                                    <h4> Owners Details</h4>
+                                    <h4>{phrases['OwnersDetails']}</h4>
                                 </div>
 
                                 <Row>
@@ -776,7 +777,7 @@ class TwoWheelerAdditionalDetails extends Component {
                                             <Field
                                                 name='first_name'
                                                 type="text"
-                                                placeholder={values.policy_for == '2' ? "Company Name" : "Full Name"}
+                                                placeholder={values.policy_for == '2' ? phrases['CompanyName'] : phrases['FullName']}
                                                 autoComplete="off"
                                                 onFocus={e => this.changePlaceHoldClassAdd(e)}
                                                 onBlur={e => this.changePlaceHoldClassRemove(e)}
@@ -795,7 +796,7 @@ class TwoWheelerAdditionalDetails extends Component {
                                                 <Field
                                                     name='gstn_no'
                                                     type="text"
-                                                    placeholder= "GSTIN"
+                                                    placeholder= {phrases['GSTIN']}
                                                     autoComplete="off"
                                                     onFocus={e => this.changePlaceHoldClassAdd(e)}
                                                     onBlur={e => this.changePlaceHoldClassRemove(e)}
@@ -813,7 +814,7 @@ class TwoWheelerAdditionalDetails extends Component {
                                             <DatePicker
                                                 name="date_of_incorporation"
                                                 dateFormat="dd MMM yyyy"
-                                                placeholderText="Incorporation Date"
+                                                placeholderText={phrases['IncorporationDate']}
                                                 peekPreviousMonth
                                                 peekPreviousYear
                                                 showMonthDropdown
@@ -843,9 +844,9 @@ class TwoWheelerAdditionalDetails extends Component {
                                                 autoComplete="off"                                                                        
                                                 className="formGrp"
                                             >
-                                            <option value="">Select gender</option>
-                                                <option value="m">Male</option>
-                                                <option value="f">Female</option>
+                                            <option value="">{phrases['SelectGender']}</option>
+                                                <option value="m">{phrases['Male']}</option>
+                                                <option value="f">{phrases['Female']}</option>
                                             </Field>     
                                             {errors.gender && touched.gender ? (
                                             <span className="errorMsg">{errors.gender}</span>
@@ -859,7 +860,7 @@ class TwoWheelerAdditionalDetails extends Component {
                                         <DatePicker
                                             name="dob"
                                             dateFormat="dd MMM yyyy"
-                                            placeholderText="DOB"
+                                            placeholderText={phrases['DOB']}
                                             peekPreviousMonth
                                             peekPreviousYear
                                             showMonthDropdown
@@ -888,7 +889,7 @@ class TwoWheelerAdditionalDetails extends Component {
                                             <Field
                                                 name='email'
                                                 type="email"
-                                                placeholder="Email "
+                                                placeholder={phrases['Email']}
                                                 autoComplete="off"
                                                 onFocus={e => this.changePlaceHoldClassAdd(e)}
                                                 onBlur={e => this.changePlaceHoldClassRemove(e)}
@@ -907,7 +908,7 @@ class TwoWheelerAdditionalDetails extends Component {
                                             <Field
                                                 name='phone'
                                                 type="text"
-                                                placeholder="Mobile No. "
+                                                placeholder={phrases['Mobile']}
                                                 autoComplete="off"
                                                 onFocus={e => this.changePlaceHoldClassAdd(e)}
                                                 onBlur={e => this.changePlaceHoldClassRemove(e)}
@@ -927,7 +928,7 @@ class TwoWheelerAdditionalDetails extends Component {
                                             <Field
                                                 name='address'
                                                 type="text"
-                                                placeholder="Address "
+                                                placeholder={phrases['Address']}
                                                 autoComplete="off"
                                                 onFocus={e => this.changePlaceHoldClassAdd(e)}
                                                 onBlur={e => this.changePlaceHoldClassRemove(e)}
@@ -949,7 +950,7 @@ class TwoWheelerAdditionalDetails extends Component {
                                             <Field
                                                 name="pincode"
                                                 type="test"
-                                                placeholder="Pincode"
+                                                placeholder={phrases['Pincode']}
                                                 autoComplete="off"
                                                 maxlength = "6"
                                                 onFocus={e => this.changePlaceHoldClassAdd(e)}
@@ -981,7 +982,7 @@ class TwoWheelerAdditionalDetails extends Component {
                                                     value={values.pincode_id}
                                                     className="formGrp"
                                                 >
-                                                <option value="">Select Area</option>
+                                                <option value="">{phrases['SelectArea']}</option>
                                                 {pinDataArr && pinDataArr.length > 0 && pinDataArr.map((resource,rindex)=>
                                                     <option value={resource.id}>{resource.LCLTY_SUBRB_TALUK_TEHSL_NM}</option>
                                                 )}
@@ -1001,7 +1002,7 @@ class TwoWheelerAdditionalDetails extends Component {
                                                 <Field
                                                     name="state"
                                                     type="text"
-                                                    placeholder="State"
+                                                    placeholder={phrases['State']}
                                                     autoComplete="off"
                                                     onFocus={e => this.changePlaceHoldClassAdd(e)}
                                                     onBlur={e => this.changePlaceHoldClassRemove(e)}
@@ -1028,7 +1029,7 @@ class TwoWheelerAdditionalDetails extends Component {
                                                 value={values.org_level}
                                                 className="formGrp"
                                             >
-                                            <option value="">Select Organization Level</option>
+                                            <option value="">{phrases['Organization']}</option>
                                             <option value="1">Corporate Public</option> 
                                             <option value="2">Corporate (PSU)</option>        
                                             <option value="3">Corporate (Private)</option>        
@@ -1057,7 +1058,7 @@ class TwoWheelerAdditionalDetails extends Component {
                                             <Field
                                                 name='pancard'
                                                 type="text"
-                                                placeholder="PAN Card No. "
+                                                placeholder={phrases['PAN']}
                                                 autoComplete="off"
                                                 onFocus={e => this.changePlaceHoldClassAdd(e)}
                                                 onBlur={e => this.changePlaceHoldClassRemove(e)}
@@ -1080,7 +1081,7 @@ class TwoWheelerAdditionalDetails extends Component {
                                 {motorInsurance && motorInsurance.policy_for == '1' && motorInsurance.pa_flag == '1' ?
                                 <Fragment>
                                 <div className="d-flex justify-content-left carloan">
-                                    <h4> Nominee Details</h4>
+                                    <h4> {phrases['NomineeDetails']}</h4>
                                 </div>
 
                                 <Row>
@@ -1090,7 +1091,7 @@ class TwoWheelerAdditionalDetails extends Component {
                                             <Field
                                                 name='nominee_first_name'
                                                 type="text"
-                                                placeholder="Nominee Name"
+                                                placeholder={phrases['NomineeName']}
                                                 autoComplete="off"
                                                 onFocus={e => this.changePlaceHoldClassAdd(e)}
                                                 onBlur={e => this.changePlaceHoldClassRemove(e)}
@@ -1111,9 +1112,9 @@ class TwoWheelerAdditionalDetails extends Component {
                                                 autoComplete="off"                                                                        
                                                 className="formGrp"
                                             >
-                                            <option value="">Select gender</option>
-                                                <option value="m">Male</option>
-                                                <option value="f">Female</option>
+                                            <option value="">{phrases['SelectGender']}</option>
+                                                <option value="m">{phrases['Male']}</option>
+                                                <option value="f">{phrases['Female']}</option>
                                             </Field>     
                                             {errors.nominee_gender && touched.nominee_gender ? (
                                             <span className="errorMsg">{errors.nominee_gender}</span>
@@ -1126,7 +1127,7 @@ class TwoWheelerAdditionalDetails extends Component {
                                         <DatePicker
                                             name="nominee_dob"
                                             dateFormat="dd MMM yyyy"
-                                            placeholderText="DOB"
+                                            placeholderText={phrases['DOB']}
                                             peekPreviousMonth
                                             peekPreviousYear
                                             showMonthDropdown
@@ -1160,7 +1161,7 @@ class TwoWheelerAdditionalDetails extends Component {
                                                 value={values.nominee_relation_with}
                                                 className="formGrp"
                                             >
-                                            <option value="">Relation with Primary Insured</option>
+                                            <option value="">{phrases['PrimaryRelation']}</option>
                                            { relation.map((relations, qIndex) => 
                                             <option value={relations.id}>{relations.name}</option>                                        
                                            )}
@@ -1178,7 +1179,7 @@ class TwoWheelerAdditionalDetails extends Component {
                                             <h4> </h4>
                                         </div>
                                         <div className="d-flex justify-content-left carloan">
-                                            <h4> Appointee  Details</h4>
+                                            <h4> {phrases['AppoDetails']}</h4>
                                         </div>
                                         <Row className="m-b-45">
                                             <Col sm={12} md={4} lg={4}>
@@ -1187,7 +1188,7 @@ class TwoWheelerAdditionalDetails extends Component {
                                                         <Field
                                                             name="appointee_name"
                                                             type="text"
-                                                            placeholder="Appointee Name"
+                                                            placeholder={phrases['AppoName']}
                                                             autoComplete="off"
                                                             onFocus={e => this.changePlaceHoldClassAdd(e)}
                                                             onBlur={e => this.changePlaceHoldClassRemove(e)}
@@ -1210,7 +1211,7 @@ class TwoWheelerAdditionalDetails extends Component {
                                                             value={values.appointee_relation_with}
                                                             className="formGrp"
                                                         >
-                                                        <option value="">Relation with Nominee</option>
+                                                        <option value="">{phrases['NomineeRelation']}</option>
                                                         { relation.map((relations, qIndex) => 
                                                             <option value={relations.id}>{relations.name}</option>                                        
                                                         )}
@@ -1308,10 +1309,10 @@ class TwoWheelerAdditionalDetails extends Component {
                                 </div>
                                 <div className="d-flex justify-content-left resmb">
                                 <Button className={`backBtn`} type="button"  disabled={isSubmitting ? true : false} onClick= {this.otherComprehensive.bind(this,productId)}>
-                                    {isSubmitting ? 'Wait..' : 'Back'}
+                                    {isSubmitting ? phrases['Wait'] : phrases['Back']}
                                 </Button> 
                                 <Button className={`proceedBtn`} type="submit"  disabled={isSubmitting ? true : false}>
-                                    {isSubmitting ? 'Wait..' : 'Next'}
+                                    {isSubmitting ? phrases['Wait'] : phrases['Next']}
                                 </Button> 
                                 </div>
 

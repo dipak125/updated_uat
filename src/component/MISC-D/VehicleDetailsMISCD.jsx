@@ -880,10 +880,11 @@ class VehicleDetailsMISCD extends Component {
             
             claim_array:  this.initClaimDetailsList()
         });
+        let phrases = localStorage.getItem("phrases") ? JSON.parse(localStorage.getItem("phrases")) : null
         
 
         const inputCustomerID = {
-            placeholder: "Search City",
+            placeholder: phrases['SearchCity'],
             value: CustomerID ? CustomerID : RTO_location,
             onChange: this.onChangeCustomerID
           };
@@ -898,11 +899,11 @@ class VehicleDetailsMISCD extends Component {
                         <SideNav />
                     </div>
                 <div className="col-sm-12 col-md-12 col-lg-10 col-xl-10 infobox">
-                <h4 className="text-center mt-3 mb-3">SBI General Insurance Company Limited</h4>
+                <h4 className="text-center mt-3 mb-3">{phrases['SBIGICL']}</h4>
                 <section className="brand m-b-25">
                     <div className="d-flex justify-content-left">
                         <div className="brandhead">
-                            <h4 className="fs-18 m-b-30">Please share your vehicle details.</h4>
+                            <h4 className="fs-18 m-b-30">{phrases['VehicleDetails']}.</h4>
                         </div>
                     </div>
                     <div className="brand-bg">
@@ -921,7 +922,7 @@ class VehicleDetailsMISCD extends Component {
                                                     <Col sm={12} md={6} lg={6}>
                                                         <FormGroup>
                                                             <div className="fs-18">
-                                                                First Purchase/Registration Date
+                                                            {phrases['FirstRegDate']}
                                                             </div>
                                                         </FormGroup>
                                                     </Col>
@@ -933,7 +934,7 @@ class VehicleDetailsMISCD extends Component {
                                                                 minDate={values.policy_type_id == '1' ? new Date(minRegnDateNew) : new Date(minRegnDate)}
                                                                 maxDate={values.policy_type_id == '1' ? new Date() : new Date(maxDate)}
                                                                 dateFormat="dd MMM yyyy"
-                                                                placeholderText="Registration Date"
+                                                                placeholderText={phrases['RegDate']}
                                                                 peekPreviousMonth
                                                                 peekPreviousYear
                                                                 showMonthDropdown
@@ -961,7 +962,7 @@ class VehicleDetailsMISCD extends Component {
                                                     <Col sm={12} md={4} lg={4}>
                                                         <FormGroup>
                                                             <div className="fs-18">
-                                                                Registration City
+                                                            {phrases['RegCity']}
                                                          </div>
                                                         </FormGroup>
                                                     </Col>
@@ -1077,7 +1078,7 @@ class VehicleDetailsMISCD extends Component {
                                                         <Col sm={12}>
                                                             <FormGroup>
                                                                 <div className="carloan">
-                                                                    <h4> Do you have a valid Insurance policy ? </h4>
+                                                                    <h4> {phrases['GCVValidPolicy']}  ? </h4>
                                                                 </div>
                                                             </FormGroup>
                                                         </Col>
@@ -1100,7 +1101,7 @@ class VehicleDetailsMISCD extends Component {
                                                                             }}
                                                                             checked={values.valid_previous_policy == '0' ? true : false}
                                                                         />
-                                                                            <span className="checkmark " /><span className="fs-14"> No</span>
+                                                                            <span className="checkmark " /><span className="fs-14"> {phrases['No']}</span>
                                                                         </label>
                                                                     </div>
 
@@ -1118,7 +1119,7 @@ class VehicleDetailsMISCD extends Component {
                                                                             checked={values.valid_previous_policy == '1' ? true : false}
                                                                         />
                                                                             <span className="checkmark" />
-                                                                            <span className="fs-14">Yes</span>
+                                                                            <span className="fs-14">{phrases['Yes']}</span>
                                                                         </label>
                                                                         {errors.valid_previous_policy && touched.valid_previous_policy ? (
                                                                         <span className="errorMsg">{errors.valid_previous_policy}</span>
@@ -1145,7 +1146,7 @@ class VehicleDetailsMISCD extends Component {
                                                     <Col sm={12}>
                                                         <FormGroup>
                                                             <div className="carloan">
-                                                                <h4> Previous Policy Details</h4>
+                                                                <h4> {phrases['PPD']}</h4>
                                                             </div>
                                                         </FormGroup>
                                                     </Col>
@@ -1160,7 +1161,7 @@ class VehicleDetailsMISCD extends Component {
                                                                 minDate={new Date(minDate)}
                                                                 maxDate={new Date(maxDatePYP)}
                                                                 dateFormat="dd MMM yyyy"
-                                                                placeholderText="Previous policy start date"
+                                                                placeholderText={phrases['PPSD']}
                                                                 openToDate={new Date(pypDateToOpen)}
                                                                 peekPreviousMonth
                                                                 autoComplete="off"
@@ -1192,7 +1193,7 @@ class VehicleDetailsMISCD extends Component {
                                                             <DatePicker
                                                                 name="previous_end_date"
                                                                 dateFormat="dd MMM yyyy"
-                                                                placeholderText="Previous policy end date"
+                                                                placeholderText={phrases['PPED']}
                                                                 disabled = {true}
                                                                 dropdownMode="select"
                                                                 className="datePckr inputfs12"
@@ -1218,9 +1219,9 @@ class VehicleDetailsMISCD extends Component {
                                                                     value = {values.previous_policy_name}
                                                                     // value={ageObj.whatIsCurrentMonth(values.registration_date) < 7 ? 6 : values.previous_policy_name}
                                                                 >
-                                                                    <option value="">Select Policy Type</option>
-                                                                    <option value="1">Package</option>
-                                                                    <option value="2">Liability Only</option>  
+                                                                <option value="">{phrases['SPT']}</option>
+                                                                <option value="1">{phrases['Package']}</option>
+                                                                <option value="2">{phrases['LiabilityOnly']}</option> 
                                                         
                                                                 </Field>
                                                                 {errors.previous_policy_name && touched.previous_policy_name ? (
@@ -1241,7 +1242,7 @@ class VehicleDetailsMISCD extends Component {
                                                             autoComplete="off"                                                                        
                                                             className="formGrp"
                                                         >
-                                                            <option value="">Select Insurer Company</option>
+                                                            <option value="">{phrases['SelectInsurer']}</option>
                                                             {insurerList.map((insurer, qIndex) => ( 
                                                                 <option key={qIndex} value= {insurer.Id}>{insurer.name}</option>
                                                             ))}
@@ -1259,7 +1260,7 @@ class VehicleDetailsMISCD extends Component {
                                                                 <Field
                                                                     name="previous_city"
                                                                     type="text"
-                                                                    placeholder="Previous Insurer Address"
+                                                                    placeholder={phrases['PInsurerAddress']}
                                                                     autoComplete="off"
                                                                     onFocus={e => this.changePlaceHoldClassAdd(e)}
                                                                     onBlur={e => this.changePlaceHoldClassRemove(e)}
@@ -1279,7 +1280,7 @@ class VehicleDetailsMISCD extends Component {
                                                                 <Field
                                                                     name="previous_policy_no"
                                                                     type="text"
-                                                                    placeholder="Previous Policy Number"
+                                                                    placeholder={phrases['PPolicyNumber']}
                                                                     autoComplete="off"
                                                                     maxLength="28"
                                                                     onFocus={e => this.changePlaceHoldClassAdd(e)}
@@ -1308,7 +1309,7 @@ class VehicleDetailsMISCD extends Component {
                                                         <Col sm={12}>
                                                             <FormGroup>
                                                                 <div className="carloan">
-                                                                    <h4>Have you made OD claim in your existing Policy</h4>
+                                                                    <h4>{phrases['ClaimODPolicy']}</h4>
                                                                 </div>
                                                             </FormGroup>
                                                         </Col>
@@ -1333,7 +1334,7 @@ class VehicleDetailsMISCD extends Component {
                                                                             }}
                                                                             checked={values.previous_is_claim == '0' ? true : false}
                                                                         />
-                                                                            <span className="checkmark " /><span className="fs-14"> No, I haven't</span>
+                                                                            <span className="checkmark " /><span className="fs-14"> {phrases['NoIHavent']}</span>
                                                                         </label>
                                                                     </div>
 
@@ -1353,7 +1354,7 @@ class VehicleDetailsMISCD extends Component {
                                                                             checked={values.previous_is_claim == '1' ? true : false}
                                                                         />
                                                                             <span className="checkmark" />
-                                                                            <span className="fs-14">Yes I have</span>
+                                                                            <span className="fs-14">{phrases['YesIHave']}</span>
                                                                         </label>
                                                                         {errors.previous_is_claim && touched.previous_is_claim ? (
                                                                         <span className="errorMsg">{errors.previous_is_claim}</span>
@@ -1368,7 +1369,7 @@ class VehicleDetailsMISCD extends Component {
                                                         <Col sm={12} md={5} lg={5}>
                                                             <FormGroup>
                                                                 <div className="fs-18">
-                                                                Select NCB mentioned on last policy
+                                                                {phrases['SelectNCB']}
                                                         </div>
                                                             </FormGroup>
                                                         </Col>
@@ -1383,7 +1384,7 @@ class VehicleDetailsMISCD extends Component {
                                                                         value = {values.previous_claim_bonus}
                                                                         
                                                                     >
-                                                                        <option value="">--Select--</option>
+                                                                        <option value="">--{phrases['Select']}--</option>
                                                                         <option value="0">0</option>
                                                                         <option value="20">20</option>
                                                                         <option value="25">25</option>
@@ -1416,7 +1417,7 @@ class VehicleDetailsMISCD extends Component {
                                                                             this.handleNoOfClaims(values, e.target.value)
                                                                         }}
                                                                     >
-                                                                        <option value="">No. of claims</option>
+                                                                        <option value="">{phrases['NoOfClaims']}</option>
                                                                         <option value="1">1</option>
                                                                         <option value="2">2</option>
                                                                         <option value="3">3</option>
@@ -1447,10 +1448,10 @@ class VehicleDetailsMISCD extends Component {
 
                                                 <div className="d-flex justify-content-left resmb">
                                                 <Button className={`backBtn`} type="button"  disabled={isSubmitting ? true : false} onClick= {this.selectBrand.bind(this,productId)}>
-                                                    {isSubmitting ? 'Wait..' : 'Back'}
+                                                    {isSubmitting ? phrases['Wait'] : phrases['Back']}
                                                 </Button> 
                                                 <Button className={`proceedBtn`} type="submit"  disabled={isSubmitting ? true : false}>
-                                                    {isSubmitting ? 'Wait..' : 'Next'}
+                                                    {isSubmitting ? phrases['Wait'] : phrases['Next']}
                                                 </Button> 
                                                 </div>
 
@@ -1460,41 +1461,41 @@ class VehicleDetailsMISCD extends Component {
                                                 <div className="regisBox">
                                                     <div className="d-flex justify-content-between flex-lg-row flex-md-column m-b-25">
 
-                                                        <div className="txtRegistr resmb-15">Registration No.<br />
+                                                        <div className="txtRegistr resmb-15">{phrases['RegNo']}.<br />
                                                             {motorInsurance && motorInsurance.registration_no}</div>
 
-                                                        <div> <button type="button" className="rgistrBtn" onClick={this.registration.bind(this, productId)}>Edit</button></div>
+                                                        <div> <button type="button" className="rgistrBtn" onClick={this.registration.bind(this, productId)}>{phrases['Edit']}</button></div>
                                                     </div>
 
 
 
                                                     <div className="d-flex justify-content-between flex-lg-row flex-md-column m-b-25">
-                                                        <div className="txtRegistr resmb-15">MISCD Brand
+                                                        <div className="txtRegistr resmb-15">{phrases['MISCDBrand']}
                                                             - <strong>{vehicleDetails && vehicleDetails.vehiclebrand && vehicleDetails.vehiclebrand.name ? vehicleDetails.vehiclebrand.name : ""}</strong>
                                                         </div>
 
-                                                        <div> <button type="button" className="rgistrBtn" onClick={this.selectBrand.bind(this, productId)}>Edit</button></div>
+                                                        <div> <button type="button" className="rgistrBtn" onClick={this.selectBrand.bind(this, productId)}>{phrases['Edit']}</button></div>
                                                     </div>
 
                                                     <div className="d-flex justify-content-between flex-lg-row flex-md-column m-b-25">
-                                                        <div className="txtRegistr">MISCD Model<br />
+                                                        <div className="txtRegistr">{phrases['MISCDModel']}<br />
                                                         <strong>{vehicleDetails && vehicleDetails.vehiclemodel && vehicleDetails.vehiclemodel.description ? vehicleDetails.vehiclemodel.description+" "+vehicleDetails.varientmodel.varient : ""}</strong></div>
 
-                                                        <div> <button type="button" className="rgistrBtn" onClick={this.selectVehicleBrand.bind(this, productId)}>Edit</button></div>
+                                                        <div> <button type="button" className="rgistrBtn" onClick={this.selectVehicleBrand.bind(this, productId)}>{phrases['Edit']}</button></div>
                                                     </div>
 
                                                     <div className="d-flex justify-content-between flex-lg-row flex-md-column m-b-25">
-                                                        <div className="txtRegistr">Body Style<br />
+                                                        <div className="txtRegistr">{phrases['BodyStyle']}<br />
                                                             <strong>{ vehicleDetails && vehicleDetails.varientmodel && vehicleDetails.varientmodel.body_style ? vehicleDetails.varientmodel.body_style: ""}</strong></div>
                                                     </div>
 
                                                     <div className="d-flex justify-content-between flex-lg-row flex-md-column m-b-25">
-                                                        <div className="txtRegistr">Power<br />
+                                                        <div className="txtRegistr">{phrases['Power']}<br />
                                                             <strong>{ vehicleDetails && vehicleDetails.varientmodel && vehicleDetails.varientmodel.horse_power ? vehicleDetails.varientmodel.horse_power+" BHP" : ""}</strong></div>
                                                     </div>
 
                                                     <div className="d-flex justify-content-between flex-lg-row flex-md-column m-b-25">
-                                                        <div className="txtRegistr">Fuel Type<br />
+                                                        <div className="txtRegistr">{phrases['Fuel']}<br />
                                                         <strong>{vehicleDetails && vehicleDetails.varientmodel && vehicleDetails.varientmodel.fueltype ? fuel[vehicleDetails.varientmodel.fueltype.id] : null} </strong></div>
 
                                                     </div>

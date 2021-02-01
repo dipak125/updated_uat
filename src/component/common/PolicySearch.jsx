@@ -260,6 +260,7 @@ class PolicySearch extends Component {
 
     render() {
         const { statusCount, policyHolder, products } = this.state
+        let phrases = localStorage.getItem("phrases") ? JSON.parse(localStorage.getItem("phrases")) : null
         var totalRecord = statusCount ? statusCount.totalRecord : 1
         var page_no = statusCount ? statusCount.page_no : 1 
 
@@ -269,8 +270,8 @@ class PolicySearch extends Component {
             page: parseInt(page_no),  // which page you want to show as default
             sizePerPage: 10,
             paginationShowsTotal: this.renderShowsTotal,  // Accept bool or function
-            prePage: 'Prev', // Previous page button text
-            nextPage: 'Next', // Next page button text
+            prePage: phrases['Prev'], // Previous page button text
+            nextPage: phrases['Next'], // Next page button text
             hideSizePerPage: true,
             remote: true,
             showTotal: true,
@@ -287,9 +288,9 @@ class PolicySearch extends Component {
                             <SideNav />
                         </div>
                         <div className="col-sm-12 col-md-12 col-lg-10 col-xl-10 infobox">
-                        <h4 className="text-center mt-3 mb-3">SBI General Insurance Company Limited</h4>
+                        <h4 className="text-center mt-3 mb-3">{phrases['SBIGICL']}</h4>
                             <div className="contBox m-b-45 tickedTable">
-                            <h4 className="text-center mt-3 mb-3">Policy Search</h4>
+                            <h4 className="text-center mt-3 mb-3">{phrases['PolicySearch']}</h4>
 
                              <Formik initialValues={newInitialValues}
                                 onSubmit={this.handleSubmit}
@@ -300,7 +301,7 @@ class PolicySearch extends Component {
                                 return (
                                     <Form>
                                         <div className="rghtsideTrigr collinput W-90 m-b-30">
-                                            <Collapsible trigger="Search with Policy Number" open={false} onClose = {this.handleClose.bind(this,1,setFieldValue,setFieldTouched)}>
+                                            <Collapsible trigger={phrases['SearchPolicyNumber']} open={false} onClose = {this.handleClose.bind(this,1,setFieldValue,setFieldTouched)}>
                                                 <div className="listrghtsideTrigr">
                                                 <Row>
                                                 <Col sm={12} md={6} lg={10}>
@@ -308,7 +309,7 @@ class PolicySearch extends Component {
                                                     <Col sm={12} md={2} lg={4}>
                                                         <FormGroup>
                                                             <div className="insurerName">
-                                                                <span className="fs-16">Enter policy Number</span>
+                                                                <span className="fs-16">{phrases['EnterPolicyNumber']}</span>
                                                             </div>
                                                         </FormGroup>
                                                     </Col>
@@ -335,14 +336,14 @@ class PolicySearch extends Component {
                                                     </Row>
                                                     </Col>
                                                     <Button className={`proceedBtn`} type="submit" >
-                                                        Search
+                                                        {phrases['Search']}
                                                     </Button>
                                                 </Row>
                                                
                                                 <Row><Col>&nbsp;</Col></Row>
                                                 </div>                    
                                             </Collapsible>
-                                            <Collapsible trigger="Search with Proposer Details" open={false} onClose = {this.handleClose.bind(this,2,setFieldValue,setFieldTouched)}>
+                                            <Collapsible trigger={phrases['SearchProposerDetails']} open={false} onClose = {this.handleClose.bind(this,2,setFieldValue,setFieldTouched)}>
                                                 <div className="listrghtsideTrigr">
                                                 <Row>
                                                 <Col sm={12} md={6} lg={5}>
@@ -350,7 +351,7 @@ class PolicySearch extends Component {
                                                     <Col sm={12} md={6} lg={6}>
                                                         <FormGroup>
                                                             <div className="insurerName">
-                                                                <span className="fs-16">Enter Mobile Number </span>
+                                                                <span className="fs-16">{phrases['EnterMobileNumber']} </span>
                                                             </div>
                                                         </FormGroup>
                                                     </Col>
@@ -381,7 +382,7 @@ class PolicySearch extends Component {
                                                     <Col sm={12} md={6} lg={6}>
                                                         <FormGroup>
                                                             <div className="insurerName">
-                                                                <span className="fs-16">Enter Email ID</span>
+                                                                <span className="fs-16">{phrases['EnterEmailID']}</span>
                                                             </div>
                                                         </FormGroup>
                                                     </Col>
@@ -407,13 +408,13 @@ class PolicySearch extends Component {
                                                     </Row>
                                                     </Col>
                                                     <Button className={`proceedBtn m-b-40`} type="submit" >
-                                                        Search
+                                                        {phrases['Search']}
                                                     </Button>
                                                 </Row>
                                                 
                                                 </div>
                                             </Collapsible>
-                                            <Collapsible trigger="Seach with Dates" open={false} onClose = {this.handleClose.bind(this,3,setFieldValue,setFieldTouched)}>
+                                            <Collapsible trigger={phrases['SeachDates']} open={false} onClose = {this.handleClose.bind(this,3,setFieldValue,setFieldTouched)}>
                                                 <div className="listrghtsideTrigr">
                                                 <Row>
                                                 <Col sm={12} md={5}>
@@ -421,7 +422,7 @@ class PolicySearch extends Component {
                                                     <Col sm={12} md={4} lg={4}>
                                                         <FormGroup>
                                                             <div className="insurerName">
-                                                                <span className="fs-16"> From Date </span>
+                                                                <span className="fs-16"> {phrases['FromDate']} </span>
                                                             </div>
                                                         </FormGroup>
                                                     </Col>
@@ -433,7 +434,7 @@ class PolicySearch extends Component {
                                                                 maxDate={new Date()}
                                                                 autoComplete="off"
                                                                 dateFormat="dd MMM yyyy"
-                                                                placeholderText="Start Date"
+                                                                placeholderText={phrases['StartDate']}
                                                                 peekPreviousMonth
                                                                 peekPreviousYear
                                                                 showMonthDropdown
@@ -460,7 +461,7 @@ class PolicySearch extends Component {
                                                     <Col sm={12} md={4} lg={4}>
                                                         <FormGroup>
                                                             <div className="insurerName">
-                                                                <span className="fs-16">To Date</span>
+                                                                <span className="fs-16">{phrases['ToDate']}</span>
                                                             </div>
                                                         </FormGroup>
                                                     </Col>
@@ -472,7 +473,7 @@ class PolicySearch extends Component {
                                                                 maxDate={new Date()}
                                                                 autoComplete="off"
                                                                 dateFormat="dd MMM yyyy"
-                                                                placeholderText="End Date"
+                                                                placeholderText={phrases['EndDate']}
                                                                 peekPreviousMonth
                                                                 peekPreviousYear
                                                                 showMonthDropdown
@@ -494,14 +495,14 @@ class PolicySearch extends Component {
                                                     </Row>
                                                     </Col>
                                                     <Button className={`proceedBtn`} type="submit" >
-                                                        Search
+                                                        {phrases['Search']}
                                                     </Button>
                                                 </Row>
                                                 
                                                 <Row><Col>&nbsp;</Col></Row>
                                                 </div>
                                             </Collapsible>
-                                            <Collapsible trigger="Search with Dates & Products" open={false} onClose = {this.handleClose.bind(this,3,setFieldValue,setFieldTouched)}>
+                                            <Collapsible trigger={phrases['SearchDatesProducts']} open={false} onClose = {this.handleClose.bind(this,3,setFieldValue,setFieldTouched)}>
                                                 <div  className="listrghtsideTrigr">
                                                 <Row className="m-b-20">
                                                 <Col sm={12} md={6} lg={5}>
@@ -509,7 +510,7 @@ class PolicySearch extends Component {
                                                     <Col sm={12} md={4} lg={4}>
                                                         <FormGroup>
                                                             <div className="insurerName">
-                                                                <span className="fs-16"> From Date </span>
+                                                                <span className="fs-16"> {phrases['FromDate']} </span>
                                                             </div>
                                                         </FormGroup>
                                                     </Col>
@@ -521,7 +522,7 @@ class PolicySearch extends Component {
                                                                 maxDate={new Date()}
                                                                 autoComplete="off"
                                                                 dateFormat="dd MMM yyyy"
-                                                                placeholderText="Start Date"
+                                                                placeholderText={phrases['StartDate']}
                                                                 peekPreviousMonth
                                                                 peekPreviousYear
                                                                 showMonthDropdown
@@ -547,7 +548,7 @@ class PolicySearch extends Component {
                                                     <Col sm={12} md={4} lg={4}>
                                                         <FormGroup>
                                                             <div className="insurerName">
-                                                                <span className="fs-16">To Date</span>
+                                                                <span className="fs-16">{phrases['ToDate']}</span>
                                                             </div>
                                                         </FormGroup>
                                                     </Col>
@@ -559,7 +560,7 @@ class PolicySearch extends Component {
                                                                 maxDate={new Date()}
                                                                 autoComplete="off"
                                                                 dateFormat="dd MMM yyyy"
-                                                                placeholderText="End Date"
+                                                                placeholderText={phrases['EndDate']}
                                                                 peekPreviousMonth
                                                                 peekPreviousYear
                                                                 showMonthDropdown
@@ -587,7 +588,7 @@ class PolicySearch extends Component {
                                                     <Col sm={12} md={2} lg={4}>
                                                         <FormGroup>
                                                             <div className="insurerName">
-                                                                <span className="fs-16">Products</span>
+                                                                <span className="fs-16">{phrases['Products']}</span>
                                                             </div>
                                                         </FormGroup>
                                                     </Col>
@@ -601,7 +602,7 @@ class PolicySearch extends Component {
                                                                 value={values.product_id}
                                                                 className="formGrp"
                                                             >
-                                                            <option value="">Products</option>
+                                                            <option value="">{phrases['Products']}</option>
                                                             {products.map((productName, qIndex) => ( 
                                                                 <option value={productName.id}>{productName.name}</option>    
                                                             ))}                                    
@@ -616,7 +617,7 @@ class PolicySearch extends Component {
                                                     </Row>
                                                     </Col>
                                                     <Button className={`proceedBtn`} type="submit" >
-                                                        Search
+                                                        {phrases['Search']}
                                                     </Button>
                                                 </Row>
                                                 
@@ -645,19 +646,19 @@ class PolicySearch extends Component {
                                     wrapperClasses="table-responsive"
                                 >
 
-                                    <TableHeaderColumn width='150px'  dataField="request_data" dataFormat={polNumFormatter} >Policy Number</TableHeaderColumn>
-                                    <TableHeaderColumn width='100px'  dataField='request_data' dataFormat={(cell) => (cell !== '0000-00-00 00:00:00' ? moment(cell.start_date).format("MM-DD-YYYY") : '')} dataSort>Policy Start Date</TableHeaderColumn>
-                                    <TableHeaderColumn width='100px'  dataField='request_data' dataFormat={(cell) => (cell !== '0000-00-00 00:00:00' ? moment(cell.end_date).format("MM-DD-YYYY") : '')} dataSort>Policy End Date</TableHeaderColumn>
-                                    <TableHeaderColumn width='100px'  dataField="vehiclebrandmodel" dataFormat={productFormatter} >Product</TableHeaderColumn>
-                                    <TableHeaderColumn width='100px'  dataField="first_name" >Proposer Name</TableHeaderColumn>
-                                    <TableHeaderColumn width='100px'  dataField="mobile"  >Mobile Number</TableHeaderColumn>
-                                    <TableHeaderColumn width='100px'  dataField="email_id"  >Email ID</TableHeaderColumn>
+                                    <TableHeaderColumn width='150px'  dataField="request_data" dataFormat={polNumFormatter} >{phrases['PolicyNumber']}</TableHeaderColumn>
+                                    <TableHeaderColumn width='100px'  dataField='request_data' dataFormat={(cell) => (cell !== '0000-00-00 00:00:00' ? moment(cell.start_date).format("MM-DD-YYYY") : '')} dataSort>{phrases['PSD']}</TableHeaderColumn>
+                                    <TableHeaderColumn width='100px'  dataField='request_data' dataFormat={(cell) => (cell !== '0000-00-00 00:00:00' ? moment(cell.end_date).format("MM-DD-YYYY") : '')} dataSort>{phrases['PED']}</TableHeaderColumn>
+                                    <TableHeaderColumn width='100px'  dataField="vehiclebrandmodel" dataFormat={productFormatter} >{phrases['Product']}</TableHeaderColumn>
+                                    <TableHeaderColumn width='100px'  dataField="first_name" >{phrases['ProposerName']}</TableHeaderColumn>
+                                    <TableHeaderColumn width='100px'  dataField="mobile"  >{phrases['MobileNumber']}</TableHeaderColumn>
+                                    <TableHeaderColumn width='100px'  dataField="email_id"  >{phrases['EmailId']}</TableHeaderColumn>
 {/* 
                                     <TableHeaderColumn width='100px' tdStyle={{ whiteSpace: 'normal', width: '120px'}} dataField="request_data" dataFormat={quoteFormatter} >Quote Number</TableHeaderColumn>
                                     <TableHeaderColumn width='100px' tdStyle={{ whiteSpace: 'normal', width: '120px'}} dataField="request_data" dataFormat={premiumFormatter} >Net Premium</TableHeaderColumn> */}
                                     
 
-                                    <TableHeaderColumn width='100px'  dataField="reference_no" isKey dataAlign="center" dataFormat={ actionFormatter(this) }>Download</TableHeaderColumn>
+                                    <TableHeaderColumn width='100px'  dataField="reference_no" isKey dataAlign="center" dataFormat={ actionFormatter(this) }>{phrases['Download']}</TableHeaderColumn>
 
                                 </BootstrapTable>
                                 </div>

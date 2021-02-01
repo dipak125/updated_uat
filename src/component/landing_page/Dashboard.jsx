@@ -415,10 +415,10 @@ class Dashboard extends Component {
                                                       this.handleChange(e.target.value);
                                                     }}
                                                   >
-                                                    <option value="1">Daily</option>
-                                                    <option value="2">Weekly</option>
-                                                    <option value="3">Monthly (date range)</option>
-                                                    <option value="4">Monthly</option>
+                                                    <option value="1">{phrases['Daily']}</option>
+                                                    <option value="2">{phrases['Weekly']}</option>
+                                                    <option value="3">{phrases['DateMonth']}</option>
+                                                    <option value="4">{phrases['Monthly']}</option>
                                                   </Field>
                                                   {errors.report_range &&
                                                   touched.report_range ? (

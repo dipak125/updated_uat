@@ -360,6 +360,7 @@ class SelectBrandMISCD extends Component {
             selectedVarientId: selectedVarientId ? selectedVarientId : (selectedBrandId ? "" :  vehicleDetails && vehicleDetails.varientmodel_id ? vehicleDetails.varientmodel_id : ""),
 
         })
+        let phrases = localStorage.getItem("phrases") ? JSON.parse(localStorage.getItem("phrases")) : null
 
         // console.log("vehicleDetails", newInitialValues)
 
@@ -372,7 +373,7 @@ class SelectBrandMISCD extends Component {
                                 <SideNav />
                             </div>
                             <div className="col-sm-12 col-md-12 col-lg-10 col-xl-10 infobox">
-                                <h4 className="text-center mt-3 mb-3">SBI General Insurance Company Limited</h4>
+                                <h4 className="text-center mt-3 mb-3">{phrases['SBIGICL']}</h4>
 
                                 <Formik initialValues={newInitialValues}
                                     onSubmit={this.handleSubmit}
@@ -386,8 +387,8 @@ class SelectBrandMISCD extends Component {
                                                     <div className="brand-bg">
                                                         <div className="d-flex justify-content-left">
                                                             <div className="brandhead">
-                                                                <h4>Please select  your Motor MISCD brand </h4>
-                                                                <p>Lets start with your Motor MISCD details</p>
+                                                                <h4>{phrases['MISCDSelectBrand']} </h4>
+                                                                <p>{phrases['MISCDDetails']}</p>
                                                             </div>
                                                         </div>
 
@@ -399,10 +400,10 @@ class SelectBrandMISCD extends Component {
 
                                                                 <div className="d-flex justify-content-left resmb">
                                                                     <Button className={`backBtn`} type="button" onClick={this.registration.bind(this, productId)}>
-                                                                        Back
+                                                                        {phrases['Back']}
                                                                 </Button>
                                                                     <Button className={`proceedBtn`} type="submit" >
-                                                                        Continue
+                                                                        {phrases['Continue']}
                                                                 </Button>
                                                                 </div>
 
@@ -413,41 +414,41 @@ class SelectBrandMISCD extends Component {
                                                                 <div className="regisBox">
                                                                     <div className="d-flex justify-content-between flex-lg-row flex-md-column m-b-25">
 
-                                                                        <div className="txtRegistr resmb-15">Registration No.<br />
+                                                                        <div className="txtRegistr resmb-15">{phrases['RegNo']}.<br />
                                                                             {motorInsurance && motorInsurance.registration_no}</div>
 
-                                                                        <div> <button type="button" className="rgistrBtn" onClick={this.registration.bind(this, productId)}>Edit</button></div>
+                                                                        <div> <button type="button" className="rgistrBtn" onClick={this.registration.bind(this, productId)}>{phrases['Edit']}</button></div>
                                                                     </div>
 
 
 
                                                                     <div className="d-flex justify-content-between flex-lg-row flex-md-column m-b-25">
-                                                                        <div className="txtRegistr resmb-15">MISCD Brand
+                                                                        <div className="txtRegistr resmb-15">{phrases['MISCDBrand']}
                                                                             - <strong>{brandName ? brandName : (vehicleDetails && vehicleDetails.vehiclebrand && vehicleDetails.vehiclebrand.name ? vehicleDetails.vehiclebrand.name : "")}</strong>
                                                                         </div>
 
-                                                                        {/* <div> <button type="button" className="rgistrBtn" onClick={this.selectVehicle.bind(this, productId)}>Edit</button></div> */}
+                                                                        {/* <div> <button type="button" className="rgistrBtn" onClick={this.selectVehicle.bind(this, productId)}>{phrases['Edit']}</button></div> */}
                                                                     </div>
 
                                                                     <div className="d-flex justify-content-between flex-lg-row flex-md-column m-b-25">
-                                                                        <div className="txtRegistr">MISCD Model<br />
+                                                                        <div className="txtRegistr">{phrases['MISCDModel']}<br />
                                                                             <strong>{modelName ? modelName : (selectedBrandId ? "" : vehicleDetails && vehicleDetails.vehiclemodel && vehicleDetails.vehiclemodel.description ? vehicleDetails.vehiclemodel.description+" "+vehicleDetails.varientmodel.varient : "")}</strong></div>
 
-                                                                        <div> <button type="button" className="rgistrBtn" onClick={this.selectBrand.bind(this, productId)}>Edit</button></div>
+                                                                        <div> <button type="button" className="rgistrBtn" onClick={this.selectBrand.bind(this, productId)}>{phrases['Edit']}</button></div>
                                                                     </div>
 
                                                                     <div className="d-flex justify-content-between flex-lg-row flex-md-column m-b-25">
-                                                                        <div className="txtRegistr">Body Style<br />
+                                                                        <div className="txtRegistr">{phrases['BodyStyle']}<br />
                                                                             <strong>{body_style ? body_style : (selectedBrandId ? "" : vehicleDetails && vehicleDetails.varientmodel && vehicleDetails.varientmodel.body_style ? vehicleDetails.varientmodel.body_style: "")}</strong></div>
                                                                     </div>
 
                                                                     <div className="d-flex justify-content-between flex-lg-row flex-md-column m-b-25">
-                                                                        <div className="txtRegistr">Power<br />
+                                                                        <div className="txtRegistr">{phrases['Power']}<br />
                                                                             <strong>{horse_power ? horse_power+" BHP" : (selectedBrandId ? "" : vehicleDetails && vehicleDetails.varientmodel && vehicleDetails.varientmodel.horse_power ? vehicleDetails.varientmodel.horse_power+" BHP" : "")} </strong></div>
                                                                     </div>
 
                                                                     <div className="d-flex justify-content-between flex-lg-row flex-md-column m-b-25">
-                                                                        <div className="txtRegistr">Fuel Type<br />
+                                                                        <div className="txtRegistr">{phrases['Fuel']}<br />
                                                                             <strong>{fuel[fuelType] ? fuel[fuelType] : (vehicleDetails && vehicleDetails.varientmodel && vehicleDetails.varientmodel.fueltype ? fuel[vehicleDetails.varientmodel.fueltype.id] : null)} </strong></div>
 
                                                                     </div>
@@ -473,7 +474,7 @@ class SelectBrandMISCD extends Component {
                     onHide={this.handleClose}>
                     <Modal.Header closeButton className="custmModlHead">
                         <div className="cntrbody">
-                            <h3>Select Model </h3>
+                            <h3>{phrases['SelectModel']} </h3>
                             {selectedBrandDetails.image ?
                                 <img src={`${process.env.REACT_APP_PAYMENT_URL}/core/public/image/car_brand_image/` + selectedBrandDetails.image} alt={selectedBrandDetails.name} /> :
                                 <img src={require('../../assets/images/car.svg')} alt="" />
@@ -488,7 +489,7 @@ class SelectBrandMISCD extends Component {
                                         name="search"
                                         type="search"
                                         className="srchimg"
-                                        placeholder="Search your variant "
+                                        placeholder={phrases['SearchYourVariant']}
                                         onFocus={e => this.changePlaceHoldClassAdd(e)}
                                         onBlur={e => this.changePlaceHoldClassRemove(e)}
                                         onChange={e => this.change(e.target.value)}
@@ -655,7 +656,7 @@ class SelectBrandMISCD extends Component {
                                     this.handleClose()
                                 }
                             >
-                                Continue</button> : null}
+                                {phrases['Continue']}</button> : null}
                     </Modal.Body>
                 </Modal>
             </>

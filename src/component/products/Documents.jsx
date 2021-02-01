@@ -32,6 +32,7 @@ class Documents extends Component {
     
     render() {
         const {product_id} = this.state
+        let phrases = localStorage.getItem("phrases") ? JSON.parse(localStorage.getItem("phrases")) : null
         console.log('product_id', product_id)
         return (
             <>
@@ -50,8 +51,8 @@ class Documents extends Component {
                                                 <Col sm={12}>
                                                     <Nav variant="pills" className="flex-column">
                                                         <div className="d-flex justify-content-left messageDeskTab">
-                                                        <div><Nav.Item><Nav.Link eventKey="first">Product Brochure</Nav.Link></Nav.Item></div>
-                                                        <div><Nav.Item><Nav.Link eventKey="second">Contact Details</Nav.Link></Nav.Item></div>
+                                                        <div><Nav.Item><Nav.Link eventKey="first">{phrases['ProductBrochure']}</Nav.Link></Nav.Item></div>
+                                                        <div><Nav.Item><Nav.Link eventKey="second">{phrases['FAQ']}</Nav.Link></Nav.Item></div>
                                                         
                                                         </div>
                                                     </Nav>
@@ -79,7 +80,7 @@ class Documents extends Component {
                         </div>
                     </div>
                 </section>
-            </BaseComponent>>
+            </BaseComponent>
             </>
         );
     }

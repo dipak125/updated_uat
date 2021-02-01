@@ -332,6 +332,7 @@ regnoFormat = (e, setFieldTouched, setFieldValue) => {
             policy_for: motorInsurance && motorInsurance.policy_for ? motorInsurance.policy_for : "",
             subclass_id : motorInsurance && motorInsurance.subclass_id ? motorInsurance.subclass_id : "",
         })
+        let phrases = localStorage.getItem("phrases") ? JSON.parse(localStorage.getItem("phrases")) : null
 
         return (
             <>
@@ -342,10 +343,10 @@ regnoFormat = (e, setFieldTouched, setFieldValue) => {
                                 <SideNav />
                             </div>
                             <div className="col-sm-12 col-md-12 col-lg-10 col-xl-10 infobox">
-                                <h4 className="text-center mt-3 mb-3">SBI General Insurance Company Limited</h4>
+                                <h4 className="text-center mt-3 mb-3">{phrases['SBIGICL']}</h4>
                                 <section className="brand">
                                     <div className="boxpd">
-                                        <h4 className="m-b-30">Help us with some information about yourself</h4>
+                                        <h4 className="m-b-30">{phrases['About']}</h4>
                                         <Formik initialValues={newInitialValues} 
                                         onSubmit={this.handleSubmit} 
                                         validationSchema={vehicleRegistrationValidation}>
@@ -356,7 +357,7 @@ regnoFormat = (e, setFieldTouched, setFieldValue) => {
                                         <Form>                                           
                                             <div className="d-flex justify-content-left">
                                                 <div className="brandhead"> 
-                                                <p>Taking GCV policy for</p>
+                                                <p>{phrases['GCVPolicy']}</p>
                                                     <div className="d-inline-flex m-b-15">
                                                         <div className="p-r-25">
                                                             <label className="customRadio3">
@@ -373,7 +374,7 @@ regnoFormat = (e, setFieldTouched, setFieldValue) => {
                                                                     }  
                                                                     }
                                                                 />
-                                                                <span className="checkmark " /><span className="fs-14"> Individual</span>
+                                                                <span className="checkmark " /><span className="fs-14"> {phrases['Individual']}</span>
                                                             </label>
                                                         </div>
                                                         <div className="p-r-25">
@@ -391,7 +392,7 @@ regnoFormat = (e, setFieldTouched, setFieldValue) => {
                                                                     }  
                                                                     }
                                                                 />
-                                                                <span className="checkmark " /><span className="fs-14"> Corporate</span>
+                                                                <span className="checkmark " /><span className="fs-14"> {phrases['Corporate']}</span>
                                                             </label>
                                                             {errors.policy_for && touched.policy_for ? (
                                                                 <span className="errorMsg">{errors.policy_for}</span>
@@ -402,7 +403,7 @@ regnoFormat = (e, setFieldTouched, setFieldValue) => {
                                             </div>
                                             <div className="d-flex justify-content-left">
                                                 <div className="brandhead"> 
-                                                    <p>Tell us about your policy details</p>
+                                                    <p>{phrases['TellAboutPolicy']}</p>
 
                                                     <div className="d-inline-flex m-b-15">
                                                         <div className="p-r-25">
@@ -420,7 +421,7 @@ regnoFormat = (e, setFieldTouched, setFieldValue) => {
                                                                     }  
                                                                     }
                                                                 />
-                                                                <span className="checkmark " /><span className="fs-14"> New Policy</span>
+                                                                <span className="checkmark " /><span className="fs-14"> {phrases['NewPolicy']}</span>
                                                             </label>
                                                         </div>
                                                         
@@ -439,7 +440,7 @@ regnoFormat = (e, setFieldTouched, setFieldValue) => {
                                                                     }  
                                                                     }
                                                                 />
-                                                                <span className="checkmark " /><span className="fs-14"> Roll Over</span>
+                                                                <span className="checkmark " /><span className="fs-14"> {phrases['RollOver']}</span>
                                                             </label>
                                                             {errors.policy_type && touched.policy_type ? (
                                                                     <span className="errorMsg">{errors.policy_type}</span>
@@ -449,7 +450,7 @@ regnoFormat = (e, setFieldTouched, setFieldValue) => {
                                                 </div>
                                             </div>
                                             <div className="row formSection">
-                                                <label className="col-md-4">Sub Product:</label>
+                                                <label className="col-md-4">{phrases['SubProduct']}:</label>
                                                 <div className="col-md-4">
                                                     
                                                     <div className="formSection">
@@ -461,7 +462,7 @@ regnoFormat = (e, setFieldTouched, setFieldValue) => {
                                                             value = {values.subclass_id}
                                                             // value={ageObj.whatIsCurrentMonth(values.registration_date) < 7 ? 6 : values.previous_policy_name}
                                                         >
-                                                            <option value="">Select Sub Product</option>
+                                                            <option value="">{phrases['SelectProduct']}</option>
                                                             {subVehicleList.map((subVehicle, qIndex) => ( 
                                                                 <option value= {subVehicle.subclass_id}>{subVehicle.subclass_title}</option>
                                                             ))}
@@ -474,13 +475,13 @@ regnoFormat = (e, setFieldTouched, setFieldValue) => {
                                                 </div>
                                             </div>
                                             <div className="row formSection">
-                                                <label className="col-md-4">Enter Vehicle Registration Number:</label>
+                                                <label className="col-md-4">{phrases['RegName']}:</label>
                                                 <div className="col-md-4">
                                                     
                                                 <Field
                                                     name="regNumber"
                                                     type="text"
-                                                    placeholder="Registration Number"
+                                                    placeholder={phrases['RegNum']}
                                                     autoComplete="off"
                                                     onFocus={e => this.changePlaceHoldClassAdd(e)}
                                                     onBlur={e => this.changePlaceHoldClassRemove(e)}
@@ -501,7 +502,7 @@ regnoFormat = (e, setFieldTouched, setFieldValue) => {
                                             {values.policy_type == '1' ?
                                             <div className="row formSection">
                                                     <label className="customCheckBox formGrp formGrp">
-                                                    Continue Without Vehicle Registration Number
+                                                    {phrases['WithoutNo']}
                                                     <Field
                                                         type="checkbox"
                                                         name="check_registration"
@@ -539,7 +540,7 @@ regnoFormat = (e, setFieldTouched, setFieldValue) => {
                                                 </div>  : null}
                                             <div className="cntrbtn">
                                             <Button className={`btnPrimary`} type="submit" >
-                                                Go
+                                                {phrases['Go']}
                                             </Button>
 
                                             

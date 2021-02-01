@@ -36,6 +36,7 @@ class Products extends Component {
     
     render() {
         const {product_id} = this.state
+        let phrases = localStorage.getItem("phrases") ? JSON.parse(localStorage.getItem("phrases")) : null
         console.log('product_id', product_id)
         return (
             <>
@@ -55,10 +56,10 @@ class Products extends Component {
                                             <Col sm={12}>
                                                 <Nav variant="pills" className="flex-column">
                                                     <div className="d-flex justify-content-left messageDeskTab">
-                                                    <div><Nav.Item><Nav.Link eventKey="first">Motor</Nav.Link></Nav.Item></div>
-                                                    <div><Nav.Item><Nav.Link eventKey="second">Health</Nav.Link></Nav.Item></div>         
-                                                    <div><Nav.Item><Nav.Link eventKey="third">Fire Insurance</Nav.Link></Nav.Item></div>         
-                                                    <div><Nav.Item><Nav.Link eventKey="fourth">Personal Accident</Nav.Link></Nav.Item></div>                       
+                                                    <div><Nav.Item><Nav.Link eventKey="first">{phrases['Motor']}</Nav.Link></Nav.Item></div>
+                                                    <div><Nav.Item><Nav.Link eventKey="second">{phrases['Health']}</Nav.Link></Nav.Item></div>         
+                                                    <div><Nav.Item><Nav.Link eventKey="third">{phrases['FireInsurance']}</Nav.Link></Nav.Item></div>         
+                                                    <div><Nav.Item><Nav.Link eventKey="fourth">{phrases['PersonalAccident']}</Nav.Link></Nav.Item></div>                       
                                                     </div>
                                                 </Nav>
                                             </Col>
@@ -91,10 +92,10 @@ class Products extends Component {
                                                 <Col sm={12}>
                                                     <Nav variant="pills" className="flex-column">
                                                         <div className="d-flex justify-content-left messageDeskTab">
-                                                        <div><Nav.Item><Nav.Link eventKey="first">Motor</Nav.Link></Nav.Item></div>
-                                                        <div><Nav.Item><Nav.Link eventKey="second">Health</Nav.Link></Nav.Item></div>
-                                                        <div><Nav.Item><Nav.Link eventKey="third">Fire Insurance</Nav.Link></Nav.Item></div>
-                                                        <div><Nav.Item><Nav.Link eventKey="fourth">Personal Accident</Nav.Link></Nav.Item></div>
+                                                        <div><Nav.Item><Nav.Link eventKey="first">{phrases['Motor']}</Nav.Link></Nav.Item></div>
+                                                        <div><Nav.Item><Nav.Link eventKey="second">{phrases['Health']}</Nav.Link></Nav.Item></div>
+                                                        <div><Nav.Item><Nav.Link eventKey="third">{phrases['FireInsurance']}</Nav.Link></Nav.Item></div>
+                                                        <div><Nav.Item><Nav.Link eventKey="fourth">{phrases['PersonalAccident']}</Nav.Link></Nav.Item></div>
                                                         
                                                         </div>
                                                     </Nav>
@@ -126,10 +127,10 @@ class Products extends Component {
                                                 <Col sm={12}>
                                                     <Nav variant="pills" className="flex-column">
                                                         <div className="d-flex justify-content-left messageDeskTab">
-                                                        <div><Nav.Item><Nav.Link eventKey="first">Motor</Nav.Link></Nav.Item></div>
-                                                        <div><Nav.Item><Nav.Link eventKey="second">Health</Nav.Link></Nav.Item></div>
-                                                        <div><Nav.Item><Nav.Link eventKey="third">Fire Insurance</Nav.Link></Nav.Item></div>
-                                                        <div><Nav.Item><Nav.Link eventKey="fourth">Personal Accident</Nav.Link></Nav.Item></div>
+                                                        <div><Nav.Item><Nav.Link eventKey="first">{phrases['Motor']}</Nav.Link></Nav.Item></div>
+                                                        <div><Nav.Item><Nav.Link eventKey="second">{phrases['Health']}</Nav.Link></Nav.Item></div>
+                                                        <div><Nav.Item><Nav.Link eventKey="third">{phrases['FireInsurance']}</Nav.Link></Nav.Item></div>
+                                                        <div><Nav.Item><Nav.Link eventKey="fourth">{phrases['PersonalAccident']}</Nav.Link></Nav.Item></div>
                         
                                                         </div>
                                                     </Nav>

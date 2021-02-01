@@ -728,6 +728,19 @@ img.avatar {  border-radius: inherit;}
 .thread-entry.avatar.message .header:before {  border-right-color: #a04fa6;}
 .thread-entry.avatar.message .header:after { top: 7px; left: -8px; right: initial; border-left: none;  border-right: 7px solid #a04fa6;  margin-left: 1px;}
 .thread-entry .header .title { max-width: 500px; vertical-align: bottom; display: inline-block;  margin-left: 15px;}
+
+.thread-entry.message .header_reply { background:#2b472b; color: #fff;}
+.thread-entry.avatar.message .header_reply:before { top: 7px; left: -8px; right: initial; border-left: none; border-right: 8px solid #CCC;}
+.thread-entry.avatar.message .header_reply:before {  border-right-color: #2b472b;}
+.thread-entry.avatar.message .header_reply:after { top: 7px; left: -8px; right: initial; border-left: none;  border-right: 7px solid #2b472b;  margin-left: 1px;}
+.thread-entry .header_reply .title { max-width: 500px; vertical-align: bottom; display: inline-block;  margin-left: 15px;}
+.thread-entry .header_reply {  padding: 8px 0.9em;  border: 1px solid #ccc;  border-color: rgba(0,0,0,0.2);  border-radius: 5px 5px 0 0;}
+.thread-entry.avatar .header_reply:before {position: absolute; top: 7px;right: -8px; content: ''; border-top: 8px solid transparent; border-bottom: 8px solid transparent; border-left: 8px solid #b0b0b0;display: inline-block;}
+.thread-entry.avatar .header_reply:after {position: absolute;top: 7px; right: -8px; content: ''; border-top: 7px solid transparent; border-bottom: 7px solid transparent; display: inline-block; margin-top: 1px; }
+.thread-entry.avatar .header_reply { position: relative; }
+.thread-entry.response .header_reply { background:#dddddd; }
+.thread-entry.avatar.response .header_reply:after { border-left: 7px solid #dddddd; margin-right: 1px;}
+
 .thread-entry .thread-body { padding:10px; border: 1px solid #ddd; border-top: none;  border-bottom:2px solid #aaa;  border-radius: 0 0 5px 5px;}
 .thread-body .attachments { background-color: #f4faff; margin: 0 -0.9em; position: relative; top: 0.9em; padding: 0.3em 0.9em; border-top: 1px dotted #ccc; border-top-color: rgba(0,0,0,0.2); border-radius: 0 0 6px 6px; }
 .thread-body .attachments .filesize { margin-left: 0.5em; }

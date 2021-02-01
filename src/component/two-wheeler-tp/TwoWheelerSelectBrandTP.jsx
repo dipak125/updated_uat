@@ -555,6 +555,7 @@ class TwoWheelerSelectBrand extends Component {
         const { brandList, motorInsurance, selectedBrandDetails, brandModelList,fuelType, fastLaneData, selectedBrandId,
             selectedModelId, selectedVarientId, otherBrands, vehicleDetails, error_msg, brandName, modelName, brandView } = this.state
         const { productId } = this.props.match.params
+        let phrases = localStorage.getItem("phrases") ? JSON.parse(localStorage.getItem("phrases")) : null
 
          const newInitialValues = Object.assign(initialValues, {
             selectedBrandId: selectedBrandId ? selectedBrandId : (vehicleDetails && vehicleDetails.vehiclebrand_id ? vehicleDetails.vehiclebrand_id : ""),
@@ -577,7 +578,8 @@ class TwoWheelerSelectBrand extends Component {
                                 <SideNav />
                             </div>
                             <div className="col-sm-12 col-md-12 col-lg-10 col-xl-10 infobox">
-                                <h4 className="text-center mt-3 mb-3">SBI General Insurance Company Limited</h4>
+                                <h4 className="text-center mt-3 mb-3">
+                {phrases['SBIGICL']}</h4>
 
                                 <Formik initialValues={newInitialValues} 
                                     onSubmit={ this.handleSubmit} 
@@ -593,7 +595,7 @@ class TwoWheelerSelectBrand extends Component {
                                                         <div className="col-md-9 col-sm-12">
                                                         <div className="d-flex justify-content-left">
                                                             <div className="brandhead"> 
-                                                            <p>Taking 2-Wheeler policy for</p>
+                                                            <p>{phrases['TakingTwoPolicy']}</p>
                                                                 <div className="d-inline-flex m-b-15">
                                                                     <div className="p-r-25">
                                                                         <label className="customRadio3">
@@ -610,7 +612,7 @@ class TwoWheelerSelectBrand extends Component {
                                                                                 }  
                                                                                 }
                                                                             />
-                                                                            <span className="checkmark " /><span className="fs-14"> Individual</span>
+                                                                            <span className="checkmark " /><span className="fs-14"> {phrases['Individual']}</span>
                                                                         </label>
                                                                     </div>
                                                                     <div className="p-r-25">
@@ -628,7 +630,7 @@ class TwoWheelerSelectBrand extends Component {
                                                                                 }  
                                                                                 }
                                                                             />
-                                                                            <span className="checkmark " /><span className="fs-14"> Corporate</span>
+                                                                            <span className="checkmark " /><span className="fs-14"> {phrases['Corporate']}</span>
                                                                         </label>
                                                                         {errors.policy_for && touched.policy_for ? (
                                                                             <span className="errorMsg">{errors.policy_for}</span>
@@ -640,7 +642,7 @@ class TwoWheelerSelectBrand extends Component {
 
                                                         <div className="d-flex justify-content-left">
                                                             <div className="brandhead"> 
-                                                                <p>Tell us about your policy details</p>
+                                                                <p>{phrases['TellAboutPolicy']}</p>
 
                                                                 <div className="d-inline-flex m-b-15">   
                                                                     
@@ -659,7 +661,7 @@ class TwoWheelerSelectBrand extends Component {
                                                                                 }  
                                                                                 }
                                                                             />
-                                                                            <span className="checkmark " /><span className="fs-14"> Roll Over</span>
+                                                                            <span className="checkmark " /><span className="fs-14">{phrases['RollOver']}</span>
                                                                         </label>
                                                                     </div>
 
@@ -679,7 +681,7 @@ class TwoWheelerSelectBrand extends Component {
                                                                                 }
                                                                             />
                                                                             <span className="checkmark" />
-                                                                            <span className="fs-14">Lapsed Policy</span>
+                                                                            <span className="fs-14">{phrases['LapsedPolicy']}</span>
                                                                         </label>
                                                                         {errors.policy_type && touched.policy_type ? (
                                                                             <span className="errorMsg">{errors.policy_type}</span>
@@ -689,17 +691,17 @@ class TwoWheelerSelectBrand extends Component {
                                                             </div>
                                                         </div>
                                                         <div className="brandhead">
-                                                        <h4 className="m-b-30">Help us with some information about yourself</h4></div>
+                                                        <h4 className="m-b-30">{phrases['About']}</h4></div>
                                                         <Row className="m-b-15">
                                                             <Col sm={10}>
                                                             
                                                                 <div className="row formSection">
-                                                                    <label className="col-md-4">Enter Vehicle Registration Number:</label>
+                                                                    <label className="col-md-4">{phrases['RegName']}:</label>
                                                                     <div className="col-md-4">
                                                                         <Field
                                                                             name="regNumber"
                                                                             type="text"
-                                                                            placeholder="Registration Number"
+                                                                            placeholder={phrases['RegNum']}
                                                                             autoComplete="off"
                                                                             onFocus={e => this.changePlaceHoldClassAdd(e)}
                                                                             onBlur={e => this.changePlaceHoldClassRemove(e)}
@@ -722,7 +724,7 @@ class TwoWheelerSelectBrand extends Component {
                                                                     <div >
                                                                     {brandView == '0' && fastLaneData.length == '0' ?
                                                                     <Button  type="button" onClick = {this.fetchFastlane.bind(this,values)} >
-                                                                        Fetch Details
+                                                                        {phrases['FetchDetails']}
                                                                     </Button> : null }
                                                                     </div>
                                                                 </div>                       
@@ -731,7 +733,7 @@ class TwoWheelerSelectBrand extends Component {
                                                         </Row>
                                                         {brandView == '1' ?
                                                         <div className="brandhead">
-                                                            <h4>Please select your Vehicle brand</h4>
+                                                            <h4>{phrases['VechicleBrandTp']}</h4>
                                                             {error_msg.brand_id || error_msg.brand_model_id || error_msg.model_varient_id ? 
                                                                 <span className="errorMsg">Please select brand and varient</span> : ""
                                                             }
@@ -746,7 +748,7 @@ class TwoWheelerSelectBrand extends Component {
                                                                 <div className="d-flex justify-content-left resmb">
                                                                 {brandView == '1' || (fastLaneData && fastLaneData.brand_text) ?
                                                                     <Button className={`proceedBtn`} type="submit"  >
-                                                                        Continue
+                                                                        {phrases['Continue']}
                                                                 </Button> : null }
                                                                 </div>
 
@@ -759,29 +761,29 @@ class TwoWheelerSelectBrand extends Component {
                                                                 <div className="regisBox">
                                                                     <div className="d-flex justify-content-between flex-lg-row flex-md-column m-b-25">
 
-                                                                        <div className="txtRegistr resmb-15">Registration No.<br />
+                                                                        <div className="txtRegistr resmb-15">{phrases['RegNo']}.<br />
                                                                             {motorInsurance && motorInsurance.registration_no}</div>
 
-                                                                        <div> <button type="button" className="rgistrBtn" onClick={this.registration.bind(this, productId)}>Edit</button></div>
+                                                                        <div> <button type="button" className="rgistrBtn" onClick={this.registration.bind(this, productId)}>{phrases['Edit']}</button></div>
                                                                     </div>
 
                                                                     <div className="d-flex justify-content-between flex-lg-row flex-md-column m-b-25">
-                                                                        <div className="txtRegistr resmb-15">Two-wheeler Brand
+                                                                        <div className="txtRegistr resmb-15">{phrases['TwoWheelBrand']}
                                                                             - <strong>{brandName ? brandName : (vehicleDetails && vehicleDetails.vehiclebrand && vehicleDetails.vehiclebrand.name ? vehicleDetails.vehiclebrand.name : "")}</strong>
                                                                         </div>
 
-                                                                        <div> <button type="button" className="rgistrBtn" onClick={this.selectVehicle.bind(this, productId)}>Edit</button></div>
+                                                                        <div> <button type="button" className="rgistrBtn" onClick={this.selectVehicle.bind(this, productId)}>{phrases['Edit']}</button></div>
                                                                     </div>
 
                                                                     <div className="d-flex justify-content-between flex-lg-row flex-md-column m-b-25">
-                                                                        <div className="txtRegistr">Two-wheeler Model<br />
+                                                                        <div className="txtRegistr">{phrases['TwoWheelerModel']}<br />
                                                                             <strong>{modelName ? modelName : (selectedBrandId ? "" : vehicleDetails && vehicleDetails.vehiclemodel && vehicleDetails.vehiclemodel.description ? vehicleDetails.vehiclemodel.description+" "+vehicleDetails.varientmodel.varient : "")}</strong></div>
 
-                                                                        <div> <button type="button" className="rgistrBtn" onClick={this.selectBrand.bind(this, productId)}>Edit</button></div>
+                                                                        <div> <button type="button" className="rgistrBtn" onClick={this.selectBrand.bind(this, productId)}>{phrases['Edit']}</button></div>
                                                                     </div>
 
                                                                     <div className="d-flex justify-content-between flex-lg-row flex-md-column m-b-25">
-                                                                        <div className="txtRegistr">Fuel Type<br />
+                                                                        <div className="txtRegistr">{phrases['Fuel']}<br />
                                                                             <strong>{fuel[fuelType] ? fuel[fuelType] : (vehicleDetails && vehicleDetails.varientmodel && vehicleDetails.varientmodel.fuel_type ? fuel[Math.floor(vehicleDetails.varientmodel.fuel_type)] : null)} </strong></div>
 
                                                                     </div>
@@ -791,29 +793,29 @@ class TwoWheelerSelectBrand extends Component {
                                                                 <div className="regisBox">
                                                                     <div className="d-flex justify-content-between flex-lg-row flex-md-column m-b-25">
 
-                                                                        <div className="txtRegistr resmb-15">Registration No.<br />
+                                                                        <div className="txtRegistr resmb-15">{phrases['RegNo']}.<br />
                                                                             {motorInsurance && motorInsurance.registration_no}</div>
 
-                                                                        <div> <button type="button" className="rgistrBtn" onClick={this.registration.bind(this, productId)}>Edit</button></div>
+                                                                        <div> <button type="button" className="rgistrBtn" onClick={this.registration.bind(this, productId)}>{phrases['Edit']}</button></div>
                                                                     </div>
 
                                                                     <div className="d-flex justify-content-between flex-lg-row flex-md-column m-b-25">
-                                                                        <div className="txtRegistr resmb-15">Two-wheeler Brand
+                                                                        <div className="txtRegistr resmb-15">{phrases['TwoWheelBrand']}
                                                                             - <strong>{fastLaneData && fastLaneData.brand_text ? fastLaneData.brand_text  : vehicleDetails && vehicleDetails.vehiclebrand && vehicleDetails.vehiclebrand.name ? vehicleDetails.vehiclebrand.name : ""}</strong>
                                                                         </div>
 
-                                                                        <div> <button type="button" className="rgistrBtn" onClick={this.selectVehicle.bind(this, productId)}>Edit</button></div>
+                                                                        <div> <button type="button" className="rgistrBtn" onClick={this.selectVehicle.bind(this, productId)}>{phrases['Edit']}</button></div>
                                                                     </div>
 
                                                                     <div className="d-flex justify-content-between flex-lg-row flex-md-column m-b-25">
-                                                                        <div className="txtRegistr">Two-wheeler Model<br />
+                                                                        <div className="txtRegistr">{phrases['TwoWheelModel']}<br />
                                                                             <strong>{fastLaneData && fastLaneData.model_text ? fastLaneData.model_text+" "+fastLaneData.varient_text : vehicleDetails && vehicleDetails.vehiclemodel && vehicleDetails.vehiclemodel.description ? vehicleDetails.vehiclemodel.description+" "+vehicleDetails.varientmodel.varient : "" }</strong></div>
 
-                                                                        <div> <button type="button" className="rgistrBtn" onClick={this.selectBrand.bind(this, productId)}>Edit</button></div>
+                                                                        <div> <button type="button" className="rgistrBtn" onClick={this.selectBrand.bind(this, productId)}>{phrases['Edit']}</button></div>
                                                                     </div>
 
                                                                     <div className="d-flex justify-content-between flex-lg-row flex-md-column m-b-25">
-                                                                        <div className="txtRegistr">Fuel Type<br />
+                                                                        <div className="txtRegistr">{phrases['Fuel']}<br />
                                                                             <strong>{fastLaneData && fastLaneData.fuel ? fastLaneData.fuel : vehicleDetails && vehicleDetails.varientmodel && vehicleDetails.varientmodel.fuel_type ? fuel[Math.floor(vehicleDetails.varientmodel.fuel_type)] : null } </strong></div>
 
                                                                     </div>
@@ -840,7 +842,7 @@ class TwoWheelerSelectBrand extends Component {
                     onHide={this.handleClose}>
                     <Modal.Header closeButton className="custmModlHead">
                         <div className="cntrbody">
-                            <h3>Select Model </h3>
+                            <h3>{phrases['SelectModel']} </h3>
                             {selectedBrandDetails.image ?
                                 <img src={`${process.env.REACT_APP_PAYMENT_URL}/core/public/image/car_brand_image/` + selectedBrandDetails.image} alt={selectedBrandDetails.name} /> : null     
                             }
@@ -854,7 +856,7 @@ class TwoWheelerSelectBrand extends Component {
                                         name="search"
                                         type="search"
                                         className="srchimg"
-                                        placeholder="Search your variant "
+                                        placeholder={phrases['SearchYourVariant']}
                                         onFocus={e => this.changePlaceHoldClassAdd(e)}
                                         onBlur={e => this.changePlaceHoldClassRemove(e)}
                                         onChange={e => this.change(e.target.value)}
@@ -1005,7 +1007,7 @@ class TwoWheelerSelectBrand extends Component {
                                     this.handleClose()
                                 }
                             >
-                                Continue</button> : null}
+                                {phrases['Continue']}</button> : null}
                     </Modal.Body>
                 </Modal>
             </>

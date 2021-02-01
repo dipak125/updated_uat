@@ -587,6 +587,8 @@ class VehicleDetails extends Component {
         const {productId} = this.props.match.params  
         const {insurerList, showClaim, previous_is_claim, motorInsurance, previousPolicy,
             CustomerID,suggestions, vehicleDetails, RTO_location} = this.state
+        
+        let phrases = localStorage.getItem("phrases") ? JSON.parse(localStorage.getItem("phrases")) : null
 
         let newInitialValues = Object.assign(initialValue, {
             registration_date: motorInsurance && motorInsurance.registration_date ? new Date(motorInsurance.registration_date) : "",
@@ -604,7 +606,7 @@ class VehicleDetails extends Component {
         });
 
         const inputCustomerID = {
-            placeholder: "Search City",
+            placeholder: phrases['SearchCity'],
             value: CustomerID ? CustomerID : RTO_location,
             onChange: this.onChangeCustomerID
           };
@@ -613,17 +615,18 @@ class VehicleDetails extends Component {
         return (
             <>
                 <BaseComponent>
+                {phrases ? 
                 <div className="container-fluid">
                 <div className="row">
                     <div className="col-sm-12 col-md-12 col-lg-2 col-xl-2 pd-l-0">
                         <SideNav />
                     </div>
                 <div className="col-sm-12 col-md-12 col-lg-10 col-xl-10 infobox">
-                <h4 className="text-center mt-3 mb-3">SBI General Insurance Company Limited</h4>
+                <h4 className="text-center mt-3 mb-3">{phrases['SBIGICL']}</h4>
                 <section className="brand m-b-25">
                     <div className="d-flex justify-content-left">
                         <div className="brandhead">
-                            <h4 className="fs-18 m-b-30">Please share your vehicle details.</h4>
+                            <h4 className="fs-18 m-b-30">{phrases['VehicleDetails']}.</h4>
                         </div>
                     </div>
                     <div className="brand-bg">
@@ -639,7 +642,7 @@ class VehicleDetails extends Component {
                                                     <Col sm={12} md={6} lg={6}>
                                                         <FormGroup>
                                                             <div className="fs-18">
-                                                                First Purchase/Registration Date
+                                                                {phrases['FirstRegDate']}
                                                             </div>
                                                         </FormGroup>
                                                     </Col>
@@ -651,7 +654,7 @@ class VehicleDetails extends Component {
                                                                 minDate={new Date(minRegnDate)}
                                                                 maxDate={new Date(maxRegnDate)}
                                                                 dateFormat="dd MMM yyyy"
-                                                                placeholderText="Registration Date"
+                                                                placeholderText={phrases['RegDate']}
                                                                 peekPreviousMonth
                                                                 peekPreviousYear
                                                                 showMonthDropdown
@@ -680,7 +683,7 @@ class VehicleDetails extends Component {
                                                     <Col sm={12} md={4} lg={4}>
                                                         <FormGroup>
                                                             <div className="fs-18">
-                                                                Registration City
+                                                                {phrases['RegCity']}
                                                          </div>
                                                         </FormGroup>
                                                     </Col>
@@ -714,7 +717,7 @@ class VehicleDetails extends Component {
                                                     <Col sm={12}>
                                                         <FormGroup>
                                                             <div className="carloan">
-                                                                <h4> Previous Policy Details</h4>
+                                                                <h4> {phrases['PPD']}</h4>
                                                             </div>
                                                         </FormGroup>
                                                     </Col>
@@ -725,11 +728,11 @@ class VehicleDetails extends Component {
                                                         <FormGroup>
 
                                                             <DatePicker
-                                                                name="previous_start_date"
+                                                                name={phrases['previous_start_date']}
                                                                 minDate={new Date(minDate)}
                                                                 maxDate={new Date(maxDate)}
                                                                 dateFormat="dd MMM yyyy"
-                                                                placeholderText="Previous policy start date"
+                                                                placeholderText={phrases['PPSD']}
                                                                 peekPreviousMonth
                                                                 peekPreviousYear
                                                                 showMonthDropdown
@@ -759,7 +762,7 @@ class VehicleDetails extends Component {
                                                             <DatePicker
                                                                 name="previous_end_date"
                                                                 dateFormat="dd MMM yyyy"
-                                                                placeholderText="Previous policy end date"
+                                                                placeholderText={phrases['PPED']}
                                                                 disabled = {true}
                                                                 dropdownMode="select"
                                                                 className="datePckr inputfs12"
@@ -778,16 +781,16 @@ class VehicleDetails extends Component {
                                                         <FormGroup>
                                                             <div className="formSection">
                                                                 <Field
-                                                                    name='previous_policy_name'
+                                                                    name="previous_policy_name"
                                                                     component="select"
                                                                     autoComplete="off"
                                                                     className="formGrp inputfs12"
                                                                     value = {values.previous_policy_name}
                                                                     // value={ageObj.whatIsCurrentMonth(values.registration_date) < 7 ? 6 : values.previous_policy_name}
                                                                 >
-                                                                    <option value="">Select Policy Type</option>
-                                                                    <option value="1">Package</option>
-                                                                    <option value="2">Liability Only</option>  
+                                                                    <option value="">{phrases['SPT']}</option>
+                                                                    <option value="1">{phrases['Package']}</option>
+                                                                    <option value="2">{phrases['LiabilityOnly']}</option>  
                                                         
                                                                 </Field>
                                                                 {errors.previous_policy_name && touched.previous_policy_name ? (
@@ -803,12 +806,12 @@ class VehicleDetails extends Component {
                                                     <FormGroup>
                                                         <div className="formSection">
                                                         <Field
-                                                            name='insurance_company_id'
+                                                            name="insurance_company_id"
                                                             component="select"
                                                             autoComplete="off"                                                                        
                                                             className="formGrp"
                                                         >
-                                                            <option value="">Select Insurer Company</option>
+                                                            <option value="">{phrases['SelectInsurer']}</option>
                                                             {insurerList.map((insurer, qIndex) => ( 
                                                                 <option value= {insurer.Id}>{insurer.name}</option>
                                                             ))}
@@ -826,7 +829,7 @@ class VehicleDetails extends Component {
                                                                 <Field
                                                                     name="previous_city"
                                                                     type="text"
-                                                                    placeholder="Previous Insurer Address"
+                                                                    placeholder={phrases['PInsurerAddress']}
                                                                     autoComplete="off"
                                                                     onFocus={e => this.changePlaceHoldClassAdd(e)}
                                                                     onBlur={e => this.changePlaceHoldClassRemove(e)}
@@ -846,7 +849,7 @@ class VehicleDetails extends Component {
                                                                 <Field
                                                                     name="previous_policy_no"
                                                                     type="text"
-                                                                    placeholder="Previous Policy Number"
+                                                                    placeholder={phrases['PPolicyNumber']}
                                                                     autoComplete="off"
                                                                     maxLength="28"
                                                                     onFocus={e => this.changePlaceHoldClassAdd(e)}
@@ -866,7 +869,7 @@ class VehicleDetails extends Component {
                                                         <Col sm={12}>
                                                             <FormGroup>
                                                                 <div className="carloan">
-                                                                    <h4>Have you made a claim in your existing Policy</h4>
+                                                                    <h4>{phrases['ClaimPolicy']}</h4>
                                                                 </div>
                                                             </FormGroup>
                                                         </Col>
@@ -891,7 +894,7 @@ class VehicleDetails extends Component {
                                                                             }}
                                                                             checked={values.previous_is_claim == '0' ? true : false}
                                                                         />
-                                                                            <span className="checkmark " /><span className="fs-14"> No, I haven't</span>
+                                                                            <span className="checkmark " /><span className="fs-14"> {phrases['NoIHavent']}</span>
                                                                         </label>
                                                                     </div>
 
@@ -911,7 +914,7 @@ class VehicleDetails extends Component {
                                                                             checked={values.previous_is_claim == '1' ? true : false}
                                                                         />
                                                                             <span className="checkmark" />
-                                                                            <span className="fs-14">Yes I have</span>
+                                                                            <span className="fs-14">{phrases['YesIHave']}</span>
                                                                         </label>
                                                                         {errors.previous_is_claim && touched.previous_is_claim ? (
                                                                         <span className="errorMsg">{errors.previous_is_claim}</span>
@@ -926,7 +929,7 @@ class VehicleDetails extends Component {
                                                         <Col sm={12} md={5} lg={5}>
                                                             <FormGroup>
                                                                 <div className="fs-18">
-                                                                You have claimed for
+                                                                {phrases['You have claimed for']}
                                                         </div>
                                                             </FormGroup>
                                                         </Col>
@@ -949,9 +952,9 @@ class VehicleDetails extends Component {
                                                                         } 
                                                                         }
                                                                     >
-                                                                        <option value="">--Select--</option>
-                                                                        <option value="1">Own Damage</option>
-                                                                        <option value="2">Liability</option>
+                                                                        <option value="">--{phrases['Select']}--</option>
+                                                                        <option value="1">{phrases['OwnDamage']}</option>
+                                                                        <option value="2">{phrases['Liability']}</option>
                                                                     </Field>     
                                                                     {errors.previous_claim_for && touched.previous_claim_for ? (
                                                                     <span className="errorMsg">{errors.previous_claim_for}</span>
@@ -966,7 +969,7 @@ class VehicleDetails extends Component {
                                                         <Col sm={12} md={5} lg={5}>
                                                             <FormGroup>
                                                                 <div className="fs-18">
-                                                                Select NCB mentioned on last policy
+                                                                {phrases['SelectNCB']}
                                                         </div>
                                                             </FormGroup>
                                                         </Col>
@@ -981,7 +984,7 @@ class VehicleDetails extends Component {
                                                                         value = {values.previous_claim_bonus}
                                                                         
                                                                     >
-                                                                        <option value="">--Select--</option>
+                                                                        <option value="">--{phrases['Select']}--</option>
                                                                         <option value="0">0</option>
                                                                         <option value="20">20</option>
                                                                         <option value="25">25</option>
@@ -1003,10 +1006,10 @@ class VehicleDetails extends Component {
 
                                                 <div className="d-flex justify-content-left resmb">
                                                 <Button className={`backBtn`} type="button"  disabled={isSubmitting ? true : false} onClick= {this.selectBrand.bind(this,productId)}>
-                                                    {isSubmitting ? 'Wait..' : 'Back'}
+                                                    {isSubmitting ? phrases['Wait'] : phrases['Back']}
                                                 </Button> 
                                                 <Button className={`proceedBtn`} type="submit"  disabled={isSubmitting ? true : false}>
-                                                    {isSubmitting ? 'Wait..' : 'Next'}
+                                                    {isSubmitting ? phrases['Wait'] : phrases['Next']}
                                                 </Button> 
                                                 </div>
 
@@ -1016,40 +1019,40 @@ class VehicleDetails extends Component {
                                                 <div className="vehbox">
                                                     <Row className="m-b-25">
                                                         <Col sm={12} md={7}>
-                                                            <div className="txtRegistr">Registration No.<br />
+                                                            <div className="txtRegistr">{phrases['RegNo']}.<br />
                                                             {motorInsurance && motorInsurance.registration_no}</div>
                                                         </Col>
 
                                                         <Col sm={12} md={5} className="text-right">
-                                                            <button className="rgistrBtn" onClick={this.registration.bind(this, productId)}>Edit</button>
+                                                            <button className="rgistrBtn" onClick={this.registration.bind(this, productId)}>{phrases['Edit']}</button>
                                                         </Col>
                                                     </Row>
 
                                                     <Row className="m-b-25">
                                                         <Col sm={12} md={7}>
-                                                            <div className="txtRegistr">Car Brand<br/>
+                                                            <div className="txtRegistr">{phrases['Brand']}<br/>
                                                                 <strong>{vehicleDetails && vehicleDetails.vehiclebrand && vehicleDetails.vehiclebrand.name ? vehicleDetails.vehiclebrand.name : ""}</strong></div>
                                                         </Col>
 
                                                         <Col sm={12} md={5} className="text-right">
-                                                            <button className="rgistrBtn" onClick= {this.editBrand.bind(this,productId)}>Edit</button>
+                                                            <button className="rgistrBtn" onClick= {this.editBrand.bind(this,productId)}>{phrases['Edit']}</button>
                                                         </Col>
                                                     </Row>
 
                                                     <Row className="m-b-25">
                                                         <Col sm={12} md={7}>
-                                                            <div className="txtRegistr">Car Model<br/>
+                                                            <div className="txtRegistr">{phrases['Model']}<br/>
                                                                 <strong>{vehicleDetails && vehicleDetails.vehiclemodel && vehicleDetails.vehiclemodel.description ? vehicleDetails.vehiclemodel.description+" "+vehicleDetails.varientmodel.varient : ""}</strong></div>
                                                         </Col>
 
                                                         <Col sm={12} md={5} className="text-right">
-                                                            <button className="rgistrBtn" onClick= {this.selectVehicleBrand.bind(this,productId)}>Edit</button>
+                                                            <button className="rgistrBtn" onClick= {this.selectVehicleBrand.bind(this,productId)}>{phrases['Edit']}</button>
                                                         </Col>
                                                     </Row>
 
                                                     <Row className="m-b-25">
                                                         <Col sm={12} md={7}>
-                                                            <div className="txtRegistr">Fuel Type<br/>
+                                                            <div className="txtRegistr">{phrases['Fuel']}<br/>
                                                                 <strong>{vehicleDetails && vehicleDetails.varientmodel && vehicleDetails.varientmodel.fuel_type ? fuel[vehicleDetails.varientmodel.fuel_type] : null} </strong></div>
                                                         </Col>
                                                     </Row>
@@ -1065,7 +1068,7 @@ class VehicleDetails extends Component {
                 <Footer />
                 </div>
                 </div>
-                </div>
+                </div> : null }
             </BaseComponent>
             </>
         );

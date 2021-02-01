@@ -324,6 +324,7 @@ class TwoWheelerVehicleDetails extends Component {
     render() {
         const {productId} = this.props.match.params  
         const { motorInsurance, CustomerID,suggestions, vehicleDetails, RTO_location, step_completed, location_reset_flag} = this.state
+        let phrases = localStorage.getItem("phrases") ? JSON.parse(localStorage.getItem("phrases")) : null
 
         let newInitialValues = Object.assign(initialValue, {
             registration_date: motorInsurance && motorInsurance.registration_date ? new Date(motorInsurance.registration_date) : "",
@@ -332,7 +333,7 @@ class TwoWheelerVehicleDetails extends Component {
         });
 
         const inputCustomerID = {
-            placeholder: "Search City",
+            placeholder: phrases['SearchCity'],
             value: CustomerID ? CustomerID : RTO_location,
             onChange: this.onChangeCustomerID
           };
@@ -347,12 +348,12 @@ class TwoWheelerVehicleDetails extends Component {
                         <SideNav />
                     </div>
                 <div className="col-sm-12 col-md-12 col-lg-10 col-xl-10 infobox">
-                <h4 className="text-center mt-3 mb-3">SBI General Insurance Company Limited</h4>
+                <h4 className="text-center mt-3 mb-3">{phrases['SBIGICL']}</h4>
                 { step_completed >= '1' && vehicleDetails.vehicletype_id == '6' ?
                 <section className="brand m-b-25">
                     <div className="d-flex justify-content-left">
                         <div className="brandhead">
-                            <h4 className="fs-18 m-b-30">Please share your vehicle details.</h4>
+                            <h4 className="fs-18 m-b-30">{phrases['VehicleDetails']}.</h4>
                         </div>
                     </div>
                     <div className="brand-bg">
@@ -370,7 +371,7 @@ class TwoWheelerVehicleDetails extends Component {
                                                     <Col sm={12} md={6} lg={6}>
                                                         <FormGroup>
                                                             <div className="fs-18">
-                                                                First Purchase/Registration Date
+                                                            {phrases['FirstRegDate']}
                                                             </div>
                                                         </FormGroup>
                                                     </Col>
@@ -382,7 +383,7 @@ class TwoWheelerVehicleDetails extends Component {
                                                                 minDate={new Date(minRegnDate)}
                                                                 maxDate={new Date(maxRegnDate)}
                                                                 dateFormat="dd MMM yyyy"
-                                                                placeholderText="Registration Date"
+                                                                placeholderText={phrases['RegDate']}
                                                                 peekPreviousMonth
                                                                 peekPreviousYear
                                                                 showMonthDropdown
@@ -407,7 +408,7 @@ class TwoWheelerVehicleDetails extends Component {
                                                     <Col sm={12} md={4} lg={4}>
                                                         <FormGroup>
                                                             <div className="fs-18">
-                                                                Registration City
+                                                            {phrases['RegCity']}
                                                          </div>
                                                         </FormGroup>
                                                     </Col>
@@ -437,10 +438,10 @@ class TwoWheelerVehicleDetails extends Component {
                                                 
                                                 <div className="d-flex justify-content-left resmb">
                                                 <Button className={`backBtn`} type="button"  disabled={isSubmitting ? true : false} onClick= {this.selectBrand.bind(this,productId)}>
-                                                    {isSubmitting ? 'Wait..' : 'Back'}
+                                                    {isSubmitting ? phrases['Wait'] : phrases['Back']}
                                                 </Button> 
                                                 <Button className={`proceedBtn`} type="submit"  disabled={isSubmitting ? true : false}>
-                                                    {isSubmitting ? 'Wait..' : 'Next'}
+                                                    {isSubmitting ? phrases['Wait'] : phrases['Next']}
                                                 </Button> 
                                                 </div>
 
@@ -450,27 +451,27 @@ class TwoWheelerVehicleDetails extends Component {
                                                 <div className="vehbox">
                                                     <div className="d-flex justify-content-between flex-lg-row flex-md-column m-b-25">
                                                        
-                                                            <div className="txtRegistr">Registration No.<br />
+                                                            <div className="txtRegistr">{phrases['RegNo']}.<br />
                                                             {motorInsurance && motorInsurance.registration_no}</div>
                                                             <div>
-                                                            <button className="rgistrBtn" type="button" onClick={this.selectBrand.bind(this, productId)}>Edit</button>
+                                                            <button className="rgistrBtn" type="button" onClick={this.selectBrand.bind(this, productId)}>{phrases['Edit']}</button>
                                                             </div>
                                                     </div>
 
                                                     <div className="d-flex justify-content-between flex-lg-row flex-md-column m-b-25">
-                                                        <div className="txtRegistr">Car Brand<br/>
+                                                        <div className="txtRegistr">{phrases['Brand']}<br/>
                                                             <strong>{vehicleDetails && vehicleDetails.vehiclebrand && vehicleDetails.vehiclebrand.name ? vehicleDetails.vehiclebrand.name : ""}</strong></div>
-                                                        <div><button className="rgistrBtn" type="button" onClick= {this.editBrand.bind(this,productId)}>Edit</button></div>
+                                                        <div><button className="rgistrBtn" type="button" onClick= {this.editBrand.bind(this,productId)}>{phrases['Edit']}</button></div>
                                                     </div>
 
                                                     <div className="d-flex justify-content-between flex-lg-row flex-md-column m-b-25">
-                                                         <div className="txtRegistr">Car Model<br/>
+                                                         <div className="txtRegistr">{phrases['Model']}<br/>
                                                             <strong>{vehicleDetails && vehicleDetails.vehiclemodel && vehicleDetails.vehiclemodel.description ? vehicleDetails.vehiclemodel.description+" "+vehicleDetails.varientmodel.varient : ""}</strong></div>
-                                                        <div><button className="rgistrBtn" type="button" onClick= {this.selectVehicleBrand.bind(this,productId)}>Edit</button></div>          
+                                                        <div><button className="rgistrBtn" type="button" onClick= {this.selectVehicleBrand.bind(this,productId)}>{phrases['Edit']}</button></div>          
                                                     </div>
 
                                                     <div className="d-flex justify-content-between flex-lg-row flex-md-column m-b-25">
-                                                        <div className="txtRegistr">Fuel Type<br/>
+                                                        <div className="txtRegistr">{phrases['Fuel']}<br/>
                                                             <strong>{vehicleDetails && vehicleDetails.varientmodel && fuel[Math.floor(vehicleDetails.varientmodel.fuel_type)]} </strong></div>
                                                     </div>
                                                 </div>

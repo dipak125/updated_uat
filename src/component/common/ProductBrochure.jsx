@@ -5,8 +5,9 @@ import axios from "../../shared/axios"
 import { connect } from "react-redux";
 import { loaderStart, loaderStop } from "../../store/actions/loader";
 
+let phrases = localStorage.getItem("phrases") ? JSON.parse(localStorage.getItem("phrases")) : null
+
 const initialValues = {};
-  
 
 class ProductBrochure extends Component {
 
@@ -14,10 +15,9 @@ class ProductBrochure extends Component {
         doc_list: [
             {
               "id": "1",
-              "product": "Arogya Sanjeevani brochure",
+              "product": 'ArogyaSanjeevaniBrochure',
               "image" : "Miscellaneous-car.svg"
-            }
-                  
+            }                  
           ]
       };
 
@@ -67,6 +67,7 @@ class ProductBrochure extends Component {
 
     render() {
         const { doc_list } = this.state;
+        let phrases = localStorage.getItem("phrases") ? JSON.parse(localStorage.getItem("phrases")) : null
         return (
             <Row>
                 <Col sm={12}>
@@ -77,8 +78,8 @@ class ProductBrochure extends Component {
                                 {doc_list.map((doc, docIndex) => ( 
                                     <tr key={docIndex}>
                                         {/* <td className="W-10"><img src={require(`../../assets/images/${doc.image}`)} alt="" /></td> */}
-                                        <td className="W-70">{doc.product}</td>
-                                        <td className="W-10 text-right"> <button className="buy" onClick= {this.dload_doc.bind(this, doc.id )} >View</button></td>
+                                        <td className="W-70">{phrases[doc.product]}</td>
+                                        <td className="W-10 text-right"> <button className="buy" onClick= {this.dload_doc.bind(this, doc.id )} >{phrases['View']}</button></td>
                                     </tr>
                                 ))
                                 }

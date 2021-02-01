@@ -602,6 +602,7 @@ class TwoWheelerVerify extends Component {
     render() {
         const {insurerList, vahanDetails, error, policyCoverage, vahanVerify, previousPolicy, motorInsurance} = this.state
         const {productId} = this.props.match.params 
+        let phrases = localStorage.getItem("phrases") ? JSON.parse(localStorage.getItem("phrases")) : null
 
         let newInitialValues = Object.assign(initialValue, {
             registration_no: motorInsurance.registration_no ? motorInsurance.registration_no : "",
@@ -676,11 +677,11 @@ class TwoWheelerVerify extends Component {
                         <SideNav />
                     </div>
                 <div className="col-sm-12 col-md-12 col-lg-10 col-xl-10 infobox">
-                <h4 className="text-center mt-3 mb-3">SBI General Insurance Company Limited</h4>
+                <h4 className="text-center mt-3 mb-3">{phrases['SBIGICL']}</h4>
                 <section className="brand m-b-25">
                     <div className="d-flex justify-content-left">
                         <div className="brandhead">
-                            <h4 className="fs-18 m-b-30">Please share your vehicle details.</h4>
+                            <h4 className="fs-18 m-b-30">{phrases['VehicleDetails']}.</h4>
                             <h5>{errMsg}</h5>
                         </div>
                     </div>
@@ -694,7 +695,7 @@ class TwoWheelerVerify extends Component {
                         <Form>
                         <FormGroup>
                                 <div className="carloan">
-                                    <h4> Please verify your vehicle</h4>
+                                    <h4> {phrases['VerifyVehicle']}</h4>
                                 </div>
                             </FormGroup>
                         <Row>
@@ -706,7 +707,7 @@ class TwoWheelerVerify extends Component {
                                 <Col sm={12} md={5} lg={6}>
                                     <FormGroup>
                                         <div className="insurerName">
-                                        Registration No:
+                                        {phrases['RegNo']}:
                                         </div>
                                     </FormGroup>
                                     </Col>
@@ -750,7 +751,7 @@ class TwoWheelerVerify extends Component {
                                 <Col sm={12} md={5} lg={7}>
                                     <FormGroup>
                                         <div className="insurerName">
-                                        Please Enter Last 5 digits of Chassis no.
+                                        {phrases['ChassisNo']}
                                         </div>
                                     </FormGroup>
                                 </Col>
@@ -785,7 +786,7 @@ class TwoWheelerVerify extends Component {
                                 <Col sm={12} md={2} lg={2}>
                                     <FormGroup>
                                     
-                                        <Button className="btn btn-primary vrifyBtn" onClick= {!errors.chasis_no_last_part ? this.getVahanDetails.bind(this,values, setFieldTouched, setFieldValue, errors) : null}>Verify</Button>
+                                        <Button className="btn btn-primary vrifyBtn" onClick= {!errors.chasis_no_last_part ? this.getVahanDetails.bind(this,values, setFieldTouched, setFieldValue, errors) : null}>{phrases['Verify']}</Button>
                                         {errors.vahanVerify ? (
                                                 <span className="errorMsg">{errors.vahanVerify}</span>
                                             ) : null}
@@ -801,7 +802,7 @@ class TwoWheelerVerify extends Component {
                                                 <Field
                                                     name="engine_no"
                                                     type="text"
-                                                    placeholder="Engine Number"
+                                                    placeholder={phrases['EngineNumber']}
                                                     autoComplete="off"
                                                     onFocus={e => this.changePlaceHoldClassAdd(e)}
                                                     onBlur={e => this.changePlaceHoldClassRemove(e)}
@@ -824,7 +825,7 @@ class TwoWheelerVerify extends Component {
                                                 <Field
                                                     name="chasis_no"
                                                     type="text"
-                                                    placeholder="Chasis Number"
+                                                    placeholder={phrases['ChasisNumber']}
                                                     autoComplete="off"
                                                     onFocus={e => this.changePlaceHoldClassAdd(e)}
                                                     onBlur={e => this.changePlaceHoldClassRemove(e)}
@@ -860,7 +861,7 @@ class TwoWheelerVerify extends Component {
                                     <Col sm={12}>
                                         <FormGroup>
                                             <div className="carloan">
-                                                <h4> Previous Policy Details</h4>
+                                                <h4> {phrases['PPD']}</h4>
                                             </div>
                                         </FormGroup>
                                     </Col>
@@ -878,7 +879,7 @@ class TwoWheelerVerify extends Component {
                                                 dateFormat="dd MMM yyyy"
                                                 disabledKeyboardNavigation
                                                 openToDate={new Date(minDate)}
-                                                placeholderText="Previous policy start date"
+                                                placeholderText={phrases['PPSD']}
                                                 peekPreviousMonth
                                                 peekPreviousYear
                                                 showMonthDropdown
@@ -902,7 +903,7 @@ class TwoWheelerVerify extends Component {
                                             <DatePicker
                                                 name="previous_end_date"
                                                 dateFormat="dd MMM yyyy"
-                                                placeholderText="Previous policy end date"
+                                                placeholderText={phrases['PPED']}
                                                 autoComplete="off"
                                                 disabled = {true}
                                                 dropdownMode="select"
@@ -929,9 +930,9 @@ class TwoWheelerVerify extends Component {
                                                     value = {values.previous_policy_name}
                                                     // value={ageObj.whatIsCurrentMonth(values.registration_date) < 7 ? 6 : values.previous_policy_name}
                                                 >
-                                                    <option value="">Select Policy Type</option>
-                                                    <option value="1">Package</option>
-                                                    <option value="2">Liability Only</option>  
+                                                <option value="">{phrases['SPT']}</option> 
+                                                <option value="1">{phrases['Package']}</option>
+                                                <option value="2">{phrases['Liability']}</option>
                                         
                                                 </Field>
                                                 {errors.previous_policy_name && touched.previous_policy_name ? (
@@ -952,7 +953,7 @@ class TwoWheelerVerify extends Component {
                                             autoComplete="off"                                                                        
                                             className="formGrp"
                                         >
-                                            <option value="">Select Insurer Company</option>
+                                            <option value="">{phrases['SelectInsurer']}</option>
                                             {insurerList.map((insurer, qIndex) => ( 
                                                 <option value= {insurer.Id}>{insurer.name}</option>
                                             ))}
@@ -970,7 +971,7 @@ class TwoWheelerVerify extends Component {
                                                 <Field
                                                     name="previous_city"
                                                     type="text"
-                                                    placeholder="Previous Insurer Address"
+                                                    placeholder={phrases['PInsurerAddress']}
                                                     autoComplete="off"
                                                     onFocus={e => this.changePlaceHoldClassAdd(e)}
                                                     onBlur={e => this.changePlaceHoldClassRemove(e)}
@@ -991,7 +992,7 @@ class TwoWheelerVerify extends Component {
                                                     name="previous_policy_no"
                                                     type="text"
                                                     maxLength="28"
-                                                    placeholder="Previous Policy Number"
+                                                    placeholder={phrases['PPolicyNumber']}
                                                     autoComplete="off"
                                                     onFocus={e => this.changePlaceHoldClassAdd(e)}
                                                     onBlur={e => this.changePlaceHoldClassRemove(e)}
@@ -1023,8 +1024,7 @@ class TwoWheelerVerify extends Component {
                                                 <h4> </h4>
                                             </div>
                                             <div className="col-md-15">
-                                                <div className="brandhead"> 
-                                                    I/we hold a valid and effective PUC and/or fitness certificate, as applicable, for the vehicle mentioned herein and undertake to renew the same during the policy period
+                                                <div className="brandhead"> {phrases['EffectivePUC']}
                                                     <div className="carloan">
                                                         <h4> </h4>
                                                     </div>
@@ -1043,7 +1043,7 @@ class TwoWheelerVerify extends Component {
                                                                         }  
                                                                         }
                                                                     />
-                                                                    <span className="checkmark " /><span className="fs-14"> Yes</span>
+                                                                    <span className="checkmark " /><span className="fs-14">{phrases['Yes']}</span>
                                                                 </label>
                                                             </div>
                                                             <div className="p-r-25">
@@ -1060,7 +1060,7 @@ class TwoWheelerVerify extends Component {
                                                                         }  
                                                                         }
                                                                     />
-                                                                    <span className="checkmark " /><span className="fs-14"> No</span>
+                                                                    <span className="checkmark " /><span className="fs-14">{phrases['No']}</span>
                                                                 </label>
                                                                 {errors.puc && touched.puc ? (
                                                                     <span className="errorMsg">{errors.puc}</span>
@@ -1076,11 +1076,11 @@ class TwoWheelerVerify extends Component {
 
                                     <div className="d-flex justify-content-left resmb">
                                         <Button className={`backBtn`} type="button"  onClick= {this.otherComprehensive.bind(this,productId)}>
-                                            Back
+                                        {phrases['Back']}
                                         </Button> 
                                         {values.puc == '1' ? 
                                         <Button className={`proceedBtn`} type="submit"  >
-                                            Continue
+                                           {phrases['Continue']}
                                         </Button>
                                         : null }
                                         </div>

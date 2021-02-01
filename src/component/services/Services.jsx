@@ -31,6 +31,7 @@ class Services extends Component {
     
     render() {
         const {product_id} = this.state
+        let phrases = localStorage.getItem("phrases") ? JSON.parse(localStorage.getItem("phrases")) : null
         console.log('product_id', product_id)
         return (
             <>
@@ -49,7 +50,7 @@ class Services extends Component {
                                                 <Col sm={12}>
                                                     <Nav variant="pills" className="flex-column">
                                                         <div className="d-flex justify-content-left messageDeskTab">
-                                                        <div><Nav.Item><Nav.Link eventKey="first">Services</Nav.Link></Nav.Item></div>
+                                                        <div><Nav.Item><Nav.Link eventKey="first">{phrases['Services']}</Nav.Link></Nav.Item></div>
                                                         
                                                         </div>
                                                     </Nav>
@@ -73,7 +74,7 @@ class Services extends Component {
                         </div>
                     </div>
                 </section>
-            </BaseComponent>>
+            </BaseComponent>
             </>
         );
     }

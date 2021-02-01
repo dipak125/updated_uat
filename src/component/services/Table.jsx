@@ -13,18 +13,18 @@ class Table extends Component {
     state = {
         doc_list: [
             {
-                "id": "1",
-                "product": "Garage Network",
+              "id": "1",
+                "product": "GarageNetwork",
                 "image" : "Miscellaneous-car.svg"
               } ,
               {
                 "id": "2",
-                "product": "Hospital Network",
+                "product": "HospitalNetwork",
                 "image" : "Miscellaneous-car.svg"
               } ,
               {
                 "id": "3",
-                "product": "Change Policy Details",
+                "product": "ChangePolicyDetails",
                 "image" : "Miscellaneous-car.svg"
               }          
           ]
@@ -77,6 +77,7 @@ class Table extends Component {
 
     render() {
         const { doc_list } = this.state;
+        let phrases = localStorage.getItem("phrases") ? JSON.parse(localStorage.getItem("phrases")) : null
         return (
             <Row>
                 <Col sm={12}>
@@ -87,8 +88,8 @@ class Table extends Component {
                                 {doc_list.map((doc, docIndex) => ( 
                                     <tr key={docIndex}>
                                         {/* <td className="W-10"><img src={require(`../../assets/images/${doc.image}`)} alt="" /></td> */}
-                                        <td className="W-70">{doc.product}</td>
-                                        <td className="W-10 text-right"> <button className="buy" onClick= {this.dload_doc.bind(this, doc.id )} >Go</button></td>
+                                        <td className="W-70">{phrases[doc.product]}</td>
+                                        <td className="W-10 text-right"> <button className="buy" onClick= {this.dload_doc.bind(this, doc.id )} >{phrases['Go']}</button></td>
                                     </tr>
                                 ))
                                 }

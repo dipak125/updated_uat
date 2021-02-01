@@ -634,6 +634,8 @@ class OtherComprehensive extends Component {
         let PA_flag = motorInsurance && (motorInsurance.pa_cover == null || motorInsurance.pa_cover == "") ? '0' : '1'
         let PA_Cover = motorInsurance &&  motorInsurance.pa_cover != null ? motorInsurance.pa_cover : ''
         let newInitialValues = {}
+        
+        let phrases = localStorage.getItem("phrases") ? JSON.parse(localStorage.getItem("phrases")) : null
 
         if(selectFlag == '1') {
              newInitialValues = Object.assign(initialValue, {
@@ -743,17 +745,18 @@ class OtherComprehensive extends Component {
         return (
             <>
                 <BaseComponent>
+                {phrases ? 
                 <div className="container-fluid">
                 <div className="row">
                     <div className="col-sm-12 col-md-12 col-lg-2 col-xl-2 pd-l-0">
                         <SideNav />
                     </div>
                 <div className="col-sm-12 col-md-12 col-lg-10 col-xl-10 infobox">
-                <h4 className="text-center mt-3 mb-3">SBI General Insurance Company Limited</h4>
+                <h4 className="text-center mt-3 mb-3">{phrases['SBIGICL']}</h4>
                 <section className="brand colpd m-b-25">
                     <div className="d-flex justify-content-left">
                         <div className="brandhead m-b-10">
-                            <h4 className="m-b-30">Covers your Car + Damage to Others (Comprehensive)</h4>
+                            <h4 className="m-b-30">{phrases['CoversYourCar']}</h4>
                             <h5>{errMsg}</h5>
                         </div>
                     </div>
@@ -767,7 +770,7 @@ class OtherComprehensive extends Component {
                         <Row>
                             <Col sm={12} md={9} lg={9}>
                                 <div className="rghtsideTrigr W-90 m-b-30">
-                                    <Collapsible trigger="Default Covered Coverages & Benefit" >
+                                    <Collapsible trigger={phrases['DefaultCovered']} >
                                         <div className="listrghtsideTrigr">
                                             {policyCoverageList}
                                         </div>
@@ -780,7 +783,7 @@ class OtherComprehensive extends Component {
                             <Col sm={12} md={5} lg={6}>
                                 <FormGroup>
                                     <div className="insurerName">
-                                    Registration No:
+                                    {phrases['RegNo']}
                                     </div>
                                 </FormGroup>
                             </Col>
@@ -827,7 +830,7 @@ class OtherComprehensive extends Component {
                                         <Col sm={12} md={5} lg={6}>
                                             <FormGroup>
                                                 <div className="insurerName">
-                                                Please Enter Last 5 digits of Chassis no.
+                                                {phrases['ChassisNo']}.
                                                 </div>
                                             </FormGroup>
                                         </Col>
@@ -862,7 +865,7 @@ class OtherComprehensive extends Component {
                                     <Col sm={12} md={2} lg={2}>
                                         <FormGroup>
                                         
-                                            <Button className="btn btn-primary vrifyBtn" onClick= {!errors.chasis_no_last_part ? this.getVahanDetails.bind(this,values, setFieldTouched, setFieldValue, errors) : null}>Verify</Button>
+                                            <Button className="btn btn-primary vrifyBtn" onClick= {!errors.chasis_no_last_part ? this.getVahanDetails.bind(this,values, setFieldTouched, setFieldValue, errors) : null}>{phrases['Verify']}</Button>
                                             {errors.vahanVerify ? (
                                                     <span className="errorMsg">{errors.vahanVerify}</span>
                                                 ) : null}
@@ -877,7 +880,7 @@ class OtherComprehensive extends Component {
                                             <Field
                                                 name="engine_no"
                                                 type="text"
-                                                placeholder="Engine Number"
+                                                placeholder={phrases["EngineNumber"]}
                                                 autoComplete="off"
                                                 onFocus={e => this.changePlaceHoldClassAdd(e)}
                                                 onBlur={e => this.changePlaceHoldClassRemove(e)}
@@ -900,7 +903,7 @@ class OtherComprehensive extends Component {
                                             <Field
                                                 name="chasis_no"
                                                 type="text"
-                                                placeholder="Chasis Number"
+                                                placeholder={phrases["ChasisNumber"]}
                                                 autoComplete="off"
                                                 onFocus={e => this.changePlaceHoldClassAdd(e)}
                                                 onBlur={e => this.changePlaceHoldClassRemove(e)}
@@ -924,7 +927,7 @@ class OtherComprehensive extends Component {
                                 <Col sm={12} md={4} lg={4}>
                                     <FormGroup>
                                         <div className="insurerName">
-                                            <span className="fs-16">Insured Declared Value</span>
+                                            <span className="fs-16">{phrases['IDValue']}</span>
                                         </div>
                                     </FormGroup>
                                 </Col>
@@ -1055,7 +1058,7 @@ class OtherComprehensive extends Component {
                             <Row>
                                 <Col sm={12} md={12} lg={12}>
                                     <FormGroup>
-                                        <span className="fs-18"> Add  more coverage to your plan.</span>
+                                        <span className="fs-18"> {phrases['AddMoreCoverage']}.</span>
                                     </FormGroup>
                                 </Col>
                             </Row>
@@ -1104,7 +1107,7 @@ class OtherComprehensive extends Component {
                                                             this.handleChange()
                                                         }}
                                                     >
-                                                        <option value="">Select Sum Insured</option>
+                                                        <option value="">{phrases['SSI']}</option>
                                                         <option value="50000">50000</option>
                                                         <option value="100000">100000</option>  
                                             
@@ -1127,7 +1130,7 @@ class OtherComprehensive extends Component {
                                             </div>
                                             <div className="col-md-15">
                                                 <div className="brandhead"> 
-                                                    I/we hold a valid and effective PUC and/or fitness certificate, as applicable, for the vehicle mentioned herein and undertake to renew the same during the policy period
+                                                    {phrases['EffectivePUC']}
                                                     <div className="carloan">
                                                         <h4> </h4>
                                                     </div>
@@ -1146,7 +1149,7 @@ class OtherComprehensive extends Component {
                                                                         }  
                                                                         }
                                                                     />
-                                                                    <span className="checkmark " /><span className="fs-14"> Yes</span>
+                                                                    <span className="checkmark " /><span className="fs-14"> {phrases['Yes']}</span>
                                                                 </label>
                                                             </div>
                                                             <div className="p-r-25">
@@ -1163,7 +1166,7 @@ class OtherComprehensive extends Component {
                                                                         }  
                                                                         }
                                                                     />
-                                                                    <span className="checkmark " /><span className="fs-14"> No</span>
+                                                                    <span className="checkmark " /><span className="fs-14"> {phrases['No']}</span>
                                                                 </label>
                                                                 {errors.puc && touched.puc ? (
                                                                     <span className="errorMsg">{errors.puc}</span>
@@ -1179,16 +1182,16 @@ class OtherComprehensive extends Component {
                                 
                                 <div className="d-flex justify-content-left resmb">
                                     <Button className={`backBtn`} type="button"  onClick= {this.vehicleDetails.bind(this,productId)}>
-                                        Back
+                                        {phrases['Back']}
                                     </Button> 
 
                                         { serverResponse && serverResponse != "" ? (serverResponse.message ? 
                                         <Button className={`proceedBtn`} type="submit"  >
-                                            Recalculate
+                                            {phrases['Recalculate']}
                                         </Button> : (values.puc == '1' ?  <Button className={`proceedBtn`} type="submit"  >
-                                            Continue
+                                            {phrases['Continue']}
                                         </Button>  : null)) : <Button className={`proceedBtn`} type="submit"  >
-                                            Recalculate
+                                            {phrases['Recalculate']}
                                         </Button>}
 
                                     </div>
@@ -1196,11 +1199,11 @@ class OtherComprehensive extends Component {
 
                                 <Col sm={12} md={3}>
                                     <div className="justify-content-left regisBox">
-                                        <h3 className="premamnt"> Total Premium Amount</h3>
+                                        <h3 className="premamnt"> {phrases['TPAmount']}</h3>
                                         <div className="rupee"> ₹ {fulQuoteResp.DuePremium}</div>
                                         <div className="text-center">
                                             <Button className={`brkbtn`} type="button" onClick= {this.handleShow}>
-                                            Breakup
+                                            {phrases['Breakup']}
                                             </Button> 
                                             </div>
                                     </div>
@@ -1214,32 +1217,32 @@ class OtherComprehensive extends Component {
                 <Footer />
                 </div>
                 </div>
-                </div>
+                </div> : null }
                 </BaseComponent>
                 <Modal className="customModal" bsSize="md"
                     show={this.state.show}
                     onHide={this.handleClose}>
                     <Modal.Header closeButton className="custmModlHead modalhd">
                         <div className="cntrbody">
-                            <h3>Premium breakup </h3>                           
+                            <h3>{phrases['PremiumBreakup']} </h3>                           
                         </div>
                     </Modal.Header>
                     <Modal.Body>
                     <table class="table table-bordered">
                             <thead>
                                 <tr>
-                                    <th>Premium:</th>
+                                    <th>{phrases['Premium']}:</th>
                                     <th>₹ {fulQuoteResp.DuePremium}</th>
                                 </tr>
                             </thead>
                             <tbody>
                             {premiumBreakup}
                                 <tr>
-                                    <td>Gross Premium:</td>
+                                    <td>{phrases['GrossPremium']}:</td>
                                     <td>₹ {Math.round(fulQuoteResp.BeforeVatPremium)}</td>
                                 </tr>
                                 <tr>
-                                    <td>GST:</td>
+                                    <td>{phrases['GST']}:</td>
                                     <td>₹ {Math.round(fulQuoteResp.TGST)}</td>
                                 </tr>
                             </tbody>

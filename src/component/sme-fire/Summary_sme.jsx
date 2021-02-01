@@ -9,7 +9,7 @@ import axios from "../../shared/axios";
 import { withRouter, Link, Route } from "react-router-dom";
 import { loaderStart, loaderStop } from "../../store/actions/loader";
 
-import { setSmeRiskData,setSmeData,setSmeOthersDetailsData,setSmeProposerDetailsData } from "../../store/actions/sme_fire";
+import { setSmeRiskData, setSmeData, setSmeOthersDetailsData, setSmeProposerDetailsData } from "../../store/actions/sme_fire";
 import { connect } from "react-redux";
 import * as Yup from "yup";
 import Encryption from '../../shared/payload-encryption';
@@ -17,15 +17,16 @@ import queryString from 'query-string';
 import fuel from '../common/FuelTypes';
 import swal from 'sweetalert';
 import moment from "moment";
+import Blink from 'react-blink-text';
 
 const initialValue = {}
 
 const validatePremium = Yup.object().shape({
     refNo: Yup.string().notRequired('Reference number is required')
-    .matches(/^[a-zA-Z0-9]*$/, function() {
-        return "Please enter valid reference number"
-    }),
-    })
+        .matches(/^[a-zA-Z0-9]*$/, function () {
+            return "Please enter valid reference number"
+        }),
+})
 
 class Summary_sme extends Component {
 
@@ -48,17 +49,17 @@ class Summary_sme extends Component {
             accessToken: "",
             PolicyArray: [],
             memberdetails: [],
-            nomineedetails:[],
+            nomineedetails: [],
             relation: [],
             policyHolder: [],
             vehicleDetails: [],
             previousPolicy: [],
             request_data: [],
             breakin_flag: 0,
-            salutationName:'',
-            policyHolder_refNo: queryString.parse(this.props.location.search).access_id ? 
-                                queryString.parse(this.props.location.search).access_id : 
-                                localStorage.getItem("policyHolder_refNo")
+            salutationName: '',
+            policyHolder_refNo: queryString.parse(this.props.location.search).access_id ?
+                queryString.parse(this.props.location.search).access_id :
+                localStorage.getItem("policyHolder_refNo")
         };
     }
 
@@ -88,9 +89,9 @@ class Summary_sme extends Component {
         //     axios.post('/sme/con-sequence',
         //     formDataNew
         //     ).then(res=>{
-                const {productId} = this.props.match.params;
-                this.props.loadingStop();
-                this.props.history.push(`/AdditionalDetails_SME/${productId}`);
+        const { productId } = this.props.match.params;
+        this.props.loadingStop();
+        this.props.history.push(`/AdditionalDetails_SME/${productId}`);
         //     }).
         //     catch(err=>{
         //         this.props.loadingStop();
@@ -101,51 +102,50 @@ class Summary_sme extends Component {
         // });
     }
 
-    fetchPolicyDetails=()=>{
-        let policy_holder_ref_no = localStorage.getItem("policy_holder_ref_no") ? localStorage.getItem("policy_holder_ref_no"):0;
+    fetchPolicyDetails = () => {
+        let policy_holder_ref_no = localStorage.getItem("policy_holder_ref_no") ? localStorage.getItem("policy_holder_ref_no") : 0;
         let encryption = new Encryption();
-        
-            this.props.loadingStart();
-            axios.get(`sme/details/${policy_holder_ref_no}`)
-            .then(res=>{
+
+        this.props.loadingStart();
+        axios.get(`sme/details/${policy_holder_ref_no}`)
+            .then(res => {
                 let decryptResp = JSON.parse(encryption.decrypt(res.data));
                 let rawData = decryptResp.data
-                
-                if(decryptResp.data.policyHolder.step_no > 0){
+
+                if (decryptResp.data.policyHolder.step_no > 0) {
 
                     this.props.setData({
-                        start_date:decryptResp.data.policyHolder.request_data.start_date,
-                        end_date:decryptResp.data.policyHolder.request_data.end_date,
-                        
-                        policy_holder_id:decryptResp.data.policyHolder.id,
-                        policy_holder_ref_no:policy_holder_ref_no,
-                        request_data_id:decryptResp.data.policyHolder.request_data.id,
-                        completed_step:decryptResp.data.policyHolder.step_no,
-                        menumaster_id:decryptResp.data.policyHolder.menumaster_id,
-                        payment_link_status: decryptResp.data.policyHolder && decryptResp.data.policyHolder.bcmaster ? decryptResp.data.policyHolder.bcmaster.eligible_for_payment_link : 0
+                        start_date: decryptResp.data.policyHolder.request_data.start_date,
+                        end_date: decryptResp.data.policyHolder.request_data.end_date,
+
+                        policy_holder_id: decryptResp.data.policyHolder.id,
+                        policy_holder_ref_no: policy_holder_ref_no,
+                        request_data_id: decryptResp.data.policyHolder.request_data.id,
+                        completed_step: decryptResp.data.policyHolder.step_no,
+                        menumaster_id: decryptResp.data.policyHolder.menumaster_id
                     });
 
-                    
+
 
                 }
 
-                if(decryptResp.data.policyHolder.step_no == 1 || decryptResp.data.policyHolder.step_no > 1){
+                if (decryptResp.data.policyHolder.step_no == 1 || decryptResp.data.policyHolder.step_no > 1) {
 
                     let risk_arr = JSON.parse(decryptResp.data.policyHolder.smeinfo.risk_address);
 
                     this.props.setRiskData(
                         {
-                            house_building_name:risk_arr.house_building_name,
-                            block_no:risk_arr.block_no,
-                            street_name:risk_arr.street_name,
-                            plot_no:risk_arr.plot_no,
-                            house_flat_no:risk_arr.house_flat_no,
-                            pincode:decryptResp.data.policyHolder.smeinfo.pincode,
-                            pincode_id:decryptResp.data.policyHolder.smeinfo.pincode_id,
+                            house_building_name: risk_arr.house_building_name,
+                            block_no: risk_arr.block_no,
+                            street_name: risk_arr.street_name,
+                            plot_no: risk_arr.plot_no,
+                            house_flat_no: risk_arr.house_flat_no,
+                            pincode: decryptResp.data.policyHolder.smeinfo.pincode,
+                            pincode_id: decryptResp.data.policyHolder.smeinfo.pincode_id,
 
-                            buildings_sum_insured:decryptResp.data.policyHolder.smeinfo.buildings_sum_insured,
-                            content_sum_insured:decryptResp.data.policyHolder.smeinfo.content_sum_insured,
-                            stock_sum_insured:decryptResp.data.policyHolder.smeinfo.stock_sum_insured
+                            buildings_sum_insured: decryptResp.data.policyHolder.smeinfo.buildings_sum_insured,
+                            content_sum_insured: decryptResp.data.policyHolder.smeinfo.content_sum_insured,
+                            stock_sum_insured: decryptResp.data.policyHolder.smeinfo.stock_sum_insured
                         }
                     );
                 }
@@ -153,14 +153,14 @@ class Summary_sme extends Component {
                 // if(decryptResp.data.policyHolder.step_no == 2 || decryptResp.data.policyHolder.step_no > 2){
 
                 //     this.props.setSmeOthersDetails({
-                    
+
                 //         Commercial_consideration:decryptResp.data.policyHolder.previouspolicy.Commercial_consideration,
                 //         previous_start_date:decryptResp.data.policyHolder.previouspolicy.start_date,
                 //         previous_end_date:decryptResp.data.policyHolder.previouspolicy.end_date,
                 //         Previous_Policy_No:decryptResp.data.policyHolder.previouspolicy.policy_no,
                 //         insurance_company_id:decryptResp.data.policyHolder.previouspolicy.insurancecompany_id,
                 //         previous_city:decryptResp.data.policyHolder.previouspolicy.address
-        
+
                 //     });
 
                 // }
@@ -193,27 +193,27 @@ class Summary_sme extends Component {
                 // }
 
                 let pincode_area_arr = JSON.parse(decryptResp.data.policyHolder.pincode_response);
-                
-                this.setState( 
+
+                this.setState(
                     {
                         // salutationName:decryptResp.data.policyHolder.salutation.displayvalue ,
                         // pincodeArea:pincode_area_arr.LCLTY_SUBRB_TALUK_TEHSL_NM != null ? pincode_area_arr.LCLTY_SUBRB_TALUK_TEHSL_NM : 0,
-                        quoteId:decryptResp.data.policyHolder.request_data.quote_id != null ? decryptResp.data.policyHolder.request_data.quote_id : 0,
-                        gst:decryptResp.data.policyHolder.request_data.service_tax != null ? decryptResp.data.policyHolder.request_data.service_tax : 0,
-                        netPremium:decryptResp.data.policyHolder.request_data.net_premium != null ? decryptResp.data.policyHolder.request_data.net_premium : 0,
-                        finalPremium:decryptResp.data.policyHolder.request_data.payable_premium != null ? decryptResp.data.policyHolder.request_data.payable_premium : 0,
+                        quoteId: decryptResp.data.policyHolder.request_data.quote_id != null ? decryptResp.data.policyHolder.request_data.quote_id : 0,
+                        gst: decryptResp.data.policyHolder.request_data.service_tax != null ? decryptResp.data.policyHolder.request_data.service_tax : 0,
+                        netPremium: decryptResp.data.policyHolder.request_data.net_premium != null ? decryptResp.data.policyHolder.request_data.net_premium : 0,
+                        finalPremium: decryptResp.data.policyHolder.request_data.payable_premium != null ? decryptResp.data.policyHolder.request_data.payable_premium : 0,
                         rawData: rawData.policyHolder.smeinfo.smecoverages != null ? rawData.policyHolder.smeinfo.smecoverages : 0,
                     }
                 );
-                    this.props.loadingStop();
+                this.props.loadingStop();
             })
             .catch(err => {
                 this.props.loadingStop();
                 swal("Thank you for showing your interest for buying product.Due to some reasons, we are not able to issue the policy online.Please call 1800 22 1111")
                 return false;
             })
-        
-        
+
+
     }
 
     componentDidMount() {
@@ -222,9 +222,9 @@ class Summary_sme extends Component {
 
     getGender = (gender) => {
 
-        if(gender == 'm'){
+        if (gender == 'm') {
             return 'Male';
-        }else if(gender == 'f'){
+        } else if (gender == 'f') {
             return 'Female';
         }
 
@@ -240,7 +240,7 @@ class Summary_sme extends Component {
     }
 
     render() {
-        const { policyHolder, show, fulQuoteResp, motorInsurance, error, error1, refNumber, paymentStatus, relation, memberdetails,nomineedetails, vehicleDetails, breakin_flag, rawData} = this.state
+        const { policyHolder, show, fulQuoteResp, motorInsurance, error, error1, refNumber, paymentStatus, relation, memberdetails, nomineedetails, vehicleDetails, breakin_flag, rawData } = this.state
         const { productId } = this.props.match.params
         // console.log("rawData-----",rawData)
         // console.log("data------",rawData.policyHolder.smeinfo)
@@ -268,17 +268,17 @@ class Summary_sme extends Component {
                 </span>
             ) : null;
 
-            const sme_Coverages =
+        const sme_Coverages =
             rawData && rawData.length > 0
-              ? rawData.map((listing, qIndex) => (                   
-                  <tr>
-                  <td>{listing.coverage.description} :</td>
-                  <td>{ listing.coverage.description == "Architecture and Surveyor Fee (Upto 3% of Claim Amount)" || listing.coverage.description == "Removal of Debris (Upto 1% claim amount)" ? '   ----' : listing.sum_insured}
-                  {/* <td>{listing.sum_insured == null ? 0 : listing.sum_insured}</td> */}</td>
-                  <td>{listing.premium == null ? 0 : listing.premium}</td>
-                </tr>
+                ? rawData.map((listing, qIndex) => (
+                    <tr>
+                        <td>{listing.coverage.description} :</td>
+                        <td>{listing.coverage.description == "Architecture and Surveyor Fee (Upto 3% of Claim Amount)" || listing.coverage.description == "Removal of Debris (Upto 1% claim amount)" ? '   ----' : listing.sum_insured}
+                            {/* <td>{listing.sum_insured == null ? 0 : listing.sum_insured}</td> */}</td>
+                        <td>{listing.premium == null ? 0 : listing.premium}</td>
+                    </tr>
                 ))
-              : null;
+                : null;
 
         return (
             <>
@@ -290,9 +290,17 @@ class Summary_sme extends Component {
                             </div>
 
                             <div className="col-sm-12 col-md-12 col-lg-10 col-xl-10 infobox">
-                                <h4 className="text-center mt-3 mb-3">SME Summary</h4>
+                                <div className="text">
+                                <h4 className="text-center mt-3 mb-0">SME Summary</h4>
+                                <a className="text-right mt-0 mb-3" href="">
+                                    <Blink color='blue' text='SME Pre Underwritten Shopkeeper Policy' fontSize='14'>
+                                    SME Pre Underwritten Shopkeeper Policy
+                                    </Blink>
+                                </a>
+                                </div>
+                                <h1 className="text-center mt-3 mb-4"> {" "} </h1>
                                 <Formik initialValues={initialValue} onSubmit={this.handleSubmit}
-                                validationSchema={validatePremium}
+                                    validationSchema={validatePremium}
                                 >
                                     {({ values, errors, setFieldValue, setFieldTouched, isValid, isSubmitting, touched }) => {
 
@@ -517,7 +525,7 @@ class Summary_sme extends Component {
                                                             </div> */}
 
                                                             <div className="rghtsideTrigr m-b-30">
-                                                                <Collapsible trigger="Policy Summary"  open= {true}>
+                                                                <Collapsible trigger="Policy Summary" open={true}>
                                                                     <div className="listrghtsideTrigr">
                                                                         <div>
                                                                             {/* <strong>Policy Summary:</strong>
@@ -547,59 +555,59 @@ class Summary_sme extends Component {
                                                                             </Row>
                                                                             <Row>
                                                                                 <Col sm={12} md={6}>
-                                                                                <table  style={({width: "45rem"})}>
-                                                                                <thead>
-                                                                                    <tr>
-                                                                                    <th>Cover Type</th>
-                                                                                    <th>Sum Insured(₹)</th>
-                                                                                    <th>Premium(₹)</th>
-                                                                                    </tr>
-                                                                                </thead>
-                                                                                <tbody>
-                                                                                {sme_Coverages}
-                                                                                </tbody>
-                                                                                </table>
+                                                                                    <table style={({ width: "45rem" })}>
+                                                                                        <thead>
+                                                                                            <tr>
+                                                                                                <th>Cover Type</th>
+                                                                                                <th>Sum Insured(₹)</th>
+                                                                                                <th>Premium(₹)</th>
+                                                                                            </tr>
+                                                                                        </thead>
+                                                                                        <tbody>
+                                                                                            {sme_Coverages}
+                                                                                        </tbody>
+                                                                                    </table>
                                                                                 </Col>
-                                                                                </Row>
-                                                                                <Row>
-                                                                                    <p></p>
-                                                                                </Row>
-                                                                                <Row>
-                                                                                    <Col sm={12} md={6}>
-                                                                                        <Row>
-                                                                                            <Col sm={12} md={6}>
-                                                                                                <FormGroup><strong>Net Premium(₹) :</strong></FormGroup>
-                                                                                            </Col>
-                                                                                            <Col sm={12} md={6}>
-                                                                                                <FormGroup>{this.state.netPremium}</FormGroup>
-                                                                                            </Col>
-                                                                                        </Row>
-                                                                                    </Col>
-                                                                                </Row>
-                                                                                <Row>
-                                                                                    <Col sm={12} md={6}>
-                                                                                        <Row>
-                                                                                            <Col sm={12} md={6}>
-                                                                                                <FormGroup><strong>GST(₹) :</strong></FormGroup>
-                                                                                            </Col>
-                                                                                            <Col sm={12} md={6}>
-                                                                                                <FormGroup>{this.state.gst}</FormGroup>
-                                                                                            </Col>
-                                                                                        </Row>
-                                                                                    </Col>
-                                                                                </Row>
-                                                                                <Row>
-                                                                                    <Col sm={12} md={6}>
-                                                                                        <Row>
-                                                                                            <Col sm={12} md={6}>
-                                                                                                <FormGroup><strong>Final Premium(₹) :</strong></FormGroup>
-                                                                                            </Col>
-                                                                                            <Col sm={12} md={6}>
-                                                                                                <FormGroup>{this.state.finalPremium}</FormGroup>
-                                                                                            </Col>
-                                                                                        </Row>
-                                                                                    </Col>
-                                                                                </Row>
+                                                                            </Row>
+                                                                            <Row>
+                                                                                <p></p>
+                                                                            </Row>
+                                                                            <Row>
+                                                                                <Col sm={12} md={6}>
+                                                                                    <Row>
+                                                                                        <Col sm={12} md={6}>
+                                                                                            <FormGroup><strong>Net Premium(₹) :</strong></FormGroup>
+                                                                                        </Col>
+                                                                                        <Col sm={12} md={6}>
+                                                                                            <FormGroup>{this.state.netPremium}</FormGroup>
+                                                                                        </Col>
+                                                                                    </Row>
+                                                                                </Col>
+                                                                            </Row>
+                                                                            <Row>
+                                                                                <Col sm={12} md={6}>
+                                                                                    <Row>
+                                                                                        <Col sm={12} md={6}>
+                                                                                            <FormGroup><strong>GST(₹) :</strong></FormGroup>
+                                                                                        </Col>
+                                                                                        <Col sm={12} md={6}>
+                                                                                            <FormGroup>{this.state.gst}</FormGroup>
+                                                                                        </Col>
+                                                                                    </Row>
+                                                                                </Col>
+                                                                            </Row>
+                                                                            <Row>
+                                                                                <Col sm={12} md={6}>
+                                                                                    <Row>
+                                                                                        <Col sm={12} md={6}>
+                                                                                            <FormGroup><strong>Final Premium(₹) :</strong></FormGroup>
+                                                                                        </Col>
+                                                                                        <Col sm={12} md={6}>
+                                                                                            <FormGroup>{this.state.finalPremium}</FormGroup>
+                                                                                        </Col>
+                                                                                    </Row>
+                                                                                </Col>
+                                                                            </Row>
                                                                             <Row>
                                                                                 <p></p>
                                                                             </Row>
@@ -610,13 +618,13 @@ class Summary_sme extends Component {
                                                             </div>
 
                                                             <div className="d-flex justify-content-left resmb">
-                                                                
-                                                                <Button className={`backBtn`} type="button" onClick= {this.otherDetails.bind(this,productId)}>
+
+                                                                <Button className={`backBtn`} type="button" onClick={this.otherDetails.bind(this, productId)}>
                                                                     {isSubmitting ? 'Wait..' : 'Back'}
-                                                                </Button> 
-                                                                <Button className={`proceedBtn`} type="submit"  disabled={isSubmitting ? true : false}>
+                                                                </Button>
+                                                                <Button className={`proceedBtn`} type="submit" disabled={isSubmitting ? true : false}>
                                                                     Next
-                                                                </Button> 
+                                                                </Button>
 
                                                             </div>
                                                         </Col>
@@ -641,9 +649,9 @@ const mapStateToProps = (state) => {
     return {
         loading: state.loader.loading,
 
-        policy_holder_ref_no:state.sme_fire.policy_holder_ref_no,
-        menumaster_id:state.sme_fire.menumaster_id,
-        policy_holder_id:state.sme_fire.policy_holder_id,
+        policy_holder_ref_no: state.sme_fire.policy_holder_ref_no,
+        menumaster_id: state.sme_fire.menumaster_id,
+        policy_holder_id: state.sme_fire.policy_holder_id,
 
         start_date: state.sme_fire.start_date,
         end_date: state.sme_fire.end_date,
@@ -660,31 +668,31 @@ const mapStateToProps = (state) => {
         content_sum_insured: state.sme_fire.content_sum_insured,
         stock_sum_insured: state.sme_fire.stock_sum_insured,
 
-        first_name:state.sme_fire.first_name,
-        last_name:state.sme_fire.last_name,
-        salutation_id:state.sme_fire.salutation_id,
-        date_of_birth:state.sme_fire.date_of_birth,
-        email_id:state.sme_fire.email_id,
-        mobile:state.sme_fire.mobile,
-        gender:state.sme_fire.gender,
-        pan_no:state.sme_fire.pan_no,
-        gstn_no:state.sme_fire.gstn_no,
+        first_name: state.sme_fire.first_name,
+        last_name: state.sme_fire.last_name,
+        salutation_id: state.sme_fire.salutation_id,
+        date_of_birth: state.sme_fire.date_of_birth,
+        email_id: state.sme_fire.email_id,
+        mobile: state.sme_fire.mobile,
+        gender: state.sme_fire.gender,
+        pan_no: state.sme_fire.pan_no,
+        gstn_no: state.sme_fire.gstn_no,
 
-        com_street_name:state.sme_fire.com_street_name,
-        com_plot_no:state.sme_fire.com_plot_no,
-        com_building_name:state.sme_fire.com_building_name,
-        com_block_no:state.sme_fire.com_block_no,
-        com_house_flat_no:state.sme_fire.com_house_flat_no,
-        com_pincode:state.sme_fire.com_pincode,
-        com_pincode_id:state.sme_fire.com_pincode_id,
+        com_street_name: state.sme_fire.com_street_name,
+        com_plot_no: state.sme_fire.com_plot_no,
+        com_building_name: state.sme_fire.com_building_name,
+        com_block_no: state.sme_fire.com_block_no,
+        com_house_flat_no: state.sme_fire.com_house_flat_no,
+        com_pincode: state.sme_fire.com_pincode,
+        com_pincode_id: state.sme_fire.com_pincode_id,
 
-        
-        previous_start_date:state.sme_fire.previous_start_date,
-        previous_end_date:state.sme_fire.previous_end_date,
-        Previous_Policy_No:state.sme_fire.Previous_Policy_No,
-        insurance_company_id:state.sme_fire.insurance_company_id,
-        previous_city:state.sme_fire.previous_city,
-        
+
+        previous_start_date: state.sme_fire.previous_start_date,
+        previous_end_date: state.sme_fire.previous_end_date,
+        Previous_Policy_No: state.sme_fire.Previous_Policy_No,
+        insurance_company_id: state.sme_fire.insurance_company_id,
+        previous_city: state.sme_fire.previous_city,
+
 
 
     };
@@ -694,10 +702,10 @@ const mapDispatchToProps = (dispatch) => {
     return {
         loadingStart: () => dispatch(loaderStart()),
         loadingStop: () => dispatch(loaderStop()),
-        setData:(data) => dispatch(setSmeData(data)),
-        setRiskData:(data) => dispatch(setSmeRiskData(data)),
-        setSmeProposerDetails:(data) => dispatch(setSmeProposerDetailsData(data)),
-        setSmeOthersDetails:(data) => dispatch(setSmeOthersDetailsData(data))
+        setData: (data) => dispatch(setSmeData(data)),
+        setRiskData: (data) => dispatch(setSmeRiskData(data)),
+        setSmeProposerDetails: (data) => dispatch(setSmeProposerDetailsData(data)),
+        setSmeOthersDetails: (data) => dispatch(setSmeOthersDetailsData(data))
     };
 };
 
