@@ -203,3 +203,20 @@ export const validRegistrationNumber = (value) => {
     }
      return true;
 }
+
+export const validSGTINcheck = (value) => {
+    var str = /^[0-9]{2}[A-Z]{3}[A,B,C,F,G,H,L,J,P,T]{1}[A-Z]{1}[0-9]{4}[A-Z]{1}[0-9]{1}[Z]{1}[A-Z0-9]{1}$/;
+    
+    if ( value && (value != '' || value != undefined) ) {  
+        if(value.match(str)) {    
+            let gstLength = value && value !="" && value.length > 4 ? value.length : 0
+            let subString = gstLength > 4 ? value.substring(0, 2) : 0
+            if (subString < 1 || subString > 37 ) {
+                return false;
+            }         
+            else return true;  
+        }
+        else return false;
+    }
+     return true;
+}

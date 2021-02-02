@@ -15,7 +15,7 @@ import axios from "../../shared/axios"
 import moment from "moment";
 import {  PersonAge } from "../../shared/dateFunctions";
 import Encryption from '../../shared/payload-encryption';
-
+import {  validSGTINcheck } from "../../shared/validationFunctions";
 
 const minDobAdult = moment(moment().subtract(100, 'years').calendar())
 const maxDobAdult = moment().subtract(18, 'years').calendar();
@@ -296,12 +296,21 @@ const ownerValidation = Yup.object().shape({
         otherwise: Yup.string()
     }), 
 
-    gstn_no: Yup.string().when(['policy_for'], {
-        is: policy_for => policy_for == '2',       
-        then: Yup.string().required('GSTIN is required')
-            .matches(/^[0-9]{2}[A-Z]{3}[CPHFATBLJG]{1}[A-Z]{1}[0-9]{4}[A-Z]{1}[0-9]{1}[A-Z]{1}[0-9]{1}$/,'Invalid GSTIN'),
-        otherwise: Yup.string().nullable()
-    }),
+    gstn_no: Yup.string()
+    // .matches(/^[0-9]{2}[A,B,C,F,G,H,L,J,P,T]{4}[A-Z]{1}[0-9]{4}[A-Z]{1}[0-9]{1}[Z]{1}[A-Z0-9]{1}$/,'Invalid GSTIN')
+    .test(
+        "first2digitcheck",
+        function() {
+            return "Invalid GSTIN"
+        },
+        function (value) {
+            if (value && (value != "" || value != undefined) ) {             
+                return validSGTINcheck(value);
+            }   
+            return true;
+        }
+    )
+    .nullable(),
 
     is_carloan: Yup.mixed().required('This field is required'),
     bank_name:Yup.string().notRequired('Bank Name is required')
@@ -800,7 +809,10 @@ class TwoWheelerAdditionalDetails extends Component {
                                                     autoComplete="off"
                                                     onFocus={e => this.changePlaceHoldClassAdd(e)}
                                                     onBlur={e => this.changePlaceHoldClassRemove(e)}
-                                                    value = {values.gstn_no.toUpperCase()}                                                                            
+                                                    value = {values.gstn_no.toUpperCase()} 
+                                                    onChange= {(e)=> 
+                                                        setFieldValue('gstn_no', e.target.value.toUpperCase())
+                                                        }                                                                                                           
                                                 />
                                                     {errors.gstn_no && touched.gstn_no ? (
                                                 <span className="errorMsg">{errors.gstn_no}</span>

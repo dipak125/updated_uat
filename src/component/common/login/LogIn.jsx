@@ -48,12 +48,9 @@ class LogIn extends Component {
           .post(`maintenance/fetchPhrases`, {})
           .then(res => {
             let phraseData = (res.data.phrase ? res.data.phrase : []);
-            this.setState({
-                phrases: phraseData
-            });
             localStorage.setItem("phrases", JSON.stringify(phraseData) )
             this.props.loadingStop();
-            return true
+            // return true
           })
           .catch(err => {
             this.setState({
@@ -138,7 +135,7 @@ class LogIn extends Component {
 
     componentWillReceiveProps(nextProps) {
         // if (nextProps.match.path === '/login' && !nextProps.loading) {
-        //     this.props.history.push('/Products');
+        //     this.props.history.push('/Dashboard');
         // }
     }
 
@@ -250,8 +247,16 @@ class LogIn extends Component {
                 this.props.onFormSubmit(values,
                     () => {
                         this.props.loadingStop();
+                        console.log("this.callFetchPhrase()-------- ", this.callFetchPhrase())
                         if(this.callFetchPhrase()){
-                            this.props.history.push('/Dashboard');
+                            setTimeout(
+                                function() {
+                                    this.props.history.push('/Dashboard')
+                                }
+                                .bind(this),
+                                300
+                            );
+                            // this.props.history.push('/Dashboard');
                         }                     
                     },
                     (err) => {

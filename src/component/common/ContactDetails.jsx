@@ -13,7 +13,8 @@ class ContactDetails extends Component {
         doc_list: [
             {
                 "id": "2",
-                "product": "ContactSalesManager",
+                // "product": "ContactSalesManager",
+                "product": "SME Pre underwritten shopkeeper",
                 "image" : "Miscellaneous-car.svg"
               }          
           ]
@@ -27,7 +28,7 @@ class ContactDetails extends Component {
             this.downloadDoc(filePath,fileName)
         }
         else if(productId == '2') {
-            fileName = "SBIG_Sales_Manager.pdf"
+            fileName = "Underwritten_Shopkeeper_Policy.pdf"
             this.downloadDoc(filePath,fileName)
         }
     }   
@@ -76,7 +77,8 @@ class ContactDetails extends Component {
                                 {doc_list.map((doc, docIndex) => ( 
                                     <tr key={docIndex}>
                                         {/* <td className="W-10"><img src={require(`../../assets/images/${doc.image}`)} alt="" /></td> */}
-                                        <td className="W-70">{phrases[doc.product]}</td>
+                                        {/* <td className="W-70">{phrases[doc.product]}</td> */}
+                                        <td className="W-70">{doc.product}</td>
                                         <td className="W-10 text-right"> <button className="buy" onClick= {this.dload_doc.bind(this, doc.id )} >{phrases['View']}</button></td>
                                     </tr>
                                 ))

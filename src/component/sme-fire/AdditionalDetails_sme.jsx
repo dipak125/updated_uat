@@ -17,7 +17,7 @@ import swal from 'sweetalert';
 import {  PersonAge } from "../../shared/dateFunctions";
 import Encryption from '../../shared/payload-encryption';
 import { setSmeRiskData,setSmeData,setSmeOthersDetailsData,setSmeProposerDetailsData,setCommunicationAddress } from '../../store/actions/sme_fire';
-
+import {  validSGTINcheck } from "../../shared/validationFunctions";
 
 const minDobAdult = moment(moment().subtract(100, 'years').calendar())
 const maxDobAdult = moment().subtract(18, 'years').calendar();
@@ -79,8 +79,21 @@ const vehicleRegistrationValidation = Yup.object().shape({
     pan_no: Yup.string()
     .matches(/^[A-Z]{3}[CPHFATBLJG]{1}[A-Z]{1}[0-9]{4}[A-Z]{1}$/,'Invalid PAN number') .nullable(),
     gstn_no: Yup.string()
-    .matches(/^[0-9]{2}[A-Z]{3}[CPHFATBLJG]{1}[A-Z]{1}[0-9]{4}[A-Z]{1}[0-9]{1}[A-Z]{1}[0-9]{1}$/,'Invalid GSTIN').nullable(),
-    //11AAACC7777A7A7
+    // .matches(/^[0-9]{2}[A,B,C,F,G,H,L,J,P,T]{4}[A-Z]{1}[0-9]{4}[A-Z]{1}[0-9]{1}[Z]{1}[A-Z0-9]{1}$/,'Invalid GSTIN')
+    .test(
+        "first2digitcheck",
+        function() {
+            return "Invalid GSTIN"
+        },
+        function (value) {
+            if (value && (value != "" || value != undefined) ) {             
+                return validSGTINcheck(value);
+            }   
+            return true;
+        }
+    )
+    .nullable(),
+
     building_name: Yup.string().required("Please enter Building name").matches(/^[a-zA-Z0-9][a-zA-Z0-9-/.,-\s]*$/, 
         function() {
             return "Please enter valid building name"
@@ -500,8 +513,7 @@ class AdditionalDetails_sme extends Component {
                         policy_holder_ref_no:policy_holder_ref_no,
                         request_data_id:decryptResp.data.policyHolder.request_data.id,
                         completed_step:decryptResp.data.policyHolder.step_no,
-                        menumaster_id:decryptResp.data.policyHolder.menumaster_id,
-                        payment_link_status: decryptResp.data.policyHolder && decryptResp.data.policyHolder.bcmaster ? decryptResp.data.policyHolder.bcmaster.eligible_for_payment_link : 0
+                        menumaster_id:decryptResp.data.policyHolder.menumaster_id
                     });
                 }
 
@@ -1072,9 +1084,7 @@ const mapStateToProps = state => {
 
       policy_holder_id:state.sme_fire.policy_holder_id,
       policy_holder_ref_no:state.sme_fire.policy_holder_ref_no,
-      menumaster_id:state.sme_fire.menumaster_id,
-
-      payment_link_status: state.sme_fire.payment_link_status
+      menumaster_id:state.sme_fire.menumaster_id
     };
   };
   

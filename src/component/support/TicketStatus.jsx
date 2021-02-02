@@ -22,12 +22,13 @@ import ReadMoreReact from 'read-more-react';
 const ticketValidation = Yup.object().shape({
 
     description: Yup.string().required('Issue Summery is required')
-        .min(12, function () {
+        .min(5, function () {
         return "Minimum 5 characters required";
-      })
+        })
         .max(1000, function () {
             return "Characters limit exceeds 1000";
-    }),
+        })
+        .matches(/^[A-Za-z0-9\s.,-]*$/,'Invalid characters'),
 })
 
 
@@ -414,42 +415,43 @@ class TicketStatus extends Component {
                                             <Field
                                                 name="description"
                                                 as="textarea"
+                                                rows="8"
                                                 className={'form-control' + (errors.description && touched.description ? ' is-invalid' : '')}
-                                                component={props =>
-                                                    <CKEditor
-                                                        config={
-                                                            {placeholder: "Write your details here"},
-                                                            {fillEmptyBlocks: false},
-                                                            {forcePasteAsPlainText: true},
-                                                            {basicEntities : false},
-                                                            {entities_greek : false},
-                                                            {entities_latin : false},
-                                                            {entities_additional : ''}
-                                                        }
-                                                        editor={ClassicEditor}
-                                                        // onInit={editor => {
-                                                        //     // You can store the "editor" and use when it is needed.
-                                                        //     console.log('Editor is ready to use!', editor);
-                                                        // }}
-                                                        data={values.description}
-                                                        onReady={ editor => {
-                                                            // You can store the "editor" and use when it is needed.
-                                                            console.log( 'Editor is ready to use!', editor );
-                                                        } }
-                                                        onChange={(event, editor) => {
-                                                            const data = editor.getData();
-                                                            console.log({ event, editor, data });
-                                                        }}
-                                                        onBlur={(event, editor) => {
-                                                            const data = editor.getData();
-                                                            console.log('Blur.',event, editor.getData());
-                                                            values.description = data;
-                                                        }}
-                                                        onFocus={(event, editor) => {
-                                                            console.log('Focus.', editor);
-                                                        }}
-                                                    />
-                                                }
+                                                // component={props =>
+                                                //     <CKEditor
+                                                //         config={
+                                                //             {placeholder: "Write your details here"},
+                                                //             {fillEmptyBlocks: false},
+                                                //             {forcePasteAsPlainText: true},
+                                                //             {basicEntities : false},
+                                                //             {entities_greek : false},
+                                                //             {entities_latin : false},
+                                                //             {entities_additional : ''}
+                                                //         }
+                                                //         editor={ClassicEditor}
+                                                //         // onInit={editor => {
+                                                //         //     // You can store the "editor" and use when it is needed.
+                                                //         //     console.log('Editor is ready to use!', editor);
+                                                //         // }}
+                                                //         data={values.description}
+                                                //         onReady={ editor => {
+                                                //             // You can store the "editor" and use when it is needed.
+                                                //             console.log( 'Editor is ready to use!', editor );
+                                                //         } }
+                                                //         onChange={(event, editor) => {
+                                                //             const data = editor.getData();
+                                                //             console.log({ event, editor, data });
+                                                //         }}
+                                                //         onBlur={(event, editor) => {
+                                                //             const data = editor.getData();
+                                                //             console.log('Blur.',event, editor.getData());
+                                                //             values.description = data;
+                                                //         }}
+                                                //         onFocus={(event, editor) => {
+                                                //             console.log('Focus.', editor);
+                                                //         }}
+                                                //     />
+                                                // }
                                             />
                                             <ErrorMessage name="description" component="div" className="errorMsg" /> 
                                         </FormGroup>

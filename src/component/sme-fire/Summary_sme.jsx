@@ -292,11 +292,11 @@ class Summary_sme extends Component {
                             <div className="col-sm-12 col-md-12 col-lg-10 col-xl-10 infobox">
                                 <div className="text">
                                 <h4 className="text-center mt-3 mb-0">SME Summary</h4>
-                                <a className="text-right mt-0 mb-3" href="">
+                                {/* <a className="text-right mt-0 mb-3" href="">
                                     <Blink color='blue' text='SME Pre Underwritten Shopkeeper Policy' fontSize='14'>
                                     SME Pre Underwritten Shopkeeper Policy
                                     </Blink>
-                                </a>
+                                </a> */}
                                 </div>
                                 <h1 className="text-center mt-3 mb-4"> {" "} </h1>
                                 <Formik initialValues={initialValue} onSubmit={this.handleSubmit}
