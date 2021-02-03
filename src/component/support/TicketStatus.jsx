@@ -9,8 +9,6 @@ import { Formik, Field, Form, ErrorMessage } from "formik";
 import Footer from '../common/footer/Footer';
 import * as Yup from "yup";
 import { Link } from 'react-router-dom';
-import CKEditor from '@ckeditor/ckeditor5-react';
-import ClassicEditor from '@ckeditor/ckeditor5-build-classic';
 import axios from "../../shared/axios"
 import swal from 'sweetalert';
 import moment from "moment";
@@ -270,33 +268,6 @@ class TicketStatus extends Component {
                                             <Row>
                                                 <Col sm={12} md={3}><div className="first">Ticket Status:</div></Col>
                                                 <Col sm={12} md={9}><div>{selectedTicket.status}</div></Col>
-                                                {/* <Col sm={12} md={4}><div className="formSection">
-                                                     <Field
-                                                        name='status'
-                                                        component="select"
-                                                        autoComplete="off"
-                                                        className="formGrp inputfs12"
-                                                        value = {values.status}      
-                                                        onChange= {(e) => {
-                                                            setFieldValue(`status`, e.target.value);
-                                                            setFieldTouched(`status`);
-                                                            this.updateStatus(e.target.value)
-                                                        }}                                      
-                                                    >
-                                                        <option disabled = {selectedTicket.status == "Resolved" ? true : false} value="Reopen">Reopen</option>
-                                                        <option disabled = {true} value="Created">Created</option>
-                                                        <option disabled = {true} value="Pending">Pending</option>
-                                                        <option disabled = {true} value="In-Progress">In-Progress</option>
-                                                        <option disabled = {true} value="Closed">Closed</option>
-                                                        <option disabled = {true} value="Resolved">Resolved</option>
-
-                                                         {goodscarriedtypes.map((subVehicle, qIndex) => ( 
-                                                            <option value= {subVehicle.id}>{subVehicle.goodscarriedtype}</option>
-                                                        ))} 
-                                            
-                                                    </Field> 
-                                                    </div>
-                                                </Col> */}
                                             </Row>
                                             <Row>
                                                 <Col sm={12} md={3}><div>Department:</div></Col>
@@ -373,7 +344,7 @@ class TicketStatus extends Component {
                                     <span className="avatar">
                                         <img className="avatar" alt="Avatar" src="//www.gravatar.com/avatar/c4b67d2401af1361e3b91f250ebc5b1b?s=80&amp;d=mm" />    </span>
                                     <div className="header-panel">
-                                        <div className= {row.is_solution == '0' ? "header" : "header_reply"}>
+                                        <div className= {row.is_solution == '0' ? (row.is_user_reply == '1' ? "header" : "header_reply") : "header_solution"}>
                                             <b>{row.name}</b> posted <span>{moment(row.created_at).format('DD/MM/YYYY hh:mm A')}</span> <span className="title truncate"></span>
                                         </div>
                                         <div className="thread-body">
@@ -404,7 +375,7 @@ class TicketStatus extends Component {
                                     : null}
                             </div>
                             )}
-
+                            {selectedTicket.status != "Closed" ?
                             <div className="justify-content-left opntckt">
                 
                                 <div className="issueSummery">
@@ -417,41 +388,6 @@ class TicketStatus extends Component {
                                                 as="textarea"
                                                 rows="8"
                                                 className={'form-control' + (errors.description && touched.description ? ' is-invalid' : '')}
-                                                // component={props =>
-                                                //     <CKEditor
-                                                //         config={
-                                                //             {placeholder: "Write your details here"},
-                                                //             {fillEmptyBlocks: false},
-                                                //             {forcePasteAsPlainText: true},
-                                                //             {basicEntities : false},
-                                                //             {entities_greek : false},
-                                                //             {entities_latin : false},
-                                                //             {entities_additional : ''}
-                                                //         }
-                                                //         editor={ClassicEditor}
-                                                //         // onInit={editor => {
-                                                //         //     // You can store the "editor" and use when it is needed.
-                                                //         //     console.log('Editor is ready to use!', editor);
-                                                //         // }}
-                                                //         data={values.description}
-                                                //         onReady={ editor => {
-                                                //             // You can store the "editor" and use when it is needed.
-                                                //             console.log( 'Editor is ready to use!', editor );
-                                                //         } }
-                                                //         onChange={(event, editor) => {
-                                                //             const data = editor.getData();
-                                                //             console.log({ event, editor, data });
-                                                //         }}
-                                                //         onBlur={(event, editor) => {
-                                                //             const data = editor.getData();
-                                                //             console.log('Blur.',event, editor.getData());
-                                                //             values.description = data;
-                                                //         }}
-                                                //         onFocus={(event, editor) => {
-                                                //             console.log('Focus.', editor);
-                                                //         }}
-                                                //     />
-                                                // }
                                             />
                                             <ErrorMessage name="description" component="div" className="errorMsg" /> 
                                         </FormGroup>
@@ -480,7 +416,11 @@ class TicketStatus extends Component {
                                     <button type="reset" className="btn btn-primary mr-2">Reset</button>
                                     <button className="btn btn-info" onClick={this.props.updateViewTicket}>Cancel</button>
                                 </div>
-                            </div>
+                            </div> : 
+                             <div className="form-group">
+                                <button className="btn btn-info" onClick={this.props.updateViewTicket}>Back</button>
+                            </div>}
+                            
                         </Form>
                         )}
                         </Formik>

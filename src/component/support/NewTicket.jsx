@@ -9,8 +9,6 @@ import { Formik, Field, Form, ErrorMessage } from "formik";
 import Footer from '../common/footer/Footer';
 import * as Yup from "yup";
 import { Link } from 'react-router-dom';
-import CKEditor from '@ckeditor/ckeditor5-react';
-import ClassicEditor from '@ckeditor/ckeditor5-build-classic';
 import axios from "../../shared/axios"
 import swal from 'sweetalert';
 import Encryption from '../../shared/payload-encryption';
@@ -20,7 +18,7 @@ const newInnitialValues = {
     description: '',
     title: '',
     mobile: '',
-    area: "PDF related issues"
+    area: ""
 }
 
 const ticketValidation = Yup.object().shape({
@@ -44,12 +42,15 @@ const ticketValidation = Yup.object().shape({
         .min(5, function () {
         return "Minimum 5 characters required";
     })
-        .max(255, function () {
-            return "Characters limit exceeds 255";
+        .max(250, function () {
+            return "Characters limit exceeds 250";
     }),
 
     mobile: Yup.string().required("Mobile number required")
      .matches(/^[6-9][0-9]{9}$/,'Invalid Mobile number').required('Mobile No. is required'),
+    
+    area:Yup.string().required("Area required")
+     
 })
 
 class NewTicket extends Component {
@@ -299,6 +300,7 @@ class NewTicket extends Component {
                                                         className="formGrp inputfs12"
                                                         value = {values.status}                                            
                                                     >
+                                                        <option value="">---Select---</option>
                                                         <option value="PDF related issues">PDF related issues</option>
                                                         <option value="Portal slowness/speed related issues">Portal slowness/speed related issues</option>
                                                         <option value="Agent ID unauthorized / Invalid Request">Agent ID unauthorized / Invalid Request</option>
@@ -341,41 +343,6 @@ class NewTicket extends Component {
                                                 as="textarea"
                                                 rows="8"
                                                 className={'form-control' + (errors.description && touched.description ? ' is-invalid' : '')}
-                                                // component={props =>
-                                                //     <CKEditor
-                                                //         config={
-                                                //             {placeholder: "Write your details here"},
-                                                //             {fillEmptyBlocks: false},
-                                                //             {forcePasteAsPlainText: true},
-                                                //             {basicEntities : false},
-                                                //             {entities_greek : false},
-                                                //             {entities_latin : false},
-                                                //             {entities_additional : ''}
-                                                //         }
-                                                //         editor={ClassicEditor}
-                                                //         // onInit={editor => {
-                                                //         //     // You can store the "editor" and use when it is needed.
-                                                //         //     console.log('Editor is ready to use!', editor);
-                                                //         // }}
-                                                //         data={values.description}
-                                                //         onReady={ editor => {
-                                                //             // You can store the "editor" and use when it is needed.
-                                                //             console.log( 'Editor is ready to use!', editor );
-                                                //         } }
-                                                //         onChange={(event, editor) => {
-                                                //             const data = editor.getData();
-                                                //             console.log({ event, editor, data });
-                                                //         }}
-                                                //         onBlur={(event, editor) => {
-                                                //             const data = editor.getData();
-                                                //             console.log('Blur.',event, editor.getData());
-                                                //             values.description = data;
-                                                //         }}
-                                                //         onFocus={(event, editor) => {
-                                                //             console.log('Focus.', editor);
-                                                //         }}
-                                                //     />
-                                                // }
                                             />
                                             <ErrorMessage name="description" component="div" className="errorMsg" /> 
                                         </FormGroup> 

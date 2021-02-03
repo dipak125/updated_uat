@@ -15,11 +15,12 @@ import swal from 'sweetalert';
 import Encryption from '../../shared/payload-encryption';
 import { Formik, Form, Field, ErrorMessage } from 'formik';
 import { changeFormat, get18YearsBeforeDate, PersonAge } from "../../shared/dateFunctions";
+import {  alphanumericCheck } from "../../shared/validationFunctions";
 
 // alert(new Date(minDate));
-const minConstructionDate = new Date(moment(moment().subtract(30, 'years').calendar()).add(1, 'day').calendar());
+const minConstructionDate = new Date(moment(moment().subtract(30, 'years').calendar()).add(0, 'day').calendar());
 // const maxDate = moment().add(15, 'day').calendar();
-const minDobAdult = new Date(moment(moment().subtract(100, 'years').calendar()))
+const minDobAdult = new Date(moment(moment().subtract(65, 'years').calendar()))
 const maxDobAdult = new Date(moment().subtract(18, 'years').calendar());
 
 const minDobNominee = new Date(moment(moment().subtract(100, 'years').calendar()))
@@ -83,10 +84,33 @@ const vehicleRegistrationValidation = Yup.object().shape({
     house_building_name:  Yup.string().when(["address_flag"], {
         is: address_flag => address_flag == '0',          
         then:Yup.string()
-        .required("Please enter building name")
-        .matches(/^[a-zA-Z0-9][a-zA-Z0-9-/.,-\s]*$/, function () {
+        .test(
+            "buildingNameCheck",
+            function() {
+                return "Please enter building name"
+            },
+            function (value) {
+                if (this.parent.house_flat_no || value) {
+                   
+                    return true
+                }
+                return false;
+        })
+        .matches(/^[a-zA-Z0-9]+([\s]?[a-zA-Z0-9.,-])*$/, function () {
             return "Please enter valid building name";
         })
+        .test(
+            "alphanumericCheck",
+            function() {
+                return "Please enter valid building name"
+            },
+            function (value) {
+                if (value ) {             
+                    return alphanumericCheck(value);
+                }   
+                return true;
+            }
+        )
         .nullable(),
         otherwise: Yup.string()
     }),
@@ -95,10 +119,33 @@ const vehicleRegistrationValidation = Yup.object().shape({
     house_flat_no: Yup.string().when(["address_flag"], {
         is: address_flag => address_flag == '0', 
         then: Yup.string()
-        .required("Please enter flat number")
-        .matches(/^[a-zA-Z0-9][a-zA-Z0-9-/.,-\s]*$/, function () {
+        .test(
+            "buildingNameCheck",
+            function() {
+                return "Please enter flat number"
+            },
+            function (value) {
+                if (this.parent.house_building_name || value) {
+                   
+                    return true
+                }
+                return false;
+        })
+        .matches(/^[a-zA-Z0-9]+([\s]?[a-zA-Z0-9.,-])*$/, function () {
             return "Please enter valid flat number";
         })
+        .test(
+            "alphanumericCheck",
+            function() {
+                return "Please enter valid flat number"
+            },
+            function (value) {
+                if (value ) {             
+                    return alphanumericCheck(value);
+                }   
+                return true;
+            }
+        )
         .nullable(),
         otherwise: Yup.string()
     }),
@@ -106,7 +153,7 @@ const vehicleRegistrationValidation = Yup.object().shape({
         is: address_flag => address_flag == '0', 
         then: Yup.string()
         .required("Please enter city")
-        .matches(/^[a-zA-Z0-9][a-zA-Z0-9-/.,-\s]*$/, function () {
+        .matches(/^[a-zA-Z]*$/, function () {
             return "Please enter valid city";
         })
         .nullable(),
@@ -115,10 +162,22 @@ const vehicleRegistrationValidation = Yup.object().shape({
     street_name: Yup.string().when(["address_flag"], {
         is: address_flag => address_flag == '0', 
         then: Yup.string()
-        .required("Please enter area name")
-        .matches(/^[a-zA-Z0-9][a-zA-Z0-9-/.,-\s]*$/, function () {
-            return "Please enter valid area name";
+        .required("Please enter street name")
+        .matches(/^[a-zA-Z0-9]+([\s]?[a-zA-Z0-9.,-])*$/, function () {
+            return "Please enter valid street name";
         })
+        .test(
+            "alphanumericCheck",
+            function() {
+                return "Please enter valid street name"
+            },
+            function (value) {
+                if (value ) {             
+                    return alphanumericCheck(value);
+                }   
+                return true;
+            }
+        )
         .nullable(),
         otherwise: Yup.string()
     }),
@@ -126,7 +185,7 @@ const vehicleRegistrationValidation = Yup.object().shape({
         is: address_flag => address_flag == '0', 
         then: Yup.string()
         .required("Please enter state")
-        .matches(/^[a-zA-Z0-9][a-zA-Z0-9-/.,-\s]*$/, function () {
+        .matches(/^[a-zA-Z]+([\s]?[a-zA-Z])*$/, function () {
             return "Please enter valid state";
         })
         .nullable(),
@@ -144,7 +203,8 @@ const vehicleRegistrationValidation = Yup.object().shape({
     }),
     area_name: Yup.string().when(["address_flag"], {
         is: address_flag => address_flag == '0', 
-        then: Yup.string().required("Please select locality").nullable(),
+        then: Yup.string().required("Please select locality")
+        .nullable(),
         otherwise: Yup.string()
     }),
 
@@ -202,7 +262,11 @@ const vehicleRegistrationValidation = Yup.object().shape({
     ),
     year_of_construction: Yup.string().required("Please enter construction year").nullable(),
     pedal_cycle_type: Yup.string().required("Please select cycle list").nullable(),
-    pedal_cycle_description: Yup.string().notRequired("Please enter description").nullable(),
+    pedal_cycle_description: Yup.string().notRequired("Please enter description")
+    .matches(/^[a-zA-Z]+([\s]?[a-zA-Z])*$/, function () {
+        return "Invalid description entered";
+      })
+      .nullable(),
     // NOMINEE--------
     nominee_title_id: Yup.string().required('Title is required').nullable(),
     nominee_first_name: Yup.string()
@@ -217,6 +281,18 @@ const vehicleRegistrationValidation = Yup.object().shape({
             return "Please enter valid nominee name";
         })
         .nullable(),
+    nominee_last_name:  Yup.string()
+        .required("Nominee last name is required")
+        .min(3, function () {
+            return "Nominee last name must be 3 characters";
+        })
+        .max(40, function () {
+            return "Nominee last name must be maximum 40 characters";
+        })
+        .matches(/^[a-zA-Z]*$/, function () {
+            return "Please enter valid nominee last name";
+        })
+    .nullable(),
     nominee_dob: Yup.date().required("Please enter date of birth").nullable(),
     relation_with: Yup.string().required(function () {
         return "Please select relation";
@@ -939,7 +1015,7 @@ class AdditionalDetails_GSB extends Component {
                                                         </div>
                                                         <div className="d-flex justify-content-left">
                                                             <div className="brandhead">
-                                                                <h6>All the openings protected with doors/windows/grill?</h6>
+                                                                <h6>All the openings protected with doors/windows/grills?</h6>
                                                                 <div className="d-inline-flex m-b-15">
                                                                     <div className="p-r-25">
                                                                         <label className="customRadio3">

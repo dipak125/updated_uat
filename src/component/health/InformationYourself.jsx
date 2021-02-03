@@ -1285,7 +1285,7 @@ setStateForPreviousData=(family_members)=>{
                                                     onBlur={e => this.changePlaceHoldClassRemove(e)}
                                                     value={insureList ? insureList : values.insureList}
                                                 />                    
-                                                <img src={require('../../assets/images/plus-sign.svg')} alt="" />
+                                                <img src={require('../../assets/images/plus-sign.svg')} alt="" class="plus-sign"/>
                                                 <br/><br/>
                                                 {errors.insureList && touched.insureList ? (
                                                     <span className="errorMsg">{errors.insureList}</span>

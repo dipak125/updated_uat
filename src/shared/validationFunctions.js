@@ -205,7 +205,7 @@ export const validRegistrationNumber = (value) => {
 }
 
 export const validSGTINcheck = (value) => {
-    var str = /^[0-9]{2}[A-Z]{3}[A,B,C,F,G,H,L,J,P,T]{1}[A-Z]{1}[0-9]{4}[A-Z]{1}[0-9]{1}[Z]{1}[A-Z0-9]{1}$/;
+    var str = /^[0-9]{2}[A,B,C,F,G,H,L,J,P,T]{4}[A-Z]{1}[0-9]{4}[A-Z]{1}[0-9]{1}[Z]{1}[A-Z0-9]{1}$/;
     
     if ( value && (value != '' || value != undefined) ) {  
         if(value.match(str)) {    
@@ -219,4 +219,14 @@ export const validSGTINcheck = (value) => {
         else return false;
     }
      return true;
+}
+
+export const alphanumericCheck = (value) => {
+    var str = /((^[0-9]+[a-zA-Z.,-\s]+)|(^[a-zA-Z.,-\s]+[0-9]+))+[0-9a-zA-Z.,-\s]+$/i ;
+    // var str = /^(?=.*?[a-zA-Z.,-\s])(?=.*?\d)[a-zA-Z.,-\s\d]+$/i
+
+    if(value.match(str)) {    
+            return true;
+        }   
+    else return false;  
 }

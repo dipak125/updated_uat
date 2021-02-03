@@ -7,13 +7,13 @@ import Footer from '../common/footer/Footer';
 import axios from "../../shared/axios";
 import { withRouter } from 'react-router-dom';
 import { loaderStart, loaderStop } from "../../store/actions/loader";
-import { setSmeRiskData,setSmeData,setSmeUpdateData,setSmeOthersDetailsData,setSmeProposerDetailsData } from "../../store/actions/sme_fire";
 import { connect } from "react-redux";
 import moment from "moment";
 import * as Yup from 'yup';
 import swal from 'sweetalert';
 import Encryption from '../../shared/payload-encryption';
 import { Formik, Form, Field, ErrorMessage } from 'formik';
+import {  alphanumericCheck } from "../../shared/validationFunctions";
 
 const minDate = moment().format();
 // alert(new Date(minDate));
@@ -31,7 +31,7 @@ const initialValues = {
     state_name: "",
     pincode: "",
     pincode_id: "",
-    business_type: "",
+    business_type: "1",
     plan_id: ""
 
 }
@@ -40,23 +40,82 @@ const vehicleRegistrationValidation = Yup.object().shape({
     pol_start_date: Yup.date().required("Please select both policy start date & time").nullable(),
     pol_end_date: Yup.date().required("Please select both policy end date & time").nullable(),
     house_building_name: Yup.string()
-      .required("Please enter building name")
-      .matches(/^[a-zA-Z0-9][a-zA-Z0-9-/.,-\s]*$/, function () {
+      .test(
+        "buildingNameCheck",
+        function() {
+            return "Please enter building name"
+        },
+        function (value) {
+            if (this.parent.house_flat_no || value) {
+               
+                return true
+            }
+            return false;
+    })
+      .matches(/^[a-zA-Z0-9]+([\s]?[a-zA-Z0-9.,-])*$/, function () {
         return "Please enter valid building name";
       })
+      .test(
+        "alphanumericCheck",
+        function() {
+            return "Please enter valid building name"
+        },
+        function (value) {
+            if (value ) {             
+                return alphanumericCheck(value);
+            }   
+            return true;
+        }
+    )
       .nullable(),
-    // block_no: Yup.string().required("Please enter Plot number").nullable(),
+
     house_flat_no: Yup.string()
-      .required("Please enter flat number")
-      .matches(/^[a-zA-Z0-9][a-zA-Z0-9-/.,-\s]*$/, function () {
+      .test(
+        "buildingNameCheck",
+        function() {
+            return "Please enter flat number"
+        },
+        function (value) {
+            if (this.parent.house_building_name || value) {
+               
+                return true
+            }
+            return false;
+    })
+      .matches(/^[a-zA-Z0-9]+([\s]?[a-zA-Z0-9.,-])*$/, function () {
         return "Please enter valid flat number";
       })
+    .test(
+        "alphanumericCheck",
+        function() {
+            return "Please enter valid flat number"
+        },
+        function (value) {
+            if (value ) {             
+                return alphanumericCheck(value);
+            }   
+            return true;
+        }
+    )
       .nullable(),
+
     area_name: Yup.string()
       .required("Please enter area name")
-      .matches(/^[a-zA-Z0-9][a-zA-Z0-9-/.,-\s]*$/, function () {
+      .matches(/^[a-zA-Z0-9]+([\s]?[a-zA-Z0-9.,-])*$/, function () {
         return "Please enter valid area name";
       })
+      .test(
+        "alphanumericCheck",
+        function() {
+            return "Please enter valid area name"
+        },
+        function (value) {
+            if (value ) {             
+                return alphanumericCheck(value);
+            }   
+            return true;
+        }
+    )
       .nullable(),
     pincode: Yup.string()
       .required("Pincode is required")
@@ -436,15 +495,15 @@ class SelectPlan_GSB extends Component {
         const {pinDataArr, stateName, cityName, requested_Data, gsb_Details, addressDetails, serverResponse,
                 validation_error, error, coverPlanA, coverPlanB, coverPlanC} = this.state
         const newInitialValues = Object.assign(initialValues,{
-            pol_start_date: requested_Data && requested_Data.start_date ? new Date(requested_Data.start_date)  : null,
-            pol_end_date: requested_Data && requested_Data.end_date ? new Date(requested_Data.end_date)  : null,
+            pol_start_date: requested_Data && requested_Data.start_date ? new Date(requested_Data.start_date)  : new Date(new Date(moment().add(1,'day')).setHours(0, 0, 0, 0)),
+            pol_end_date: requested_Data && requested_Data.end_date ? new Date(requested_Data.end_date)  : new Date(new Date(moment().add(365, 'day').calendar()).setHours(23, 59, 0, 0) ),
             house_flat_no: addressDetails && addressDetails.house_flat_no ? addressDetails.house_flat_no: "",
             city: addressDetails && addressDetails.city ? addressDetails.city: "",
             house_building_name:  addressDetails && addressDetails.house_building_name ? addressDetails.house_building_name: "",
             area_name: addressDetails && addressDetails.area_name ? addressDetails.area_name: "",
             pincode: gsb_Details && gsb_Details.pincode ? gsb_Details.pincode : "",
             pincode_id: gsb_Details && gsb_Details.pincode_id ? gsb_Details.pincode_id : "",
-            business_type: gsb_Details && gsb_Details.business_type ? gsb_Details.business_type : "",
+            business_type: gsb_Details && gsb_Details.business_type ? gsb_Details.business_type : "1",
             plan_id: gsb_Details && gsb_Details.plan_id ? gsb_Details.plan_id : "",
         })
 
@@ -470,11 +529,6 @@ class SelectPlan_GSB extends Component {
                                             
                                         return (
                                             <Form>    
-                                                {/* {console.log('pol_start_date',values.pol_start_date)}                                                                                
-                                            <div className="d-flex justify-content-left">
-                                                <div className="brandhead">
-                                                </div>
-                                            </div> */}
                                             <div className="brandhead"> 
                                                 <h4 className="fs-18 m-b-30">POLICY INFORMATION</h4>
                                             </div>                                           
@@ -507,6 +561,7 @@ class SelectPlan_GSB extends Component {
                                                                     name='business_type'
                                                                     value='2'
                                                                     key='1'
+                                                                    disabled={true}
                                                                     checked = {values.business_type == '2' ? true : false}
                                                                     onChange = {() =>{
                                                                         setFieldTouched('business_type')
@@ -837,10 +892,7 @@ class SelectPlan_GSB extends Component {
                                                                     }
                                                                 />
                                                                 <span className="checkmark " /><span className="fs-14"><h7> Plan B</h7></span>
-                                                            </label>
-                                                            {errors.plan_id && touched.plan_id ? (
-                                                                <span className="errorMsg">{errors.plan_id}</span>
-                                                            ) : null}
+                                                            </label>                         
                                                         </div>
                                                         <div className="p-r-25">
                                                             <label className="customRadio3">
