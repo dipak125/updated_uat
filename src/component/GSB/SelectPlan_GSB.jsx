@@ -51,23 +51,7 @@ const vehicleRegistrationValidation = Yup.object().shape({
                 return true
             }
             return false;
-    })
-      .matches(/^[a-zA-Z0-9]+([\s]?[a-zA-Z0-9.,-])*$/, function () {
-        return "Please enter valid building name";
-      })
-      .test(
-        "alphanumericCheck",
-        function() {
-            return "Please enter valid building name"
-        },
-        function (value) {
-            if (value ) {             
-                return alphanumericCheck(value);
-            }   
-            return true;
-        }
-    )
-      .nullable(),
+    }) .matches(/^(?![0-9]*$)+([\s]?[a-zA-Z0-9.,-])+$/, 'Please enter a valid building name only').matches(/^([a-zA-Z0-9]+\s)*[a-zA-Z0-9.,-]+$/, 'The field should have only one space in between words').nullable(),
 
     house_flat_no: Yup.string()
       .test(
@@ -81,42 +65,13 @@ const vehicleRegistrationValidation = Yup.object().shape({
                 return true
             }
             return false;
-    })
-      .matches(/^[a-zA-Z0-9]+([\s]?[a-zA-Z0-9.,-])*$/, function () {
-        return "Please enter valid flat number";
-      })
-    .test(
-        "alphanumericCheck",
-        function() {
-            return "Please enter valid flat number"
-        },
-        function (value) {
-            if (value ) {             
-                return alphanumericCheck(value);
-            }   
-            return true;
-        }
-    )
-      .nullable(),
+    }).matches(/^\d+$/, 'The flat number field should have digits only').nullable(),
 
     area_name: Yup.string()
       .required("Please enter area name")
       .matches(/^[a-zA-Z0-9]+([\s]?[a-zA-Z0-9.,-])*$/, function () {
         return "Please enter valid area name";
-      })
-      .test(
-        "alphanumericCheck",
-        function() {
-            return "Please enter valid area name"
-        },
-        function (value) {
-            if (value ) {             
-                return alphanumericCheck(value);
-            }   
-            return true;
-        }
-    )
-      .nullable(),
+      }).matches(/^(?![0-9]*$)+([\s]?[a-zA-Z0-9.,-])+$/, 'Please enter a valid area name only').matches(/^([a-zA-Z0-9]+\s)*[a-zA-Z0-9.,-]+$/, 'The field should have only one space in between words').nullable(),
     pincode: Yup.string()
       .required("Pincode is required")
       .matches(/^[0-9]{6}$/, function () {
