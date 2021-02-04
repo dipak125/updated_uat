@@ -95,23 +95,7 @@ const vehicleRegistrationValidation = Yup.object().shape({
                     return true
                 }
                 return false;
-        })
-        .matches(/^[a-zA-Z0-9]+([\s]?[a-zA-Z0-9.,-])*$/, function () {
-            return "Please enter valid building name";
-        })
-        .test(
-            "alphanumericCheck",
-            function() {
-                return "Please enter valid building name"
-            },
-            function (value) {
-                if (value ) {             
-                    return alphanumericCheck(value);
-                }   
-                return true;
-            }
-        )
-        .nullable(),
+        }) .matches(/^(?![0-9]*$)+([\s]?[a-zA-Z0-9.,-])+$/, 'Please enter a valid building name only').matches(/^([a-zA-Z0-9]+\s)*[a-zA-Z0-9.,-]+$/, 'The field should have only one space in between words').nullable(),
         otherwise: Yup.string()
     }),
 
@@ -130,23 +114,7 @@ const vehicleRegistrationValidation = Yup.object().shape({
                     return true
                 }
                 return false;
-        })
-        .matches(/^[a-zA-Z0-9]+([\s]?[a-zA-Z0-9.,-])*$/, function () {
-            return "Please enter valid flat number";
-        })
-        .test(
-            "alphanumericCheck",
-            function() {
-                return "Please enter valid flat number"
-            },
-            function (value) {
-                if (value ) {             
-                    return alphanumericCheck(value);
-                }   
-                return true;
-            }
-        )
-        .nullable(),
+        }).matches(/^\d+$/, 'The flat number field should have digits only').nullable(),
         otherwise: Yup.string()
     }),
     city: Yup.string().when(["address_flag"], {
@@ -162,23 +130,7 @@ const vehicleRegistrationValidation = Yup.object().shape({
     street_name: Yup.string().when(["address_flag"], {
         is: address_flag => address_flag == '0', 
         then: Yup.string()
-        .required("Please enter street name")
-        .matches(/^[a-zA-Z0-9]+([\s]?[a-zA-Z0-9.,-])*$/, function () {
-            return "Please enter valid street name";
-        })
-        .test(
-            "alphanumericCheck",
-            function() {
-                return "Please enter valid street name"
-            },
-            function (value) {
-                if (value ) {             
-                    return alphanumericCheck(value);
-                }   
-                return true;
-            }
-        )
-        .nullable(),
+        .required("Please enter street name").matches(/^(?![0-9]*$)+([\s]?[a-zA-Z0-9.,-])+$/, 'Please enter a valid street name only').matches(/^([a-zA-Z0-9]+\s)*[a-zA-Z0-9.,-]+$/, 'The field should have only one space in between words').nullable(),
         otherwise: Yup.string()
     }),
     state_name: Yup.string().when(["address_flag"], {
