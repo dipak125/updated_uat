@@ -95,7 +95,7 @@ const vehicleRegistrationValidation = Yup.object().shape({
                     return true
                 }
                 return false;
-        }) .matches(/^(?![0-9]*$)+([\s]?[a-zA-Z0-9.,-])+$/, 'Please enter a valid building name only').matches(/^([a-zA-Z0-9]+\s)*[a-zA-Z0-9.,-]+$/, 'The field should have only one space in between words').nullable(),
+        }) .matches(/^(?![0-9]*$)+([\s]?[\/a-zA-Z0-9.,-])+$/, 'Please enter a valid building name only').matches(/^([a-zA-Z0-9]+\s)*[\/a-zA-Z0-9.,-]+$/, 'The field should have only one space in between words').nullable(),
         otherwise: Yup.string()
     }),
 
@@ -114,7 +114,7 @@ const vehicleRegistrationValidation = Yup.object().shape({
                     return true
                 }
                 return false;
-        }).matches(/^\d+$/, 'The flat number field should have digits only').nullable(),
+        }).matches(/^[\/a-zA-Z0-9.,-]*$/, 'Please enter a valid flat number only').nullable(),
         otherwise: Yup.string()
     }),
     city: Yup.string().when(["address_flag"], {
@@ -130,7 +130,7 @@ const vehicleRegistrationValidation = Yup.object().shape({
     street_name: Yup.string().when(["address_flag"], {
         is: address_flag => address_flag == '0', 
         then: Yup.string()
-        .required("Please enter street name").matches(/^(?![0-9]*$)+([\s]?[a-zA-Z0-9.,-])+$/, 'Please enter a valid street name only').matches(/^([a-zA-Z0-9]+\s)*[a-zA-Z0-9.,-]+$/, 'The field should have only one space in between words').nullable(),
+        .required("Please enter street name").matches(/^(?![0-9]*$)+([\s]?[\/a-zA-Z0-9.,-])+$/, 'Please enter a valid street name only').matches(/^([a-zA-Z0-9]+\s)*[\/a-zA-Z0-9.,-]+$/, 'The field should have only one space in between words').nullable(),
         otherwise: Yup.string()
     }),
     state_name: Yup.string().when(["address_flag"], {
@@ -1135,14 +1135,14 @@ class AdditionalDetails_GSB extends Component {
                                                                         setFieldTouched("pincode_id")
                                                                         setFieldTouched("area_name")
  
-                                                                        // setFieldValue(`house_flat_no`,"");
-                                                                        // setFieldValue(`city`, "");
-                                                                        // setFieldValue(`house_building_name`,"");
-                                                                        // setFieldValue(`street_name`,"");
-                                                                        // setFieldValue(`state_name`,"");
-                                                                        // setFieldValue(`pincode_id`,"");
-                                                                        // setFieldValue(`area_name`,"");
-                                                                        this.fetchAreadetailsBack(gsb_Details && gsb_Details.pincode, setFieldValue, setFieldTouched)                                                  
+                                                                        setFieldValue(`house_flat_no`,"");
+                                                                        setFieldValue(`city`, "");
+                                                                        setFieldValue(`house_building_name`,"");
+                                                                        setFieldValue(`street_name`,"");
+                                                                        setFieldValue(`state_name`,"");
+                                                                        setFieldValue(`pincode_id`,"");
+                                                                        setFieldValue(`area_name`,"");
+                                                                        //this.fetchAreadetailsBack(gsb_Details && gsb_Details.pincode, setFieldValue, setFieldTouched)                                                  
                                                                     }  
                                                                 }}
                                                                 checked={values.address_flag == '1' ? true : false}

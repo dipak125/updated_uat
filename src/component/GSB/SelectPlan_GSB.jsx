@@ -15,7 +15,7 @@ import Encryption from '../../shared/payload-encryption';
 import { Formik, Form, Field, ErrorMessage } from 'formik';
 import {  alphanumericCheck } from "../../shared/validationFunctions";
 
-const minDate = moment().format();
+const minDate = moment().add(1, 'day').format();
 // alert(new Date(minDate));
 const maxDate = moment().add(14, 'day');
 const maxDateEnd = moment().add(15, 'day').calendar();
@@ -51,7 +51,7 @@ const vehicleRegistrationValidation = Yup.object().shape({
                 return true
             }
             return false;
-    }) .matches(/^(?![0-9]*$)+([\s]?[a-zA-Z0-9.,-])+$/, 'Please enter a valid building name only').matches(/^([a-zA-Z0-9]+\s)*[a-zA-Z0-9.,-]+$/, 'The field should have only one space in between words').nullable(),
+    }) .matches(/^(?![0-9]*$)+([\s]?[\/a-zA-Z0-9.,-])+$/, 'Please enter a valid building name only').matches(/^([a-zA-Z0-9]+\s)*[\/a-zA-Z0-9.,-]+$/, 'The field should have only one space in between words').nullable(),
 
     house_flat_no: Yup.string()
       .test(
@@ -65,13 +65,13 @@ const vehicleRegistrationValidation = Yup.object().shape({
                 return true
             }
             return false;
-    }).matches(/^\d+$/, 'The flat number field should have digits only').nullable(),
+    }).matches(/^[\/a-zA-Z0-9.,-]*$/, 'Please enter a valid flat number only').nullable(),
 
     area_name: Yup.string()
       .required("Please enter area name")
-      .matches(/^[a-zA-Z0-9]+([\s]?[a-zA-Z0-9.,-])*$/, function () {
+      .matches(/^[a-zA-Z0-9]+([\s]?[\/a-zA-Z0-9.,-])*$/, function () {
         return "Please enter valid area name";
-      }).matches(/^(?![0-9]*$)+([\s]?[a-zA-Z0-9.,-])+$/, 'Please enter a valid area name only').matches(/^([a-zA-Z0-9]+\s)*[a-zA-Z0-9.,-]+$/, 'The field should have only one space in between words').nullable(),
+      }).matches(/^(?![0-9]*$)+([\s]?[\/a-zA-Z0-9.,-])+$/, 'Please enter a valid area name only').matches(/^([a-zA-Z0-9]+\s)*[\/a-zA-Z0-9.,-]+$/, 'The field should have only one space in between words').nullable(),
     pincode: Yup.string()
       .required("Pincode is required")
       .matches(/^[0-9]{6}$/, function () {

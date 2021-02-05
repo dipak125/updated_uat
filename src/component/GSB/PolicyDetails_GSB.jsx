@@ -493,6 +493,27 @@ paypoint_payment = () => {
                 </FormGroup>
               </Col>
             </Row>
+            <Row>
+              <Col sm={12} md={6}>
+                Mobile number:
+              </Col>
+              <Col sm={12} md={6}>
+                {policyHolderDetails.mobile}
+              </Col>
+            </Row>
+          <Row>
+            <Col sm={12} md={3}>
+            &nbsp;
+            </Col>
+          </Row>
+          <Row>
+            <Col sm={12} md={6}>
+              Email:
+            </Col>
+            <Col sm={12} md={6}>
+              {policyHolderDetails.email_id}
+            </Col>
+          </Row>
           </Col>
         </Row>
         <Row>
@@ -576,9 +597,45 @@ paypoint_payment = () => {
                                       <Row>
                                         <Col sm={12} md={9} lg={18}>
                                           <div className="rghtsideTrigr">
-                                            <Collapsible trigger=" SBI General Insurance Company Limited Plan"  open= {true}>
+                                            <Collapsible trigger=" GSB Policy"  open= {true}>
                                               <div className="listrghtsideTrigr">
                                                 {policy_Coverage ? policy_Coverage : null}
+                                              </div>
+                                            </Collapsible>
+                                            <Collapsible trigger=" Premium Details"  open= {true}>
+                                              <div className="listrghtsideTrigr">
+                                                <Row>
+                                                    <Col sm={12} md={3}>
+                                                        <div className="motopremium">
+                                                        Net Premium:
+                                                        </div>
+                                                    </Col>
+                                                    <Col sm={12} md={3}>
+                                                        <div className="premamount">
+                                                            ₹ {fulQuoteResp.DuePremium ? fulQuoteResp.DuePremium : 0}
+                                                        </div>
+                                                    </Col>
+                                                    <Col sm={12} md={3}>
+                                                        <div className="motopremium">
+                                                        Gross Premium:
+                                                        </div>
+                                                    </Col>
+                                                    <Col sm={12} md={3}>
+                                                        <div className="premamount">
+                                                            ₹ {fulQuoteResp.BeforeVatPremium ? Math.round(fulQuoteResp.BeforeVatPremium) : 0}
+                                                        </div>
+                                                    </Col>
+                                                    <Col sm={12} md={3}>
+                                                        <div className="motopremium">
+                                                        Applicable Taxes:
+                                                        </div>
+                                                    </Col>
+                                                    <Col sm={12} md={3}>
+                                                        <div className="premamount">
+                                                            ₹ {fulQuoteResp.TGST ? Math.round(fulQuoteResp.TGST) : 0}
+                                                        </div>
+                                                    </Col>
+                                                </Row>
                                               </div>
                                              </Collapsible>
                                           </div>
@@ -597,28 +654,6 @@ paypoint_payment = () => {
                                                 </div>
                                                 <Row>
                                                   <Col sm={12} md={18}>
-
-                                                    <Row>
-                                                      <Col sm={12} md={3}>
-                                                        Mobile number:
-                                                      </Col>
-                                                      <Col sm={12} md={9}>
-                                                        {policyHolderDetails.mobile}
-                                                      </Col>
-                                                    </Row>
-                                                    <Row>
-                                                      <Col sm={12} md={3}>
-                                                      &nbsp;
-                                                      </Col>
-                                                    </Row>
-                                                    <Row>
-                                                      <Col sm={12} md={3}>
-                                                        Email:
-                                                      </Col>
-                                                      <Col sm={12} md={6}>
-                                                        {policyHolderDetails.email_id}
-                                                      </Col>
-                                                    </Row>
                                                     <Row>
                                                       <Col sm={12} md={3}>
                                                       &nbsp;
