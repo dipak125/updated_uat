@@ -34,18 +34,18 @@ const initialValues = {
 
 
 const vehicleValidation = Yup.object().shape({
-    policy_type: Yup.string().required("Please enter policy type"),
-    policy_for: Yup.string().required("Please select policy for indivudal or corporate"),
+    policy_type: Yup.string().required("PleasePT"),
+    policy_for: Yup.string().required("PleasePIC"),
     check_registration: Yup.string().notRequired(),  
 
     regNumber: Yup.string().when("check_registration", {
         is: "1",       
         then: Yup.string(),
-        otherwise: Yup.string().required('Please provide registration number')
+        otherwise: Yup.string().required('PleaseProRegNum')
         .test(
             "last4digitcheck",
             function() {
-                return "Invalid Registration number"
+                return "InvalidRegistrationNumber"
             },
             function (value) {
                 if (value && this.parent.check_registration == 2 && (value != "" || value != undefined) ) {             
@@ -58,7 +58,7 @@ const vehicleValidation = Yup.object().shape({
 
     lapse_duration: Yup.string().when("policy_type", {
         is: "3",       
-        then: Yup.string().required('Please select lapse duration'),
+        then: Yup.string().required('LapseDuration'),
         otherwise: Yup.string()
     }),
 })
@@ -641,7 +641,7 @@ class TwoWheelerSelectBrand extends Component {
                                                                             <span className="checkmark " /><span className="fs-14"> {phrases['Corporate']}</span>
                                                                         </label>
                                                                         {errors.policy_for && touched.policy_for ? (
-                                                                            <span className="errorMsg">{errors.policy_for}</span>
+                                                                            <span className="errorMsg">{phrases[errors.policy_for]}</span>
                                                                         ) : null}
                                                                     </div>
                                                                 </div>
@@ -710,7 +710,7 @@ class TwoWheelerSelectBrand extends Component {
                                                                             <span className="fs-14">{phrases['LapsedPolicy']}</span>
                                                                         </label>
                                                                         {errors.policy_type && touched.policy_type ? (
-                                                                            <span className="errorMsg">{errors.policy_type}</span>
+                                                                            <span className="errorMsg">{phrases[errors.policy_type]}</span>
                                                                         ) : null}
                                                                     </div>
                                                                 </div>
@@ -745,7 +745,7 @@ class TwoWheelerSelectBrand extends Component {
                                                                             <span className="checkmark " /><span className="fs-14"> {phrases['OverNinety']}</span>
                                                                         </label>
                                                                         {errors.lapse_duration && touched.lapse_duration ? (
-                                                                            <span className="errorMsg">{errors.lapse_duration}</span>
+                                                                            <span className="errorMsg">{phrases[errors.lapse_duration]}</span>
                                                                         ) : null}
                                                                     </div>
                                                                 </div>
@@ -787,7 +787,7 @@ class TwoWheelerSelectBrand extends Component {
                                                                         />
                                                                         }
                                                                         {errors.regNumber && touched.regNumber ? (
-                                                                            <span className="errorMsg">{errors.regNumber}</span>
+                                                                            <span className="errorMsg">{phrases[errors.regNumber]}</span>
                                                                         ) : null}   
                                                                          {/* {console.log("error_msg.registration_no", error_msg)} */}
                                                                         {error_msg.registration_no ? (

@@ -13,7 +13,10 @@ import Encryption from '../../shared/payload-encryption';
 import { Formik, Form, Field, ErrorMessage } from 'formik';
 import { setData } from "../../store/actions/data";
 import { validRegistrationNumber } from "../../shared/validationFunctions";
+// let phrases = localStorage.getItem("phrases") ? JSON.parse(localStorage.getItem("phrases")) : null
 
+// const { t, i18n } = useTranslation();
+// const href = "#";
 
 const initialValues = {
     regNumber: '',
@@ -28,7 +31,7 @@ const vehicleRegistrationValidation = Yup.object().shape({
         .test(
             "registrationNumberCheck",
             function () {
-                return "Please Provide Vehicle Registration Number"
+                return "RegistrationNumber"
             },
             function (value) {
                 // console.log('YUP', value)
@@ -40,7 +43,7 @@ const vehicleRegistrationValidation = Yup.object().shape({
         ).test(
             "last4digitcheck",
             function () {
-                return "Invalid Registration number"
+                return "InvalidRegistrationNumber"
             },
             function (value) {
                 if (value && this.parent.check_registration == 2 && (value != "" || value != undefined)) {
@@ -52,8 +55,8 @@ const vehicleRegistrationValidation = Yup.object().shape({
 
 });
 
-
 class Registration extends Component {
+
     state = {
         motorInsurance: '',
         regno: '',
@@ -309,6 +312,7 @@ class Registration extends Component {
             regNumber: motorInsurance ? motorInsurance.registration_no : ''
         })
         let phrases = localStorage.getItem("phrases") ? JSON.parse(localStorage.getItem("phrases")) : null
+        
 
         return (
             <>
@@ -353,7 +357,7 @@ class Registration extends Component {
 
                                                                     />
                                                                     {errors.regNumber && touched.regNumber ? (
-                                                                        <span className="errorMsg">{errors.regNumber}</span>
+                                                                        <span className="errorMsg">{phrases[errors.regNumber]}</span>
                                                                     ) : null}
                                                                 </div>
                                                             </div>
@@ -390,10 +394,11 @@ class Registration extends Component {
                                                                     />
                                                                     <span className="checkmark mL-0"></span>
                                                                 </label>
+                                                                {/* {console.log('phrases[errors.check_registration]----',errors.check_registration)} */}
                                                                 {errors.check_registration ?
                                                                     <span className="error-message">{errors.check_registration}</span> : ""
                                                                 }
-
+                                                                
                                                             </div>
                                                             <div className="cntrbtn">
                                                                 <Button className={`btnPrimary`} type="submit" >

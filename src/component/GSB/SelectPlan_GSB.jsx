@@ -17,7 +17,7 @@ import {  alphanumericCheck } from "../../shared/validationFunctions";
 
 const minDate = moment().add(1, 'day').format();
 // alert(new Date(minDate));
-const maxDate = moment().add(14, 'day');
+const maxDate = moment().add(16, 'day');
 const maxDateEnd = moment().add(15, 'day').calendar();
 
 const initialValues = {
@@ -580,8 +580,8 @@ class SelectPlan_GSB extends Component {
                                                         <div className="formSection">
                                                             <DatePicker
                                                                 name="pol_end_date"
-                                                                minDate={new Date(values.pol_start_date)}
-                                                                maxDate={new Date(maxDate)}
+                                                                // minDate={new Date(values.pol_start_date)}
+                                                                // maxDate={new Date(maxDate)}
                                                                 dateFormat="dd-MM-yyyy HH:mm"
                                                                 showTimeSelect
                                                                 // dateFormat="Pp"

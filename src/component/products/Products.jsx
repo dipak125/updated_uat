@@ -61,7 +61,7 @@ class Products extends Component {
                                                                     <div><Nav.Item><Nav.Link eventKey="second">{phrases['Health']}</Nav.Link></Nav.Item></div>
                                                                     <div><Nav.Item><Nav.Link eventKey="third">{phrases['FireInsurance']}</Nav.Link></Nav.Item></div>
                                                                     <div><Nav.Item><Nav.Link eventKey="fourth">{phrases['PersonalAccident']}</Nav.Link></Nav.Item></div>
-                                                                    <div><Nav.Item><Nav.Link eventKey="fifth">Miscellaneous LOB</Nav.Link></Nav.Item></div>
+                                                                    <div><Nav.Item><Nav.Link eventKey="fifth">{phrases['MiscellaneousLOB']}</Nav.Link></Nav.Item></div>
                                                                 </div>
                                                             </Nav>
                                                         </Col>
@@ -102,7 +102,7 @@ class Products extends Component {
                                                                         <div><Nav.Item><Nav.Link eventKey="second">{phrases['Health']}</Nav.Link></Nav.Item></div>
                                                                         <div><Nav.Item><Nav.Link eventKey="third">{phrases['FireInsurance']}</Nav.Link></Nav.Item></div>
                                                                         <div><Nav.Item><Nav.Link eventKey="fourth">{phrases['PersonalAccident']}</Nav.Link></Nav.Item></div>
-                                                                        <div><Nav.Item><Nav.Link eventKey="fifth">Miscellaneous LOB</Nav.Link></Nav.Item></div>
+                                                                        <div><Nav.Item><Nav.Link eventKey="fifth">{phrases['MiscellaneousLOB']}</Nav.Link></Nav.Item></div>
 
                                                                     </div>
                                                                 </Nav>
@@ -142,7 +142,7 @@ class Products extends Component {
                                                                         <div><Nav.Item><Nav.Link eventKey="second">{phrases['Health']}</Nav.Link></Nav.Item></div>
                                                                         <div><Nav.Item><Nav.Link eventKey="third">{phrases['FireInsurance']}</Nav.Link></Nav.Item></div>
                                                                         <div><Nav.Item><Nav.Link eventKey="fourth">{phrases['PersonalAccident']}</Nav.Link></Nav.Item></div>
-                                                                        <div><Nav.Item><Nav.Link eventKey="fifth">Miscellaneous LOB</Nav.Link></Nav.Item></div>
+                                                                        <div><Nav.Item><Nav.Link eventKey="fifth">{phrases['MiscellaneousLOB']}</Nav.Link></Nav.Item></div>
 
                                                                     </div>
                                                                 </Nav>

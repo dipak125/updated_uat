@@ -92,7 +92,11 @@ class PolicyDetails_GSB extends Component {
     nomineedetails: [],
     policyCoverage: [],
     NomineeRelationArr: {},
-    AppointeeRelationArr: {}
+    AppointeeRelationArr: {},
+    pincode: "",
+    location: "",
+    city: "",
+    state: ""
   };
 
   handleClose = () => {
@@ -188,11 +192,14 @@ class PolicyDetails_GSB extends Component {
         let addressDetails = policyHolderDetails ? JSON.parse(policyHolderDetails.address) : null
         let pincode_Details = gsb_Details ? JSON.parse(gsb_Details.pincode_response) : null
         let bcMaster = decryptResp.data.policyHolder ? decryptResp.data.policyHolder.bcmaster : {};
-        
+        let pincode = decryptResp.data.policyHolder.pincode
+        let location = decryptResp.data.policyHolder.location
+        let city = decryptResp.data.policyHolder.city
+        let state = decryptResp.data.policyHolder.state      
         console.log("---gsb_Details--->>", decryptResp.data.policyHolder);
         this.setState({
           gsb_Details, requested_Data, bcMaster,
-          addressDetails, pincode_Details, policyHolderDetails
+          addressDetails, pincode_Details, policyHolderDetails, pincode, location, city, state
         });
         this.fetchCoveragePlan(decryptResp.data.policyHolder, gsb_Details)
       })
@@ -354,24 +361,127 @@ paypoint_payment = () => {
 
   render() {
     const { productId } = this.props.match.params;
-    const { fulQuoteResp, addressDetails, error, show, policyHolderDetails, nomineedetails, paymentStatus, policyCoverage, bcMaster, NomineeRelationArr, AppointeeRelationArr } = this.state;
+    const { fulQuoteResp, addressDetails, error, show, policyHolderDetails, nomineedetails, paymentStatus, policyCoverage, 
+        bcMaster, NomineeRelationArr, AppointeeRelationArr, location, city, state, gsb_Details } = this.state;
     const Is_appo = policyHolderDetails.request_data ? policyHolderDetails.request_data.nominee[0].is_appointee : null
-    console.log('Is-appoo-----',Is_appo)
-    const AddressDetails = addressDetails ? (
-        <div>
-          <Row>
-            <Col sm={12} md={6}>
-              <Row>
-                <Col sm={12} md={6}>
-                  <FormGroup>{addressDetails.house_flat_no +", "+addressDetails.house_building_name +", "+ addressDetails.area_name}</FormGroup>
-                  {/* <FormGroup>{ addressDetails.address3}</FormGroup> */}
-                </Col>
-              </Row>
-            </Col>
-          </Row>
-        </div>
-    ) :null
+    const risk_address = gsb_Details && gsb_Details.risk_address ? JSON.parse(gsb_Details.risk_address) : {}
 
+    const riskDetails = risk_address ? (
+      <div>
+        <Row>
+          <Col sm={12} md={6}>
+            <FormGroup>House/Flat No:</FormGroup>
+          </Col>
+          <Col sm={12} md={6}>
+            <FormGroup>{risk_address.house_flat_no}</FormGroup>
+          </Col>
+        </Row>
+        <Row>
+          <Col sm={12} md={6}>
+            <FormGroup>House/Building Name:</FormGroup>
+          </Col>
+          <Col sm={12} md={6}>
+            <FormGroup>{risk_address.house_building_name}</FormGroup>
+          </Col>
+        </Row>
+        <Row>
+          <Col sm={12} md={6}>
+            <FormGroup>Area Name:</FormGroup>
+          </Col>
+          <Col sm={12} md={6}>
+            <FormGroup>{risk_address.area_name}</FormGroup>
+          </Col>
+        </Row>
+
+        <Row>
+          <Col sm={12} md={6}>
+            <FormGroup>Pincode:</FormGroup>
+          </Col>
+          <Col sm={12} md={6}>
+            <FormGroup>{risk_address.pincode}</FormGroup>
+          </Col>
+        </Row>
+        <Row>
+          <Col sm={12} md={6}>
+            <FormGroup>Locality:</FormGroup>
+          </Col>
+          <Col sm={12} md={6}>
+            <FormGroup>{risk_address.locality}</FormGroup>
+          </Col>
+        </Row>
+        <Row>
+          <Col sm={12} md={6}>
+            <FormGroup>City:</FormGroup>
+          </Col>
+          <Col sm={12} md={6}>
+            <FormGroup>{risk_address.city}</FormGroup>
+          </Col>
+        </Row>
+        <Row>
+          <Col sm={12} md={6}>
+            <FormGroup>State:</FormGroup>
+          </Col>
+          <Col sm={12} md={6}>
+            <FormGroup>{risk_address.state}</FormGroup>
+          </Col>
+        </Row>
+      </div>
+  ) :null
+
+    const HouseFlatNo = addressDetails ? (
+      <div>
+        <Row>
+          <Col sm={12} md={6}>
+            <FormGroup>{addressDetails.house_flat_no}</FormGroup>
+          </Col>
+        </Row>
+      </div>
+  ) :null
+  const HouseBuildingName = addressDetails ? (
+    <div>
+      <Row>
+        <Col sm={12} md={6}>
+          <FormGroup>{addressDetails.house_building_name}</FormGroup>
+        </Col>
+      </Row>
+    </div>
+) :null
+const StreetName = addressDetails ? (
+  <div>
+    <Row>
+      <Col sm={12} md={6}>
+        <FormGroup>{addressDetails.street_name}</FormGroup>
+      </Col>
+    </Row>
+  </div>
+) :null
+const Locality = location ? (
+  <div>
+    <Row>
+      <Col sm={12} md={6}>
+        <FormGroup>{location}</FormGroup>
+      </Col>
+    </Row>
+  </div>
+) :null
+const City = city ? (
+  <div>
+    <Row>
+      <Col sm={12} md={6}>
+        <FormGroup>{city}</FormGroup>
+      </Col>
+    </Row>
+  </div>
+) :null
+const State = state ? (
+  <div>
+    <Row>
+      <Col sm={12} md={6}>
+        <FormGroup>{state}</FormGroup>
+      </Col>
+    </Row>
+  </div>
+) :null
     const PincodeDetails = policyHolderDetails ? (
       <div>
         <Row>
@@ -386,7 +496,7 @@ paypoint_payment = () => {
         return (
           <div>
           <Row>
-            <Col sm={12} md={6}>
+            <Col sm={12} md={12}>
               <h6><strong>Nominee</strong></h6>
               <Row>
                 <Col sm={12} md={6}>
@@ -402,7 +512,7 @@ paypoint_payment = () => {
                   <FormGroup>Date Of Birth:</FormGroup>
                 </Col>
                 <Col sm={12} md={6}>
-                  <FormGroup>{member.dob}</FormGroup>
+                  <FormGroup>{ member ? moment(member.dob).format("DD-MM-YYYY") : null}</FormGroup>
                 </Col>
               </Row>
 
@@ -430,7 +540,7 @@ paypoint_payment = () => {
         return (
           <div>
           <Row>
-            <Col sm={12} md={6}>
+            <Col sm={12} md={12}>
               <h6><strong>Appointee </strong></h6>
               <Row>
                 <Col sm={12} md={6}>
@@ -473,7 +583,7 @@ paypoint_payment = () => {
     const proposerDetails = policyHolderDetails ? 
         <div>
         <Row>
-          <Col sm={12} md={6}>
+          <Col sm={12} md={12}>
             <Row>
               <Col sm={12} md={6}>
                 <FormGroup>Proposer Name:</FormGroup>
@@ -489,7 +599,7 @@ paypoint_payment = () => {
               </Col>
               <Col sm={12} md={6}>
                 <FormGroup>
-                {policyHolderDetails.dob}
+                { policyHolderDetails ? moment(policyHolderDetails.dob).format("DD-MM-YYYY") : null}
                 </FormGroup>
               </Col>
             </Row>
@@ -523,16 +633,16 @@ paypoint_payment = () => {
       :null
 
     const policy_Coverage =
-      <table >
+      <table width={500}>
           <tr>
-            <th>Section</th>
-            <th>Sum Insured</th>
+          <th><Col sm={12} md={18}>Section</Col></th>
+          <th><Col sm={12} md={18}>Sum Insured</Col></th>
         </tr>
         { policyCoverage && policyCoverage.length > 0 ?
             policyCoverage.map((coverage, qIndex) => (
                 <tr>
-                    <td>{coverage.benefit_name}:</td>
-                    <td>₹ {Math.round(coverage.benefit_suminsured)}</td>
+                     <td><Col sm={12} md={18}>{coverage.benefit_name}:</Col></td>
+                     <td><Col sm={12} md={18}>₹ {Math.round(coverage.benefit_suminsured)}</Col></td>
                 </tr>                    
 
         )) : null}
@@ -597,7 +707,7 @@ paypoint_payment = () => {
                                       <Row>
                                         <Col sm={12} md={9} lg={18}>
                                           <div className="rghtsideTrigr">
-                                            <Collapsible trigger=" GSB Policy"  open= {true}>
+                                            <Collapsible trigger=" GSB Policy Plan Details"  open= {true}>
                                               <div className="listrghtsideTrigr">
                                                 {policy_Coverage ? policy_Coverage : null}
                                               </div>
@@ -645,6 +755,15 @@ paypoint_payment = () => {
                                               <div className="listrghtsideTrigr">{proposerDetails}</div>
                                             </Collapsible>
                                           </div>
+                                          <div className="rghtsideTrigr">
+                                            <Collapsible trigger=" Risk Details">
+                                              <div className="listrghtsideTrigr">         
+                                              <Col sm={12} md={12}>                       
+                                                {riskDetails}
+                                              </Col>  
+                                              </div>
+                                            </Collapsible>
+                                          </div>
 
                                           <div className="rghtsideTrigr">
                                             <Collapsible trigger=" Communication Address">
@@ -660,23 +779,61 @@ paypoint_payment = () => {
                                                       </Col>
                                                     </Row>
                                                     <Row >
-                                                      <Col sm={12} md={3}>
-                                                        Address:
+                                                      <Col sm={12} md={6}>
+                                                        House/Flat No:
                                                       </Col>
                                                       <Col sm={12} md={6}>
-                                                        {AddressDetails} 
+                                                        {HouseFlatNo}
                                                       </Col>
                                                     </Row>
-                                                    
+                                                    <Row >
+                                                      <Col sm={12} md={6}>
+                                                        House/Building Name:
+                                                      </Col>
+                                                      <Col sm={12} md={6}>
+                                                        {HouseBuildingName}
+                                                      </Col>
+                                                    </Row>
+                                                    <Row >
+                                                      <Col sm={12} md={6}>
+                                                        Street Name:
+                                                      </Col>
+                                                      <Col sm={12} md={6}>
+                                                        {StreetName}
+                                                      </Col>
+                                                    </Row>
+                                                    <Row >
+                                                      <Col sm={12} md={6}>
+                                                        Locality:
+                                                      </Col>
+                                                      <Col sm={12} md={6}>
+                                                        {Locality}
+                                                      </Col>
+                                                    </Row>
+                                                    <Row >
+                                                      <Col sm={12} md={6}>
+                                                        City:
+                                                      </Col>
+                                                      <Col sm={12} md={6}>
+                                                        {City}
+                                                      </Col>
+                                                    </Row>
+                                                    <Row >
+                                                      <Col sm={12} md={6}>
+                                                        State:
+                                                      </Col>
+                                                      <Col sm={12} md={6}>
+                                                        {State}
+                                                      </Col>
+                                                    </Row>
                                                     <Row>
-                                                      <Col sm={12} md={3}>
+                                                      <Col sm={12} md={6}>
                                                         Pincode:
                                                       </Col>
                                                       <Col sm={12} md={9}>
                                                         {PincodeDetails}
                                                       </Col>
                                                     </Row>
-
                                                   </Col>
                                                 </Row>
                                               </div>

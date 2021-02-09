@@ -34,7 +34,7 @@ const fuel = {
 
 
 const vehicleValidation = Yup.object().shape({
-    selectedBrandId: Yup.string().required("Please enter the brand name"),
+    selectedBrandId: Yup.string().required("Enter Brand Name"),
     selectedModelId: Yup.string().required("Please enter the model name"),
     // selectedVarientId : Yup.string().required("Please enter the varient name"),
 })
@@ -292,6 +292,7 @@ class SelectBrand extends Component {
     }
 
     handleSubmit = (values, pageLoad) => {
+        let phrases = localStorage.getItem("phrases") ? JSON.parse(localStorage.getItem("phrases")) : null
         const { productId } = this.props.match.params
         const { selectedVarientId, selectedModelId, selectedBrandId, fastlanelog } = this.state
         const formData = new FormData();
@@ -340,7 +341,7 @@ class SelectBrand extends Component {
             .catch(err => {
                 // handle error
                 if(err.status == '422') {
-                    swal("Please select vehicle model")
+                    swal([phrases.PleaseVehicleMmodel])
                 }
                 this.props.loadingStop();
             })

@@ -57,7 +57,9 @@ const initialValues = {
     nominee_title_id: "",
     nominee_last_name: "",
     appointee_name: "",
-    appointee_relation_with: ""
+    appointee_relation_with: "",
+    plot_no: "",
+    is_appointee: "0"
 
 }
 
@@ -81,6 +83,8 @@ const vehicleRegistrationValidation = Yup.object().shape({
     proposer_mobile: Yup.string()
         .matches(/^[6-9][0-9]{9}$/, 'Invalid Mobile number').required('Mobile No. is required').nullable(),
         
+    plot_no: Yup.string().required("Please enter Plot No.")
+        .matches(/^[0-9]*$/, 'Invalid Plot No'),
     house_building_name:  Yup.string().when(["address_flag"], {
         is: address_flag => address_flag == '0',          
         then:Yup.string()
@@ -420,7 +424,7 @@ class AdditionalDetails_GSB extends Component {
                 this.setState({
                     gsb_Details, riskAddressDetails, commAddressDetails,
                     address_flag :  gsb_Details && gsb_Details.gsbinfo ? gsb_Details.gsbinfo.address_flag : "0",
-                    is_appointee: nomineeDetails ? nomineeDetails.is_appointee : ""
+                    is_appointee: nomineeDetails ? nomineeDetails.is_appointee : "0"
                 });
                 let pincode = gsb_Details && gsb_Details.gsbinfo && gsb_Details.gsbinfo.address_flag == '1' ? gsb_Details.gsbinfo.pincode : gsb_Details ? gsb_Details.pincode : ""
                 this.fetchAreadetailsBack(pincode)
@@ -470,7 +474,8 @@ class AdditionalDetails_GSB extends Component {
             'appointee_name': values.appointee_name,
             'appointee_relation_with': values.appointee_relation_with,
             'is_appointee': this.state.is_appointee,
-            'pedal_cycle_description': values.pedal_cycle_description
+            'pedal_cycle_description': values.pedal_cycle_description,
+            'plot_no': values.plot_no
 
         }
 
@@ -667,7 +672,8 @@ class AdditionalDetails_GSB extends Component {
             address_flag: gsb_Details && gsb_Details.gsbinfo ? gsb_Details.gsbinfo.address_flag : "",
             appointee_name: gsb_Details && gsb_Details.request_data && gsb_Details.request_data.nominee && gsb_Details.request_data.nominee.length>0 ? gsb_Details.request_data.nominee[0].appointee_name : "",
             appointee_relation_with: gsb_Details && gsb_Details.request_data && gsb_Details.request_data.nominee && gsb_Details.request_data.nominee.length>0 ? gsb_Details.request_data.nominee[0].appointee_relation_with : "",
-            is_appointee: this.state.is_appointee
+            is_appointee: this.state.is_appointee,
+            plot_no: commAddressDetails ? commAddressDetails.plot_no : ""
         })
 // console.log("newInitialValues------- ", newInitialValues)
         return (
@@ -1160,6 +1166,31 @@ class AdditionalDetails_GSB extends Component {
                                                                 <FormGroup>
                                                                     <div className="insurerName">
                                                                         <Field
+                                                                            name="plot_no"
+                                                                            type="text"
+                                                                            placeholder="Plot No"
+                                                                            autoComplete="off"
+                                                                            onFocus={(e) =>
+                                                                                this.changePlaceHoldClassAdd(e)
+                                                                            }
+                                                                            onBlur={(e) =>
+                                                                                this.changePlaceHoldClassRemove(e)
+                                                                            }
+                                                                            value={values.plot_no}
+                                                                        />
+                                                                        {errors.plot_no &&
+                                                                            touched.plot_no ? (
+                                                                                <span className="errorMsg">
+                                                                                    {errors.plot_no}
+                                                                                </span>
+                                                                            ) : null}
+                                                                    </div>
+                                                                </FormGroup>
+                                                            </Col>
+                                                            <Col sm={6} md={3} lg={3}>
+                                                                <FormGroup>
+                                                                    <div className="insurerName">
+                                                                        <Field
                                                                             name="house_flat_no"
                                                                             type="text"
                                                                             placeholder="House/Flat No."
@@ -1204,7 +1235,9 @@ class AdditionalDetails_GSB extends Component {
                                                                             ) : null}
                                                                     </div>
                                                                 </FormGroup>
-                                                            </Col>
+                                                            </Col>    
+                                                        </Row>
+                                                        <Row>
                                                             <Col sm={6} md={3} lg={3}>
                                                                 <FormGroup>
                                                                     <div className="insurerName">
@@ -1230,9 +1263,6 @@ class AdditionalDetails_GSB extends Component {
                                                                     </div>
                                                                 </FormGroup>
                                                             </Col>
-                                                        </Row>
-                                                        <Row>
-
                                                             <Col sm={6} md={3} lg={3}>
                                                                 <FormGroup>
                                                                     <div className="insurerName">
@@ -1291,6 +1321,9 @@ class AdditionalDetails_GSB extends Component {
                                                                     </div>
                                                                 </FormGroup>
                                                             </Col>
+                                                        </Row>
+
+                                                        <Row>
                                                             <Col sm={6} md={3} lg={3}>
                                                                 <FormGroup>
                                                                     <div className="insurerName">
@@ -1315,9 +1348,6 @@ class AdditionalDetails_GSB extends Component {
                                                                     </div>
                                                                 </FormGroup>
                                                             </Col>
-                                                        </Row>
-
-                                                        <Row>
                                                             <Col sm={6} md={3} lg={3}>
                                                                 <FormGroup>
                                                                     <div className="insurerName">
