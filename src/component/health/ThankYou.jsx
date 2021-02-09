@@ -258,6 +258,7 @@ class ThankYouPage extends Component {
 }
 
 
+
 downloadWording = () => {
   let file_path = `${process.env.REACT_APP_PAYMENT_URL}/policy_pdf_download.php?ipa_wording=1`
   const url = file_path;
@@ -299,11 +300,13 @@ downloadWordingGSB = () => {
   render() {
     const { policyId } = this.props.match.params
     const { vehicletype } = this.state
+    let phrases = localStorage.getItem("phrases") ? JSON.parse(localStorage.getItem("phrases")) : null
 
 
     return (
       <>
         <BaseComponent>
+        {phrases ? 
           <div className="container-fluid">
             <div className="row">
               <div className="col-sm-12 col-md-12 col-lg-2 col-xl-2 pd-l-0">
@@ -314,13 +317,13 @@ downloadWordingGSB = () => {
                   <div className="thankuinfo">
                     <div className="text-center custtxt">
                       <img src={require('../../assets/images/like.svg')} alt="" className="m-b-30" />
-                      <p>Thank you for choosing SBI General Insurance</p>
-                      <p className="fs-16 m-b-30">Policy No <span className="lghtBlue"> {policyId}</span></p>
+                      <p>{phrases['ThankYouSBI']}</p>
+                      <p className="fs-16 m-b-30">{phrases['PolicyNo']} <span className="lghtBlue"> {policyId}</span></p>
                         <div className="d-flex justify-content-center align-items-center">
                         {vehicletype.download_type == 0 ?
-                            <button className="policy m-l-20" onClick={this.generateDoc}>Policy Copy </button>
+                            <button className="policy m-l-20" onClick={this.generateDoc}>{phrases['PolicyCopy']} </button>
                             :
-                            <button className="policy m-l-20" onClick={this.getAccessToken}>Policy Copy </button>
+                            <button className="policy m-l-20" onClick={this.getAccessToken}>{phrases['PolicyCopy']} </button>
                         }
                         {vehicletype.id == 13 ?
                             <button className="policy m-l-20" onClick={this.downloadWording}>Policy Wording </button>
@@ -341,7 +344,7 @@ downloadWordingGSB = () => {
                 <Footer />
               </div>
             </div>
-          </div>
+          </div> : null }
         </BaseComponent>
       </>
     );

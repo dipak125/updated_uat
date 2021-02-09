@@ -372,7 +372,7 @@ class PremiumGCV extends Component {
                                                         <h5>{errMsg}</h5>	
                                                         <h5>{paymentErrMsg}</h5>	
                                                         <h4>	
-                                                        {phrases['PolRefNumber']}{fulQuoteResp.QuotationNo}	
+                                                        {phrases['PolRefNumber']} {fulQuoteResp.QuotationNo}	
                                                         </h4>	
                                                     </div>	
                                                     <Row>	
