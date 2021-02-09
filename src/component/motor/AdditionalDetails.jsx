@@ -48,7 +48,7 @@ const initialValue = {
 }
 
 const ownerValidation = Yup.object().shape({
-    first_name: Yup.string().required('Name is required')
+    first_name: Yup.string().required('NameRequired')
         .min(3, function() {
             return "First name must be 3 chracters & last name 1 characters long"
         })
@@ -59,11 +59,11 @@ const ownerValidation = Yup.object().shape({
             return "Please enter valid name"
         }),
     // last_name:Yup.string().required('Last name is required'),
-    gender: Yup.string().required('Gender is required')
+    gender: Yup.string().required('GenderRequired')
     .matches(/^[MmFf]$/, function() {
         return "Please select valid gender"
     }),
-    dob:Yup.date().required('Date of birth is required')
+    dob:Yup.date().required('DOBRequired')
     .test(
         "18YearsChecking",
         function() {
@@ -83,23 +83,23 @@ const ownerValidation = Yup.object().shape({
     }).matches(/^[A-Z]{3}[CPHFATBLJG]{1}[A-Z]{1}[0-9]{4}[A-Z]{1}$/, function() {
         return "Please enter valid Pan Number"
     }),
-    pincode_id:Yup.string().required('Location is required'),
+    pincode_id:Yup.string().required('LocationRequired'),
 
-    pincode:Yup.string().required('Pincode is required')
+    pincode:Yup.string().required('PincodeRequired')
     .matches(/^[0-9]{6}$/, function() {
         return "Please enter valid pin code"
     }),
 
-    address:Yup.string().required('Address is required')
+    address:Yup.string().required('AddressRequired')
     // .matches(/^(?![0-9._])(?!.*[0-9._]$)(?!.*\d_)(?!.*_\d)[a-zA-Z0-9_.,-\\]+$/, 
     .matches(/^[a-zA-Z0-9\s,/.-]*$/, 
     function() {
         return "Please enter valid address"
     }),
     phone: Yup.string()
-    .matches(/^[6-9][0-9]{9}$/,'Invalid Mobile number').required('Phone No. is required'),
+    .matches(/^[6-9][0-9]{9}$/,'Invalid Mobile number').required('PhoneRequired'),
     
-    email:Yup.string().email().required('Email is required').min(8, function() {
+    email:Yup.string().email().required('EmailRequired').min(8, function() {
         return "Email must be minimum 8 chracters"
     })
     .max(75, function() {
@@ -107,11 +107,11 @@ const ownerValidation = Yup.object().shape({
     }).matches(/^[a-zA-Z0-9]+([._\-]?[a-zA-Z0-9]+)*@\w+([-]?\w+)*(\.\w{2,3})+$/,'Invalid Email Id'),
 
     is_carloan: Yup.mixed().required('This field is required'),
-    bank_name:Yup.string().notRequired('Bank Name is required')
+    bank_name:Yup.string().notRequired('BankNameReq')
     .test(
         "isLoanChecking",
         function() {
-            return "Please enter bank name"
+            return "PleaseEnterBank"
         },
         function (value) {
             if (this.parent.is_carloan == 1 && !value) {   
@@ -120,13 +120,13 @@ const ownerValidation = Yup.object().shape({
             return true;
         }
     ).matches(/^[A-Za-z][A-Za-z\s]*$/, function() {
-        return "Please enter bank name"
+        return "PleaseEnterBank"
     }),
-    bank_branch: Yup.string().notRequired('Bank branch is required')
+    bank_branch: Yup.string().notRequired('BankBranchReq')
     .test(
         "isLoanChecking",
         function() {
-            return "Please enter bank branch"
+            return "PleaseEnterBranch"
         },
         function (value) {
             if (this.parent.is_carloan == 1 && !value) {   
@@ -135,22 +135,22 @@ const ownerValidation = Yup.object().shape({
             return true;
         }
     ).matches(/^[A-Za-z][A-Za-z\s]*$/, function() {
-        return "Please enter bank branch"
+        return "PleaseEnterBranch"
     }),
 
     nominee_relation_with: Yup.string().when(['pa_flag'], {
         is: pa_flag => pa_flag == '1',       
-        then:  Yup.string().required("Please select nominee relation"),
+        then:  Yup.string().required("NomineeReltnRequired"),
         otherwise: Yup.string().nullable()
     }),
     nominee_first_name: Yup.string().when(['pa_flag'], {
         is: pa_flag => pa_flag == '1',       
-        then: Yup.string().required("Nominee name is required")
+        then: Yup.string().required("NomineeNameRequired")
                 .min(3, function() {
-                    return "Name must be minimum 3 chracters"
+                    return "NameReqMin"
                 })
                 .max(40, function() {
-                    return "Name must be maximum 40 chracters"
+                    return "NameReqMax"
                 })
                 .matches(/^[a-zA-Z]+([\s]?[a-zA-Z]+)([\s]?[a-zA-Z]+)$/, function() {
                     return "Please enter valid name"
@@ -159,12 +159,12 @@ const ownerValidation = Yup.object().shape({
     }),
     nominee_gender: Yup.string().when(['pa_flag'], {
         is: pa_flag => pa_flag == '1',       
-        then: Yup.string().required("Nominee gender is required"),
+        then: Yup.string().required("NomGenderRequired"),
         otherwise: Yup.string()
     }),
     nominee_dob: Yup.date().when(['pa_flag'], {
         is: pa_flag => pa_flag == '1',       
-        then: Yup.date()
+        then: Yup.date().required("DOBRequired")
                 .test(
                     "3monthsChecking",
                     function() {
@@ -183,17 +183,17 @@ const ownerValidation = Yup.object().shape({
 
     appointee_name: Yup.string().notRequired("Please enter appointee name")
                 .min(3, function() {
-                    return "Name must be minimum 3 chracters"
+                    return "NameReqMin"
                 })
                 .max(40, function() {
-                    return "Name must be maximum 40 chracters"
+                    return "NameReqMax"
                 })        
                 .matches(/^[a-zA-Z]+([\s]?[a-zA-Z]+)([\s]?[a-zA-Z]+)$/, function() {
                     return "Please enter valid name"
                 }).test(
                     "18YearsChecking",
                     function() {
-                        return "Please enter appointee name"
+                        return "AppoNameRequired"
                     },
                     function (value) {
                         const ageObj = new PersonAge();
@@ -209,7 +209,7 @@ const ownerValidation = Yup.object().shape({
                 .test(
                     "18YearsChecking",
                     function() {
-                        return 'Apppointee relation is required'
+                        return 'AppoReltnRequired'
                     },
                     function (value) {
                         const ageObj = new PersonAge();
@@ -221,12 +221,12 @@ const ownerValidation = Yup.object().shape({
                 ),
 
    
-    is_eia_account: Yup.string().required('This field is required'),
+    is_eia_account: Yup.string().required('RequiredField'),
     eia_no: Yup.string()
     .test(
         "isEIAchecking",
         function() {
-            return "Please enter EIA no"
+            return "PleaseEiaN"
         },
         function (value) {
             if (this.parent.is_eia_account == 1 && !value) {   
@@ -236,11 +236,11 @@ const ownerValidation = Yup.object().shape({
         }
     )
     .min(13, function() {
-        return "EIA no must be minimum 13 chracters"
+        return "EIAMin"
     })
     .max(13, function() {
-        return "EIA no must be maximum 13 chracters"
-    }).matches(/^[1245][0-9]{0,13}$/,'Please enter valid EIA no').notRequired('EIA no is required'),
+        return "EIAMax"
+    }).matches(/^[1245][0-9]{0,13}$/,'EIAValidReq').notRequired('EIARequired'),
 })
 
 class AdditionalDetails extends Component {
@@ -624,7 +624,7 @@ console.log('post_data', post_data);
                                                     value = {values.bank_name}                                                                            
                                             />
                                                 {errors.bank_name && touched.bank_name ? (
-                                            <span className="errorMsg">{errors.bank_name}</span>
+                                            <span className="errorMsg">{phrases[errors.bank_name]}</span>
                                             ) : null}
                                             </div>
                                         </FormGroup>
@@ -642,7 +642,7 @@ console.log('post_data', post_data);
                                                     value = {values.bank_branch}                                                                            
                                             />
                                                 {errors.bank_branch && touched.bank_branch ? (
-                                            <span className="errorMsg">{errors.bank_branch}</span>
+                                            <span className="errorMsg">{phrases[errors.bank_branch]}</span>
                                             ) : null} 
                                             </div>
                                         </FormGroup>
@@ -671,7 +671,7 @@ console.log('post_data', post_data);
                                                 value = {values.first_name}                                                                            
                                             />
                                                 {errors.first_name && touched.first_name ? (
-                                            <span className="errorMsg">{errors.first_name}</span>
+                                            <span className="errorMsg">{phrases[errors.first_name]}</span>
                                             ) : null} 
                                             </div>
                                         </FormGroup>
@@ -690,7 +690,7 @@ console.log('post_data', post_data);
                                                 <option value="f">{phrases['Female']}</option>
                                             </Field>     
                                             {errors.gender && touched.gender ? (
-                                            <span className="errorMsg">{errors.gender}</span>
+                                            <span className="errorMsg">{phrases[errors.gender]}</span>
                                             ) : null}              
                                             </div>
                                         </FormGroup>
@@ -716,7 +716,7 @@ console.log('post_data', post_data);
                                                 }}
                                         />
                                         {errors.dob && touched.dob ? (
-                                            <span className="errorMsg">{errors.dob}</span>
+                                            <span className="errorMsg">{phrases[errors.dob]}</span>
                                         ) : null}  
                                         </FormGroup>
                                     </Col>
@@ -757,7 +757,7 @@ console.log('post_data', post_data);
                                                 value = {values.email}                                                                            
                                             />
                                             {errors.email && touched.email ? (
-                                            <span className="errorMsg">{errors.email}</span>
+                                            <span className="errorMsg">{phrases[errors.email]}</span>
                                             ) : null}  
                                             </div>
                                         </FormGroup>
@@ -778,7 +778,7 @@ console.log('post_data', post_data);
                                                 className="phoneinput pd-l-25"                                                                          
                                             />
                                             {errors.phone && touched.phone ? (
-                                            <span className="errorMsg msgpositn">{errors.phone}</span>
+                                            <span className="errorMsg msgpositn">{phrases[errors.phone]}</span>
                                             ) : null}  
                                             </div>
                                         </FormGroup>
@@ -800,7 +800,7 @@ console.log('post_data', post_data);
                                                 value = {values.address}                                                                            
                                             />
                                             {errors.address && touched.address ? (
-                                            <span className="errorMsg">{errors.address}</span>
+                                            <span className="errorMsg">{phrases[errors.address]}</span>
                                             ) : null}  
                                             </div>
                                         </FormGroup>
@@ -828,7 +828,7 @@ console.log('post_data', post_data);
                                                 }}
                                             />
                                             {errors.pincode && touched.pincode ? (
-                                            <span className="errorMsg">{errors.pincode}</span>
+                                            <span className="errorMsg">{phrases[errors.pincode]}</span>
                                             ) : null}                                                   
                                         </div>
                                     </FormGroup>
@@ -851,7 +851,7 @@ console.log('post_data', post_data);
                                                     {/*<option value="area2">Area 2</option>*/}
                                                 </Field>     
                                                 {errors.pincode_id && touched.pincode_id ? (
-                                                    <span className="errorMsg">{errors.pincode_id}</span>
+                                                    <span className="errorMsg">{phrases[errors.pincode_id]}</span>
                                                 ) : null}     
                                             </div>
                                         </FormGroup>
@@ -901,7 +901,7 @@ console.log('post_data', post_data);
                                                 value = {values.nominee_first_name}                                                                            
                                             />
                                             {errors.nominee_first_name && touched.nominee_first_name ? (
-                                            <span className="errorMsg">{errors.nominee_first_name}</span>
+                                            <span className="errorMsg">{phrases[errors.nominee_first_name]}</span>
                                             ) : null}  
                                             </div>
                                         </FormGroup>
@@ -920,7 +920,7 @@ console.log('post_data', post_data);
                                                 <option value="f">{phrases['Female']}</option>
                                             </Field>     
                                             {errors.nominee_gender && touched.nominee_gender ? (
-                                            <span className="errorMsg">{errors.nominee_gender}</span>
+                                            <span className="errorMsg">{phrases[errors.nominee_gender]}</span>
                                             ) : null}              
                                             </div>
                                         </FormGroup>
@@ -947,7 +947,7 @@ console.log('post_data', post_data);
                                                 }}
                                         />
                                         {errors.nominee_dob && touched.nominee_dob ? (
-                                            <span className="errorMsg">{errors.nominee_dob}</span>
+                                            <span className="errorMsg">{phrases[errors.nominee_dob]}</span>
                                         ) : null}  
                                         </FormGroup>
                                     </Col>
@@ -970,7 +970,7 @@ console.log('post_data', post_data);
                                            )}
                                             </Field>     
                                             {errors.nominee_relation_with && touched.nominee_relation_with ? (
-                                                <span className="errorMsg">{errors.nominee_relation_with}</span>
+                                                <span className="errorMsg">{phrases[errors.nominee_relation_with]}</span>
                                             ) : null}        
                                             </div>
                                         </FormGroup>
@@ -999,7 +999,7 @@ console.log('post_data', post_data);
                                                             value={values.appointee_name}
                                                         />
                                                         {errors.appointee_name && touched.appointee_name ? (
-                                                        <span className="errorMsg">{errors.appointee_name}</span>
+                                                        <span className="errorMsg">{phrases[errors.appointee_name]}</span>
                                                         ) : null}
                                                         
                                                     </div>
@@ -1021,7 +1021,7 @@ console.log('post_data', post_data);
                                                         )}
                                                         </Field>     
                                                         {errors.appointee_relation_with && touched.appointee_relation_with ? (
-                                                            <span className="errorMsg">{errors.appointee_relation_with}</span>
+                                                            <span className="errorMsg">{phrases[errors.appointee_relation_with]}</span>
                                                         ) : null}        
                                                     </div>
                                                 </FormGroup>
@@ -1074,7 +1074,7 @@ console.log('post_data', post_data);
                                                         <span className="checkmark" />
                                                         <span className="fs-14">{phrases['No']}</span>
                                                         {errors.is_eia_account && touched.is_eia_account ? (
-                                                        <span className="errorMsg">{errors.is_eia_account}</span>
+                                                        <span className="errorMsg">{phrases[errors.is_eia_account]}</span>
                                                     ) : null}
                                                     </label>
                                                 </div>
@@ -1096,7 +1096,7 @@ console.log('post_data', post_data);
                                                 onBlur={e => this.changePlaceHoldClassRemove(e)}
                                             />
                                             {errors.eia_no && touched.eia_no ? (
-                                            <span className="errorMsg">{errors.eia_no}</span>
+                                            <span className="errorMsg">{phrases[errors.eia_no]}</span>
                                             ) : null}                                             
                                             </div>
                                         </FormGroup>

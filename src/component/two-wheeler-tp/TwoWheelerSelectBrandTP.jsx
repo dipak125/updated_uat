@@ -35,17 +35,17 @@ const initialValues = {
 
 
 const vehicleValidation = Yup.object().shape({
-    policy_type: Yup.string().required("Please enter policy type"),
-    policy_for: Yup.string().required("Please select policy for indivudal or corporate"),
+    policy_type: Yup.string().required("PleasePT"),
+    policy_for: Yup.string().required("PleasePIC"),
 
     regNumber: Yup.string().when("check_registration", {
         is: "1",       
         then: Yup.string(),
-        otherwise: Yup.string().required('Please provide registration number')
+        otherwise: Yup.string().required('PleaseProRegNum')
         .test(
             "last4digitcheck",
             function() {
-                return "Invalid Registration number"
+                return "InvalidRegistrationNumber"
             },
             function (value) {
                 if (value && this.parent.check_registration == 2 && (value != "" || value != undefined) ) {             
@@ -633,7 +633,7 @@ class TwoWheelerSelectBrand extends Component {
                                                                             <span className="checkmark " /><span className="fs-14"> {phrases['Corporate']}</span>
                                                                         </label>
                                                                         {errors.policy_for && touched.policy_for ? (
-                                                                            <span className="errorMsg">{errors.policy_for}</span>
+                                                                            <span className="errorMsg">{phrases[errors.policy_for]}</span>
                                                                         ) : null}
                                                                     </div>
                                                                 </div>
@@ -684,7 +684,7 @@ class TwoWheelerSelectBrand extends Component {
                                                                             <span className="fs-14">{phrases['LapsedPolicy']}</span>
                                                                         </label>
                                                                         {errors.policy_type && touched.policy_type ? (
-                                                                            <span className="errorMsg">{errors.policy_type}</span>
+                                                                            <span className="errorMsg">{phrases[errors.policy_type]}</span>
                                                                         ) : null}
                                                                     </div>
                                                                 </div>
@@ -714,7 +714,7 @@ class TwoWheelerSelectBrand extends Component {
                                                                             }}                              
                                                                         /> 
                                                                         {errors.regNumber && touched.regNumber ? (
-                                                                            <span className="errorMsg">{errors.regNumber}</span>
+                                                                            <span className="errorMsg">{phrases[errors.regNumber]}</span>
                                                                         ) : null}   
                                                                          {/* {console.log("error_msg.registration_no", error_msg)} */}
                                                                         {error_msg.registration_no ? (
@@ -735,7 +735,7 @@ class TwoWheelerSelectBrand extends Component {
                                                         <div className="brandhead">
                                                             <h4>{phrases['VechicleBrandTp']}</h4>
                                                             {error_msg.brand_id || error_msg.brand_model_id || error_msg.model_varient_id ? 
-                                                                <span className="errorMsg">Please select brand and varient</span> : ""
+                                                                <span className="errorMsg">{phrases['BrandVarient']}</span> : ""
                                                             }
                                                         </div> : null }
 
@@ -776,7 +776,7 @@ class TwoWheelerSelectBrand extends Component {
                                                                     </div>
 
                                                                     <div className="d-flex justify-content-between flex-lg-row flex-md-column m-b-25">
-                                                                        <div className="txtRegistr">{phrases['TwoWheelerModel']}<br />
+                                                                        <div className="txtRegistr">{phrases['TwoWheelModel']}<br />
                                                                             <strong>{modelName ? modelName : (selectedBrandId ? "" : vehicleDetails && vehicleDetails.vehiclemodel && vehicleDetails.vehiclemodel.description ? vehicleDetails.vehiclemodel.description+" "+vehicleDetails.varientmodel.varient : "")}</strong></div>
 
                                                                         <div> <button type="button" className="rgistrBtn" onClick={this.selectBrand.bind(this, productId)}>{phrases['Edit']}</button></div>

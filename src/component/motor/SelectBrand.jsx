@@ -341,7 +341,7 @@ class SelectBrand extends Component {
             .catch(err => {
                 // handle error
                 if(err.status == '422') {
-                    swal([phrases.PleaseVehicleMmodel])
+                    swal(phrases.PleaseVehicleMmodel)
                 }
                 this.props.loadingStop();
             })

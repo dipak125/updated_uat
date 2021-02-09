@@ -38,11 +38,11 @@ const initialValue = {
     previous_claim_bonus: "",
 }
 const vehicleRegistrationValidation = Yup.object().shape({
-    registration_date: Yup.string().required('Registration date is required'), 
+    registration_date: Yup.string().required('RegistrationRequired'), 
 
     location_id: Yup.string()
     .required(function() {
-        return "Registration city is required"
+        return "CityRequired"
     })
     .matches(/^([0-9]*)$/, function() {
         return "No special Character allowed"
@@ -382,7 +382,7 @@ console.log("redux data----- ", this.props.data)
                                                                 
                                                             />
                                                             {errors.registration_date && touched.registration_date ? (
-                                                                <span className="errorMsg">{errors.registration_date}</span>
+                                                                <span className="errorMsg">{phrases[errors.registration_date]}</span>
                                                             ) : null}
                                                         </FormGroup>
                                                     </Col>
@@ -414,7 +414,7 @@ console.log("redux data----- ", this.props.data)
                                                                     }}
                                                                 />
                                                                 {errors.location_id && touched.location_id ? (
-                                                                    <span className="errorMsg">{errors.location_id}</span>
+                                                                    <span className="errorMsg">{phrases[errors.location_id]}</span>
                                                                 ) : null}
                                                             </div>
                                                         </FormGroup>

@@ -46,11 +46,11 @@ const initialValue = {
     previous_claim_bonus: "",
 }
 const vehicleRegistrationValidation = Yup.object().shape({
-    registration_date: Yup.string().required('Registration date is required'), 
+    registration_date: Yup.string().required('RegistrationRequired'), 
 
     location_id: Yup.string()
     .required(function() {
-        return "Registration city is required"
+        return "CityRequired"
     })
     .matches(/^([0-9]*)$/, function() {
         return "No special Character allowed"
@@ -63,7 +63,7 @@ const vehicleRegistrationValidation = Yup.object().shape({
             .test(
                 "validRegistrationChecking",
                 function() {
-                    return "Please select if you have previous claim"
+                    return "PleaseSPC"
                 },
                 function (value) {
                     if (this.parent.lapse_duration == '2' && this.parent.policy_type_Id == '3') {
@@ -78,7 +78,7 @@ const vehicleRegistrationValidation = Yup.object().shape({
 
     previous_claim_bonus:Yup.string().when("previous_is_claim", {
         is: "0" ,       
-        then: Yup.string().required('Please provide previous NCB'),
+        then: Yup.string().required('PleaseNCB'),
         othewise: Yup.string()
     }),
    
@@ -441,7 +441,7 @@ class TwoWheelerVehicleDetails extends Component {
                                                                 
                                                             />
                                                             {errors.registration_date && touched.registration_date ? (
-                                                                <span className="errorMsg">{errors.registration_date}</span>
+                                                                <span className="errorMsg">{phrases[errors.registration_date]}</span>
                                                             ) : null}
                                                         </FormGroup>
                                                     </Col>
@@ -473,7 +473,7 @@ class TwoWheelerVehicleDetails extends Component {
                                                                     }}
                                                                 />
                                                                 {errors.location_id && touched.location_id ? (
-                                                                    <span className="errorMsg">{errors.location_id}</span>
+                                                                    <span className="errorMsg">{phrases[errors.location_id]}</span>
                                                                 ) : null}
                                                             </div>
                                                         </FormGroup>
@@ -537,7 +537,7 @@ class TwoWheelerVehicleDetails extends Component {
                                                                         <span className="fs-14">{phrases['YesIHave']}</span>
                                                                     </label>
                                                                     {errors.previous_is_claim && touched.previous_is_claim ? (
-                                                                    <span className="errorMsg">{errors.previous_is_claim}</span>
+                                                                    <span className="errorMsg">{phrases[errors.previous_is_claim]}</span>
                                                                 ) : null}
                                                                 </div>
                                                             </div>
@@ -635,7 +635,7 @@ class TwoWheelerVehicleDetails extends Component {
                                                                 </div>     
                                                             </div>
                                                             {errors.previous_claim_bonus && touched.previous_claim_bonus ? (
-                                                                    <span className="errorMsg">{errors.previous_claim_bonus}</span>
+                                                                    <span className="errorMsg">{phrases[errors.previous_claim_bonus]}</span>
                                                                 ) : null}
                                                         </FormGroup>
                                                     </Col>

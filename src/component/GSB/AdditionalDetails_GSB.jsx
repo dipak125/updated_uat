@@ -58,7 +58,7 @@ const initialValues = {
     nominee_last_name: "",
     appointee_name: "",
     appointee_relation_with: "",
-    plot_no: "",
+    plot_number: "",
     is_appointee: "0"
 
 }
@@ -83,7 +83,7 @@ const vehicleRegistrationValidation = Yup.object().shape({
     proposer_mobile: Yup.string()
         .matches(/^[6-9][0-9]{9}$/, 'Invalid Mobile number').required('Mobile No. is required').nullable(),
         
-    plot_no: Yup.string().required("Please enter Plot No.")
+    plot_number: Yup.string().required("Please enter Plot No.")
         .matches(/^[0-9]*$/, 'Invalid Plot No'),
     house_building_name:  Yup.string().when(["address_flag"], {
         is: address_flag => address_flag == '0',          
@@ -392,7 +392,6 @@ class AdditionalDetails_GSB extends Component {
         axios.get('gsb/gsb-relation-list')
           .then(res => {
             let decryptResp = JSON.parse(encryption.decrypt(res.data))
-            console.log("pedal-Relation-list------ ",decryptResp)
             let nomineeRelation = decryptResp.data.relation_nominee_appointee ? decryptResp.data.relation_nominee_appointee.nominee_relations : []
             let appointeeRelation = decryptResp.data.relation_nominee_appointee ? decryptResp.data.relation_nominee_appointee.appointee_relations : []
             this.setState({
@@ -475,7 +474,7 @@ class AdditionalDetails_GSB extends Component {
             'appointee_relation_with': values.appointee_relation_with,
             'is_appointee': this.state.is_appointee,
             'pedal_cycle_description': values.pedal_cycle_description,
-            'plot_no': values.plot_no
+            'plot_number': values.plot_number
 
         }
 
@@ -502,7 +501,7 @@ class AdditionalDetails_GSB extends Component {
         .post('gsb/set-proposer-with-aditional-info', formData)
         .then(res => {
             let decryptResp = JSON.parse(encryption.decrypt(res.data));
-            console.log('decryptResp-----', decryptResp)
+            console.log('decryptResp--/set-proposer-with-aditional-info------', decryptResp)
             if (decryptResp.error === false) {
                 this.props.loadingStop();
                 this.props.history.push(`/PolicyDetails_GSB/${productId}`);
@@ -673,7 +672,7 @@ class AdditionalDetails_GSB extends Component {
             appointee_name: gsb_Details && gsb_Details.request_data && gsb_Details.request_data.nominee && gsb_Details.request_data.nominee.length>0 ? gsb_Details.request_data.nominee[0].appointee_name : "",
             appointee_relation_with: gsb_Details && gsb_Details.request_data && gsb_Details.request_data.nominee && gsb_Details.request_data.nominee.length>0 ? gsb_Details.request_data.nominee[0].appointee_relation_with : "",
             is_appointee: this.state.is_appointee,
-            plot_no: commAddressDetails ? commAddressDetails.plot_no : ""
+            plot_number: commAddressDetails ? commAddressDetails.plot_number : ""
         })
 // console.log("newInitialValues------- ", newInitialValues)
         return (
@@ -1166,7 +1165,7 @@ class AdditionalDetails_GSB extends Component {
                                                                 <FormGroup>
                                                                     <div className="insurerName">
                                                                         <Field
-                                                                            name="plot_no"
+                                                                            name="plot_number"
                                                                             type="text"
                                                                             placeholder="Plot No"
                                                                             autoComplete="off"
@@ -1176,12 +1175,12 @@ class AdditionalDetails_GSB extends Component {
                                                                             onBlur={(e) =>
                                                                                 this.changePlaceHoldClassRemove(e)
                                                                             }
-                                                                            value={values.plot_no}
+                                                                            value={values.plot_number}
                                                                         />
-                                                                        {errors.plot_no &&
-                                                                            touched.plot_no ? (
+                                                                        {errors.plot_number &&
+                                                                            touched.plot_number ? (
                                                                                 <span className="errorMsg">
-                                                                                    {errors.plot_no}
+                                                                                    {errors.plot_number}
                                                                                 </span>
                                                                             ) : null}
                                                                     </div>

@@ -530,7 +530,7 @@ class TwoWheelerOtherComprehensive extends Component {
                                                                             disabled={(localStorage.getItem('declinedModel')>0 && sessionStorage.getItem('csc_id') && values[coverage.code] == 'B00015') ? true : false}
                                                                             onClick={(e) =>{
                                                                                 if( e.target.checked == false && values[coverage.code] == 'B00015') {
-                                                                                    swal("This cover is mandated by IRDAI, it is compulsory for Owner-Driver to possess a PA cover of minimum Rs 15 Lacs, except in certain conditions. By not choosing this cover, you confirm that you hold an existing PA cover or you do not possess a valid driving license.")
+                                                                                    swal(phrases.SwalIRDAI)
                                                                                 }
                                                                                 this.onRowSelect(e.target.value, e.target.checked, setFieldTouched, setFieldValue)         
                                                                             }

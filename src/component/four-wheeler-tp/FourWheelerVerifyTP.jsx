@@ -59,11 +59,11 @@ const ComprehensiveValidation = Yup.object().shape({
     registration_no: Yup.string().when("newRegistrationNo", {
         is: "NEW",       
         then: Yup.string(),
-        otherwise: Yup.string().required('Please provide registration number')
+        otherwise: Yup.string().required('PleaseProRegNum')
         .test(
             "last4digitcheck",
             function() {
-                return "Invalid Registration number"
+                return "InvalidRegistrationNumber"
             },
             function (value) {
                 if (value && (value != "" || value != undefined)) {             
@@ -76,44 +76,44 @@ const ComprehensiveValidation = Yup.object().shape({
 
     puc: Yup.string().required("Please verify pollution certificate to proceed"),
 
-    chasis_no_last_part:Yup.string().required('This field is required')
+    chasis_no_last_part:Yup.string().required('RequiredField')
     .matches(/^([0-9]*)$/, function() {
-        return "Invalid number"
+        return "InvalidNumber"
     })
     .min(5, function() {
-        return "Chasis no. should be last 5 digit"
+        return "ChasisLastDigit"
     })
     .max(5, function() {
-        return "Chasis no. should be last 5 digit"
+        return "ChasisLastDigit"
     }),
 
-    engine_no:Yup.string().required('Engine no is required')
+    engine_no:Yup.string().required('EngineRequired')
     .matches(/^[a-zA-Z0-9]*$/, function() {
-        return "Invalid engine number"
+        return "InvalidEngineNumber"
     })
     .min(5, function() {
-        return "Engine no. should be minimum 5 characters"
+        return "EngineMin"
     })
     .max(17, function() {
-        return "Engine no. should be maximum 17 characters"
+        return "EngineMax"
     }),
 
-    chasis_no:Yup.string().required('Chasis no is required')
+    chasis_no:Yup.string().required('ChasisRequired')
     .matches(/^[a-zA-Z0-9]*$/, function() {
-        return "Invalid chasis number"
+        return "InvalidChasisNumber"
     })
     .min(5, function() {
-        return "Chasis no. should be minimum 5 characters"
+        return "ChasisMin"
     })
     .max(17, function() {
-        return "Chasis no. should be maximum 17 characters"
+        return "ChasisMax"
     }),
 
-    vahanVerify:Yup.boolean().notRequired('Please verify chasis number')
+    vahanVerify:Yup.boolean().notRequired('PleaseNumber')
     .test(
         "vahanVerifyChecking",
         function() {
-            return "Please verify chasis number"
+            return "PleaseNumber"
         },
         function (value) {
             if (value == false && this.parent.chasis_no_last_part && this.parent.chasis_no_last_part.length == 5) {  
@@ -128,7 +128,7 @@ const ComprehensiveValidation = Yup.object().shape({
     .test(
         "currentMonthChecking",
         function() {
-            return "Please enter Start date"
+            return "PleaseESD"
         },
         function (value) {
             if (this.parent.policy_type_id == 2 && !value) {   
@@ -160,7 +160,7 @@ const ComprehensiveValidation = Yup.object().shape({
     .test(
         "currentMonthChecking",
         function() {
-            return "Please enter end date"
+            return "PleaseEED"
         },
         function (value) {
             if (this.parent.policy_type_id == 2 && !value) {   
@@ -192,7 +192,7 @@ const ComprehensiveValidation = Yup.object().shape({
     .test(
         "currentMonthChecking",
         function() {
-            return "Please select Policy Type"
+            return "PleaseSPT"
         },
         function (value) {
             if (this.parent.policy_type_id == 2 && !value) {   
@@ -206,7 +206,7 @@ const ComprehensiveValidation = Yup.object().shape({
     .test(
         "currentMonthChecking",
         function() {
-            return "Please enter previous insurance company"
+            return "PleaseEPIC"
         },
         function (value) {
             if (this.parent.policy_type_id == 2 && !value) {   
@@ -220,7 +220,7 @@ const ComprehensiveValidation = Yup.object().shape({
     .test(
         "currentMonthChecking",
         function() {
-            return "Please enter previous insurance company city"
+            return "PleaseEPICC"
         },
         function (value) {
             if (this.parent.policy_type_id == 2 && !value) {   
@@ -239,7 +239,7 @@ const ComprehensiveValidation = Yup.object().shape({
     .test(
         "currentMonthChecking",
         function() {
-            return "Please enter previous policy number"
+            return "PleaseEPPN"
         },
         function (value) {
             if (this.parent.policy_type_id == 2 && !value) {   
@@ -250,12 +250,12 @@ const ComprehensiveValidation = Yup.object().shape({
     )
     .matches(/^[a-zA-Z0-9][a-zA-Z0-9\s-/]*$/, 
         function() {
-            return "Please enter valid policy number"
+            return "ValidPolicyNumber"
         }).min(6, function() {
-            return "Policy No. must be minimum 6 chracters"
+            return "PolicyMinCharacter"
         })
         .max(28, function() {
-            return "Policy No. must be maximum 28 chracters"
+            return "PolicyMaxCharacter"
         }),
 
    
@@ -632,7 +632,7 @@ regnoFormat = (e, setFieldTouched, setFieldValue) => {
                                                         }}                                                 
                                                     /> 
                                                 {errors.registration_no ? (
-                                                    <span className="errorMsg">{errors.registration_no}</span>
+                                                    <span className="errorMsg">{phrases[errors.registration_no]}</span>
                                                 ) : null}
                                             </div>
                                         </FormGroup>
@@ -669,7 +669,7 @@ regnoFormat = (e, setFieldTouched, setFieldValue) => {
                                                         
                                                     />
                                                     {errors.chasis_no_last_part && touched.chasis_no_last_part ? (
-                                                    <span className="errorMsg">{errors.chasis_no_last_part}</span>
+                                                    <span className="errorMsg">{phrases[errors.chasis_no_last_part]}</span>
                                                 ) : null}
                                             </div>
                                         </FormGroup>
@@ -682,7 +682,7 @@ regnoFormat = (e, setFieldTouched, setFieldValue) => {
                                     
                                         <Button className="btn btn-primary vrifyBtn" onClick= {!errors.chasis_no_last_part ? this.getVahanDetails.bind(this,values, setFieldTouched, setFieldValue, errors) : null}>{phrases['Verify']}</Button>
                                         {errors.vahanVerify ? (
-                                                <span className="errorMsg">{errors.vahanVerify}</span>
+                                                <span className="errorMsg">{phrases[errors.vahanVerify]}</span>
                                             ) : null}
                                     </FormGroup>
                                 </Col>
@@ -708,7 +708,7 @@ regnoFormat = (e, setFieldTouched, setFieldValue) => {
                                                     }}  
                                                 />
                                                 {errors.engine_no && touched.engine_no ? (
-                                                    <span className="errorMsg">{errors.engine_no}</span>
+                                                    <span className="errorMsg">{phrases[errors.engine_no]}</span>
                                                 ) : null}
                                             </div>
                                         </FormGroup>
@@ -731,7 +731,7 @@ regnoFormat = (e, setFieldTouched, setFieldValue) => {
                                                     }} 
                                                 />
                                                 {errors.chasis_no && touched.chasis_no ? (
-                                                    <span className="errorMsg">{errors.chasis_no}</span>
+                                                    <span className="errorMsg">{phrases[errors.chasis_no]}</span>
                                                 ) : null}
                                             </div>
                                         </FormGroup>
@@ -782,7 +782,7 @@ regnoFormat = (e, setFieldTouched, setFieldValue) => {
                                                 }}
                                             />
                                             {errors.previous_start_date && touched.previous_start_date ? (
-                                                <span className="errorMsg">{errors.previous_start_date}</span>
+                                                <span className="errorMsg">{phrases[errors.previous_start_date]}</span>
                                             ) : null}
                                         </FormGroup>
                                     </Col>
@@ -803,7 +803,7 @@ regnoFormat = (e, setFieldTouched, setFieldValue) => {
                                                 }}
                                             />
                                             {errors.previous_end_date && touched.previous_end_date ? (
-                                                <span className="errorMsg">{errors.previous_end_date}</span>
+                                                <span className="errorMsg">{phrases[errors.previous_end_date]}</span>
                                             ) : null}
                                         </FormGroup>
                                     </Col>
@@ -824,7 +824,7 @@ regnoFormat = (e, setFieldTouched, setFieldValue) => {
                                         
                                                 </Field>
                                                 {errors.previous_policy_name && touched.previous_policy_name ? (
-                                                    <span className="errorMsg">{errors.previous_policy_name}</span>
+                                                    <span className="errorMsg">{phrases[errors.previous_policy_name]}</span>
                                                 ) : null}
                                             </div>
                                         </FormGroup>
@@ -847,7 +847,7 @@ regnoFormat = (e, setFieldTouched, setFieldValue) => {
                                             ))}
                                         </Field>     
                                         {errors.insurance_company_id && touched.insurance_company_id ? (
-                                        <span className="errorMsg">{errors.insurance_company_id}</span>
+                                        <span className="errorMsg">{phrases[errors.insurance_company_id]}</span>
                                         ) : null}          
                                         </div>
                                     </FormGroup>
@@ -866,7 +866,7 @@ regnoFormat = (e, setFieldTouched, setFieldValue) => {
                                                     
                                                 />
                                                 {errors.previous_city && touched.previous_city ? (
-                                                    <span className="errorMsg">{errors.previous_city}</span>
+                                                    <span className="errorMsg">{phrases[errors.previous_city]}</span>
                                                 ) : null}
                                             </div>
                                         </FormGroup>
@@ -887,7 +887,7 @@ regnoFormat = (e, setFieldTouched, setFieldValue) => {
                                                     
                                                 />
                                                 {errors.previous_policy_no && touched.previous_policy_no ? (
-                                                    <span className="errorMsg">{errors.previous_policy_no}</span>
+                                                    <span className="errorMsg">{phrases[errors.previous_policy_no]}</span>
                                                 ) : null}
                                             </div>
                                         </FormGroup>
