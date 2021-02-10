@@ -400,14 +400,6 @@ paypoint_payment = () => {
             <FormGroup>Plot No:</FormGroup>
           </Col>
           <Col sm={12} md={6}>
-            <FormGroup>{addressDetails.plot_number}</FormGroup>
-          </Col>
-        </Row>
-        <Row>
-          <Col sm={12} md={6}>
-            <FormGroup>House/Flat No:</FormGroup>
-          </Col>
-          <Col sm={12} md={6}>
             <FormGroup>{addressDetails.house_flat_no}</FormGroup>
           </Col>
         </Row>

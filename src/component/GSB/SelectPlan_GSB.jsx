@@ -52,7 +52,7 @@ const vehicleRegistrationValidation = Yup.object().shape({
             }
             return false;
     }) .matches(/^(?![0-9]*$)+([\s]?[\/a-zA-Z0-9.,-])+$/, 'Please enter a valid building name only')
-        .matches(/^([a-zA-Z0-9.,-]+\s)*[\/a-zA-Z0-9.,-]+$/, 'The field should have only one space in between words').nullable(),
+        .matches(/^([a-zA-Z0-9.,-\/]+\s)*[\/a-zA-Z0-9.,-/]+$/, 'The field should have only one space in between words').nullable(),
 
     house_flat_no: Yup.string()
       .test(
@@ -73,7 +73,7 @@ const vehicleRegistrationValidation = Yup.object().shape({
       .matches(/^[a-zA-Z0-9]+([\s]?[\/a-zA-Z0-9.,-])*$/, function () {
         return "Please enter valid area name";
       }).matches(/^(?![0-9]*$)+([\s]?[\/a-zA-Z0-9.,-])+$/, 'Please enter a valid area name only')
-        .matches(/^([a-zA-Z0-9.,-]+\s)*[\/a-zA-Z0-9.,-]+$/, 'The field should have only one space in between words').nullable(),
+        .matches(/^([a-zA-Z0-9.,-\/]+\s)*[\/a-zA-Z0-9.,-]+$/, 'The field should have only one space in between words').nullable(),
     pincode: Yup.string()
       .required("Pincode is required")
       .matches(/^[0-9]{6}$/, function () {

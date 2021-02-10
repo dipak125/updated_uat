@@ -1636,7 +1636,7 @@ class OtherComprehensiveMISCD extends Component {
                                             <Col sm={12} md={5} lg={6}>
                                                 <FormGroup>
                                                     <div className="insurerName">
-                                                    {phrases['ChassisNo']}.
+                                                    {phrases['ChassisNo']}
                                                     </div>
                                                 </FormGroup>
                                             </Col>
@@ -1865,7 +1865,7 @@ class OtherComprehensiveMISCD extends Component {
                             <Row>
                                 <Col sm={12} md={12} lg={12}>
                                     <FormGroup>
-                                        <span className="fs-18">{phrases['AddMoreCoverage']}.</span>
+                                        <span className="fs-18">{phrases['AddMoreCoverage']}</span>
                                     </FormGroup>
                                 </Col>
                             </Row>

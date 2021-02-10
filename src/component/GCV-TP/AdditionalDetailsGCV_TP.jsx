@@ -305,7 +305,7 @@ const ownerValidation = Yup.object().shape({
 
     date_of_incorporation: Yup.date().when(['policy_for'], {
         is: policy_for => policy_for == '2', 
-        then: Yup.date().required('IncorporationDate'),
+        then: Yup.date().required('PleaseIncorporationDate'),
         otherwise: Yup.date().nullable()
     }),
 

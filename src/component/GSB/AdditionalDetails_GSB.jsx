@@ -97,7 +97,7 @@ const vehicleRegistrationValidation = Yup.object().shape({
                 }
                 return false;
         }) .matches(/^(?![0-9]*$)+([\s]?[\/a-zA-Z0-9.,-])+$/, 'Please enter a valid building name only')
-            .matches(/^([a-zA-Z0-9.,-]+\s)*[\/a-zA-Z0-9.,-]+$/, 'The field should have only one space in between words').nullable(),
+            .matches(/^([a-zA-Z0-9.,-\/]+\s)*[\/a-zA-Z0-9.,-]+$/, 'The field should have only one space in between words').nullable(),
         otherwise: Yup.string()
     }),
 
@@ -143,7 +143,7 @@ const vehicleRegistrationValidation = Yup.object().shape({
         is: address_flag => address_flag == '0', 
         then: Yup.string()
         .required("Please enter street name").matches(/^(?![0-9]*$)+([\s]?[\/a-zA-Z0-9.,-])+$/, 'Please enter a valid street name only')
-        .matches(/^([a-zA-Z0-9.,-]+\s)*[\/a-zA-Z0-9.,-]+$/, 'The field should have only one space in between words').nullable(),
+        .matches(/^([a-zA-Z0-9.,-\/]+\s)*[\/a-zA-Z0-9.,-]+$/, 'The field should have only one space in between words').nullable(),
         otherwise: Yup.string()
     }),
     state_name: Yup.string().when(["address_flag"], {
