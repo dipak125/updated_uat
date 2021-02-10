@@ -112,10 +112,9 @@ class PolicyDetails_GSB extends Component {
     this.props.history.push(`/AdditionalDetails_GSB/${productId}`);
   };
 
-  fetchNomineeRel = () => {
+  fetchNomineeRel = (policyHolder) => {
     const { productId } = this.props.match.params;
     let encryption = new Encryption();
-    this.props.loadingStart();
     axios
       .get('gsb/gsb-relation-list')
       .then((res) => {
@@ -129,45 +128,13 @@ class PolicyDetails_GSB extends Component {
           for (const x in nomineeRelation) {
             NomineeRelationArr[nomineeRelation[x].id] = nomineeRelation[x].name
           }
-          // for (const y in appointeeRelation) {
-          //   AppointeeRelationArr[appointeeRelation[y].id] = appointeeRelation[faYelp].name
-          // }
-          this.setState({
-          nomineeRelation, NomineeRelationArr, AppointeeRelationArr
-        });
-        this.fetchData();
-        }      
-      })
-      .catch((err) => {
-        // handle error
-        this.props.loadingStop();
-      });
-  };
-  fetchAppointeeRel = () => {
-    const { productId } = this.props.match.params;
-    let encryption = new Encryption();
-    this.props.loadingStart();
-    axios
-      .get('gsb/gsb-relation-list')
-      .then((res) => {
-        let decryptResp = JSON.parse(encryption.decrypt(res.data));
-        console.log("decrypt--fetchSubVehicle------ ", decryptResp);
-        if(decryptResp.error == false) {
-          // let nomineeRelation = decryptResp.data.relation_nominee_appointee.nominee_relations;
-          let appointeeRelation = decryptResp.data.relation_nominee_appointee.appointee_relations;
-          // let NomineeRelationArr = []
-          let AppointeeRelationArr = []
-          // for (const x in nomineeRelation) {
-          //   NomineeRelationArr[nomineeRelation[x].id] = nomineeRelation[x].name
-          // }
           for (const y in appointeeRelation) {
             AppointeeRelationArr[appointeeRelation[y].id] = appointeeRelation[y].name
           }
           this.setState({
-          // nomineeRelation, NomineeRelationArr,
-           AppointeeRelationArr
+          nomineeRelation, NomineeRelationArr, AppointeeRelationArr
         });
-        this.fetchData();
+        this.fullQuote(policyHolder)
         }      
       })
       .catch((err) => {
@@ -225,7 +192,7 @@ fetchCoveragePlan=(policyHolder, gsb_Details)=>{
       this.setState({
         policyCoverage
       });
-      this.fullQuote(policyHolder)
+      this.fetchNomineeRel(policyHolder);
     })
     .catch((err) => {
       // handle error
@@ -355,8 +322,6 @@ paypoint_payment = () => {
 
   componentDidMount() {
   this.fetchPolicyDetails();
-  this.fetchNomineeRel();
-  this.fetchAppointeeRel();
   }
 
   render() {
@@ -428,70 +393,76 @@ paypoint_payment = () => {
       </div>
   ) :null
 
-    const HouseFlatNo = addressDetails ? (
+    const communicationDetails = addressDetails ? (
       <div>
         <Row>
+          <Col sm={12} md={6}>
+            <FormGroup>Plot No:</FormGroup>
+          </Col>
+          <Col sm={12} md={6}>
+            <FormGroup>{addressDetails.plot_number}</FormGroup>
+          </Col>
+        </Row>
+        <Row>
+          <Col sm={12} md={6}>
+            <FormGroup>House/Flat No:</FormGroup>
+          </Col>
           <Col sm={12} md={6}>
             <FormGroup>{addressDetails.house_flat_no}</FormGroup>
           </Col>
         </Row>
-      </div>
-  ) :null
-  const HouseBuildingName = addressDetails ? (
-    <div>
-      <Row>
-        <Col sm={12} md={6}>
-          <FormGroup>{addressDetails.house_building_name}</FormGroup>
-        </Col>
-      </Row>
-    </div>
-) :null
-const StreetName = addressDetails ? (
-  <div>
-    <Row>
-      <Col sm={12} md={6}>
-        <FormGroup>{addressDetails.street_name}</FormGroup>
-      </Col>
-    </Row>
-  </div>
-) :null
-const Locality = location ? (
-  <div>
-    <Row>
-      <Col sm={12} md={6}>
-        <FormGroup>{location}</FormGroup>
-      </Col>
-    </Row>
-  </div>
-) :null
-const City = city ? (
-  <div>
-    <Row>
-      <Col sm={12} md={6}>
-        <FormGroup>{city}</FormGroup>
-      </Col>
-    </Row>
-  </div>
-) :null
-const State = state ? (
-  <div>
-    <Row>
-      <Col sm={12} md={6}>
-        <FormGroup>{state}</FormGroup>
-      </Col>
-    </Row>
-  </div>
-) :null
-    const PincodeDetails = policyHolderDetails ? (
-      <div>
         <Row>
+          <Col sm={12} md={6}>
+            <FormGroup>House/Building Name:</FormGroup>
+          </Col>
+          <Col sm={12} md={6}>
+            <FormGroup>{addressDetails.house_building_name}</FormGroup>
+          </Col>
+        </Row>
+        <Row>
+          <Col sm={12} md={6}>
+            <FormGroup> Street Name:</FormGroup>
+          </Col>
+          <Col sm={12} md={6}>
+            <FormGroup>{addressDetails.street_name}</FormGroup>
+          </Col>
+        </Row>
+
+        <Row>
+          <Col sm={12} md={6}>
+            <FormGroup>Pincode:</FormGroup>
+          </Col>
           <Col sm={12} md={6}>
             <FormGroup>{policyHolderDetails.pincode}</FormGroup>
           </Col>
         </Row>
+        <Row>
+          <Col sm={12} md={6}>
+            <FormGroup>Locality:</FormGroup>
+          </Col>
+          <Col sm={12} md={6}>
+            <FormGroup>{location}</FormGroup>
+          </Col>
+        </Row>
+        <Row>
+          <Col sm={12} md={6}>
+            <FormGroup>City:</FormGroup>
+          </Col>
+          <Col sm={12} md={6}>
+            <FormGroup>{city}</FormGroup>
+          </Col>
+        </Row>
+        <Row>
+          <Col sm={12} md={6}>
+            <FormGroup>State:</FormGroup>
+          </Col>
+          <Col sm={12} md={6}>
+            <FormGroup>{state}</FormGroup>
+          </Col>
+        </Row>
       </div>
   ) :null
-
+ 
       const nominee = policyHolderDetails.request_data ? policyHolderDetails.request_data.nominee.map((member, qIndex) => {
         return (
           <div>
@@ -768,74 +739,9 @@ const State = state ? (
                                           <div className="rghtsideTrigr">
                                             <Collapsible trigger=" Communication Address">
                                               <div className="listrghtsideTrigr">
-                                                <div className="d-flex justify-content-end carloan">
-                                                  {/* <Link to ={`/arogya_Address/${productId}`}> Edit</Link> */}
-                                                </div>
-                                                <Row>
-                                                  <Col sm={12} md={18}>
-                                                    <Row>
-                                                      <Col sm={12} md={3}>
-                                                      &nbsp;
-                                                      </Col>
-                                                    </Row>
-                                                    <Row >
-                                                      <Col sm={12} md={6}>
-                                                        House/Flat No:
-                                                      </Col>
-                                                      <Col sm={12} md={6}>
-                                                        {HouseFlatNo}
-                                                      </Col>
-                                                    </Row>
-                                                    <Row >
-                                                      <Col sm={12} md={6}>
-                                                        House/Building Name:
-                                                      </Col>
-                                                      <Col sm={12} md={6}>
-                                                        {HouseBuildingName}
-                                                      </Col>
-                                                    </Row>
-                                                    <Row >
-                                                      <Col sm={12} md={6}>
-                                                        Street Name:
-                                                      </Col>
-                                                      <Col sm={12} md={6}>
-                                                        {StreetName}
-                                                      </Col>
-                                                    </Row>
-                                                    <Row >
-                                                      <Col sm={12} md={6}>
-                                                        Locality:
-                                                      </Col>
-                                                      <Col sm={12} md={6}>
-                                                        {Locality}
-                                                      </Col>
-                                                    </Row>
-                                                    <Row >
-                                                      <Col sm={12} md={6}>
-                                                        City:
-                                                      </Col>
-                                                      <Col sm={12} md={6}>
-                                                        {City}
-                                                      </Col>
-                                                    </Row>
-                                                    <Row >
-                                                      <Col sm={12} md={6}>
-                                                        State:
-                                                      </Col>
-                                                      <Col sm={12} md={6}>
-                                                        {State}
-                                                      </Col>
-                                                    </Row>
-                                                    <Row>
-                                                      <Col sm={12} md={6}>
-                                                        Pincode:
-                                                      </Col>
-                                                      <Col sm={12} md={9}>
-                                                        {PincodeDetails}
-                                                      </Col>
-                                                    </Row>
-                                                  </Col>
-                                                </Row>
+                                                <Col sm={12} md={12}> 
+                                                  {communicationDetails}
+                                                </Col>
                                               </div>
                                             </Collapsible>
                                           </div>

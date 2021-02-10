@@ -297,11 +297,12 @@ class SelectBrandGCV extends Component {
     }
 
     handleSubmit = (values) => {
+        let phrases = localStorage.getItem("phrases") ? JSON.parse(localStorage.getItem("phrases")) : null
         const { productId } = this.props.match.params
         const { selectedVarientId, selectedModelId, selectedBrandId,  modelName, vehicleDetails } = this.state
         let vehicleModel = modelName ? modelName : (selectedBrandId ? "" : vehicleDetails && vehicleDetails.vehiclemodel && vehicleDetails.vehiclemodel.description ? vehicleDetails.vehiclemodel.description+" "+vehicleDetails.varientmodel.varient : "")
         if(vehicleModel == "" || vehicleModel == null || vehicleModel == undefined) {
-            swal("Please select vehicle Brand Model")
+            swal(phrases.PleaseVBrand)
             return false
         }
         const formData = new FormData();

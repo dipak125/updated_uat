@@ -99,7 +99,8 @@ const vehicleRegistrationValidation = Yup.object().shape({
                     return true
                 }
                 return false;
-        }) .matches(/^(?![0-9]*$)+([\s]?[\/a-zA-Z0-9.,-])+$/, 'Please enter a valid building name only').matches(/^([a-zA-Z0-9]+\s)*[\/a-zA-Z0-9.,-]+$/, 'The field should have only one space in between words').nullable(),
+        }) .matches(/^(?![0-9]*$)+([\s]?[\/a-zA-Z0-9.,-])+$/, 'Please enter a valid building name only')
+            .matches(/^([a-zA-Z0-9.,-]+\s)*[\/a-zA-Z0-9.,-]+$/, 'The field should have only one space in between words').nullable(),
         otherwise: Yup.string()
     }),
 
@@ -134,7 +135,8 @@ const vehicleRegistrationValidation = Yup.object().shape({
     street_name: Yup.string().when(["address_flag"], {
         is: address_flag => address_flag == '0', 
         then: Yup.string()
-        .required("Please enter street name").matches(/^(?![0-9]*$)+([\s]?[\/a-zA-Z0-9.,-])+$/, 'Please enter a valid street name only').matches(/^([a-zA-Z0-9]+\s)*[\/a-zA-Z0-9.,-]+$/, 'The field should have only one space in between words').nullable(),
+        .required("Please enter street name").matches(/^(?![0-9]*$)+([\s]?[\/a-zA-Z0-9.,-])+$/, 'Please enter a valid street name only')
+        .matches(/^([a-zA-Z0-9.,-]+\s)*[\/a-zA-Z0-9.,-]+$/, 'The field should have only one space in between words').nullable(),
         otherwise: Yup.string()
     }),
     state_name: Yup.string().when(["address_flag"], {
@@ -255,7 +257,7 @@ const vehicleRegistrationValidation = Yup.object().shape({
     }),
     appointee_name: Yup.string().when(['is_appointee'], {
         is: is_appointee => is_appointee == '1',       
-        then: Yup.string().notRequired("Please enter appointee name")
+        then: Yup.string().required("Please enter appointee name")
                 .min(3, function() {
                     return "Name must be minimum 3 characters"
                 })
@@ -277,12 +279,33 @@ const vehicleRegistrationValidation = Yup.object().shape({
                         return true;
                     }
                 ),
-        otherwise: Yup.string().nullable()
+        otherwise: Yup.string().notRequired("Please enter appointee name")
+                .min(3, function() {
+                    return "Name must be minimum 3 characters"
+                })
+                .max(40, function() {
+                    return "Name must be maximum 40 characters"
+                })        
+                .matches(/^[a-zA-Z]+([\s]?[a-zA-Z]+)([\s]?[a-zA-Z]+)$/, function() {
+                    return "Please enter valid name"
+                }).test(
+                    "18YearsChecking",
+                    function() {
+                        return "Please enter appointee name"
+                    },
+                    function (value) {
+                        const ageObj = new PersonAge();
+                        if (ageObj.whatIsMyAge(this.parent.nominee_dob) < 18 && !value) {   
+                            return false  
+                        }
+                        return true;
+                    }
+                )
     }),
 
     appointee_relation_with: Yup.string().when(['is_appointee'], {
         is: is_appointee => is_appointee == '1',       
-        then: Yup.string().notRequired("Please select relation")
+        then: Yup.string().required("Please select relation")
                 .test(
                     "18YearsChecking",
                     function() {
@@ -296,7 +319,20 @@ const vehicleRegistrationValidation = Yup.object().shape({
                         return true;
                     }
                 ),
-        otherwise: Yup.string().nullable()
+        otherwise: Yup.string().notRequired("Please select relation")
+                .test(
+                    "18YearsChecking",
+                    function() {
+                        return 'Apppointee relation is required'
+                    },
+                    function (value) {
+                        const ageObj = new PersonAge();
+                        if (ageObj.whatIsMyAge(this.parent.nominee_dob) < 18 && !value) {   
+                            return false;    
+                        }
+                        return true;
+                    }
+                )
     }),
 })
 

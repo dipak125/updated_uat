@@ -52,7 +52,7 @@ const initialValue = {
     valid_previous_policy: ""
 }
 const vehicleRegistrationValidation = Yup.object().shape({
-    registration_date: Yup.string().required('Registration date is required')
+    registration_date: Yup.string().required('RegistrationRequired')
     .test(
         "checkMaxDateRollover",
         "Registration date must be one year old",
@@ -88,7 +88,7 @@ const vehicleRegistrationValidation = Yup.object().shape({
 
     location_id: Yup.string()
     .required(function() {
-        return "Registration city is required"
+        return "CityRequired"
     })
     .matches(/^([0-9]*)$/, function() {
         return "No special Character allowed"
@@ -99,7 +99,7 @@ const vehicleRegistrationValidation = Yup.object().shape({
     .test(
         "currentMonthChecking",
         function() {
-            return "Please enter Start date"
+            return "PleaseESD"
         },
         function (value) {
             const ageObj = new PersonAge();
@@ -132,7 +132,7 @@ const vehicleRegistrationValidation = Yup.object().shape({
     .test(
         "currentMonthChecking",
         function() {
-            return "Please enter end date"
+            return "PleaseEED"
         },
         function (value) {
             const ageObj = new PersonAge();
@@ -161,11 +161,11 @@ const vehicleRegistrationValidation = Yup.object().shape({
         }
     ),
     previous_policy_name:Yup.string()
-    .notRequired('Please select Policy Type')
+    .notRequired('PleaseSPT')
     .test(
         "currentMonthChecking",
         function() {
-            return "Please select Policy Type"
+            return "PleaseSPT"
         },
         function (value) {
             if (this.parent.policy_type_id == '2'  && !value  && this.parent.valid_previous_policy == '1') {   
@@ -191,7 +191,7 @@ const vehicleRegistrationValidation = Yup.object().shape({
     .test(
         "currentMonthChecking",
         function() {
-            return "Please enter previous insurance company"
+            return "PleaseEPIC"
         },
         function (value) {
             if (this.parent.policy_type_id == '2' && !value  && this.parent.valid_previous_policy == '1') {   
@@ -205,7 +205,7 @@ const vehicleRegistrationValidation = Yup.object().shape({
     .test(
         "currentMonthChecking",
         function() {
-            return "Please enter previous insurance company city"
+            return "PleaseEPICC"
         },
         function (value) {
             if (this.parent.policy_type_id == '2' && !value  && this.parent.valid_previous_policy == '1') {   
@@ -224,7 +224,7 @@ const vehicleRegistrationValidation = Yup.object().shape({
     .test(
         "currentMonthChecking",
         function() {
-            return "Please enter previous policy number"
+            return "PleaseEPPN"
         },
         function (value) {
             if (this.parent.policy_type_id == '2'&& !value  && this.parent.valid_previous_policy == '1') {   
@@ -237,20 +237,20 @@ const vehicleRegistrationValidation = Yup.object().shape({
         function() {
             return "Please enter valid policy number"
         }).min(6, function() {
-            return "Policy No. must be minimum 6 characters"
+            return "PolicyMinCharacter"
         })
         .max(28, function() {
-            return "Policy No. must be maximum 18 characters"
+            return "PolicyMaxCharacter"
         }),
 
 
     goodscarriedtypes_id: Yup.string()
     .required(function() {
-        return "Please select type of goods"
+        return "PleaseSTOG"
     }).test(
         "currentMonthChecking",
         function() {
-            return "Hazardous goods not allowed"
+            return "HazardousGNA"
         },
         function (value) {
             if (value == '1' ) {   
@@ -261,11 +261,11 @@ const vehicleRegistrationValidation = Yup.object().shape({
     ),
     averagemonthlyusages_id: Yup.string()
     .required(function() {
-        return "Please select average monthly use"
+        return "PleaseSAM"
     }),
     permittypes_id: Yup.string()
     .required(function() {
-        return "Please select type of permit"
+        return "PleaseSTOP"
     }),
     valid_previous_policy: Yup.string()
     .required(function() {
@@ -708,7 +708,7 @@ class VehicleDetailsGCV extends Component {
                                                                 
                                                             />
                                                             {errors.registration_date && touched.registration_date ? (
-                                                                <span className="errorMsg">{errors.registration_date}</span>
+                                                                <span className="errorMsg">{phrases[errors.registration_date]}</span>
                                                             ) : null}
                                                         </FormGroup>
                                                     </Col>
@@ -739,7 +739,7 @@ class VehicleDetailsGCV extends Component {
                                                                     }}
                                                                 />
                                                                 {errors.location_id && touched.location_id ? (
-                                                                    <span className="errorMsg">{errors.location_id}</span>
+                                                                    <span className="errorMsg">{phrases[errors.location_id]}</span>
                                                                 ) : null}
                                                             </div>
                                                         </FormGroup>
@@ -764,7 +764,7 @@ class VehicleDetailsGCV extends Component {
                                                         
                                                                 </Field>
                                                                 {errors.goodscarriedtypes_id && touched.goodscarriedtypes_id ? (
-                                                                    <span className="errorMsg">{errors.goodscarriedtypes_id}</span>
+                                                                    <span className="errorMsg">{phrases[errors.goodscarriedtypes_id]}</span>
                                                                 ) : null}
                                                             </div>
                                                         </FormGroup>
@@ -788,7 +788,7 @@ class VehicleDetailsGCV extends Component {
                                                         
                                                                 </Field>
                                                                 {errors.averagemonthlyusages_id && touched.averagemonthlyusages_id ? (
-                                                                    <span className="errorMsg">{errors.averagemonthlyusages_id}</span>
+                                                                    <span className="errorMsg">{phrases[errors.averagemonthlyusages_id]}</span>
                                                                 ) : null}
                                                             </div>
                                                         </FormGroup>
@@ -811,7 +811,7 @@ class VehicleDetailsGCV extends Component {
                                                         
                                                                 </Field>
                                                                 {errors.permittypes_id && touched.permittypes_id ? (
-                                                                    <span className="errorMsg">{errors.permittypes_id}</span>
+                                                                    <span className="errorMsg">{phrases[errors.permittypes_id]}</span>
                                                                 ) : null}
                                                             </div>
                                                         </FormGroup>
@@ -876,7 +876,7 @@ class VehicleDetailsGCV extends Component {
                                                                         <span className="fs-14">{phrases['Yes']}</span>
                                                                     </label>
                                                                     {errors.valid_previous_policy && touched.valid_previous_policy ? (
-                                                                    <span className="errorMsg">{errors.valid_previous_policy}</span>
+                                                                    <span className="errorMsg">{phrases[errors.valid_previous_policy]}</span>
                                                                 ) : null}
                                                                 </div>
                                                             </div>
@@ -935,7 +935,7 @@ class VehicleDetailsGCV extends Component {
                                                                 }}
                                                             />
                                                             {errors.previous_start_date && touched.previous_start_date ? (
-                                                                <span className="errorMsg">{errors.previous_start_date}</span>
+                                                                <span className="errorMsg">{phrases[errors.previous_start_date]}</span>
                                                             ) : null}
                                                         </FormGroup>
                                                     </Col>
@@ -956,7 +956,7 @@ class VehicleDetailsGCV extends Component {
                                                                 }}
                                                             />
                                                             {errors.previous_end_date && touched.previous_end_date ? (
-                                                                <span className="errorMsg">{errors.previous_end_date}</span>
+                                                                <span className="errorMsg">{phrases[errors.previous_end_date]}</span>
                                                             ) : null}
                                                         </FormGroup>
                                                     </Col>
@@ -977,7 +977,7 @@ class VehicleDetailsGCV extends Component {
                                                         
                                                                 </Field>
                                                                 {errors.previous_policy_name && touched.previous_policy_name ? (
-                                                                    <span className="errorMsg">{errors.previous_policy_name}</span>
+                                                                    <span className="errorMsg">{phrases[errors.previous_policy_name]}</span>
                                                                 ) : null}
                                                             </div>
                                                         </FormGroup>
@@ -1000,7 +1000,7 @@ class VehicleDetailsGCV extends Component {
                                                             ))}
                                                         </Field>     
                                                         {errors.insurance_company_id && touched.insurance_company_id ? (
-                                                        <span className="errorMsg">{errors.insurance_company_id}</span>
+                                                        <span className="errorMsg">{phrases[errors.insurance_company_id]}</span>
                                                         ) : null}          
                                                         </div>
                                                     </FormGroup>
@@ -1019,7 +1019,7 @@ class VehicleDetailsGCV extends Component {
                                                                     
                                                                 />
                                                                 {errors.previous_city && touched.previous_city ? (
-                                                                    <span className="errorMsg">{errors.previous_city}</span>
+                                                                    <span className="errorMsg">{phrases[errors.previous_city]}</span>
                                                                 ) : null}
                                                             </div>
                                                         </FormGroup>
@@ -1040,7 +1040,7 @@ class VehicleDetailsGCV extends Component {
                                                                     
                                                                 />
                                                                 {errors.previous_policy_no && touched.previous_policy_no ? (
-                                                                    <span className="errorMsg">{errors.previous_policy_no}</span>
+                                                                    <span className="errorMsg">{phrases[errors.previous_policy_no]}</span>
                                                                 ) : null}
                                                             </div>
                                                         </FormGroup>

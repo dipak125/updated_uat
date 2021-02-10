@@ -101,6 +101,7 @@ class Motor extends Component {
 
     render() {
         const { motor_list, health_list } = this.state;
+        let phrases = localStorage.getItem("phrases") ? JSON.parse(localStorage.getItem("phrases")) : null
         return (
             <Row>
                 <Col sm={12}>
@@ -113,7 +114,7 @@ class Motor extends Component {
                                     <tr key={partIndex}>
                                         <td className="W-10"><img src={require(`../../assets/images/${part.logo}`)} alt="" /></td>
                                         <td className="W-70">{part.name}</td>
-                                        <td className="W-10 text-right"> <button className="buy" onClick= {this.buy_policy.bind(this, part.id )}>Buy</button></td>
+                                        <td className="W-10 text-right"> <button className="buy" onClick= {this.buy_policy.bind(this, part.id )}>{phrases['Buy']}</button></td>
                                         {/* <td className="W-10 text-right"> <button className="renew">Renew</button></td> */}
                                     </tr>
                                     ))
