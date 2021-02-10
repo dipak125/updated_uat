@@ -812,12 +812,12 @@ paypoint_payment = () => {
                                           </Row>
 
                                           <div className="d-flex justify-content-left resmb">
-                                            <button
+                                            <Button
                                               className="backBtn"
                                               onClick={this.nomineeDetails.bind(this, productId)}
                                             >
                                               Back
-                                            </button>
+                                            </Button>
 
                                             {bcMaster && bcMaster.eligible_for_payment_link == 1 ?
                                               <div>
@@ -826,13 +826,13 @@ paypoint_payment = () => {
                                               </div> : null }
 
                                           {fulQuoteResp.QuotationNo ? 
-                                            <button
+                                            <Button
                                               className="proceedBtn"
                                               type="button"
                                               onClick= {this.handleSubmit }
                                             >
                                               Make Payment
-                                            </button> : null
+                                            </Button> : null
                                           } 
                                           </div>
                                         </Col>

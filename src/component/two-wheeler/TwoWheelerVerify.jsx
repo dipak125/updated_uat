@@ -681,7 +681,7 @@ class TwoWheelerVerify extends Component {
                 <section className="brand m-b-25">
                     <div className="d-flex justify-content-left">
                         <div className="brandhead">
-                            <h4 className="fs-18 m-b-30">{phrases['VehicleDetails']}.</h4>
+                            <h4 className="fs-18 m-b-30">{phrases['PleaseVehicleDetails']}.</h4>
                             <h5>{errMsg}</h5>
                         </div>
                     </div>

@@ -58,7 +58,7 @@ const initialValue = {
 }
 
 const vehicleRegistrationValidation = Yup.object().shape({
-    registration_date: Yup.string().required('Registration date is required')
+    registration_date: Yup.string().required('RegistrationRequired')
     .test(
         "checkMaxDateRollover",
         "Registration date must be one year old",
@@ -94,7 +94,7 @@ const vehicleRegistrationValidation = Yup.object().shape({
 
     location_id: Yup.string()
     .required(function() {
-        return "Registration city is required"
+        return "CityRequired"
     })
     .matches(/^([0-9]*)$/, function() {
         return "No special Character allowed"
@@ -105,7 +105,7 @@ const vehicleRegistrationValidation = Yup.object().shape({
     .test(
         "currentMonthChecking",
         function() {
-            return "Please enter Start date"
+            return "PleaseESD"
         },
         function (value) {
             const ageObj = new PersonAge();
@@ -138,7 +138,7 @@ const vehicleRegistrationValidation = Yup.object().shape({
     .test(
         "currentMonthChecking",
         function() {
-            return "Please enter end date"
+            return "PleaseEED"
         },
         function (value) {
             const ageObj = new PersonAge();
@@ -167,11 +167,11 @@ const vehicleRegistrationValidation = Yup.object().shape({
         }
     ),
     previous_policy_name:Yup.string()
-    .notRequired('Please select Policy Type')
+    .notRequired('PleaseSPT')
     .test(
         "currentMonthChecking",
         function() {
-            return "Please select Policy Type"
+            return "PleaseSPT"
         },
         function (value) {
             if (this.parent.policy_type_id == '2'  && !value  && this.parent.valid_previous_policy == '1') {   
@@ -197,7 +197,7 @@ const vehicleRegistrationValidation = Yup.object().shape({
     .test(
         "currentMonthChecking",
         function() {
-            return "Please enter previous insurance company"
+            return "PleaseEPIC"
         },
         function (value) {
             if (this.parent.policy_type_id == '2' && !value  && this.parent.valid_previous_policy == '1') {   
@@ -211,7 +211,7 @@ const vehicleRegistrationValidation = Yup.object().shape({
     .test(
         "currentMonthChecking",
         function() {
-            return "Please enter previous insurance company address"
+            return "PleaseEPICC"
         },
         function (value) {
             if (this.parent.policy_type_id == '2' && !value  && this.parent.valid_previous_policy == '1') {   
@@ -230,7 +230,7 @@ const vehicleRegistrationValidation = Yup.object().shape({
     .test(
         "currentMonthChecking",
         function() {
-            return "Please enter previous policy number"
+            return "PleaseEPPN"
         },
         function (value) {
             if (this.parent.policy_type_id == '2'&& !value  && this.parent.valid_previous_policy == '1') {   
@@ -243,10 +243,10 @@ const vehicleRegistrationValidation = Yup.object().shape({
         function() {
             return "Please enter valid policy number"
         }).min(6, function() {
-            return "Policy No. must be minimum 6 characters"
+            return "PolicyMinCharacter"
         })
         .max(28, function() {
-            return "Policy No. must be maximum 18 characters"
+            return "PolicyMaxCharacter"
         }),
 
     previous_claim_bonus:Yup.string()
@@ -254,7 +254,7 @@ const vehicleRegistrationValidation = Yup.object().shape({
     .test(
         "currentMonthChecking",
         function() {
-            return "Please enter previous claim bonus"
+            return "PleaseEPCB"
         },
         function (value) {
             if (this.parent.previous_is_claim == '0' && this.parent.previous_policy_name == '1' && (!value || value == '1')) {   
@@ -280,7 +280,7 @@ const vehicleRegistrationValidation = Yup.object().shape({
     .test(
         "currentMonthChecking",
         function() {
-            return "Please select if you have previous claim"
+            return "PleaseSPC"
         },
         function (value) {
             const ageObj = new PersonAge();
@@ -293,7 +293,7 @@ const vehicleRegistrationValidation = Yup.object().shape({
     ),
     no_of_claim:Yup.string().when(['previous_is_claim'], {
         is: previous_is_claim => previous_is_claim == '1',       
-        then: Yup.string().required('Please provide No of claims'),
+        then: Yup.string().required('PleasePNOC'),
         otherwise: Yup.string()
     }),
 
@@ -903,7 +903,7 @@ class VehicleDetailsMISCD extends Component {
                 <section className="brand m-b-25">
                     <div className="d-flex justify-content-left">
                         <div className="brandhead">
-                            <h4 className="fs-18 m-b-30">{phrases['VehicleDetails']}.</h4>
+                            <h4 className="fs-18 m-b-30">{phrases['PleaseVehicleDetails']}.</h4>
                         </div>
                     </div>
                     <div className="brand-bg">
@@ -952,7 +952,7 @@ class VehicleDetailsMISCD extends Component {
                                                                 
                                                             />
                                                             {errors.registration_date && touched.registration_date ? (
-                                                                <span className="errorMsg">{errors.registration_date}</span>
+                                                                <span className="errorMsg">{phrases[errors.registration_date]}</span>
                                                             ) : null}
                                                         </FormGroup>
                                                     </Col>
@@ -983,7 +983,7 @@ class VehicleDetailsMISCD extends Component {
                                                                     }}
                                                                 />
                                                                 {errors.location_id && touched.location_id ? (
-                                                                    <span className="errorMsg">{errors.location_id}</span>
+                                                                    <span className="errorMsg">{phrases[errors.location_id]}</span>
                                                                 ) : null}
                                                             </div>
                                                         </FormGroup>
@@ -1122,7 +1122,7 @@ class VehicleDetailsMISCD extends Component {
                                                                             <span className="fs-14">{phrases['Yes']}</span>
                                                                         </label>
                                                                         {errors.valid_previous_policy && touched.valid_previous_policy ? (
-                                                                        <span className="errorMsg">{errors.valid_previous_policy}</span>
+                                                                        <span className="errorMsg">{phrases[errors.valid_previous_policy]}</span>
                                                                     ) : null}
                                                                     </div>
                                                                 </div>
@@ -1183,7 +1183,7 @@ class VehicleDetailsMISCD extends Component {
                                                                 }}
                                                             />
                                                             {errors.previous_start_date && touched.previous_start_date ? (
-                                                                <span className="errorMsg">{errors.previous_start_date}</span>
+                                                                <span className="errorMsg">{phrases[errors.previous_start_date]}</span>
                                                             ) : null}
                                                         </FormGroup>
                                                     </Col>
@@ -1204,7 +1204,7 @@ class VehicleDetailsMISCD extends Component {
                                                                 }}
                                                             />
                                                             {errors.previous_end_date && touched.previous_end_date ? (
-                                                                <span className="errorMsg">{errors.previous_end_date}</span>
+                                                                <span className="errorMsg">{phrases[errors.previous_end_date]}</span>
                                                             ) : null}
                                                         </FormGroup>
                                                     </Col>
@@ -1225,7 +1225,7 @@ class VehicleDetailsMISCD extends Component {
                                                         
                                                                 </Field>
                                                                 {errors.previous_policy_name && touched.previous_policy_name ? (
-                                                                    <span className="errorMsg">{errors.previous_policy_name}</span>
+                                                                    <span className="errorMsg">{phrases[errors.previous_policy_name]}</span>
                                                                 ) : null}
                                                             </div>
                                                         </FormGroup>
@@ -1248,7 +1248,7 @@ class VehicleDetailsMISCD extends Component {
                                                             ))}
                                                         </Field>     
                                                         {errors.insurance_company_id && touched.insurance_company_id ? (
-                                                        <span className="errorMsg">{errors.insurance_company_id}</span>
+                                                        <span className="errorMsg">{phrases[errors.insurance_company_id]}</span>
                                                         ) : null}          
                                                         </div>
                                                     </FormGroup>
@@ -1267,7 +1267,7 @@ class VehicleDetailsMISCD extends Component {
                                                                     
                                                                 />
                                                                 {errors.previous_city && touched.previous_city ? (
-                                                                    <span className="errorMsg">{errors.previous_city}</span>
+                                                                    <span className="errorMsg">{phrases[errors.previous_city]}</span>
                                                                 ) : null}
                                                             </div>
                                                         </FormGroup>
@@ -1288,7 +1288,7 @@ class VehicleDetailsMISCD extends Component {
                                                                     
                                                                 />
                                                                 {errors.previous_policy_no && touched.previous_policy_no ? (
-                                                                    <span className="errorMsg">{errors.previous_policy_no}</span>
+                                                                    <span className="errorMsg">{phrases[errors.previous_policy_no]}</span>
                                                                 ) : null}
                                                             </div>
                                                         </FormGroup>
@@ -1357,7 +1357,7 @@ class VehicleDetailsMISCD extends Component {
                                                                             <span className="fs-14">{phrases['YesIHave']}</span>
                                                                         </label>
                                                                         {errors.previous_is_claim && touched.previous_is_claim ? (
-                                                                        <span className="errorMsg">{errors.previous_is_claim}</span>
+                                                                        <span className="errorMsg">{phrases[errors.previous_is_claim]}</span>
                                                                     ) : null}
                                                                     </div>
                                                                 </div>
@@ -1393,7 +1393,7 @@ class VehicleDetailsMISCD extends Component {
                                                                         <option value="50">50</option>
                                                                     </Field>     
                                                                     {errors.previous_claim_bonus && touched.previous_claim_bonus ? (
-                                                                    <span className="errorMsg">{errors.previous_claim_bonus}</span>
+                                                                    <span className="errorMsg">{phrases[errors.previous_claim_bonus]}</span>
                                                                     ) : null}       
                                                                 </div>
                                                             </FormGroup>
@@ -1430,7 +1430,7 @@ class VehicleDetailsMISCD extends Component {
                                                                         <option value="10">10</option>
                                                                     </Field>     
                                                                     {errors.no_of_claim && touched.no_of_claim ? (
-                                                                    <span className="errorMsg">{errors.no_of_claim}</span>
+                                                                    <span className="errorMsg">{phrases[errors.no_of_claim]}</span>
                                                                     ) : null}       
                                                                 </div>
                                                             </FormGroup>

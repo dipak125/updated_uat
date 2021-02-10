@@ -58,7 +58,6 @@ const initialValues = {
     nominee_last_name: "",
     appointee_name: "",
     appointee_relation_with: "",
-    plot_number: "",
     is_appointee: "0"
 
 }
@@ -83,8 +82,6 @@ const vehicleRegistrationValidation = Yup.object().shape({
     proposer_mobile: Yup.string()
         .matches(/^[6-9][0-9]{9}$/, 'Invalid Mobile number').required('Mobile No. is required').nullable(),
         
-    plot_number: Yup.string().required("Please enter Plot No.")
-        .matches(/^[0-9]*$/, 'Invalid Plot No'),
     house_building_name:  Yup.string().when(["address_flag"], {
         is: address_flag => address_flag == '0',          
         then:Yup.string()
@@ -111,16 +108,26 @@ const vehicleRegistrationValidation = Yup.object().shape({
         .test(
             "buildingNameCheck",
             function() {
-                return "Please enter flat number"
+                return "Please enter Plot No"
             },
             function (value) {
-                if (this.parent.house_building_name || value) {
-                   
+                if (value) {               
                     return true
                 }
                 return false;
-        }).matches(/^[\/a-zA-Z0-9.,-]*$/, 'Please enter a valid flat number only').nullable(),
+        }).matches(/^[\/a-zA-Z0-9.,-]*$/, 'Please enter a valid plot number only').nullable(),
         otherwise: Yup.string()
+        .test(
+            "buildingNameCheck",
+            function() {
+                return "Please enter Plot No"
+            },
+            function (value) {
+                if (value) {
+                    return true
+                }
+                return false;
+        }).matches(/^[\/a-zA-Z0-9.,-]*$/, 'Please enter a valid plot number only').nullable()
     }),
     city: Yup.string().when(["address_flag"], {
         is: address_flag => address_flag == '0', 
@@ -428,6 +435,7 @@ class AdditionalDetails_GSB extends Component {
         axios.get('gsb/gsb-relation-list')
           .then(res => {
             let decryptResp = JSON.parse(encryption.decrypt(res.data))
+            console.log("relation ---------- ", decryptResp)
             let nomineeRelation = decryptResp.data.relation_nominee_appointee ? decryptResp.data.relation_nominee_appointee.nominee_relations : []
             let appointeeRelation = decryptResp.data.relation_nominee_appointee ? decryptResp.data.relation_nominee_appointee.appointee_relations : []
             this.setState({
@@ -510,7 +518,6 @@ class AdditionalDetails_GSB extends Component {
             'appointee_relation_with': values.appointee_relation_with,
             'is_appointee': this.state.is_appointee,
             'pedal_cycle_description': values.pedal_cycle_description,
-            'plot_number': values.plot_number
 
         }
 
@@ -692,7 +699,7 @@ class AdditionalDetails_GSB extends Component {
             pedal_cycle_type: gsb_Details && gsb_Details.gsbinfo ? gsb_Details.gsbinfo.pedal_cycle_type : "",
             pedal_cycle_description: gsb_Details && gsb_Details.gsbinfo ? gsb_Details.gsbinfo.pedal_cycle_description : "",
             check_box: "0",
-            house_flat_no: address_flag == '1' ? riskAddressDetails.house_flat_no : commAddressDetails ? commAddressDetails.house_flat_no : "" ,
+            house_flat_no: address_flag == '1' && riskAddressDetails.house_flat_no ? riskAddressDetails.house_flat_no : commAddressDetails ? commAddressDetails.house_flat_no : "" ,
             city: address_flag == '1' ? riskAddressDetails.city : gsb_Details ? gsb_Details.city : "" ,
             house_building_name: address_flag == '1' ? riskAddressDetails.house_building_name : commAddressDetails ? commAddressDetails.house_building_name : "" ,
             street_name: address_flag == '1' ? riskAddressDetails.area_name : commAddressDetails ? commAddressDetails.street_name : "" ,
@@ -1201,34 +1208,9 @@ class AdditionalDetails_GSB extends Component {
                                                                 <FormGroup>
                                                                     <div className="insurerName">
                                                                         <Field
-                                                                            name="plot_number"
-                                                                            type="text"
-                                                                            placeholder="Plot No"
-                                                                            autoComplete="off"
-                                                                            onFocus={(e) =>
-                                                                                this.changePlaceHoldClassAdd(e)
-                                                                            }
-                                                                            onBlur={(e) =>
-                                                                                this.changePlaceHoldClassRemove(e)
-                                                                            }
-                                                                            value={values.plot_number}
-                                                                        />
-                                                                        {errors.plot_number &&
-                                                                            touched.plot_number ? (
-                                                                                <span className="errorMsg">
-                                                                                    {errors.plot_number}
-                                                                                </span>
-                                                                            ) : null}
-                                                                    </div>
-                                                                </FormGroup>
-                                                            </Col>
-                                                            <Col sm={6} md={3} lg={3}>
-                                                                <FormGroup>
-                                                                    <div className="insurerName">
-                                                                        <Field
                                                                             name="house_flat_no"
                                                                             type="text"
-                                                                            placeholder="House/Flat No."
+                                                                            placeholder="Plot No."
                                                                             autoComplete="off"
                                                                             onFocus={(e) =>
                                                                                 this.changePlaceHoldClassAdd(e)
@@ -1236,7 +1218,7 @@ class AdditionalDetails_GSB extends Component {
                                                                             onBlur={(e) =>
                                                                                 this.changePlaceHoldClassRemove(e)
                                                                             }
-                                                                            value={address_flag == '1' ? riskAddressDetails.house_flat_no : values.house_flat_no}
+                                                                            value={address_flag == '1' && riskAddressDetails.house_flat_no != "" ? riskAddressDetails.house_flat_no : values.house_flat_no}
                                                                         />
                                                                         {errors.house_flat_no && touched.house_flat_no ? (
                                                                             <span className="errorMsg">
@@ -1254,12 +1236,6 @@ class AdditionalDetails_GSB extends Component {
                                                                             type="text"
                                                                             placeholder="House/Building Name"
                                                                             autoComplete="off"
-                                                                            // onFocus={(e) =>
-                                                                            //   this.changePlaceHoldClassAdd(e)
-                                                                            // }
-                                                                            // onBlur={(e) =>
-                                                                            //   this.changePlaceHoldClassRemove(e)
-                                                                            // }
                                                                             value={address_flag == '1' ? riskAddressDetails.house_building_name : values.house_building_name}
                                                                         />
                                                                         {errors.house_building_name &&
@@ -1271,8 +1247,6 @@ class AdditionalDetails_GSB extends Component {
                                                                     </div>
                                                                 </FormGroup>
                                                             </Col>    
-                                                        </Row>
-                                                        <Row>
                                                             <Col sm={6} md={3} lg={3}>
                                                                 <FormGroup>
                                                                     <div className="insurerName">
@@ -1298,6 +1272,8 @@ class AdditionalDetails_GSB extends Component {
                                                                     </div>
                                                                 </FormGroup>
                                                             </Col>
+                                                        </Row>
+                                                        <Row>
                                                             <Col sm={6} md={3} lg={3}>
                                                                 <FormGroup>
                                                                     <div className="insurerName">
@@ -1356,9 +1332,6 @@ class AdditionalDetails_GSB extends Component {
                                                                     </div>
                                                                 </FormGroup>
                                                             </Col>
-                                                        </Row>
-
-                                                        <Row>
                                                             <Col sm={6} md={3} lg={3}>
                                                                 <FormGroup>
                                                                     <div className="insurerName">
@@ -1383,6 +1356,9 @@ class AdditionalDetails_GSB extends Component {
                                                                     </div>
                                                                 </FormGroup>
                                                             </Col>
+                                                        </Row>
+
+                                                        <Row>    
                                                             <Col sm={6} md={3} lg={3}>
                                                                 <FormGroup>
                                                                     <div className="insurerName">

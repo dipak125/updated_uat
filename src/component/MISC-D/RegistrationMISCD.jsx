@@ -27,7 +27,7 @@ const vehicleRegistrationValidation = Yup.object().shape({
     .test(
         "registrationNumberCheck",
         function() {
-            return "Please Provide Vehicle Registration Number"
+            return "RegistrationNumber"
         },
         function (value) {
             // console.log('YUP', value)
@@ -53,9 +53,9 @@ const vehicleRegistrationValidation = Yup.object().shape({
         }
     ),
 
-    policy_type: Yup.string().required("Please select policy type"),
-    policy_for: Yup.string().required("Please select policy for Individual or Corporate"),
-    subclass_id: Yup.string().required("Please select sub product"),
+    policy_type: Yup.string().required("PleaseSPT"),
+    policy_for: Yup.string().required("PleasePIC"),
+    subclass_id: Yup.string().required("PleaseSSP"),
    
 // });
 
@@ -417,7 +417,7 @@ regnoFormat = (e, setFieldTouched, setFieldValue) => {
                                                                 <span className="checkmark " /><span className="fs-14"> {phrases['Corporate']}</span>
                                                             </label>
                                                             {errors.policy_for && touched.policy_for ? (
-                                                                <span className="errorMsg">{errors.policy_for}</span>
+                                                                <span className="errorMsg">{phrases[errors.policy_for]}</span>
                                                             ) : null}
                                                         </div>
                                                     </div>
@@ -465,7 +465,7 @@ regnoFormat = (e, setFieldTouched, setFieldValue) => {
                                                                 <span className="checkmark " /><span className="fs-14"> {phrases['RollOver']}</span>
                                                             </label>
                                                             {errors.policy_type && touched.policy_type ? (
-                                                                    <span className="errorMsg">{errors.policy_type}</span>
+                                                                    <span className="errorMsg">{phrases[errors.policy_type]}</span>
                                                                 ) : null}
                                                         </div>
                                                     </div>
@@ -491,7 +491,7 @@ regnoFormat = (e, setFieldTouched, setFieldValue) => {
                                                 
                                                         </Field>
                                                         {errors.subclass_id && touched.subclass_id ? (
-                                                            <span className="errorMsg">{errors.subclass_id}</span>
+                                                            <span className="errorMsg">{phrases[errors.subclass_id]}</span>
                                                         ) : null}
                                                     </div>
                                                 </div>
@@ -517,7 +517,7 @@ regnoFormat = (e, setFieldTouched, setFieldValue) => {
         
                                                 />
                                                 {errors.regNumber && touched.regNumber ? (
-                                                    <span className="errorMsg">{errors.regNumber}</span>
+                                                    <span className="errorMsg">{phrases[errors.regNumber]}</span>
                                                 ) : null}    
                                                 </div>
                                             </div>

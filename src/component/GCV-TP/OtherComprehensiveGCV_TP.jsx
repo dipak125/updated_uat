@@ -26,11 +26,11 @@ const ComprehensiveValidation = Yup.object().shape({
     registration_no: Yup.string().when("newRegistrationNo", {
         is: "NEW",       
         then: Yup.string(),
-        otherwise: Yup.string().required('Please provide registration number')
+        otherwise: Yup.string().required('PleaseProRegNum')
         .test(
             "last4digitcheck",
             function() {
-                return "Invalid Registration number"
+                return "InvalidRegNumber"
             },
             function (value) {
                 if (value && (value != "" || value != undefined)) {             
@@ -43,37 +43,37 @@ const ComprehensiveValidation = Yup.object().shape({
 
     puc: Yup.string().required("Please verify pollution certificate to proceed"),
 
-    chasis_no_last_part:Yup.string().required('This field is required')
+    chasis_no_last_part:Yup.string().required('RequiredField')
     .matches(/^([0-9]*)$/, function() {
         return "Invalid number"
     })
     .min(5, function() {
-        return "Chasis no. should be last 5 digit"
+        return "ChasisLastDigit"
     })
     .max(5, function() {
-        return "Chasis no. should be last 5 digit"
+        return "ChasisLastDigit"
     }),
 
-    engine_no:Yup.string().required('Engine no is required')
+    engine_no:Yup.string().required('EngineRequired')
     .matches(/^[a-zA-Z0-9]*$/, function() {
-        return "Invalid engine number"
+        return "InvalidEngineNumber"
     })
     .min(5, function() {
-        return "Engine no. should be minimum 5 characters"
+        return "EngineMin"
     })
     .max(17, function() {
-        return "Engine no. should be maximum 17 characters"
+        return "EngineMax"
     }),
 
-    chasis_no:Yup.string().required('Chasis no is required')
+    chasis_no:Yup.string().required('ChasisRequired')
     .matches(/^[a-zA-Z0-9]*$/, function() {
-        return "Invalid chasis number"
+        return "InvalidChasisNumber"
     })
     .min(5, function() {
-        return "Chasis no. should be minimum 5 characters"
+        return "ChasisMin"
     })
     .max(17, function() {
-        return "Chasis no. should be maximum 17 characters"
+        return "ChasisMax"
     }),
 
     // cng_kit:Yup.string().required("Please select an option"),
@@ -87,11 +87,11 @@ const ComprehensiveValidation = Yup.object().shape({
     //     return "Invalid number"
     // }),
    
-    vahanVerify:Yup.boolean().notRequired('Please verify chasis number')
+    vahanVerify:Yup.boolean().notRequired('PleaseNumber')
     .test(
         "vahanVerifyChecking",
         function() {
-            return "Please verify chasis number"
+            return "PleaseNumber"
         },
         function (value) {
             if (value == false && this.parent.chasis_no_last_part && this.parent.chasis_no_last_part.length == 5) {  
@@ -1254,7 +1254,7 @@ class OtherComprehensiveGCV extends Component {
                                                     />}
 
                                                 {errors.registration_no ? (
-                                                    <span className="errorMsg">{errors.registration_no}</span>
+                                                    <span className="errorMsg">{phrases[errors.registration_no]}</span>
                                                 ) : null}
                                             </div>
                                         </FormGroup>
@@ -1291,7 +1291,7 @@ class OtherComprehensiveGCV extends Component {
                                                             
                                                         />
                                                         {errors.chasis_no_last_part && touched.chasis_no_last_part ? (
-                                                        <span className="errorMsg">{errors.chasis_no_last_part}</span>
+                                                        <span className="errorMsg">{phrases[errors.chasis_no_last_part]}</span>
                                                     ) : null}
                                                 </div>
                                             </FormGroup>
@@ -1299,7 +1299,7 @@ class OtherComprehensiveGCV extends Component {
                                         <Col sm={12} md={1} lg={2}>
                                             <Button className="btn btn-primary vrifyBtn" onClick= {!errors.chasis_no_last_part ? this.getVahanDetails.bind(this,values, setFieldTouched, setFieldValue, errors) : null}>{phrases['Verify']}</Button>
                                             {errors.vahanVerify ? (
-                                                    <span className="errorMsg">{errors.vahanVerify}</span>
+                                                    <span className="errorMsg">{phrases[errors.vahanVerify]}</span>
                                                 ) : null}       
                                         </Col>
                                     </Row>                                   
@@ -1325,7 +1325,7 @@ class OtherComprehensiveGCV extends Component {
                                                 }}  
                                             />
                                             {errors.engine_no && touched.engine_no ? (
-                                                <span className="errorMsg">{errors.engine_no}</span>
+                                                <span className="errorMsg">{phrases[errors.engine_no]}</span>
                                             ) : null}
                                         </div>
                                     </FormGroup>
@@ -1348,7 +1348,7 @@ class OtherComprehensiveGCV extends Component {
                                                 }} 
                                             />
                                             {errors.chasis_no && touched.chasis_no ? (
-                                                <span className="errorMsg">{errors.chasis_no}</span>
+                                                <span className="errorMsg">{phrases[errors.chasis_no]}</span>
                                             ) : null}
                                         </div>
                                     </FormGroup>
@@ -1418,7 +1418,7 @@ class OtherComprehensiveGCV extends Component {
                                                     // checked={values.roadsideAssistance ? true : false}
                                                     onClick={(e) =>{
                                                         if( e.target.checked == false && values[coverage.code] == 'B00015') {
-                                                            swal("This cover is mandated by IRDAI, it is compulsory for Owner-Driver to possess a PA cover of minimum Rs 15 Lacs, except in certain conditions. By not choosing this cover, you confirm that you hold an existing PA cover or you do not possess a valid driving license.")
+                                                            swal(phrases.SwalIRDAI)
                                                         }
                                                         this.onRowSelect(e.target.value, e.target.checked, setFieldTouched, setFieldValue)         
                                                     }
@@ -1440,7 +1440,7 @@ class OtherComprehensiveGCV extends Component {
                                                     // checked={values.roadsideAssistance ? true : false}
                                                     onClick={(e) =>{
                                                         if( e.target.checked == false && values[coverage.code] == 'B00015') {
-                                                            swal("This cover is mandated by IRDAI, it is compulsory for Owner-Driver to possess a PA cover of minimum Rs 15 Lacs, except in certain conditions. By not choosing this cover, you confirm that you hold an existing PA cover or you do not possess a valid driving license.")
+                                                            swal(phrases.SwalIRDAI)
                                                         }
                                                         this.onRowSelect(e.target.value, values, e.target.checked, setFieldTouched, setFieldValue)         
                                                     }

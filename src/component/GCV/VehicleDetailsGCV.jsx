@@ -289,7 +289,7 @@ const vehicleRegistrationValidation = Yup.object().shape({
     ),
     no_of_claim:Yup.string().when(['previous_is_claim'], {
         is: previous_is_claim => previous_is_claim == '1',       
-        then: Yup.string().required('Please provide No of claims'),
+        then: Yup.string().required('PleasePNOC'),
         otherwise: Yup.string()
     }),
 
@@ -325,17 +325,17 @@ const vehicleRegistrationValidation = Yup.object().shape({
     claim_array: Yup.array().of(
         Yup.object().shape({
             claim_year : Yup.string(function() {
-                return "PleaseECY"
+                return "Please enter claim year"
             }).required(function() {
-                return "PleaseECY"
+                return "Please enter claim year"
             }).matches(/^[0-9]*$/, function() {
                 return "Invalid Year"
             }),
 
             claim_amount : Yup.string(function() {
-                return "PleaseECA"
+                return "Please enter claim amount"
             }).required(function() {
-                return "PleaseECA"
+                return "Please enter claim amount"
             }).matches(/^[0-9]*$/, function() {
                 return "Invalid Amout"
             }),
@@ -816,7 +816,7 @@ class VehicleDetailsGCV extends Component {
                                 disabled = {true}
                             />
                             {errors.claim_array && errors.claim_array[i] && errors.claim_array[i].type_of_claim ? (
-                            <span className="errorMsg">{phrases[errors.claim_array[i].type_of_claim]}</span>
+                            <span className="errorMsg">{errors.claim_array[i].type_of_claim}</span>
                             ) : null}           
                         </div>
                     </FormGroup>
@@ -886,7 +886,7 @@ class VehicleDetailsGCV extends Component {
                 <section className="brand m-b-25">
                     <div className="d-flex justify-content-left">
                         <div className="brandhead">
-                            <h4 className="fs-18 m-b-30">{phrases['VehicleDetails']}.</h4>
+                            <h4 className="fs-18 m-b-30">{phrases['PleaseVehicleDetails']}.</h4>
                         </div>
                     </div>
                     <div className="brand-bg">

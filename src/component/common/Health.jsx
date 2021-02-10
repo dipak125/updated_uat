@@ -24,8 +24,6 @@ class Health extends Component {
         this.props.history.push(`/Health_KSB/${productId}`);
         if(productId == '12')
         this.props.history.push(`/arogya_Health/${productId}`);
-        if(productId == '14')
-        this.props.history.push(`/SelectPlan_GSB/${productId}`);
     }   
 
     getPolicyList = () => {
@@ -77,6 +75,7 @@ class Health extends Component {
 
     render() {
         const { health_list } = this.state;
+        let phrases = localStorage.getItem("phrases") ? JSON.parse(localStorage.getItem("phrases")) : null
         return (
             <Row>
                 <Col sm={12}>
@@ -89,7 +88,7 @@ class Health extends Component {
                                     <tr key={partIndex}>
                                         <td className="W-10"><img src={require(`../../assets/images/${part.logo}`)} alt="" /></td>
                                         <td className="W-70">{part.name}</td>
-                                        <td className="W-10 text-right"> <button className="buy" onClick= {this.buy_policy.bind(this, part.id )} >Buy</button></td>
+                                        <td className="W-10 text-right"> <button className="buy" onClick= {this.buy_policy.bind(this, part.id )} >{phrases['Buy']}</button></td>
                                         {/* {(part.product != 'Arogya Sanjeevani') ? (<td className="W-10 text-right"> <button className="renew">Renew</button></td>):null} */}
                                     </tr>
                                     ))

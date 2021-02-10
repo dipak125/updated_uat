@@ -54,6 +54,7 @@ class HeaderTop extends Component {
             });
             localStorage.setItem("phrases", JSON.stringify(phraseData) )
             this.props.loadingStop();
+            window.location.reload();
             return true
           })
           .catch(err => {
@@ -104,10 +105,7 @@ class HeaderTop extends Component {
                             defaultValue={localStorage.getItem('lang_name')}
                             onChange={e => {
                                 localStorage.setItem('lang_name', e.target.value);
-                                if(this.fetchPhrases()){
-                                    window.location.reload();
-                                }
-                                
+                                this.fetchPhrases();
                             }}
                             style={{
                                 width: '96px',
