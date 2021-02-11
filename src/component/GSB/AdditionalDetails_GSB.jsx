@@ -248,7 +248,7 @@ const vehicleRegistrationValidation = Yup.object().shape({
         .nullable(),
     nominee_last_name:  Yup.string()
         .required("Nominee last name is required")
-        .min(3, function () {
+        .min(1, function () {
             return "Nominee last name must be 3 characters";
         })
         .max(40, function () {

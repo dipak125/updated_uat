@@ -140,19 +140,19 @@ const ComprehensiveValidation = Yup.object().shape({
    
     B00069_value: Yup.string().when(['LL_Coolie_flag'], {
         is: LL_Coolie_flag => LL_Coolie_flag == '1',
-        then: Yup.string().required('Please provide No. of person').matches(/^[0-9]$/, 'Please provide valid No.'),
+        then: Yup.string().required('pleaseProvidePerson').matches(/^[0-9]$/, 'Please provide valid No.'),
         otherwise: Yup.string()
     }),
    
     B00012_value: Yup.string().when(['LL_Emp_flag'], {
         is: LL_Emp_flag => LL_Emp_flag == '1',
-        then: Yup.string().required('Please provide No. of employee').matches(/^[0-9]$/, 'Please provide valid No.'),
+        then: Yup.string().required('pleaseProvideEmployee').matches(/^[0-9]$/, 'Please provide valid No.'),
         otherwise: Yup.string()
     }),
    
     B00013_value: Yup.string().when(['LL_PD_flag'], {
         is: LL_PD_flag => LL_PD_flag == '1',
-        then: Yup.string().required('Please provide  No. of driver'),
+        then: Yup.string().required('pleaseProvideDriver'),
         otherwise: Yup.string()
     }),
 
@@ -170,7 +170,7 @@ const ComprehensiveValidation = Yup.object().shape({
 
     B00004_value: Yup.string().when(['electric_flag'], {
         is: electric_flag => electric_flag == '1',
-        then: Yup.string().required('Please provide electrical IDV').matches(/^[0-9]*$/, 'Please provide valid IDV').max(8, function() {
+        then: Yup.string().required('pleaseProvideElecIDV').matches(/^[0-9]*$/, 'Please provide valid IDV').max(8, function() {
                 return "Value should be maximum 8 characters"
             }),
         otherwise: Yup.string()
@@ -178,13 +178,13 @@ const ComprehensiveValidation = Yup.object().shape({
 
     B00004_description: Yup.string().when(['electric_flag'], {
         is: electric_flag => electric_flag == '1',
-        then: Yup.string().required('Please provide accessory desription').matches(/^[a-zA-Z0-9]+[a-zA-Z0-9\s]*$/, 'Please provide valid description'),
+        then: Yup.string().required('pleaseProvideAccessory').matches(/^[a-zA-Z0-9]+[a-zA-Z0-9\s]*$/, 'Please provide valid description'),
         otherwise: Yup.string()
     }),
 
     B00003_value: Yup.string().when(['nonElectric_flag'], {
         is: nonElectric_flag => nonElectric_flag == '1',
-        then: Yup.string().required('Please provide non-electrical IDV').matches(/^[0-9]*$/, 'Please provide valid IDV').max(8, function() {
+        then: Yup.string().required('pleaseProvideNonElecIDV').matches(/^[0-9]*$/, 'Please provide valid IDV').max(8, function() {
                 return "Value should be maximum 8 characters"
             }),
         otherwise: Yup.string()
@@ -192,7 +192,7 @@ const ComprehensiveValidation = Yup.object().shape({
 
     B00003_description: Yup.string().when(['nonElectric_flag'], {
         is: nonElectric_flag => nonElectric_flag == '1',
-        then: Yup.string().required('Please provide accessory desription').matches(/^[a-zA-Z0-9]+[a-zA-Z0-9\s]*$/, 'Please provide valid description'),
+        then: Yup.string().required('pleaseProvideAccessory').matches(/^[a-zA-Z0-9]+[a-zA-Z0-9\s]*$/, 'Please provide valid description'),
         otherwise: Yup.string()
     }),
 
@@ -210,13 +210,13 @@ const ComprehensiveValidation = Yup.object().shape({
 
     B00007_value: Yup.string().when(['trailer_flag'], {
         is: trailer_flag => trailer_flag == '1',
-        then: Yup.string().required('Please provide No. of trailer').matches(/^[0-9]$/, 'Please provide valid No.'),
+        then: Yup.string().required('pleaseProvideTrailer').matches(/^[0-9]$/, 'Please provide valid No.'),
         otherwise: Yup.string()
     }),
 
     B00007_description: Yup.string().when(['trailer_flag'], {
         is: trailer_flag => trailer_flag == '1',
-        then: Yup.string().required('Please provide trailer IDV').matches(/^[0-9]*$/, 'Please provide valid IDV'),
+        then: Yup.string().required('pleaseProvideTrailerIDV').matches(/^[0-9]*$/, 'Please provide valid IDV'),
         otherwise: Yup.string()
     }),
     // B00011_value: Yup.string().when(['trailer_flag_TP'], {
@@ -1955,7 +1955,7 @@ class OtherComprehensiveMISCD extends Component {
                                             
                                                     </Field>
                                                     {errors.B00007_value ? (
-                                                        <span className="errorMsg">{errors.B00007_value}</span>
+                                                        <span className="errorMsg">{phrases[errors.B00007_value]}</span>
                                                     ) : null}
                                                 </div>
                                             </FormGroup>
@@ -1979,7 +1979,7 @@ class OtherComprehensiveMISCD extends Component {
                                                     >                                     
                                                     </Field>
                                                     {errors.B00007_description ? (
-                                                        <span className="errorMsg">{errors.B00007_description}</span>
+                                                        <span className="errorMsg">{phrases[errors.B00007_description]}</span>
                                                     ) : null}
                                                 </div>
                                             </FormGroup>
@@ -2119,7 +2119,7 @@ class OtherComprehensiveMISCD extends Component {
                                                     >                                     
                                                     </Field>
                                                     {errors.B00003_value ? (
-                                                        <span className="errorMsg">{errors.B00003_value}</span>
+                                                        <span className="errorMsg">{phrases[errors.B00003_value]}</span>
                                                     ) : null}
                                                 </div>
                                             </FormGroup>
@@ -2143,7 +2143,7 @@ class OtherComprehensiveMISCD extends Component {
                                                     >                                     
                                                     </Field>
                                                     {errors.B00003_description ? (
-                                                        <span className="errorMsg">{errors.B00003_description}</span>
+                                                        <span className="errorMsg">{phrases[errors.B00003_description]}</span>
                                                     ) : null}
                                                 </div>
                                             </FormGroup>
@@ -2170,7 +2170,7 @@ class OtherComprehensiveMISCD extends Component {
                                                     >                                     
                                                     </Field>
                                                     {errors.B00004_value ? (
-                                                        <span className="errorMsg">{errors.B00004_value}</span>
+                                                        <span className="errorMsg">{phrases[errors.B00004_value]}</span>
                                                     ) : null}
                                                 </div>
                                             </FormGroup>
@@ -2194,7 +2194,7 @@ class OtherComprehensiveMISCD extends Component {
                                                     >                                     
                                                     </Field>
                                                     {errors.B00004_description ? (
-                                                        <span className="errorMsg">{errors.B00004_description}</span>
+                                                        <span className="errorMsg">{phrases[errors.B00004_description]}</span>
                                                     ) : null}
                                                 </div>
                                             </FormGroup>
@@ -2314,7 +2314,7 @@ class OtherComprehensiveMISCD extends Component {
                                             
                                                     </Field>
                                                     {errors.B00013_value ? (
-                                                        <span className="errorMsg">{errors.B00013_value}</span>
+                                                        <span className="errorMsg">{phrases[errors.B00013_value]}</span>
                                                     ) : null}
                                                 </div>
                                             </FormGroup>
@@ -2343,7 +2343,7 @@ class OtherComprehensiveMISCD extends Component {
                                                     >                                     
                                                     </Field>
                                                     {errors.B00012_value ? (
-                                                        <span className="errorMsg">{errors.B00012_value}</span>
+                                                        <span className="errorMsg">{phrases[errors.B00012_value]}</span>
                                                     ) : null}
                                                 </div>
                                             </FormGroup>
@@ -2371,7 +2371,7 @@ class OtherComprehensiveMISCD extends Component {
                                                     >                                     
                                                     </Field>
                                                     {errors.B00069_value ? (
-                                                        <span className="errorMsg">{errors.B00069_value}</span>
+                                                        <span className="errorMsg">{phrases[errors.B00069_value]}</span>
                                                     ) : null}
                                                 </div>
                                             </FormGroup>
