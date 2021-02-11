@@ -53,7 +53,7 @@ const initialValue = {
 const ownerValidation = Yup.object().shape({
     first_name: Yup.string().when(['policy_for'], {
         is: policy_for => policy_for == '1',       
-        then: Yup.string().required('NameRequired')
+        then: Yup.string().required("NameRequired")
         .min(3, function() {
             return "First name must be 3 chracters"
         })
@@ -797,7 +797,7 @@ class TwoWheelerAdditionalDetails extends Component {
                                                 value = {values.first_name}                                                                            
                                             />
                                                 {errors.first_name && touched.first_name ? (
-                                            <span className="errorMsg">{errors.first_name}</span>
+                                            <span className="errorMsg">{phrases[errors.first_name]}</span>
                                             ) : null} 
                                             </div>
                                         </FormGroup>
