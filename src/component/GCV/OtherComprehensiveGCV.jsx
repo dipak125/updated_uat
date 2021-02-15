@@ -19,6 +19,7 @@ import swal from 'sweetalert';
 import moment from "moment";
 import {  validRegistrationNumber } from "../../shared/validationFunctions";
 
+let translation = localStorage.getItem("phrases") ? JSON.parse(localStorage.getItem("phrases")) : []
 
 const ComprehensiveValidation = Yup.object().shape({
     // is_carloan: Yup.number().required('Please select one option')
@@ -103,7 +104,7 @@ const ComprehensiveValidation = Yup.object().shape({
 
     PA_Cover: Yup.string().when(['PA_flag'], {
         is: PA_flag => PA_flag == '1',
-        then: Yup.string().required('Please provide PA coverage'),
+        then: Yup.string().required('PleasePACover'),
         otherwise: Yup.string()
     }),
 
@@ -140,19 +141,19 @@ const ComprehensiveValidation = Yup.object().shape({
    
     B00069_value: Yup.string().when(['LL_Coolie_flag'], {
         is: LL_Coolie_flag => LL_Coolie_flag == '1',
-        then: Yup.string().required('Please provide No. of person').matches(/^[0-9]$/, 'Please provide valid No.'),
+        then: Yup.string().required('pleaseProvidePerson').matches(/^[0-9]$/, 'Please provide valid No.'),
         otherwise: Yup.string()
     }),
    
     B00012_value: Yup.string().when(['LL_Emp_flag'], {
         is: LL_Emp_flag => LL_Emp_flag == '1',
-        then: Yup.string().required('Please provide No. of employee').matches(/^[0-9]$/, 'Please provide valid No.'),
+        then: Yup.string().required('pleaseProvideEmployee').matches(/^[0-9]$/, 'Please provide valid No.'),
         otherwise: Yup.string()
     }),
    
     B00013_value: Yup.string().when(['LL_PD_flag'], {
         is: LL_PD_flag => LL_PD_flag == '1',
-        then: Yup.string().required('Please provide  No. of driver'),
+        then: Yup.string().required('pleaseProvideDriver'),
         otherwise: Yup.string()
     }),
 
@@ -170,7 +171,7 @@ const ComprehensiveValidation = Yup.object().shape({
 
     B00004_value: Yup.string().when(['electric_flag'], {
         is: electric_flag => electric_flag == '1',
-        then: Yup.string().required('Please provide electrical IDV').matches(/^[0-9]*$/, 'Please provide valid IDV').max(8, function() {
+        then: Yup.string().required('pleaseProvideElecIDV').matches(/^[0-9]*$/, 'Please provide valid IDV').max(8, function() {
                 return "Value should be maximum 8 characters"
             }),
         otherwise: Yup.string()
@@ -178,13 +179,13 @@ const ComprehensiveValidation = Yup.object().shape({
 
     B00004_description: Yup.string().when(['electric_flag'], {
         is: electric_flag => electric_flag == '1',
-        then: Yup.string().required('Please provide accessory desription').matches(/^[a-zA-Z0-9]*$/, 'Please provide valid description'),
+        then: Yup.string().required('pleaseProvideAccessory').matches(/^[a-zA-Z0-9]*$/, 'Please provide valid description'),
         otherwise: Yup.string()
     }),
 
     B00003_value: Yup.string().when(['nonElectric_flag'], {
         is: nonElectric_flag => nonElectric_flag == '1',
-        then: Yup.string().required('Please provide non-electrical IDV').matches(/^[0-9]*$/, 'Please provide valid IDV').max(8, function() {
+        then: Yup.string().required('pleaseProvideNonElecIDV').matches(/^[0-9]*$/, 'Please provide valid IDV').max(8, function() {
                 return "Value should be maximum 8 characters"
             }),
         otherwise: Yup.string()
@@ -192,31 +193,31 @@ const ComprehensiveValidation = Yup.object().shape({
 
     B00003_description: Yup.string().when(['nonElectric_flag'], {
         is: nonElectric_flag => nonElectric_flag == '1',
-        then: Yup.string().required('Please provide accessory desription').matches(/^[a-zA-Z0-9]*$/, 'Please provide valid description'),
+        then: Yup.string().required('pleaseProvideAccessory').matches(/^[a-zA-Z0-9]*$/, 'Please provide valid description'),
         otherwise: Yup.string()
     }),
 
     B00073_value: Yup.string().when(['pa_coolie_flag'], {
         is: pa_coolie_flag => pa_coolie_flag == '1',
-        then: Yup.string().required('Please provide PA value').matches(/^[0-9]*$/, 'Please provide valid PA value'),
+        then: Yup.string().required('PleasePAValue').matches(/^[0-9]*$/, 'Please provide valid PA value'),
         otherwise: Yup.string()
     }),
 
     B00073_description: Yup.string().when(['pa_coolie_flag'], {
         is: pa_coolie_flag => pa_coolie_flag == '1',
-        then: Yup.string().required('Please provide No. of paid driver').matches(/^[0-9]$/, 'Please provide valid number'),
+        then: Yup.string().required('PleaseProvidePD').matches(/^[0-9]$/, 'Please provide valid number'),
         otherwise: Yup.string()
     }),
 
     B00007_value: Yup.string().when(['trailer_flag'], {
         is: trailer_flag => trailer_flag == '1',
-        then: Yup.string().required('Please provide No. of trailer').matches(/^[0-9]$/, 'Please provide valid No.'),
+        then: Yup.string().required('pleaseProvideTrailer').matches(/^[0-9]$/, 'Please provide valid No.'),
         otherwise: Yup.string()
     }),
 
     B00007_description: Yup.string().when(['trailer_flag'], {
         is: trailer_flag => trailer_flag == '1',
-        then: Yup.string().required('Please provide trailer IDV').matches(/^[0-9]*$/, 'Please provide valid IDV'),
+        then: Yup.string().required('pleaseProvideTrailerIDV').matches(/^[0-9]*$/, 'Please provide valid IDV'),
         otherwise: Yup.string()
     }),
     // B00011_value: Yup.string().when(['trailer_flag_TP'], {
@@ -258,7 +259,7 @@ const ComprehensiveValidation = Yup.object().shape({
 
     B00005_value: Yup.string().when(['CNG_OD_flag'], {
         is: CNG_OD_flag => CNG_OD_flag == '1',
-        then: Yup.string().required('Please provide IDV').test(
+        then: Yup.string().required('PleaseProvideIDV').test(
                 "isLoanChecking",
                 function() {
                     return "Value should be 1K to 5L"
@@ -311,28 +312,28 @@ const ComprehensiveValidation = Yup.object().shape({
 
 const Coverage = {
 
-        "B00002": "Own Damage Basic",
-        "B00003": "Non Electrical Accessories",
-        "B00004": "Electrical /Electronic Accessories",
-        "B00005": "CNG /LPG Kit - Own Damage",
-        "B00006": "In built - CNG /LPG Kit Own Damage",
-        "B00007": "Trailer - OD",
-        "B00008": "Third Party Bodily Injury",
-        "B00009": "Third Party Property Damage",
-        "B00010": "CNG /LPG Kit -  Liability",
-        "B00011": "Trailer - TP",
-        "B00012": "Legal Liability to Employees",
-        "B00013": "Legal Liability to Paid Drivers",
-        "B00069": "Legal Liability to Cleaner\Conductor\Coolie",
-        "B00070": "Legal Liability to Workmen",
-        "B00071": "Legal Liability to NFPP",
-        "B00015": "PA -  Owner Driver",
-        "B00073": "PA Cleaner\Conductor\Coolie & PaidDriver",
+    "B00002":  translation["B00002"],
+    "B00003":  translation["B00003"],
+    "B00004":  translation["B00004"],
+    "B00005":  translation["B00005"],
+    "B00006":  translation["B00006"],
+    "B00007":  translation["B00007"],
+    "B00008":  translation["B00008"],
+    "B00009":  translation["B00009"],
+    "B00010":  translation["B00010"],
+    "B00011":  translation["B00011"],
+    "B00012":  translation["B00012"],
+    "B00013":  translation["B00013"],
+    "B00069":  translation["B00069"],
+    "B00070":  translation["B00070"],
+    "B00071":  translation["B00071"],
+    "B00015":  translation["B00015"],
+    "B00073":  translation["B00073"],
 
-        "B00018": "Enhanced PA Cover - Owner driver",
-        "B00019": "Enhanced PA Cover - Paid driver",
-        "B00020": "Hospital Cash Cover - Owner Driver",
-        "B00022": "Hospital Cash Cover - Paid Driver ",  
+    "B00018":  translation["B00018"],
+    "B00019":  translation["B00019"],
+    "B00020":  translation["B00020"],
+    "B00022":  translation["B00022"],   
 }
 
 class OtherComprehensiveGCV extends Component {
@@ -1246,7 +1247,7 @@ class OtherComprehensiveGCV extends Component {
         let max_IDV_suggested = PolicyArray.length > 0 ? PolicyArray[0].PolicyRiskList[0].MaxIDV_Suggested : 0
         let minIDV = min_IDV_suggested
         let maxIDV = PolicyArray.length > 0 ? Math.floor(max_IDV_suggested) : null
-        let phrases = localStorage.getItem("phrases") ? JSON.parse(localStorage.getItem("phrases")) : null
+        let phrases = localStorage.getItem("phrases") ? JSON.parse(localStorage.getItem("phrases")) : []
 
         if(Number.isInteger(min_IDV_suggested) == false ) {
             minIDV = PolicyArray.length > 0 ? Math.floor(PolicyArray[0].PolicyRiskList[0].MinIDV_Suggested) : null           
@@ -1397,15 +1398,16 @@ class OtherComprehensiveGCV extends Component {
 // -------------------------------------------------------
         let OD_TP_premium = serverResponse.PolicyLobList ? serverResponse.PolicyLobList[0].PolicyRiskList[0] : []
         let TRAILOR_OD_PREMIUM = 0
-        console.log('ncbDiscount', ncbDiscount);
+
         policyCoverage.map((coverage, qIndex) => (
             coverage.PolicyBenefitList && coverage.PolicyBenefitList.map((benefit, bIndex) => (
                 benefit.ProductElementCode == 'B00007' ? TRAILOR_OD_PREMIUM+=benefit.AnnualPremium : 0
             ))
         ))
-        console.log('TRAILOR_OD_PREMIUM -- ', TRAILOR_OD_PREMIUM)
+
         let productCount = 1;
         let ncbCount = 1;
+
         const policyCoverageList =  policyCoverage && policyCoverage.length > 0 ?
             policyCoverage.map((coverage, qIndex) => (
                 coverage.PolicyBenefitList && coverage.PolicyBenefitList.map((benefit, bIndex) => (
@@ -1425,17 +1427,19 @@ class OtherComprehensiveGCV extends Component {
                    </div>
             ))
         )) : null
+
         const ncbStr = (ncbDiscount && ncbDiscount!=0 && ncbCount==1) ? <Row><Col sm={12} md={6}>
-        <FormGroup>NCB Discount</FormGroup>
+        <FormGroup>{phrases["NCBDiscount"]}</FormGroup>
         </Col>
         <Col sm={12} md={6} data={ncbCount+=1}>
             <FormGroup>₹ - {Math.round(ncbDiscount)}</FormGroup>
         </Col></Row> : null
+
         const policyCoveragIMT =  fulQuoteResp && fulQuoteResp.PolicyLobList  && Math.round(fulQuoteResp.PolicyLobList[0].PolicyRiskList[0].imt23prem) > 0 ?
                     <div>
                         <Row>
                             <Col sm={12} md={6}>
-                                <FormGroup>IMT 23</FormGroup>
+                                <FormGroup>{phrases["IMT"]}</FormGroup>
                             </Col>
                             <Col sm={12} md={6}>
                                 <FormGroup>₹ {Math.round(fulQuoteResp.PolicyLobList[0].PolicyRiskList[0].imt23prem)}</FormGroup>
@@ -1462,15 +1466,15 @@ class OtherComprehensiveGCV extends Component {
             )) : null
         
         const ncbBreakup = (ncbDiscount && ncbDiscount!=0 && ncbCount==1) ? <tr label={ncbCount+=1}>
-        <td >NCB Discount:</td>
+        <td >{phrases["NCBDiscount"]}:</td>
         <td>₹ - {Math.round(ncbDiscount)}</td>
     </tr> : null
 
         const premiumBreakupIMT = fulQuoteResp && fulQuoteResp.PolicyLobList  && Math.round(fulQuoteResp.PolicyLobList[0].PolicyRiskList[0].imt23prem) > 0 ?
-                        <tr>
-                            <td>IMT 23:</td>
-                            <td>₹ {Math.round(fulQuoteResp.PolicyLobList[0].PolicyRiskList[0].imt23prem)}</td>
-                        </tr>  
+            <tr>
+                <td>{phrases["IMT"]}:</td>
+                <td>₹ {Math.round(fulQuoteResp.PolicyLobList[0].PolicyRiskList[0].imt23prem)}</td>
+            </tr>  
              : null
         
 
@@ -1917,7 +1921,7 @@ class OtherComprehensiveGCV extends Component {
                                             
                                                     </Field>
                                                     {errors.B00007_value ? (
-                                                        <span className="errorMsg">{errors.B00007_value}</span>
+                                                        <span className="errorMsg">{phrases[errors.B00007_value]}</span>
                                                     ) : null}
                                                 </div>
                                             </FormGroup>
@@ -1941,7 +1945,7 @@ class OtherComprehensiveGCV extends Component {
                                                     >                                     
                                                     </Field>
                                                     {errors.B00007_description ? (
-                                                        <span className="errorMsg">{errors.B00007_description}</span>
+                                                        <span className="errorMsg">{phrases[errors.B00007_description]}</span>
                                                     ) : null}
                                                 </div>
                                             </FormGroup>
@@ -2030,7 +2034,7 @@ class OtherComprehensiveGCV extends Component {
                                             
                                                     </Field>
                                                     {errors.B00073_value ? (
-                                                        <span className="errorMsg">{errors.B00073_value}</span>
+                                                        <span className="errorMsg">{phrases[errors.B00073_value]}</span>
                                                     ) : null}
                                                 </div>
                                             </FormGroup>
@@ -2054,7 +2058,7 @@ class OtherComprehensiveGCV extends Component {
                                                     >                                     
                                                     </Field>
                                                     {errors.B00073_description ? (
-                                                        <span className="errorMsg">{errors.B00073_description}</span>
+                                                        <span className="errorMsg">{phrases[errors.B00073_description]}</span>
                                                     ) : null}
                                                 </div>
                                             </FormGroup>
@@ -2081,7 +2085,7 @@ class OtherComprehensiveGCV extends Component {
                                                     >                                     
                                                     </Field>
                                                     {errors.B00003_value ? (
-                                                        <span className="errorMsg">{errors.B00003_value}</span>
+                                                        <span className="errorMsg">{phrases[errors.B00003_value]}</span>
                                                     ) : null}
                                                 </div>
                                             </FormGroup>
@@ -2105,7 +2109,7 @@ class OtherComprehensiveGCV extends Component {
                                                     >                                     
                                                     </Field>
                                                     {errors.B00003_description ? (
-                                                        <span className="errorMsg">{errors.B00003_description}</span>
+                                                        <span className="errorMsg">{phrases[errors.B00003_description]}</span>
                                                     ) : null}
                                                 </div>
                                             </FormGroup>
@@ -2132,7 +2136,7 @@ class OtherComprehensiveGCV extends Component {
                                                     >                                     
                                                     </Field>
                                                     {errors.B00004_value ? (
-                                                        <span className="errorMsg">{errors.B00004_value}</span>
+                                                        <span className="errorMsg">{phrases[errors.B00004_value]}</span>
                                                     ) : null}
                                                 </div>
                                             </FormGroup>
@@ -2156,7 +2160,7 @@ class OtherComprehensiveGCV extends Component {
                                                     >                                     
                                                     </Field>
                                                     {errors.B00004_description ? (
-                                                        <span className="errorMsg">{errors.B00004_description}</span>
+                                                        <span className="errorMsg">{phrases[errors.B00004_description]}</span>
                                                     ) : null}
                                                 </div>
                                             </FormGroup>
@@ -2183,7 +2187,7 @@ class OtherComprehensiveGCV extends Component {
                                                         >                                     
                                                     </Field>
                                                     {errors.B00005_value ? (
-                                                        <span className="errorMsg">{errors.B00005_value}</span>
+                                                        <span className="errorMsg">{phrases[errors.B00005_value]}</span>
                                                     ) : null}
                                                 </div>
                                             </FormGroup>
@@ -2276,7 +2280,7 @@ class OtherComprehensiveGCV extends Component {
                                             
                                                     </Field>
                                                     {errors.B00013_value ? (
-                                                        <span className="errorMsg">{errors.B00013_value}</span>
+                                                        <span className="errorMsg">{phrases[errors.B00013_value]}</span>
                                                     ) : null}
                                                 </div>
                                             </FormGroup>
@@ -2305,7 +2309,7 @@ class OtherComprehensiveGCV extends Component {
                                                     >                                     
                                                     </Field>
                                                     {errors.B00012_value ? (
-                                                        <span className="errorMsg">{errors.B00012_value}</span>
+                                                        <span className="errorMsg">{phrases[errors.B00012_value]}</span>
                                                     ) : null}
                                                 </div>
                                             </FormGroup>
@@ -2333,7 +2337,7 @@ class OtherComprehensiveGCV extends Component {
                                                     >                                     
                                                     </Field>
                                                     {errors.B00069_value ? (
-                                                        <span className="errorMsg">{errors.B00069_value}</span>
+                                                        <span className="errorMsg">{phrases[errors.B00069_value]}</span>
                                                     ) : null}
                                                 </div>
                                             </FormGroup>
@@ -2428,7 +2432,7 @@ class OtherComprehensiveGCV extends Component {
                                         </Col>
                                         </Fragment> : null
                                     }
-{values.trailer_flag == '1' && values[coverage.code] == 'B00007' && values.B00007_value != "" ?
+                            {values.trailer_flag == '1' && values[coverage.code] == 'B00007' && values.B00007_value != "" ?
                                       this.handleClaims(values, errors, touched, setFieldTouched, setFieldValue) : null
                                     }
                                 </Row>
@@ -2552,11 +2556,11 @@ class OtherComprehensiveGCV extends Component {
                             {premiumBreakupIMT}
                             
                                 <tr>
-                                    <td>Gross Premium:</td>
+                                    <td>{phrases["GrossPremium"]}:</td>
                                     <td>₹ {Math.round(fulQuoteResp.BeforeVatPremium)}</td>
                                 </tr>
                                 <tr>
-                                    <td>GST:</td>
+                                    <td>{phrases["GST"]}:</td>
                                     <td>₹ {Math.round(fulQuoteResp.TGST)}</td>
                                 </tr>
                             </tbody>

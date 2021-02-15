@@ -654,7 +654,7 @@ class TwoWheelerAdditionalDetails extends Component {
 
         const quoteNumber =
         quoteId ? (
-            <h4>{phrases['PolicyReady']}: {quoteId}. {phrases['MoreDetails']}. </h4>
+            <h4>{phrases['PolicyReady']}: {quoteId}. {phrases['MoreDetailsPolicy']} </h4>
         ) : null;
 
         

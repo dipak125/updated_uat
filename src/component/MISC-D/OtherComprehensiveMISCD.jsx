@@ -20,6 +20,8 @@ import moment from "moment";
 import {  validRegistrationNumber } from "../../shared/validationFunctions";
 
 const menumaster_id = 7
+let translation = localStorage.getItem("phrases") ? JSON.parse(localStorage.getItem("phrases")) : []
+
 const ComprehensiveValidation = Yup.object().shape({
     // is_carloan: Yup.number().required('Please select one option')
 
@@ -311,28 +313,28 @@ const ComprehensiveValidation = Yup.object().shape({
 
 const Coverage = {
 
-        "B00002": "Own Damage Basic",
-        "B00003": "Non Electrical Accessories",
-        "B00004": "Electrical /Electronic Accessories",
-        "B00005": "CNG /LPG Kit - Own Damage",
-        "B00006": "In built - CNG /LPG Kit Own Damage",
-        "B00007": "Trailer - OD",
-        "B00008": "Third Party Bodily Injury",
-        "B00009": "Third Party Property Damage",
-        "B00010": "CNG /LPG Kit -  Liability",
-        "B00011": "Trailer - TP",
-        "B00012": "Legal Liability to Employees",
-        "B00013": "Legal Liability to Paid Drivers",
-        "B00069": "Legal Liability to Cleaner\Conductor\Coolie",
-        "B00070": "Legal Liability to Workmen",
-        "B00071": "Legal Liability to NFPP",
-        "B00015": "PA -  Owner Driver",
-        "B00073": "PA Cleaner\Conductor\Coolie & PaidDriver",
+        "B00002":  translation["B00002"],
+        "B00003":  translation["B00003"],
+        "B00004":  translation["B00004"],
+        "B00005":  translation["B00005"],
+        "B00006":  translation["B00006"],
+        "B00007":  translation["B00007"],
+        "B00008":  translation["B00008"],
+        "B00009":  translation["B00009"],
+        "B00010":  translation["B00010"],
+        "B00011":  translation["B00011"],
+        "B00012":  translation["B00012"],
+        "B00013":  translation["B00013"],
+        "B00069":  translation["B00069"],
+        "B00070":  translation["B00070"],
+        "B00071":  translation["B00071"],
+        "B00015":  translation["B00015"],
+        "B00073":  translation["B00073"],
 
-        "B00018": "Enhanced PA Cover - Owner driver",
-        "B00019": "Enhanced PA Cover - Paid driver",
-        "B00020": "Hospital Cash Cover - Owner Driver",
-        "B00022": "Hospital Cash Cover - Paid Driver ",  
+        "B00018":  translation["B00018"],
+        "B00019":  translation["B00019"],
+        "B00020":  translation["B00020"],
+        "B00022":  translation["B00022"],  
 }
 
 class OtherComprehensiveMISCD extends Component {
@@ -1328,7 +1330,7 @@ class OtherComprehensiveMISCD extends Component {
         let trailer_flag_TP = add_more_coverage_request_array.B00011 && add_more_coverage_request_array.B00011.value ? '1' : '0'
         let CNG_OD_flag = add_more_coverage_request_array.B00005 && add_more_coverage_request_array.B00005.value ? '1' : '0'
         
-        let phrases = localStorage.getItem("phrases") ? JSON.parse(localStorage.getItem("phrases")) : null
+        let phrases = localStorage.getItem("phrases") ? JSON.parse(localStorage.getItem("phrases")) : []
 
         let newInitialValues = {}
 
@@ -1472,17 +1474,19 @@ class OtherComprehensiveMISCD extends Component {
                    </div>
             ))
         )) : null
+
         const ncbStr = (ncbDiscount && ncbDiscount!=0 && ncbCount==1) ? <Row><Col sm={12} md={6}>
-        <FormGroup>NCB Discount</FormGroup>
+        <FormGroup>{phrases["NCBDiscount"]}</FormGroup>
         </Col>
         <Col sm={12} md={6} data={ncbCount+=1}>
             <FormGroup>₹ - {Math.round(ncbDiscount)}</FormGroup>
         </Col></Row> : null
+
         const policyCoveragIMT =  fulQuoteResp && fulQuoteResp.PolicyLobList  && Math.round(fulQuoteResp.PolicyLobList[0].PolicyRiskList[0].imt23prem) > 0 ?
                     <div>
                         <Row>
                             <Col sm={12} md={6}>
-                                <FormGroup>IMT 23</FormGroup>
+                                <FormGroup>{phrases["IMT"]}</FormGroup>
                             </Col>
                             <Col sm={12} md={6}>
                                 <FormGroup>₹ {Math.round(fulQuoteResp.PolicyLobList[0].PolicyRiskList[0].imt23prem)}</FormGroup>
@@ -1493,6 +1497,7 @@ class OtherComprehensiveMISCD extends Component {
 
         productCount=1
         ncbCount=1
+
          const premiumBreakup = policyCoverage && policyCoverage.length > 0 ?
             policyCoverage.map((coverage, qIndex) => (
                 coverage.PolicyBenefitList && coverage.PolicyBenefitList.map((benefit, bIndex) => (
@@ -1508,13 +1513,13 @@ class OtherComprehensiveMISCD extends Component {
             )) : null
         
         const ncbBreakup = (ncbDiscount && ncbDiscount!=0 && ncbCount==1) ? <tr label={ncbCount+=1}>
-        <td >NCB Discount:</td>
+        <td >{phrases["NCBDiscount"]}:</td>
         <td>₹ - {Math.round(ncbDiscount)}</td>
     </tr> : null
 
         const premiumBreakupIMT = fulQuoteResp && fulQuoteResp.PolicyLobList  && Math.round(fulQuoteResp.PolicyLobList[0].PolicyRiskList[0].imt23prem) > 0 ?
                 <tr>
-                    <td>IMT 23:</td>
+                    <td>{phrases["IMT"]}:</td>
                     <td>₹ {Math.round(fulQuoteResp.PolicyLobList[0].PolicyRiskList[0].imt23prem)}</td>
                 </tr>  
         : null
@@ -2590,11 +2595,11 @@ class OtherComprehensiveMISCD extends Component {
                             {premiumBreakupIMT}
                             
                                 <tr>
-                                    <td>Gross Premium:</td>
+                                    <td>{phrases["GrossPremium"]}:</td>
                                     <td>₹ {Math.round(fulQuoteResp.BeforeVatPremium)}</td>
                                 </tr>
                                 <tr>
-                                    <td>GST:</td>
+                                    <td>{phrases["GST"]}:</td>
                                     <td>₹ {Math.round(fulQuoteResp.TGST)}</td>
                                 </tr>
                             </tbody>

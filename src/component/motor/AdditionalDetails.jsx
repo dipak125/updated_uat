@@ -529,7 +529,7 @@ console.log('post_data', post_data);
 
         const quoteNumber =
         quoteId ? (
-            <h4>{phrases['PolicyReady']}: {quoteId}. {phrases['MoreDetails']}. </h4>
+            <h4>{phrases['PolicyReady']}: {quoteId}. {phrases['MoreDetailsPolicy']} </h4>
         ) : null;
 
         // console.log("newInitialValues", newInitialValues)

@@ -116,6 +116,9 @@ class Vedvag_gateway extends Component {
         else if(productId == 13) {
             this.props.history.push(`/AccidentAdditionalPremium/${productId}`);
         }
+        else if(productId == 14) {
+            this.props.history.push(`/PolicyDetails_GSB/${productId}`);
+        }
          
 
     }

@@ -275,6 +275,7 @@ class TwoWheelerVehicleDetails extends Component {
                  let vehicleDetails = decryptResp.data.policyHolder ? decryptResp.data.policyHolder.vehiclebrandmodel : {};
                  let RTO_location = motorInsurance && motorInsurance.location && motorInsurance.location.RTO_LOCATION ? motorInsurance.location.RTO_LOCATION+" - "+motorInsurance.location.NameCode : ""
                  let step_completed = decryptResp.data.policyHolder ? decryptResp.data.policyHolder.step_no : "";
+                 console.log("fetch--step-completed----->",step_completed)
                 this.setState({
                     motorInsurance, previousPolicy, vehicleDetails,RTO_location,step_completed
                 })
@@ -322,6 +323,7 @@ class TwoWheelerVehicleDetails extends Component {
           };
           
 console.log("redux data----- ", this.props.data)
+console.log("step-completed----->",step_completed)
         return (
             <>        
                 <BaseComponent>
@@ -481,7 +483,7 @@ console.log("redux data----- ", this.props.data)
                             }}
                         </Formik>
                     </div>
-                </section> : step_completed == "" ? "Forbidden" : null
+                </section> : step_completed == "1" ? "Forbidden" : null
             }
 
                 <Footer />

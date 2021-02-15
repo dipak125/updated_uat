@@ -41,7 +41,8 @@ const initialValues = {
     motherInLaw: 0,
     motherInLawDob: "",
     gender: "",
-    insureList: ""
+    insureList: "",
+    occupation_id: "",
 
 }
 
@@ -49,7 +50,7 @@ const initialValues = {
 
 const vehicleInspectionValidation = Yup.object().shape({
     gender: Yup.string().required('Please select gender'),
-   
+    occupation_id: Yup.string().required("Please select occupation type"),
    
 });
 
@@ -820,7 +821,9 @@ class InformationYourself extends Component {
             relationList:[],
             display_gender:[],
             gender_for:[],
-            confirm: ""
+            confirm: "",
+            policyHolder: [],
+            occupationList: []
         };
     }
 
@@ -906,6 +909,7 @@ class InformationYourself extends Component {
     post_data['menumaster_id'] = menumaster_id
     post_data['proposer_gender'] = values.gender    
     post_data['page_name'] = `Health/${productId}`
+    post_data['occupation_id'] = values.occupation_id
     
     let arr_date=[]
     for(let i=0;i<dob.length;i++){        
@@ -946,6 +950,7 @@ class InformationYourself extends Component {
         post_data['bcmaster_id'] = bc_data ? bc_data.agent_id : ""
         post_data['bc_token'] = bc_data ? bc_data.token : ""
         post_data['bc_agent_id'] = bc_data ? bc_data.user_info.data.user.username : ""
+        post_data['agent_name'] = bc_data ? bc_data.user_info.data.user.name : ""
 
     }
      
@@ -1053,9 +1058,7 @@ class InformationYourself extends Component {
                             gender_for.push(display_gender[i])    
                         }   
                     }
-
-                   
-                   
+  
                     if ( key.match(/dob/gi)){                 
                         i = key.substr(4, 1);   
                         display_dob[i] = values[key] ? values[key] : '';    
@@ -1065,8 +1068,7 @@ class InformationYourself extends Component {
                     }
                 } 
             }
-
-            
+       
             sessionStorage.setItem('display_looking_for',JSON.stringify(display_looking_for));
             sessionStorage.setItem('display_dob',JSON.stringify(display_dob));
             this.setState({
@@ -1080,20 +1082,6 @@ class InformationYourself extends Component {
                 display_dob
              });  
              this.handleClose()
-        /*formData.append('menumaster_id', 2);
-        formData.append('gender', gender);
-        axios
-            .post(`/yourself`, formData)
-            .then(res => {
-                localStorage.setItem('policyHolder_id', res.data.data.policyHolder_id);
-                localStorage.setItem('policyHolder_refNo', res.data.data.policyHolder_refNo);
-               
-            })
-            .catch(err => {
-              
-              this.props.loadingStop();
-            });
-            this.handleClose()*/
     }   
     else{
         swal('Please select at least one option');
@@ -1116,16 +1104,17 @@ fetchData=()=>{
             let is_eia_account = res.data.data.policyHolder.is_eia_account
             let gender = res.data.data.policyHolder.gender
             let validateCheck = family_members && family_members.length>0 ? 1:0;
+            let policyHolder =  res.data.data.policyHolder ? res.data.data.policyHolder : []
             this.setState({ 
                 familyMembers:family_members,
                 addressDetails,
                 is_eia_account,
                 gender,
-                validateCheck
+                validateCheck, policyHolder
             })
             this.setStateForPreviousData(family_members);
         })
-        .catch(function (error) {
+        .catch((err) => {
             // handle error
 
         })
@@ -1139,11 +1128,47 @@ fetchRelations = () => {
         this.setState({
             relationList            
         })
+        this.fetchInsurance()
     })
-    .catch(function (error) {
+    .catch((err) => {
         // handle error
+        this.props.loadingStop();
     })
 }
+
+fetchInsurance = () => {
+    let encryption = new Encryption();
+    // this.props.loaderStart();
+    axios
+      .get(`occupations/${this.props.match.params.productId}`)
+      .then((res) => {
+        let decryptErr = JSON.parse(encryption.decrypt(res.data));
+        console.log('decrypOccupation-----', decryptErr)
+        this.setState({ occupationList: decryptErr.data });
+        this.props.loadingStop();
+      })
+      .catch((err) => {
+        this.props.loadingStop();
+      });
+  };
+
+  handleChange = (e) => {
+    const {occupationList} = this.state
+    let declineStatus = ""
+    if (occupationList) {
+      {
+        occupationList && occupationList.length > 0 && occupationList.map((insure, qIndex) => (
+          insure.id == e.target.value ? insure.decline_status == "Decline" ? swal('Insurance Policy cannot be offered') : '' : '',
+          insure.id == e.target.value && (declineStatus = insure.decline_status)     
+        ))
+      }
+    }
+    this.setState({
+      serverResponse: [],
+      error: [],
+      declineStatus
+    })
+  }
 
 
 setValueData = () => {
@@ -1190,7 +1215,8 @@ setStateForPreviousData=(family_members)=>{
 		}
     }
     render() {
-        const {memberInfo, insureList,validateCheck,gender,familyMembers,lookingFor,dob,display_looking_for,display_dob,display_gender, confirm} = this.state
+        const {memberInfo, insureList,validateCheck,gender,familyMembers,lookingFor,dob,display_looking_for,display_dob,
+            display_gender, confirm, policyHolder, occupationList} = this.state
         const insureListPrev = this.getInsuredList(familyMembers);
         let display_looking_for_arr = display_looking_for  && display_looking_for.length >0 ? display_looking_for : (sessionStorage.getItem('display_looking_for') ? JSON.parse(sessionStorage.getItem('display_looking_for')) : []);
         let display_dob_arr = display_dob && display_dob.length >0 ? display_dob : (sessionStorage.getItem('display_dob') ? JSON.parse(sessionStorage.getItem('display_dob')) : []);
@@ -1220,7 +1246,8 @@ setStateForPreviousData=(family_members)=>{
             dob_7: display_dob_arr[7] ? new Date(display_dob_arr[7]) : "",
             looking_for_8: display_looking_for_arr[8] ? display_looking_for_arr[8] : "",
             dob_8: display_dob_arr[8] ? new Date(display_dob_arr[8]) : "",
-            insureList: insureListPrev ? insureListPrev.toString()  : (insureList ? insureList :'')
+            insureList: insureListPrev ? insureListPrev.toString()  : (insureList ? insureList :''),
+            occupation_id: policyHolder ? policyHolder.occupation_id : "",
         });
            
 
@@ -1271,6 +1298,37 @@ setStateForPreviousData=(family_members)=>{
                                             ) : null}    
                                             </div>
                                         </div>
+
+                                        <div className="row formSection">
+                                            <label className="col-md-4">Occupation:</label>
+                                            <div className="col-md-4">
+                                            <Field
+                                                name="occupation_id"
+                                                component="select"
+                                                autoComplete="off"
+                                                className="formGrp"
+                                                onChange={(e) => {
+                                                    setFieldTouched("occupation_id");
+                                                    setFieldValue(
+                                                    "occupation_id",
+                                                    e.target.value
+                                                    );
+                                                    this.handleChange(e);
+                                                }}
+                                                >
+                                                <option value="">Occupation Type</option>
+                                                {occupationList && occupationList.length > 0 && occupationList.map((insurer, qIndex) => (
+                                                    <option key={qIndex} value={insurer.id} > {insurer.occupation} </option>
+                                                ))}
+                                                </Field>
+                                                {errors.occupation_id && touched.occupation_id ? (
+                                                <span className="errorMsg">
+                                                    {errors.occupation_id}
+                                                </span>
+                                                ) : null}
+                                            </div>
+                                        </div>
+
                                         <div className="row formSection m-b-30">
                                             <label className="col-md-4">Looking to Insure: <br /><span className="small">(Add Family Members to be Insured)</span></label>
                                             <div className="d-flex col-md-4" onClick={this.handleShow} href={'#'}>

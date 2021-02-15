@@ -5,6 +5,7 @@ import { authLogout } from "../../../store/actions/auth";
 import { connect } from "react-redux";
 import Encryption from "../../../shared/payload-encryption";
 import { withRouter } from "react-router-dom";
+import { loaderStart, loaderStop } from "../../../store/actions/loader";
 
 class SideNav extends Component {
   state = {
@@ -27,18 +28,21 @@ class SideNav extends Component {
     };
 
     formData.append("enc_data", encryption.encrypt(JSON.stringify(post_data)));
+    this.props.loadingStart();
     axios
       .post("/logout", formData)
       .then((res) => {
+        this.props.loadingStop();
         this.props.logout();
         localStorage.removeItem("cons_reg_info");
         // window.location = `${res.data.data.logout_url}`
         this.props.history.push(`/logout`);
-        
+               
       })
       .catch((err) => {
         this.props.logout();
-        // this.props.loadingStop();
+        this.props.loadingStop();
+        this.props.history.push(`/logout`);
       });
   };
 
@@ -72,10 +76,10 @@ class SideNav extends Component {
 
   render() {
     const { BC_check } = this.state
-    console.log('that.----->',this.state.BC_check)
+    // console.log('that.----->',this.state.BC_check)
     let check_bc_exist = BC_check && BC_check.master_data ? BC_check.master_data.eligible_for_support_ticket : null
     let childPhrase = localStorage.getItem("phrases") ? JSON.parse(localStorage.getItem("phrases")) : null
-    console.log("check_bc_exist------>",check_bc_exist)
+    // console.log("check_bc_exist------>",check_bc_exist)
     return (
       <>
       {childPhrase ?
@@ -180,6 +184,8 @@ class SideNav extends Component {
 const mapDispatchToProps = (dispatch) => {
   return {
     logout: () => dispatch(authLogout()),
+    loadingStart: () => dispatch(loaderStart()),
+    loadingStop: () => dispatch(loaderStop())
   };
 };
 

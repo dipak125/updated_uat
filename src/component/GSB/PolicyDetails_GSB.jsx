@@ -271,19 +271,25 @@ fullQuote = (values, actions) => {
 
 }
 
-  handleSubmit = () => {
-    const {policyHolderDetails} = this.state
-    if(policyHolderDetails && policyHolderDetails.bcmaster && policyHolderDetails.bcmaster.paymentgateway && policyHolderDetails.bcmaster.paymentgateway.slug) {
-      if(policyHolderDetails.bcmaster.paymentgateway.slug == "csc_wallet") {
-          this.payment()
-      }
-      if(policyHolderDetails.bcmaster.paymentgateway.slug == "razorpay") {
-          this.Razor_payment()
-      }
-      if(policyHolderDetails.bcmaster.paymentgateway.slug == "PPINL") {
-          this.paypoint_payment()
-      }
-  }
+handleSubmit = (values) => {	
+
+  const policyHolder = this.state.policyHolderDetails
+  console.log("vedvag wallet -------- ", policyHolder )
+  if(policyHolder && policyHolder.bcmaster && policyHolder.bcmaster.paymentgateway && policyHolder.bcmaster.paymentgateway.slug && values.gateway == 1) {	
+      if(policyHolder.bcmaster.paymentgateway.slug == "csc_wallet") {	
+          this.payment()	
+      }	
+      if(policyHolder.bcmaster.paymentgateway.slug == "razorpay") {	
+          this.Razor_payment()	
+      }	
+      if(policyHolder.bcmaster.paymentgateway.slug == "PPINL") {	
+          this.paypoint_payment()	
+      }	
+  }	
+  else if (policyHolder && policyHolder.bcmaster && policyHolder.bcmaster.paymentgateway && policyHolder.bcmaster.paymentgateway.slug && values.gateway == 2) {	
+      // console.log("vedvag wallet -------- ", policyHolder.bcmaster.paymentgateway.slug)
+    this.props.history.push(`/Vedvag_gateway/${this.props.match.params.productId}?access_id=${this.state.refNumber}`);	
+  }	
 }
 
 sendPaymentLink = () => {
@@ -647,7 +653,8 @@ paypoint_payment = () => {
                 <h4 className="text-center mt-3 mb-3">
                 SBI General Insurance Company Limited
                 </h4>
-                  <Formik initialValues={initialValue} onSubmit={this.handleSubmit}
+                  <Formik initialValues={initialValue} 
+                      onSubmit={this.handleSubmit}
                       // validationSchema={validatePremium}
                       >
                         {({ values, errors, setFieldValue, setFieldTouched, isValid, isSubmitting, touched }) => {
@@ -817,11 +824,10 @@ paypoint_payment = () => {
                                               &nbsp;&nbsp;&nbsp;&nbsp;
                                               </div> : null }
 
-                                          {fulQuoteResp.QuotationNo ? 
-                                            <Button
-                                              className="proceedBtn"
-                                              type="button"
-                                              onClick= {this.handleSubmit }
+                                          {fulQuoteResp.QuotationNo && values.gateway != "" ? 
+                                            < Button type="submit"
+                                              className="proceedBtn"   
+                                              // onClick={this.handleSubmit.bind(this, values)}                            
                                             >
                                               Make Payment
                                             </Button> : null

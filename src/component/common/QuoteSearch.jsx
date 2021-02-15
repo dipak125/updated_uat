@@ -64,8 +64,8 @@ function nameFormatter(cell, row){
 }
 
 const statusFormatter = (refObj) => (cell,row) => {
-    return ( 
-        cell.payment_link_status == 1 ? <div> Payment link sent</div> : <div> Quote Issued</div>
+    return (
+        <div>Quote Issued</div>
     )
 }
 
@@ -153,12 +153,14 @@ class QuoteSearch extends Component {
     }
 
     renderShowsTotal(start, to, total) {
+        let trans = localStorage.getItem("phrases") ? JSON.parse(localStorage.getItem("phrases")) : null
         start = start ? start : 0
         to = to ? to : 0
         total = total ? total : 0
         return (
           <p style={ { color: 'blue' } }>
-            From { start } to { to }, total is { total }
+            {/* From { start } to { to }, total is { total } */}
+            {trans['From']} { start } {trans['to']} { to }, {trans['totalis']} { total }
           </p>
         );
       }

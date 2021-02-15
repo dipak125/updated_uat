@@ -19,6 +19,7 @@ import swal from 'sweetalert';
 import moment from "moment";
 import {  validRegistrationNumber } from "../../shared/validationFunctions";
 
+let translation = localStorage.getItem("phrases") ? JSON.parse(localStorage.getItem("phrases")) : []
 
 const ComprehensiveValidation = Yup.object().shape({
     // is_carloan: Yup.number().required('Please select one option')
@@ -140,19 +141,19 @@ const ComprehensiveValidation = Yup.object().shape({
    
     B00069_value: Yup.string().when(['LL_Coolie_flag'], {
         is: LL_Coolie_flag => LL_Coolie_flag == '1',
-        then: Yup.string().required('Please provide No. of person').matches(/^[0-9]$/, 'Please provide valid No.'),
+        then: Yup.string().required('pleaseProvidePerson').matches(/^[0-9]$/, 'Please provide valid No.'),
         otherwise: Yup.string()
     }),
    
     B00012_value: Yup.string().when(['LL_Emp_flag'], {
         is: LL_Emp_flag => LL_Emp_flag == '1',
-        then: Yup.string().required('Please provide No. of employee').matches(/^[0-9]$/, 'Please provide valid No.'),
+        then: Yup.string().required('pleaseProvideEmployee').matches(/^[0-9]$/, 'Please provide valid No.'),
         otherwise: Yup.string()
     }),
    
     B00013_value: Yup.string().when(['LL_PD_flag'], {
         is: LL_PD_flag => LL_PD_flag == '1',
-        then: Yup.string().required('Please provide  No. of driver'),
+        then: Yup.string().required('pleaseProvideDriver'),
         otherwise: Yup.string()
     }),
 
@@ -192,25 +193,25 @@ const ComprehensiveValidation = Yup.object().shape({
 
     B00003_description: Yup.string().when(['nonElectric_flag'], {
         is: nonElectric_flag => nonElectric_flag == '1',
-        then: Yup.string().required('Please provide accessory desription').matches(/^[a-zA-Z0-9]*$/, 'Please provide valid description'),
+        then: Yup.string().required('pleaseProvideAccessory').matches(/^[a-zA-Z0-9]*$/, 'Please provide valid description'),
         otherwise: Yup.string()
     }),
 
     B00073_value: Yup.string().when(['pa_coolie_flag'], {
         is: pa_coolie_flag => pa_coolie_flag == '1',
-        then: Yup.string().required('Please provide PA value').matches(/^[0-9]*$/, 'Please provide valid PA value'),
+        then: Yup.string().required('PleasePAValue').matches(/^[0-9]*$/, 'Please provide valid PA value'),
         otherwise: Yup.string()
     }),
 
     B00073_description: Yup.string().when(['pa_coolie_flag'], {
         is: pa_coolie_flag => pa_coolie_flag == '1',
-        then: Yup.string().required('Please provide No. of paid driver').matches(/^[0-9]$/, 'Please provide valid number'),
+        then: Yup.string().required('PleaseProvidePD').matches(/^[0-9]$/, 'Please provide valid number'),
         otherwise: Yup.string()
     }),
 
     B00007_value: Yup.string().when(['trailer_flag'], {
         is: trailer_flag => trailer_flag == '1',
-        then: Yup.string().required('Please provide No. of trailer').matches(/^[0-9]$/, 'Please provide valid No.'),
+        then: Yup.string().required('pleaseProvideTrailer').matches(/^[0-9]$/, 'Please provide valid No.'),
         otherwise: Yup.string()
     }),
 
@@ -222,7 +223,7 @@ const ComprehensiveValidation = Yup.object().shape({
 
     B00011_value: Yup.string().when(['trailer_flag_TP'], {
         is: trailer_flag_TP => trailer_flag_TP == '1',
-        then: Yup.string().required('Please provide No. of trailer').matches(/^[0-9]$/, 'Please provide valid No.'),
+        then: Yup.string().required('pleaseProvideTrailer').matches(/^[0-9]$/, 'Please provide valid No.'),
         otherwise: Yup.string()
     }),
 
@@ -268,28 +269,28 @@ const ComprehensiveValidation = Yup.object().shape({
 
 const Coverage = {
 
-        "B00002": "Own Damage Basic",
-        "B00003": "Non Electrical Accessories",
-        "B00004": "Electrical /Electronic Accessories",
-        "B00005": "CNG /LPG Kit - Own Damage",
-        "B00006": "In built - CNG /LPG Kit Own Damage",
-        "B00007": "Trailer - OD",
-        "B00008": "Third Party Bodily Injury",
-        "B00009": "Third Party Property Damage",
-        "B00010": "CNG /LPG Kit -  Liability",
-        "B00011": "Trailer - TP",
-        "B00012": "Legal Liability to Employees",
-        "B00013": "Legal Liability to Paid Drivers",
-        "B00069": "Legal Liability to Cleaner\Conductor\Coolie",
-        "B00070": "Legal Liability to Workmen",
-        "B00071": "Legal Liability to NFPP",
-        "B00015": "PA -  Owner Driver",
-        "B00073": "PA Cleaner\Conductor\Coolie & PaidDriver",
+    "B00002":  translation["B00002"],
+    "B00003":  translation["B00003"],
+    "B00004":  translation["B00004"],
+    "B00005":  translation["B00005"],
+    "B00006":  translation["B00006"],
+    "B00007":  translation["B00007"],
+    "B00008":  translation["B00008"],
+    "B00009":  translation["B00009"],
+    "B00010":  translation["B00010"],
+    "B00011":  translation["B00011"],
+    "B00012":  translation["B00012"],
+    "B00013":  translation["B00013"],
+    "B00069":  translation["B00069"],
+    "B00070":  translation["B00070"],
+    "B00071":  translation["B00071"],
+    "B00015":  translation["B00015"],
+    "B00073":  translation["B00073"],
 
-        "B00018": "Enhanced PA Cover - Owner driver",
-        "B00019": "Enhanced PA Cover - Paid driver",
-        "B00020": "Hospital Cash Cover - Owner Driver",
-        "B00022": "Hospital Cash Cover - Paid Driver ",  
+    "B00018":  translation["B00018"],
+    "B00019":  translation["B00019"],
+    "B00020":  translation["B00020"],
+    "B00022":  translation["B00022"],  
 }
 
 class OtherComprehensiveGCV extends Component {
@@ -1138,7 +1139,7 @@ class OtherComprehensiveGCV extends Component {
 // -------------------------------------------------------
 
         let OD_TP_premium = serverResponse.PolicyLobList ? serverResponse.PolicyLobList[0].PolicyRiskList[0] : []
-        let phrases = localStorage.getItem("phrases") ? JSON.parse(localStorage.getItem("phrases")) : null
+        let phrases = localStorage.getItem("phrases") ? JSON.parse(localStorage.getItem("phrases")) : []
 
 
         const policyCoverageList =  policyCoverage && policyCoverage.length > 0 ?
@@ -1502,7 +1503,7 @@ class OtherComprehensiveGCV extends Component {
                                             
                                                     </Field>
                                                     {errors.B00011_value ? (
-                                                        <span className="errorMsg">{errors.B00011_value}</span>
+                                                        <span className="errorMsg">{phrases[errors.B00011_value]}</span>
                                                     ) : null}
                                                 </div>
                                             </FormGroup>
@@ -1557,7 +1558,7 @@ class OtherComprehensiveGCV extends Component {
                                             
                                                     </Field>
                                                     {errors.B00073_value ? (
-                                                        <span className="errorMsg">{errors.B00073_value}</span>
+                                                        <span className="errorMsg">{phrases[errors.B00073_value]}</span>
                                                     ) : null}
                                                 </div>
                                             </FormGroup>
@@ -1581,7 +1582,7 @@ class OtherComprehensiveGCV extends Component {
                                                     >                                     
                                                     </Field>
                                                     {errors.B00073_description ? (
-                                                        <span className="errorMsg">{errors.B00073_description}</span>
+                                                        <span className="errorMsg">{phrases[errors.B00073_description]}</span>
                                                     ) : null}
                                                 </div>
                                             </FormGroup>
@@ -1632,7 +1633,7 @@ class OtherComprehensiveGCV extends Component {
                                                     >                                     
                                                     </Field>
                                                     {errors.B00003_description ? (
-                                                        <span className="errorMsg">{errors.B00003_description}</span>
+                                                        <span className="errorMsg">{phrases[errors.B00003_description]}</span>
                                                     ) : null}
                                                 </div>
                                             </FormGroup>
@@ -1768,14 +1769,14 @@ class OtherComprehensiveGCV extends Component {
                                                             this.handleChange()
                                                         }}
                                                     >
-                                                        <option value="">Enter No. of Drivers</option>
+                                                        <option value="">{phrases['NoOfDrivers']}</option>
                                                         {coverage.covarage_value != null && JSON.parse(coverage.covarage_value).value.length > 0 && JSON.parse(coverage.covarage_value).value.map((insurer, qIndex) => (
                                                             <option value= {insurer}>{insurer}</option>
                                                         ))} 
                                             
                                                     </Field>
                                                     {errors.B00013_value ? (
-                                                        <span className="errorMsg">{errors.B00013_value}</span>
+                                                        <span className="errorMsg">{phrases[errors.B00013_value]}</span>
                                                     ) : null}
                                                 </div>
                                             </FormGroup>
@@ -1804,7 +1805,7 @@ class OtherComprehensiveGCV extends Component {
                                                     >                                     
                                                     </Field>
                                                     {errors.B00012_value ? (
-                                                        <span className="errorMsg">{errors.B00012_value}</span>
+                                                        <span className="errorMsg">{phrases[errors.B00012_value]}</span>
                                                     ) : null}
                                                 </div>
                                             </FormGroup>
@@ -1832,7 +1833,7 @@ class OtherComprehensiveGCV extends Component {
                                                     >                                     
                                                     </Field>
                                                     {errors.B00069_value ? (
-                                                        <span className="errorMsg">{errors.B00069_value}</span>
+                                                        <span className="errorMsg">{phrases[errors.B00069_value]}</span>
                                                     ) : null}
                                                 </div>
                                             </FormGroup>
@@ -2032,25 +2033,25 @@ class OtherComprehensiveGCV extends Component {
                     onHide={this.handleClose}>
                     <Modal.Header closeButton className="custmModlHead modalhd">
                         <div className="cntrbody">
-                            <h3>Premium breakup </h3>                           
+                            <h3>{phrases['PremiumBreakup']} </h3>                           
                         </div>
                     </Modal.Header>
                     <Modal.Body>
                     <table class="table table-bordered">
                             <thead>
                                 <tr>
-                                    <th>Premium:</th>
+                                    <th>{phrases['Premium']}:</th>
                                     <th>₹ {fulQuoteResp.DuePremium}</th>
                                 </tr>
                             </thead>
                             <tbody>
                             {premiumBreakup}
                                 <tr>
-                                    <td>Gross Premium:</td>
+                                    <td>{phrases["GrossPremium"]}:</td>
                                     <td>₹ {Math.round(fulQuoteResp.BeforeVatPremium)}</td>
                                 </tr>
                                 <tr>
-                                    <td>GST:</td>
+                                    <td>{phrases["GST"]}:</td>
                                     <td>₹ {Math.round(fulQuoteResp.TGST)}</td>
                                 </tr>
                             </tbody>

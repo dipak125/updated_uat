@@ -18,7 +18,7 @@ import * as Yup from "yup";
 import swal from 'sweetalert';
 
 let encryption = new Encryption()
-
+let translation = localStorage.getItem("phrases") ? JSON.parse(localStorage.getItem("phrases")) : null
 
  let initialValue = {
     // add_more_coverage: "",
@@ -33,7 +33,7 @@ const ComprehensiveValidation = Yup.object().shape({
 
     PA_Cover: Yup.string().when(['PA_flag'], {
         is: PA_flag => PA_flag == '1',
-        then: Yup.string().required('Please provide PA coverage'),
+        then: Yup.string().required('PleasePACover'),
         otherwise: Yup.string()
     })
 
@@ -41,12 +41,12 @@ const ComprehensiveValidation = Yup.object().shape({
 
 
 const Coverage = {
-    "B00002": "Own Damage Basic",
-    "B00008": "Third Party Bodily Injury",
-    "B00013": "Legal Liability to Paid Drivers",
-    "B00015": "PA -  Owner Driver",
-    "B00075": "PA for Unnamed Passenger",
-    "B00009": "Third Party Property Damage Limit",
+    "B00002":  translation["B00002"],
+    "B00008":  translation["B00008"],
+    "B00013":  translation["B00013"],
+    "B00015":  translation["B00015"],
+    "B00075":  translation["B00075"],
+    "B00009":  translation["B00009"],
 }
 
 class TwoWheelerOtherComprehensive extends Component {
@@ -563,7 +563,7 @@ class TwoWheelerOtherComprehensive extends Component {
                                                                         
                                                                                 </Field>
                                                                                 {errors.PA_Cover ? (
-                                                                                    <span className="errorMsg">{errors.PA_Cover}</span>
+                                                                                    <span className="errorMsg">{phrases[errors.PA_Cover]}</span>
                                                                                 ) : null}
                                                                             </div>
                                                                         </FormGroup>

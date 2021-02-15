@@ -719,6 +719,7 @@ class VehicleDetailsMISCD extends Component {
     }
 
     handleNoOfClaims = (values, value) => {
+        let trans = localStorage.getItem("phrases") ? JSON.parse(localStorage.getItem("phrases")) : null
 
         var claimLnt = values.claim_array.length
         if(values.claim_array.length > value) {
@@ -732,7 +733,7 @@ class VehicleDetailsMISCD extends Component {
                         {
                         claim_amount :  "",
                         claim_year : "",
-                        type_of_claim : "Own Damage"
+                        type_of_claim : trans["OwnDamage"]
                     } )
             }
         }
@@ -760,6 +761,7 @@ class VehicleDetailsMISCD extends Component {
     };
 
     handleClaims = (values, errors, touched, setFieldTouched, setFieldValue) => {
+        let phrases = localStorage.getItem("phrases") ? JSON.parse(localStorage.getItem("phrases")) : null
         let field_array = []
         var pol_start_date = new Date(values.previous_start_date).getFullYear()
         var pol_end_date =  pol_start_date == new Date(values.previous_end_date).getFullYear() ? pol_start_date : new Date(values.previous_end_date).getFullYear()
@@ -779,7 +781,7 @@ class VehicleDetailsMISCD extends Component {
                                 className="formGrp inputfs12"
                                 // value = {values[`claim_array[${i}].claim_year`]}
                             >
-                                <option value="">Select Year</option>
+                                <option value="">{phrases['SelectYear']}</option>
                                 <option value= {pol_start_date}>{pol_start_date}</option>
                                 <option value= {pol_end_date}>{pol_end_date}</option>
                             </Field>
@@ -796,7 +798,7 @@ class VehicleDetailsMISCD extends Component {
                             <Field
                                 name={`claim_array[${i}].claim_amount`}
                                 type="text"
-                                placeholder="Claim Amount"
+                                placeholder={phrases["ClaimAmount"]}
                                 autoComplete="off"
                                 onFocus={e => this.changePlaceHoldClassAdd(e)}
                                 onBlur={e => this.changePlaceHoldClassRemove(e)}
@@ -820,7 +822,7 @@ class VehicleDetailsMISCD extends Component {
                                 onFocus={e => this.changePlaceHoldClassAdd(e)}
                                 onBlur={e => this.changePlaceHoldClassRemove(e)}
                                 // value = {values[`claim_array[${i}].type_of_claim`]}
-                                value = "Own Damage"
+                                value = {phrases["OwnDamage"]}
                                 disabled = {true}
                             />
                             {errors.claim_array && errors.claim_array[i] && errors.claim_array[i].type_of_claim ? (

@@ -1088,6 +1088,7 @@ class InformationYourself extends Component {
         post_data['bcmaster_id'] = bc_data ? bc_data.agent_id : ""
         post_data['bc_token'] = bc_data ? bc_data.token : ""
         post_data['bc_agent_id'] = bc_data ? bc_data.user_info.data.user.username : ""
+        post_data['agent_name'] = bc_data ? bc_data.user_info.data.user.name : ""
 
     }
      
@@ -1208,9 +1209,7 @@ class InformationYourself extends Component {
                             gender_for.push(display_gender[i])    
                         }   
                     }
-
-                   
-                   
+            
                     if ( key.match(/dob/gi)){                 
                         i = key.substr(4, 1);   
                         display_dob[i] = values[key] ? values[key] : '';    
@@ -1220,8 +1219,7 @@ class InformationYourself extends Component {
                     }
                 } 
             }
-
-            
+           
             sessionStorage.setItem('display_looking_for',JSON.stringify(display_looking_for));
             sessionStorage.setItem('display_dob',JSON.stringify(display_dob));
             this.setState({
@@ -1590,7 +1588,7 @@ setStateForPreviousData=(family_members)=>{
                                                     onBlur={e => this.changePlaceHoldClassRemove(e)}
                                                     value={insureList ? insureList : values.insureList}
                                                 />                    
-                                                <img src={require('../../assets/images/plus-sign.svg')} alt="" />
+                                                <img src={require('../../assets/images/plus-sign.svg')} alt="" className="plus-sign" />
                                                 <br/><br/>
                                                 {errors.insureList && touched.insureList ? (
                                                     <span className="errorMsg">{errors.insureList}</span>

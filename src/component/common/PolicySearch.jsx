@@ -200,12 +200,13 @@ class PolicySearch extends Component {
     }
 
     renderShowsTotal(start, to, total) {
+        let trans = localStorage.getItem("phrases") ? JSON.parse(localStorage.getItem("phrases")) : null
         start = start ? start : 0
         to = to ? to : 0
         total = total ? total : 0
         return (
           <p style={ { color: 'blue' } }>
-            From { start } to { to }, total is { total }
+            {trans['From']} { start } {trans['to']} { to }, {trans['totalis']} { total }
           </p>
         );
       }

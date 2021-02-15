@@ -706,7 +706,7 @@ class AdditionalDetailsGCV extends Component {
 
         const quoteNumber =
         quoteId ? (
-            <h4>{phrases['PolicyReady']}: {quoteId}. {phrases['MoreDetails']}. </h4>
+            <h4>{phrases['PolicyReady']}: {quoteId}. {phrases['MoreDetailsPolicy']} </h4>
         ) : null;
 
         
@@ -1328,7 +1328,7 @@ class AdditionalDetailsGCV extends Component {
                                     <Col sm={12} md={4} lg={4}>
                                         <FormGroup>
                                             <div className="insurerName">
-                                                <h4 className="fs-16">{phrases['EIANumber']}
+                                                <h4 className="fs-16">{phrases['EIAAccount']}
                                                     <OverlayTrigger overlay={<Tooltip id="tooltip-disabled">{eia_desc}</Tooltip>}>
                                                         <a className="infoIcon"><img src={require('../../assets/images/i.svg')} alt="" className="premtool" /></a>
                                                     </OverlayTrigger>
