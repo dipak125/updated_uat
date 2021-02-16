@@ -206,7 +206,7 @@ class PolicySearch extends Component {
         total = total ? total : 0
         return (
           <p style={ { color: 'blue' } }>
-            {trans['From']} { start } {trans['to']} { to }, {trans['totalis']} { total }
+            {trans['From']} { start } {trans['to']} { to }, {trans['totalis']} { total } {trans['hai']}
           </p>
         );
       }

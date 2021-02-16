@@ -154,13 +154,14 @@ class QuoteSearch extends Component {
 
     renderShowsTotal(start, to, total) {
         let trans = localStorage.getItem("phrases") ? JSON.parse(localStorage.getItem("phrases")) : null
+        let lang = localStorage.getItem("lang_name") ? localStorage.getItem("lang_name") : []
         start = start ? start : 0
         to = to ? to : 0
         total = total ? total : 0
         return (
           <p style={ { color: 'blue' } }>
-            {/* From { start } to { to }, total is { total } */}
-            {trans['From']} { start } {trans['to']} { to }, {trans['totalis']} { total }
+            {/* {lang == 'en' ? 'From'  {start}  'to' { to }, 'total is' { total }  : 'hello' } */}
+            {trans['From']} { start } {trans['to']} { to }, {trans['totalis']} { total } {trans['hai']}
           </p>
         );
       }

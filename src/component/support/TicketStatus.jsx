@@ -27,6 +27,20 @@ const ticketValidation = Yup.object().shape({
             return "Characters limit exceeds 1000";
         })
         .matches(/^[A-Za-z0-9\s.,-]*$/,'Invalid characters'),
+
+    fileSize:Yup.string()
+        .test(
+            "filesize",
+            function() {
+                return "Max file size below 4MB"
+            },
+            function (value) {
+                if (value && value > 4194304) {             
+                    return false;
+                }   
+                return true;
+            }
+        ),
 })
 
 
@@ -96,16 +110,29 @@ class TicketStatus extends Component {
         })  
     }
 
-    fileUpload = async (uploadFile) => {
+    fileUpload = async (uploadFile,setFieldValue,setFieldTouched) => {
 
         if (uploadFile[0] && uploadFile[0].name !== "") {
-            let selectedFile = uploadFile[0];
-            let selectedFileName = uploadFile[0].name;
-
-            await this.setState({
-                selectedFile,
-                selectedFileName
-            })
+            let selectedFileSize = uploadFile[0].size;
+            setFieldTouched("fileSize")
+            setFieldValue("fileSize", selectedFileSize);
+            
+            if(selectedFileSize <= 4194304) {
+                let selectedFile = uploadFile[0];
+                let selectedFileName = uploadFile[0].name;
+  
+                await this.setState({
+                    selectedFile,
+                    selectedFileName
+                })         
+            }
+            else {
+                await this.setState({
+                    selectedFile: "",
+                    selectedFileName: ""
+                })      
+            }
+             
         }
     }
 
@@ -392,6 +419,7 @@ class TicketStatus extends Component {
                                             <ErrorMessage name="description" component="div" className="errorMsg" /> 
                                         </FormGroup>
                                     </div>
+                                    {selectedTicket.status != "Resolved" ?
                                     <div class="form-group">
                                         <input type="file" key='1' name="attachment"
                                             // accept=".png, .jpeg, .jpg, .doc, .docx, .xls, .xlsx, .pdf"
@@ -399,11 +427,14 @@ class TicketStatus extends Component {
                                             onChange={(e) => {
                                                 const { target } = e
                                                 if (target.value.length > 0) {
-                                                    this.fileUpload(e.target.files)
+                                                    this.fileUpload(e.target.files, setFieldValue,setFieldTouched)
                                                 } 
                                             }}
                                         />
-                                    </div>
+                                        {errors.fileSize && touched.fileSize ? (
+                                                <span className="errorMsg">{errors.fileSize}</span>
+                                            ) : null}
+                                    </div> : null }
                                 </div>
 
                                 <div className="form-group">

@@ -719,7 +719,6 @@ class VehicleDetailsMISCD extends Component {
     }
 
     handleNoOfClaims = (values, value) => {
-        let trans = localStorage.getItem("phrases") ? JSON.parse(localStorage.getItem("phrases")) : null
 
         var claimLnt = values.claim_array.length
         if(values.claim_array.length > value) {
@@ -733,7 +732,7 @@ class VehicleDetailsMISCD extends Component {
                         {
                         claim_amount :  "",
                         claim_year : "",
-                        type_of_claim : trans["OwnDamage"]
+                        type_of_claim : "OwnDamage"
                     } )
             }
         }

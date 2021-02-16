@@ -49,7 +49,21 @@ const ticketValidation = Yup.object().shape({
     mobile: Yup.string().required("Mobile number required")
      .matches(/^[6-9][0-9]{9}$/,'Invalid Mobile number').required('Mobile No. is required'),
     
-    area:Yup.string().required("Area required")
+    area:Yup.string().required("Area required"),
+
+    fileSize:Yup.string()
+        .test(
+            "filesize",
+            function() {
+                return "Max file size below 4MB"
+            },
+            function (value) {
+                if (value && value > 4194304) {             
+                    return false;
+                }   
+                return true;
+            }
+        ),
      
 })
 
@@ -71,16 +85,29 @@ class NewTicket extends Component {
         e.target.value.length === 0 && element.classList.remove('active');
     }
 
-    fileUpload = async (uploadFile) => {
+    fileUpload = async (uploadFile,setFieldValue,setFieldTouched) => {
 
         if (uploadFile[0] && uploadFile[0].name !== "") {
-            let selectedFile = uploadFile[0];
-            let selectedFileName = uploadFile[0].name;
-
-            await this.setState({
-                selectedFile,
-                selectedFileName
-            })
+            let selectedFileSize = uploadFile[0].size;
+            setFieldTouched("fileSize")
+            setFieldValue("fileSize", selectedFileSize);
+            
+            if(selectedFileSize <= 4194304) {
+                let selectedFile = uploadFile[0];
+                let selectedFileName = uploadFile[0].name;
+  
+                await this.setState({
+                    selectedFile,
+                    selectedFileName
+                })         
+            }
+            else {
+                await this.setState({
+                    selectedFile: "",
+                    selectedFileName: ""
+                })      
+            }
+             
         }
         
         // const formData = new FormData();
@@ -216,7 +243,7 @@ class NewTicket extends Component {
 
     render() {
         const { selectedFile, selectedFileName } = this.state
-        console.log(selectedFile, selectedFileName);
+
         return (
             <>
                 <div className="createtckt">
@@ -248,7 +275,7 @@ class NewTicket extends Component {
                             validationSchema={ticketValidation}
                             onSubmit={this.handleSubmit}
                         >
-                            {({ errors, status, touched, values }) => (
+                            {({ errors, status, touched, values, setFieldValue, setFieldTouched }) => (
                                 <Form>
                                     <div className="justify-content-left opntckt">
                                         <Row>
@@ -353,11 +380,15 @@ class NewTicket extends Component {
                                             accept=".jpg,.jpeg,.png,.gif,.pdf,.doc,.docx,.key,.ppt,.pptx,.pps,.ppsx,.odt,.xls,.xlsx,.zip,.html,.bmp,.dib,.txt,.xml,.eml,.csv,.msg,.xps,.htm"
                                             onChange={(e) => {
                                                 const { target } = e
-                                                if (target.value.length > 0) {
-                                                    this.fileUpload(e.target.files)
+                                                if (target.value.length > 0) {           
+                                                    this.fileUpload(e.target.files, setFieldValue,setFieldTouched)
                                                 } 
                                             }}
                                         />
+                                       
+                                       {errors.fileSize && touched.fileSize ? (
+                                                <span className="errorMsg">{errors.fileSize}</span>
+                                            ) : null}
                                     </div>
 
                                     <div className="form-group">
