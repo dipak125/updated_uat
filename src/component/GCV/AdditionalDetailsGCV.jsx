@@ -1407,10 +1407,10 @@ class AdditionalDetailsGCV extends Component {
                                 </div>
                                 <div className="d-flex justify-content-left resmb">
                                 <Button className={`backBtn`} type="button"  disabled={isSubmitting ? true : false} onClick= {this.otherComprehensive.bind(this,productId)}>
-                                    {isSubmitting ? 'Wait..' : 'Back'}
+                                    {isSubmitting ? phrases['Wait..'] : phrases['Back']}
                                 </Button> 
                                 <Button className={`proceedBtn`} type="submit"  disabled={isSubmitting ? true : false}>
-                                    {isSubmitting ? 'Wait..' : 'Next'}
+                                    {isSubmitting ? phrases['Wait..'] : phrases['Next']}
                                 </Button> 
                                 </div>
 

@@ -31,17 +31,17 @@ const initialValues = {
 
 
 const vehicleValidation = Yup.object().shape({
-    policy_type: Yup.string().required("Please enter policy type"),
-    policy_for: Yup.string().required("Please select policy for indivudal or corporate"),
+    policy_type: Yup.string().required("PleasePT"),
+    policy_for: Yup.string().required("PleasePIC"),
 
     regNumber: Yup.string().when("check_registration", {
         is: "1",       
         then: Yup.string(),
-        otherwise: Yup.string().required('Please provide registration number')
+        otherwise: Yup.string().required('PleaseProRegNum')
         .test(
             "last4digitcheck",
             function() {
-                return "Invalid Registration number"
+                return "InvalidRegistrationNumber"
             },
             function (value) {
                 if (value && this.parent.check_registration == 2 && (value != "" || value != undefined) ) {             
@@ -318,6 +318,7 @@ class TwoWheelerSelectBrand extends Component {
 
 
     handleSubmit = (values) => {
+        console.log('values----->',values)
         const { productId } = this.props.match.params
         const { selectedVarientId, selectedModelId, selectedBrandId, request_data , brandView, fastLaneData, fastlanelog } = this.state
         let post_data = {}
@@ -635,7 +636,7 @@ class TwoWheelerSelectBrand extends Component {
                                                                             <span className="checkmark " /><span className="fs-14"> {phrases['Corporate']}</span>
                                                                         </label>
                                                                         {errors.policy_for && touched.policy_for ? (
-                                                                            <span className="errorMsg">{errors.policy_for}</span>
+                                                                            <span className="errorMsg">{phrases[errors.policy_for]}</span>
                                                                         ) : null}
                                                                     </div>
                                                                 </div>
@@ -686,7 +687,7 @@ class TwoWheelerSelectBrand extends Component {
                                                                             <span className="fs-14">{phrases['LapsedPolicy']}</span>
                                                                         </label>
                                                                         {errors.policy_type && touched.policy_type ? (
-                                                                            <span className="errorMsg">{errors.policy_type}</span>
+                                                                            <span className="errorMsg">{phrases[errors.policy_type]}</span>
                                                                         ) : null}
                                                                     </div>
                                                                 </div>
@@ -715,11 +716,11 @@ class TwoWheelerSelectBrand extends Component {
                                                                         /> 
                                                                         
                                                                         {errors.regNumber && touched.regNumber ? (
-                                                                            <span className="errorMsg">{errors.regNumber}</span>
+                                                                            <span className="errorMsg">{phrases[errors.regNumber]}</span>
                                                                         ) : null}   
                                                                          {/* {console.log("error_msg.registration_no", error_msg)} */}
                                                                         {error_msg.registration_no ? (
-                                                                            <span className="errorMsg">Please provide registration number</span>
+                                                                            <span className="errorMsg">{phrases['PleaseProRegNum']}</span>
                                                                         ) : null}
                                                                     </div>
                                                                     <div>

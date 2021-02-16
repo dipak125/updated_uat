@@ -792,7 +792,7 @@ class AdditionalDetailsMISCD extends Component {
                                             <Field
                                                     name='bank_name'
                                                     type="text"
-                                                    placeholder="Bank Name"
+                                                    placeholder={phrases["BankName"]}
                                                     autoComplete="off"
                                                     onFocus={e => this.changePlaceHoldClassAdd(e)}
                                                     onBlur={e => this.changePlaceHoldClassRemove(e)}
@@ -810,7 +810,7 @@ class AdditionalDetailsMISCD extends Component {
                                             <Field
                                                     name='bank_branch'
                                                     type="text"
-                                                    placeholder="Bank Branch"
+                                                    placeholder={phrases["BankBranch"]}
                                                     autoComplete="off"
                                                     onFocus={e => this.changePlaceHoldClassAdd(e)}
                                                     onBlur={e => this.changePlaceHoldClassRemove(e)}

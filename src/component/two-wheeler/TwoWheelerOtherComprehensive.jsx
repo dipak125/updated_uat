@@ -43,7 +43,7 @@ const ComprehensiveValidation = Yup.object().shape({
 
     PA_Cover: Yup.string().when(['PA_flag'], {
         is: PA_flag => PA_flag == '1',
-        then: Yup.string().required('Please provide PA coverage'),
+        then: Yup.string().required('PleasePACover'),
         otherwise: Yup.string()
     })
 
@@ -51,14 +51,14 @@ const ComprehensiveValidation = Yup.object().shape({
 
 
 const Coverage = {
-    "B00002": translation["B00002"],
-    "B00008": translation["B00008"],
-    "B00013": translation["B00013"],
-    "B00015": translation["B00015"],
-    "B00075": translation["B00075"],
-    "B00009": translation["B00009"],
-    "NCB": translation["NCB"],
-    "TOTALOD": translation["TOTALOD"]
+    "B00002":translation["B00002"],
+    "B00008":translation["B00008"],
+    "B00013":translation["B00013"],
+    "B00015":translation["B00015"],
+    "B00075":translation["B00075"],
+    "B00009":translation["B00009"],
+    "NCB":translation["NCB"],
+    "TOTALOD":translation["TOTALOD"]
 }
 
 
@@ -341,7 +341,7 @@ class TwoWheelerOtherComprehensive extends Component {
         let csc_data = localStorage.getItem('users') ? localStorage.getItem('users') : "";
         let csc_user_type = "";
         let bc_data = sessionStorage.getItem('bcLoginData') ? sessionStorage.getItem('bcLoginData') : "";
-        let phrases = localStorage.getItem("phrases") ? JSON.parse(localStorage.getItem("phrases")) : null
+        let phrases = localStorage.getItem("phrases") ? JSON.parse(localStorage.getItem("phrases")) : []
 
         if(csc_data && sessionStorage.getItem('csc_id')) {
             let encryption = new Encryption();
@@ -477,7 +477,7 @@ class TwoWheelerOtherComprehensive extends Component {
         let max_IDV_suggested = PolicyArray.length > 0 ? PolicyArray[0].PolicyRiskList[0].MaxIDV_Suggested : 0
         let minIDV = min_IDV_suggested
         let maxIDV = PolicyArray.length > 0 ? Math.floor(max_IDV_suggested) : null
-        let phrases = localStorage.getItem("phrases") ? JSON.parse(localStorage.getItem("phrases")) : []
+        let phrases = localStorage.getItem("phrases") ? JSON.parse(localStorage.getItem("phrases")) : null
 
         if(Number.isInteger(min_IDV_suggested) == false ) {
             minIDV = PolicyArray.length > 0 ? Math.floor(PolicyArray[0].PolicyRiskList[0].MinIDV_Suggested) : null           
@@ -719,7 +719,7 @@ console.log("values----- ", values)
                                                                         
                                                                                 </Field>
                                                                                 {errors.PA_Cover ? (
-                                                                                    <span className="errorMsg">{errors.PA_Cover}</span>
+                                                                                    <span className="errorMsg">{phrases[errors.PA_Cover]}</span>
                                                                                 ) : null}
                                                                             </div>
                                                                         </FormGroup>
