@@ -65,14 +65,9 @@ class SideNav extends Component {
   }
 
   render() {
-    const { BC_check, CSC_check } = this.state
-    // console.log('that.----->',this.state.BC_check)
-    let check_bc_exist = BC_check && BC_check.master_data ? BC_check.master_data.eligible_for_support_ticket : null
+    const { BC_check } = this.state
     let childPhrase = localStorage.getItem("phrases") ? JSON.parse(localStorage.getItem("phrases")) : null
-    let Check_CSC = CSC_check ? 1 : 0
-    console.log("BC-check----",BC_check)
-    console.log("check_bc_exist------>",check_bc_exist)
-    console.log("Check_CSC------>",Check_CSC)
+
     return (
       <>
       {childPhrase ?
@@ -136,7 +131,7 @@ class SideNav extends Component {
                 {childPhrase['Services']}
               </Link>
             </li>
-           { BC_check.is_permission == true || Check_CSC == 1 ?
+           { BC_check.is_permission == true ?
             <li>
 							<Link to="/Supports" activeClassName="active"><span className="leftIcon01"><img src={require('../../../assets/images/support.png')} alt="" /></span>{childPhrase['Support']}</Link>
             </li> 

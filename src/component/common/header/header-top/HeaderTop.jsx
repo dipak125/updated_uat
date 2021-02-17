@@ -19,20 +19,20 @@ class HeaderTop extends Component {
         phrases: []
     }
 
-    handleLogout = () => {
-        let token = localStorage.getItem("auth_token");
-        axios.get('/logout')
-            .then(res => {
-                localStorage.removeItem('cons_reg_info');
-                this.props.history.push(`/LogIn`);
-                this.props.logout();
-            })
-            .catch(err => {
-                this.props.logout();
-                // this.props.loadingStop();
-            });
+    // handleLogout = () => {
+    //     let token = localStorage.getItem("auth_token");
+    //     axios.get('/logout')
+    //         .then(res => {
+    //             localStorage.removeItem('cons_reg_info');
+    //             this.props.history.push(`/LogIn`);
+    //             this.props.logout();
+    //         })
+    //         .catch(err => {
+    //             this.props.logout();
+    //             // this.props.loadingStop();
+    //         });
 
-    };
+    // };
 
 
     componentWillUpdate(nextProps, nextState) {
@@ -68,7 +68,7 @@ class HeaderTop extends Component {
 
     componentDidMount() {
         let bc_data = sessionStorage.getItem('bcLoginData') ? sessionStorage.getItem('bcLoginData') : "";
-        let csc_data = localStorage.getItem('users') ? localStorage.getItem('users') : "";
+        let csc_data = sessionStorage.getItem('users') ? sessionStorage.getItem('users') : "";
 
         if(bc_data) {
             let encryption = new Encryption();

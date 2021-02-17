@@ -73,7 +73,6 @@ export const authProcess = (data, onSuccess, onFailure) => {
         dispatch(authStart());
         // Auth Processing
         const formData = new FormData();
-console.log("data-------- ", data)
         let post_data_obj = {}
         if(data.bc_id) {
             post_data_obj = {
@@ -89,12 +88,13 @@ console.log("data-------- ", data)
                 'email': data.emailAddress,
                 'password':data.password,
                 'bc_id': data.agent_id,
-                'user_id': data.bc_agent_id
+                'user_id': data.bc_agent_id,
+                'user_type': "bc",
             }
         }
         let encryption = new Encryption();
         formData.append('enc_data',encryption.encrypt(JSON.stringify(post_data_obj)))
-
+console.log("login post_data_obj--------", post_data_obj)
         axios
             .post('/login', formData)
             .then(response => {
@@ -118,7 +118,7 @@ console.log("data-------- ", data)
                 // localStorage.setItem('product_id', cscData["productId"]);
 
 
-                console.log('user_data',response.data.user_data)
+                console.log('user_data',response.data)
                 onSuccess && onSuccess();
             })
             .catch(error => {
