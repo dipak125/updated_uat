@@ -890,7 +890,7 @@ class TwoWheelerSelectBrand extends Component {
 
                                                                     <div className="d-flex justify-content-between flex-lg-row flex-md-column m-b-25">
                                                                         <div className="txtRegistr resmb-15">{phrases['TwoWheelModel']}
-                                                                            <strong>{modelName ? modelName : (selectedBrandId ? "" : vehicleDetails && vehicleDetails.vehiclemodel && vehicleDetails.vehiclemodel.description ? vehicleDetails.vehiclemodel.description+" "+vehicleDetails.varientmodel.varient : "")}</strong></div>
+                                                                            - <strong>{modelName ? modelName : (selectedBrandId ? "" : vehicleDetails && vehicleDetails.vehiclemodel && vehicleDetails.vehiclemodel.description ? vehicleDetails.vehiclemodel.description+" "+vehicleDetails.varientmodel.varient : "")}</strong></div>
 
                                                                         <div> <button type="button" className="rgistrBtn" onClick={this.selectBrand.bind(this, productId)}>{phrases['Edit']}</button></div>
                                                                     </div>
@@ -921,8 +921,8 @@ class TwoWheelerSelectBrand extends Component {
                                                                 </div>
 
                                                                 <div className="d-flex justify-content-between flex-lg-row flex-md-column m-b-25">
-                                                                    <div className="txtRegistr">{phrases['TwoWheelerModel']}<br />
-                                                                    <strong>{fastLaneData && fastLaneData.model_text ? fastLaneData.model_text+" "+fastLaneData.varient_text : vehicleDetails && vehicleDetails.vehiclemodel && vehicleDetails.vehiclemodel.description ? vehicleDetails.vehiclemodel.description+" "+vehicleDetails.varientmodel.varient : "" }</strong></div>
+                                                                    <div className="txtRegistr">{phrases['TwoWheelerModel']}
+                                                                        -  <strong>{fastLaneData && fastLaneData.model_text ? fastLaneData.model_text+" "+fastLaneData.varient_text : vehicleDetails && vehicleDetails.vehiclemodel && vehicleDetails.vehiclemodel.description ? vehicleDetails.vehiclemodel.description+" "+vehicleDetails.varientmodel.varient : "" }</strong></div>
 
                                                                     <div> <button type="button" className="rgistrBtn" onClick={this.selectBrand.bind(this, productId)}>{phrases['Edit']}</button></div>
                                                                 </div>
