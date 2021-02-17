@@ -33,7 +33,7 @@ const ComprehensiveValidation = Yup.object().shape({
 
     PA_Cover: Yup.string().when(['PA_flag'], {
         is: PA_flag => PA_flag == '1',
-        then: Yup.string().required('PleasePACover'),
+        then: Yup.string().required('Please provide PA coverage'),
         otherwise: Yup.string()
     })
 
@@ -530,7 +530,8 @@ class TwoWheelerOtherComprehensive extends Component {
                                                                             disabled={(localStorage.getItem('declinedModel')>0 && sessionStorage.getItem('csc_id') && values[coverage.code] == 'B00015') ? true : false}
                                                                             onClick={(e) =>{
                                                                                 if( e.target.checked == false && values[coverage.code] == 'B00015') {
-                                                                                    swal(phrases.SwalIRDAI)
+                                                                                    swal(phrases.SwalIRDAI,
+                                                                                        {button: phrases.OK})
                                                                                 }
                                                                                 this.onRowSelect(e.target.value, e.target.checked, setFieldTouched, setFieldValue)         
                                                                             }
@@ -563,7 +564,7 @@ class TwoWheelerOtherComprehensive extends Component {
                                                                         
                                                                                 </Field>
                                                                                 {errors.PA_Cover ? (
-                                                                                    <span className="errorMsg">{phrases[errors.PA_Cover]}</span>
+                                                                                    <span className="errorMsg">{errors.PA_Cover}</span>
                                                                                 ) : null}
                                                                             </div>
                                                                         </FormGroup>

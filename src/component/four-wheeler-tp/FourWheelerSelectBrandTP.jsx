@@ -500,21 +500,22 @@ class TwoWheelerSelectBrand extends Component {
     fetchFastlane = (values) => {
         const formData = new FormData();
         formData.append('registration_no', values.regNumber)
-        formData.append('menumaster_id', '1')
+        formData.append('menumaster_id', '3')
         this.props.loadingStart();
         axios.post('fastlane', formData).then(res => {
 
             if(res.data.error == false) {
                 this.props.loadingStop();
-                this.setState({fastLaneData: res.data.data, brandView: '0'})
+                this.setState({fastLaneData: res.data.data, brandView: '0', fastlaneLogId: res.data.data.fastlaneLog_id})
             } 
             else {
                 this.props.loadingStop();
-                this.setState({fastLaneData: [], brandView: '1', vehicleDetails: []})
+                this.setState({fastLaneData: [], brandView: '1', vehicleDetails: [], fastlaneLogId: res.data.data.fastlaneLog_id })
             }       
         })
             .catch(err => {
                 this.props.loadingStop();
+                this.setState({fastLaneData: [], brandView: '1', vehicleDetails: [], fastlaneLogId: 0 })
             })
     }
 

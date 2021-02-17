@@ -302,7 +302,8 @@ class SelectBrandGCV extends Component {
         const { selectedVarientId, selectedModelId, selectedBrandId,  modelName, vehicleDetails } = this.state
         let vehicleModel = modelName ? modelName : (selectedBrandId ? "" : vehicleDetails && vehicleDetails.vehiclemodel && vehicleDetails.vehiclemodel.description ? vehicleDetails.vehiclemodel.description+" "+vehicleDetails.varientmodel.varient : "")
         if(vehicleModel == "" || vehicleModel == null || vehicleModel == undefined) {
-            swal(phrases.PleaseVBrand)
+            swal(phrases.PleaseVBrand,
+                {button: phrases.OK})
             return false
         }
         const formData = new FormData();

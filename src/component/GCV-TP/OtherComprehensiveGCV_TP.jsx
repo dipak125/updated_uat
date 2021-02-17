@@ -1419,7 +1419,8 @@ class OtherComprehensiveGCV extends Component {
                                                     // checked={values.roadsideAssistance ? true : false}
                                                     onClick={(e) =>{
                                                         if( e.target.checked == false && values[coverage.code] == 'B00015') {
-                                                            swal(phrases.SwalIRDAI)
+                                                            swal(phrases.SwalIRDAI,
+                                                                {button: phrases.OK})
                                                         }
                                                         this.onRowSelect(e.target.value, e.target.checked, setFieldTouched, setFieldValue)         
                                                     }
@@ -1441,7 +1442,8 @@ class OtherComprehensiveGCV extends Component {
                                                     // checked={values.roadsideAssistance ? true : false}
                                                     onClick={(e) =>{
                                                         if( e.target.checked == false && values[coverage.code] == 'B00015') {
-                                                            swal(phrases.SwalIRDAI)
+                                                            swal(phrases.SwalIRDAI,
+                                                                {button: phrases.OK})
                                                         }
                                                         this.onRowSelect(e.target.value, values, e.target.checked, setFieldTouched, setFieldValue)         
                                                     }

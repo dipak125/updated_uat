@@ -19,6 +19,7 @@ import swal from 'sweetalert';
 import moment from "moment";
 import {  validRegistrationNumber } from "../../shared/validationFunctions";
 
+
 let translation = localStorage.getItem("phrases") ? JSON.parse(localStorage.getItem("phrases")) : []
 
 const ComprehensiveValidation = Yup.object().shape({
@@ -111,23 +112,42 @@ const ComprehensiveValidation = Yup.object().shape({
 });
 
 
-const Coverage =  {
-        "C101064": translation["C101064"],
-        "C101065": translation["C101065"],
-        "C101066": translation["C101066"],
-        "C101069": translation["C101069"],
-        "C101072": translation["C101072"],
-        "C101067": translation["C101067"],
-        "C101108": translation["C101108"],
-        "C101111": translation["C101111"],
-        "B00002": translation["B00002"],
-        "B00008": translation["B00008"],
-        "B00013": translation["B00013"],
-        "B00015": translation["B00015"],
-        "B00016": translation["B00016"],
-        "B00009": translation["B00009"],
-        "NCB": translation["NCB"],
-        "TOTALOD": translation["TOTALOD"]
+// const Coverage = {
+//         "C101064":"Own Damage",
+//         "C101065":"Legal Liability to Third Party",
+//         "C101066":"PA Cover",
+//         "C101069":"Basic Road Side Assistance",
+//         "C101072":"Depreciation Reimbursement",
+//         "C101067":"Return to Invoice",
+//         "C101108":"Engine Guard",
+//         "C101111":"Cover for consumables",
+//         "B00002": "Own Damage Basic",
+//         "B00008": "Third Party Bodily Injury",
+//         "B00013": "Legal Liability to Paid Drivers",
+//         "B00015": "PA -  Owner Driver",
+//         "B00016": "PA for Unnamed Passenger",
+//         "B00009": "Third Party Property Damage Limit",
+//         "NCB": "NCB Discount",
+//         "TOTALOD": "Total Own Damage"
+// }
+
+const Coverage = {
+    "C101064":translation["C101064"],
+    "C101065":translation["C101065"],
+    "C101066":translation["C101066"],
+    "C101069":translation["C101069"],
+    "C101072":translation["C101072"],
+    "C101067":translation["C101067"],
+    "C101108":translation["C101108"],
+    "C101111":translation["C101111"],
+    "B00002":translation["B00002"],
+    "B00008":translation["B00008"],
+    "B00013":translation["B00013"],
+    "B00015":translation["B00015"],
+    "B00016":translation["B00016"],
+    "B00009":translation["B00009"],
+    "NCB":translation["NCB"],
+    "TOTALOD":translation["TOTALOD"]
 }
 
 class OtherComprehensive extends Component {
@@ -1081,7 +1101,8 @@ class OtherComprehensive extends Component {
                                                 // checked={values.roadsideAssistance ? true : false}
                                                 onClick={(e) =>{
                                                     if( e.target.checked == false && values[coverage.code] == 'B00015') {
-                                                        swal(phrases.SwalIRDAI)
+                                                        swal(phrases.SwalIRDAI,
+                                                            {button: phrases.OK})
                                                     }
                                                     this.onRowSelect(e.target.value, e.target.checked, setFieldTouched, setFieldValue)         
                                                 }

@@ -5,7 +5,6 @@ import { authLogout } from "../../../store/actions/auth";
 import { connect } from "react-redux";
 import Encryption from "../../../shared/payload-encryption";
 import { withRouter } from "react-router-dom";
-import { loaderStart, loaderStop } from "../../../store/actions/loader";
 
 class SideNav extends Component {
   state = {
@@ -28,21 +27,18 @@ class SideNav extends Component {
     };
 
     formData.append("enc_data", encryption.encrypt(JSON.stringify(post_data)));
-    this.props.loadingStart();
     axios
       .post("/logout", formData)
       .then((res) => {
-        this.props.loadingStop();
         this.props.logout();
         localStorage.removeItem("cons_reg_info");
         // window.location = `${res.data.data.logout_url}`
         this.props.history.push(`/logout`);
-               
+        
       })
       .catch((err) => {
         this.props.logout();
-        this.props.loadingStop();
-        this.props.history.push(`/logout`);
+        // this.props.loadingStop();
       });
   };
 
@@ -50,24 +46,18 @@ class SideNav extends Component {
     const formData = new FormData();
     let encryption = new Encryption();
     // let post_data = {};
-    let bc_data = sessionStorage.getItem("bcLoginData")
-      ? sessionStorage.getItem("bcLoginData")
+    let user_data = sessionStorage.getItem("users")
+      ? JSON.parse(sessionStorage.getItem("users"))
       : "";
-    if (bc_data) {
-      bc_data = JSON.parse(encryption.decrypt(bc_data));
-      let BC_check =  bc_data ? bc_data : null
-      // console.log('bc_data------>',BC_check)
+    if (user_data) {
+      user_data = JSON.parse(encryption.decrypt(user_data.permission));
+      let BC_check =  user_data ? user_data : null
+      // console.log('user_data------>',BC_check)
       this.setState ({
         BC_check
       })
-      console.log('this.----->',this.state.BC_check)
+      console.log('this.----->',BC_check)
     }
-    // post_data = {
-    //   token: bc_data ? bc_data.token : "",
-    //   bc_agent_id: bc_data ? bc_data.user_info.data.user.username : "",
-    //   bc_master_id: bc_data ? bc_data.agent_id : "",
-    // };
-
   }
 
   componentDidMount() {
@@ -75,11 +65,14 @@ class SideNav extends Component {
   }
 
   render() {
-    const { BC_check } = this.state
+    const { BC_check, CSC_check } = this.state
     // console.log('that.----->',this.state.BC_check)
     let check_bc_exist = BC_check && BC_check.master_data ? BC_check.master_data.eligible_for_support_ticket : null
     let childPhrase = localStorage.getItem("phrases") ? JSON.parse(localStorage.getItem("phrases")) : null
-    // console.log("check_bc_exist------>",check_bc_exist)
+    let Check_CSC = CSC_check ? 1 : 0
+    console.log("BC-check----",BC_check)
+    console.log("check_bc_exist------>",check_bc_exist)
+    console.log("Check_CSC------>",Check_CSC)
     return (
       <>
       {childPhrase ?
@@ -143,7 +136,7 @@ class SideNav extends Component {
                 {childPhrase['Services']}
               </Link>
             </li>
-           { check_bc_exist == 1 ?
+           { BC_check.is_permission == true || Check_CSC == 1 ?
             <li>
 							<Link to="/Supports" activeClassName="active"><span className="leftIcon01"><img src={require('../../../assets/images/support.png')} alt="" /></span>{childPhrase['Support']}</Link>
             </li> 
@@ -184,8 +177,6 @@ class SideNav extends Component {
 const mapDispatchToProps = (dispatch) => {
   return {
     logout: () => dispatch(authLogout()),
-    loadingStart: () => dispatch(loaderStart()),
-    loadingStop: () => dispatch(loaderStop())
   };
 };
 
