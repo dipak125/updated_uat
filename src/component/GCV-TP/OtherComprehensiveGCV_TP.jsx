@@ -199,19 +199,19 @@ const ComprehensiveValidation = Yup.object().shape({
 
     B00073_value: Yup.string().when(['pa_coolie_flag'], {
         is: pa_coolie_flag => pa_coolie_flag == '1',
-        then: Yup.string().required('PleasePAValue').matches(/^[0-9]*$/, 'Please provide valid PA value'),
+        then: Yup.string().required('Please provide PA value').matches(/^[0-9]*$/, 'Please provide valid PA value'),
         otherwise: Yup.string()
     }),
 
     B00073_description: Yup.string().when(['pa_coolie_flag'], {
         is: pa_coolie_flag => pa_coolie_flag == '1',
-        then: Yup.string().required('PleaseProvidePD').matches(/^[0-9]$/, 'Please provide valid number'),
+        then: Yup.string().required('Please provide No. of paid driver').matches(/^[0-9]$/, 'Please provide valid number'),
         otherwise: Yup.string()
     }),
 
     B00007_value: Yup.string().when(['trailer_flag'], {
         is: trailer_flag => trailer_flag == '1',
-        then: Yup.string().required('pleaseProvideTrailer').matches(/^[0-9]$/, 'Please provide valid No.'),
+        then: Yup.string().required('Please provide No. of trailer').matches(/^[0-9]$/, 'Please provide valid No.'),
         otherwise: Yup.string()
     }),
 
@@ -223,7 +223,7 @@ const ComprehensiveValidation = Yup.object().shape({
 
     B00011_value: Yup.string().when(['trailer_flag_TP'], {
         is: trailer_flag_TP => trailer_flag_TP == '1',
-        then: Yup.string().required('pleaseProvideTrailer').matches(/^[0-9]$/, 'Please provide valid No.'),
+        then: Yup.string().required('Please provide No. of trailer').matches(/^[0-9]$/, 'Please provide valid No.'),
         otherwise: Yup.string()
     }),
 
@@ -233,19 +233,19 @@ const ComprehensiveValidation = Yup.object().shape({
     //     otherwise: Yup.string()
     // }),
 
-    B00010: Yup.string().when(['fuel_type'], {
-        is: fuel_type => fuel_type == '3' || fuel_type == '4',
-        then: Yup.string().test(
-            "isLoanChecking",
-            function (value) {
-                if (value == "" || value == null || value == undefined) {   
-                    swal("If Fuel type is CNG/LPG ,then CNG/LPG Kit-Liability cover is mandatory.")
-                    return false;    
-                }
-                return true;
-            }) ,
-        otherwise: Yup.string()
-    }),
+    // B00010: Yup.string().when(['fuel_type'], {
+    //     is: fuel_type => fuel_type == '3' || fuel_type == '4',
+    //     then: Yup.string().test(
+    //         "isLoanChecking",
+    //         function (value) {
+    //             if (value == "" || value == null || value == undefined) {   
+    //                 swal("If Fuel type is CNG/LPG ,then CNG/LPG Kit-Liability cover is mandatory.")
+    //                 return false;    
+    //             }
+    //             return true;
+    //         }) ,
+    //     otherwise: Yup.string()
+    // }),
 
     B00011: Yup.string().when(['fuel_type'], {
         is: fuel_type => fuel_type == '3' || fuel_type == '4',
@@ -262,6 +262,21 @@ const ComprehensiveValidation = Yup.object().shape({
     }),
 
     fuel_type: Yup.string().required("Select fuel type"),
+geographical_extension_length: Yup.string().when(['Geographical_flag'], {
+        is: Geographical_flag => Geographical_flag == '1',
+        then: Yup.string().test(
+            "geoExtention",
+            function() {
+                return "Select any one country"
+            },
+            function (value) {
+                if (value < 1 ) {   
+                    return false;    
+                }
+                return true;
+            }) ,
+        otherwise: Yup.string()
+    }),
    
    
 });
@@ -340,7 +355,8 @@ class OtherComprehensiveGCV extends Component {
             add_more_coverage_request_array: [],
             bodySliderVal: '',
             fuelList: [],
-            vehicleDetails: []
+            vehicleDetails: [],
+	    geographical_extension: []
         };
     }
 
@@ -455,6 +471,7 @@ class OtherComprehensiveGCV extends Component {
                 let add_more_coverage_request_json = motorInsurance && motorInsurance.add_more_coverage_request_json != null ? motorInsurance.add_more_coverage_request_json : ""
 
                 let add_more_coverage_request_array = add_more_coverage_request_json != "" ? JSON.parse(add_more_coverage_request_json) : []
+		var geographical_extension = add_more_coverage_request_array && add_more_coverage_request_array.geographical_extension ? add_more_coverage_request_array.geographical_extension : []
 
                 values.ATC_value = add_more_coverage_request_array.ATC ? add_more_coverage_request_array.ATC.value : ""
                 values.B00018_value = add_more_coverage_request_array.B00018 ? add_more_coverage_request_array.B00018.value : ""
@@ -480,7 +497,7 @@ class OtherComprehensiveGCV extends Component {
                     showCNG: motorInsurance.cng_kit == 1 ? true : false,
                     vahanVerify: motorInsurance.chasis_no && motorInsurance.engine_no ? true : false,
                     selectFlag: motorInsurance && motorInsurance.add_more_coverage != null ? '0' : '1',
-                    add_more_coverage_request_array
+                    add_more_coverage_request_array, geographical_extension
                 })
                 this.props.loadingStop();
                 this.getAccessToken(values)
@@ -628,7 +645,7 @@ class OtherComprehensiveGCV extends Component {
 
 
     fullQuote = (access_token, values) => {
-        const { PolicyArray, sliderVal, add_more_coverage, motorInsurance, bodySliderVal, vehicleDetails } = this.state
+        const { PolicyArray, sliderVal, add_more_coverage, motorInsurance, bodySliderVal, vehicleDetails,  geographical_extension } = this.state
         // let cng_kit_flag = 0;
         // let cngKit_Cost = 0;
         // if(values.toString()) {            
@@ -664,7 +681,8 @@ class OtherComprehensiveGCV extends Component {
                 'B00073' : {'value': values.B00073_value, 'description': values.B00073_description},
                 'B00007' : {'value': values.B00007_value, 'description': values.B00007_description},
                 'B00011' : {'value': values.B00011_value},
-                'B00070' : {'value': values.B00070_value}
+                'B00070' : {'value': values.B00070_value},
+		geographical_extension
             }
         }
 
@@ -730,7 +748,7 @@ class OtherComprehensiveGCV extends Component {
 
     handleSubmit = (values) => {
         const { productId } = this.props.match.params
-        const { motorInsurance, PolicyArray, sliderVal, add_more_coverage, bodySliderVal } = this.state
+        const { motorInsurance, PolicyArray, sliderVal, add_more_coverage, bodySliderVal, geographical_extension } = this.state
         let defaultSliderValue = PolicyArray.length > 0 ? Math.round(PolicyArray[0].PolicyRiskList[0].IDV_Suggested) : 0
         let defaultBodySliderValue =  0
         let coverage_data = {}
@@ -760,7 +778,8 @@ class OtherComprehensiveGCV extends Component {
                 'B00073' : {'value': values.B00073_value, 'description': values.B00073_description},
                 'B00007' : {'value': values.B00007_value, 'description': values.B00007_description},
                 'B00011' : {'value': values.B00011_value},
-                'B00070' : {'value': values.B00070_value}
+                'B00070' : {'value': values.B00070_value},
+		geographical_extension
             }
         }
 
@@ -885,7 +904,11 @@ class OtherComprehensiveGCV extends Component {
                 setFieldTouched("trailer_flag_TP");
                 setFieldValue("trailer_flag_TP", '1');
             }
-
+            if(values == "geographical_extension") {
+                setFieldTouched("Geographical_flag");
+                setFieldValue("Geographical_flag", '1');
+            }        
+            
         }
         else {
             const index = add_more_coverage.indexOf(values);
@@ -960,41 +983,61 @@ class OtherComprehensiveGCV extends Component {
                 setFieldTouched("trailer_flag_TP");
                 setFieldValue("trailer_flag_TP", '0');
             }
+            if(values == "geographical_extension") {
+                setFieldTouched("Geographical_flag");
+                setFieldValue("Geographical_flag", '0');
+
+                setFieldValue("GeoExtnBhutan", '');
+                setFieldValue("GeoExtnNepal", '');
+                setFieldValue("GeoExtnMaldives", '');
+                setFieldValue("GeoExtnPakistan", '');
+                setFieldValue("GeoExtnSriLanka", '');
+                setFieldValue("GeoExtnBangladesh", '');
+                this.setState({
+                    geographical_extension: []
+                })
+            }
         }
         
     }
 
+    onGeoAreaSelect = (value, values, isSelect, setFieldTouched, setFieldValue) => {
+
+        const { add_more_coverage, geographical_extension } = this.state;
+        let drv = []
+        
+        if (isSelect) {
+            geographical_extension.push(value);
+            this.setState({
+                geographical_extension,
+                serverResponse: [],
+                error: []
+            });
+            setFieldTouched(value);
+            setFieldValue(value, '1');
+            setFieldTouched("geographical_extension_length");
+            setFieldValue("geographical_extension_length", geographical_extension.length);
+        }
+        else {
+            const index = geographical_extension.indexOf(value);
+            if (index !== -1) {
+                geographical_extension.splice(index, 1);
+                this.setState({
+                    serverResponse: [],
+                    error: []
+                });
+            }
+            setFieldTouched(value);
+            setFieldValue(value, '');
+            setFieldTouched("geographical_extension_length");
+            setFieldValue("geographical_extension_length", geographical_extension.length);
+            }        
+    }
+
+
     regnoFormat = (e, setFieldTouched, setFieldValue) => {
     
-        let regno = e.target.value
-        // let formatVal = ""
-        // let regnoLength = regno.length
-        // var letter = /^[a-zA-Z]+$/;
-        // var number = /^[0-9]+$/;
-        // let subString = regno.substring(regnoLength-1, regnoLength)
-        // let preSubString = regno.substring(regnoLength-2, regnoLength-1)
-    
-        // if(subString.match(letter) && preSubString.match(letter) && regnoLength == 3) {        
-        //     formatVal = formatVal = regno.substring(0, regnoLength-1) + " " +subString
-        // }
-        // else if(subString.match(letter) && preSubString.match(letter)) {
-        //     formatVal = regno
-        // }
-        // else if(subString.match(number) && preSubString.match(number) && regnoLength == 6) {
-        //     formatVal = formatVal = regno.substring(0, regnoLength-1) + " " +subString
-        // } 
-        // else if(subString.match(number) && preSubString.match(number) && regnoLength == 11 && regno.substring(3, 4).match(letter) && regno.substring(5, 7).match(number) ) {
-        //     formatVal = formatVal = regno.substring(0, 7) + " " +regno.substring(7, 11)
-        // } 
-        // else if(subString.match(number) && preSubString.match(letter)) {        
-        //     formatVal = regno.substring(0, regnoLength-1) + " " +subString      
-        // } 
-        // else if(subString.match(letter) && preSubString.match(number)) {
-        //     formatVal = regno.substring(0, regnoLength-1) + " " +subString   
-        // } 
-        
-        // else formatVal = regno.toUpperCase()
-        
+        let regno = e.target.value     
         e.target.value = regno.toUpperCase()
     
     }
@@ -1006,7 +1049,7 @@ class OtherComprehensiveGCV extends Component {
 
 
     render() {
-        const {showCNG, is_CNG_account, vahanDetails,error, policyCoverage, vahanVerify, selectFlag, fulQuoteResp, PolicyArray, fuelList, vehicleDetails, 
+        const {add_more_coverage, is_CNG_account, vahanDetails,error, policyCoverage, vahanVerify, selectFlag, fulQuoteResp, PolicyArray, fuelList, vehicleDetails, geographical_extension,
             moreCoverage, sliderVal, bodySliderVal, motorInsurance, serverResponse, engine_no, chasis_no, initialValue, add_more_coverage_request_array} = this.state
         const {productId} = this.props.match.params 
 
@@ -1029,8 +1072,9 @@ class OtherComprehensiveGCV extends Component {
         let ATC_flag= add_more_coverage_request_array.ATC && add_more_coverage_request_array.ATC.value ? '1' : '0'
         let LL_workman_flag= add_more_coverage_request_array.B00070 && add_more_coverage_request_array.B00070.value ? '1' : '0'
         let trailer_flag_TP = add_more_coverage_request_array.B00011 && add_more_coverage_request_array.B00011.value ? '1' : '0'
-        
-
+        let Geographical_flag = add_more_coverage && add_more_coverage[add_more_coverage.indexOf("geographical_extension")] ? '1' : '0'
+       
+   
         let newInitialValues = {}
 
         if(selectFlag == '1') {
@@ -1061,6 +1105,8 @@ class OtherComprehensiveGCV extends Component {
                 LL_workman_flag: '0',
                 fuel_type: fuel_type,
                 trailer_flag_TP: '0',
+                Geographical_flag: "0",
+                geographical_extension_length: geographical_extension && geographical_extension.length
 
             });
         }
@@ -1091,8 +1137,10 @@ class OtherComprehensiveGCV extends Component {
                     fuel_type: fuel_type,
                     trailer_flag_TP: '0',
                     B00010 : "",
-                });
-        }
+                    Geographical_flag: "0",
+                    geographical_extension_length: geographical_extension && geographical_extension.length
+                }
+            )}
 
        
 // For setting up updated value from database----------
@@ -1115,6 +1163,7 @@ class OtherComprehensiveGCV extends Component {
         newInnitialArray.LL_workman_flag = LL_workman_flag       
         newInnitialArray.PA_Cover = PA_Cover
         newInnitialArray.trailer_flag_TP = trailer_flag_TP
+        newInnitialArray.Geographical_flag = Geographical_flag
 
         newInnitialArray.ATC_value = add_more_coverage_request_array.ATC ? add_more_coverage_request_array.ATC.value : ""
         newInnitialArray.B00018_value = add_more_coverage_request_array.B00018 ? add_more_coverage_request_array.B00018.value : ""
@@ -1134,6 +1183,14 @@ class OtherComprehensiveGCV extends Component {
         newInnitialArray.B00011_value = add_more_coverage_request_array.B00011 ? add_more_coverage_request_array.B00011.value : ""
         // newInnitialArray.B00011_description = add_more_coverage_request_array.B00011 ? add_more_coverage_request_array.B00011.description : ""
         newInnitialArray.B00070_value = add_more_coverage_request_array.B00070 ? add_more_coverage_request_array.B00070.value : ""    
+
+        newInnitialArray.GeoExtnBangladesh = geographical_extension ? geographical_extension[geographical_extension.indexOf("GeoExtnBangladesh")] : ""
+        newInnitialArray.GeoExtnBhutan = geographical_extension ? geographical_extension[geographical_extension.indexOf("GeoExtnBhutan")] : ""
+        newInnitialArray.GeoExtnNepal = geographical_extension ? geographical_extension[geographical_extension.indexOf("GeoExtnNepal")] : ""
+        newInnitialArray.GeoExtnMaldives = geographical_extension ? geographical_extension[geographical_extension.indexOf("GeoExtnMaldives")] : ""
+        newInnitialArray.GeoExtnPakistan = geographical_extension ? geographical_extension[geographical_extension.indexOf("GeoExtnPakistan")] : ""
+        newInnitialArray.GeoExtnSriLanka = geographical_extension ? geographical_extension[geographical_extension.indexOf("GeoExtnSriLanka")] : ""
+
         newInitialValues = Object.assign(initialValue, newInnitialArray );
 
 // -------------------------------------------------------
@@ -1406,7 +1463,6 @@ class OtherComprehensiveGCV extends Component {
                                 {moreCoverage && moreCoverage.length > 0 ? moreCoverage.map((coverage, qIndex) => (
                                 <Row key={qIndex}>   
                                  {motorInsurance && motorInsurance.policy_for == '2' && coverage.code != 'B00015' || motorInsurance && motorInsurance.policy_for == '1' ?
-                                    vehicleDetails.varientmodel.fueltype.id == "2" || vehicleDetails.varientmodel.fueltype.id == "6" || vehicleDetails.varientmodel.fueltype.id == "7" && coverage.code != 'B00010' && coverage.code != 'B00005' && coverage.code !='B00006' ?
                                     <Col sm={12} md={11} lg={6} key={qIndex+"a"} >
                                             <label className="customCheckBox formGrp formGrp">{coverage.name}
                                                 
@@ -1419,33 +1475,9 @@ class OtherComprehensiveGCV extends Component {
                                                     // checked={values.roadsideAssistance ? true : false}
                                                     onClick={(e) =>{
                                                         if( e.target.checked == false && values[coverage.code] == 'B00015') {
-                                                            swal(phrases.SwalIRDAI,
-                                                                {button: phrases.OK})
+                                                            swal(phrases.SwalIRDAI)
                                                         }
                                                         this.onRowSelect(e.target.value, e.target.checked, setFieldTouched, setFieldValue)         
-                                                    }
-                                                    }
-                                                    checked = {values[coverage.code] == coverage.code ? true : false}
-                                                />
-                                                <span className="checkmark mL-0"></span>
-                                                <span className="error-message"></span>
-                                            </label>
-                                        </Col> : 
-                                        <Col sm={12} md={11} lg={6} key={qIndex+"a"} >
-                                            <label className="customCheckBox formGrp formGrp">{coverage.name}
-                                                <Field
-                                                    type="checkbox"
-                                                    // name={`moreCov_${qIndex}`}
-                                                    name={coverage.code}
-                                                    value={coverage.code}
-                                                    className="user-self"
-                                                    // checked={values.roadsideAssistance ? true : false}
-                                                    onClick={(e) =>{
-                                                        if( e.target.checked == false && values[coverage.code] == 'B00015') {
-                                                            swal(phrases.SwalIRDAI,
-                                                                {button: phrases.OK})
-                                                        }
-                                                        this.onRowSelect(e.target.value, values, e.target.checked, setFieldTouched, setFieldValue)         
                                                     }
                                                     }
                                                     checked = {values[coverage.code] == coverage.code ? true : false}
@@ -1505,7 +1537,7 @@ class OtherComprehensiveGCV extends Component {
                                             
                                                     </Field>
                                                     {errors.B00011_value ? (
-                                                        <span className="errorMsg">{phrases[errors.B00011_value]}</span>
+                                                        <span className="errorMsg">{errors.B00011_value}</span>
                                                     ) : null}
                                                 </div>
                                             </FormGroup>
@@ -1560,7 +1592,7 @@ class OtherComprehensiveGCV extends Component {
                                             
                                                     </Field>
                                                     {errors.B00073_value ? (
-                                                        <span className="errorMsg">{phrases[errors.B00073_value]}</span>
+                                                        <span className="errorMsg">{errors.B00073_value}</span>
                                                     ) : null}
                                                 </div>
                                             </FormGroup>
@@ -1584,7 +1616,7 @@ class OtherComprehensiveGCV extends Component {
                                                     >                                     
                                                     </Field>
                                                     {errors.B00073_description ? (
-                                                        <span className="errorMsg">{phrases[errors.B00073_description]}</span>
+                                                        <span className="errorMsg">{errors.B00073_description}</span>
                                                     ) : null}
                                                 </div>
                                             </FormGroup>
@@ -1686,11 +1718,39 @@ class OtherComprehensiveGCV extends Component {
                                                     >                                     
                                                     </Field>
                                                     {errors.B00004_description ? (
-                                                        <span className="errorMsg">{errors.B00004_description}</span>
+                                                        <span className="errorMsg">{phrases[errors.B00004_description]}</span>
                                                     ) : null}
                                                 </div>
                                             </FormGroup>
                                         </Col> </Fragment> : null
+                                    }
+                                    {values.CNG_OD_flag == '1' && values[coverage.code] == 'B00005' ?
+                                        <Fragment>
+                                        <Col sm={12} md={11} lg={2} key={qIndex+"b"}>
+                                            <FormGroup>
+                                                <div className="formSection">
+                                                    <Field
+                                                        name="B00005_value"
+                                                        type="text"
+                                                        placeholder="IDV"
+                                                        autoComplete="off"
+                                                        maxLength="7"
+                                                        onFocus={e => this.changePlaceHoldClassAdd(e)}
+                                                        onBlur={e => this.changePlaceHoldClassRemove(e)}
+                                                        onChange={(e) => {
+                                                            setFieldTouched('B00005_value')
+                                                            setFieldValue('B00005_value', e.target.value);
+                                                            this.handleChange()
+                                                        }}
+                                                        >                                     
+                                                    </Field>
+                                                    {errors.B00005_value ? (
+                                                        <span className="errorMsg">{errors.B00005_value}</span>
+                                                    ) : null}
+                                                </div>
+                                            </FormGroup>
+                                        </Col>
+                                        </Fragment> : null
                                     }
                                     {values.hospital_cash_OD_flag == '1' && values[coverage.code] == 'B00020' ?
                                         <Fragment>
@@ -1709,7 +1769,7 @@ class OtherComprehensiveGCV extends Component {
                                                             this.handleChange()
                                                         }}
                                                     >
-                                                        <option value="">Select</option>
+                                                        <option value="">{phrases['Select']}</option>
                                                         {coverage.covarage_value != null && JSON.parse(coverage.covarage_value).value.length > 0 && JSON.parse(coverage.covarage_value).value.map((insurer, qIndex) => (
                                                             <option value= {insurer}>{insurer}</option>
                                                         ))} 
@@ -1740,7 +1800,7 @@ class OtherComprehensiveGCV extends Component {
                                                             this.handleChange()
                                                         }}
                                                     >
-                                                        <option value="">Select</option>
+                                                        <option value="">{phrases['Select']}</option>
                                                         {coverage.covarage_value != null && JSON.parse(coverage.covarage_value).value.length > 0 && JSON.parse(coverage.covarage_value).value.map((insurer, qIndex) => (
                                                             <option value= {insurer}>{insurer}</option>
                                                         ))}  
@@ -1898,6 +1958,7 @@ class OtherComprehensiveGCV extends Component {
                                         </Col>
                                         </Fragment> : null
                                     }
+
                                     {values.ATC_flag == '1' && values[coverage.code] == 'ATC' ?
                                         <Fragment>
                                         <Col sm={12} md={11} lg={2} key={qIndex+"c"}>
@@ -1915,7 +1976,7 @@ class OtherComprehensiveGCV extends Component {
                                                             this.handleChange()
                                                         }}
                                                     >
-                                                        <option value="">Select</option>
+                                                        <option value="">{phrases['Select']}</option>
                                                         {coverage.covarage_value != null && JSON.parse(coverage.covarage_value).value.length > 0 && JSON.parse(coverage.covarage_value).value.map((insurer, qIndex) => (
                                                             <option value= {insurer}>{insurer}</option>
                                                         ))} 
@@ -1929,10 +1990,39 @@ class OtherComprehensiveGCV extends Component {
                                         </Col>
                                         </Fragment> : null
                                     }
-                                    
+
+                                     {values.Geographical_flag == '1' && values[coverage.code] == 'geographical_extension' ?
+                                        <Fragment>
+                                        <Col sm={12} md={11} lg={3} key={qIndex+"c"}>
+                                        {coverage.covarage_value != null && JSON.parse(coverage.covarage_value).value.length > 0 && JSON.parse(coverage.covarage_value).value.map((insurer, qIndex) => (
+                                            insurer.status == '1' ?
+                                            <label className="customCheckBox formGrp formGrp">{insurer.name}                                         
+                                                <Field
+                                                    type="checkbox"
+                                                    // name={`moreCov_${qIndex}`}
+                                                    name={insurer.id}
+                                                    value={insurer.id}
+                                                    className="user-self"
+                                                    checked = {values[insurer.id] == insurer.id ? true : false}
+                                                    onClick={(e) =>{
+                                                        this.onGeoAreaSelect(e.target.value, values, e.target.checked, setFieldTouched, setFieldValue)         
+                                                    }}
+                                                />
+                                                <span className="checkmark mL-0"></span>
+                                                <span className="error-message"></span>
+                                            </label> : null))}
+                                            {errors.geographical_extension_length ? (
+                                                    <span className="errorMsg">{errors.geographical_extension_length}</span>
+                                            ) : null} 
+                                        </Col>
+                                        </Fragment> : null
+                                    }
+
+                                    {values.trailer_flag == '1' && values[coverage.code] == 'B00007' && values.B00007_value != "" ?
+                                      this.handleClaims(values, errors, touched, setFieldTouched, setFieldValue) : null
+                                    }
                                 </Row>
                                 )) : null}
-                                
                                 <Row>
                                     <Col sm={12}>
                                         <FormGroup>

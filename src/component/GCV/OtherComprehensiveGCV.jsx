@@ -268,10 +268,10 @@ const ComprehensiveValidation = Yup.object().shape({
         then: Yup.string().required('Please provide IDV').test(
                 "isLoanChecking",
                 function() {
-                    return "Value should be 1K to 5L"
+                    return "Value should be 1K to 10L"
                 },
                 function (value) {
-                    if (parseInt(value) < 1000 || value > 500000) {   
+                    if (parseInt(value) < 1000 || value > 1000000) {   
                         return false;    
                     }
                     return true;
@@ -283,6 +283,23 @@ const ComprehensiveValidation = Yup.object().shape({
     }),
 
     fuel_type: Yup.string().required("Select fuel type"),
+
+    geographical_extension_length: Yup.string().when(['Geographical_flag'], {
+        is: Geographical_flag => Geographical_flag == '1',
+        then: Yup.string().test(
+            "geoExtention",
+            function() {
+                return "Select any one country"
+            },
+            function (value) {
+                if (value < 1 ) {   
+                    return false;    
+                }
+                return true;
+            }) ,
+        otherwise: Yup.string()
+    }),
+
 
     trailer_array: Yup.array().of(
         Yup.object().shape({
@@ -526,9 +543,7 @@ class OtherComprehensiveGCV extends Component {
                 let add_more_coverage_request_json = motorInsurance && motorInsurance.add_more_coverage_request_json != null ? motorInsurance.add_more_coverage_request_json : ""
 
                 let add_more_coverage_request_array = add_more_coverage_request_json != "" ? JSON.parse(add_more_coverage_request_json) : []
-                let geographical_extension = add_more_coverage_request_array && add_more_coverage_request_array.geographical_extension ? add_more_coverage_request_array.geographical_extension : []
-
-                console.log("add_more_coverage_request_array-------------- ", geographical_extension)
+                var geographical_extension = add_more_coverage_request_array && add_more_coverage_request_array.geographical_extension ? add_more_coverage_request_array.geographical_extension : []
 
                 values.ATC_value = add_more_coverage_request_array.ATC ? add_more_coverage_request_array.ATC.value : ""
                 values.B00018_value = add_more_coverage_request_array.B00018 ? add_more_coverage_request_array.B00018.value : ""
@@ -549,19 +564,14 @@ class OtherComprehensiveGCV extends Component {
                 // values.B00011_value = add_more_coverage_request_array.B00011 ? add_more_coverage_request_array.B00011.value : ""
                 // values.B00011_description = add_more_coverage_request_array.B00011 ? add_more_coverage_request_array.B00011.description : ""
                 values.trailer_array = trailer_array
-
-                for(var i = 0; i <= geographical_extension; i++) {
-                    // values.B00070_value = add_more_coverage_request_array.B00070 ? add_more_coverage_request_array.B00070.value : ""
-                }
                 
-
                 this.setState({
                     motorInsurance, add_more_coverage,request_data, vehicleDetails, 
                     showCNG: motorInsurance.cng_kit == 1 ? true : false,
                     vahanVerify: motorInsurance.chasis_no && motorInsurance.engine_no ? true : false,
                     selectFlag: motorInsurance && motorInsurance.add_more_coverage != null ? '0' : '1',
                     no_of_claim: add_more_coverage_request_array.B00007 ? add_more_coverage_request_array.B00007.value : "",
-                    add_more_coverage_request_array,trailer_array
+                    add_more_coverage_request_array,trailer_array, geographical_extension
                 })
                 this.props.loadingStop();
                 this.getAccessToken(values)
@@ -1119,6 +1129,16 @@ class OtherComprehensiveGCV extends Component {
             if(value == "geographical_extension") {
                 setFieldTouched("Geographical_flag");
                 setFieldValue("Geographical_flag", '0');
+
+                setFieldValue("GeoExtnBhutan", '');
+                setFieldValue("GeoExtnNepal", '');
+                setFieldValue("GeoExtnMaldives", '');
+                setFieldValue("GeoExtnPakistan", '');
+                setFieldValue("GeoExtnSriLanka", '');
+                setFieldValue("GeoExtnBangladesh", '');
+                this.setState({
+                    geographical_extension: []
+                })
             }
         }
         
@@ -1138,6 +1158,8 @@ class OtherComprehensiveGCV extends Component {
             });
             setFieldTouched(value);
             setFieldValue(value, '1');
+            setFieldTouched("geographical_extension_length");
+            setFieldValue("geographical_extension_length", geographical_extension.length);
         }
         else {
             const index = geographical_extension.indexOf(value);
@@ -1150,41 +1172,15 @@ class OtherComprehensiveGCV extends Component {
             }
             setFieldTouched(value);
             setFieldValue(value, '');
+            setFieldTouched("geographical_extension_length");
+            setFieldValue("geographical_extension_length", geographical_extension.length);
             }        
     }
 
 
     regnoFormat = (e, setFieldTouched, setFieldValue) => {
     
-        let regno = e.target.value
-        // let formatVal = ""
-        // let regnoLength = regno.length
-        // var letter = /^[a-zA-Z]+$/;
-        // var number = /^[0-9]+$/;
-        // let subString = regno.substring(regnoLength-1, regnoLength)
-        // let preSubString = regno.substring(regnoLength-2, regnoLength-1)
-    
-        // if(subString.match(letter) && preSubString.match(letter) && regnoLength == 3) {        
-        //     formatVal = formatVal = regno.substring(0, regnoLength-1) + " " +subString
-        // }
-        // else if(subString.match(letter) && preSubString.match(letter)) {
-        //     formatVal = regno
-        // }
-        // else if(subString.match(number) && preSubString.match(number) && regnoLength == 6) {
-        //     formatVal = formatVal = regno.substring(0, regnoLength-1) + " " +subString
-        // } 
-        // else if(subString.match(number) && preSubString.match(number) && regnoLength == 11 && regno.substring(3, 4).match(letter) && regno.substring(5, 7).match(number) ) {
-        //     formatVal = formatVal = regno.substring(0, 7) + " " +regno.substring(7, 11)
-        // } 
-        // else if(subString.match(number) && preSubString.match(letter)) {        
-        //     formatVal = regno.substring(0, regnoLength-1) + " " +subString      
-        // } 
-        // else if(subString.match(letter) && preSubString.match(number)) {
-        //     formatVal = regno.substring(0, regnoLength-1) + " " +subString   
-        // } 
-        
-        // else formatVal = regno.toUpperCase()
-        
+        let regno = e.target.value    
         e.target.value = regno.toUpperCase()
     
     }
@@ -1291,7 +1287,7 @@ class OtherComprehensiveGCV extends Component {
 
 
     render() {
-        const {showCNG, is_CNG_account, vahanDetails,error, policyCoverage, vahanVerify, selectFlag, fulQuoteResp, PolicyArray, fuelList, vehicleDetails,
+        const {add_more_coverage, is_CNG_account, vahanDetails,error, policyCoverage, vahanVerify, selectFlag, fulQuoteResp, PolicyArray, fuelList, vehicleDetails, geographical_extension,
             moreCoverage, sliderVal, bodySliderVal, motorInsurance, serverResponse, engine_no, chasis_no, initialValue, add_more_coverage_request_array,ncbDiscount} = this.state
         const {productId} = this.props.match.params 
         let defaultSliderValue = PolicyArray.length > 0 ? Math.round(PolicyArray[0].PolicyRiskList[0].IDV_Suggested) : 0
@@ -1302,7 +1298,7 @@ class OtherComprehensiveGCV extends Component {
         let maxIDV = PolicyArray.length > 0 ? Math.floor(max_IDV_suggested) : null
         let phrases = localStorage.getItem("phrases") ? JSON.parse(localStorage.getItem("phrases")) : []
 
-        // console.log("geographycval area values------------------ ", this.state.add_more_coverage)
+        console.log("geographycval area values------------------ ", add_more_coverage)
 
         if(Number.isInteger(min_IDV_suggested) == false ) {
             minIDV = PolicyArray.length > 0 ? Math.floor(PolicyArray[0].PolicyRiskList[0].MinIDV_Suggested) : null           
@@ -1335,9 +1331,9 @@ class OtherComprehensiveGCV extends Component {
         let LL_workman_flag= add_more_coverage_request_array.B00070 && add_more_coverage_request_array.B00070.value ? '1' : '0'
         let trailer_flag_TP = add_more_coverage_request_array.B00011 && add_more_coverage_request_array.B00011.value ? '1' : '0'
         let CNG_OD_flag = add_more_coverage_request_array.B00005 && add_more_coverage_request_array.B00005.value ? '1' : '0'
-        let Geographical_flag = add_more_coverage_request_array.geographical_extension && add_more_coverage_request_array.geographical_extension.length > 0 ? '1' : '0'
+        let Geographical_flag = add_more_coverage && add_more_coverage[add_more_coverage.indexOf("geographical_extension")] ? '1' : '0'
        
-        // console.log("add_more_coverage_request_array----------- ", add_more_coverage_request_array)
+   
         let newInitialValues = {}
 
         if(selectFlag == '1') {
@@ -1371,7 +1367,8 @@ class OtherComprehensiveGCV extends Component {
                 fuel_type: fuel_type,
                 trailer_flag_TP: '0',
                 trailer_array:  this.initClaimDetailsList(),
-                Geographical_flag: "0"
+                Geographical_flag: "0",
+                geographical_extension_length: geographical_extension && geographical_extension.length
 
             });
         }
@@ -1405,7 +1402,8 @@ class OtherComprehensiveGCV extends Component {
                     // B00005 : "",
                     B00010 : "",
                     trailer_array:  this.initClaimDetailsList(),
-                    Geographical_flag: "0"
+                    Geographical_flag: "0",
+                    geographical_extension_length: geographical_extension && geographical_extension.length
                 }
             )}
 
@@ -1452,6 +1450,14 @@ class OtherComprehensiveGCV extends Component {
         // newInnitialArray.B00011_description = add_more_coverage_request_array.B00011 ? add_more_coverage_request_array.B00011.description : ""
         newInnitialArray.B00070_value = add_more_coverage_request_array.B00070 ? add_more_coverage_request_array.B00070.value : ""    
         newInnitialArray.B00005_value = add_more_coverage_request_array.B00005 ? add_more_coverage_request_array.B00005.value : ""
+
+        newInnitialArray.GeoExtnBangladesh = geographical_extension ? geographical_extension[geographical_extension.indexOf("GeoExtnBangladesh")] : ""
+        newInnitialArray.GeoExtnBhutan = geographical_extension ? geographical_extension[geographical_extension.indexOf("GeoExtnBhutan")] : ""
+        newInnitialArray.GeoExtnNepal = geographical_extension ? geographical_extension[geographical_extension.indexOf("GeoExtnNepal")] : ""
+        newInnitialArray.GeoExtnMaldives = geographical_extension ? geographical_extension[geographical_extension.indexOf("GeoExtnMaldives")] : ""
+        newInnitialArray.GeoExtnPakistan = geographical_extension ? geographical_extension[geographical_extension.indexOf("GeoExtnPakistan")] : ""
+        newInnitialArray.GeoExtnSriLanka = geographical_extension ? geographical_extension[geographical_extension.indexOf("GeoExtnSriLanka")] : ""
+
         newInitialValues = Object.assign(initialValue, newInnitialArray );
 
 // -------------------------------------------------------
@@ -1877,8 +1883,8 @@ console.log("values----------- ", values)
 
                                 {moreCoverage && moreCoverage.length > 0 ? moreCoverage.map((coverage, qIndex) => (
                                 <Row key={qIndex}>   
-                                {motorInsurance && motorInsurance.policy_for == '2' && coverage.code != 'B00015' && coverage.code != 'B00018' || motorInsurance && motorInsurance.policy_for == '1' ?
-                                    (vehicleDetails.varientmodel.fueltype.id == "2" || vehicleDetails.varientmodel.fueltype.id == "6" || vehicleDetails.varientmodel.fueltype.id == "7") && coverage.code != 'B00010' && coverage.code != 'B00005' && coverage.code !='B00006' ?
+                                {(motorInsurance && motorInsurance.policy_for == '2' && coverage.code != 'B00015' && coverage.code != 'B00018') || (motorInsurance && motorInsurance.policy_for == '1') ?
+                                   
                                     <Col sm={12} md={11} lg={6} key={qIndex+"a"} >
                                         <label className="customCheckBox formGrp formGrp">{coverage.name}
                                             
@@ -1891,8 +1897,7 @@ console.log("values----------- ", values)
                                                 // checked={values.roadsideAssistance ? true : false}
                                                 onClick={(e) =>{
                                                     if( e.target.checked == false && values[coverage.code] == 'B00015') {
-                                                        swal(phrases.SwalIRDAI,
-                                                            {button: phrases.OK})
+                                                        swal(phrases.SwalIRDAI)
                                                     }
                                                     this.onRowSelect(e.target.value, values, e.target.checked, setFieldTouched, setFieldValue)         
                                                 }
@@ -1902,30 +1907,7 @@ console.log("values----------- ", values)
                                             <span className="checkmark mL-0"></span>
                                             <span className="error-message"></span>
                                         </label>
-                                    </Col> : 
-                                    <Col sm={12} md={11} lg={6} key={qIndex+"a"} >
-                                        <label className="customCheckBox formGrp formGrp">{coverage.name}
-                                            <Field
-                                                type="checkbox"
-                                                // name={`moreCov_${qIndex}`}
-                                                name={coverage.code}
-                                                value={coverage.code}
-                                                className="user-self"
-                                                // checked={values.roadsideAssistance ? true : false}
-                                                onClick={(e) =>{
-                                                    if( e.target.checked == false && values[coverage.code] == 'B00015') {
-                                                        swal(phrases.SwalIRDAI,
-                                                            {button: phrases.OK})
-                                                    }
-                                                    this.onRowSelect(e.target.value, values, e.target.checked, setFieldTouched, setFieldValue)         
-                                                }
-                                                }
-                                                checked = {values[coverage.code] == coverage.code ? true : false}
-                                            />
-                                            <span className="checkmark mL-0"></span>
-                                            <span className="error-message"></span>
-                                        </label>
-                                    </Col> : null }
+                                    </Col> :  null }
                                     {values.PA_cover_flag == '1' && values[coverage.code] == 'B00015' ?
                                         <Col sm={12} md={11} lg={3} key={qIndex+"b"}>
                                             <FormGroup>
@@ -2237,7 +2219,7 @@ console.log("values----------- ", values)
                                                         type="text"
                                                         placeholder="IDV"
                                                         autoComplete="off"
-                                                        maxLength="6"
+                                                        maxLength="7"
                                                         onFocus={e => this.changePlaceHoldClassAdd(e)}
                                                         onBlur={e => this.changePlaceHoldClassRemove(e)}
                                                         onChange={(e) => {
@@ -2511,10 +2493,12 @@ console.log("values----------- ", values)
                                                         this.onGeoAreaSelect(e.target.value, values, e.target.checked, setFieldTouched, setFieldValue)         
                                                     }}
                                                 />
-                                            
                                                 <span className="checkmark mL-0"></span>
                                                 <span className="error-message"></span>
                                             </label> : null))}
+                                            {errors.geographical_extension_length ? (
+                                                    <span className="errorMsg">{errors.geographical_extension_length}</span>
+                                            ) : null} 
                                         </Col>
                                         </Fragment> : null
                                     }
