@@ -44,6 +44,7 @@ const initialValues = {
     insureList: "",
     cover_type_id: "",
     occupation_id: "",
+    occupation_description: "",
 }
 
 
@@ -51,6 +52,11 @@ const initialValues = {
 const vehicleInspectionValidation = Yup.object().shape({
     gender: Yup.string().required('Please select gender'),
     occupation_id: Yup.string().required("Please select occupation type"),
+    occupation_description: Yup.string().when(['occupation_id'], {
+        is: occupation_id => occupation_id == '193',       
+        then: Yup.string().typeError('Please agree to the terms'),
+        othewise: Yup.string()
+    })
    
 });
 
@@ -1001,7 +1007,8 @@ class arogya_InformationYourself extends Component {
     }
 
     handleFormSubmit = (values) => {
-        console.log('this.state.lookingFor.length',this.state.lookingFor.length)
+    console.log('values.occupation_id',values.occupation_id)
+        
     const {productId} = this.props.match.params
     const formData = new FormData();
     let encryption = new Encryption();
@@ -1022,6 +1029,7 @@ class arogya_InformationYourself extends Component {
     post_data['proposer_gender'] = values.gender 
     post_data['cover_type_id'] = cover_type_id  
     post_data['occupation_id'] = values.occupation_id
+    post_data['occupation_description'] = values.occupation_description
     
     let arr_date=[]
     for(let i=0;i<dob.length;i++){        
@@ -1424,6 +1432,7 @@ setStateForPreviousData=(family_members)=>{
             // cover_type_id: cover_type_id || lookingFor > 1 ? 1 : cover_type_id,
             insureList: insureListPrev ? insureListPrev.toString()  : (insureList ? insureList :''),
             occupation_id: policyHolder ? policyHolder.occupation_id : "",
+            occupation_description: policyHolder ? policyHolder.occupation_description : "",
         });
            
 
@@ -1500,6 +1509,27 @@ setStateForPreviousData=(family_members)=>{
                                                 ) : null}
                                             </div>
                                         </div>
+                                        {values.occupation_id == '193' ?
+                                        <div className="row formSection">
+                                            <label className="col-md-4"></label>
+                                            <div className="col-md-4">
+                                            <Field
+                                                name="occupation_description"
+                                                type="text"
+                                                placeholder='Please mention your occupation here.'
+                                                autoComplete="off"
+                                                value = {values.occupation_description}
+                                                maxLength="256"
+                                                onFocus={e => this.changePlaceHoldClassAdd(e)}
+                                                onBlur={e => this.changePlaceHoldClassRemove(e)}
+                                               />
+                                                {errors.occupation_description && touched.occupation_description ? (
+                                                <span className="errorMsg">
+                                                    {errors.occupation_description}
+                                                </span>
+                                                ) : null}
+                                            </div>
+                                        </div> : ''}
 
                                         <div className="row formSection m-b-30">
                                             <label className="col-md-4">Looking to Insure: <br /><span className="small">(Add Family Members to be Insured)</span></label>

@@ -78,6 +78,34 @@ const ComprehensiveValidation = Yup.object().shape({
         return "ChasisMax"
     }),
 
+    B00004_value: Yup.string().when(['electric_flag'], {
+        is: electric_flag => electric_flag == '1',
+        then: Yup.string().required('pleaseProvideElecIDV').matches(/^[0-9]*$/, 'PleaseValidIDV').max(8, function() {
+                return "Value should be maximum 8 characters"
+            }),
+        otherwise: Yup.string()
+    }),
+
+    B00004_description: Yup.string().when(['electric_flag'], {
+        is: electric_flag => electric_flag == '1',
+        then: Yup.string().required('pleaseProvideAccessory').matches(/^[a-zA-Z0-9]*$/, 'PleaseValidDescription'),
+        otherwise: Yup.string()
+    }),
+
+    B00003_value: Yup.string().when(['nonElectric_flag'], {
+        is: nonElectric_flag => nonElectric_flag == '1',
+        then: Yup.string().required('Please provide non-electrical IDV').matches(/^[0-9]*$/, 'PleaseValidIDV').max(8, function() {
+                return "Value should be maximum 8 characters"
+            }),
+        otherwise: Yup.string()
+    }),
+
+    B00003_description: Yup.string().when(['nonElectric_flag'], {
+        is: nonElectric_flag => nonElectric_flag == '1',
+        then: Yup.string().required('pleaseProvideAccessory').matches(/^[a-zA-Z0-9]*$/, 'PleaseValidDescription'),
+        otherwise: Yup.string()
+    }),
+
     // cng_kit:Yup.string().required("Please select an option"),
     // // IDV:Yup.number().required('Declared value is required'),
     
@@ -107,7 +135,48 @@ const ComprehensiveValidation = Yup.object().shape({
         is: PA_flag => PA_flag == '1',
         then: Yup.string().required('PleasePACover'),
         otherwise: Yup.string()
-    })
+    }),
+
+    geographical_extension_length: Yup.string().when(['Geographical_flag'], {
+        is: Geographical_flag => Geographical_flag == '1',
+        then: Yup.string().test(
+            "geoExtention",
+            function() {
+                return "Select any one country"
+            },
+            function (value) {
+                if (value < 1 ) {   
+                    return false;    
+                }
+                return true;
+            }) ,
+        otherwise: Yup.string()
+    }),
+
+    B00005_value: Yup.string().when(['CNG_OD_flag'], {
+        is: CNG_OD_flag => CNG_OD_flag == '1',
+        then: Yup.string().required('Please provide IDV').test(
+                "isLoanChecking",
+                function() {
+                    return "Value should be 1K to 5L"
+                },
+                function (value) {
+                    if (parseInt(value) < 1000 || value > 500000) {   
+                        return false;    
+                    }
+                    return true;
+                }
+            ).matches(/^[0-9]*$/, function() {
+                return "Please enter valid IDV"
+            }),
+        otherwise: Yup.string()
+    }),
+
+    B00013_value: Yup.string().when(['LL_PD_flag'], {
+        is: LL_PD_flag => LL_PD_flag == '1',
+        then: Yup.string().required('pleaseProvideDriver'),
+        otherwise: Yup.string()
+    }),
    
 });
 
@@ -139,15 +208,33 @@ const Coverage = {
     "C101072":translation["C101072"],
     "C101067":translation["C101067"],
     "C101108":translation["C101108"],
-    "C101111":translation["C101111"],
-    "B00002":translation["B00002"],
-    "B00008":translation["B00008"],
-    "B00013":translation["B00013"],
-    "B00015":translation["B00015"],
-    "B00016":translation["B00016"],
-    "B00009":translation["B00009"],
+    "C101111":translation["C101111"], 
     "NCB":translation["NCB"],
-    "TOTALOD":translation["TOTALOD"]
+    "TOTALOD":translation["TOTALOD"],
+
+    "B00016":translation["B00016"],
+    "B00002":  translation["B00002"],
+    "B00003":  translation["B00003"],
+    "B00004":  translation["B00004"],
+    "B00005":  translation["B00005"],
+    "B00006":  translation["B00006"],
+    "B00007":  translation["B00007"],
+    "B00008":  translation["B00008"],
+    "B00009":  translation["B00009"],
+    "B00010":  translation["B00010"],
+    "B00011":  translation["B00011"],
+    "B00012":  translation["B00012"],
+    "B00013":  translation["B00013"],
+    "B00069":  translation["B00069"],
+    "B00070":  translation["B00070"],
+    "B00071":  translation["B00071"],
+    "B00015":  translation["B00015"],
+    "B00073":  translation["B00073"],
+    "B00018":  translation["B00018"],
+    "B00019":  translation["B00019"],
+    "B00020":  translation["B00020"],
+    "B00022":  translation["B00022"],  
+    "B00025":  translation["B00025"] 
 }
 
 class OtherComprehensive extends Component {
@@ -192,7 +279,9 @@ class OtherComprehensive extends Component {
                 newRegistrationNo: "",
                 puc: '1',
             },
-            request_data: []
+            request_data: [],
+            geographical_extension: [],
+            add_more_coverage_request_array: [],
         };
     }
 
@@ -264,11 +353,22 @@ class OtherComprehensive extends Component {
                 let values = []
                 let add_more_coverage = motorInsurance && motorInsurance.add_more_coverage != null ? motorInsurance.add_more_coverage.split(",") : ['B00015']
                 add_more_coverage = add_more_coverage.flat()
+
+                let add_more_coverage_request_json = motorInsurance && motorInsurance.add_more_coverage_request_json != null ? motorInsurance.add_more_coverage_request_json : ""
+                let add_more_coverage_request_array = add_more_coverage_request_json != "" ? JSON.parse(add_more_coverage_request_json) : []
+                var geographical_extension = add_more_coverage_request_array && add_more_coverage_request_array.geographical_extension ? add_more_coverage_request_array.geographical_extension : []
+
                 values.PA_flag = motorInsurance && motorInsurance.pa_cover != "" ? '1' : '0'
                 values.PA_Cover = motorInsurance && motorInsurance.pa_cover != "" ? motorInsurance.pa_cover : '0'
+                values.B00013_value = add_more_coverage_request_array.B00013 ? add_more_coverage_request_array.B00013.value : ""
+                values.B00004_value = add_more_coverage_request_array.B00004 ? add_more_coverage_request_array.B00004.value : ""
+                values.B00005_value = add_more_coverage_request_array.B00005 ? add_more_coverage_request_array.B00005.value : ""
+                values.B00004_description = add_more_coverage_request_array.B00004 ? add_more_coverage_request_array.B00004.description : ""
+                values.B00003_value = add_more_coverage_request_array.B00003 ? add_more_coverage_request_array.B00003.value : ""
+                values.B00003_description = add_more_coverage_request_array.B00003 ? add_more_coverage_request_array.B00003.description : ""
 
                 this.setState({
-                    motorInsurance, add_more_coverage,request_data,
+                    motorInsurance, add_more_coverage,request_data,geographical_extension,add_more_coverage_request_array,
                     showCNG: motorInsurance.cng_kit == 1 ? true : false,
                     vahanVerify: motorInsurance.chasis_no && motorInsurance.engine_no ? true : false,
                     selectFlag: motorInsurance && motorInsurance.add_more_coverage != null ? '0' : '1'
@@ -393,7 +493,7 @@ class OtherComprehensive extends Component {
 
 
     fullQuote = (access_token, values) => {
-        const { PolicyArray, sliderVal, add_more_coverage, motorInsurance } = this.state
+        const { PolicyArray, sliderVal, add_more_coverage, motorInsurance, geographical_extension } = this.state
         // let cng_kit_flag = 0;
         // let cngKit_Cost = 0;
         // if(values.toString()) {            
@@ -401,10 +501,13 @@ class OtherComprehensive extends Component {
         //     cngKit_Cost = values.cngKit_Cost
         // }
         let defaultSliderValue = PolicyArray.length > 0 ? Math.round(PolicyArray[0].PolicyRiskList[0].IDV_Suggested) : 0
+        let coverage_data = {}
         const formData = new FormData();
 
         let csc_data = localStorage.getItem('users') ? localStorage.getItem('users') : "";
         let csc_user_type = "";
+        let total_idv=0
+        let other_idv=0
 
         if(csc_data && sessionStorage.getItem('csc_id')) {
             let encryption = new Encryption();
@@ -414,19 +517,38 @@ class OtherComprehensive extends Component {
             csc_user_type = csc_data.type
         }
 
+        if(add_more_coverage) {
+            coverage_data = {
+                'B00004' : {'value': values.B00004_value, 'description': values.B00004_description},
+                'B00003' : {'value': values.B00003_value, 'description': values.B00003_description},
+                'B00005' : {'value': values.B00005_value},
+                'B00013' : {'value': values.B00013_value},
+                geographical_extension
+            }
+            if(values.B00004_value){
+                other_idv = other_idv + parseInt(values.B00004_value)
+            }
+            if(values.B00003_value){
+                other_idv = other_idv + parseInt(values.B00003_value)
+            }
+            
+        }
+
         const post_data = {
             'ref_no':localStorage.getItem('policyHolder_refNo'),
             'access_token':access_token,
             'idv_value': sliderVal ? sliderVal : defaultSliderValue.toString(),
             'policy_type': motorInsurance.policy_type,
             'add_more_coverage': add_more_coverage.toString(),
+            'coverage_data': JSON.stringify(coverage_data),
             'PA_Cover': values.PA_flag ? values.PA_Cover : "0",
             // 'cng_kit': cng_kit_flag,
             // 'cngKit_Cost': cngKit_Cost
         }
         console.log('fullQuote_post_data', post_data)
+        total_idv = parseInt(other_idv) + parseInt(post_data.idv_value)+parseInt(post_data.body_idv_value)
 
-        if(post_data.idv_value > 5000000 && csc_user_type == "POSP" ) {
+        if(( total_idv> 5000000) && csc_user_type == "POSP" ) {
             swal("Quote cannot proceed with IDV greater than 5000000")
             this.props.loadingStop();
             return false
@@ -473,8 +595,11 @@ class OtherComprehensive extends Component {
 
     handleSubmit = (values) => {
         const { productId } = this.props.match.params
-        const { motorInsurance, PolicyArray, sliderVal, add_more_coverage } = this.state
+        const { motorInsurance, PolicyArray, sliderVal, add_more_coverage, geographical_extension } = this.state
         let defaultSliderValue = PolicyArray.length > 0 ? Math.round(PolicyArray[0].PolicyRiskList[0].IDV_Suggested) : 0
+        let coverage_data = {}
+        let total_idv=0
+        let other_idv=0
 
         let csc_data = localStorage.getItem('users') ? localStorage.getItem('users') : "";
         let csc_user_type = "";
@@ -494,6 +619,23 @@ class OtherComprehensive extends Component {
             }
         }
 
+        if(add_more_coverage) {
+            coverage_data = {
+                'B00004' : {'value': values.B00004_value, 'description': values.B00004_description},
+                'B00003' : {'value': values.B00003_value, 'description': values.B00003_description},
+                'B00005' : {'value': values.B00005_value},
+                'B00013' : {'value': values.B00013_value},
+                geographical_extension
+            }
+            if(values.B00004_value){
+                other_idv = other_idv + parseInt(values.B00004_value)
+            }
+            if(values.B00003_value){
+                other_idv = other_idv + parseInt(values.B00003_value)
+            }
+            
+        }
+
         const formData = new FormData();
         let encryption = new Encryption();
         let post_data = {}
@@ -509,6 +651,7 @@ class OtherComprehensive extends Component {
                 'engine_no': values.engine_no,
                 'idv_value': sliderVal ? sliderVal : defaultSliderValue.toString(),
                 'add_more_coverage': add_more_coverage,
+                'coverage_data': JSON.stringify(coverage_data),
                 'puc': values.puc,
                 'pa_cover': values.PA_flag ? values.PA_Cover : "0",
                 'pa_flag' : values.PA_cover_flag,
@@ -531,7 +674,9 @@ class OtherComprehensive extends Component {
             }
         }
         console.log('post_data',post_data)
-        if((post_data.idv_value > 5000000 && csc_user_type == "POSP" ) || (post_data.idv_value > 5000000 && bc_data && bc_data.master_data.vendor_name == "PayPoint" )) {
+        total_idv = parseInt(other_idv) + parseInt(post_data.idv_value)+parseInt(post_data.body_idv_value)
+
+        if(((total_idv> 5000000) && csc_user_type == "POSP" ) || (total_idv> 5000000 && bc_data && bc_data.master_data.vendor_name == "PayPoint" )) {
             swal("Quote cannot proceed with IDV greater than 5000000")
             this.props.loadingStop();
             return false
@@ -572,7 +717,28 @@ class OtherComprehensive extends Component {
             if(values == "B00015") {
                 setFieldTouched("PA_cover_flag");
                 setFieldValue("PA_cover_flag", '1');
-            }            
+            } 
+            if(values == "B00003") {
+                setFieldTouched("nonElectric_flag");
+                setFieldValue("nonElectric_flag", '1');
+                
+            }
+            if(values == "B00004") {
+                setFieldTouched("electric_flag");
+                setFieldValue("electric_flag", '1');
+            }        
+            if(values == "geographical_extension") {
+                setFieldTouched("Geographical_flag");
+                setFieldValue("Geographical_flag", '1');
+            }   
+            if(values == "B00005") {
+                setFieldTouched("CNG_OD_flag");
+                setFieldValue("CNG_OD_flag", '1');
+            }
+            if(values == "B00013") {
+                setFieldTouched("LL_PD_flag");
+                setFieldValue("LL_PD_flag", '1');
+            }
         }
         else {
             const index = add_more_coverage.indexOf(values);
@@ -593,42 +759,77 @@ class OtherComprehensive extends Component {
             if(values == "B00015") {
                 setFieldTouched("PA_cover_flag");
                 setFieldValue("PA_cover_flag", '0');
-            }       
-        }
+            } 
+            if(values == "B00003") {
+                setFieldTouched("nonElectric_flag");
+                setFieldValue("nonElectric_flag", '0');
+                
+            }
+            if(values == "B00004") {
+                setFieldTouched("electric_flag");
+                setFieldValue("electric_flag", '0');
+            }      
+            if(values == "geographical_extension") {
+                setFieldTouched("Geographical_flag");
+                setFieldValue("Geographical_flag", '0');
+
+                setFieldValue("GeoExtnBhutan", '');
+                setFieldValue("GeoExtnNepal", '');
+                setFieldValue("GeoExtnMaldives", '');
+                setFieldValue("GeoExtnPakistan", '');
+                setFieldValue("GeoExtnSriLanka", '');
+                setFieldValue("GeoExtnBangladesh", '');
+                this.setState({
+                    geographical_extension: []
+                })
+            }
+            if(values == "B00005") {
+                setFieldTouched("CNG_OD_flag");
+                setFieldValue("CNG_OD_flag", '0');
+            }
+            if(values == "B00013") {
+                setFieldTouched("LL_PD_flag");
+                setFieldValue("LL_PD_flag", '0');
+            }
+        }      
+    }
+
+    onGeoAreaSelect = (value, values, isSelect, setFieldTouched, setFieldValue) => {
+
+        const { add_more_coverage, geographical_extension } = this.state;
+        let drv = []
         
+        if (isSelect) {
+            geographical_extension.push(value);
+            this.setState({
+                geographical_extension,
+                serverResponse: [],
+                error: []
+            });
+            setFieldTouched(value);
+            setFieldValue(value, '1');
+            setFieldTouched("geographical_extension_length");
+            setFieldValue("geographical_extension_length", geographical_extension.length);
+        }
+        else {
+            const index = geographical_extension.indexOf(value);
+            if (index !== -1) {
+                geographical_extension.splice(index, 1);
+                this.setState({
+                    serverResponse: [],
+                    error: []
+                });
+            }
+            setFieldTouched(value);
+            setFieldValue(value, '');
+            setFieldTouched("geographical_extension_length");
+            setFieldValue("geographical_extension_length", geographical_extension.length);
+            }        
     }
 
     regnoFormat = (e, setFieldTouched, setFieldValue) => {
     
-        let regno = e.target.value
-        // let formatVal = ""
-        // let regnoLength = regno.length
-        // var letter = /^[a-zA-Z]+$/;
-        // var number = /^[0-9]+$/;
-        // let subString = regno.substring(regnoLength-1, regnoLength)
-        // let preSubString = regno.substring(regnoLength-2, regnoLength-1)
-    
-        // if(subString.match(letter) && preSubString.match(letter) && regnoLength == 3) {        
-        //     formatVal = formatVal = regno.substring(0, regnoLength-1) + " " +subString
-        // }
-        // else if(subString.match(letter) && preSubString.match(letter)) {
-        //     formatVal = regno
-        // }
-        // else if(subString.match(number) && preSubString.match(number) && regnoLength == 6) {
-        //     formatVal = formatVal = regno.substring(0, regnoLength-1) + " " +subString
-        // } 
-        // else if(subString.match(number) && preSubString.match(number) && regnoLength == 11 && regno.substring(3, 4).match(letter) && regno.substring(5, 7).match(number) ) {
-        //     formatVal = formatVal = regno.substring(0, 7) + " " +regno.substring(7, 11)
-        // } 
-        // else if(subString.match(number) && preSubString.match(letter)) {        
-        //     formatVal = regno.substring(0, regnoLength-1) + " " +subString      
-        // } 
-        // else if(subString.match(letter) && preSubString.match(number)) {
-        //     formatVal = regno.substring(0, regnoLength-1) + " " +subString   
-        // } 
-        
-        // else formatVal = regno.toUpperCase()
-        
+        let regno = e.target.value        
         e.target.value = regno.toUpperCase()
     
     }
@@ -640,8 +841,8 @@ class OtherComprehensive extends Component {
 
 
     render() {
-        const {showCNG, vahanDetails,error, policyCoverage, vahanVerify, selectFlag, fulQuoteResp, PolicyArray, 
-            moreCoverage, sliderVal, motorInsurance, serverResponse, engine_no, chasis_no, initialValue} = this.state
+        const {showCNG, vahanDetails,error, policyCoverage, vahanVerify, selectFlag, fulQuoteResp, PolicyArray, geographical_extension,
+            moreCoverage, sliderVal, motorInsurance, serverResponse, engine_no, chasis_no, initialValue, add_more_coverage, add_more_coverage_request_array} = this.state
         const {productId} = this.props.match.params 
         let defaultSliderValue = PolicyArray.length > 0 ? Math.round(PolicyArray[0].PolicyRiskList[0].IDV_Suggested) : 0
         let sliderValue = sliderVal
@@ -654,6 +855,11 @@ class OtherComprehensive extends Component {
         let newInnitialArray = {}
         let PA_flag = motorInsurance && (motorInsurance.pa_cover == null || motorInsurance.pa_cover == "") ? '0' : '1'
         let PA_Cover = motorInsurance &&  motorInsurance.pa_cover != null ? motorInsurance.pa_cover : ''
+        let Geographical_flag = add_more_coverage && add_more_coverage[add_more_coverage.indexOf("geographical_extension")] ? '1' : '0'
+        let CNG_OD_flag = add_more_coverage_request_array.B00005 && add_more_coverage_request_array.B00005.value ? '1' : '0'
+        let electric_flag= add_more_coverage_request_array.B00004 && add_more_coverage_request_array.B00004.value ? '1' : '0'
+        let nonElectric_flag= add_more_coverage_request_array.B00003 && add_more_coverage_request_array.B00003.value ? '1' : '0'
+        let LL_PD_flag= add_more_coverage_request_array.B00013 && add_more_coverage_request_array.B00013.value ? '1' : '0'
         let newInitialValues = {}
         
         let phrases = localStorage.getItem("phrases") ? JSON.parse(localStorage.getItem("phrases")) : []
@@ -666,11 +872,17 @@ class OtherComprehensive extends Component {
                 add_more_coverage: motorInsurance.add_more_coverage ? motorInsurance.add_more_coverage : "",
                 engine_no: motorInsurance.engine_no ? motorInsurance.engine_no : (engine_no ? engine_no : ""),
                 vahanVerify: vahanVerify,
-                newRegistrationNo: localStorage.getItem('registration_number') == "NEW" ? localStorage.getItem('registration_number') : "",
+                newRegistrationNo: motorInsurance.registration_no ? motorInsurance.registration_no : "",
                 B00015: "B00015",
                 PA_Cover: "",
                 PA_cover_flag: "1",
                 PA_flag: '0',
+                Geographical_flag: "0",
+                CNG_OD_flag: "",
+                electric_flag: '0',
+                LL_PD_flag: '0',
+                nonElectric_flag: '0',
+                geographical_extension_length: geographical_extension && geographical_extension.length
 
             });
         }
@@ -685,7 +897,13 @@ class OtherComprehensive extends Component {
                     newRegistrationNo: localStorage.getItem('registration_number') == "NEW" ? localStorage.getItem('registration_number') : "", 
                     PA_flag: '0',
                     PA_Cover: "",
-                    PA_cover_flag: motorInsurance && motorInsurance.pa_flag ? motorInsurance.pa_flag : '0'
+                    PA_cover_flag: motorInsurance && motorInsurance.pa_flag ? motorInsurance.pa_flag : '0',
+                    Geographical_flag: "0",
+                    CNG_OD_flag: "",
+                    electric_flag: '0',
+                    nonElectric_flag: '0',
+                    LL_PD_flag: '0',
+                    geographical_extension_length: geographical_extension && geographical_extension.length
                 });
         }
 
@@ -696,58 +914,97 @@ class OtherComprehensive extends Component {
         }    
         newInnitialArray.PA_flag = PA_flag   
         newInnitialArray.PA_Cover = PA_Cover
+        newInnitialArray.Geographical_flag = Geographical_flag
+        newInnitialArray.CNG_OD_flag = CNG_OD_flag
+        newInnitialArray.electric_flag = electric_flag
+        newInnitialArray.nonElectric_flag = nonElectric_flag
+        newInnitialArray.LL_PD_flag = LL_PD_flag
+
+        newInnitialArray.B00013_value = add_more_coverage_request_array.B00013 ? add_more_coverage_request_array.B00013.value : ""
+        newInnitialArray.B00004_value = add_more_coverage_request_array.B00004 ? add_more_coverage_request_array.B00004.value : ""
+        newInnitialArray.B00004_description = add_more_coverage_request_array.B00004 ? add_more_coverage_request_array.B00004.description : ""
+        newInnitialArray.B00003_value = add_more_coverage_request_array.B00003 ? add_more_coverage_request_array.B00003.value : ""
+        newInnitialArray.B00003_description = add_more_coverage_request_array.B00003 ? add_more_coverage_request_array.B00003.description : ""
+        newInnitialArray.B00005_value = add_more_coverage_request_array.B00005 ? add_more_coverage_request_array.B00005.value : ""
+        newInnitialArray.GeoExtnBangladesh = geographical_extension ? geographical_extension[geographical_extension.indexOf("GeoExtnBangladesh")] : ""
+        newInnitialArray.GeoExtnBhutan = geographical_extension ? geographical_extension[geographical_extension.indexOf("GeoExtnBhutan")] : ""
+        newInnitialArray.GeoExtnNepal = geographical_extension ? geographical_extension[geographical_extension.indexOf("GeoExtnNepal")] : ""
+        newInnitialArray.GeoExtnMaldives = geographical_extension ? geographical_extension[geographical_extension.indexOf("GeoExtnMaldives")] : ""
+        newInnitialArray.GeoExtnPakistan = geographical_extension ? geographical_extension[geographical_extension.indexOf("GeoExtnPakistan")] : ""
+        newInnitialArray.GeoExtnSriLanka = geographical_extension ? geographical_extension[geographical_extension.indexOf("GeoExtnSriLanka")] : ""
+
         newInitialValues = Object.assign(initialValue, newInnitialArray );
 
 
         let OD_TP_premium = serverResponse.PolicyLobList ? serverResponse.PolicyLobList[0].PolicyRiskList[0] : []
 
         const policyCoverageList = policyCoverage && policyCoverage.length > 0 ?
-        policyCoverage.map((coverage, qIndex) => {
-            // let coverSpan = Math.floor(moment(coverage.ExpiryDate).diff(coverage.EffectiveDate, 'years', true)) + 1;
-            return(
+        policyCoverage.map((coverage, qIndex) => (
+            coverage.PolicyBenefitList ?
+                coverage.PolicyBenefitList.map((coverage1, qIndex) => (
                 <div>
-                    {coverage.ProductElementCode == "C101066" ? 
-                    coverage.PolicyBenefitList.map((coverage1, qIndex) => {
-                        return(
-                                <Row>
-                                    <Col sm={12} md={6}>
-                                    <FormGroup>{Coverage[coverage1.ProductElementCode]}</FormGroup>
-                                    </Col>
-                                    <Col sm={12} md={6}>
-                                    <FormGroup>₹ {Math.round(coverage1.BeforeVatPremium)}  </FormGroup>                      
-                                    </Col>
-                                </Row>)}) :
+                    {coverage1.AnnualPremium > 0 ? 
+                    <Row>
+                        <Col sm={12} md={6}>
+                        <FormGroup>{Coverage[coverage1.ProductElementCode]}</FormGroup>
+                        </Col>
+                        <Col sm={12} md={6}>
+                        <FormGroup>₹ {Math.round(coverage1.AnnualPremium)}  </FormGroup>                      
+                        </Col>
+                    </Row> : null }
+                </div>)) :
+                <div>
                     <Row>
                         <Col sm={12} md={6}>
                         <FormGroup>{Coverage[coverage.ProductElementCode]}</FormGroup>
                         </Col>
                         <Col sm={12} md={6}>
-                        <FormGroup>₹ {Math.round(coverage.BeforeVatPremium)}  </FormGroup>                      
+                        <FormGroup>₹ {Math.round(coverage.AnnualPremium)}  </FormGroup>                      
                         </Col>
-                    </Row>}
+                    </Row> 
                 </div>
-            )
-        }) : null
+        )) : null
 
         const premiumBreakup = policyCoverage && policyCoverage.length > 0 ?
-            policyCoverage.map((coverage, qIndex) => {
-                return(
-                    <Fragment>
-                        {coverage.ProductElementCode == "C101066" ? 
-                            coverage.PolicyBenefitList.map((coverage1, qIndex) => {
-                                return(
-                                        <tr>
-                                            <td>{Coverage[coverage1.ProductElementCode]}</td>
-                                            <td>₹ {Math.round(coverage1.BeforeVatPremium)}  </td>                      
+        policyCoverage.map((coverage, qIndex) => (
+            coverage.PolicyBenefitList ?
+                coverage.PolicyBenefitList && coverage.PolicyBenefitList.map((coverage1, qIndex) => (
+                    <Fragment>      
+                        {coverage1.AnnualPremium > 0 ?         
+                        <tr>
+                            <td>{Coverage[coverage1.ProductElementCode]}</td>
+                            {/* <td>{coverage1.ProductElementCode}</td> */}
+                            <td>₹ {Math.round(coverage1.BeforeVatPremium)}  </td>                      
+                        </tr> : null }
+                    </Fragment>           
+                )) : 
+                    <Fragment>           
+                        <tr>
+                            <td>{Coverage[coverage.ProductElementCode]}</td>
+                            <td>₹ {Math.round(coverage.BeforeVatPremium)}  </td>                      
+                        </tr> 
+                    </Fragment>  
+        )) : null
 
-                                        </tr>)}) :
-                            <tr>
-                                <td>{Coverage[coverage.ProductElementCode]}:</td>
-                                <td>₹ {Math.round(coverage.BeforeVatPremium)}</td>
-                            </tr>}
-                    </Fragment>
-                )   
-            }) : null
+        // const premiumBreakup = policyCoverage && policyCoverage.length > 0 ?
+        //     policyCoverage.map((coverage, qIndex) => {
+        //         return(
+        //             <Fragment>
+        //                 {coverage.ProductElementCode == "C101066" ? 
+        //                     coverage.PolicyBenefitList.map((coverage1, qIndex) => {
+        //                         return(
+        //                                 <tr>
+        //                                     <td>{Coverage[coverage1.ProductElementCode]}</td>
+        //                                     <td>₹ {Math.round(coverage1.BeforeVatPremium)}  </td>                      
+
+        //                                 </tr>)}) :
+        //                     <tr>
+        //                         <td>{Coverage[coverage.ProductElementCode]}:</td>
+        //                         <td>₹ {Math.round(coverage.BeforeVatPremium)}</td>
+        //                     </tr>}
+        //             </Fragment>
+        //         )   
+        //     }) : null
         
 
         const errMsg =
@@ -1141,9 +1398,196 @@ class OtherComprehensive extends Component {
                                             </FormGroup>
                                         </Col> : null
                                     }
+                                    {values.nonElectric_flag == '1' && values[coverage.code] == 'B00003' ?
+                                     <Fragment>
+                                        <Col sm={12} md={11} lg={2} key={qIndex+"b"}>
+                                            <FormGroup>
+                                                <div className="formSection">
+                                                    <Field
+                                                        name="B00003_value"
+                                                        type="text"
+                                                        placeholder={phrases['ValueOfAccessory']}
+                                                        autoComplete="off"
+                                                        maxLength="8"
+                                                        onFocus={e => this.changePlaceHoldClassAdd(e)}
+                                                        onBlur={e => this.changePlaceHoldClassRemove(e)}
+                                                        onChange={(e) => {
+                                                            setFieldTouched('B00003_value')
+                                                            setFieldValue('B00003_value', e.target.value);
+                                                            this.handleChange()
+                                                        }}
+                                                    >                                     
+                                                    </Field>
+                                                    {errors.B00003_value ? (
+                                                        <span className="errorMsg">{errors.B00003_value}</span>
+                                                    ) : null}
+                                                </div>
+                                            </FormGroup>
+                                        </Col>
+                                        <Col sm={12} md={11} lg={3} key={qIndex+"c"}>
+                                            <FormGroup>
+                                                <div className="formSection">
+                                                    <Field
+                                                        name="B00003_description"
+                                                        type="text"
+                                                        placeholder={phrases['AccessoryDescription']}
+                                                        autoComplete="off"
+                                                        // maxLength="28"
+                                                        onFocus={e => this.changePlaceHoldClassAdd(e)}
+                                                        onBlur={e => this.changePlaceHoldClassRemove(e)}
+                                                        onChange={(e) => {
+                                                            setFieldTouched('B00003_description')
+                                                            setFieldValue('B00003_description', e.target.value);
+                                                            this.handleChange()
+                                                        }}
+                                                    >                                     
+                                                    </Field>
+                                                    {errors.B00003_description ? (
+                                                        <span className="errorMsg">{phrases[errors.B00003_description]}</span>
+                                                    ) : null}
+                                                </div>
+                                            </FormGroup>
+                                        </Col> </Fragment> : null
+                                    }
+                                    {values.electric_flag == '1' && values[coverage.code] == 'B00004' ?
+                                        <Fragment>
+                                        <Col sm={12} md={11} lg={2} key={qIndex+"b"}>
+                                            <FormGroup>
+                                                <div className="formSection">
+                                                    <Field
+                                                        name="B00004_value"
+                                                        type="text"
+                                                        placeholder={phrases['ValueOfAccessory']}
+                                                        autoComplete="off"
+                                                        maxLength="8"
+                                                        onFocus={e => this.changePlaceHoldClassAdd(e)}
+                                                        onBlur={e => this.changePlaceHoldClassRemove(e)}
+                                                        onChange={(e) => {
+                                                            setFieldTouched('B00004_value')
+                                                            setFieldValue('B00004_value', e.target.value);
+                                                            this.handleChange()
+                                                        }}
+                                                    >                                     
+                                                    </Field>
+                                                    {errors.B00004_value ? (
+                                                        <span className="errorMsg">{phrases[errors.B00004_value]}</span>
+                                                    ) : null}
+                                                </div>
+                                            </FormGroup>
+                                        </Col>
+                                        <Col sm={12} md={11} lg={3} key={qIndex+"c"}>
+                                            <FormGroup>
+                                                <div className="formSection">
+                                                    <Field
+                                                        name="B00004_description"
+                                                        type="text"
+                                                        placeholder={phrases['AccessoryDescription']}
+                                                        autoComplete="off"
+                                                        // maxLength="28"
+                                                        onFocus={e => this.changePlaceHoldClassAdd(e)}
+                                                        onBlur={e => this.changePlaceHoldClassRemove(e)}
+                                                        onChange={(e) => {
+                                                            setFieldTouched('B00004_description')
+                                                            setFieldValue('B00004_description', e.target.value);
+                                                            this.handleChange()
+                                                        }}
+                                                    >                                     
+                                                    </Field>
+                                                    {errors.B00004_description ? (
+                                                        <span className="errorMsg">{phrases[errors.B00004_description]}</span>
+                                                    ) : null}
+                                                </div>
+                                            </FormGroup>
+                                        </Col> </Fragment> : null
+                                    }
+                                    {values.Geographical_flag == '1' && values[coverage.code] == 'geographical_extension' ?
+                                        <Fragment>
+                                        <Col sm={12} md={11} lg={3} key={qIndex+"c"}>
+                                        {coverage.covarage_value != null && JSON.parse(coverage.covarage_value).value.length > 0 && JSON.parse(coverage.covarage_value).value.map((insurer, qIndex) => (
+                                            insurer.status == '1' ?
+                                            <label className="customCheckBox formGrp formGrp">{insurer.name}                                         
+                                                <Field
+                                                    type="checkbox"
+                                                    // name={`moreCov_${qIndex}`}
+                                                    name={insurer.id}
+                                                    value={insurer.id}
+                                                    className="user-self"
+                                                    checked = {values[insurer.id] == insurer.id ? true : false}
+                                                    onClick={(e) =>{
+                                                        this.onGeoAreaSelect(e.target.value, values, e.target.checked, setFieldTouched, setFieldValue)         
+                                                    }}
+                                                />
+                                                <span className="checkmark mL-0"></span>
+                                                <span className="error-message"></span>
+                                            </label> : null))}
+                                            {errors.geographical_extension_length ? (
+                                                    <span className="errorMsg">{errors.geographical_extension_length}</span>
+                                            ) : null} 
+                                        </Col>
+                                        </Fragment> : null
+                                    }
+                                    {values.CNG_OD_flag == '1' && values[coverage.code] == 'B00005' ?
+                                        <Fragment>
+                                        <Col sm={12} md={11} lg={2} key={qIndex+"b"}>
+                                            <FormGroup>
+                                                <div className="formSection">
+                                                    <Field
+                                                        name="B00005_value"
+                                                        type="text"
+                                                        placeholder="IDV"
+                                                        autoComplete="off"
+                                                        maxLength="7"
+                                                        onFocus={e => this.changePlaceHoldClassAdd(e)}
+                                                        onBlur={e => this.changePlaceHoldClassRemove(e)}
+                                                        onChange={(e) => {
+                                                            setFieldTouched('B00005_value')
+                                                            setFieldValue('B00005_value', e.target.value);
+                                                            this.handleChange()
+                                                        }}
+                                                        >                                     
+                                                    </Field>
+                                                    {errors.B00005_value ? (
+                                                        <span className="errorMsg">{errors.B00005_value}</span>
+                                                    ) : null}
+                                                </div>
+                                            </FormGroup>
+                                        </Col>
+                                        </Fragment> : null
+                                    }
+                                     {values.LL_PD_flag == '1' && values[coverage.code] == 'B00013' ?
+                                        <Fragment>
+                                        <Col sm={12} md={11} lg={3} key={qIndex+"c"}>
+                                            <FormGroup>
+                                                <div className="formSection">
+                                                    <Field
+                                                        name='B00013_value'
+                                                        component="select"
+                                                        autoComplete="off"
+                                                        className="formGrp inputfs12"
+                                                        value = {values.B00013_value}
+                                                        onChange={(e) => {
+                                                            setFieldTouched('B00013_value')
+                                                            setFieldValue('B00013_value', e.target.value);
+                                                            this.handleChange()
+                                                        }}
+                                                    >
+                                                        <option value="">{phrases['NoOfDrivers']}</option>
+                                                        {coverage.covarage_value != null && JSON.parse(coverage.covarage_value).value.length > 0 && JSON.parse(coverage.covarage_value).value.map((insurer, qIndex) => (
+                                                            <option value= {insurer}>{insurer}</option>
+                                                        ))} 
+                                            
+                                                    </Field>
+                                                    {errors.B00013_value ? (
+                                                        <span className="errorMsg">{phrases[errors.B00013_value]}</span>
+                                                    ) : null}
+                                                </div>
+                                            </FormGroup>
+                                        </Col>
+                                        </Fragment> : null
+                                    }
                                 </Row>
                                 )) : null}
-                                
+
                                 <Row>
                                     <Col sm={12}>
                                         <FormGroup>

@@ -123,6 +123,18 @@ const ownerValidation = Yup.object().shape({
         .max(75, function() {
             return "Email must be maximum 75 chracters"
         }).matches(/^[a-zA-Z0-9]+([._\-]?[a-zA-Z0-9]+)*@\w+([-]?\w+)*(\.\w{2,3})+$/,'Invalid Email Id'),
+
+    salutation_id: Yup.string().when(['policy_for'], {
+            is: policy_for => policy_for == '1',  
+            then: Yup.string().required('Title is required'),
+            otherwise: Yup.string().nullable()
+        }),
+        
+    nominee_salutation: Yup.string().when(['policy_for'], {
+        is: policy_for => policy_for == '1',  
+        then: Yup.string().required('Title is required'),
+        otherwise: Yup.string().nullable()
+    }),
         
     nominee_relation_with: Yup.string().when(['policy_for'], {
         is: policy_for => policy_for == '1',       
@@ -359,7 +371,8 @@ class TwoWheelerAdditionalDetails extends Component {
         relation: [],
         step_completed: "0",
         appointeeFlag: false,
-        is_appointee:0
+        is_appointee:0,
+        titleList: []
     };
     
     ageCheck = (value) => {
@@ -450,6 +463,8 @@ class TwoWheelerAdditionalDetails extends Component {
             'is_carloan':values['is_carloan'],
             'bank_name':values['bank_name'],
             'bank_branch':values['bank_branch'],
+            'salutation_id': values['salutation_id'],
+            'nominee_title_id': values['nominee_salutation'],
             'page_name': `two_wheeler_additional_detailsTP/${productId}`,
         }
         if(motorInsurance.policy_for == '1' && motorInsurance.pa_flag == '1'){
@@ -528,6 +543,7 @@ class TwoWheelerAdditionalDetails extends Component {
                 })
                 this.props.loadingStop();
                 this.fetchPrevAreaDetails(addressDetails)
+                this.fetchSalutation();
             })
             .catch(err => {
                 // handle error
@@ -615,6 +631,30 @@ class TwoWheelerAdditionalDetails extends Component {
         
     }
 
+    fetchSalutation=(addressDetails, motorInsurance)=>{
+
+        const formData = new FormData();
+        let policy_for = motorInsurance && motorInsurance.policy_for ? motorInsurance.policy_for : "1"
+        this.props.loadingStart();
+        formData.append('policy_for_flag', policy_for)
+        axios.post('salutation-list', formData)
+        .then(res=>{
+            let titleList = res.data.data.salutationlist ? res.data.data.salutationlist : []                        
+            this.setState({
+                titleList
+            });
+            this.props.loadingStop();
+            this.fetchPrevAreaDetails(addressDetails)
+        }).
+        catch(err=>{
+            this.props.loadingStop();
+            this.setState({
+                titleList: []
+            });
+        })
+    
+}
+
     componentDidMount() {
         this.fetchData();
         this.fetchRelationships();
@@ -623,7 +663,7 @@ class TwoWheelerAdditionalDetails extends Component {
    
 
     render() {
-        const {showLoan, is_eia_account, is_loan_account, nomineeDetails, motorInsurance,appointeeFlag, is_appointee,
+        const {showLoan, is_eia_account, is_loan_account, nomineeDetails, motorInsurance,appointeeFlag, is_appointee,titleList,
             bankDetails,policyHolder, stateName, pinDataArr, quoteId, addressDetails, relation,step_completed,vehicleDetails} = this.state
         const {productId} = this.props.match.params 
         let phrases = localStorage.getItem("phrases") ? JSON.parse(localStorage.getItem("phrases")) : null
@@ -655,6 +695,8 @@ class TwoWheelerAdditionalDetails extends Component {
             appointee_name: nomineeDetails && nomineeDetails.appointee_name ? nomineeDetails.appointee_name : "",
             date_of_incorporation: policyHolder && policyHolder.date_of_incorporation ? new Date(policyHolder.date_of_incorporation) : "",
             org_level: policyHolder && policyHolder.org_level ? policyHolder.org_level : "",
+            salutation_id: policyHolder && policyHolder.salutation_id ? policyHolder.salutation_id : "",            
+            nominee_salutation: nomineeDetails && nomineeDetails.gender ? nomineeDetails.title_id : "",
         });
 
         const quoteNumber =
@@ -784,6 +826,28 @@ class TwoWheelerAdditionalDetails extends Component {
                                 </div>
 
                                 <Row>
+                                {motorInsurance && motorInsurance.policy_for == '1' ?
+                                    <Col sm={12} md={4} lg={2}>
+                                        <FormGroup>
+                                            <div className="formSection">
+                                            <Field
+                                                name='salutation_id'
+                                                component="select"
+                                                autoComplete="off"                                                                        
+                                                className="formGrp"
+                                            >
+                                                <option value="">{phrases['Title']}</option>
+                                                {titleList.map((title, qIndex) => ( 
+                                                <option value={title.id}>{title.displayvalue}</option>
+                                                ))}
+                                            </Field>     
+                                            {errors.salutation_id && touched.salutation_id ? (
+                                            <span className="errorMsg">{errors.salutation_id}</span>
+                                            ) : null}              
+                                            </div>
+                                        </FormGroup>
+                                    </Col>
+                                    :null}
                                     <Col sm={12} md={4} lg={4}>
                                         <FormGroup>
                                             <div className="insurerName">
@@ -871,6 +935,9 @@ class TwoWheelerAdditionalDetails extends Component {
                                             </div>
                                         </FormGroup>
                                     </Col> : null}
+                                </Row>
+
+                                <Row>
                                     {motorInsurance && motorInsurance.policy_for == '1' ?
                                     <Col sm={12} md={4} lg={4}>
                                         <FormGroup>
@@ -898,9 +965,6 @@ class TwoWheelerAdditionalDetails extends Component {
                                         ) : null}  
                                         </FormGroup>
                                     </Col> : null }
-                                </Row>
-
-                                <Row>
                                     <Col sm={12} md={4} lg={4}>
                                         <FormGroup>
                                             <div className="insurerName">
@@ -939,8 +1003,44 @@ class TwoWheelerAdditionalDetails extends Component {
                                             ) : null}  
                                             </div>
                                         </FormGroup>
-                                    </Col>
+                                    </Col>    
+                                
+                                {motorInsurance && motorInsurance.policy_for == '2' ?
                                     <Col sm={12} md={4} lg={4}>
+                                        <FormGroup>
+                                            <div className="formSection">
+                                            <Field
+                                                name="org_level"
+                                                component="select"
+                                                autoComplete="off"
+                                                value={values.org_level}
+                                                className="formGrp"
+                                            >
+                                            <option value="">{phrases['Organization']}</option>
+                                            <option value="1">Corporate Public</option> 
+                                            <option value="2">Corporate (PSU)</option>        
+                                            <option value="3">Corporate (Private)</option>        
+                                            <option value="4">Firm</option>        
+                                            <option value="5">HUF</option>        
+                                            <option value="6">Society</option>  
+                                            <option value="7">NGO</option>       
+                                            <option value="8">Trust</option>   
+                                            <option value="9">BOA</option>        
+                                            <option value="10">Government</option>        
+                                            <option value="11">SME</option>                                              
+                                           
+                                            </Field>     
+                                            {errors.org_level && touched.org_level ? (
+                                                <span className="errorMsg">{errors.org_level}</span>
+                                            ) : null}        
+                                            </div>
+                                        </FormGroup>
+                                    </Col>
+                                 : null }                                
+                                </Row>
+
+                                <Row>                                     
+                                <Col sm={12} md={4} lg={4}>
                                         <FormGroup>
                                             <div className="insurerName">
                                             <Field
@@ -957,11 +1057,7 @@ class TwoWheelerAdditionalDetails extends Component {
                                             ) : null}  
                                             </div>
                                         </FormGroup>
-                                    </Col>
-                                    
-                                </Row>
-
-                                <Row>  
+                                    </Col> 
                                     <Col sm={12} md={4} lg={4}>
                                     <FormGroup>
                                         <div className="insurerName">
@@ -1014,6 +1110,10 @@ class TwoWheelerAdditionalDetails extends Component {
                                         </FormGroup>
                                         
                                     </Col>
+                                    
+                                </Row>
+                                
+                                <Row>
                                     <Col sm={12} md={4} lg={4}>
                                         <FormGroup>
                                             <div className="insurerName">
@@ -1034,42 +1134,7 @@ class TwoWheelerAdditionalDetails extends Component {
                                             </div>
                                         </FormGroup>
                                     </Col>
-                                </Row>
-                                {motorInsurance && motorInsurance.policy_for == '2' ?
-                                <Row>
-                                    <Col sm={12} md={4} lg={4}>
-                                        <FormGroup>
-                                            <div className="formSection">
-                                            <Field
-                                                name="org_level"
-                                                component="select"
-                                                autoComplete="off"
-                                                value={values.org_level}
-                                                className="formGrp"
-                                            >
-                                            <option value="">{phrases['Organization']}</option>
-                                            <option value="1">Corporate Public</option> 
-                                            <option value="2">Corporate (PSU)</option>        
-                                            <option value="3">Corporate (Private)</option>        
-                                            <option value="4">Firm</option>        
-                                            <option value="5">HUF</option>        
-                                            <option value="6">Society</option>  
-                                            <option value="7">NGO</option>       
-                                            <option value="8">Trust</option>   
-                                            <option value="9">BOA</option>        
-                                            <option value="10">Government</option>        
-                                            <option value="11">SME</option>                                              
-                                           
-                                            </Field>     
-                                            {errors.org_level && touched.org_level ? (
-                                                <span className="errorMsg">{errors.org_level}</span>
-                                            ) : null}        
-                                            </div>
-                                        </FormGroup>
-                                    </Col>
-                                </Row> : null }
-                                {motorInsurance && motorInsurance.policy_for == '1' ?
-                                <Row>
+                                    {motorInsurance && motorInsurance.policy_for == '1' ?
                                     <Col sm={12} md={4} lg={4}>
                                         <FormGroup>
                                             <div className="insurerName">
@@ -1090,8 +1155,8 @@ class TwoWheelerAdditionalDetails extends Component {
                                             ) : null} 
                                             </div>
                                         </FormGroup>
-                                    </Col>
-                                </Row> : null }
+                                    </Col>  : null }
+                                </Row>
 
                                 <div className="d-flex justify-content-left carloan">
                                     <h4> </h4>
@@ -1102,7 +1167,29 @@ class TwoWheelerAdditionalDetails extends Component {
                                     <h4> {phrases['NomineeDetails']}</h4>
                                 </div>
 
-                                <Row>
+                                <Row>                                    
+                                {motorInsurance && motorInsurance.policy_for == '1' ?
+                                    <Col sm={12} md={4} lg={2}>
+                                        <FormGroup>
+                                            <div className="formSection">
+                                            <Field
+                                                name='nominee_salutation'
+                                                component="select"
+                                                autoComplete="off"                                                                        
+                                                className="formGrp"
+                                            >
+                                                <option value="">{phrases['Title']}</option>
+                                                {titleList.map((title, qIndex) => ( 
+                                                <option value={title.id}>{title.displayvalue}</option>
+                                                ))}
+                                            </Field>     
+                                            {errors.nominee_salutation && touched.nominee_salutation ? (
+                                            <span className="errorMsg">{errors.nominee_salutation}</span>
+                                            ) : null}              
+                                            </div>
+                                        </FormGroup>
+                                    </Col>
+                                    :null}
                                     <Col sm={12} md={4} lg={4}>
                                         <FormGroup>
                                             <div className="insurerName">
@@ -1140,6 +1227,9 @@ class TwoWheelerAdditionalDetails extends Component {
                                             </div>
                                         </FormGroup>
                                     </Col>
+                                </Row>
+
+                                <Row>
                                     <Col sm={12} md={4} lg={4}>
                                         <FormGroup>
                                         <DatePicker
@@ -1167,9 +1257,6 @@ class TwoWheelerAdditionalDetails extends Component {
                                         ) : null}  
                                         </FormGroup>
                                     </Col>
-                                </Row>
-
-                                <Row>
                                     <Col sm={12} md={4} lg={4}>
                                         <FormGroup>
                                             <div className="formSection">

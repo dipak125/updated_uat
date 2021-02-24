@@ -115,9 +115,11 @@ class PremiumGCV extends Component {
                 let previousPolicy = decryptResp.data.policyHolder ? decryptResp.data.policyHolder.previouspolicy : {};
                 let bcMaster = decryptResp.data.policyHolder ? decryptResp.data.policyHolder.bcmaster : {};
                 let step_completed = decryptResp.data.policyHolder ? decryptResp.data.policyHolder.step_no : "";
+                let request_data = decryptResp.data.policyHolder ? decryptResp.data.policyHolder.request_data : {}
+                let menumaster = decryptResp.data.policyHolder ? decryptResp.data.policyHolder.menumaster : {};
 		        let dateDiff = 0
                 this.setState({
-                    motorInsurance,vehicleDetails,step_completed,policyHolder,bcMaster,
+                    motorInsurance,vehicleDetails,step_completed,policyHolder,bcMaster,request_data,menumaster,
                     refNumber: decryptResp.data.policyHolder.reference_no,
                     paymentStatus: decryptResp.data.policyHolder.payment ? decryptResp.data.policyHolder.payment[0] : [],
                     memberdetails : decryptResp.data.policyHolder ? decryptResp.data.policyHolder : [],
@@ -256,7 +258,7 @@ class PremiumGCV extends Component {
     }
 
     render() {
-        const { policyHolder, show, fulQuoteResp, motorInsurance, error, error1, refNumber, bcMaster,
+        const { policyHolder, show, fulQuoteResp, motorInsurance, error, error1, refNumber, bcMaster,request_data,menumaster,
             paymentStatus, relation, memberdetails,nomineedetails, vehicleDetails, step_completed } = this.state
         const { productId } = this.props.match.params
         let phrases = localStorage.getItem("phrases") ? JSON.parse(localStorage.getItem("phrases")) : null
@@ -328,37 +330,61 @@ class PremiumGCV extends Component {
                                                                                 {phrases['Premium']}:
                                                                                 </div>
                                                                             </Col>
-
-
                                                                             <Col sm={12} md={3}>
                                                                                 <div className="premamount">
                                                                                     ₹ {fulQuoteResp.DuePremium}
                                                                                 </div>
                                                                             </Col>
-
                                                                             <Col sm={12} md={3}>
                                                                                 <div className="motopremium">
                                                                                 {phrases['GrossPremium']}:
-                                                                    </div>
+                                                                                </div>
                                                                             </Col>
-
-
                                                                             <Col sm={12} md={3}>
                                                                                 <div className="premamount">
                                                                                     ₹ {Math.round(fulQuoteResp.BeforeVatPremium)}
                                                                                 </div>
                                                                             </Col>
-
                                                                             <Col sm={12} md={3}>
                                                                                 <div className="motopremium">
                                                                                 {phrases['GST']}:
-                                                                    </div>
+                                                                                </div>
                                                                             </Col>
-
-
                                                                             <Col sm={12} md={3}>
                                                                                 <div className="premamount">
                                                                                     ₹ {Math.round(fulQuoteResp.TGST)}
+                                                                                </div>
+                                                                            </Col>
+
+                                                                            <Col sm={12} md={3}>
+                                                                                <div className="motopremium">
+                                                                                    Policy Start date:
+                                                                                </div>
+                                                                            </Col>
+                                                                            <Col sm={12} md={3}>
+                                                                                <div className="premamount">
+                                                                                    {request_data && request_data.start_date ? moment(request_data.start_date).format('DD-MM-yyy') : null}
+                                                                                </div>
+                                                                            </Col>
+
+                                                                            <Col sm={12} md={3}>
+                                                                                <div className="motopremium">
+                                                                                    Policy End Date:
+                                                                                </div>
+                                                                            </Col>
+                                                                            <Col sm={12} md={3}>
+                                                                                <div className="premamount">
+                                                                                {request_data && request_data.end_date ? moment(request_data.end_date).format('DD-MM-yyy') : null}
+                                                                                </div>
+                                                                            </Col>
+                                                                            <Col sm={12} md={3}>
+                                                                                <div className="motopremium">
+                                                                                    Product Name:
+                                                                                </div>
+                                                                            </Col>
+                                                                            <Col sm={12} md={3}>
+                                                                                <div className="premamount">
+                                                                                    {menumaster && menumaster.name ? menumaster.name : null}
                                                                                 </div>
                                                                             </Col>
                                                                         </Row>
@@ -574,7 +600,7 @@ class PremiumGCV extends Component {
                                                                                             </Row>
                                                                                             <Row>
                                                                                                 <Col sm={12} md={6}>
-                                                                                                    <FormGroup>{phrases['ChassisNumber']}</FormGroup>
+                                                                                                    <FormGroup>{phrases['ChasisNumber']}</FormGroup>
                                                                                                 </Col>
                                                                                                 <Col sm={12} md={6}>
                                                                                                     <FormGroup>{motorInsurance && motorInsurance.chasis_no  ? motorInsurance.chasis_no : ""}</FormGroup>
@@ -621,6 +647,15 @@ class PremiumGCV extends Component {
                                                                                                 </Col>
                                                                                                 <Col sm={12} md={6}>
                                                                                                     <FormGroup>{vehicleDetails && vehicleDetails.varientmodel && vehicleDetails.varientmodel.gross_vechicle_weight ? vehicleDetails.varientmodel.gross_vechicle_weight : null}</FormGroup>
+                                                                                                </Col>
+                                                                                            </Row>
+
+                                                                                            <Row>
+                                                                                                <Col sm={12} md={6}>
+                                                                                                    <FormGroup>{phrases['IDVofVehicle']}</FormGroup>
+                                                                                                </Col>
+                                                                                                <Col sm={12} md={6}>
+                                                                                                    <FormGroup>{motorInsurance && motorInsurance.idv_value ? motorInsurance.idv_value : null}</FormGroup>
                                                                                                 </Col>
                                                                                             </Row>
 

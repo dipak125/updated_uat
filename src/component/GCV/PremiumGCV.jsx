@@ -112,10 +112,11 @@ class PremiumGCV extends Component {
                 let request_data = decryptResp.data.policyHolder ? decryptResp.data.policyHolder.request_data : {}	
                 let step_completed = decryptResp.data.policyHolder ? decryptResp.data.policyHolder.step_no : "";	
                 let bcMaster = decryptResp.data.policyHolder ? decryptResp.data.policyHolder.bcmaster : {};	
+                let menumaster = decryptResp.data.policyHolder ? decryptResp.data.policyHolder.menumaster : {};
                 let dateDiff = 0	
                 	
                 this.setState({	
-                    motorInsurance,policyHolder,vehicleDetails,previousPolicy,request_data,step_completed, bcMaster,	
+                    motorInsurance,policyHolder,vehicleDetails,previousPolicy,request_data,menumaster,step_completed, bcMaster,	
                     refNumber: decryptResp.data.policyHolder.reference_no,	
                     paymentStatus: decryptResp.data.policyHolder.payment ? decryptResp.data.policyHolder.payment[0] : [],	
                     memberdetails : decryptResp.data.policyHolder ? decryptResp.data.policyHolder : [],	
@@ -320,7 +321,7 @@ class PremiumGCV extends Component {
     }	
     render() {	
         const { policyHolder, show, fulQuoteResp, motorInsurance, error, error1, refNumber, paymentStatus, bcMaster,	
-             relation, memberdetails,nomineedetails, vehicleDetails, breakin_flag, step_completed, request_data } = this.state	
+             relation, memberdetails,nomineedetails, vehicleDetails, breakin_flag, step_completed, request_data,menumaster, } = this.state	
         const { productId } = this.props.match.params	
         let phrases = localStorage.getItem("phrases") ? JSON.parse(localStorage.getItem("phrases")) : null	
         const errMsg =	
@@ -394,7 +395,7 @@ class PremiumGCV extends Component {
                                                                             <Col sm={12} md={3}>	
                                                                                 <div className="motopremium">	
                                                                                 {phrases['GrossPremium']}:	
-                                                                    </div>	
+                                                                                </div>	
                                                                             </Col>	
                                                                             <Col sm={12} md={3}>	
                                                                                 <div className="premamount">	
@@ -404,13 +405,45 @@ class PremiumGCV extends Component {
                                                                             <Col sm={12} md={3}>	
                                                                                 <div className="motopremium">	
                                                                                 {phrases['GST']}:	
-                                                                    </div>	
+                                                                                </div>	
                                                                             </Col>	
                                                                             <Col sm={12} md={3}>	
                                                                                 <div className="premamount">	
                                                                                     ₹ {Math.round(fulQuoteResp.TGST)}	
                                                                                 </div>	
                                                                             </Col>	
+
+                                                                            <Col sm={12} md={3}>
+                                                                                <div className="motopremium">
+                                                                                    Policy Start date:
+                                                                                </div>
+                                                                            </Col>
+                                                                            <Col sm={12} md={3}>
+                                                                                <div className="premamount">
+                                                                                    {request_data && request_data.start_date ? moment(request_data.start_date).format('DD-MM-yyy') : null}
+                                                                                </div>
+                                                                            </Col>
+
+                                                                            <Col sm={12} md={3}>
+                                                                                <div className="motopremium">
+                                                                                    Policy End Date:
+                                                                                </div>
+                                                                            </Col>
+                                                                            <Col sm={12} md={3}>
+                                                                                <div className="premamount">
+                                                                                {request_data && request_data.end_date ? moment(request_data.end_date).format('DD-MM-yyy') : null}
+                                                                                </div>
+                                                                            </Col>
+                                                                            <Col sm={12} md={3}>
+                                                                                <div className="motopremium">
+                                                                                    Product Name:
+                                                                                </div>
+                                                                            </Col>
+                                                                            <Col sm={12} md={3}>
+                                                                                <div className="premamount">
+                                                                                    {menumaster && menumaster.name ? menumaster.name : null}
+                                                                                </div>
+                                                                            </Col>
                                                                         </Row>	
                                                                     </div>	
                                                                 </Collapsible>	
@@ -611,7 +644,7 @@ class PremiumGCV extends Component {
                                                                                             </Row>	
                                                                                             <Row>	
                                                                                                 <Col sm={12} md={6}>	
-                                                                                                    <FormGroup>{phrases['ChassisNumber']}</FormGroup>	
+                                                                                                    <FormGroup>{phrases['ChasisNumber']}</FormGroup>	
                                                                                                 </Col>	
                                                                                                 <Col sm={12} md={6}>	
                                                                                                     <FormGroup>{motorInsurance && motorInsurance.chasis_no  ? motorInsurance.chasis_no : ""}</FormGroup>	
@@ -657,6 +690,14 @@ class PremiumGCV extends Component {
                                                                                                     <FormGroup>{vehicleDetails && vehicleDetails.varientmodel && vehicleDetails.varientmodel.gross_vechicle_weight ? vehicleDetails.varientmodel.gross_vechicle_weight : null}</FormGroup>	
                                                                                                 </Col>	
                                                                                             </Row>	
+                                                                                            <Row>
+                                                                                                <Col sm={12} md={6}>
+                                                                                                    <FormGroup>{phrases['IDVofVehicle']}</FormGroup>
+                                                                                                </Col>
+                                                                                                <Col sm={12} md={6}>
+                                                                                                    <FormGroup>{motorInsurance && motorInsurance.idv_value ? motorInsurance.idv_value : null}</FormGroup>
+                                                                                                </Col>
+                                                                                            </Row>
                                                                                         </Col>	
                                                                                     </Row>	
                                                                                     <Row>	
@@ -729,11 +770,11 @@ class PremiumGCV extends Component {
                                                             <Row>&nbsp;</Row>	
                                                             <div className="d-flex justify-content-left resmb">	
                                                                 <Button className="backBtn" type="button" onClick={this.additionalDetails.bind(this, productId)}>{phrases['Back']}</Button>	
-								{bcMaster && bcMaster.eligible_for_payment_link == 1 ?
+                                                            {bcMaster && bcMaster.eligible_for_payment_link == 1 ?
                                                                 <div>
                                                                 <Button type="button" className="proceedBtn" onClick = {this.sendPaymentLink.bind(this)}>  {phrases['PaymentLink']}  </Button>	
                                                                 &nbsp;&nbsp;&nbsp;&nbsp;	
-								</div> : null }
+                                                                </div> : null }
                                                                 {fulQuoteResp.QuotationNo && breakin_flag == 0 && values.gateway != "" ?	
                                                                     <Button type="submit"	
                                                                         className="proceedBtn"	

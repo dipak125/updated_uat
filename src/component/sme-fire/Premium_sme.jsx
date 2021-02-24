@@ -370,6 +370,85 @@ class Premium_sme extends Component {
                                                     <Row>
                                                         <Col sm={12} md={9} lg={9}>
                                                         <div className="rghtsideTrigr">
+                                                            <Collapsible trigger="Premium Details"  open= {true}>
+                                                                <div className="listrghtsideTrigr">
+                                                                    <Row>
+                                                                        <Col sm={12} md={3}>
+                                                                            <div className="motopremium">
+                                                                                Premium:
+                                                                            </div>
+                                                                        </Col>
+
+                                                                        <Col sm={12} md={3}>
+                                                                            <div className="premamount">
+                                                                                ₹ {this.state.payablePremium}
+                                                                            </div>
+                                                                        </Col>
+                                                                        
+                                                                        <Col sm={12} md={3}>
+                                                                            <div className="motopremium">
+                                                                                GST:
+                                                                            </div>
+                                                                        </Col>
+
+                                                                        <Col sm={12} md={3}>
+                                                                            <div className="premamount">
+                                                                                ₹ {this.state.gst}
+                                                                            </div>
+                                                                        </Col>
+
+                                                                        <Col sm={12} md={3}>
+                                                                            <div className="motopremium">
+                                                                                Gross Premium:
+                                                                            </div>
+                                                                        </Col>
+
+
+                                                                        <Col sm={12} md={3}>
+                                                                            <div className="premamount">
+                                                                                ₹ {this.state.grossPremium}
+                                                                            </div>
+                                                                        </Col>
+
+                                                                        <Col sm={12} md={3}>
+                                                                            <div className="motopremium">
+                                                                                Policy Start date:
+                                                                            </div>
+                                                                        </Col>
+                                                                        <Col sm={12} md={3}>
+                                                                            <div className="premamount">
+                                                                                {this.props.start_date ? moment(this.props.start_date).format('DD-MM-yyy') : null}
+                                                                            </div>
+                                                                        </Col>
+
+                                                                        <Col sm={12} md={3}>
+                                                                            <div className="motopremium">
+                                                                                Policy End Date:
+                                                                            </div>
+                                                                        </Col>
+                                                                        <Col sm={12} md={3}>
+                                                                            <div className="premamount">
+                                                                            {this.props.end_date ? moment(this.props.end_date).format('DD-MM-yyy') : null}
+                                                                            </div>
+                                                                        </Col>
+                                                                        <Col sm={12} md={3}>
+                                                                            <div className="motopremium">
+                                                                                Product Name:
+                                                                            </div>
+                                                                        </Col>
+                                                                        <Col sm={12} md={3}>
+                                                                            <div className="premamount">
+                                                                                SME - Fire
+                                                                            </div>
+                                                                        </Col>
+                                                                    </Row>
+                                                                </div>
+
+                                                            </Collapsible>
+                                                        </div>
+
+                                                           
+                                                        <div className="rghtsideTrigr">
                                                                 <Collapsible trigger="Proposer Details" >
                                                                     <div className="listrghtsideTrigr">
                                                                         <div>
@@ -573,67 +652,6 @@ class Premium_sme extends Component {
                                                                     </div>
                                                                 </Collapsible>    
                                                             </div>
-
-                                                            <div className="rghtsideTrigr">
-                                                                <Collapsible trigger="Premium Details"  open= {true}>
-                                                                    <div className="listrghtsideTrigr">
-                                                                        <Row>
-                                                                            <Col sm={12} md={3}>
-                                                                                <div className="motopremium">
-                                                                                    Premium:
-                                                                                </div>
-                                                                            </Col>
-
-                                                                            <Col sm={12} md={3}>
-                                                                                <div className="premamount">
-                                                                                    ₹ {this.state.payablePremium}
-                                                                                </div>
-                                                                            </Col>
-                                                                            
-                                                                            <Col sm={12} md={3}>
-                                                                                <div className="motopremium">
-                                                                                    GST:
-                                                                                </div>
-                                                                            </Col>
-
-                                                                            <Col sm={12} md={3}>
-                                                                                <div className="premamount">
-                                                                                    ₹ {this.state.gst}
-                                                                                </div>
-                                                                            </Col>
-
-                                                                            <Col sm={12} md={3}>
-                                                                                <div className="motopremium">
-                                                                                    Gross Premium:
-                                                                                </div>
-                                                                            </Col>
-
-
-                                                                            <Col sm={12} md={3}>
-                                                                                <div className="premamount">
-                                                                                    ₹ {this.state.grossPremium}
-                                                                                </div>
-                                                                            </Col>
-
-                                                                            {/* <Col sm={12} md={3}>
-                                                                                <div className="motopremium">
-                                                                                    GST:
-                                                                                </div>
-                                                                            </Col>
-
-
-                                                                            <Col sm={12} md={3}>
-                                                                                <div className="premamount">
-                                                                                    ₹ {Math.round(fulQuoteResp.TGST)}
-                                                                                </div>
-                                                                            </Col> */}
-                                                                        </Row>
-                                                                    </div>
-
-                                                                </Collapsible>
-                                                            </div>
-
-                                                           
 
                                                             <Row>
                                                             <Col sm={12} md={6}>

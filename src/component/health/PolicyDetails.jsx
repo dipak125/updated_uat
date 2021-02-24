@@ -92,13 +92,15 @@ class PolicyDetails extends Component {
       .get(`/policy-holder/${localStorage.getItem("policyHolder_id")}`)
       .then((res) => {
         let bcMaster = res.data.data.policyHolder ? res.data.data.policyHolder.bcmaster : {};
+        let menumaster = res.data.data.policyHolder ? res.data.data.policyHolder.menumaster : {};
+        let request_data = res.data.data.policyHolder && res.data.data.policyHolder.request_data ? res.data.data.policyHolder.request_data : {};
 
         this.setState({
           policyHolderDetails: res.data.data.policyHolder ? res.data.data.policyHolder : [],
           familyMember: res.data.data.policyHolder.request_data.family_members,
           refNumber: res.data.data.policyHolder.reference_no,
           paymentStatus: res.data.data.policyHolder.payment ? res.data.data.policyHolder.payment[0] : [],
-          bcMaster
+          bcMaster,  menumaster, request_data
 
         });
         this.getAccessToken(
@@ -282,7 +284,7 @@ paypoint_payment = () => {
 
   render() {
     const { productId } = this.props.match.params;
-    const { fulQuoteResp, error, show, policyHolderDetails, refNumber, paymentStatus, bcMaster } = this.state;
+    const { fulQuoteResp, error, show, policyHolderDetails, refNumber, paymentStatus, bcMaster, menumaster, request_data } = this.state;
 
     console.log("policyHolderDetails ", policyHolderDetails)
     const items =
@@ -437,6 +439,32 @@ paypoint_payment = () => {
                                                     <FormGroup>
                                                       <strong>Rs:</strong>{" "}
                                                       {fulQuoteResp.DuePremium}
+                                                    </FormGroup>
+                                                  </Col>
+
+                                                  <Col sm={12} md={3}>
+                                                    <FormGroup>Policy Start date:</FormGroup>
+                                                  </Col>
+                                                  <Col sm={12} md={3}>
+                                                    <FormGroup>
+                                                      {request_data && request_data.start_date ? moment(request_data.start_date).format('DD-MM-yyy') : null}
+                                                    </FormGroup>
+                                                  </Col>
+                                                  <Col sm={12} md={3}>
+                                                    <FormGroup>Policy End Date:</FormGroup>
+                                                  </Col>
+                                                  <Col sm={12} md={3}>
+                                                    <FormGroup>
+                                                      {request_data && request_data.end_date ? moment(request_data.end_date).format('DD-MM-yyy') : null}
+                                                    </FormGroup>
+                                                  </Col>
+
+                                                  <Col sm={12} md={3}>
+                                                    <FormGroup>Product Name:</FormGroup>
+                                                  </Col>
+                                                  <Col sm={12} md={3}>
+                                                    <FormGroup>
+                                                      {menumaster && menumaster.name ? menumaster.name : null}
                                                     </FormGroup>
                                                   </Col>
                                                 </Row>

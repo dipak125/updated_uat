@@ -40,7 +40,7 @@ const vehicleRegistrationValidation = Yup.object().shape({
     .test(
         "last4digitcheck",
         function() {
-            return "Invalid Registration number"
+            return "InvalidRegNumber"
         },
         function (value) {
             if (value && this.parent.check_registration == 2 && (value != "" || value != undefined) ) {             
@@ -511,12 +511,13 @@ regnoFormat = (e, setFieldTouched, setFieldValue) => {
                                                         onChange={(e) => {
                                                             if (e.target.checked === true) {
                                                                 setFieldTouched('regNumber')
-                                                                setFieldValue('regNumber', '');
+                                                                setFieldValue('regNumber', 'NEW');
                                                                 setFieldTouched('check_registration')
                                                                 setFieldValue('check_registration', e.target.value);
         
                                                             } else {
-                                                                setFieldValue('check_registration', '2');                                                            
+                                                                setFieldValue('check_registration', '2');   
+                                                                setFieldValue('regNumber', '');                                                         
                                                             }
                                                             if(this.setValueData()){
                                                                 this.setState({

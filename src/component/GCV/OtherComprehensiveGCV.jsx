@@ -110,7 +110,7 @@ const ComprehensiveValidation = Yup.object().shape({
 
     ATC_value: Yup.string().when(['ATC_flag'], {
         is: ATC_flag => ATC_flag == '1',
-        then: Yup.string().required('Please select additional towing charges'),
+        then: Yup.string().required('PleaseAdditionalTowingCharges'),
         otherwise: Yup.string()
     }), 
     
@@ -122,16 +122,16 @@ const ComprehensiveValidation = Yup.object().shape({
 
     B00070_value: Yup.string().when(['LL_workman_flag'], {
         is: LL_workman_flag => LL_workman_flag == '1',
-        then: Yup.string().required('Please enter No. of workman').matches(/^[0-9]*$/, 'Please provide valid No.'),
+        then: Yup.string().required('PleaseEnterNoWorkman').matches(/^[0-9]*$/, 'PleaseProvideValidNo'),
         otherwise: Yup.string()
     }),
    
     B00018_value: Yup.string().when(['enhance_PA_OD_flag'], {
         is: enhance_PA_OD_flag => enhance_PA_OD_flag == '1',
-        then: Yup.string().required('Please provide enhance PA coverage').test(
+        then: Yup.string().required('PleaseProvidePACoverage').test(
                     "isLoanChecking",
                     function() {
-                        return "Value should be 16L to 50L"
+                        return "Value16Lto50L"
                     },
                     function (value) {
                         if (parseInt(value) < 1600000 || value > 5000000) {   
@@ -140,20 +140,20 @@ const ComprehensiveValidation = Yup.object().shape({
                         return true;
                     }
                 ).matches(/^[0-9]*$/, function() {
-                    return "Please enter valid IDV"
+                    return "PleaseEnterIDV"
                 }),
         otherwise: Yup.string()
     }),
    
     B00069_value: Yup.string().when(['LL_Coolie_flag'], {
         is: LL_Coolie_flag => LL_Coolie_flag == '1',
-        then: Yup.string().required('pleaseProvidePerson').matches(/^[0-9]$/, 'Please provide valid No.'),
+        then: Yup.string().required('pleaseProvidePerson').matches(/^[0-9]$/, 'PleaseProvideValidNo'),
         otherwise: Yup.string()
     }),
    
     B00012_value: Yup.string().when(['LL_Emp_flag'], {
         is: LL_Emp_flag => LL_Emp_flag == '1',
-        then: Yup.string().required('pleaseProvideEmployee').matches(/^[0-9]$/, 'Please provide valid No.'),
+        then: Yup.string().required('pleaseProvideEmployee').matches(/^[0-9]$/, 'PleaseProvideValidNo'),
         otherwise: Yup.string()
     }),
    
@@ -211,19 +211,19 @@ const ComprehensiveValidation = Yup.object().shape({
 
     B00073_description: Yup.string().when(['pa_coolie_flag'], {
         is: pa_coolie_flag => pa_coolie_flag == '1',
-        then: Yup.string().required('Please provide No. of paid driver').matches(/^[0-9]$/, 'Please provide valid number'),
+        then: Yup.string().required('PleaseProvidePaidDriv').matches(/^[0-9]$/, 'PleaseProvideValidNumber'),
         otherwise: Yup.string()
     }),
 
     B00007_value: Yup.string().when(['trailer_flag'], {
         is: trailer_flag => trailer_flag == '1',
-        then: Yup.string().required('pleaseProvideTrailer').matches(/^[0-9]$/, 'Please provide valid No.'),
+        then: Yup.string().required('pleaseProvideTrailer').matches(/^[0-9]$/, 'PleaseProvideValidNo'),
         otherwise: Yup.string()
     }),
 
     B00007_description: Yup.string().when(['trailer_flag'], {
         is: trailer_flag => trailer_flag == '1',
-        then: Yup.string().required('pleaseProvideTrailerIDV').matches(/^[0-9]*$/, 'Please provide valid IDV'),
+        then: Yup.string().required('pleaseProvideTrailerIDV').matches(/^[0-9]*$/, 'PleaseProvideValidIDV'),
         otherwise: Yup.string()
     }),
     // B00011_value: Yup.string().when(['trailer_flag_TP'], {
@@ -265,10 +265,10 @@ const ComprehensiveValidation = Yup.object().shape({
 
     B00005_value: Yup.string().when(['CNG_OD_flag'], {
         is: CNG_OD_flag => CNG_OD_flag == '1',
-        then: Yup.string().required('Please provide IDV').test(
+        then: Yup.string().required('PleaseProvideIDV').test(
                 "isLoanChecking",
                 function() {
-                    return "Value should be 1K to 10L"
+                    return "Value1Kto10L"
                 },
                 function (value) {
                     if (parseInt(value) < 1000 || value > 1000000) {   
@@ -277,7 +277,7 @@ const ComprehensiveValidation = Yup.object().shape({
                     return true;
                 }
             ).matches(/^[0-9]*$/, function() {
-                return "Please enter valid IDV"
+                return "PleaseEnterIDV"
             }),
         otherwise: Yup.string()
     }),
@@ -289,7 +289,7 @@ const ComprehensiveValidation = Yup.object().shape({
         then: Yup.string().test(
             "geoExtention",
             function() {
-                return "Select any one country"
+                return "SelectAnyOneCountry"
             },
             function (value) {
                 if (value < 1 ) {   
@@ -303,11 +303,11 @@ const ComprehensiveValidation = Yup.object().shape({
 
     trailer_array: Yup.array().of(
         Yup.object().shape({
-            regNo : Yup.string().required('Registration no is required')
+            regNo : Yup.string().required('RegistrationNoRequired')
             .test(
                 "last4digitcheck",
                 function() {
-                    return "Invalid Registration number"
+                    return "InvalidRegNumber"
                 },
                 function (value) {
                     if (value && (value != "" || value != undefined)) {             
@@ -317,14 +317,14 @@ const ComprehensiveValidation = Yup.object().shape({
                 }
             ),
 
-            chassisNo : Yup.string().required('Chassis no is required')
+            chassisNo : Yup.string().required('ChassisNoIsRequired')
             .matches(/^[a-zA-Z0-9]*$/, function() {
-                return "Invalid chassis No"
+                return "InvalidChassisNo"
             }).min(5, function() {
-                return "Chassis no. should be minimum 5 characters"
+                return "ChassisNoMin"
             })
             .max(17, function() {
-                return "Chassis no. should be maximum 17 characters"
+                return "ChassisNoMax"
             })
         })
     ),
@@ -546,6 +546,7 @@ class OtherComprehensiveGCV extends Component {
                 var geographical_extension = add_more_coverage_request_array && add_more_coverage_request_array.geographical_extension ? add_more_coverage_request_array.geographical_extension : []
 
                 values.ATC_value = add_more_coverage_request_array.ATC ? add_more_coverage_request_array.ATC.value : ""
+                values.B00005_value = add_more_coverage_request_array.B00005 ? add_more_coverage_request_array.B00005.value : ""
                 values.B00018_value = add_more_coverage_request_array.B00018 ? add_more_coverage_request_array.B00018.value : ""
                 values.B00069_value = add_more_coverage_request_array.B00069 ? add_more_coverage_request_array.B00069.value : ""
                 values.B00012_value = add_more_coverage_request_array.B00012 ? add_more_coverage_request_array.B00012.value : ""
@@ -1225,7 +1226,8 @@ class OtherComprehensiveGCV extends Component {
 
 
     handleClaims = (values, errors, touched, setFieldTouched, setFieldValue) => {
-        let field_array = []
+        let field_array = []        
+        let phrases = localStorage.getItem("phrases") ? JSON.parse(localStorage.getItem("phrases")) : []
         
         for (var i = 0; i < values.B00007_value ; i++) {
             field_array.push(
@@ -1268,7 +1270,7 @@ class OtherComprehensiveGCV extends Component {
 
                                     />
                                     {errors.trailer_array && errors.trailer_array[i] && errors.trailer_array[i].chassisNo ? (
-                                    <span className="errorMsg">{errors.trailer_array[i].chassisNo}</span>
+                                    <span className="errorMsg">{phrases[errors.trailer_array[i].chassisNo]}</span>
                                     ) : null}   
                                 </div>
                             </FormGroup>
@@ -2101,7 +2103,7 @@ console.log("values----------- ", values)
                                                     >                                     
                                                     </Field>
                                                     {errors.B00073_description ? (
-                                                        <span className="errorMsg">{errors.B00073_description}</span>
+                                                        <span className="errorMsg">{phrases[errors.B00073_description]}</span>
                                                     ) : null}
                                                 </div>
                                             </FormGroup>
@@ -2230,7 +2232,7 @@ console.log("values----------- ", values)
                                                         >                                     
                                                     </Field>
                                                     {errors.B00005_value ? (
-                                                        <span className="errorMsg">{errors.B00005_value}</span>
+                                                        <span className="errorMsg">{phrases[errors.B00005_value]}</span>
                                                     ) : null}
                                                 </div>
                                             </FormGroup>
@@ -2408,7 +2410,7 @@ console.log("values----------- ", values)
                                                     >                                     
                                                     </Field>
                                                     {errors.B00018_value ? (
-                                                        <span className="errorMsg">{errors.B00018_value}</span>
+                                                        <span className="errorMsg">{phrases[errors.B00018_value]}</span>
                                                     ) : null}
                                                 </div>
                                             </FormGroup>
@@ -2436,7 +2438,7 @@ console.log("values----------- ", values)
                                                     >                                     
                                                     </Field>
                                                     {errors.B00070_value ? (
-                                                        <span className="errorMsg">{errors.B00070_value}</span>
+                                                        <span className="errorMsg">{phrases[errors.B00070_value]}</span>
                                                     ) : null}
                                                 </div>
                                             </FormGroup>
@@ -2468,7 +2470,7 @@ console.log("values----------- ", values)
                                             
                                                     </Field>
                                                     {errors.ATC_value ? (
-                                                        <span className="errorMsg">{errors.ATC_value}</span>
+                                                        <span className="errorMsg">{phrases[errors.ATC_value]}</span>
                                                     ) : null}
                                                 </div>
                                             </FormGroup>
@@ -2497,7 +2499,7 @@ console.log("values----------- ", values)
                                                 <span className="error-message"></span>
                                             </label> : null))}
                                             {errors.geographical_extension_length ? (
-                                                    <span className="errorMsg">{errors.geographical_extension_length}</span>
+                                                    <span className="errorMsg">{phrases[errors.geographical_extension_length]}</span>
                                             ) : null} 
                                         </Col>
                                         </Fragment> : null

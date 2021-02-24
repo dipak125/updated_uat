@@ -364,7 +364,7 @@ class Registration extends Component {
                                                             <div className="row formSection">
                                                                 <label className="customCheckBox formGrp formGrp">
                                                                     {phrases['WithoutNo']}
-                                                <Field
+                                                                    <Field
                                                                         type="checkbox"
                                                                         name="check_registration"
                                                                         value="1"
@@ -372,12 +372,13 @@ class Registration extends Component {
                                                                         onChange={(e) => {
                                                                             if (e.target.checked === true) {
                                                                                 setFieldTouched('regNumber')
-                                                                                setFieldValue('regNumber', '');
+                                                                                setFieldValue('regNumber', 'NEW');
                                                                                 setFieldTouched('check_registration')
                                                                                 setFieldValue('check_registration', e.target.value);
 
                                                                             } else {
                                                                                 setFieldValue('check_registration', '2');
+                                                                                setFieldValue('regNumber', '');
                                                                             }
                                                                             if (this.setValueData()) {
                                                                                 this.setState({
@@ -403,7 +404,7 @@ class Registration extends Component {
                                                             <div className="cntrbtn">
                                                                 <Button className={`btnPrimary`} type="submit" >
                                                                     {phrases['Go']}
-                                        </Button>
+                                                                </Button>
 
 
                                                             </div>

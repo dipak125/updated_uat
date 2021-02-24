@@ -14,6 +14,7 @@ import swal from 'sweetalert';
 import ScrollArea from 'react-scrollbar';
 import Encryption from '../../shared/payload-encryption';
 import { setData } from "../../store/actions/data";
+import fuel from "../common/FuelTypes";
 
 
 
@@ -26,11 +27,6 @@ const initialValues = {
 
 };
 
-const fuel = {
-    1: 'Petrol',
-    2: 'Diesel',
-    3: 'CNG'
-}
 
 
 const vehicleValidation = Yup.object().shape({
@@ -341,8 +337,7 @@ class SelectBrand extends Component {
             .catch(err => {
                 // handle error
                 if(err.status == '422') {
-                    swal(phrases.PleaseVehicleMmodel,
-                        {button: phrases.OK})
+                    swal(phrases.PleaseVehicleMmodel)
                 }
                 this.props.loadingStop();
             })

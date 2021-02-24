@@ -88,7 +88,8 @@ class arogya_PolicyDetails extends Component {
     show: false,
     refNumber: "",
     paymentStatus: [],
-    nomineedetails: []
+    nomineedetails: [],
+    request_data: []
   };
 
   handleClose = () => {
@@ -118,6 +119,8 @@ class arogya_PolicyDetails extends Component {
         let addressArray = JSON.parse(decryptResp.data.policyHolder.address)
         console.log("decrypt-----", decryptResp)
         let bcMaster = decryptResp.data.policyHolder ? decryptResp.data.policyHolder.bcmaster : {};
+        let menumaster = decryptResp.data.policyHolder ? decryptResp.data.policyHolder.menumaster : {};
+        let request_data = decryptResp.data.policyHolder && decryptResp.data.policyHolder.request_data ? decryptResp.data.policyHolder.request_data : {};
 
         this.setState({
           policyHolderDetails: decryptResp.data.policyHolder ? decryptResp.data.policyHolder : [],
@@ -126,7 +129,7 @@ class arogya_PolicyDetails extends Component {
           refNumber: decryptResp.data.policyHolder.reference_no,
           paymentStatus: decryptResp.data.policyHolder.payment ? decryptResp.data.policyHolder.payment[0] : [],
           nomineedetails: decryptResp.data.policyHolder ? decryptResp.data.policyHolder.request_data.nominee[0]:[],
-          bcMaster
+          bcMaster, menumaster, request_data
           
         });
         this.fullQuote( decryptResp.data.policyHolder );
@@ -247,7 +250,7 @@ paypoint_payment = () => {
 
   render() {
     const { productId } = this.props.match.params;
-    const { fulQuoteResp, addressArray, error, show, policyHolderDetails, nomineedetails, paymentStatus,bcMaster } = this.state;
+    const { fulQuoteResp, addressArray, error, show, policyHolderDetails, nomineedetails, paymentStatus,bcMaster, menumaster, request_data } = this.state;
 
     const AddressDetails = addressArray ? (
         <div>
@@ -545,6 +548,31 @@ paypoint_payment = () => {
                                                     <FormGroup>
                                                       <strong>Rs:</strong>{" "}
                                                       {policyHolderDetails && policyHolderDetails.request_data ? Math.round(policyHolderDetails.request_data.net_premium) : null}
+                                                    </FormGroup>
+                                                  </Col>
+
+                                                  <Col sm={12} md={3}>
+                                                    <FormGroup>Policy Start date:</FormGroup>
+                                                  </Col>
+                                                  <Col sm={12} md={3}>
+                                                    <FormGroup>
+                                                      {request_data && request_data.start_date ? moment(request_data.start_date).format('DD-MM-yyy') : null}
+                                                    </FormGroup>
+                                                  </Col>
+                                                  <Col sm={12} md={3}>
+                                                    <FormGroup>Policy End Date:</FormGroup>
+                                                  </Col>
+                                                  <Col sm={12} md={3}>
+                                                    <FormGroup>
+                                                      {request_data && request_data.end_date ? moment(request_data.end_date).format('DD-MM-yyy') : null}
+                                                    </FormGroup>
+                                                  </Col>
+                                                  <Col sm={12} md={3}>
+                                                    <FormGroup>Product Name:</FormGroup>
+                                                  </Col>
+                                                  <Col sm={12} md={3}>
+                                                    <FormGroup>
+                                                      {menumaster && menumaster.name ? menumaster.name : null}
                                                     </FormGroup>
                                                   </Col>
                                                 </Row>

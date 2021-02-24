@@ -29,7 +29,7 @@ const ageObj = new PersonAge();
 const minDate = moment(moment().subtract(20, 'years').calendar()).add(1, 'day').calendar();
 const maxDate = moment(moment().subtract(1, 'years').calendar()).add(0, 'day').calendar();
 const maxDatePYP = moment(moment().subtract(1, 'years').calendar()).add(30, 'day').calendar();
-const startRegnDate = moment().subtract(20, 'years').calendar();
+const startRegnDate = moment().subtract(30, 'years').calendar();
 const minRegnDate = moment(startRegnDate).startOf('year').format('YYYY-MM-DD hh:mm');
 const minRegnDateNew = moment(moment().subtract(1, 'months').calendar()).add(1, 'day').calendar();
 const maxDateForValidtion = moment(moment().subtract(1, 'years').calendar()).add(31, 'day').calendar();
@@ -57,7 +57,7 @@ const vehicleRegistrationValidation = Yup.object().shape({
     registration_date: Yup.string().required('RegistrationRequired')
     .test(
         "checkMaxDateRollover",
-        "Registration date must be one year old",
+        "RegistrationDateOld",
         function (value) {
             if (value && this.parent.policy_type_id == '2') {
                 return checkGreaterStartEndTimes(value, maxDateForValidtion);
@@ -67,7 +67,7 @@ const vehicleRegistrationValidation = Yup.object().shape({
     )
     .test(
         "checkMinDate_MaxDate_NewPolicy",
-        "Registration date cannot be older than one month",
+        "RegistrationDateOneMonth",
         function (value) {
             if (value && this.parent.policy_type_id == '1') {
                 // return checkGreaterStartEndTimes(value, new Date()) && checkGreaterStartEndTimes(minRegnDateNew, value);
@@ -78,7 +78,7 @@ const vehicleRegistrationValidation = Yup.object().shape({
     )
     .test(
         "checkGreaterTimes",
-        "Registration date must be less than Previous policy start date",
+        "RegistrationDateLessStartDate",
         function (value) {
             if (value) {
                 return checkGreaterStartEndTimes(value, this.parent.previous_start_date);
@@ -93,7 +93,7 @@ const vehicleRegistrationValidation = Yup.object().shape({
         return "CityRequired"
     })
     .matches(/^([0-9]*)$/, function() {
-        return "No special Character allowed"
+        return "NoCharacterAllowed"
     }),
 
     previous_start_date:Yup.date()
@@ -112,7 +112,7 @@ const vehicleRegistrationValidation = Yup.object().shape({
         }
     ).test(
         "checkGreaterTimes",
-        "Start date must be less than end date",
+        "StartDateLessEnd",
         function (value) {
             if (value && this.parent.policy_type_id == '2'  && this.parent.valid_previous_policy == '1'  && this.parent.valid_previous_policy == '1') {
                 return checkGreaterStartEndTimes(value, this.parent.previous_end_date);
@@ -145,7 +145,7 @@ const vehicleRegistrationValidation = Yup.object().shape({
         }
     ).test( 
         "checkGreaterTimes",
-        "End date must be greater than start date",
+        "EndDateGreaterStart",
         function (value) {
             if (value && this.parent.policy_type_id == '2'  && this.parent.valid_previous_policy == '1') {
                 return checkGreaterTimes(value, this.parent.previous_start_date);
@@ -179,7 +179,7 @@ const vehicleRegistrationValidation = Yup.object().shape({
     .test(
         "currentMonthChecking",
         function() {
-            return "Since previous policy is a liability policy, issuance of a package policy will be subjet to successful inspection of your vehicle. Our Customer care executive will call you to assit on same, shortly"
+            return "PreviousPolicyLiabilityPolicy"
         },
         function (value) {
             // if (value == '2' ) {   
@@ -218,7 +218,7 @@ const vehicleRegistrationValidation = Yup.object().shape({
     )
     .matches(/^[a-zA-Z0-9][a-zA-Z0-9-/.,\s]*$/, 
         function() {
-            return "Please enter valid address"
+            return "PleaseValidAddress"
         }),
 
     previous_policy_no:Yup.string()
@@ -237,7 +237,7 @@ const vehicleRegistrationValidation = Yup.object().shape({
     )
     .matches(/^[a-zA-Z0-9][a-zA-Z0-9\s-/]*$/, 
         function() {
-            return "Please enter valid policy number"
+            return "PleasePolicyNumber"
         }).min(6, function() {
             return "PolicyMinCharacter"
         })
@@ -318,34 +318,34 @@ const vehicleRegistrationValidation = Yup.object().shape({
     }),
     valid_previous_policy: Yup.string()
     .required(function() {
-        return "This field is required"
+        return "RequiredField"
     }),
 
 
     claim_array: Yup.array().of(
         Yup.object().shape({
             claim_year : Yup.string(function() {
-                return "Please enter claim year"
+                return "PleaseEnterClaimYear"
             }).required(function() {
-                return "Please enter claim year"
+                return "PleaseEnterClaimYear"
             }).matches(/^[0-9]*$/, function() {
-                return "Invalid Year"
+                return "InvalidYear"
             }),
 
             claim_amount : Yup.string(function() {
-                return "Please enter claim amount"
+                return "PleaseEnterClaiAmmount"
             }).required(function() {
-                return "Please enter claim amount"
+                return "PleaseEnterClaiAmmount"
             }).matches(/^[0-9]*$/, function() {
-                return "Invalid Amout"
+                return "InvalidAmout"
             }),
 
             type_of_claim : Yup.string(function() {
-                return "Please enter type of claim"
+                return "PleaseEnterTypeClaim"
             }).required(function() {
-                return "Please enter type of claim"
+                return "PleaseEnterTypeClaim"
             }).matches(/^[a-zA-Z\s]*$/, function() {
-                return "Invalid Value"
+                return "InvalidValue"
             })
 
         })
@@ -777,7 +777,7 @@ class VehicleDetailsGCV extends Component {
                             </Field>
 
                             {errors.claim_array && errors.claim_array[i] && errors.claim_array[i].claim_year ? (
-                            <span className="errorMsg">{errors.claim_array[i].claim_year}</span>
+                            <span className="errorMsg">{phrases[errors.claim_array[i].claim_year]}</span>
                             ) : null}       
                         </div>
                     </FormGroup>
@@ -796,7 +796,7 @@ class VehicleDetailsGCV extends Component {
 
                             />
                            {errors.claim_array && errors.claim_array[i] && errors.claim_array[i].claim_amount ? (
-                            <span className="errorMsg">{errors.claim_array[i].claim_amount}</span>
+                            <span className="errorMsg">{phrases[errors.claim_array[i].claim_amount]}</span>
                             ) : null}        
                         </div>
                     </FormGroup>

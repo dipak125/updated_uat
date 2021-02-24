@@ -137,6 +137,9 @@ const ownerValidation = Yup.object().shape({
     ).matches(/^[A-Za-z][A-Za-z\s]*$/, function() {
         return "PleaseEnterBranch"
     }),
+    salutation_id: Yup.string().
+        required('Title is required').nullable(),
+    nominee_salutation: Yup.string().required('Title is required').nullable(),
 
     nominee_relation_with: Yup.string().when(['pa_flag'], {
         is: pa_flag => pa_flag == '1',       
@@ -260,7 +263,8 @@ class AdditionalDetails extends Component {
         relation: [],
         is_appointee:0,
         appointeeFlag: false,
-        motorInsurance: []
+        motorInsurance: [],
+        titleList: []
     };
 
     ageCheck = (value) => {
@@ -357,6 +361,8 @@ class AdditionalDetails extends Component {
             'appointee_name': values['appointee_name'],
             'appointee_relation_with': values['appointee_relation_with'],
             'is_appointee': this.state.is_appointee,
+            'salutation_id': values['salutation_id'],
+            'nominee_title_id': values['nominee_salutation'],
             'page_name': `Additional_details/${productId}`,
         }
 console.log('post_data', post_data);
@@ -477,6 +483,7 @@ console.log('post_data', post_data);
                     relation
                 });
                 this.props.loadingStop();
+                this.fetchSalutation();
             }).
             catch(err=>{
                 this.props.loadingStop();
@@ -487,6 +494,32 @@ console.log('post_data', post_data);
         
     }
 
+    fetchSalutation = () => {
+        const formData = new FormData();
+        let encryption = new Encryption();
+        this.props.loadingStart();
+        let post_data = {
+          'policy_for_flag': '1',
+        }
+        formData.append('enc_data', encryption.encrypt(JSON.stringify(post_data)))
+        axios.post('ipa/titles', formData)
+          .then(res => {
+            let decryptResp = JSON.parse(encryption.decrypt(res.data))
+            let titleList = decryptResp.data.salutationlist
+            this.setState({
+              titleList
+            });
+            this.fetchData();
+          }).
+          catch(err => {
+            this.props.loadingStop();
+            this.setState({
+              titleList: []
+            });
+          })
+      }
+
+
     componentDidMount() {
         this.fetchData();
         this.fetchRelationships();
@@ -495,7 +528,7 @@ console.log('post_data', post_data);
    
 
     render() {
-        const {showEIA, is_eia_account, showLoan, is_loan_account, nomineeDetails, is_appointee,appointeeFlag,
+        const {showEIA, is_eia_account, showLoan, is_loan_account, nomineeDetails, is_appointee,appointeeFlag, titleList,
             bankDetails,policyHolder, stateName, pinDataArr, quoteId, addressDetails, relation, motorInsurance} = this.state
         const {productId} = this.props.match.params 
         let phrases = localStorage.getItem("phrases") ? JSON.parse(localStorage.getItem("phrases")) : null        
@@ -524,6 +557,8 @@ console.log('post_data', post_data);
             eia_no: policyHolder && policyHolder.eia_no ? policyHolder.eia_no : "",
             appointee_relation_with: nomineeDetails && nomineeDetails.appointee_relation_with ? nomineeDetails.appointee_relation_with : "",
             appointee_name: nomineeDetails && nomineeDetails.appointee_name ? nomineeDetails.appointee_name : "",
+            salutation_id: policyHolder && policyHolder.salutation_id ? policyHolder.salutation_id : "",        
+            nominee_salutation: nomineeDetails && nomineeDetails.gender ? nomineeDetails.title_id : "",
 
         });
 
@@ -658,7 +693,27 @@ console.log('post_data', post_data);
                                 </div>
 
                                 <Row>
-                                    <Col sm={12} md={4} lg={4}>
+                                    <Col sm={12} md={4} lg={2}>
+                                        <FormGroup>
+                                            <div className="formSection">
+                                            <Field
+                                                name='salutation_id'
+                                                component="select"
+                                                autoComplete="off"                                                                        
+                                                className="formGrp"
+                                            >
+                                                <option value="">{phrases['Title']}</option>
+                                                {titleList.map((title, qIndex) => ( 
+                                                <option value={title.id}>{title.displayvalue}</option>
+                                                ))}
+                                            </Field>     
+                                            {errors.salutation_id && touched.salutation_id ? (
+                                            <span className="errorMsg">{errors.salutation_id}</span>
+                                            ) : null}              
+                                            </div>
+                                        </FormGroup>
+                                    </Col>
+                                    <Col sm={12} md={4} lg={5}>
                                         <FormGroup>
                                             <div className="insurerName">
                                             <Field
@@ -676,7 +731,7 @@ console.log('post_data', post_data);
                                             </div>
                                         </FormGroup>
                                     </Col>
-                                    <Col sm={12} md={4} lg={4}>
+                                    <Col sm={12} md={4} lg={5}>
                                         <FormGroup>
                                             <div className="formSection">
                                             <Field
@@ -695,6 +750,9 @@ console.log('post_data', post_data);
                                             </div>
                                         </FormGroup>
                                     </Col>
+                                </Row>
+
+                                <Row>
                                     <Col sm={12} md={4} lg={4}>
                                         <FormGroup>
                                         <DatePicker
@@ -718,30 +776,6 @@ console.log('post_data', post_data);
                                         {errors.dob && touched.dob ? (
                                             <span className="errorMsg">{phrases[errors.dob]}</span>
                                         ) : null}  
-                                        </FormGroup>
-                                    </Col>
-                                </Row>
-
-                                <Row>
-                                    <Col sm={12} md={4} lg={4}>
-                                        <FormGroup>
-                                            <div className="insurerName">
-                                            <Field
-                                                name='pancard'
-                                                type="text"
-                                                placeholder={phrases["PAN"]}
-                                                autoComplete="off"
-                                                onFocus={e => this.changePlaceHoldClassAdd(e)}
-                                                onBlur={e => this.changePlaceHoldClassRemove(e)}
-                                                value = {values.pancard.toUpperCase()} 
-                                                onChange= {(e)=> 
-                                                    setFieldValue('pancard', e.target.value.toUpperCase())
-                                                    }                                                                           
-                                            />
-                                            {errors.pancard && touched.pancard ? (
-                                            <span className="errorMsg">{errors.pancard}</span>
-                                            ) : null} 
-                                            </div>
                                         </FormGroup>
                                     </Col>
                                     <Col sm={12} md={4} lg={4}>
@@ -879,6 +913,27 @@ console.log('post_data', post_data);
                                             </div>
                                         </FormGroup>
                                     </Col>
+                                    <Col sm={12} md={4} lg={4}>
+                                        <FormGroup>
+                                            <div className="insurerName">
+                                            <Field
+                                                name='pancard'
+                                                type="text"
+                                                placeholder={phrases["PAN"]}
+                                                autoComplete="off"
+                                                onFocus={e => this.changePlaceHoldClassAdd(e)}
+                                                onBlur={e => this.changePlaceHoldClassRemove(e)}
+                                                value = {values.pancard.toUpperCase()} 
+                                                onChange= {(e)=> 
+                                                    setFieldValue('pancard', e.target.value.toUpperCase())
+                                                    }                                                                           
+                                            />
+                                            {errors.pancard && touched.pancard ? (
+                                            <span className="errorMsg">{errors.pancard}</span>
+                                            ) : null} 
+                                            </div>
+                                        </FormGroup>
+                                    </Col>
                                 </Row>
 
                                 {motorInsurance && motorInsurance.pa_flag == '1' ?
@@ -888,6 +943,26 @@ console.log('post_data', post_data);
                                 </div>
 
                                 <Row>
+                                    <Col sm={12} md={4} lg={2}>
+                                        <FormGroup>
+                                            <div className="formSection">
+                                            <Field
+                                                name='nominee_salutation'
+                                                component="select"
+                                                autoComplete="off"                                                                        
+                                                className="formGrp"
+                                            >
+                                                <option value="">{phrases['Title']}</option>
+                                                {titleList.map((title, qIndex) => ( 
+                                                <option value={title.id}>{title.displayvalue}</option>
+                                                ))}
+                                            </Field>     
+                                            {errors.nominee_salutation && touched.nominee_salutation ? (
+                                            <span className="errorMsg">{errors.nominee_salutation}</span>
+                                            ) : null}              
+                                            </div>
+                                        </FormGroup>
+                                    </Col>
                                     <Col sm={12} md={4} lg={4}>
                                         <FormGroup>
                                             <div className="insurerName">
@@ -925,6 +1000,9 @@ console.log('post_data', post_data);
                                             </div>
                                         </FormGroup>
                                     </Col>
+                                </Row>
+
+                                <Row>
                                     <Col sm={12} md={4} lg={4}>
                                         <FormGroup>
                                         <DatePicker
@@ -951,9 +1029,6 @@ console.log('post_data', post_data);
                                         ) : null}  
                                         </FormGroup>
                                     </Col>
-                                </Row>
-
-                                <Row>
                                     <Col sm={12} md={4} lg={4}>
                                         <FormGroup>
                                             <div className="formSection">

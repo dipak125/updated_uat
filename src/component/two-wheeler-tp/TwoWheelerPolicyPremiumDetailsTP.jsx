@@ -15,6 +15,7 @@ import Encryption from '../../shared/payload-encryption';
 import queryString from 'query-string';
 import fuel from '../common/FuelTypes';
 import swal from 'sweetalert';
+import moment from "moment";
 // import Razorpay from "./Razorpay.jsx"
 
 const initialValue = {
@@ -115,10 +116,12 @@ class Premium extends Component {
                 let step_completed = decryptResp.data.policyHolder ? decryptResp.data.policyHolder.step_no : "";
                 let policyHolder = decryptResp.data.policyHolder ? decryptResp.data.policyHolder : [];
                 let bcMaster = decryptResp.data.policyHolder ? decryptResp.data.policyHolder.bcmaster : {};
+                let request_data = decryptResp.data.policyHolder ? decryptResp.data.policyHolder.request_data : {}
+                let menumaster = decryptResp.data.policyHolder ? decryptResp.data.policyHolder.menumaster : {};
 
 
                 this.setState({
-                    motorInsurance,vehicleDetails,step_completed,policyHolder,bcMaster,
+                    motorInsurance,vehicleDetails,step_completed,policyHolder,bcMaster,request_data,menumaster,
                     refNumber: decryptResp.data.policyHolder.reference_no,
                     paymentStatus: decryptResp.data.policyHolder.payment ? decryptResp.data.policyHolder.payment[0] : [],
                     memberdetails : decryptResp.data.policyHolder ? decryptResp.data.policyHolder : [],
@@ -261,7 +264,7 @@ sendPaymentLink = () => {
     }
 
     render() {
-        const { policyHolder, show, fulQuoteResp, motorInsurance, error, error1, refNumber, 
+        const { policyHolder, show, fulQuoteResp, motorInsurance, error, error1, refNumber, request_data,menumaster,
             paymentStatus, relation, memberdetails,nomineedetails,vehicleDetails,step_completed, bcMaster } = this.state
         const { productId } = this.props.match.params
         let phrases = localStorage.getItem("phrases") ? JSON.parse(localStorage.getItem("phrases")) : null
@@ -336,37 +339,61 @@ sendPaymentLink = () => {
                                                                                 {phrases['Premium']}:
                                                                                 </div>
                                                                             </Col>
-
-
                                                                             <Col sm={12} md={3}>
                                                                                 <div className="premamount">
                                                                                     ₹ {fulQuoteResp.DuePremium}
                                                                                 </div>
                                                                             </Col>
-
                                                                             <Col sm={12} md={3}>
                                                                                 <div className="motopremium">
                                                                                     {phrases['GrossPremium']}:
-                                                                    </div>
+                                                                                </div>
                                                                             </Col>
-
-
                                                                             <Col sm={12} md={3}>
                                                                                 <div className="premamount">
                                                                                     ₹ {Math.round(fulQuoteResp.BeforeVatPremium)}
                                                                                 </div>
                                                                             </Col>
-
                                                                             <Col sm={12} md={3}>
                                                                                 <div className="motopremium">
                                                                                 {phrases['GST']}:
-                                                                    </div>
+                                                                                </div>
                                                                             </Col>
-
-
                                                                             <Col sm={12} md={3}>
                                                                                 <div className="premamount">
                                                                                     ₹ {Math.round(fulQuoteResp.TGST)}
+                                                                                </div>
+                                                                            </Col>
+
+                                                                            <Col sm={12} md={3}>
+                                                                                <div className="motopremium">
+                                                                                    Policy Start date:
+                                                                                </div>
+                                                                            </Col>
+                                                                            <Col sm={12} md={3}>
+                                                                                <div className="premamount">
+                                                                                    {request_data && request_data.start_date ? moment(request_data.start_date).format('DD-MM-yyy') : null}
+                                                                                </div>
+                                                                            </Col>
+
+                                                                            <Col sm={12} md={3}>
+                                                                                <div className="motopremium">
+                                                                                    Policy End Date:
+                                                                                </div>
+                                                                            </Col>
+                                                                            <Col sm={12} md={3}>
+                                                                                <div className="premamount">
+                                                                                {request_data && request_data.end_date ? moment(request_data.end_date).format('DD-MM-yyy') : null}
+                                                                                </div>
+                                                                            </Col>
+                                                                            <Col sm={12} md={3}>
+                                                                                <div className="motopremium">
+                                                                                    Product Name:
+                                                                                </div>
+                                                                            </Col>
+                                                                            <Col sm={12} md={3}>
+                                                                                <div className="premamount">
+                                                                                    {menumaster && menumaster.name ? menumaster.name : null}
                                                                                 </div>
                                                                             </Col>
                                                                         </Row>
@@ -603,6 +630,15 @@ sendPaymentLink = () => {
                                                                                                 </Col>
                                                                                                 <Col sm={12} md={6}>
                                                                                                     <FormGroup>{vehicleDetails && vehicleDetails.varientmodel && vehicleDetails.varientmodel.seating ? vehicleDetails.varientmodel.seating : null}</FormGroup>
+                                                                                                </Col>
+                                                                                            </Row>
+
+                                                                                            <Row>
+                                                                                                <Col sm={12} md={6}>
+                                                                                                    <FormGroup>{phrases['IDVofVehicle']}</FormGroup>
+                                                                                                </Col>
+                                                                                                <Col sm={12} md={6}>
+                                                                                                    <FormGroup>{motorInsurance && motorInsurance.idv_value ? motorInsurance.idv_value : null}</FormGroup>
                                                                                                 </Col>
                                                                                             </Row>
 

@@ -136,9 +136,10 @@ class PremiumMISCD extends Component {
                 let request_data = decryptResp.data.policyHolder ? decryptResp.data.policyHolder.request_data : {}
                 let step_completed = decryptResp.data.policyHolder ? decryptResp.data.policyHolder.step_no : "";
                 let bcMaster = decryptResp.data.policyHolder ? decryptResp.data.policyHolder.bcmaster : {};
+                let menumaster = decryptResp.data.policyHolder ? decryptResp.data.policyHolder.menumaster : {};
 	
                 this.setState({
-                    motorInsurance,policyHolder,vehicleDetails,previousPolicy,request_data,step_completed, bcMaster,
+                    motorInsurance,policyHolder,vehicleDetails,previousPolicy,request_data,step_completed, bcMaster,menumaster,
                     refNumber: decryptResp.data.policyHolder.reference_no,
                     paymentStatus: decryptResp.data.policyHolder.payment ? decryptResp.data.policyHolder.payment[0] : [],
                     memberdetails : decryptResp.data.policyHolder ? decryptResp.data.policyHolder : [],
@@ -345,7 +346,7 @@ class PremiumMISCD extends Component {
 
     render() {
         const { policyHolder, show, fulQuoteResp, motorInsurance, error, error1, refNumber, paymentStatus, relation, memberdetails,
-            nomineedetails, vehicleDetails, breakin_flag, step_completed, paymentButton, smsButton, bcMaster } = this.state
+            nomineedetails, vehicleDetails, breakin_flag, step_completed, paymentButton, smsButton, bcMaster,menumaster,request_data } = this.state
         const { productId } = this.props.match.params
 
         const errMsg =
@@ -417,37 +418,61 @@ class PremiumMISCD extends Component {
                                                                                 {phrases['Premium']}:
                                                                                 </div>
                                                                             </Col>
-
-
                                                                             <Col sm={12} md={3}>
                                                                                 <div className="premamount">
                                                                                     ₹ {fulQuoteResp.DuePremium ? fulQuoteResp.DuePremium : 0}
                                                                                 </div>
                                                                             </Col>
-
                                                                             <Col sm={12} md={3}>
                                                                                 <div className="motopremium">
                                                                                 {phrases['GrossPremium']}:
                                                                                 </div>
                                                                             </Col>
-
-
                                                                             <Col sm={12} md={3}>
                                                                                 <div className="premamount">
                                                                                     ₹ {fulQuoteResp.BeforeVatPremium ? Math.round(fulQuoteResp.BeforeVatPremium) : 0}
                                                                                 </div>
                                                                             </Col>
-
                                                                             <Col sm={12} md={3}>
                                                                                 <div className="motopremium">
                                                                                 {phrases['GST']}:
-                                                                    </div>
+                                                                                </div>
                                                                             </Col>
-
-
                                                                             <Col sm={12} md={3}>
                                                                                 <div className="premamount">
                                                                                     ₹ {fulQuoteResp.TGST ? Math.round(fulQuoteResp.TGST) : 0}
+                                                                                </div>
+                                                                            </Col>
+
+                                                                            <Col sm={12} md={3}>
+                                                                                <div className="motopremium">
+                                                                                    Policy Start date:
+                                                                                </div>
+                                                                            </Col>
+                                                                            <Col sm={12} md={3}>
+                                                                                <div className="premamount">
+                                                                                    {request_data && request_data.start_date ? moment(request_data.start_date).format('DD-MM-yyy') : null}
+                                                                                </div>
+                                                                            </Col>
+
+                                                                            <Col sm={12} md={3}>
+                                                                                <div className="motopremium">
+                                                                                    Policy End Date:
+                                                                                </div>
+                                                                            </Col>
+                                                                            <Col sm={12} md={3}>
+                                                                                <div className="premamount">
+                                                                                {request_data && request_data.end_date ? moment(request_data.end_date).format('DD-MM-yyy') : null}
+                                                                                </div>
+                                                                            </Col>
+                                                                            <Col sm={12} md={3}>
+                                                                                <div className="motopremium">
+                                                                                    Product Name:
+                                                                                </div>
+                                                                            </Col>
+                                                                            <Col sm={12} md={3}>
+                                                                                <div className="premamount">
+                                                                                    {menumaster && menumaster.name ? menumaster.name : null}
                                                                                 </div>
                                                                             </Col>
                                                                         </Row>
@@ -663,7 +688,7 @@ class PremiumMISCD extends Component {
                                                                                             </Row>
                                                                                             <Row>
                                                                                                 <Col sm={12} md={6}>
-                                                                                                    <FormGroup>{phrases['ChassisNumber']}</FormGroup>
+                                                                                                    <FormGroup>{phrases['ChasisNumber']}</FormGroup>
                                                                                                 </Col>
                                                                                                 <Col sm={12} md={6}>
                                                                                                     <FormGroup>{motorInsurance && motorInsurance.chasis_no  ? motorInsurance.chasis_no : ""}</FormGroup>
@@ -710,6 +735,15 @@ class PremiumMISCD extends Component {
                                                                                                 </Col>
                                                                                                 <Col sm={12} md={6}>
                                                                                                     <FormGroup>{vehicleDetails && vehicleDetails.varientmodel && vehicleDetails.varientmodel.horse_power ? vehicleDetails.varientmodel.horse_power+" BHP" : null}</FormGroup>
+                                                                                                </Col>
+                                                                                            </Row>
+
+                                                                                            <Row>
+                                                                                                <Col sm={12} md={6}>
+                                                                                                    <FormGroup>{phrases['IDVofVehicle']}</FormGroup>
+                                                                                                </Col>
+                                                                                                <Col sm={12} md={6}>
+                                                                                                    <FormGroup>{motorInsurance && motorInsurance.idv_value ? motorInsurance.idv_value : null}</FormGroup>
                                                                                                 </Col>
                                                                                             </Row>
 

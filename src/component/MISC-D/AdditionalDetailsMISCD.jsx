@@ -83,6 +83,12 @@ const ownerValidation = Yup.object().shape({
         otherwise: Yup.string().nullable()
     }),
     
+    nominee_salutation: Yup.string().when(['policy_for'], {
+        is: policy_for => policy_for == '1',  
+        then: Yup.string().required('Title is required'),
+        otherwise: Yup.string().nullable()
+    }),
+    
     gender: Yup.string().when(['policy_for'], {
         is: policy_for => policy_for == '1',  
         then: Yup.string().required('GenderRequired'),
@@ -474,6 +480,7 @@ class AdditionalDetailsMISCD extends Component {
             'address': values['address'],          
             'gstn_no': values['gstn_no'],
             'salutation_id': values['salutation_id'],
+            'nominee_title_id': values['nominee_salutation'],
             'page_name': `AdditionalDetails_MISCD/${productId}`,
         }
         if(motorInsurance.policy_for == '1'){
@@ -702,7 +709,8 @@ class AdditionalDetailsMISCD extends Component {
             org_level: policyHolder && policyHolder.org_level ? policyHolder.org_level : "",
             pa_flag: motorInsurance && motorInsurance.pa_flag ? motorInsurance.pa_flag : "",
             net_premium: request_data && request_data.net_premium ? request_data.net_premium : "0",
-            salutation_id: policyHolder && policyHolder.salutation_id ? policyHolder.salutation_id : "",
+            salutation_id: policyHolder && policyHolder.salutation_id ? policyHolder.salutation_id : "",     
+            nominee_salutation: nomineeDetails && nomineeDetails.gender ? nomineeDetails.title_id : "",
         });
 
         const quoteNumber =
@@ -856,7 +864,7 @@ class AdditionalDetailsMISCD extends Component {
                                     </Col>
                                     :null}
 
-                                    <Col sm={12} md={4} lg={6}>
+                                    <Col sm={12} md={4} lg={5}>
                                         <FormGroup>
                                             <div className="insurerName">
                                             <Field
@@ -898,7 +906,7 @@ class AdditionalDetailsMISCD extends Component {
                                         </Col> : null }
                                         
                                     {motorInsurance && motorInsurance.policy_for == '1' ?
-                                    <Col sm={12} md={4} lg={4}>
+                                    <Col sm={12} md={4} lg={5}>
                                         <FormGroup>
                                             <div className="formSection">
                                             <Field
@@ -1198,6 +1206,28 @@ class AdditionalDetailsMISCD extends Component {
                                 </div>
 
                                 <Row>
+                                    {motorInsurance && motorInsurance.policy_for == '1' ?
+                                    <Col sm={12} md={4} lg={2}>
+                                        <FormGroup>
+                                            <div className="formSection">
+                                            <Field
+                                                name='nominee_salutation'
+                                                component="select"
+                                                autoComplete="off"                                                                        
+                                                className="formGrp"
+                                            >
+                                                <option value="">{phrases['Title']}</option>
+                                                {titleList.map((title, qIndex) => ( 
+                                                <option value={title.id}>{title.displayvalue}</option>
+                                                ))}
+                                            </Field>     
+                                            {errors.nominee_salutation && touched.nominee_salutation ? (
+                                            <span className="errorMsg">{errors.nominee_salutation}</span>
+                                            ) : null}              
+                                            </div>
+                                        </FormGroup>
+                                    </Col>
+                                    :null}
                                     <Col sm={12} md={4} lg={4}>
                                         <FormGroup>
                                             <div className="insurerName">
@@ -1235,6 +1265,9 @@ class AdditionalDetailsMISCD extends Component {
                                             </div>
                                         </FormGroup>
                                     </Col>
+                                </Row>
+
+                                <Row>
                                     <Col sm={12} md={4} lg={4}>
                                         <FormGroup>
                                         <DatePicker
@@ -1261,9 +1294,6 @@ class AdditionalDetailsMISCD extends Component {
                                         ) : null}  
                                         </FormGroup>
                                     </Col>
-                                </Row>
-
-                                <Row>
                                     <Col sm={12} md={4} lg={4}>
                                         <FormGroup>
                                             <div className="formSection">

@@ -1,4 +1,4 @@
-import React, { Component } from 'react';
+import React, { Component, Fragment } from 'react';
 import { Row, Col, Modal, Button, FormGroup, OverlayTrigger, Tooltip } from 'react-bootstrap';
 import Collapsible from 'react-collapsible';
 import BackContinueButton from '../common/button/BackContinueButton';
@@ -18,7 +18,7 @@ import * as Yup from "yup";
 import swal from 'sweetalert';
 
 let encryption = new Encryption()
-let translation = localStorage.getItem("phrases") ? JSON.parse(localStorage.getItem("phrases")) : []
+let translation = localStorage.getItem("phrases") ? JSON.parse(localStorage.getItem("phrases")) : null
 
 
  let initialValue = {
@@ -36,7 +36,22 @@ const ComprehensiveValidation = Yup.object().shape({
         is: PA_flag => PA_flag == '1',
         then: Yup.string().required('PleasePACover'),
         otherwise: Yup.string()
-    })
+    }),
+    geographical_extension_length: Yup.string().when(['Geographical_flag'], {
+        is: Geographical_flag => Geographical_flag == '1',
+        then: Yup.string().test(
+            "geoExtention",
+            function() {
+                return "Select any one country"
+            },
+            function (value) {
+                if (value < 1 ) {   
+                    return false;    
+                }
+                return true;
+            }) ,
+        otherwise: Yup.string()
+    }),
 
 });
 
@@ -85,7 +100,8 @@ class TwoWheelerOtherComprehensive extends Component {
             vehicleDetails: [],
             selectFlag: '',
             moreCoverage: [],
-            request_data: []
+            request_data: [],
+            geographical_extension: []
         };
     }
 
@@ -141,11 +157,15 @@ class TwoWheelerOtherComprehensive extends Component {
                 let add_more_coverage = motorInsurance && motorInsurance.policy_for == '2' ? [] : (motorInsurance.add_more_coverage != null ? motorInsurance.add_more_coverage.split(",") : ['B00015']) 
                 add_more_coverage = add_more_coverage.flat()
 
-                 values.PA_flag = motorInsurance && motorInsurance.pa_cover != "" ? '1' : '0'
-                 values.PA_Cover = motorInsurance && motorInsurance.pa_cover != "" ? motorInsurance.pa_cover : '0'
+                let add_more_coverage_request_json = motorInsurance && motorInsurance.add_more_coverage_request_json != null ? motorInsurance.add_more_coverage_request_json : ""
+                let add_more_coverage_request_array = add_more_coverage_request_json != "" ? JSON.parse(add_more_coverage_request_json) : []
+                var geographical_extension = add_more_coverage_request_array && add_more_coverage_request_array.geographical_extension ? add_more_coverage_request_array.geographical_extension : []
+
+                values.PA_flag = motorInsurance && motorInsurance.pa_cover != "" ? '1' : '0'
+                values.PA_Cover = motorInsurance && motorInsurance.pa_cover != "" ? motorInsurance.pa_cover : '0'
                 
                 this.setState({
-                    motorInsurance,vehicleDetails,step_completed,request_data,
+                    motorInsurance,vehicleDetails,step_completed,request_data,geographical_extension,
                     add_more_coverage: add_more_coverage, 
                     selectFlag: motorInsurance && motorInsurance.policy_for == '2' ? [] : (motorInsurance.add_more_coverage != null ? '0' : '1') 
                     
@@ -179,15 +199,24 @@ class TwoWheelerOtherComprehensive extends Component {
 
 
     fullQuote = (access_token, values) => {
-        const { PolicyArray, sliderVal, add_more_coverage, motorInsurance } = this.state
-
+        const { PolicyArray, sliderVal, add_more_coverage, motorInsurance, geographical_extension } = this.state
         const formData = new FormData();
+        let coverage_data = {}
+
+        if(add_more_coverage) {
+            coverage_data = {
+                'B00004' : {'value': values.B00004_value, 'description': values.B00004_description},
+                'B00003' : {'value': values.B00003_value, 'description': values.B00003_description},
+                geographical_extension
+            }           
+        }
 
         const post_data = {
             'ref_no':localStorage.getItem('policyHolder_refNo'),
             'access_token':access_token,
             'idv_value': "0",
             'add_more_coverage': add_more_coverage.toString(),
+            'coverage_data': JSON.stringify(coverage_data),
             'policy_type': motorInsurance ? motorInsurance.policy_type : "",
             'policytype_id': motorInsurance ? motorInsurance.policytype_id : "",
             'PA_Cover': values.PA_flag ? values.PA_Cover : "0",
@@ -237,12 +266,21 @@ class TwoWheelerOtherComprehensive extends Component {
 
     handleSubmit = (values) => {
         const { productId } = this.props.match.params
-        const { motorInsurance, PolicyArray, sliderVal, add_more_coverage, request_data } = this.state
+        const { motorInsurance, PolicyArray, sliderVal, add_more_coverage, request_data, geographical_extension } = this.state
         let defaultSliderValue = PolicyArray.length > 0 ? Math.floor(PolicyArray[0].PolicyRiskList[0].IDV_Suggested) : 0
 
         const formData = new FormData();
         let encryption = new Encryption();
         let post_data = {}
+        let coverage_data = {}
+        if(add_more_coverage) {
+            coverage_data = {
+                'B00004' : {'value': values.B00004_value, 'description': values.B00004_description},
+                'B00003' : {'value': values.B00003_value, 'description': values.B00003_description},
+                geographical_extension
+            }           
+        }
+
         if (add_more_coverage.length > 0) {
             post_data = {
                 'policy_holder_id': request_data.policyholder_id,
@@ -251,6 +289,7 @@ class TwoWheelerOtherComprehensive extends Component {
                 'registration_no': motorInsurance.registration_no,
                 'idv_value': "0",
                 'add_more_coverage': add_more_coverage,
+                'coverage_data': JSON.stringify(coverage_data),
                 'pa_cover': values.PA_flag ? values.PA_Cover : "0",
                 'pa_flag' : values.PA_cover_flag,
                 'page_name': `four_wheeler_OtherComprehensiveTP/${productId}`,
@@ -307,7 +346,11 @@ class TwoWheelerOtherComprehensive extends Component {
             if(values == "B00015") {
                 setFieldTouched("PA_cover_flag");
                 setFieldValue("PA_cover_flag", '1');
-            }            
+            }        
+            if(values == "geographical_extension") {
+                setFieldTouched("Geographical_flag");
+                setFieldValue("Geographical_flag", '1');
+            }     
         }
         else {
             const index = add_more_coverage.indexOf(values);
@@ -329,9 +372,57 @@ class TwoWheelerOtherComprehensive extends Component {
                 setFieldTouched("PA_cover_flag");
                 setFieldValue("PA_cover_flag", '0');
             }   
+            if(values == "geographical_extension") {
+                setFieldTouched("Geographical_flag");
+                setFieldValue("Geographical_flag", '0');
+
+                setFieldValue("GeoExtnBhutan", '');
+                setFieldValue("GeoExtnNepal", '');
+                setFieldValue("GeoExtnMaldives", '');
+                setFieldValue("GeoExtnPakistan", '');
+                setFieldValue("GeoExtnSriLanka", '');
+                setFieldValue("GeoExtnBangladesh", '');
+                this.setState({
+                    geographical_extension: []
+                })
+            }
         }
         
     }
+
+    onGeoAreaSelect = (value, values, isSelect, setFieldTouched, setFieldValue) => {
+
+        const { add_more_coverage, geographical_extension } = this.state;
+        let drv = []
+        
+        if (isSelect) {
+            geographical_extension.push(value);
+            this.setState({
+                geographical_extension,
+                serverResponse: [],
+                error: []
+            });
+            setFieldTouched(value);
+            setFieldValue(value, '1');
+            setFieldTouched("geographical_extension_length");
+            setFieldValue("geographical_extension_length", geographical_extension.length);
+        }
+        else {
+            const index = geographical_extension.indexOf(value);
+            if (index !== -1) {
+                geographical_extension.splice(index, 1);
+                this.setState({
+                    serverResponse: [],
+                    error: []
+                });
+            }
+            setFieldTouched(value);
+            setFieldValue(value, '');
+            setFieldTouched("geographical_extension_length");
+            setFieldValue("geographical_extension_length", geographical_extension.length);
+            }        
+    }
+
 
     getCoverage = () => {
         this.props.loadingStart();
@@ -359,13 +450,14 @@ class TwoWheelerOtherComprehensive extends Component {
 
     render() {
         const { vahanDetails, error, policyCoverage, vahanVerify, fulQuoteResp, PolicyArray, motorInsurance, serverResponse, add_more_coverage,
-            step_completed, vehicleDetails, selectFlag, moreCoverage} = this.state
+            step_completed, vehicleDetails, selectFlag, moreCoverage, geographical_extension} = this.state
         const { productId } = this.props.match.params
         let covList = motorInsurance && motorInsurance.add_more_coverage ? motorInsurance.add_more_coverage.split(",") : ""
         let newInnitialArray = {}
         let PA_flag = motorInsurance && (motorInsurance.pa_cover == null || motorInsurance.pa_cover == "") ? '0' : '1'
         let PA_Cover = motorInsurance &&  motorInsurance.pa_cover != null ? motorInsurance.pa_cover : '0'
-        let phrases = localStorage.getItem("phrases") ? JSON.parse(localStorage.getItem("phrases")) : []
+        let Geographical_flag = add_more_coverage && add_more_coverage[add_more_coverage.indexOf("geographical_extension")] ? '1' : '0'
+        let phrases = localStorage.getItem("phrases") ? JSON.parse(localStorage.getItem("phrases")) : null
 
         if(selectFlag == '1') {
             initialValue = {
@@ -374,7 +466,9 @@ class TwoWheelerOtherComprehensive extends Component {
                 B00015: "B00015",
                 PA_flag: '0',
                 PA_Cover: "",
-                PA_cover_flag: "1"
+                PA_cover_flag: "1",
+                Geographical_flag: "0",
+                geographical_extension_length: geographical_extension && geographical_extension.length
             
             }
            
@@ -385,7 +479,9 @@ class TwoWheelerOtherComprehensive extends Component {
                 // B00015: "B00015",
                 PA_flag: '0',
                 PA_Cover: "",
-                PA_cover_flag: motorInsurance && motorInsurance.pa_flag ? motorInsurance.pa_flag : '0'
+                PA_cover_flag: motorInsurance && motorInsurance.pa_flag ? motorInsurance.pa_flag : '0',
+                Geographical_flag: "0",
+                geographical_extension_length: geographical_extension && geographical_extension.length
             
             }
         }
@@ -396,6 +492,15 @@ class TwoWheelerOtherComprehensive extends Component {
 
         newInnitialArray.PA_flag = PA_flag   
         newInnitialArray.PA_Cover = PA_Cover
+        newInnitialArray.Geographical_flag = Geographical_flag
+
+        newInnitialArray.GeoExtnBangladesh = geographical_extension ? geographical_extension[geographical_extension.indexOf("GeoExtnBangladesh")] : ""
+        newInnitialArray.GeoExtnBhutan = geographical_extension ? geographical_extension[geographical_extension.indexOf("GeoExtnBhutan")] : ""
+        newInnitialArray.GeoExtnNepal = geographical_extension ? geographical_extension[geographical_extension.indexOf("GeoExtnNepal")] : ""
+        newInnitialArray.GeoExtnMaldives = geographical_extension ? geographical_extension[geographical_extension.indexOf("GeoExtnMaldives")] : ""
+        newInnitialArray.GeoExtnPakistan = geographical_extension ? geographical_extension[geographical_extension.indexOf("GeoExtnPakistan")] : ""
+        newInnitialArray.GeoExtnSriLanka = geographical_extension ? geographical_extension[geographical_extension.indexOf("GeoExtnSriLanka")] : ""
+
         let newInitialValues = Object.assign(initialValue, newInnitialArray );
 
         console.log("InitialValues---", newInnitialArray)
@@ -501,8 +606,7 @@ class TwoWheelerOtherComprehensive extends Component {
                                                                             // checked={values.roadsideAssistance ? true : false}
                                                                             onClick={(e) =>{
                                                                                 if( e.target.checked == false && values[coverage.code] == 'B00015') {
-                                                                                    swal(phrases.SwalIRDAI,
-                                                                                        {button: phrases.OK})
+                                                                                    swal(phrases.SwalIRDAI)
                                                                                 }
                                                                                 this.onRowSelect(e.target.value, e.target.checked, setFieldTouched, setFieldValue)         
                                                                             }
@@ -541,8 +645,35 @@ class TwoWheelerOtherComprehensive extends Component {
                                                                         </FormGroup>
                                                                     </Col> : null
                                                                 }
+                                                                {values.Geographical_flag == '1' && values[coverage.code] == 'geographical_extension' ?
+                                                                    <Fragment>
+                                                                    <Col sm={12} md={11} lg={3} key={qIndex+"c"}>
+                                                                    {coverage.covarage_value != null && JSON.parse(coverage.covarage_value).value.length > 0 && JSON.parse(coverage.covarage_value).value.map((insurer, qIndex) => (
+                                                                        insurer.status == '1' ?
+                                                                        <label className="customCheckBox formGrp formGrp">{insurer.name}                                         
+                                                                            <Field
+                                                                                type="checkbox"
+                                                                                // name={`moreCov_${qIndex}`}
+                                                                                name={insurer.id}
+                                                                                value={insurer.id}
+                                                                                className="user-self"
+                                                                                checked = {values[insurer.id] == insurer.id ? true : false}
+                                                                                onClick={(e) =>{
+                                                                                    this.onGeoAreaSelect(e.target.value, values, e.target.checked, setFieldTouched, setFieldValue)         
+                                                                                }}
+                                                                            />
+                                                                            <span className="checkmark mL-0"></span>
+                                                                            <span className="error-message"></span>
+                                                                        </label> : null))}
+                                                                        {errors.geographical_extension_length ? (
+                                                                                <span className="errorMsg">{errors.geographical_extension_length}</span>
+                                                                        ) : null} 
+                                                                    </Col>
+                                                                    </Fragment> : null
+                                                                }
                                                             </Row>
                                                             ))}
+                                                            <Row>&nbsp;</Row>
                                                             
                                                             <div className="d-flex justify-content-left resmb">
                                                                 <Button className={`backBtn`} type="button" onClick={this.vehicleDetails.bind(this, productId)}>
