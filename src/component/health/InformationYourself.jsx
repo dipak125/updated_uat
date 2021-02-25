@@ -52,14 +52,12 @@ const initialValues = {
 const vehicleInspectionValidation = Yup.object().shape({
     gender: Yup.string().required('Please select gender'),
     occupation_id: Yup.string().required("Please select occupation type"),
-    occupation_description: Yup
-      .string()
-      .when("occupation_id", {
-        is: '193',
-        then: Yup.string().typeError("Must enter occupation details"),
-        othewise: Yup.string()
-    })
-   
+    occupation_description: Yup.string()
+    .when('occupation_id', {
+      is: 193,
+      then: Yup.string().typeError('Please Specify'),
+      othewise: Yup.string()
+    })   
 });
 
 const validateFamilyMembers  = Yup.object().shape({
@@ -900,117 +898,126 @@ class InformationYourself extends Component {
     }
 
     handleFormSubmit = (values) => {
-    const {productId} = this.props.match.params
-    const formData = new FormData();
-    let encryption = new Encryption();
-    let lookingFor = this.state.lookingFor ;
-    let dob = this.state.dob ;
-    let familyMembers = this.state.familyMembers;
-    let post_data = []
-    let menumaster_id = 2;
-    let bc_data = sessionStorage.getItem('bcLoginData') ? sessionStorage.getItem('bcLoginData') : "";
-    if(bc_data) {
-        bc_data = JSON.parse(encryption.decrypt(bc_data));
-    }
+        if(values.occupation_id == '193' && (values.occupation_description ==null || values.occupation_description == '')){
+            swal({
+                text: "Please specify the occupation !",
+                icon: "error",
+              });
+            return false;
+        }else{
+            const {productId} = this.props.match.params
+            const formData = new FormData();
+            let encryption = new Encryption();
+            let lookingFor = this.state.lookingFor ;
+            let dob = this.state.dob ;
+            let familyMembers = this.state.familyMembers;
+            let post_data = []
+            let menumaster_id = 2;
+            let bc_data = sessionStorage.getItem('bcLoginData') ? sessionStorage.getItem('bcLoginData') : "";
+            if(bc_data) {
+            bc_data = JSON.parse(encryption.decrypt(bc_data));
+            }
 
-    post_data['menumaster_id'] = menumaster_id
-    post_data['proposer_gender'] = values.gender    
-    post_data['page_name'] = `Health/${productId}`
-    post_data['occupation_id'] = values.occupation_id
-    post_data['occupation_description'] = values.occupation_description
-    
-    
-    let arr_date=[]
-    for(let i=0;i<dob.length;i++){        
-        let date_of_birth= dob[i] ? dob[i] : familyMembers[i].dob;    
-      arr_date.push(date_of_birth)
-      
-    }  
-    post_data['dob'] = arr_date
-    let is_self_select = false;
-    arr_date=[]
-    for(let i=0;i<lookingFor.length;i++){        
-            
+            post_data['menumaster_id'] = menumaster_id
+            post_data['proposer_gender'] = values.gender    
+            post_data['page_name'] = `Health/${productId}`
+            post_data['occupation_id'] = values.occupation_id
+            post_data['occupation_description'] = values.occupation_description
+
+
+            let arr_date=[]
+            for(let i=0;i<dob.length;i++){        
+            let date_of_birth= dob[i] ? dob[i] : familyMembers[i].dob;    
+            arr_date.push(date_of_birth)
+
+            }  
+            post_data['dob'] = arr_date
+            let is_self_select = false;
+            arr_date=[]
+            for(let i=0;i<lookingFor.length;i++){        
+
             let looking_for = lookingFor[i] ? lookingFor[i] : familyMembers[i].relation_with; 
             is_self_select =  looking_for == 'self' ? true:false   
             arr_date.push(looking_for)          
-    }  
-    post_data['looking_for'] = arr_date
-    let policyHolder_id = localStorage.getItem('policyHolder_id') ? localStorage.getItem('policyHolder_id') :0
-    
-    let gender_for = this.state.gender_for
+            }  
+            post_data['looking_for'] = arr_date
+            let policyHolder_id = localStorage.getItem('policyHolder_id') ? localStorage.getItem('policyHolder_id') :0
 
-    arr_date=[]
-    for(let i=0;i<gender_for.length;i++){
-        let gender_val;
-        gender_val = gender_for[i] ? gender_for[i] : familyMembers[i].gender; 
-        arr_date.push(gender_val); 
-    } 
-    post_data['gender'] = arr_date
-    post_data['confirm'] = this.state.confirm
-    
-    if(sessionStorage.getItem('csc_id')) {
-        post_data['csc_id'] = sessionStorage.getItem('csc_id') ? sessionStorage.getItem('csc_id') : ""
-        post_data['agent_name'] = sessionStorage.getItem('agent_name') ? sessionStorage.getItem('agent_name') : ""
-        post_data['product_id'] = sessionStorage.getItem('product_id') ? sessionStorage.getItem('product_id') : ""
-        post_data['bcmaster_id'] = "5"
-    }
-    else {
-        post_data['bcmaster_id'] = bc_data ? bc_data.agent_id : ""
-        post_data['bc_token'] = bc_data ? bc_data.token : ""
-        post_data['bc_agent_id'] = bc_data ? bc_data.user_info.data.user.username : ""
-        post_data['agent_name'] = bc_data ? bc_data.user_info.data.user.name : ""
+            let gender_for = this.state.gender_for
 
-    }
-     
+            arr_date=[]
+            for(let i=0;i<gender_for.length;i++){
+            let gender_val;
+            gender_val = gender_for[i] ? gender_for[i] : familyMembers[i].gender; 
+            arr_date.push(gender_val); 
+            } 
+            post_data['gender'] = arr_date
+            post_data['confirm'] = this.state.confirm
 
-    let post_data_obj = {}
+            if(sessionStorage.getItem('csc_id')) {
+            post_data['csc_id'] = sessionStorage.getItem('csc_id') ? sessionStorage.getItem('csc_id') : ""
+            post_data['agent_name'] = sessionStorage.getItem('agent_name') ? sessionStorage.getItem('agent_name') : ""
+            post_data['product_id'] = sessionStorage.getItem('product_id') ? sessionStorage.getItem('product_id') : ""
+            post_data['bcmaster_id'] = "5"
+            }
+            else {
+            post_data['bcmaster_id'] = bc_data ? bc_data.agent_id : ""
+            post_data['bc_token'] = bc_data ? bc_data.token : ""
+            post_data['bc_agent_id'] = bc_data ? bc_data.user_info.data.user.username : ""
+            post_data['agent_name'] = bc_data ? bc_data.user_info.data.user.name : ""
 
-    console.log("postData========", post_data)
-    
-    if(policyHolder_id > 0){
-        post_data['policy_holder_id'] = policyHolder_id
-        Object.assign(post_data_obj, post_data); // {0:"a", 1:"b", 2:"c"}
-        formData.append('enc_data',encryption.encrypt(JSON.stringify(post_data_obj)))
-        //let vvv = encryption.encrypt(JSON.stringify(target))        
-        this.props.loadingStart();
-        axios
-        .post(`/update-yourself`, formData)
-        .then(res => {
+            }
+
+
+            let post_data_obj = {}
+
+            console.log("postData========", post_data)
+
+            if(policyHolder_id > 0){
+            post_data['policy_holder_id'] = policyHolder_id
+            Object.assign(post_data_obj, post_data); // {0:"a", 1:"b", 2:"c"}
+            formData.append('enc_data',encryption.encrypt(JSON.stringify(post_data_obj)))
+            //let vvv = encryption.encrypt(JSON.stringify(target))        
+            this.props.loadingStart();
+            axios
+            .post(`/update-yourself`, formData)
+            .then(res => {
             localStorage.setItem('policyHolder_id', res.data.data.policyHolder_id);
             localStorage.setItem('policyHolder_refNo', res.data.data.policyHolder_refNo);
             localStorage.setItem('display_gender', JSON.stringify(this.state.display_gender));
             this.props.loadingStop();
             this.props.history.push(`/MedicalDetails/${productId}`);
-        })
-        .catch(err => {
-        if(err && err.data){
+            })
+            .catch(err => {
+            if(err && err.data){
             swal('Family Member fields are required...');
-        }
-        this.props.loadingStop();
-        });
-    }
-    else{
-        Object.assign(post_data_obj, post_data); // {0:"a", 1:"b", 2:"c"}
-        formData.append('enc_data',encryption.encrypt(JSON.stringify(post_data_obj)))
+            }
+            this.props.loadingStop();
+            });
+            }
+            else{
+            Object.assign(post_data_obj, post_data); // {0:"a", 1:"b", 2:"c"}
+            formData.append('enc_data',encryption.encrypt(JSON.stringify(post_data_obj)))
 
-        this.props.loadingStart();
-        axios
-        .post(`/yourself`, formData)
-        .then(res => {
+            this.props.loadingStart();
+            axios
+            .post(`/yourself`, formData)
+            .then(res => {
             localStorage.setItem('policyHolder_id', res.data.data.policyHolder_id);
             localStorage.setItem('policyHolder_refNo', res.data.data.policyHolder_refNo);
             localStorage.setItem('display_gender', JSON.stringify(this.state.display_gender));
             this.props.loadingStop();
             this.props.history.push(`/MedicalDetails/${productId}`);
-        })
-        .catch(err => {
-        if(err && err.data){
+            })
+            .catch(err => {
+            if(err && err.data){
             swal('Family Member fields are required...');
+            }
+            this.props.loadingStop();
+            });
+            }
         }
-        this.props.loadingStop();
-        });
-    }
+
     
        // this.props.history.push(`/MedicalDetails/${productId}`);
     }
@@ -1257,7 +1264,7 @@ setStateForPreviousData=(family_members)=>{
             dob_8: display_dob_arr[8] ? new Date(display_dob_arr[8]) : "",
             insureList: insureListPrev ? insureListPrev.toString()  : (insureList ? insureList :''),
             occupation_id: policyHolder ? policyHolder.occupation_id : "",
-            occupation_description: policyHolder ? policyHolder.occupation_description : "",
+            occupation_description: (policyHolder && policyHolder.occupation_description!=null) ? policyHolder.occupation_description : ""
         });
 
         return (

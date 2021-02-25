@@ -52,10 +52,11 @@ const initialValues = {
 const vehicleInspectionValidation = Yup.object().shape({
     gender: Yup.string().required('Please select gender'),
     occupation_id: Yup.string().required("Please select occupation type"),
-    occupation_description: Yup.string().when(['occupation_id'], {
-        is: occupation_id => occupation_id == '193',       
-        then: Yup.string().typeError('Please agree to the terms'),
-        othewise: Yup.string()
+    occupation_description: Yup.string()
+    .when('occupation_id', {
+      is: 193,
+      then: Yup.string().typeError('Please Specify'),
+      othewise: Yup.string()
     })
    
 });
@@ -1007,79 +1008,83 @@ class arogya_InformationYourself extends Component {
     }
 
     handleFormSubmit = (values) => {
-    console.log('values.occupation_id',values.occupation_id)
-        
-    const {productId} = this.props.match.params
-    const formData = new FormData();
-    let encryption = new Encryption();
-    let lookingFor = this.state.lookingFor ;
-    let dob = this.state.dob ;
-    let familyMembers = this.state.familyMembers;
-    let cover_type_id = this.state.cover_type_id;
-    let post_data = []
-    let menumaster_id = 8;
+    if(values.occupation_id == '193' && (values.occupation_description ==null || values.occupation_description == '')){
+        swal({
+            text: "Please specify the occupation !",
+            icon: "error",
+          });
+        return false;
+    }else{
 
-    let bc_data = sessionStorage.getItem('bcLoginData') ? sessionStorage.getItem('bcLoginData') : "";
-    if(bc_data) {
+        const {productId} = this.props.match.params
+        const formData = new FormData();
+        let encryption = new Encryption();
+        let lookingFor = this.state.lookingFor ;
+        let dob = this.state.dob ;
+        let familyMembers = this.state.familyMembers;
+        let cover_type_id = this.state.cover_type_id;
+        let post_data = []
+        let menumaster_id = 8;
+
+        let bc_data = sessionStorage.getItem('bcLoginData') ? sessionStorage.getItem('bcLoginData') : "";
+        if(bc_data) {
         bc_data = JSON.parse(encryption.decrypt(bc_data));
-    }
+        }
 
-    post_data['menumaster_id'] = menumaster_id
-    post_data['page_name'] = `arogya_Health/${productId}`
-    post_data['proposer_gender'] = values.gender 
-    post_data['cover_type_id'] = cover_type_id  
-    post_data['occupation_id'] = values.occupation_id
-    post_data['occupation_description'] = values.occupation_description
-    
-    let arr_date=[]
-    for(let i=0;i<dob.length;i++){        
+        post_data['menumaster_id'] = menumaster_id
+        post_data['page_name'] = `arogya_Health/${productId}`
+        post_data['proposer_gender'] = values.gender 
+        post_data['cover_type_id'] = cover_type_id  
+        post_data['occupation_id'] = values.occupation_id
+        post_data['occupation_description'] = values.occupation_description
+
+        let arr_date=[]
+        for(let i=0;i<dob.length;i++){        
         let date_of_birth= dob[i] ? dob[i] : familyMembers[i].dob;    
-      arr_date.push(date_of_birth)
-      
-    }  
-    post_data['dob'] = arr_date
-    let is_self_select = false;
-    arr_date=[]
-    for(let i=0;i<lookingFor.length;i++){        
-            
-            let looking_for = lookingFor[i] ? lookingFor[i] : familyMembers[i].relation_with; 
-            is_self_select =  looking_for == 'self' ? true:false   
-            arr_date.push(looking_for)          
-    }  
-    post_data['looking_for'] = arr_date
-    let policyHolder_id = localStorage.getItem('policyHolder_id') ? localStorage.getItem('policyHolder_id') :0
-    
-    let gender_for = this.state.gender_for
+        arr_date.push(date_of_birth)
 
-    arr_date=[]
-    for(let i=0;i<gender_for.length;i++){
+        }  
+        post_data['dob'] = arr_date
+        let is_self_select = false;
+        arr_date=[]
+        for(let i=0;i<lookingFor.length;i++){        
+
+        let looking_for = lookingFor[i] ? lookingFor[i] : familyMembers[i].relation_with; 
+        is_self_select =  looking_for == 'self' ? true:false   
+        arr_date.push(looking_for)          
+        }  
+        post_data['looking_for'] = arr_date
+        let policyHolder_id = localStorage.getItem('policyHolder_id') ? localStorage.getItem('policyHolder_id') :0
+
+        let gender_for = this.state.gender_for
+
+        arr_date=[]
+        for(let i=0;i<gender_for.length;i++){
         let gender_val;
         gender_val = gender_for[i] ? gender_for[i] : familyMembers[i].gender; 
         arr_date.push(gender_val); 
-    } 
-    post_data['gender'] = arr_date
-    post_data['confirm'] = this.state.confirm
-    
-    if(sessionStorage.getItem('csc_id')) {
+        } 
+        post_data['gender'] = arr_date
+        post_data['confirm'] = this.state.confirm
+
+        if(sessionStorage.getItem('csc_id')) {
         post_data['csc_id'] = sessionStorage.getItem('csc_id') ? sessionStorage.getItem('csc_id') : ""
         post_data['agent_name'] = sessionStorage.getItem('agent_name') ? sessionStorage.getItem('agent_name') : ""
         post_data['product_id'] = sessionStorage.getItem('product_id') ? sessionStorage.getItem('product_id') : ""
         post_data['bcmaster_id'] = "5"
-    }
-    else {
+        }
+        else {
         post_data['bcmaster_id'] = bc_data ? bc_data.agent_id : ""
         post_data['bc_token'] = bc_data ? bc_data.token : ""
         post_data['bc_agent_id'] = bc_data ? bc_data.user_info.data.user.username : ""
         post_data['agent_name'] = bc_data ? bc_data.user_info.data.user.name : ""
 
-    }
-     
+        }
+        let post_data_obj = {}
 
-    let post_data_obj = {}
+        console.log("postData========", post_data)
 
-    console.log("postData========", post_data)
-    
-    if(policyHolder_id > 0){
+        if(policyHolder_id > 0){
         post_data['policy_holder_id'] = policyHolder_id
         Object.assign(post_data_obj, post_data); // {0:"a", 1:"b", 2:"c"}
         formData.append('enc_data',encryption.encrypt(JSON.stringify(post_data_obj)))
@@ -1088,27 +1093,27 @@ class arogya_InformationYourself extends Component {
         axios
         .post(`arogya-topup/update-yourself`, formData)
         .then(res => {
-            let decryptResp = JSON.parse(encryption.decrypt(res.data))
-            console.log("decrypt", decryptResp)
-            localStorage.setItem('policyHolder_id', decryptResp.data.policyHolder_id);
-            localStorage.setItem('policyHolder_refNo', decryptResp.data.policyHolder_refNo);
-            localStorage.setItem('display_gender', JSON.stringify(this.state.display_gender));
-            this.props.loadingStop();
-            if(decryptResp.error == false) {
-            this.props.history.push(`/arogya_MedicalDetails/${productId}`);
-            }
-            else{
-                swal(decryptResp.msg)
-            } 
+        let decryptResp = JSON.parse(encryption.decrypt(res.data))
+        console.log("decrypt", decryptResp)
+        localStorage.setItem('policyHolder_id', decryptResp.data.policyHolder_id);
+        localStorage.setItem('policyHolder_refNo', decryptResp.data.policyHolder_refNo);
+        localStorage.setItem('display_gender', JSON.stringify(this.state.display_gender));
+        this.props.loadingStop();
+        if(decryptResp.error == false) {
+        this.props.history.push(`/arogya_MedicalDetails/${productId}`);
+        }
+        else{
+        swal(decryptResp.msg)
+        } 
         })
         .catch(err => {
         if(err && err.data){
-            swal('Family Member fields are required...');
+        swal('Family Member fields are required...');
         }
         this.props.loadingStop();
         });
-    }
-    else{
+        }
+        else{
         Object.assign(post_data_obj, post_data); // {0:"a", 1:"b", 2:"c"}
         formData.append('enc_data',encryption.encrypt(JSON.stringify(post_data_obj)))
 
@@ -1116,34 +1121,33 @@ class arogya_InformationYourself extends Component {
         axios
         .post(`/arogya-topup/yourself`, formData)
         .then(res => {
-            let decryptResp = JSON.parse(encryption.decrypt(res.data))
-            console.log("decrypt", decryptResp)
-            localStorage.setItem('policyHolder_id', decryptResp.data.policyHolder_id);
-            localStorage.setItem('policyHolder_refNo', decryptResp.data.policyHolder_refNo);
-            localStorage.setItem('display_gender', JSON.stringify(this.state.display_gender));
-            this.props.loadingStop();
-            if(decryptResp.error == false) {
-                this.props.history.push(`/arogya_MedicalDetails/${productId}`);
-            }
-            else{
-                swal(decryptResp.msg)
-            }   
-            // this.props.history.push(`/arogya_MedicalDetails/${productId}`);
+        let decryptResp = JSON.parse(encryption.decrypt(res.data))
+        console.log("decrypt", decryptResp)
+        localStorage.setItem('policyHolder_id', decryptResp.data.policyHolder_id);
+        localStorage.setItem('policyHolder_refNo', decryptResp.data.policyHolder_refNo);
+        localStorage.setItem('display_gender', JSON.stringify(this.state.display_gender));
+        this.props.loadingStop();
+        if(decryptResp.error == false) {
+        this.props.history.push(`/arogya_MedicalDetails/${productId}`);
+        }
+        else{
+        swal(decryptResp.msg)
+        }   
+        // this.props.history.push(`/arogya_MedicalDetails/${productId}`);
         })
         .catch(err => {
-            let decryptErr = JSON.parse(encryption.decrypt(err.data));
-            console.log('decryptResp--err---', decryptErr)
-            this.props.loadingStop();
-            if(decryptErr && err.data){
-                swal('Family Member fields are required...');
-            }
+        let decryptErr = JSON.parse(encryption.decrypt(err.data));
+        console.log('decryptResp--err---', decryptErr)
+        this.props.loadingStop();
+        if(decryptErr && err.data){
+        swal('Family Member fields are required...');
+        }
         // if(err && err.data){
         //     swal('Family Member fields are required...');
         // }
         });
+        }
     }
-    
-       // this.props.history.push(`/MedicalDetails/${productId}`);
     }
 
     checkPolicyType = (value, isSelect,setFieldTouched, setFieldValue) => {
@@ -1432,9 +1436,8 @@ setStateForPreviousData=(family_members)=>{
             // cover_type_id: cover_type_id || lookingFor > 1 ? 1 : cover_type_id,
             insureList: insureListPrev ? insureListPrev.toString()  : (insureList ? insureList :''),
             occupation_id: policyHolder ? policyHolder.occupation_id : "",
-            occupation_description: policyHolder ? policyHolder.occupation_description : "",
+            occupation_description: (policyHolder && policyHolder.occupation_description!=null) ? policyHolder.occupation_description : ""
         });
-           
 
         return (
             <>

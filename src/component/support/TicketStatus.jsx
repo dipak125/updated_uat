@@ -297,7 +297,7 @@ class TicketStatus extends Component {
                                                 <Col sm={12} md={9}><div>{selectedTicket.status}</div></Col>
                                             </Row>
                                             <Row>
-                                                <Col sm={12} md={3}><div>Department:</div></Col>
+                                                <Col sm={12} md={3}><div>Area:</div></Col>
                                                 <Col sm={12} md={9}><div>{selectedTicket.area}</div></Col>
                                             </Row>
                                             <Row>
