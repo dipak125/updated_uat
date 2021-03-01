@@ -328,13 +328,13 @@ downloadWordingGSB = () => {
                             <button className="policy m-l-20" onClick={this.getAccessToken}>{phrases['PolicyCopy']} </button>
                         } */}
                         <button className="policy m-l-20" onClick={this.generateDoc}>{phrases['PolicyCopy']} </button>
-                        {vehicletype.id == 13 ?
+                        {vehicletype && vehicletype.id && vehicletype.id == 13 ?
                             <button className="policy m-l-20" onClick={this.downloadWording}>Policy Wording </button>
                             :
                            null
                         }
                         
-                        {vehicletype.id == 14 ?
+                        {vehicletype && vehicletype.id && vehicletype.id == 14 ?
                             <button className="policy m-l-20" onClick={this.downloadWordingGSB}>Policy Wording </button>
                             :
                            null

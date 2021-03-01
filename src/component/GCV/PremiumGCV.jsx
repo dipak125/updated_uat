@@ -379,40 +379,9 @@ class PremiumGCV extends Component {
                                                     <Row>	
                                                         <Col sm={12} md={9} lg={9}>	
                                                             <div className="rghtsideTrigr">	
-                                                                <Collapsible trigger={phrases['RMPolicy']}  open= {true}>	
+                                                                <Collapsible trigger={phrases['PolicyDetails']}>	
                                                                     <div className="listrghtsideTrigr">	
                                                                         <Row>	
-                                                                            <Col sm={12} md={3}>	
-                                                                                <div className="motopremium">	
-                                                                                {phrases['Premium']}:	
-                                                                                </div>	
-                                                                            </Col>	
-                                                                            <Col sm={12} md={3}>	
-                                                                                <div className="premamount">	
-                                                                                    ₹ {fulQuoteResp.DuePremium}	
-                                                                                </div>	
-                                                                            </Col>	
-                                                                            <Col sm={12} md={3}>	
-                                                                                <div className="motopremium">	
-                                                                                {phrases['GrossPremium']}:	
-                                                                                </div>	
-                                                                            </Col>	
-                                                                            <Col sm={12} md={3}>	
-                                                                                <div className="premamount">	
-                                                                                    ₹ {Math.round(fulQuoteResp.BeforeVatPremium)}	
-                                                                                </div>	
-                                                                            </Col>	
-                                                                            <Col sm={12} md={3}>	
-                                                                                <div className="motopremium">	
-                                                                                {phrases['GST']}:	
-                                                                                </div>	
-                                                                            </Col>	
-                                                                            <Col sm={12} md={3}>	
-                                                                                <div className="premamount">	
-                                                                                    ₹ {Math.round(fulQuoteResp.TGST)}	
-                                                                                </div>	
-                                                                            </Col>	
-
                                                                             <Col sm={12} md={3}>
                                                                                 <div className="motopremium">
                                                                                     Policy Start date:
@@ -448,6 +417,158 @@ class PremiumGCV extends Component {
                                                                     </div>	
                                                                 </Collapsible>	
                                                             </div>	
+                                                            
+                                                            <div className="rghtsideTrigr">	
+                                                                <Collapsible trigger={phrases['RMPolicy']}  open= {true}>	
+                                                                    <div className="listrghtsideTrigr">	
+                                                                        <Row>	
+                                                                            <Col sm={12} md={3}>	
+                                                                                <div className="motopremium">	
+                                                                                {phrases['Premium']}:	
+                                                                                </div>	
+                                                                            </Col>	
+                                                                            <Col sm={12} md={3}>	
+                                                                                <div className="premamount">	
+                                                                                    ₹ {fulQuoteResp.DuePremium}	
+                                                                                </div>	
+                                                                            </Col>	
+                                                                            <Col sm={12} md={3}>	
+                                                                                <div className="motopremium">	
+                                                                                {phrases['GrossPremium']}:	
+                                                                                </div>	
+                                                                            </Col>	
+                                                                            <Col sm={12} md={3}>	
+                                                                                <div className="premamount">	
+                                                                                    ₹ {Math.round(fulQuoteResp.BeforeVatPremium)}	
+                                                                                </div>	
+                                                                            </Col>	
+                                                                            <Col sm={12} md={3}>	
+                                                                                <div className="motopremium">	
+                                                                                {phrases['GST']}:	
+                                                                                </div>	
+                                                                            </Col>	
+                                                                            <Col sm={12} md={3}>	
+                                                                                <div className="premamount">	
+                                                                                    ₹ {Math.round(fulQuoteResp.TGST)}	
+                                                                                </div>	
+                                                                            </Col>	
+                                                                        </Row>	
+                                                                    </div>	
+                                                                </Collapsible>	
+                                                            </div>	
+                                                            
+                                                            <div className="rghtsideTrigr m-b-30">	
+                                                                <Collapsible trigger={phrases['VehicleDetails']} >	
+                                                                    <div className="listrghtsideTrigr">	
+                                                                        {memberdetails ?	
+                                                                                <div>	
+                                                                                    <Row>	
+                                                                                        <Col sm={12} md={6}>	
+                                                                                            <Row>	
+                                                                                                <Col sm={12} md={6}>	
+                                                                                                    <FormGroup>{phrases['RegNo']}:</FormGroup>	
+                                                                                                </Col>	
+                                                                                                <Col sm={12} md={6}>	
+                                                                                                    <FormGroup>{motorInsurance && motorInsurance.registration_no}</FormGroup>	
+                                                                                                </Col>	
+                                                                                            </Row>	
+                                                                                            <Row>	
+                                                                                                <Col sm={12} md={6}>	
+                                                                                                    <FormGroup>{phrases['Brand']}:</FormGroup>	
+                                                                                                </Col>	
+                                                                                                <Col sm={12} md={6}>	
+                                                                                                    <FormGroup>{vehicleDetails && vehicleDetails.vehiclebrand && vehicleDetails.vehiclebrand.name ? vehicleDetails.vehiclebrand.name : ""}</FormGroup>	
+                                                                                                </Col>	
+                                                                                            </Row>	
+                                                                                            <Row>	
+                                                                                                <Col sm={12} md={6}>	
+                                                                                                    <FormGroup>{phrases['Model']}</FormGroup>	
+                                                                                                </Col>	
+                                                                                                <Col sm={12} md={6}>	
+                                                                                                    <FormGroup>{vehicleDetails && vehicleDetails.vehiclemodel && vehicleDetails.vehiclemodel.description ? vehicleDetails.vehiclemodel.description+" "+vehicleDetails.varientmodel.varient : ""}</FormGroup>	
+                                                                                                </Col>	
+                                                                                            </Row>	
+                                                                                            <Row>	
+                                                                                                <Col sm={12} md={6}>	
+                                                                                                    <FormGroup>{phrases['Variant']}</FormGroup>	
+                                                                                                </Col>	
+                                                                                                <Col sm={12} md={6}>	
+                                                                                                    <FormGroup>{vehicleDetails && vehicleDetails.varientmodel && vehicleDetails.varientmodel.varient ? vehicleDetails.varientmodel.varient : ""}</FormGroup>	
+                                                                                                </Col>	
+                                                                                            </Row>	
+                                                                                            <Row>	
+                                                                                                <Col sm={12} md={6}>	
+                                                                                                    <FormGroup>{phrases['ChasisNumber']}</FormGroup>	
+                                                                                                </Col>	
+                                                                                                <Col sm={12} md={6}>	
+                                                                                                    <FormGroup>{motorInsurance && motorInsurance.chasis_no  ? motorInsurance.chasis_no : ""}</FormGroup>	
+                                                                                                </Col>	
+                                                                                            </Row>	
+                                                                                            <Row>	
+                                                                                                <Col sm={12} md={6}>	
+                                                                                                    <FormGroup>{phrases['EngineNumber']}</FormGroup>	
+                                                                                                </Col>	
+                                                                                                <Col sm={12} md={6}>	
+                                                                                                <FormGroup>{motorInsurance && motorInsurance.engine_no  ? motorInsurance.engine_no : ""}</FormGroup>	
+                                                                                                </Col>	
+                                                                                            </Row>	
+                                                                                            <Row>	
+                                                                                                <Col sm={12} md={6}>	
+                                                                                                    <FormGroup>{phrases['Fuel']}</FormGroup>	
+                                                                                                </Col>	
+                                                                                                <Col sm={12} md={6}>	
+                                                                                                    <FormGroup>{vehicleDetails && vehicleDetails.varientmodel && vehicleDetails.varientmodel.fuel_type ? fuel[parseInt(vehicleDetails.varientmodel.fuel_type)] : null}</FormGroup>	
+                                                                                                </Col>	
+                                                                                            </Row>	
+                                                                                            <Row>	
+                                                                                                <Col sm={12} md={6}>	
+                                                                                                    <FormGroup>{phrases['Seating']}</FormGroup>	
+                                                                                                </Col>	
+                                                                                                <Col sm={12} md={6}>	
+                                                                                                    <FormGroup>{vehicleDetails && vehicleDetails.varientmodel && vehicleDetails.varientmodel.seating ? vehicleDetails.varientmodel.seating : null}</FormGroup>	
+                                                                                                </Col>	
+                                                                                            </Row>	
+                                                                                            <Row>	
+                                                                                                <Col sm={12} md={6}>	
+                                                                                                    <FormGroup>{phrases['BodyStyle']}</FormGroup>	
+                                                                                                </Col>	
+                                                                                                <Col sm={12} md={6}>	
+                                                                                                    <FormGroup>{vehicleDetails && vehicleDetails.varientmodel && vehicleDetails.varientmodel.body_style ? vehicleDetails.varientmodel.body_style : null}</FormGroup>	
+                                                                                                </Col>	
+                                                                                            </Row>	
+                                                                                            <Row>	
+                                                                                                <Col sm={12} md={6}>	
+                                                                                                    <FormGroup>{phrases['GrossVehicleWeight']}</FormGroup>	
+                                                                                                </Col>	
+                                                                                                <Col sm={12} md={6}>	
+                                                                                                    <FormGroup>{vehicleDetails && vehicleDetails.varientmodel && vehicleDetails.varientmodel.gross_vechicle_weight ? vehicleDetails.varientmodel.gross_vechicle_weight : null}</FormGroup>	
+                                                                                                </Col>	
+                                                                                            </Row>	
+                                                                                            <Row>
+                                                                                                <Col sm={12} md={6}>
+                                                                                                    <FormGroup>{phrases['IDVofVehicle']}</FormGroup>
+                                                                                                </Col>
+                                                                                                <Col sm={12} md={6}>
+                                                                                                    <FormGroup>{motorInsurance && motorInsurance.idv_value ? motorInsurance.idv_value : null}</FormGroup>
+                                                                                                </Col>
+                                                                                            </Row>
+                                                                                        </Col>	
+                                                                                    </Row>	
+                                                                                    <Row>	
+                                                                                        <p></p>	
+                                                                                    </Row>	
+                                                                                </div>	
+                                                                            : (<p></p>)}	
+                                                                                   	
+                                                                        <div>	
+                                                                            <Row>	
+                                                                                <p></p>	
+                                                                            </Row>	
+                                                                        </div>	
+                                                                    </div>	
+                                                                </Collapsible>	
+                                                            </div>	
+                                                            
                                                             <div className="rghtsideTrigr m-b-30">	
                                                                 <Collapsible trigger={phrases['MemberDetails']} >	
                                                                     <div className="listrghtsideTrigr">	
@@ -603,117 +724,7 @@ class PremiumGCV extends Component {
                                                                     </div>	
                                                                 </Collapsible>	
                                                             </div>	
-                                                            <div className="rghtsideTrigr m-b-30">	
-                                                                <Collapsible trigger={phrases['VehicleDetails']} >	
-                                                                    <div className="listrghtsideTrigr">	
-                                                                        {memberdetails ?	
-                                                                                <div>	
-                                                                                    <Row>	
-                                                                                        <Col sm={12} md={6}>	
-                                                                                            <Row>	
-                                                                                                <Col sm={12} md={6}>	
-                                                                                                    <FormGroup>{phrases['RegNo']}:</FormGroup>	
-                                                                                                </Col>	
-                                                                                                <Col sm={12} md={6}>	
-                                                                                                    <FormGroup>{motorInsurance && motorInsurance.registration_no}</FormGroup>	
-                                                                                                </Col>	
-                                                                                            </Row>	
-                                                                                            <Row>	
-                                                                                                <Col sm={12} md={6}>	
-                                                                                                    <FormGroup>{phrases['Brand']}:</FormGroup>	
-                                                                                                </Col>	
-                                                                                                <Col sm={12} md={6}>	
-                                                                                                    <FormGroup>{vehicleDetails && vehicleDetails.vehiclebrand && vehicleDetails.vehiclebrand.name ? vehicleDetails.vehiclebrand.name : ""}</FormGroup>	
-                                                                                                </Col>	
-                                                                                            </Row>	
-                                                                                            <Row>	
-                                                                                                <Col sm={12} md={6}>	
-                                                                                                    <FormGroup>{phrases['Model']}</FormGroup>	
-                                                                                                </Col>	
-                                                                                                <Col sm={12} md={6}>	
-                                                                                                    <FormGroup>{vehicleDetails && vehicleDetails.vehiclemodel && vehicleDetails.vehiclemodel.description ? vehicleDetails.vehiclemodel.description+" "+vehicleDetails.varientmodel.varient : ""}</FormGroup>	
-                                                                                                </Col>	
-                                                                                            </Row>	
-                                                                                            <Row>	
-                                                                                                <Col sm={12} md={6}>	
-                                                                                                    <FormGroup>{phrases['Variant']}</FormGroup>	
-                                                                                                </Col>	
-                                                                                                <Col sm={12} md={6}>	
-                                                                                                    <FormGroup>{vehicleDetails && vehicleDetails.varientmodel && vehicleDetails.varientmodel.varient ? vehicleDetails.varientmodel.varient : ""}</FormGroup>	
-                                                                                                </Col>	
-                                                                                            </Row>	
-                                                                                            <Row>	
-                                                                                                <Col sm={12} md={6}>	
-                                                                                                    <FormGroup>{phrases['ChasisNumber']}</FormGroup>	
-                                                                                                </Col>	
-                                                                                                <Col sm={12} md={6}>	
-                                                                                                    <FormGroup>{motorInsurance && motorInsurance.chasis_no  ? motorInsurance.chasis_no : ""}</FormGroup>	
-                                                                                                </Col>	
-                                                                                            </Row>	
-                                                                                            <Row>	
-                                                                                                <Col sm={12} md={6}>	
-                                                                                                    <FormGroup>{phrases['EngineNumber']}</FormGroup>	
-                                                                                                </Col>	
-                                                                                                <Col sm={12} md={6}>	
-                                                                                                <FormGroup>{motorInsurance && motorInsurance.engine_no  ? motorInsurance.engine_no : ""}</FormGroup>	
-                                                                                                </Col>	
-                                                                                            </Row>	
-                                                                                            <Row>	
-                                                                                                <Col sm={12} md={6}>	
-                                                                                                    <FormGroup>{phrases['Fuel']}</FormGroup>	
-                                                                                                </Col>	
-                                                                                                <Col sm={12} md={6}>	
-                                                                                                    <FormGroup>{vehicleDetails && vehicleDetails.varientmodel && vehicleDetails.varientmodel.fuel_type ? fuel[parseInt(vehicleDetails.varientmodel.fuel_type)] : null}</FormGroup>	
-                                                                                                </Col>	
-                                                                                            </Row>	
-                                                                                            <Row>	
-                                                                                                <Col sm={12} md={6}>	
-                                                                                                    <FormGroup>{phrases['Seating']}</FormGroup>	
-                                                                                                </Col>	
-                                                                                                <Col sm={12} md={6}>	
-                                                                                                    <FormGroup>{vehicleDetails && vehicleDetails.varientmodel && vehicleDetails.varientmodel.seating ? vehicleDetails.varientmodel.seating : null}</FormGroup>	
-                                                                                                </Col>	
-                                                                                            </Row>	
-                                                                                            <Row>	
-                                                                                                <Col sm={12} md={6}>	
-                                                                                                    <FormGroup>{phrases['BodyStyle']}</FormGroup>	
-                                                                                                </Col>	
-                                                                                                <Col sm={12} md={6}>	
-                                                                                                    <FormGroup>{vehicleDetails && vehicleDetails.varientmodel && vehicleDetails.varientmodel.body_style ? vehicleDetails.varientmodel.body_style : null}</FormGroup>	
-                                                                                                </Col>	
-                                                                                            </Row>	
-                                                                                            <Row>	
-                                                                                                <Col sm={12} md={6}>	
-                                                                                                    <FormGroup>{phrases['GrossVehicleWeight']}</FormGroup>	
-                                                                                                </Col>	
-                                                                                                <Col sm={12} md={6}>	
-                                                                                                    <FormGroup>{vehicleDetails && vehicleDetails.varientmodel && vehicleDetails.varientmodel.gross_vechicle_weight ? vehicleDetails.varientmodel.gross_vechicle_weight : null}</FormGroup>	
-                                                                                                </Col>	
-                                                                                            </Row>	
-                                                                                            <Row>
-                                                                                                <Col sm={12} md={6}>
-                                                                                                    <FormGroup>{phrases['IDVofVehicle']}</FormGroup>
-                                                                                                </Col>
-                                                                                                <Col sm={12} md={6}>
-                                                                                                    <FormGroup>{motorInsurance && motorInsurance.idv_value ? motorInsurance.idv_value : null}</FormGroup>
-                                                                                                </Col>
-                                                                                            </Row>
-                                                                                        </Col>	
-                                                                                    </Row>	
-                                                                                    <Row>	
-                                                                                        <p></p>	
-                                                                                    </Row>	
-                                                                                </div>	
-                                                                            : (<p></p>)}	
-                                                                                   	
-                                                                        <div>	
-                                                                            <Row>	
-                                                                                <p></p>	
-                                                                            </Row>	
-                                                                        </div>	
-                                                                    </div>	
-                                                                </Collapsible>	
-                                                            </div>	
+                                                            
                                                             <Row>	
                                                             <Col sm={12} md={6}>	
                                                             </Col>	

@@ -440,7 +440,7 @@ class OtherComprehensiveMISCD extends Component {
     sliderValue = (value) => {
         this.setState({
             sliderVal: value,
-            bodySliderVal: '',
+            // bodySliderVal: '',
             serverResponse: [],
             error: []
         })
