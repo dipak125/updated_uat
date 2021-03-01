@@ -227,6 +227,8 @@ class ThankYouPage extends Component {
             let decryptResp = JSON.parse(encryption.decrypt(res.data))
             console.log("decrypt", decryptResp)
             let vehicletype = decryptResp.data.policyHolder && decryptResp.data.policyHolder.vehiclebrandmodel ? decryptResp.data.policyHolder.vehiclebrandmodel.vehicletype : {};
+
+            console.log('vehicletype', vehicletype)
             
             localStorage.removeItem("policyHolder_id");
             localStorage.removeItem("policyHolder_refNo");
@@ -320,11 +322,12 @@ downloadWordingGSB = () => {
                       <p>{phrases['ThankYouSBI']}</p>
                       <p className="fs-16 m-b-30">{phrases['PolicyNo']} <span className="lghtBlue"> {policyId}</span></p>
                         <div className="d-flex justify-content-center align-items-center">
-                        {vehicletype.download_type == 0 ?
+                        {/* {vehicletype.download_type == 0 ?
                             <button className="policy m-l-20" onClick={this.generateDoc}>{phrases['PolicyCopy']} </button>
                             :
                             <button className="policy m-l-20" onClick={this.getAccessToken}>{phrases['PolicyCopy']} </button>
-                        }
+                        } */}
+                        <button className="policy m-l-20" onClick={this.generateDoc}>{phrases['PolicyCopy']} </button>
                         {vehicletype.id == 13 ?
                             <button className="policy m-l-20" onClick={this.downloadWording}>Policy Wording </button>
                             :

@@ -402,6 +402,38 @@ paypoint_payment = () => {
 
                                       <Row>
                                         <Col sm={12} md={9} lg={9}>
+                                        <div className="rghtsideTrigr">
+                                            <Collapsible trigger="Policy Details">
+                                              <div className="listrghtsideTrigr">
+                                                <Row>
+                                                  <Col sm={12} md={3}>
+                                                    <FormGroup>Policy Start date:</FormGroup>
+                                                  </Col>
+                                                  <Col sm={12} md={3}>
+                                                    <FormGroup>
+                                                      {request_data && request_data.start_date ? moment(request_data.start_date).format('DD-MM-yyy') : null}
+                                                    </FormGroup>
+                                                  </Col>
+                                                  <Col sm={12} md={3}>
+                                                    <FormGroup>Policy End Date:</FormGroup>
+                                                  </Col>
+                                                  <Col sm={12} md={3}>
+                                                    <FormGroup>
+                                                      {request_data && request_data.end_date ? moment(request_data.end_date).format('DD-MM-yyy') : null}
+                                                    </FormGroup>
+                                                  </Col>
+                                                  <Col sm={12} md={3}>
+                                                    <FormGroup>Product Name:</FormGroup>
+                                                  </Col>
+                                                  <Col sm={12} md={3}>
+                                                    <FormGroup>
+                                                      {menumaster && menumaster.name ? menumaster.name : null}
+                                                    </FormGroup>
+                                                  </Col>
+                                                </Row>
+                                              </div>
+                                            </Collapsible>
+                                          </div>
                                           <div className="rghtsideTrigr">
                                             <Collapsible trigger="Arogya Sanjeevani Policy, SBI General Insurance Company Limited">
                                               <div className="listrghtsideTrigr">
@@ -439,32 +471,6 @@ paypoint_payment = () => {
                                                     <FormGroup>
                                                       <strong>Rs:</strong>{" "}
                                                       {fulQuoteResp.DuePremium}
-                                                    </FormGroup>
-                                                  </Col>
-
-                                                  <Col sm={12} md={3}>
-                                                    <FormGroup>Policy Start date:</FormGroup>
-                                                  </Col>
-                                                  <Col sm={12} md={3}>
-                                                    <FormGroup>
-                                                      {request_data && request_data.start_date ? moment(request_data.start_date).format('DD-MM-yyy') : null}
-                                                    </FormGroup>
-                                                  </Col>
-                                                  <Col sm={12} md={3}>
-                                                    <FormGroup>Policy End Date:</FormGroup>
-                                                  </Col>
-                                                  <Col sm={12} md={3}>
-                                                    <FormGroup>
-                                                      {request_data && request_data.end_date ? moment(request_data.end_date).format('DD-MM-yyy') : null}
-                                                    </FormGroup>
-                                                  </Col>
-
-                                                  <Col sm={12} md={3}>
-                                                    <FormGroup>Product Name:</FormGroup>
-                                                  </Col>
-                                                  <Col sm={12} md={3}>
-                                                    <FormGroup>
-                                                      {menumaster && menumaster.name ? menumaster.name : null}
                                                     </FormGroup>
                                                   </Col>
                                                 </Row>

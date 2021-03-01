@@ -889,7 +889,7 @@ class TwoWheelerVerify extends Component {
                                                 selected={values.previous_start_date}
                                                 onChange={(val) => {
                                                     setFieldValue('previous_start_date', val);
-                                                    setFieldValue("previous_end_date", addDays(new Date(val), 365));
+                                                    setFieldValue("previous_end_date", addDays(new Date(val), 364));
                                                 }}
                                             />
                                             {errors.previous_start_date && touched.previous_start_date ? (
