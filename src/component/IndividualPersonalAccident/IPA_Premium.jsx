@@ -132,13 +132,13 @@ class IPA_Premium extends Component {
       .get(`ipa/details/${policyHolder_refNo}`)
       .then((res) => {
         let decryptResp = JSON.parse(encryption.decrypt(res.data));
-
+        let menumaster = decryptResp.data.policyHolder ? decryptResp.data.policyHolder.menumaster : {};
         let bcMaster = decryptResp.data.policyHolder ? decryptResp.data.policyHolder.bcmaster : {};
         let ipaInfo = decryptResp.data && decryptResp.data.policyHolder && decryptResp.data.policyHolder.ipainfo ? decryptResp.data.policyHolder.ipainfo : null;
         let policyHolderDetails = decryptResp.data.policyHolder ? decryptResp.data.policyHolder : [];
         console.log("---ipaInfo--->>", ipaInfo);
         this.setState({
-          ipaInfo, policyHolderDetails, bcMaster,
+          ipaInfo, policyHolderDetails, bcMaster,menumaster,
           nomineeDetails: policyHolderDetails.request_data && policyHolderDetails.request_data.nominee && policyHolderDetails.request_data.nominee[0],
         });
         this.quote() 
@@ -162,7 +162,7 @@ class IPA_Premium extends Component {
     }
     let encryption = new Encryption();
     formData.append('enc_data',encryption.encrypt(JSON.stringify(post_data)))
-console.log("post_data---quote--- ", post_data)
+    console.log("post_data---quote--- ", post_data)
     axios
       .post(`/fullQuoteServiceIPA`, formData)
       .then(res => { 
@@ -279,7 +279,8 @@ console.log("post_data---quote--- ", post_data)
 
   render() {
     const { productId } = this.props.match.params;
-    const { fulQuoteResp, error, show, policyHolderDetails, nomineeDetails, paymentStatus, policyCoverage, relationArr, ipaInfo, bcMaster } = this.state;
+    const { fulQuoteResp, error, show, policyHolderDetails, nomineeDetails, paymentStatus, policyCoverage, relationArr, 
+      ipaInfo, bcMaster, menumaster } = this.state;
 
     console.log("policyHolderDetails ", policyHolderDetails)
 
@@ -475,16 +476,9 @@ console.log("post_data---quote--- ", post_data)
                                       </div>
 
                                       <Row>
-                                        <Col sm={12} md={9} lg={9}>
+                                        <Col sm={12} md={9} lg={9}>   
                                           <div className="rghtsideTrigr">
-                                              <Collapsible trigger="Default Covered Coverages & Benefit" open= {true}>
-                                                  <div className="listrghtsideTrigr">
-                                                      {policyCoverageList}
-                                                  </div>
-                                              </Collapsible>
-                                          </div>
-                                          <div className="rghtsideTrigr">
-                                            <Collapsible trigger="Premium Summary" open={true}>
+                                            <Collapsible trigger="Policy Details" >
                                               <div className="listrghtsideTrigr">
                                                 <Row>
                                                   <Col sm={12} md={3}>
@@ -503,6 +497,31 @@ console.log("post_data---quote--- ", post_data)
                                                       {policyHolderDetails && policyHolderDetails.request_data ? moment(policyHolderDetails.request_data.end_date).format('DD-MM-yyyy') : null}
                                                     </FormGroup>
                                                   </Col>
+                                                  <Col sm={12} md={3}>
+                                                      <FormGroup>Product Name:</FormGroup>
+                                                    </Col>
+                                                    <Col sm={12} md={3}>
+                                                      <FormGroup>
+                                                        {menumaster && menumaster.name ? menumaster.name : null}
+                                                      </FormGroup>
+                                                    </Col>
+                                                </Row>
+                                              </div>
+                                            </Collapsible>
+                                          </div>
+                                     
+                                          <div className="rghtsideTrigr">
+                                              <Collapsible trigger="Default Covered Coverages & Benefit" open= {true}>
+                                                  <div className="listrghtsideTrigr">
+                                                      {policyCoverageList}
+                                                  </div>
+                                              </Collapsible>
+                                          </div>
+                                          
+                                          <div className="rghtsideTrigr">
+                                            <Collapsible trigger="Premium Summary" open={true}>
+                                              <div className="listrghtsideTrigr">
+                                                <Row> 
                                                   <Col sm={12} md={3}>
                                                     <FormGroup>Sum Insured:</FormGroup>
                                                   </Col>

@@ -163,9 +163,10 @@ class PolicyDetails_GSB extends Component {
         let location = decryptResp.data.policyHolder.location
         let city = decryptResp.data.policyHolder.city
         let state = decryptResp.data.policyHolder.state      
+        let menumaster = decryptResp.data.policyHolder ? decryptResp.data.policyHolder.menumaster : {};
         console.log("---gsb_Details--->>", decryptResp.data.policyHolder);
         this.setState({
-          gsb_Details, requested_Data, bcMaster,
+          gsb_Details, requested_Data, bcMaster,menumaster,
           addressDetails, pincode_Details, policyHolderDetails, pincode, location, city, state
         });
         this.fetchCoveragePlan(decryptResp.data.policyHolder, gsb_Details)
@@ -333,7 +334,7 @@ paypoint_payment = () => {
   render() {
     const { productId } = this.props.match.params;
     const { fulQuoteResp, addressDetails, error, show, policyHolderDetails, nomineedetails, paymentStatus, policyCoverage, 
-        bcMaster, NomineeRelationArr, AppointeeRelationArr, location, city, state, gsb_Details } = this.state;
+        bcMaster, NomineeRelationArr, AppointeeRelationArr, location, city, state, gsb_Details, menumaster } = this.state;
     const Is_appo = policyHolderDetails.request_data ? policyHolderDetails.request_data.nominee[0].is_appointee : null
     const risk_address = gsb_Details && gsb_Details.risk_address ? JSON.parse(gsb_Details.risk_address) : {}
 
@@ -677,11 +678,47 @@ paypoint_payment = () => {
                                       <Row>
                                         <Col sm={12} md={9} lg={18}>
                                           <div className="rghtsideTrigr">
+                                            <Collapsible trigger="Policy Details" >
+                                              <div className="listrghtsideTrigr">
+                                                <Row>
+                                                  <Col sm={12} md={3}>
+                                                    <FormGroup>Policy Start Date:</FormGroup>
+                                                  </Col>
+                                                  <Col sm={12} md={3}>
+                                                    <FormGroup>
+                                                      {policyHolderDetails && policyHolderDetails.request_data ? moment(policyHolderDetails.request_data.start_date).format('DD-MM-yyyy') : null}
+                                                    </FormGroup>
+                                                  </Col>
+                                                  <Col sm={12} md={3}>
+                                                    <FormGroup>Policy End Date:</FormGroup>
+                                                  </Col>
+                                                  <Col sm={12} md={3}>
+                                                    <FormGroup>
+                                                      {policyHolderDetails && policyHolderDetails.request_data ? moment(policyHolderDetails.request_data.end_date).format('DD-MM-yyyy') : null}
+                                                    </FormGroup>
+                                                  </Col>
+                                                  <Col sm={12} md={3}>
+                                                      <FormGroup>Product Name:</FormGroup>
+                                                    </Col>
+                                                    <Col sm={12} md={3}>
+                                                      <FormGroup>
+                                                        {menumaster && menumaster.name ? menumaster.name : null}
+                                                      </FormGroup>
+                                                    </Col>
+                                                </Row>
+                                              </div>
+                                            </Collapsible>
+                                          </div>
+                                     
+                                          <div className="rghtsideTrigr">
                                             <Collapsible trigger=" GSB Policy Plan Details"  open= {true}>
                                               <div className="listrghtsideTrigr">
                                                 {policy_Coverage ? policy_Coverage : null}
                                               </div>
                                             </Collapsible>
+                                            </div>
+
+                                          <div className="rghtsideTrigr">
                                             <Collapsible trigger=" Premium Details"  open= {true}>
                                               <div className="listrghtsideTrigr">
                                                 <Row>
@@ -725,6 +762,7 @@ paypoint_payment = () => {
                                               <div className="listrghtsideTrigr">{proposerDetails}</div>
                                             </Collapsible>
                                           </div>
+                                          
                                           <div className="rghtsideTrigr">
                                             <Collapsible trigger=" Risk Details">
                                               <div className="listrghtsideTrigr">         
