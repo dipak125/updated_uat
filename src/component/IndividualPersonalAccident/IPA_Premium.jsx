@@ -136,9 +136,10 @@ class IPA_Premium extends Component {
         let bcMaster = decryptResp.data.policyHolder ? decryptResp.data.policyHolder.bcmaster : {};
         let ipaInfo = decryptResp.data && decryptResp.data.policyHolder && decryptResp.data.policyHolder.ipainfo ? decryptResp.data.policyHolder.ipainfo : null;
         let policyHolderDetails = decryptResp.data.policyHolder ? decryptResp.data.policyHolder : [];
+        let vehicleDetails = decryptResp.data.policyHolder ? decryptResp.data.policyHolder.vehiclebrandmodel : {};
         console.log("---ipaInfo--->>", ipaInfo);
         this.setState({
-          ipaInfo, policyHolderDetails, bcMaster,menumaster,
+          ipaInfo, policyHolderDetails, bcMaster,menumaster,vehicleDetails,
           nomineeDetails: policyHolderDetails.request_data && policyHolderDetails.request_data.nominee && policyHolderDetails.request_data.nominee[0],
         });
         this.quote() 
@@ -280,7 +281,7 @@ class IPA_Premium extends Component {
   render() {
     const { productId } = this.props.match.params;
     const { fulQuoteResp, error, show, policyHolderDetails, nomineeDetails, paymentStatus, policyCoverage, relationArr, 
-      ipaInfo, bcMaster, menumaster } = this.state;
+      ipaInfo, bcMaster, menumaster, vehicleDetails } = this.state;
 
     console.log("policyHolderDetails ", policyHolderDetails)
 
@@ -500,9 +501,9 @@ class IPA_Premium extends Component {
                                                   <Col sm={12} md={3}>
                                                       <FormGroup>Product Name:</FormGroup>
                                                     </Col>
-                                                    <Col sm={12} md={3}>
+                                                    <Col sm={12} md={6}>
                                                       <FormGroup>
-                                                        {menumaster && menumaster.name ? menumaster.name : null}
+                                                      {vehicleDetails && vehicleDetails.vehicletype ? vehicleDetails.vehicletype.description : null}
                                                       </FormGroup>
                                                     </Col>
                                                 </Row>

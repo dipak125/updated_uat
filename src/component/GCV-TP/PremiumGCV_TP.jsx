@@ -353,7 +353,7 @@ class PremiumGCV extends Component {
                                                                             </Col>
                                                                             <Col sm={12} md={3}>
                                                                                 <div className="premamount">
-                                                                                    {menumaster && menumaster.name ? menumaster.name : null}
+                                                                                {vehicleDetails && vehicleDetails.vehicletype ? vehicleDetails.vehicletype.description : null}
                                                                                 </div>
                                                                             </Col>
                                                                         </Row>

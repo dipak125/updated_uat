@@ -94,6 +94,7 @@ class ThankYouCCM extends Component {
           this.setState({
             policyNo: res.data.data.PolicyNo, retry: 0
           });
+          this.getCustomerMsg(res.data.data.PolicyNo)
           this.props.loadingStop();   
         }
         else { 
@@ -475,6 +476,24 @@ class ThankYouCCM extends Component {
         // this.autoPopulateAddress();
     }
     
+}
+
+getCustomerMsg = (policyId) => {
+  const { productId } = this.props.match.params
+  // let encryption = new Encryption();
+  // const { policyId } = this.props.match.params
+
+  const formData = new FormData();
+  formData.append('policy_no', policyId);
+
+  axios.post(`customer-msg`, formData)
+      .then(res => {
+        // custom Msg
+      })
+      .catch(err => {
+          // handle error
+          this.props.loadingStop();
+      })
 }
 
 downloadWording = () => {

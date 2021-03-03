@@ -18,7 +18,8 @@ import * as Yup from "yup";
 import swal from 'sweetalert';
 import moment from "moment";
 import {  PersonAge } from "../../shared/dateFunctions";
-import { addDays } from 'date-fns';
+// import { addDays } from 'date-fns';
+import {prevEndDate} from "../../shared/reUseFunctions";
 import {
     checkGreaterTimes,
     checkGreaterStartEndTimes, validRegistrationNumber
@@ -778,7 +779,7 @@ regnoFormat = (e, setFieldTouched, setFieldValue) => {
                                                 selected={values.previous_start_date}
                                                 onChange={(val) => {
                                                     setFieldValue('previous_start_date', val);
-                                                    setFieldValue("previous_end_date", addDays(new Date(val), 365));
+                                                    setFieldValue("previous_end_date",  prevEndDate(val));
                                                 }}
                                             />
                                             {errors.previous_start_date && touched.previous_start_date ? (

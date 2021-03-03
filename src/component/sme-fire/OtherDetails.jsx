@@ -270,7 +270,7 @@ class OtherDetails extends Component {
             axios.get(`sme/details/${policy_holder_ref_no}`)
             .then(res=>{
                 let decryptResp = JSON.parse(encryption.decrypt(res.data));
-                
+                console.log("decryptResp -------->",decryptResp)
                 if(decryptResp.data.policyHolder.step_no > 0){
 
                     this.props.setData({

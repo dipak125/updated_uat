@@ -95,9 +95,10 @@ class PolicyDetails extends Component {
         let bcMaster = res.data.data.policyHolder ? res.data.data.policyHolder.bcmaster : {};
         let menumaster = res.data.data.policyHolder ? res.data.data.policyHolder.menumaster : {};
         let request_data = res.data.data.policyHolder && res.data.data.policyHolder.request_data ? res.data.data.policyHolder.request_data : {};
+        let vehicleDetails = res.data.data.policyHolder ? res.data.data.policyHolder.vehiclebrandmodel : {};
 
         this.setState({
-          policyHolderDetails: policyHolderDetails,bcMaster, menumaster, request_data,
+          policyHolderDetails: policyHolderDetails,bcMaster, menumaster, request_data,vehicleDetails,
           nomineeDetails: policyHolderDetails.request_data && policyHolderDetails.request_data.nominee && policyHolderDetails.request_data.nominee[0],
           familyMember: res.data.data.policyHolder.request_data.family_members,
           refNumber: res.data.data.policyHolder.reference_no,
@@ -220,7 +221,8 @@ class PolicyDetails extends Component {
 
   render() {
     const { productId } = this.props.match.params;
-    const { fulQuoteResp, error, show, policyHolderDetails, refNumber, paymentStatus, nomineeDetails, bcMaster, menumaster, request_data } = this.state;
+    const { fulQuoteResp, error, show, policyHolderDetails, refNumber, paymentStatus, nomineeDetails, bcMaster,
+       menumaster, request_data, vehicleDetails } = this.state;
 
     console.log("policyHolderDetails ", policyHolderDetails)
     const items =
@@ -437,9 +439,9 @@ class PolicyDetails extends Component {
                                                     <Col sm={12} md={3}>
                                                       <FormGroup>Product Name:</FormGroup>
                                                     </Col>
-                                                    <Col sm={12} md={3}>
+                                                    <Col sm={12} md={6}>
                                                       <FormGroup>
-                                                        {menumaster && menumaster.name ? menumaster.name : null}
+                                                      {vehicleDetails && vehicleDetails.vehicletype ? vehicleDetails.vehicletype.description : null}
                                                       </FormGroup>
                                                     </Col>
                                                   </Row>

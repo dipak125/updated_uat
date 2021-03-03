@@ -436,9 +436,9 @@ sendPaymentLink = () => {
                                                                                     Product Name:
                                                                                 </div>
                                                                                 </Col>
-                                                                                <Col sm={12} md={3}>
+                                                                                <Col sm={12} md={6}>
                                                                                 <div className="premamount">
-                                                                                    {menumaster && menumaster.name ? menumaster.name : null}
+                                                                                {vehicleDetails && vehicleDetails.vehicletype ? vehicleDetails.vehicletype.description : null}
                                                                                 </div>
                                                                                 </Col>
                                                                             </Row>

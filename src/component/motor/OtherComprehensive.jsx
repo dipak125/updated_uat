@@ -22,6 +22,15 @@ import {  validRegistrationNumber } from "../../shared/validationFunctions";
 
 let translation = localStorage.getItem("phrases") ? JSON.parse(localStorage.getItem("phrases")) : []
 
+const insert = (arr, index, newItem) => [
+    // part of the array before the specified index
+    ...arr.slice(0, index),
+    // inserted item
+    newItem,
+    // part of the array after the specified index
+    ...arr.slice(index)
+  ]
+
 const ComprehensiveValidation = Yup.object().shape({
     // is_carloan: Yup.number().required('Please select one option')
 
@@ -282,6 +291,7 @@ class OtherComprehensive extends Component {
             request_data: [],
             geographical_extension: [],
             add_more_coverage_request_array: [],
+            ncbDiscount: 0
         };
     }
 
@@ -559,12 +569,31 @@ class OtherComprehensive extends Component {
         axios.post('fullQuotePMCAR',formData)
             .then(res => {
                 if (res.data.PolicyObject && res.data.UnderwritingResult && res.data.UnderwritingResult.Status == "Success") {
+                    let policyCoverage= res.data.PolicyObject.PolicyLobList ? res.data.PolicyObject.PolicyLobList[0].PolicyRiskList[0].PolicyCoverageList : []
+                    let ncbDiscount= res.data.PolicyObject.PolicyLobList ? res.data.PolicyObject.PolicyLobList[0].PolicyRiskList[0].OD_NCBAmount : 0
+                    if(ncbDiscount != '0') {
+                        let ncbArr = {}
+                        ncbArr.PolicyBenefitList = [{
+                            BeforeVatPremium : 0 - Math.round(ncbDiscount),
+                            ProductElementCode : 'NCB'
+                        }]
+    
+                        let totOD = {}
+                        totOD.PolicyBenefitList = [{
+                            BeforeVatPremium : Math.round(policyCoverage[0]['PolicyBenefitList'][0]['BeforeVatPremium']) - Math.round(ncbDiscount),
+                            ProductElementCode : 'TOTALOD'
+                        }]
+    
+                        policyCoverage = ncbDiscount != '0' ?  insert(policyCoverage, 1, ncbArr) : ""
+                        policyCoverage = ncbDiscount != '0' ?  insert(policyCoverage, 2, totOD) : ""
+                    }
+
                     this.setState({
                       fulQuoteResp: res.data.PolicyObject,
                       PolicyArray: res.data.PolicyObject.PolicyLobList,
                       error: [],
-                      serverResponse: res.data.PolicyObject,
-                      policyCoverage: res.data.PolicyObject.PolicyLobList ? res.data.PolicyObject.PolicyLobList[0].PolicyRiskList[0].PolicyCoverageList : [],
+                      serverResponse: res.data.PolicyObject,policyCoverage
+                    //   policyCoverage: res.data.PolicyObject.PolicyLobList ? res.data.PolicyObject.PolicyLobList[0].PolicyRiskList[0].PolicyCoverageList : [],
                     });
                   } 
                 else if (res.data.PolicyObject && res.data.UnderwritingResult && res.data.UnderwritingResult.Status == "Fail") {
@@ -841,7 +870,7 @@ class OtherComprehensive extends Component {
 
 
     render() {
-        const {showCNG, vahanDetails,error, policyCoverage, vahanVerify, selectFlag, fulQuoteResp, PolicyArray, geographical_extension,
+        const {showCNG, vahanDetails,error, policyCoverage, vahanVerify, selectFlag, fulQuoteResp, PolicyArray, geographical_extension,ncbDiscount,
             moreCoverage, sliderVal, motorInsurance, serverResponse, engine_no, chasis_no, initialValue, add_more_coverage, add_more_coverage_request_array} = this.state
         const {productId} = this.props.match.params 
         let defaultSliderValue = PolicyArray.length > 0 ? Math.round(PolicyArray[0].PolicyRiskList[0].IDV_Suggested) : 0
@@ -938,53 +967,49 @@ class OtherComprehensive extends Component {
 
         let OD_TP_premium = serverResponse.PolicyLobList ? serverResponse.PolicyLobList[0].PolicyRiskList[0] : []
 
-        const policyCoverageList = policyCoverage && policyCoverage.length > 0 ?
-        policyCoverage.map((coverage, qIndex) => (
-            coverage.PolicyBenefitList ?
-                coverage.PolicyBenefitList.map((coverage1, qIndex) => (
-                <div>
-                    {coverage1.AnnualPremium > 0 ? 
-                    <Row>
-                        <Col sm={12} md={6}>
-                        <FormGroup>{Coverage[coverage1.ProductElementCode]}</FormGroup>
-                        </Col>
-                        <Col sm={12} md={6}>
-                        <FormGroup>₹ {Math.round(coverage1.AnnualPremium)}  </FormGroup>                      
-                        </Col>
-                    </Row> : null }
-                </div>)) :
-                <div>
-                    <Row>
-                        <Col sm={12} md={6}>
-                        <FormGroup>{Coverage[coverage.ProductElementCode]}</FormGroup>
-                        </Col>
-                        <Col sm={12} md={6}>
-                        <FormGroup>₹ {Math.round(coverage.AnnualPremium)}  </FormGroup>                      
-                        </Col>
-                    </Row> 
-                </div>
-        )) : null
+        console.log("policyCoverage--------------- ", policyCoverage)
+
+        const policyCoverageList =  policyCoverage && policyCoverage.length > 0 ?
+            policyCoverage.map((coverage, qIndex) => (
+                coverage.PolicyBenefitList ? coverage.PolicyBenefitList.map((benefit, bIndex) => (
+                    benefit.BeforeVatPremium != 0 ?
+                    <div>
+                        <Row>
+                            <Col sm={12} md={6}>
+                                <FormGroup>{Coverage[benefit.ProductElementCode]}</FormGroup>
+                            </Col>
+                            <Col sm={12} md={6}>
+                                <FormGroup>₹ {Math.round(benefit.BeforeVatPremium)}</FormGroup>
+                            </Col>
+                        </Row>
+                    </div> : null
+            )) : 
+            <div>
+                <Row>
+                    <Col sm={12} md={6}>
+                    <FormGroup>{Coverage[coverage.ProductElementCode]}</FormGroup>
+                    </Col>
+                    <Col sm={12} md={6}>
+                    <FormGroup>₹ {Math.round(coverage.AnnualPremium)}  </FormGroup>                      
+                    </Col>
+                </Row> 
+            </div>
+        )) : null 
 
         const premiumBreakup = policyCoverage && policyCoverage.length > 0 ?
-        policyCoverage.map((coverage, qIndex) => (
-            coverage.PolicyBenefitList ?
-                coverage.PolicyBenefitList && coverage.PolicyBenefitList.map((coverage1, qIndex) => (
-                    <Fragment>      
-                        {coverage1.AnnualPremium > 0 ?         
+            policyCoverage.map((coverage, qIndex) => (
+                coverage.PolicyBenefitList ? coverage.PolicyBenefitList.map((benefit, bIndex) => (
+                    benefit.BeforeVatPremium != 0 ?
                         <tr>
-                            <td>{Coverage[coverage1.ProductElementCode]}</td>
-                            {/* <td>{coverage1.ProductElementCode}</td> */}
-                            <td>₹ {Math.round(coverage1.BeforeVatPremium)}  </td>                      
-                        </tr> : null }
-                    </Fragment>           
+                            <td>{Coverage[benefit.ProductElementCode]}:</td>
+                            <td>₹ {Math.round(benefit.BeforeVatPremium)}</td>
+                        </tr>  : null
                 )) : 
-                    <Fragment>           
-                        <tr>
-                            <td>{Coverage[coverage.ProductElementCode]}</td>
-                            <td>₹ {Math.round(coverage.BeforeVatPremium)}  </td>                      
-                        </tr> 
-                    </Fragment>  
-        )) : null
+                    <tr>
+                        <td>{Coverage[coverage.ProductElementCode]}</td>
+                        <td>₹ {Math.round(coverage.BeforeVatPremium)}  </td>                      
+                    </tr> 
+            )) : null
 
         // const premiumBreakup = policyCoverage && policyCoverage.length > 0 ?
         //     policyCoverage.map((coverage, qIndex) => {
@@ -1703,6 +1728,12 @@ class OtherComprehensive extends Component {
                             </thead>
                             <tbody>
                             {premiumBreakup}
+                            {ncbDiscount != 0 ? (
+                                <tr>
+                                    <td>{phrases['NCBDiscount']}:</td>
+                                    <td>₹ -{Math.round(ncbDiscount)}</td>
+                                </tr>
+                                ) : ""}
                                 <tr>
                                     <td>{phrases['GrossPremium']}:</td>
                                     <td>₹ {Math.round(fulQuoteResp.BeforeVatPremium)}</td>

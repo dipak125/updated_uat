@@ -241,6 +241,7 @@ class ThankYouPage extends Component {
             sessionStorage.removeItem('display_looking_for');
             sessionStorage.removeItem('display_dob');
             
+            this.getCustomerMsg()
             this.setState({
                 vehicletype       
             })
@@ -257,6 +258,24 @@ class ThankYouPage extends Component {
             // handle error
             this.props.loadingStop();
         })
+}
+
+getCustomerMsg = () => {
+  const { productId } = this.props.match.params
+  // let encryption = new Encryption();
+  const { policyId } = this.props.match.params
+
+  const formData = new FormData();
+  formData.append('policy_no', policyId);
+
+  axios.post(`customer-msg`, formData)
+      .then(res => {
+        // custom Msg
+      })
+      .catch(err => {
+          // handle error
+          this.props.loadingStop();
+      })
 }
 
 

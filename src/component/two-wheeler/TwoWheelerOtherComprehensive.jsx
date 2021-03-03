@@ -57,6 +57,7 @@ const Coverage = {
     "B00015":translation["B00015"],
     "B00075":translation["B00075"],
     "B00009":translation["B00009"],
+    "C101072":translation["C101072"],
     "NCB":translation["NCB"],
     "TOTALOD":translation["TOTALOD"]
 }
@@ -519,11 +520,11 @@ class TwoWheelerOtherComprehensive extends Component {
 
         // console.log("InitialValues---", newInnitialArray)
         // console.log("add_more_coverage---", add_more_coverage)
-        // console.log('policyCoverage', policyCoverage)
+        console.log('policyCoverage', policyCoverage)
 
         const policyCoverageList =  policyCoverage && policyCoverage.length > 0 ?
             policyCoverage.map((coverage, qIndex) => (
-                coverage.PolicyBenefitList && coverage.PolicyBenefitList.map((benefit, bIndex) => (
+                coverage.PolicyBenefitList ? coverage.PolicyBenefitList.map((benefit, bIndex) => (
                     <div>
                         <Row>
                             <Col sm={12} md={6}>
@@ -534,7 +535,17 @@ class TwoWheelerOtherComprehensive extends Component {
                             </Col>
                         </Row>
                     </div>     
-            ))
+            )) : 
+            <div>
+                <Row>
+                    <Col sm={12} md={6}>
+                    <FormGroup>{Coverage[coverage.ProductElementCode]}</FormGroup>
+                    </Col>
+                    <Col sm={12} md={6}>
+                    <FormGroup>₹ {Math.round(coverage.AnnualPremium)}  </FormGroup>                      
+                    </Col>
+                </Row> 
+            </div>
         )) : null 
 
         const ncb_Discount = ncbDiscount && ncbDiscount != 0 ? (
@@ -553,12 +564,16 @@ class TwoWheelerOtherComprehensive extends Component {
 
         const premiumBreakup = policyCoverage && policyCoverage.length > 0 ?
             policyCoverage.map((coverage, qIndex) => (
-                coverage.PolicyBenefitList && coverage.PolicyBenefitList.map((benefit, bIndex) => (
+                coverage.PolicyBenefitList ? coverage.PolicyBenefitList.map((benefit, bIndex) => (
                         <tr>
                             <td>{Coverage[benefit.ProductElementCode]}:</td>
                             <td>₹ {Math.round(benefit.BeforeVatPremium)}</td>
                         </tr>  
-                ))
+                )) : 
+                    <tr>
+                        <td>{Coverage[coverage.ProductElementCode]}</td>
+                        <td>₹ {Math.round(coverage.BeforeVatPremium)}  </td>                      
+                    </tr> 
             )) : null
 
         const errMsg =

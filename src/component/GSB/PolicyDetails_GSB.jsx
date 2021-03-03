@@ -164,9 +164,10 @@ class PolicyDetails_GSB extends Component {
         let city = decryptResp.data.policyHolder.city
         let state = decryptResp.data.policyHolder.state      
         let menumaster = decryptResp.data.policyHolder ? decryptResp.data.policyHolder.menumaster : {};
+        let vehicleDetails = decryptResp.data.policyHolder ? decryptResp.data.policyHolder.vehiclebrandmodel : {};
         console.log("---gsb_Details--->>", decryptResp.data.policyHolder);
         this.setState({
-          gsb_Details, requested_Data, bcMaster,menumaster,
+          gsb_Details, requested_Data, bcMaster,menumaster,vehicleDetails,
           addressDetails, pincode_Details, policyHolderDetails, pincode, location, city, state
         });
         this.fetchCoveragePlan(decryptResp.data.policyHolder, gsb_Details)
@@ -334,7 +335,7 @@ paypoint_payment = () => {
   render() {
     const { productId } = this.props.match.params;
     const { fulQuoteResp, addressDetails, error, show, policyHolderDetails, nomineedetails, paymentStatus, policyCoverage, 
-        bcMaster, NomineeRelationArr, AppointeeRelationArr, location, city, state, gsb_Details, menumaster } = this.state;
+        bcMaster, NomineeRelationArr, AppointeeRelationArr, location, city, state, gsb_Details, vehicleDetails } = this.state;
     const Is_appo = policyHolderDetails.request_data ? policyHolderDetails.request_data.nominee[0].is_appointee : null
     const risk_address = gsb_Details && gsb_Details.risk_address ? JSON.parse(gsb_Details.risk_address) : {}
 
@@ -700,9 +701,9 @@ paypoint_payment = () => {
                                                   <Col sm={12} md={3}>
                                                       <FormGroup>Product Name:</FormGroup>
                                                     </Col>
-                                                    <Col sm={12} md={3}>
+                                                    <Col sm={12} md={6}>
                                                       <FormGroup>
-                                                        {menumaster && menumaster.name ? menumaster.name : null}
+                                                        {vehicleDetails && vehicleDetails.vehicletype ? vehicleDetails.vehicletype.description : null}
                                                       </FormGroup>
                                                     </Col>
                                                 </Row>

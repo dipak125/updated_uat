@@ -27,3 +27,12 @@ export const registrationNoFormat = (e, numLength) => {
     return formatVal
 
 }
+
+
+export const prevEndDate = (value) => {
+    var day =  value.getDate() - 1
+    var month = value.getMonth()
+    var year =   value.getFullYear() + 1
+    var endDate = new Date(year,month,day)
+    return endDate
+}

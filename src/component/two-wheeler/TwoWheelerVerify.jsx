@@ -24,6 +24,8 @@ import {
     checkGreaterStartEndTimes, validRegistrationNumber
   } from "../../shared/validationFunctions";
 
+import {prevEndDate} from "../../shared/reUseFunctions";
+
 let encryption = new Encryption();
 
 const ageObj = new PersonAge();
@@ -560,35 +562,7 @@ class TwoWheelerVerify extends Component {
 
     regnoFormat = (e, setFieldTouched, setFieldValue) => {
         
-        let regno = e.target.value
-        // let formatVal = ""
-        // let regnoLength = regno.length
-        // var letter = /^[a-zA-Z]+$/;
-        // var number = /^[0-9]+$/;
-        // let subString = regno.substring(regnoLength-1, regnoLength)
-        // let preSubString = regno.substring(regnoLength-2, regnoLength-1)
-    
-        // if(subString.match(letter) && preSubString.match(letter) && regnoLength == 3) {        
-        //     formatVal = formatVal = regno.substring(0, regnoLength-1) + " " +subString
-        // }
-        // else if(subString.match(letter) && preSubString.match(letter)) {
-        //     formatVal = regno
-        // }
-        // else if(subString.match(number) && preSubString.match(number) && regnoLength == 6) {
-        //     formatVal = formatVal = regno.substring(0, regnoLength-1) + " " +subString
-        // } 
-        // else if(subString.match(number) && preSubString.match(number) && regnoLength == 11 && regno.substring(3, 4).match(letter) && regno.substring(5, 7).match(number) ) {
-        //     formatVal = formatVal = regno.substring(0, 7) + " " +regno.substring(7, 11)
-        // } 
-        // else if(subString.match(number) && preSubString.match(letter)) {        
-        //     formatVal = regno.substring(0, regnoLength-1) + " " +subString      
-        // } 
-        // else if(subString.match(letter) && preSubString.match(number)) {
-        //     formatVal = regno.substring(0, regnoLength-1) + " " +subString   
-        // } 
-        
-        // else formatVal = regno.toUpperCase()
-        
+        let regno = e.target.value      
         e.target.value = regno.toUpperCase()
 
     }
@@ -889,7 +863,9 @@ class TwoWheelerVerify extends Component {
                                                 selected={values.previous_start_date}
                                                 onChange={(val) => {
                                                     setFieldValue('previous_start_date', val);
-                                                    setFieldValue("previous_end_date", addDays(new Date(val), 364));
+                                                    setFieldValue("previous_end_date", prevEndDate(val));
+                                                    
+                                                    // setFieldValue("previous_end_date", addDays(new Date(val), 364));
                                                 }}
                                             />
                                             {errors.previous_start_date && touched.previous_start_date ? (
