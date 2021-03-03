@@ -1304,8 +1304,7 @@ class OtherComprehensiveMISCD extends Component {
         
         let minBodyIDV = 0
         let maxBodyIDV = PolicyArray.length > 0 ? Math.floor(maxBodyVal/2) : 0
-        console.log("sliderVal", this.state.sliderVal)
-        console.log("bodySliderVal", this.state.bodySliderVal)
+
         let defaultBodySliderValue =  motorInsurance && motorInsurance.body_idv_value ? Math.round(motorInsurance.body_idv_value) : 0
         let bodySliderValue = bodySliderVal
 
@@ -1342,6 +1341,7 @@ class OtherComprehensiveMISCD extends Component {
                 add_more_coverage: motorInsurance.add_more_coverage ? motorInsurance.add_more_coverage : "",
                 engine_no: motorInsurance.engine_no ? motorInsurance.engine_no : (engine_no ? engine_no : ""),
                 vahanVerify: vahanVerify,
+                slider: defaultSliderValue,
                 newRegistrationNo: localStorage.getItem('registration_number') == "NEW" ? localStorage.getItem('registration_number') : "",
                 B00015: motorInsurance && motorInsurance.policy_for == '2' ? "" : "B00015",
                 // B00005 : vehicleDetails && vehicleDetails.varientmodel && (vehicleDetails.varientmodel.fueltype.id == 8 || vehicleDetails.varientmodel.fueltype.id == 9) ? "B00005" : "",
@@ -1376,6 +1376,7 @@ class OtherComprehensiveMISCD extends Component {
                     add_more_coverage: motorInsurance.add_more_coverage ? motorInsurance.add_more_coverage : "",
                     engine_no: motorInsurance.engine_no ? motorInsurance.engine_no : (engine_no ? engine_no : ""),
                     vahanVerify: vahanVerify,
+                    slider: defaultSliderValue,
                     newRegistrationNo: localStorage.getItem('registration_number') == "NEW" ? localStorage.getItem('registration_number') : "", 
                     PA_flag: '0',
                     PA_Cover: "",
@@ -1758,6 +1759,8 @@ class OtherComprehensiveMISCD extends Component {
                                         </div>
                                     </FormGroup>
                                 </Col>
+                                {console.log("minIDV------------- ", minIDV)}
+                                {console.log("values.slider------------- ", values.slider)}
                                 {defaultSliderValue ? 
 
                                 <Col sm={12} md={12} lg={6}>
@@ -1771,7 +1774,7 @@ class OtherComprehensiveMISCD extends Component {
                                     value={values.slider}
                                     onChange= {(e) =>{
                                     setFieldTouched("slider");
-                                    setFieldValue("slider",values.slider);
+                                    setFieldValue("slider",e.target.value);
                                     this.sliderValue(e.target.value)
                                 }}
                                     />
@@ -1813,15 +1816,15 @@ class OtherComprehensiveMISCD extends Component {
                                 <Col sm={12} md={12} lg={6}>
                                     <FormGroup>
                                     <input type="range" className="W-90" 
-                                    name= 'slider'
+                                    name= 'slider1'
                                     defaultValue= {defaultBodySliderValue}
                                     min= {minBodyIDV}
                                     max= {maxBodyIDV}
                                     step= '1'
-                                    value={values.slider}
+                                    value={values.slider1}
                                     onChange= {(e) =>{
                                     setFieldTouched("slider1");
-                                    setFieldValue("slider1",values.slider);
+                                    setFieldValue("slider1",values.slider1);
                                     this.bodySliderValue(e.target.value)
                                 }}
                                     />

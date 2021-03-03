@@ -71,6 +71,7 @@ const Coverage = {
     "B00015": translation["B00015"],
     "B00016": translation["B00016"],
     "B00009": translation["B00009"],
+    "B00010": translation["B00010"],   
     "NCB": translation["NCB"],
     "TOTALOD": translation["TOTALOD"]
 }
