@@ -480,14 +480,14 @@ sendPaymentLink = () => {
                                                                                                     <FormGroup>{vehicleDetails && vehicleDetails.varientmodel && vehicleDetails.varientmodel.seating ? vehicleDetails.varientmodel.seating : null}</FormGroup>
                                                                                                 </Col>
                                                                                             </Row>
-                                                                                            <Row>
+                                                                                            {/* <Row>
                                                                                                 <Col sm={12} md={6}>
                                                                                                     <FormGroup>{phrases['IDVofVehicle']}</FormGroup>
                                                                                                 </Col>
                                                                                                 <Col sm={12} md={6}>
                                                                                                     <FormGroup>{motorInsurance && motorInsurance.idv_value ? motorInsurance.idv_value : null}</FormGroup>
                                                                                                 </Col>
-                                                                                            </Row>
+                                                                                            </Row> */}
 
                                                                                         </Col>
                                                                                     </Row>
