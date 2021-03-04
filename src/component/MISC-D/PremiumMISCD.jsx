@@ -194,7 +194,7 @@ class PremiumMISCD extends Component {
         
         const {previousPolicy, request_data, policyHolder} = this.state
 
-        let trailer_array = motorInsurance.trailers ? motorInsurance.trailers : ""
+        let trailer_array = motorInsurance.trailers ? motorInsurance.trailers : null
         trailer_array = trailer_array ? JSON.parse(trailer_array) : []
         
         const post_data = {

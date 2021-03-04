@@ -58,6 +58,7 @@ const Coverage = {
     "B00075":translation["B00075"],
     "B00009":translation["B00009"],
     "C101072":translation["C101072"],
+    "C101108":translation["C101108"],
     "NCB":translation["NCB"],
     "TOTALOD":translation["TOTALOD"]
 }

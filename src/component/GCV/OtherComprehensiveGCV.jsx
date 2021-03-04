@@ -1300,8 +1300,6 @@ class OtherComprehensiveGCV extends Component {
         let maxIDV = PolicyArray.length > 0 ? Math.floor(max_IDV_suggested) : null
         let phrases = localStorage.getItem("phrases") ? JSON.parse(localStorage.getItem("phrases")) : []
 
-        console.log("geographycval area values------------------ ", add_more_coverage)
-
         if(Number.isInteger(min_IDV_suggested) == false ) {
             minIDV = PolicyArray.length > 0 ? Math.floor(PolicyArray[0].PolicyRiskList[0].MinIDV_Suggested) : null           
             minIDV = minIDV + 1;
@@ -1415,6 +1413,7 @@ class OtherComprehensiveGCV extends Component {
         for (var i = 0 ; i < covList.length; i++) {
             newInnitialArray[covList[i]] = covList[i];
         }    
+        newInnitialArray.slider= defaultSliderValue
         newInnitialArray.PA_flag = PA_flag   
         newInnitialArray.trailer_flag = trailer_flag
         newInnitialArray.pa_coolie_flag = pa_coolie_flag
@@ -1503,16 +1502,16 @@ class OtherComprehensiveGCV extends Component {
         </Col></Row> : null
 
         const policyCoveragIMT =  fulQuoteResp && fulQuoteResp.PolicyLobList  && Math.round(fulQuoteResp.PolicyLobList[0].PolicyRiskList[0].imt23prem) > 0 ?
-                    <div>
-                        <Row>
-                            <Col sm={12} md={6}>
-                                <FormGroup>{phrases["IMT"]}</FormGroup>
-                            </Col>
-                            <Col sm={12} md={6}>
-                                <FormGroup>₹ {Math.round(fulQuoteResp.PolicyLobList[0].PolicyRiskList[0].imt23prem)}</FormGroup>
-                            </Col>
-                        </Row>
-                    </div>     
+            <div>
+                <Row>
+                    <Col sm={12} md={6}>
+                        <FormGroup>{phrases["IMT"]}</FormGroup>
+                    </Col>
+                    <Col sm={12} md={6}>
+                        <FormGroup>₹ {Math.round(fulQuoteResp.PolicyLobList[0].PolicyRiskList[0].imt23prem)}</FormGroup>
+                    </Col>
+                </Row>
+            </div>     
          : null 
 
         productCount=1
@@ -1535,7 +1534,7 @@ class OtherComprehensiveGCV extends Component {
         const ncbBreakup = (ncbDiscount && ncbDiscount!=0 && ncbCount==1) ? <tr label={ncbCount+=1}>
         <td >{phrases["NCBDiscount"]}:</td>
         <td>₹ - {Math.round(ncbDiscount)}</td>
-    </tr> : null
+        </tr> : null
 
         const premiumBreakupIMT = fulQuoteResp && fulQuoteResp.PolicyLobList  && Math.round(fulQuoteResp.PolicyLobList[0].PolicyRiskList[0].imt23prem) > 0 ?
             <tr>
@@ -1763,6 +1762,9 @@ console.log("values----------- ", values)
                                         </div>
                                     </FormGroup>
                                 </Col>
+                                {console.log("minIDV------------- ", minIDV)}
+                                {console.log("values.slider------------- ", values.slider)}
+
                                 {defaultSliderValue ? 
 
                                 <Col sm={12} md={12} lg={6}>
@@ -1776,11 +1778,10 @@ console.log("values----------- ", values)
                                     value={values.slider}
                                     onChange= {(e) =>{
                                     setFieldTouched("slider");
-                                    setFieldValue("slider",values.slider);
+                                    setFieldValue("slider",e.target.value);
                                     this.sliderValue(e.target.value)
                                 }}
                                     />
-                                        {/* <img src={require('../../assets/images/slide.svg')} alt="" className="W-90" /> */}
                                     </FormGroup>
                                 </Col>
                                 : null}
@@ -1818,15 +1819,15 @@ console.log("values----------- ", values)
                                 <Col sm={12} md={12} lg={6}>
                                     <FormGroup>
                                     <input type="range" className="W-90" 
-                                    name= 'slider'
+                                    name= 'slider1'
                                     defaultValue= {defaultBodySliderValue}
                                     min= {minBodyIDV}
                                     max= {maxBodyIDV}
                                     step= '1'
-                                    value={values.slider}
+                                    value={values.slider1}
                                     onChange= {(e) =>{
                                     setFieldTouched("slider1");
-                                    setFieldValue("slider1",values.slider);
+                                    setFieldValue("slider1",values.slider1);
                                     this.bodySliderValue(e.target.value)
                                 }}
                                     />
