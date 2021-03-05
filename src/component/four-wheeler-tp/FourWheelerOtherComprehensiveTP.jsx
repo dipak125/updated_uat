@@ -20,6 +20,15 @@ import swal from 'sweetalert';
 let encryption = new Encryption()
 let translation = localStorage.getItem("phrases") ? JSON.parse(localStorage.getItem("phrases")) : null
 
+const insert = (arr, index, newItem) => [
+    // part of the array before the specified index
+    ...arr.slice(0, index),
+    // inserted item
+    newItem,
+    // part of the array after the specified index
+    ...arr.slice(index)
+  ]
+
 
  let initialValue = {
     // add_more_coverage: "",
@@ -73,7 +82,9 @@ const Coverage = {
     "B00009": translation["B00009"],
     "B00010": translation["B00010"],   
     "NCB": translation["NCB"],
-    "TOTALOD": translation["TOTALOD"]
+    "TOTALOD": translation["TOTALOD"],
+    "GEOGRAPHYOD":translation["GEOGRAPHYOD"],
+    "GEOGRAPHYTP":translation["GEOGRAPHYTP"],
 }
 class TwoWheelerOtherComprehensive extends Component {
 
@@ -231,12 +242,24 @@ class TwoWheelerOtherComprehensive extends Component {
         axios.post('fullQuotePMCARTP', formData)
             .then(res => {
                 if (res.data.PolicyObject && res.data.UnderwritingResult && res.data.UnderwritingResult.Status == "Success") {
+                    let policyCoverage= res.data.PolicyObject.PolicyLobList ? res.data.PolicyObject.PolicyLobList[0].PolicyRiskList[0].PolicyCoverageList : []
+                    let IsGeographicalExtension= res.data.PolicyObject.PolicyLobList ? res.data.PolicyObject.PolicyLobList[0].PolicyRiskList[0].IsGeographicalExtension : 0
+                    if(IsGeographicalExtension == '1') {
+                        let geoArrTP = {}
+
+                        geoArrTP.PolicyBenefitList = [{
+                            BeforeVatPremium : res.data.PolicyObject.PolicyLobList && res.data.PolicyObject.PolicyLobList[0].PolicyRiskList[0].PolicyCoverageList ? Math.round(res.data.PolicyObject.PolicyLobList[0].PolicyRiskList[0].PolicyCoverageList[0].LoadingAmount) : 0,
+                            ProductElementCode : 'GEOGRAPHYTP'
+                        }]   
+                        policyCoverage = IsGeographicalExtension == '1' ?  insert(policyCoverage, 1, geoArrTP) : ""
+                    }
+
                     this.setState({
                         fulQuoteResp: res.data.PolicyObject,
                         PolicyArray: res.data.PolicyObject.PolicyLobList,
                         error: [],
-                        serverResponse: res.data.PolicyObject,
-                        policyCoverage: res.data.PolicyObject.PolicyLobList ? res.data.PolicyObject.PolicyLobList[0].PolicyRiskList[0].PolicyCoverageList : [],
+                        serverResponse: res.data.PolicyObject,policyCoverage,
+                        // policyCoverage: res.data.PolicyObject.PolicyLobList ? res.data.PolicyObject.PolicyLobList[0].PolicyRiskList[0].PolicyCoverageList : [],
                     });
                 }
                 else if (res.data.PolicyObject && res.data.UnderwritingResult && res.data.UnderwritingResult.Status == "Fail") {
@@ -504,12 +527,11 @@ class TwoWheelerOtherComprehensive extends Component {
 
         let newInitialValues = Object.assign(initialValue, newInnitialArray );
 
-        console.log("InitialValues---", newInnitialArray)
-        console.log("add_more_coverage---", add_more_coverage)
+        console.log("policyCoverage--------------- ", policyCoverage)
 
         const policyCoverageList =  policyCoverage && policyCoverage.length > 0 ?
             policyCoverage.map((coverage, qIndex) => (
-                coverage.PolicyBenefitList && coverage.PolicyBenefitList.map((benefit, bIndex) => (
+                coverage.PolicyBenefitList ? coverage.PolicyBenefitList.map((benefit, bIndex) => (
                     <div>
                         <Row>
                             <Col sm={12} md={6}>
@@ -520,7 +542,17 @@ class TwoWheelerOtherComprehensive extends Component {
                             </Col>
                         </Row>
                     </div>     
-            ))
+            )) :
+            <div>
+                <Row>
+                    <Col sm={12} md={6}>
+                    <FormGroup>{Coverage[coverage.ProductElementCode]}</FormGroup>
+                    </Col>
+                    <Col sm={12} md={6}>
+                    <FormGroup>₹ {Math.round(coverage.AnnualPremium)}  </FormGroup>                      
+                    </Col>
+                </Row> 
+            </div>
         )) : null 
 
         const premiumBreakup = policyCoverage && policyCoverage.length > 0 ?

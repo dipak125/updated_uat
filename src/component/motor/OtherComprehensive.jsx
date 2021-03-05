@@ -89,9 +89,19 @@ const ComprehensiveValidation = Yup.object().shape({
 
     B00004_value: Yup.string().when(['electric_flag'], {
         is: electric_flag => electric_flag == '1',
-        then: Yup.string().required('pleaseProvideElecIDV').matches(/^[0-9]*$/, 'PleaseValidIDV').max(8, function() {
-                return "Value should be maximum 8 characters"
-            }),
+        then: Yup.string().required('pleaseProvideElecIDV').matches(/^[0-9]*$/, 'PleaseValidIDV')
+        .test(
+            "maxMinIDVCheck",
+            function() {
+                return "IDV should be 1000 - 500000"
+            },
+            function (value) {
+                if (parseInt(value) < 1000 || value > 500000) {   
+                    return false;    
+                }
+                return true;
+            }
+        ),
         otherwise: Yup.string()
     }),
 
@@ -103,9 +113,19 @@ const ComprehensiveValidation = Yup.object().shape({
 
     B00003_value: Yup.string().when(['nonElectric_flag'], {
         is: nonElectric_flag => nonElectric_flag == '1',
-        then: Yup.string().required('Please provide non-electrical IDV').matches(/^[0-9]*$/, 'PleaseValidIDV').max(8, function() {
-                return "Value should be maximum 8 characters"
-            }),
+        then: Yup.string().required('pleaseProvideNonElecIDV').matches(/^[0-9]*$/, 'PleaseValidIDV')
+        .test(
+            "maxMinIDVCheck",
+            function() {
+                return "IDV should be 1000 - 500000"
+            },
+            function (value) {
+                if (parseInt(value) < 1000 || value > 500000) {   
+                    return false;    
+                }
+                return true;
+            }
+        ),
         otherwise: Yup.string()
     }),
 
@@ -220,6 +240,8 @@ const Coverage = {
     "C101111":translation["C101111"], 
     "NCB":translation["NCB"],
     "TOTALOD":translation["TOTALOD"],
+    "GEOGRAPHYOD":translation["GEOGRAPHYOD"],
+    "GEOGRAPHYTP":translation["GEOGRAPHYTP"],
 
     "B00016":translation["B00016"],
     "B00002":  translation["B00002"],
@@ -571,6 +593,7 @@ class OtherComprehensive extends Component {
                 if (res.data.PolicyObject && res.data.UnderwritingResult && res.data.UnderwritingResult.Status == "Success") {
                     let policyCoverage= res.data.PolicyObject.PolicyLobList ? res.data.PolicyObject.PolicyLobList[0].PolicyRiskList[0].PolicyCoverageList : []
                     let ncbDiscount= res.data.PolicyObject.PolicyLobList ? res.data.PolicyObject.PolicyLobList[0].PolicyRiskList[0].OD_NCBAmount : 0
+                    let IsGeographicalExtension= res.data.PolicyObject.PolicyLobList ? res.data.PolicyObject.PolicyLobList[0].PolicyRiskList[0].IsGeographicalExtension : 0
                     if(ncbDiscount != '0') {
                         let ncbArr = {}
                         ncbArr.PolicyBenefitList = [{
@@ -586,6 +609,23 @@ class OtherComprehensive extends Component {
     
                         policyCoverage = ncbDiscount != '0' ?  insert(policyCoverage, 1, ncbArr) : ""
                         policyCoverage = ncbDiscount != '0' ?  insert(policyCoverage, 2, totOD) : ""
+                    }
+
+                    if(IsGeographicalExtension == '1') {
+                        let geoArrOD = {}
+                        let geoArrTP = {}
+                        geoArrOD.PolicyBenefitList = [{
+                            BeforeVatPremium : res.data.PolicyObject.PolicyLobList && res.data.PolicyObject.PolicyLobList[0].PolicyRiskList[0].PolicyCoverageList ? Math.round(res.data.PolicyObject.PolicyLobList[0].PolicyRiskList[0].PolicyCoverageList[0].LoadingAmount) : 0,
+                            ProductElementCode : 'GEOGRAPHYOD'
+                        }]
+
+                        geoArrTP.PolicyBenefitList = [{
+                            BeforeVatPremium : res.data.PolicyObject.PolicyLobList && res.data.PolicyObject.PolicyLobList[0].PolicyRiskList[0].PolicyCoverageList ? Math.round(res.data.PolicyObject.PolicyLobList[0].PolicyRiskList[0].PolicyCoverageList[1].LoadingAmount) : 0,
+                            ProductElementCode : 'GEOGRAPHYTP'
+                        }]
+    
+                        policyCoverage = IsGeographicalExtension == '1' ?  insert(policyCoverage, 1, geoArrOD) : ""
+                        policyCoverage = IsGeographicalExtension == '1' ?  insert(policyCoverage, 2, geoArrTP) : ""
                     }
 
                     this.setState({
@@ -1433,7 +1473,7 @@ class OtherComprehensive extends Component {
                                                         type="text"
                                                         placeholder={phrases['ValueOfAccessory']}
                                                         autoComplete="off"
-                                                        maxLength="8"
+                                                        maxLength="6"
                                                         onFocus={e => this.changePlaceHoldClassAdd(e)}
                                                         onBlur={e => this.changePlaceHoldClassRemove(e)}
                                                         onChange={(e) => {
@@ -1444,7 +1484,7 @@ class OtherComprehensive extends Component {
                                                     >                                     
                                                     </Field>
                                                     {errors.B00003_value ? (
-                                                        <span className="errorMsg">{errors.B00003_value}</span>
+                                                        <span className="errorMsg">{phrases[errors.B00003_value] ? phrases[errors.B00003_value] : errors.B00003_value }</span>
                                                     ) : null}
                                                 </div>
                                             </FormGroup>
@@ -1484,7 +1524,7 @@ class OtherComprehensive extends Component {
                                                         type="text"
                                                         placeholder={phrases['ValueOfAccessory']}
                                                         autoComplete="off"
-                                                        maxLength="8"
+                                                        maxLength="6"
                                                         onFocus={e => this.changePlaceHoldClassAdd(e)}
                                                         onBlur={e => this.changePlaceHoldClassRemove(e)}
                                                         onChange={(e) => {
@@ -1495,7 +1535,7 @@ class OtherComprehensive extends Component {
                                                     >                                     
                                                     </Field>
                                                     {errors.B00004_value ? (
-                                                        <span className="errorMsg">{phrases[errors.B00004_value]}</span>
+                                                        <span className="errorMsg">{phrases[errors.B00004_value] ? phrases[errors.B00004_value] : errors.B00004_value }</span>
                                                     ) : null}
                                                 </div>
                                             </FormGroup>

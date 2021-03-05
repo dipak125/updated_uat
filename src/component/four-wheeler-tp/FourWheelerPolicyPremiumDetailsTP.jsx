@@ -163,6 +163,7 @@ class Premium extends Component {
             'idv_value': motorInsurance.idv_value,
             'policy_type': motorInsurance ? motorInsurance.policy_type : "",
             'add_more_coverage': motorInsurance.add_more_coverage,
+            'coverage_data': motorInsurance && motorInsurance.add_more_coverage_request_json != null ? motorInsurance.add_more_coverage_request_json : "",
             'policy_for': motorInsurance ? motorInsurance.policy_for : "",
             'policytype_id': motorInsurance ? motorInsurance.policytype_id : "",
             'PA_Cover': motorInsurance ? motorInsurance.pa_cover : "0",

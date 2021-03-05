@@ -21,6 +21,15 @@ import {  validRegistrationNumber } from "../../shared/validationFunctions";
 
 let translation = localStorage.getItem("phrases") ? JSON.parse(localStorage.getItem("phrases")) : []
 
+const insert = (arr, index, newItem) => [
+    // part of the array before the specified index
+    ...arr.slice(0, index),
+    // inserted item
+    newItem,
+    // part of the array after the specified index
+    ...arr.slice(index)
+  ]
+
 const ComprehensiveValidation = Yup.object().shape({
     // is_carloan: Yup.number().required('Please select one option')
 
@@ -177,21 +186,31 @@ const ComprehensiveValidation = Yup.object().shape({
 
     B00004_value: Yup.string().when(['electric_flag'], {
         is: electric_flag => electric_flag == '1',
-        then: Yup.string().required('pleaseProvideElecIDV').matches(/^[0-9]*$/, 'Please provide valid IDV').max(8, function() {
-                return "Value should be maximum 8 characters"
-            }),
+        then: Yup.string().required('pleaseProvideElecIDV').matches(/^[0-9]*$/, 'PleaseprovidevalidIDV')
+        .test(
+            "maxMinIDVCheck",
+            function() {
+                return "IDV should be 1000 - 1000000"
+            },
+            function (value) {
+                if (parseInt(value) < 1000 || value > 1000000) {   
+                    return false;    
+                }
+                return true;
+            }
+        ),
         otherwise: Yup.string()
     }),
 
     B00004_description: Yup.string().when(['electric_flag'], {
         is: electric_flag => electric_flag == '1',
-        then: Yup.string().required('pleaseProvideAccessory').matches(/^[a-zA-Z0-9]*$/, 'Please provide valid description'),
+        then: Yup.string().required('pleaseProvideAccessory').matches(/^[a-zA-Z0-9]*$/, 'Pleaseprovidevaliddescription'),
         otherwise: Yup.string()
     }),
 
     B00003_value: Yup.string().when(['nonElectric_flag'], {
         is: nonElectric_flag => nonElectric_flag == '1',
-        then: Yup.string().required('Please provide non-electrical IDV').matches(/^[0-9]*$/, 'Please provide valid IDV').max(8, function() {
+        then: Yup.string().required('pleaseProvideNonElecIDV').matches(/^[0-9]*$/, 'PleaseprovidevalidIDV').max(8, function() {
                 return "Value should be maximum 8 characters"
             }),
         otherwise: Yup.string()
@@ -199,7 +218,7 @@ const ComprehensiveValidation = Yup.object().shape({
 
     B00003_description: Yup.string().when(['nonElectric_flag'], {
         is: nonElectric_flag => nonElectric_flag == '1',
-        then: Yup.string().required('pleaseProvideAccessory').matches(/^[a-zA-Z0-9]*$/, 'Please provide valid description'),
+        then: Yup.string().required('pleaseProvideAccessory').matches(/^[a-zA-Z0-9]*$/, 'Pleaseprovidevaliddescription'),
         otherwise: Yup.string()
     }),
 
@@ -357,6 +376,9 @@ const Coverage = {
     "B00019":  translation["B00019"],
     "B00020":  translation["B00020"],
     "B00022":  translation["B00022"],   
+    "GEOGRAPHYOD":translation["GEOGRAPHYOD"],
+    "GEOGRAPHYTP":translation["GEOGRAPHYTP"],
+
 }
 
 class OtherComprehensiveGCV extends Component {
@@ -803,6 +825,26 @@ class OtherComprehensiveGCV extends Component {
 
                 if (res.data.PolicyObject && res.data.UnderwritingResult && res.data.UnderwritingResult.Status == "Success") {
                     let ncbDiscount= (res.data.PolicyObject.PolicyLobList && res.data.PolicyObject.PolicyLobList[0].PolicyRiskList[0].IsNCB) ? res.data.PolicyObject.PolicyLobList[0].PolicyRiskList[0].OD_NCBAmount : 0
+                    let policyCoverage= res.data.PolicyObject.PolicyLobList ? res.data.PolicyObject.PolicyLobList[0].PolicyRiskList[0].PolicyCoverageList : []
+                    let IsGeographicalExtension= res.data.PolicyObject.PolicyLobList ? res.data.PolicyObject.PolicyLobList[0].PolicyRiskList[0].IsGeographicalExtension : 0
+
+                    // if(IsGeographicalExtension == '1') {
+                    //     let geoArrOD = {}
+                    //     let geoArrTP = {}
+                    //     geoArrOD.PolicyBenefitList = [{
+                    //         BeforeVatPremium : res.data.PolicyObject.PolicyLobList && res.data.PolicyObject.PolicyLobList[0].PolicyRiskList[0].PolicyCoverageList ? Math.round(res.data.PolicyObject.PolicyLobList[0].PolicyRiskList[0].PolicyCoverageList[0].LoadingAmount) : 0,
+                    //         ProductElementCode : 'GEOGRAPHYOD'
+                    //     }]
+
+                    //     geoArrTP.PolicyBenefitList = [{
+                    //         BeforeVatPremium : res.data.PolicyObject.PolicyLobList && res.data.PolicyObject.PolicyLobList[0].PolicyRiskList[0].PolicyCoverageList ? Math.round(res.data.PolicyObject.PolicyLobList[0].PolicyRiskList[0].PolicyCoverageList[1].LoadingAmount) : 0,
+                    //         ProductElementCode : 'GEOGRAPHYTP'
+                    //     }]
+    
+                    //     policyCoverage = IsGeographicalExtension == '1' ?  insert(policyCoverage, 1, geoArrOD) : ""
+                    //     policyCoverage = IsGeographicalExtension == '1' ?  insert(policyCoverage, 2, geoArrTP) : ""
+                    // }
+
                     this.setState({
                         fulQuoteResp: res.data.PolicyObject,
                         PolicyArray: res.data.PolicyObject.PolicyLobList,
@@ -1578,7 +1620,7 @@ class OtherComprehensiveGCV extends Component {
                     onSubmit={ serverResponse && serverResponse != "" ? (serverResponse.message ? this.getAccessToken : this.handleSubmit ) : this.getAccessToken} 
                     validationSchema={ComprehensiveValidation}>
                     {({ values, errors, setFieldValue, setFieldTouched, isValid, isSubmitting, touched }) => {
-console.log("values----------- ", values)
+
                     return (
                         <Form>
                         <Row>
@@ -1762,8 +1804,6 @@ console.log("values----------- ", values)
                                         </div>
                                     </FormGroup>
                                 </Col>
-                                {console.log("minIDV------------- ", minIDV)}
-                                {console.log("values.slider------------- ", values.slider)}
 
                                 {defaultSliderValue ? 
 
@@ -2171,7 +2211,7 @@ console.log("values----------- ", values)
                                                         type="text"
                                                         placeholder={phrases['ValueOfAccessory']}
                                                         autoComplete="off"
-                                                        maxLength="8"
+                                                        maxLength="7"
                                                         onFocus={e => this.changePlaceHoldClassAdd(e)}
                                                         onBlur={e => this.changePlaceHoldClassRemove(e)}
                                                         onChange={(e) => {
@@ -2182,7 +2222,7 @@ console.log("values----------- ", values)
                                                     >                                     
                                                     </Field>
                                                     {errors.B00004_value ? (
-                                                        <span className="errorMsg">{phrases[errors.B00004_value]}</span>
+                                                        <span className="errorMsg">{phrases[errors.B00004_value] ? phrases[errors.B00004_value] : errors.B00004_value }</span>
                                                     ) : null}
                                                 </div>
                                             </FormGroup>
