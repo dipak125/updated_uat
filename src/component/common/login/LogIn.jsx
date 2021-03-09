@@ -363,13 +363,7 @@ class LogIn extends Component {
                                                 </div>
                                             </Col>
                                         </Row> */}
-                                        <Row>
-                                           <Col>&nbsp;</Col>
-                                        </Row>
-                                        <Row>
-                                           <Col>&nbsp;</Col>
-                                        </Row>
-
+                                        
                                         <Row className="show-grid dropinput">
                                             <Col xs={8}>
 
@@ -423,5 +417,3 @@ const mapDispatchToProps = dispatch => {
 }
 
 export default connect(mapStateToProps, mapDispatchToProps)(LogIn);
-
-

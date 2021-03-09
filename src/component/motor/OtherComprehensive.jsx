@@ -603,7 +603,7 @@ class OtherComprehensive extends Component {
     
                         let totOD = {}
                         totOD.PolicyBenefitList = [{
-                            BeforeVatPremium : Math.round(policyCoverage[0]['PolicyBenefitList'][0]['BeforeVatPremium']) - Math.round(ncbDiscount),
+                            BeforeVatPremium : Math.round(policyCoverage[0]['GrossPremium'] + policyCoverage[0]['LoadingAmount']) - Math.round(ncbDiscount),
                             ProductElementCode : 'TOTALOD'
                         }]
     

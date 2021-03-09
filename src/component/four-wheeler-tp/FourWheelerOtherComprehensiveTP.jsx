@@ -706,6 +706,65 @@ class TwoWheelerOtherComprehensive extends Component {
                                                                 }
                                                             </Row>
                                                             ))}
+
+                                                            {motorInsurance && motorInsurance.policy_for == '2' && moreCoverage.map((coverage, qIndex) => (
+                                                            <Row key={qIndex}>   
+                                                            {console.log("coverage.name-------> ", coverage)}
+                                                            {coverage.code == "geographical_extension" || coverage.code == "B00010" ? 
+                                                                <Col sm={12} md={11} lg={6} key={qIndex+"a"} >
+                                                                    <label className="customCheckBox formGrp formGrp">{coverage.name}
+                                                                        <OverlayTrigger overlay={<Tooltip id="tooltip-disabled">{coverage.description}</Tooltip>}>
+                                                                            <a className="infoIcon"><img src={require('../../assets/images/i.svg')} alt="" className="premtool" /></a>
+                                                                        </OverlayTrigger>
+                                                                        <Field
+                                                                            type="checkbox"
+                                                                            // name={`moreCov_${qIndex}`}
+                                                                            name={coverage.code}
+                                                                            value={coverage.code}
+                                                                            className="user-self"
+                                                                            // checked={values.roadsideAssistance ? true : false}
+                                                                            onClick={(e) =>{
+                                                                                if( e.target.checked == false && values[coverage.code] == 'B00015') {
+                                                                                    swal(phrases.SwalIRDAI)
+                                                                                }
+                                                                                this.onRowSelect(e.target.value, e.target.checked, setFieldTouched, setFieldValue)         
+                                                                            }
+                                                                            }
+                                                                            checked = {values[coverage.code] == coverage.code ? true : false}
+                                                                        />
+                                                                        <span className="checkmark mL-0"></span>
+                                                                        <span className="error-message"></span>
+                                                                    </label>
+                                                                </Col> : null}
+                                                                
+                                                                {values.Geographical_flag == '1' && values[coverage.code] == 'geographical_extension' ?
+                                                                    <Fragment>
+                                                                    <Col sm={12} md={11} lg={3} key={qIndex+"c"}>
+                                                                    {coverage.covarage_value != null && JSON.parse(coverage.covarage_value).value.length > 0 && JSON.parse(coverage.covarage_value).value.map((insurer, qIndex) => (
+                                                                        insurer.status == '1' ?
+                                                                        <label className="customCheckBox formGrp formGrp">{insurer.name}                                         
+                                                                            <Field
+                                                                                type="checkbox"
+                                                                                // name={`moreCov_${qIndex}`}
+                                                                                name={insurer.id}
+                                                                                value={insurer.id}
+                                                                                className="user-self"
+                                                                                checked = {values[insurer.id] == insurer.id ? true : false}
+                                                                                onClick={(e) =>{
+                                                                                    this.onGeoAreaSelect(e.target.value, values, e.target.checked, setFieldTouched, setFieldValue)         
+                                                                                }}
+                                                                            />
+                                                                            <span className="checkmark mL-0"></span>
+                                                                            <span className="error-message"></span>
+                                                                        </label> : null))}
+                                                                        {errors.geographical_extension_length ? (
+                                                                                <span className="errorMsg">{errors.geographical_extension_length}</span>
+                                                                        ) : null} 
+                                                                    </Col>
+                                                                    </Fragment> : null
+                                                                }
+                                                            </Row>
+                                                            ))}
                                                             <Row>&nbsp;</Row>
                                                             
                                                             <div className="d-flex justify-content-left resmb">

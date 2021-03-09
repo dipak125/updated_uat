@@ -45,7 +45,24 @@ const ComprehensiveValidation = Yup.object().shape({
         is: PA_flag => PA_flag == '1',
         then: Yup.string().required('PleasePACover'),
         otherwise: Yup.string()
-    })
+    }),
+
+    tyre_rim_array: Yup.array().of(
+        Yup.object().shape({
+            tyreMfgYr : Yup.string().required('MFG year required')
+            .min(4, function() {
+                return "Invalid year"
+            })
+            .max(4, function() {
+                return "Invalid year"
+            }),
+
+            tyreSerialNo : Yup.string().required('Serial No Required')
+            .matches(/^[a-zA-Z0-9]*$/, function() {
+                return "Invalid Serial No"
+            })
+        })
+    ),
 
 });
 
@@ -59,6 +76,7 @@ const Coverage = {
     "B00009":translation["B00009"],
     "C101072":translation["C101072"],
     "C101108":translation["C101108"],
+    "C101110":translation["C101110"],
     "NCB":translation["NCB"],
     "TOTALOD":translation["TOTALOD"]
 }
@@ -90,7 +108,9 @@ class TwoWheelerOtherComprehensive extends Component {
             vehicleDetails: [],
             selectFlag: '',
             moreCoverage: [],
-            ncbDiscount: 0
+            ncbDiscount: 0,
+            tyre_rim_array: [],
+            no_of_claim : 2
         };
     }
 
@@ -141,15 +161,18 @@ class TwoWheelerOtherComprehensive extends Component {
                 let motorInsurance = decryptResp.data.policyHolder ? decryptResp.data.policyHolder.motorinsurance : {}
                 let vehicleDetails = decryptResp.data.policyHolder ? decryptResp.data.policyHolder.vehiclebrandmodel : {};
                 let step_completed = decryptResp.data.policyHolder ? decryptResp.data.policyHolder.step_no : "";
+                let tyre_rim_array = motorInsurance.tyre_rim_array && motorInsurance.tyre_rim_array!=null ? motorInsurance.tyre_rim_array : null
+                tyre_rim_array = tyre_rim_array!=null ? JSON.parse(tyre_rim_array) : []
 
                 let add_more_coverage = motorInsurance && motorInsurance.policy_for == '2' ? [] : (motorInsurance.add_more_coverage != null ? motorInsurance.add_more_coverage.split(",") : ['B00015']) 
                 add_more_coverage = add_more_coverage.flat()
 
                  values.PA_flag = motorInsurance && motorInsurance.pa_cover != "" ? '1' : '0'
                  values.PA_Cover = motorInsurance && motorInsurance.pa_cover != "" ? motorInsurance.pa_cover : '0'
+                 values.tyre_rim_array = tyre_rim_array
                 
                 this.setState({
-                    motorInsurance,vehicleDetails,step_completed,
+                    motorInsurance,vehicleDetails,step_completed,tyre_rim_array,
                     add_more_coverage: add_more_coverage, 
                     selectFlag: motorInsurance && motorInsurance.policy_for == '2' ? [] : (motorInsurance.add_more_coverage != null ? '0' : '1') 
                     
@@ -258,7 +281,8 @@ class TwoWheelerOtherComprehensive extends Component {
             'policy_type': motorInsurance ? motorInsurance.policy_type : "",
             'policytype_id': motorInsurance ? motorInsurance.policytype_id : "",
             'PA_Cover': values.PA_flag ? values.PA_Cover : "0",
-            'policy_for': motorInsurance ? motorInsurance.policy_for : ""
+            'policy_for': motorInsurance ? motorInsurance.policy_for : "",
+            'tyre_rim_array' : values.tyre_rim_array,
         }
         console.log('fullQuote_post_data', post_data)
         if(post_data.idv_value > 5000000 && csc_user_type == "POSP") {
@@ -276,6 +300,7 @@ class TwoWheelerOtherComprehensive extends Component {
         formData.append('policytype_id',motorInsurance ? motorInsurance.policytype_id : "")
         formData.append('PA_Cover',values.PA_flag ? values.PA_Cover : "0")
         formData.append('policy_for',motorInsurance ? motorInsurance.policy_for : "")
+        formData.append('tyre_rim_array',values.tyre_rim_array ? JSON.stringify(values.tyre_rim_array) : "")
 
         axios.post('fullQuotePM2W', formData)
             .then(res => {
@@ -373,6 +398,7 @@ class TwoWheelerOtherComprehensive extends Component {
                 'pa_cover': values.PA_flag ? values.PA_Cover : "0",
                 'pa_flag' : values.PA_cover_flag,
                 'page_name': `two_wheeler_OtherComprehensive/${productId}`,
+                'tyre_rim_array' : values.tyre_rim_array,
             }
         }
         else {
@@ -411,30 +437,46 @@ class TwoWheelerOtherComprehensive extends Component {
             })
     }
 
-    onRowSelect = (values, isSelect, setFieldTouched, setFieldValue) => {
+    onRowSelect = (value, isSelect, setFieldTouched, setFieldValue,values) => {
 
         const { add_more_coverage } = this.state;
         var drv = [];
 
 
         if (isSelect) {
-            add_more_coverage.push(values);
+            add_more_coverage.push(value);
+            if(value == 'C101110') {
+                var array_length = 2
+                 if(values.tyre_rim_array.length < array_length) {
+                    for(var i = values.tyre_rim_array.length ; i < array_length ; i++) {
+                        values.tyre_rim_array.push(
+                                {
+                                    tyreSerialNo : "",
+                                    tyreMfgYr : ""
+                            } )
+                    }
+                }
+            }
             this.setState({
                 add_more_coverage: add_more_coverage,
                 serverResponse: [],
-                error: []
+                error: [], no_of_claim : array_length
             });
-            if(values == "B00075") {
+            if(value == "B00075") {
                 setFieldTouched("PA_flag");
                 setFieldValue("PA_flag", '1');
             }  
-            if(values == "B00015") {
+            if(value == "B00015") {
                 setFieldTouched("PA_cover_flag");
                 setFieldValue("PA_cover_flag", '1');
-            }            
+            }         
+            if(value == "C101110") {
+                setFieldTouched("tyre_cover_flag");
+                setFieldValue("tyre_cover_flag", '1');
+            }    
         }
         else {
-            const index = add_more_coverage.indexOf(values);
+            const index = add_more_coverage.indexOf(value);
             if (index !== -1) {
                 add_more_coverage.splice(index, 1);
                 this.setState({
@@ -443,18 +485,93 @@ class TwoWheelerOtherComprehensive extends Component {
                 });
             }
 
-            if(values == "B00075") {
+            if(value == "B00075") {
                 setFieldTouched("PA_flag");
                 setFieldValue("PA_flag", '0');
                 setFieldTouched("PA_Cover");
                 setFieldValue("PA_Cover", '');
             } 
-            if(values == "B00015") {
+            if(value == "B00015") {
                 setFieldTouched("PA_cover_flag");
                 setFieldValue("PA_cover_flag", '0');
             }       
+            if(value == "C101110") {
+                setFieldTouched("tyre_cover_flag");
+                setFieldValue("tyre_cover_flag", '0');
+            }  
         }
         
+    }
+
+    initClaimDetailsList = () => {
+        let innicialClaimList = []
+        const {tyre_rim_array} = this.state
+            for (var i = 0; i < this.state.no_of_claim ; i++) {
+                innicialClaimList.push(
+                    {
+                        tyreSerialNo :  tyre_rim_array && tyre_rim_array[i] && tyre_rim_array[i].tyreSerialNo ? tyre_rim_array[i].tyreSerialNo : "",
+                        tyreMfgYr :  tyre_rim_array && tyre_rim_array[i] && tyre_rim_array[i].tyreMfgYr ? tyre_rim_array[i].tyreMfgYr : ""
+                    }
+                )
+            }   
+
+    return innicialClaimList
+    
+    };
+
+    handleClaims = (values, errors, touched, setFieldTouched, setFieldValue) => {
+        let field_array = []        
+        let phrases = localStorage.getItem("phrases") ? JSON.parse(localStorage.getItem("phrases")) : []
+        
+        for (var i = 0; i < 2 ; i++) {
+            field_array.push(
+                <Col sm={12} md={12} lg={12}>
+                    <Row >
+                        <Col sm={1} md={1} lg={1}><span className="indexing"> {i+1} </span></Col>
+                        <Col sm={12} md={5} lg={4}>
+                            <FormGroup>
+                                <div className="formSection">
+                                <Field
+                                        name={`tyre_rim_array[${i}].tyreMfgYr`}
+                                        type="text"
+                                        placeholder="MFG Year"
+                                        autoComplete="off"
+                                        onFocus={e => this.changePlaceHoldClassAdd(e)}
+                                        onBlur={e => this.changePlaceHoldClassRemove(e)}
+                                        // value = {values[`tyre_rim_array[${i}].chassisNo`]}
+
+                                    />
+                                    {errors.tyre_rim_array && errors.tyre_rim_array[i] && errors.tyre_rim_array[i].tyreMfgYr ? (
+                                    <span className="errorMsg">{errors.tyre_rim_array[i].tyreMfgYr}</span>
+                                    ) : null}    
+                                </div>
+                            </FormGroup>
+                        </Col>
+                        <Col sm={12} md={5} lg={4}>
+                            <FormGroup>
+                                <div className="formSection">
+                                    <Field
+                                        name={`tyre_rim_array[${i}].tyreSerialNo`}
+                                        type="text"
+                                        placeholder="Serial No"
+                                        autoComplete="off"
+                                        onFocus={e => this.changePlaceHoldClassAdd(e)}
+                                        onBlur={e => this.changePlaceHoldClassRemove(e)}
+                                        // value = {values[`tyre_rim_array[${i}].tyreSerialNo`]}
+
+                                    />
+                                    {errors.tyre_rim_array && errors.tyre_rim_array[i] && errors.tyre_rim_array[i].tyreSerialNo ? (
+                                    <span className="errorMsg">{errors.tyre_rim_array[i].tyreSerialNo}</span>
+                                    ) : null}   
+                                </div>
+                            </FormGroup>
+                        </Col>
+                    </Row>
+                </Col>
+            )
+            } 
+        return field_array
+
     }
 
 
@@ -469,9 +586,15 @@ class TwoWheelerOtherComprehensive extends Component {
             step_completed, vehicleDetails, selectFlag, sliderVal, moreCoverage, ncbDiscount} = this.state
         const { productId } = this.props.match.params
         let covList = motorInsurance && motorInsurance.add_more_coverage ? motorInsurance.add_more_coverage.split(",") : ""
+        console.log("covList--------------> ", covList)
         let newInnitialArray = {}
         let PA_flag = motorInsurance && (motorInsurance.pa_cover == null || motorInsurance.pa_cover == "") ? '0' : '1'
         let PA_Cover = motorInsurance &&  motorInsurance.pa_cover != null ? motorInsurance.pa_cover : ''
+        let tyre_cover_flag=  '0'
+        
+        for(var i = 0; i<covList.length; i++) {
+            if(covList.indexOf('C101110')) tyre_cover_flag = '1'
+        }
 
         let defaultSliderValue = PolicyArray.length > 0 ? Math.round(PolicyArray[0].PolicyRiskList[0].IDV_Suggested) : 0
         let sliderValue = sliderVal
@@ -495,7 +618,8 @@ class TwoWheelerOtherComprehensive extends Component {
                 B00015: "B00015",
                 PA_flag: '0',
                 PA_Cover: "",
-                PA_cover_flag: "1"
+                PA_cover_flag: "1",
+                tyre_rim_array:  this.initClaimDetailsList(),
             
             }
            
@@ -506,7 +630,8 @@ class TwoWheelerOtherComprehensive extends Component {
                 // B00015: "B00015",
                 PA_flag: '0',
                 PA_Cover: "",
-                PA_cover_flag: motorInsurance && motorInsurance.pa_flag ? motorInsurance.pa_flag : '0'
+                PA_cover_flag: motorInsurance && motorInsurance.pa_flag ? motorInsurance.pa_flag : '0',
+                tyre_rim_array:  this.initClaimDetailsList(),
             
             }
         }
@@ -517,6 +642,7 @@ class TwoWheelerOtherComprehensive extends Component {
 
         newInnitialArray.PA_flag = PA_flag   
         newInnitialArray.PA_Cover = PA_Cover
+        newInnitialArray.tyre_cover_flag = tyre_cover_flag
         let newInitialValues = Object.assign(initialValue, newInnitialArray );
 
         // console.log("InitialValues---", newInnitialArray)
@@ -616,7 +742,7 @@ class TwoWheelerOtherComprehensive extends Component {
                                         validationSchema={ComprehensiveValidation}
                                         >
                                         {({ values, errors, setFieldValue, setFieldTouched, isValid, isSubmitting, touched }) => {
-console.log("values----- ", values)
+
                                             return (
                                                 <Form>
                                                     <Row>
@@ -704,7 +830,7 @@ console.log("values----- ", values)
                                                                                 if( e.target.checked == false && values[coverage.code] == 'B00015') {
                                                                                     swal(phrases.SwalIRDAI)
                                                                                 }
-                                                                                this.onRowSelect(e.target.value, e.target.checked, setFieldTouched, setFieldValue)         
+                                                                                this.onRowSelect(e.target.value, e.target.checked, setFieldTouched, setFieldValue,values)         
                                                                             }
                                                                             }
                                                                             checked = {values[coverage.code] == coverage.code ? true : false}
@@ -740,6 +866,13 @@ console.log("values----- ", values)
                                                                             </div>
                                                                         </FormGroup>
                                                                     </Col> : null
+                                                                }
+
+                                                                {values.tyre_cover_flag == '0' ? values.tyre_rim_array = [] : null }
+                                                                {/* {values.tyre_cover_flag == '0' ? values.B00007_value = "" : null } */}
+
+                                                                {values.tyre_cover_flag == '1' && values[coverage.code] == 'C101110' ?
+                                                                    this.handleClaims(values, errors, touched, setFieldTouched, setFieldValue) : null
                                                                 }
                                                             </Row>
                                                             ))}

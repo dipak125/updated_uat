@@ -186,11 +186,11 @@ const ComprehensiveValidation = Yup.object().shape({
 
     B00004_value: Yup.string().when(['electric_flag'], {
         is: electric_flag => electric_flag == '1',
-        then: Yup.string().required('pleaseProvideElecIDV').matches(/^[0-9]*$/, 'PleaseprovidevalidIDV')
+        then: Yup.string().required('pleaseProvideElecIDV').matches(/^[0-9]*$/, 'PleaseProvideValidIDV')
         .test(
             "maxMinIDVCheck",
             function() {
-                return "IDV should be 1000 - 1000000"
+                return "IDVShouldBe1000To1000000"
             },
             function (value) {
                 if (parseInt(value) < 1000 || value > 1000000) {   
@@ -204,21 +204,31 @@ const ComprehensiveValidation = Yup.object().shape({
 
     B00004_description: Yup.string().when(['electric_flag'], {
         is: electric_flag => electric_flag == '1',
-        then: Yup.string().required('pleaseProvideAccessory').matches(/^[a-zA-Z0-9]*$/, 'Pleaseprovidevaliddescription'),
+        then: Yup.string().required('pleaseProvideAccessory').matches(/^[a-zA-Z0-9]*$/, 'PleaseValidDescription'),
         otherwise: Yup.string()
     }),
 
     B00003_value: Yup.string().when(['nonElectric_flag'], {
         is: nonElectric_flag => nonElectric_flag == '1',
-        then: Yup.string().required('pleaseProvideNonElecIDV').matches(/^[0-9]*$/, 'PleaseprovidevalidIDV').max(8, function() {
-                return "Value should be maximum 8 characters"
-            }),
+        then: Yup.string().required('pleaseProvideNonElecIDV').matches(/^[0-9]*$/, 'PleaseProvideValidIDV')
+        .test(
+            "maxMinIDVCheck",
+            function() {
+                return "IDVShouldBe1000To1000000"
+            },
+            function (value) {
+                if (parseInt(value) < 1000 || value > 1000000) {   
+                    return false;    
+                }
+                return true;
+            }
+        ),
         otherwise: Yup.string()
     }),
 
     B00003_description: Yup.string().when(['nonElectric_flag'], {
         is: nonElectric_flag => nonElectric_flag == '1',
-        then: Yup.string().required('pleaseProvideAccessory').matches(/^[a-zA-Z0-9]*$/, 'Pleaseprovidevaliddescription'),
+        then: Yup.string().required('pleaseProvideAccessory').matches(/^[a-zA-Z0-9]*$/, 'PleaseValidDescription'),
         otherwise: Yup.string()
     }),
 
@@ -1620,7 +1630,7 @@ class OtherComprehensiveGCV extends Component {
                     onSubmit={ serverResponse && serverResponse != "" ? (serverResponse.message ? this.getAccessToken : this.handleSubmit ) : this.getAccessToken} 
                     validationSchema={ComprehensiveValidation}>
                     {({ values, errors, setFieldValue, setFieldTouched, isValid, isSubmitting, touched }) => {
-
+console.log("values------------> ", values)
                     return (
                         <Form>
                         <Row>
@@ -2171,7 +2181,7 @@ class OtherComprehensiveGCV extends Component {
                                                     >                                     
                                                     </Field>
                                                     {errors.B00003_value ? (
-                                                        <span className="errorMsg">{errors.B00003_value}</span>
+                                                        <span className="errorMsg">{phrases[errors.B00003_value]}</span>
                                                     ) : null}
                                                 </div>
                                             </FormGroup>
@@ -2222,7 +2232,7 @@ class OtherComprehensiveGCV extends Component {
                                                     >                                     
                                                     </Field>
                                                     {errors.B00004_value ? (
-                                                        <span className="errorMsg">{phrases[errors.B00004_value] ? phrases[errors.B00004_value] : errors.B00004_value }</span>
+                                                        <span className="errorMsg">{phrases[errors.B00004_value]}</span>
                                                     ) : null}
                                                 </div>
                                             </FormGroup>
