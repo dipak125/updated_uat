@@ -36,7 +36,7 @@ const initialValue = {
     bank_branch:"",
     nominee_relation_with:"",
     nominee_first_name:"",
-    nominee_last_name:"test",
+    nominee_last_name:"",
     nominee_gender:"",
     nominee_dob: "",
     phone: "",
@@ -126,13 +126,24 @@ const ownerValidation = Yup.object().shape({
 
     salutation_id: Yup.string().when(['policy_for'], {
             is: policy_for => policy_for == '1',  
-            then: Yup.string().required('Title is required'),
+            then: Yup.string().required('TitleIsRequired'),
             otherwise: Yup.string().nullable()
         }),
         
     nominee_salutation: Yup.string().when(['policy_for'], {
         is: policy_for => policy_for == '1',  
-        then: Yup.string().required('Title is required'),
+        then: Yup.string()
+            .test(
+                "paFlagChecking",
+                function() {
+                    return "TitleIsRequired"
+                },
+                function (value) {
+                    if (this.parent.pa_flag == 1 && !value) {
+                        return false
+                    }
+                    return true;
+            }),
         otherwise: Yup.string().nullable()
     }),
         
@@ -842,7 +853,7 @@ class TwoWheelerAdditionalDetails extends Component {
                                                 ))}
                                             </Field>     
                                             {errors.salutation_id && touched.salutation_id ? (
-                                            <span className="errorMsg">{errors.salutation_id}</span>
+                                            <span className="errorMsg">{phrases[errors.salutation_id]}</span>
                                             ) : null}              
                                             </div>
                                         </FormGroup>
@@ -1184,7 +1195,7 @@ class TwoWheelerAdditionalDetails extends Component {
                                                 ))}
                                             </Field>     
                                             {errors.nominee_salutation && touched.nominee_salutation ? (
-                                            <span className="errorMsg">{errors.nominee_salutation}</span>
+                                            <span className="errorMsg">{phrases[errors.nominee_salutation]}</span>
                                             ) : null}              
                                             </div>
                                         </FormGroup>

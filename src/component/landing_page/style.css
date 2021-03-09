@@ -5,3 +5,18 @@
 }
 .scrollable:hover{overflow-y:auto}
 
+/* New CSS */
+.dashboardBrand {
+	margin: 25px auto;
+    padding: 25px 25px 25px 45px;
+    max-width: 100%;
+    background: url(/static/media/brand-bg1.bff98810.svg) no-repeat 35px top;
+    box-sizing: border-box;
+    border-radius: 25px;
+    min-height: 620px;
+    background-size: cover;
+    background-attachment: fixed;
+    transition: 0.3s;
+}
+    
+

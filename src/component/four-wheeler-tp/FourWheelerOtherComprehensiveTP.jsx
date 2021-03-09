@@ -166,7 +166,7 @@ class TwoWheelerOtherComprehensive extends Component {
                 let step_completed = decryptResp.data.policyHolder ? decryptResp.data.policyHolder.step_no : "";
                 let request_data = decryptResp.data.policyHolder ? decryptResp.data.policyHolder.request_data : {};
 
-                let add_more_coverage = motorInsurance && motorInsurance.policy_for == '2' ? [] : (motorInsurance.add_more_coverage != null ? motorInsurance.add_more_coverage.split(",") : ['B00015']) 
+                let add_more_coverage = motorInsurance && motorInsurance.policy_for == '2' ? (motorInsurance.add_more_coverage != null ? motorInsurance.add_more_coverage.split(",") : []) : (motorInsurance.add_more_coverage != null ? motorInsurance.add_more_coverage.split(",") : ['B00015']) 
                 add_more_coverage = add_more_coverage.flat()
 
                 let add_more_coverage_request_json = motorInsurance && motorInsurance.add_more_coverage_request_json != null ? motorInsurance.add_more_coverage_request_json : ""
@@ -527,7 +527,7 @@ class TwoWheelerOtherComprehensive extends Component {
 
         let newInitialValues = Object.assign(initialValue, newInnitialArray );
 
-        console.log("policyCoverage--------------- ", policyCoverage)
+        // console.log("policyCoverage--------------- ", policyCoverage)
 
         const policyCoverageList =  policyCoverage && policyCoverage.length > 0 ?
             policyCoverage.map((coverage, qIndex) => (
@@ -709,8 +709,8 @@ class TwoWheelerOtherComprehensive extends Component {
 
                                                             {motorInsurance && motorInsurance.policy_for == '2' && moreCoverage.map((coverage, qIndex) => (
                                                             <Row key={qIndex}>   
-                                                            {console.log("coverage.name-------> ", coverage)}
-                                                            {coverage.code == "geographical_extension" || coverage.code == "B00010" ? 
+                                                            {/* {console.log("coverage.name-------> ", coverage)} */}
+                                                            {coverage.code == "geographical_extension" || coverage.code == "B00010" || coverage.code == "B00013" ? 
                                                                 <Col sm={12} md={11} lg={6} key={qIndex+"a"} >
                                                                     <label className="customCheckBox formGrp formGrp">{coverage.name}
                                                                         <OverlayTrigger overlay={<Tooltip id="tooltip-disabled">{coverage.description}</Tooltip>}>

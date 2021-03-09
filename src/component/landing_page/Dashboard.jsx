@@ -348,7 +348,7 @@ class Dashboard extends Component {
                 <h4 className="text-center mt-3 mb-3">
                 {phrases['SBIGICL']}
                 </h4>
-                <section className="brand m-b-25">
+                <section className="contBox m-b-45 dashboardBrand">
                   <h4 className="text-center mt-3 mb-3">{phrases['Dashboard']}</h4>
                   <Formik
                     initialValues={initialValues}
@@ -596,8 +596,8 @@ class Dashboard extends Component {
                     }}
                   </Formik>
                 </section>
-                <Footer />
               </div>
+			  <Footer />
             </div>
           </div> : null }
         </BaseComponent>

@@ -98,7 +98,7 @@ class HeaderTop extends Component {
                 <section className="container-fluid headerTop d-flex justify-content-between">
                     <div className="align-self-center"><img src={require('../../../../assets/images/logo.svg')} alt="" /></div>
                     {sessionStorage.getItem("auth_token") && phrases ? 
-                    <div className="align-self-right">
+                    <div className="align-self-right langDrop">
                         <select
                             name="langauage"
                             className="listSelect"

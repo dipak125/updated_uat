@@ -49,18 +49,26 @@ const ComprehensiveValidation = Yup.object().shape({
 
     tyre_rim_array: Yup.array().of(
         Yup.object().shape({
-            tyreMfgYr : Yup.string().required('MFG year required')
-            .min(4, function() {
-                return "Invalid year"
-            })
-            .max(4, function() {
-                return "Invalid year"
+            tyreMfgYr : Yup.string().when(['tyre_cover_flag'], {
+                is: tyre_cover_flag => tyre_cover_flag == '1',
+                then: Yup.string().required('MFG year required')
+                    .min(4, function() {
+                        return "Invalid year"
+                    })
+                    .max(4, function() {
+                        return "Invalid year"
+                    }),
+                otherwise: Yup.string()
             }),
 
-            tyreSerialNo : Yup.string().required('Serial No Required')
-            .matches(/^[a-zA-Z0-9]*$/, function() {
-                return "Invalid Serial No"
-            })
+            tyreSerialNo : Yup.string().when(['tyre_cover_flag'], {
+                is: tyre_cover_flag => tyre_cover_flag == '1',
+                then: Yup.string().required('Serial No Required')
+                    .matches(/^[a-zA-Z0-9]*$/, function() {
+                        return "Invalid Serial No"
+                    }),
+                otherwise: Yup.string()
+            }),
         })
     ),
 
@@ -742,6 +750,8 @@ class TwoWheelerOtherComprehensive extends Component {
                                         validationSchema={ComprehensiveValidation}
                                         >
                                         {({ values, errors, setFieldValue, setFieldTouched, isValid, isSubmitting, touched }) => {
+console.log("values--------------------> ", values)
+console.log("errors--------------------> ", errors)
 
                                             return (
                                                 <Form>
