@@ -1599,7 +1599,7 @@ class OtherComprehensive extends Component {
                                                     <Field
                                                         name="B00005_value"
                                                         type="text"
-                                                        placeholder="IDV"
+                                                        placeholder="Sum insured"
                                                         autoComplete="off"
                                                         maxLength="7"
                                                         onFocus={e => this.changePlaceHoldClassAdd(e)}
