@@ -16,6 +16,9 @@ import axios from "../../shared/axios"
 import Encryption from '../../shared/payload-encryption';
 import * as Yup from "yup";
 import swal from 'sweetalert';
+import {
+    compareStartEndYear
+  } from "../../shared/validationFunctions";
 
 let encryption = new Encryption()
 let translation = localStorage.getItem("phrases") ? JSON.parse(localStorage.getItem("phrases")) : []
@@ -47,30 +50,37 @@ const ComprehensiveValidation = Yup.object().shape({
         otherwise: Yup.string()
     }),
 
+
     tyre_rim_array: Yup.array().of(
         Yup.object().shape({
-            tyreMfgYr : Yup.string().when(['tyre_cover_flag'], {
-                is: tyre_cover_flag => tyre_cover_flag == '1',
-                then: Yup.string().required('MFG year required')
-                    .min(4, function() {
-                        return "Invalid year"
-                    })
-                    .max(4, function() {
-                        return "Invalid year"
-                    }),
-                otherwise: Yup.string()
+            tyreMfgYr : Yup.string().required('MFG year required')
+                .test(
+                    "checkGreaterTimes",
+                    "Mfg date must be greater than registration date",
+                    function (value) {
+                        if (value) { 
+                            return compareStartEndYear(new Date(this.parent.vehicleRegDate), value);
+                        }
+                        return true;
+                    }
+                )
+                .test(
+                    "checkGreaterTimes",
+                    "Mfg date must be less than today",
+                    function (value) {
+                        if (value) {
+                            return compareStartEndYear(value, new Date());
+                        }
+                        return true;
+                    }
+                ),
+            tyreSerialNo : Yup.string().required('Serial No Required')
+                .matches(/^[a-zA-Z0-9]*$/, function() {
+                    return "Invalid Serial No"
+                })
             }),
-
-            tyreSerialNo : Yup.string().when(['tyre_cover_flag'], {
-                is: tyre_cover_flag => tyre_cover_flag == '1',
-                then: Yup.string().required('Serial No Required')
-                    .matches(/^[a-zA-Z0-9]*$/, function() {
-                        return "Invalid Serial No"
-                    }),
-                otherwise: Yup.string()
-            }),
-        })
     ),
+
 
 });
 
@@ -169,6 +179,7 @@ class TwoWheelerOtherComprehensive extends Component {
                 let motorInsurance = decryptResp.data.policyHolder ? decryptResp.data.policyHolder.motorinsurance : {}
                 let vehicleDetails = decryptResp.data.policyHolder ? decryptResp.data.policyHolder.vehiclebrandmodel : {};
                 let step_completed = decryptResp.data.policyHolder ? decryptResp.data.policyHolder.step_no : "";
+                let vehicleRegDate = motorInsurance &&  motorInsurance.registration_date != null ? motorInsurance.registration_date : ''
                 let tyre_rim_array = motorInsurance.tyre_rim_array && motorInsurance.tyre_rim_array!=null ? motorInsurance.tyre_rim_array : null
                 tyre_rim_array = tyre_rim_array!=null ? JSON.parse(tyre_rim_array) : []
 
@@ -180,7 +191,7 @@ class TwoWheelerOtherComprehensive extends Component {
                  values.tyre_rim_array = tyre_rim_array
                 
                 this.setState({
-                    motorInsurance,vehicleDetails,step_completed,tyre_rim_array,
+                    motorInsurance,vehicleDetails,step_completed,tyre_rim_array,vehicleRegDate,
                     add_more_coverage: add_more_coverage, 
                     selectFlag: motorInsurance && motorInsurance.policy_for == '2' ? [] : (motorInsurance.add_more_coverage != null ? '0' : '1') 
                     
@@ -460,7 +471,8 @@ class TwoWheelerOtherComprehensive extends Component {
                         values.tyre_rim_array.push(
                                 {
                                     tyreSerialNo : "",
-                                    tyreMfgYr : ""
+                                    tyreMfgYr : "",
+                                    vehicleRegDate: this.state.vehicleRegDate
                             } )
                     }
                 }
@@ -513,12 +525,13 @@ class TwoWheelerOtherComprehensive extends Component {
 
     initClaimDetailsList = () => {
         let innicialClaimList = []
-        const {tyre_rim_array} = this.state
+        const {tyre_rim_array,vehicleRegDate} = this.state
             for (var i = 0; i < this.state.no_of_claim ; i++) {
                 innicialClaimList.push(
                     {
                         tyreSerialNo :  tyre_rim_array && tyre_rim_array[i] && tyre_rim_array[i].tyreSerialNo ? tyre_rim_array[i].tyreSerialNo : "",
-                        tyreMfgYr :  tyre_rim_array && tyre_rim_array[i] && tyre_rim_array[i].tyreMfgYr ? tyre_rim_array[i].tyreMfgYr : ""
+                        tyreMfgYr :  tyre_rim_array && tyre_rim_array[i] && tyre_rim_array[i].tyreMfgYr ? tyre_rim_array[i].tyreMfgYr : "",
+                        vehicleRegDate : vehicleRegDate ,
                     }
                 )
             }   
@@ -594,7 +607,6 @@ class TwoWheelerOtherComprehensive extends Component {
             step_completed, vehicleDetails, selectFlag, sliderVal, moreCoverage, ncbDiscount} = this.state
         const { productId } = this.props.match.params
         let covList = motorInsurance && motorInsurance.add_more_coverage ? motorInsurance.add_more_coverage.split(",") : ""
-        console.log("covList--------------> ", covList)
         let newInnitialArray = {}
         let PA_flag = motorInsurance && (motorInsurance.pa_cover == null || motorInsurance.pa_cover == "") ? '0' : '1'
         let PA_Cover = motorInsurance &&  motorInsurance.pa_cover != null ? motorInsurance.pa_cover : ''
@@ -652,10 +664,6 @@ class TwoWheelerOtherComprehensive extends Component {
         newInnitialArray.PA_Cover = PA_Cover
         newInnitialArray.tyre_cover_flag = tyre_cover_flag
         let newInitialValues = Object.assign(initialValue, newInnitialArray );
-
-        // console.log("InitialValues---", newInnitialArray)
-        // console.log("add_more_coverage---", add_more_coverage)
-        console.log('policyCoverage', policyCoverage)
 
         const policyCoverageList =  policyCoverage && policyCoverage.length > 0 ?
             policyCoverage.map((coverage, qIndex) => (
@@ -723,8 +731,6 @@ class TwoWheelerOtherComprehensive extends Component {
                     </h6>
                 </span>
             ) : null;
-
-            // console.log("step_completed---", step_completed)
 
         return (
             

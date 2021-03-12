@@ -102,6 +102,22 @@ export const checkGreaterStartEndTimes = (time1, time2) => {
     return false;
 }
 
+export const compareStartEndYear = (time1, time2) => {
+    if (time1 != '' && time2 != '') {
+        let time3 = new Date(time1)
+        let time4 = new Date(time2)
+        if (time3.getFullYear() <= time4.getFullYear()) {
+            return true;
+        }
+    }
+    
+    if(typeof time2 == 'undefined'){
+        return true;
+    }
+
+    return false;
+}
+
 export const checkDateLessOrEqual = (time1, time2) => {
     if (time1 != '' && time2 != '') {
         let time3 = new Date(time1);

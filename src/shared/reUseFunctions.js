@@ -36,3 +36,11 @@ export const prevEndDate = (value) => {
     var endDate = new Date(year,month,day)
     return endDate
 }
+
+export const currentEndDate = (value) => {
+    var day =  value.getDate() - 1
+    var month = value.getMonth()
+    var year =   value.getFullYear() + 5
+    var endDate = new Date(year,month,day)
+    return endDate
+}

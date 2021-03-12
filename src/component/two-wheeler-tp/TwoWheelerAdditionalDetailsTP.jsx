@@ -478,21 +478,19 @@ class TwoWheelerAdditionalDetails extends Component {
             'nominee_title_id': values['nominee_salutation'],
             'page_name': `two_wheeler_additional_detailsTP/${productId}`,
         }
-        if(motorInsurance.policy_for == '1' && motorInsurance.pa_flag == '1'){
-            post_data['dob'] = moment(values['dob']).format("YYYY-MM-DD")
-            post_data['nominee_relation_with'] = values['nominee_relation_with']
-            post_data['nominee_first_name'] = values['nominee_first_name']
-            post_data['nominee_last_name']= values['nominee_last_name']
-            post_data['nominee_gender'] = values['nominee_gender']
-            post_data['nominee_dob'] = moment(values['nominee_dob']).format("YYYY-MM-DD")
-            post_data['appointee_name'] = values['appointee_name']
-            post_data['appointee_relation_with'] = values['appointee_relation_with']
-            post_data['is_appointee'] = this.state.is_appointee
-            post_data['gender']= values['gender']
-        }
-        else if(motorInsurance.policy_for == '1' && motorInsurance.pa_flag == '0') {
+        if(motorInsurance.policy_for == '1'){
             post_data['gender']= values['gender']
             post_data['dob'] = moment(values['dob']).format("YYYY-MM-DD")
+            if( motorInsurance.pa_flag == '1') {
+                post_data['nominee_relation_with'] = values['nominee_relation_with']
+                post_data['nominee_first_name'] = values['nominee_first_name']
+                post_data['nominee_last_name']= values['nominee_last_name']
+                post_data['nominee_gender'] = values['nominee_gender']
+                post_data['nominee_dob'] = moment(values['nominee_dob']).format("YYYY-MM-DD")
+                post_data['appointee_name'] = values['appointee_name']
+                post_data['appointee_relation_with'] = values['appointee_relation_with']
+                post_data['is_appointee'] = this.state.is_appointee
+            }
         }
         else {
             post_data['gender']= "cc"

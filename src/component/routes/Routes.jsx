@@ -390,6 +390,35 @@ const IPA_Premium = Loadable({
     loading: () => loadingContent
 });
 
+
+// ========== Two-Wheeler OD =============================================
+
+const TwoWheelerSelectBrandOD = Loadable({
+    loader: () => import(/*webpackChunkName: "Products" */"../two-wheeler-OD/TwoWheelerSelectBrandOD.jsx"),
+    loading: () => loadingContent
+});
+const TwoWheelerVehicleDetailsOD = Loadable({
+    loader: () => import(/*webpackChunkName: "Products" */"../two-wheeler-OD/TwoWheelerVehicleDetailsOD.jsx"),
+    loading: () => loadingContent
+});
+const TwoWheelerPolicyPremiumDetailsOD = Loadable({
+    loader: () => import(/*webpackChunkName: "Products" */"../two-wheeler-OD/TwoWheelerPolicyPremiumDetailsOD.jsx"),
+    loading: () => loadingContent
+});
+const TwoWheelerOtherComprehensiveOD = Loadable({
+    loader: () => import(/*webpackChunkName: "Products" */"../two-wheeler-OD/TwoWheelerOtherComprehensiveOD.jsx"),
+    loading: () => loadingContent
+});
+const TwoWheelerVerifyOD = Loadable({
+    loader: () => import(/*webpackChunkName: "Products" */"../two-wheeler-OD/TwoWheelerVerifyOD.jsx"),
+    loading: () => loadingContent
+});
+const TwoWheelerAdditionalDetailsOD = Loadable({
+    loader: () => import(/*webpackChunkName: "Products" */"../two-wheeler-OD/TwoWheelerAdditionalDetailsOD.jsx"),
+    loading: () => loadingContent
+});
+
+
 // =================== GRAMIN SAMRIDDHI BIMA =============================== //
 
 const SelectPlan_GSB = Loadable({
@@ -405,6 +434,34 @@ const PolicyDetails_GSB = Loadable({
     loading: () => loadingContent
 });
 // ====================================================================
+
+// ========== Four-Wheeler OD =============================================
+						
+					const RegistrationOD = Loadable({
+						loader: () => import(/*webpackChunkName: "Products" */"../motor-OD/RegistrationOD.jsx"),
+						loading: () => loadingContent
+					});
+					const SelectBrandOD = Loadable({
+						loader: () => import(/*webpackChunkName: "Products" */"../motor-OD/SelectBrandOD.jsx"),
+						loading: () => loadingContent
+					});
+					const VehicleDetailsOD = Loadable({
+						loader: () => import(/*webpackChunkName: "Products" */"../motor-OD/VehicleDetailsOD.jsx"),
+						loading: () => loadingContent
+					});
+					const OtherComprehensiveOD = Loadable({
+						loader: () => import(/*webpackChunkName: "Products" */"../motor-OD/OtherComprehensiveOD.jsx"),
+						loading: () => loadingContent
+					});
+					const AdditionalDetailsOD = Loadable({
+						loader: () => import(/*webpackChunkName: "Products" */"../motor-OD/AdditionalDetailsOD.jsx"),
+						loading: () => loadingContent
+					});
+					const PremiumOD = Loadable({
+						loader: () => import("../motor-OD/PremiumOD.jsx"),
+						loading: () => loadingContent
+					});
+				/**/
 
 
 //  ************ Vedvag Payment Gateway ******************
@@ -486,6 +543,15 @@ class Routes extends Component {
                         <PrivateRoute exact path="/two_wheeler_policy_premium_detailsTP/:productId" component={TwoWheelerPolicyPremiumDetailsTP} />
                         {/* <PrivateRoute exact path="/two_wheeler_ThankYou_motorTP/:policyId" component={TwoWheelerThankYou_motorTP} /> */}
 
+                        {/************ TwoWheelerOD ******************/}
+                        {/* <PrivateRoute exact path="/two_wheeler_Registration/:productId" component={TwoWheelerRegistration} />  */}
+                        <PrivateRoute exact path="/two_wheeler_Select-brandOD/:productId" component={TwoWheelerSelectBrandOD} />
+                        <PrivateRoute exact path="/two_wheeler_Vehicle_detailsOD/:productId" component={TwoWheelerVehicleDetailsOD} />
+                        <PrivateRoute exact path="/two_wheeler_OtherComprehensiveOD/:productId" component={TwoWheelerOtherComprehensiveOD} />
+                        <PrivateRoute exact path="/two_wheeler_verifyOD/:productId" component={TwoWheelerVerifyOD} />
+                        <PrivateRoute exact path="/two_wheeler_additional_detailsOD/:productId" component={TwoWheelerAdditionalDetailsOD} />  
+                        <PrivateRoute exact path="/two_wheeler_policy_premium_detailsOD/:productId" component={TwoWheelerPolicyPremiumDetailsOD} />
+
                         {/************ FourWheelerTP ******************/}
                         <PrivateRoute exact path="/four_wheeler_Select-brandTP/:productId" component={FourWheelerSelectBrandTP} />
                         <PrivateRoute exact path="/four_wheeler_Vehicle_detailsTP/:productId" component={FourWheelerVehicleDetailsTP} />
@@ -560,6 +626,16 @@ class Routes extends Component {
 
 
                         <PrivateRoute exact path="/UnderMaintenance" component={UnderMaintenance} />
+						
+						{/************ Four-Wheeler OD ******************/}
+						<PrivateRoute exact path="/RegistrationOD/:productId" component={RegistrationOD} />                    
+                        <PrivateRoute exact path="/Select-brandOD/:productId" component={SelectBrandOD} />
+                        <PrivateRoute exact path="/VehicleDetailsOD/:productId" component={VehicleDetailsOD} />
+                        <PrivateRoute exact path="/OtherComprehensiveOD/:productId" component={OtherComprehensiveOD} />
+                        {/*<PrivateRoute exact path="/Additional_detailsOD/:productId" component={AdditionalDetailsOD} />*/}
+                        <PrivateRoute exact path="/PremiumOD/:productId" component={PremiumOD} />
+                        {/* <PrivateRoute exact path="/ThankYou_motor/:policyId" component={ThankYou_motor} /> */}
+						
                         <Redirect from="/" to="/Dashboard" />
                     </Switch>
                 </HashRouter>

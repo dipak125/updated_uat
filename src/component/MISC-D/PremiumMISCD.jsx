@@ -245,29 +245,31 @@ class PremiumMISCD extends Component {
                                 let break_in_checking = res.data.data.break_in_checking
                                 let break_in_inspection_no = res.data.data.break_in_inspection_no
                                 let break_in_status = res.data.data.break_in_status
-                                if( break_in_checking == true && break_in_inspection_no == "" && (break_in_status == null || break_in_status == "0")) {
-                                    swal({
-                                        title: "Breakin",
-                                        text: `Your Quotation number is ${request_data.quote_id}. Your vehicle needs inspection. Do you want to raise inspection.`,
-                                        icon: "warning",
-                                        buttons: true,
-                                        dangerMode: true,
-                                    })
-                                    .then((willCreate) => {
-                                        if (willCreate) {
-                                            this.callBreakin(motorInsurance && motorInsurance.registration_no)
-                                        }
-                                        else {
-                                            this.props.loadingStop();
-                                        }
-                                    })                                                           
-                                }
-                                else {
-                                    swal({
-                                        title: "Breakin",
-                                        text: `Breakin already raised. \nBreaking number ${break_in_inspection_no}.`,
-                                        icon: "warning",
-                                    })
+                                if( break_in_checking == true){
+                                    if( break_in_inspection_no == "" && (break_in_status == null || break_in_status == "0")) {
+                                        swal({
+                                            title: "Breakin",
+                                            text: `Your Quotation number is ${request_data.quote_id}. Your vehicle needs inspection. Do you want to raise inspection.`,
+                                            icon: "warning",
+                                            buttons: true,
+                                            dangerMode: true,
+                                        })
+                                        .then((willCreate) => {
+                                            if (willCreate) {
+                                                this.callBreakin(motorInsurance && motorInsurance.registration_no)
+                                            }
+                                            else {
+                                                this.props.loadingStop();
+                                            }
+                                        })                                                           
+                                    }
+                                    else {
+                                        swal({
+                                            title: "Breakin",
+                                            text: `Breakin already raised. \nBreaking number ${break_in_inspection_no}.`,
+                                            icon: "warning",
+                                        })
+                                    }
                                 }
                             })
                             .catch(err => {

@@ -525,35 +525,7 @@ class TwoWheelerSelectBrand extends Component {
         let regno = e.target.value
         this.setState({fastLaneData: [], brandView: '0', vehicleDetails: []})
         let brandEdit = {'brandEdit' : 1}
-        this.props.setData(brandEdit)
-        // let formatVal = ""
-        // let regnoLength = regno.length
-        // var letter = /^[a-zA-Z]+$/;
-        // var number = /^[0-9]+$/;
-        // let subString = regno.substring(regnoLength-1, regnoLength)
-        // let preSubString = regno.substring(regnoLength-2, regnoLength-1)
-    
-        // if(subString.match(letter) && preSubString.match(letter) && regnoLength == 3) {        
-        //     formatVal = formatVal = regno.substring(0, regnoLength-1) + " " +subString
-        // }
-        // else if(subString.match(letter) && preSubString.match(letter)) {
-        //     formatVal = regno
-        // }
-        // else if(subString.match(number) && preSubString.match(number) && regnoLength == 6) {
-        //     formatVal = formatVal = regno.substring(0, regnoLength-1) + " " +subString
-        // } 
-        // else if(subString.match(number) && preSubString.match(number) && regnoLength == 11 && regno.substring(3, 4).match(letter) && regno.substring(5, 7).match(number) ) {
-        //     formatVal = formatVal = regno.substring(0, 7) + " " +regno.substring(7, 11)
-        // } 
-        // else if(subString.match(number) && preSubString.match(letter)) {        
-        //     formatVal = regno.substring(0, regnoLength-1) + " " +subString      
-        // } 
-        // else if(subString.match(letter) && preSubString.match(number)) {
-        //     formatVal = regno.substring(0, regnoLength-1) + " " +subString   
-        // } 
-        
-        // else formatVal = regno.toUpperCase()
-        
+        this.props.setData(brandEdit)      
         e.target.value = regno.toUpperCase()
 
     }
@@ -921,7 +893,7 @@ class TwoWheelerSelectBrand extends Component {
                                                                 </div>
 
                                                                 <div className="d-flex justify-content-between flex-lg-row flex-md-column m-b-25">
-                                                                    <div className="txtRegistr">{phrases['TwoWheelerModel']}
+                                                                    <div className="txtRegistr">{phrases['TwoWheelModel']}
                                                                         -  <strong>{fastLaneData && fastLaneData.model_text ? fastLaneData.model_text+" "+fastLaneData.varient_text : vehicleDetails && vehicleDetails.vehiclemodel && vehicleDetails.vehiclemodel.description ? vehicleDetails.vehiclemodel.description+" "+vehicleDetails.varientmodel.varient : "" }</strong></div>
 
                                                                     <div> <button type="button" className="rgistrBtn" onClick={this.selectBrand.bind(this, productId)}>{phrases['Edit']}</button></div>
