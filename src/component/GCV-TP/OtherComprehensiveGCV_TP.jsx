@@ -437,21 +437,21 @@ class OtherComprehensiveGCV extends Component {
                 let values = []
                 let add_more_coverage = []
                 
-                if(vehicleDetails && vehicleDetails.varientmodel && (vehicleDetails.varientmodel.fueltype.id == 3 || vehicleDetails.varientmodel.fueltype.id == 4)) {
-                    if(motorInsurance && motorInsurance.policy_for == '1' && motorInsurance.add_more_coverage == null) {
-                        var cov_val = ['B00015', 'B00010']
-                        add_more_coverage.push(cov_val);
-                    }
-                    else if(motorInsurance && motorInsurance.policy_for == '2' && motorInsurance.add_more_coverage == null) {
-                        var cov_val = ['B00010']
-                        add_more_coverage.push(cov_val);
-                    }
-                    else {
-                        var cov_val = motorInsurance.add_more_coverage.split(",")
-                        add_more_coverage.push(cov_val);
-                    }             
-                }
-                else {
+                // if(vehicleDetails && vehicleDetails.varientmodel && (vehicleDetails.varientmodel.fueltype.id == 3 || vehicleDetails.varientmodel.fueltype.id == 4)) {
+                //     if(motorInsurance && motorInsurance.policy_for == '1' && motorInsurance.add_more_coverage == null) {
+                //         var cov_val = ['B00015', 'B00010']
+                //         add_more_coverage.push(cov_val);
+                //     }
+                //     else if(motorInsurance && motorInsurance.policy_for == '2' && motorInsurance.add_more_coverage == null) {
+                //         var cov_val = ['B00010']
+                //         add_more_coverage.push(cov_val);
+                //     }
+                //     else {
+                //         var cov_val = motorInsurance.add_more_coverage.split(",")
+                //         add_more_coverage.push(cov_val);
+                //     }             
+                // }
+                // else {
                     if(motorInsurance && motorInsurance.policy_for == '1' && motorInsurance.add_more_coverage == null) {
                         var cov_val = ['B00015']
                         add_more_coverage.push(cov_val);
@@ -464,7 +464,7 @@ class OtherComprehensiveGCV extends Component {
                         var cov_val = motorInsurance.add_more_coverage.split(",")
                         add_more_coverage.push(cov_val);
                     }             
-                }
+                // }
                 add_more_coverage = add_more_coverage.flat()
                 values.PA_flag = motorInsurance && motorInsurance.pa_cover != "" ? '1' : '0'
                 values.PA_Cover = motorInsurance && motorInsurance.pa_cover != "" ? motorInsurance.pa_cover : '0'

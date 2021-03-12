@@ -50,36 +50,69 @@ const ComprehensiveValidation = Yup.object().shape({
         otherwise: Yup.string()
     }),
 
+    tyre_rim_array: Yup.array().when(['policy_for'], {
+        is: policy_for => policy_for == '1',
+        then: Yup.array().of(
+            Yup.object().shape({
+                tyreMfgYr : Yup.string().required('MFG year required')
+                    .test(
+                        "checkGreaterTimes",
+                        "Mfg date must be greater than registration date",
+                        function (value) {
+                            if (value) { 
+                                return compareStartEndYear(new Date(this.parent.vehicleRegDate), value);
+                            }
+                            return true;
+                        }
+                    )
+                    .test(
+                        "checkGreaterTimes",
+                        "Mfg date must be less than today",
+                        function (value) {
+                            if (value) {
+                                return compareStartEndYear(value, new Date());
+                            }
+                            return true;
+                        }
+                    ),
+                tyreSerialNo : Yup.string().required('Serial No Required')
+                    .matches(/^[a-zA-Z0-9]*$/, function() {
+                        return "Invalid Serial No"
+                    })
+                }),
+        ),
+        otherwise: Yup.string()
+    }),
 
-    tyre_rim_array: Yup.array().of(
-        Yup.object().shape({
-            tyreMfgYr : Yup.string().required('MFG year required')
-                .test(
-                    "checkGreaterTimes",
-                    "Mfg date must be greater than registration date",
-                    function (value) {
-                        if (value) { 
-                            return compareStartEndYear(new Date(this.parent.vehicleRegDate), value);
-                        }
-                        return true;
-                    }
-                )
-                .test(
-                    "checkGreaterTimes",
-                    "Mfg date must be less than today",
-                    function (value) {
-                        if (value) {
-                            return compareStartEndYear(value, new Date());
-                        }
-                        return true;
-                    }
-                ),
-            tyreSerialNo : Yup.string().required('Serial No Required')
-                .matches(/^[a-zA-Z0-9]*$/, function() {
-                    return "Invalid Serial No"
-                })
-            }),
-    ),
+    // tyre_rim_array: Yup.array().of(
+    //     Yup.object().shape({
+    //         tyreMfgYr : Yup.string().required('MFG year required')
+    //             .test(
+    //                 "checkGreaterTimes",
+    //                 "Mfg date must be greater than registration date",
+    //                 function (value) {
+    //                     if (value) { 
+    //                         return compareStartEndYear(new Date(this.parent.vehicleRegDate), value);
+    //                     }
+    //                     return true;
+    //                 }
+    //             )
+    //             .test(
+    //                 "checkGreaterTimes",
+    //                 "Mfg date must be less than today",
+    //                 function (value) {
+    //                     if (value) {
+    //                         return compareStartEndYear(value, new Date());
+    //                     }
+    //                     return true;
+    //                 }
+    //             ),
+    //         tyreSerialNo : Yup.string().required('Serial No Required')
+    //             .matches(/^[a-zA-Z0-9]*$/, function() {
+    //                 return "Invalid Serial No"
+    //             })
+    //         }),
+    // ),
 
 
 });
@@ -183,7 +216,9 @@ class TwoWheelerOtherComprehensive extends Component {
                 let tyre_rim_array = motorInsurance.tyre_rim_array && motorInsurance.tyre_rim_array!=null ? motorInsurance.tyre_rim_array : null
                 tyre_rim_array = tyre_rim_array!=null ? JSON.parse(tyre_rim_array) : []
 
-                let add_more_coverage = motorInsurance && motorInsurance.policy_for == '2' ? [] : (motorInsurance.add_more_coverage != null ? motorInsurance.add_more_coverage.split(",") : ['B00015']) 
+                // let add_more_coverage = motorInsurance && motorInsurance.policy_for == '2' ? [] : (motorInsurance.add_more_coverage != null ? motorInsurance.add_more_coverage.split(",") : ['B00015']) 
+                let add_more_coverage = motorInsurance && motorInsurance.policy_for == '2' ? (motorInsurance.add_more_coverage != null ? motorInsurance.add_more_coverage.split(",") : [])
+                    : (motorInsurance.add_more_coverage != null ? motorInsurance.add_more_coverage.split(",") : ['B00015']) 
                 add_more_coverage = add_more_coverage.flat()
 
                  values.PA_flag = motorInsurance && motorInsurance.pa_cover != "" ? '1' : '0'
@@ -611,6 +646,7 @@ class TwoWheelerOtherComprehensive extends Component {
         let PA_flag = motorInsurance && (motorInsurance.pa_cover == null || motorInsurance.pa_cover == "") ? '0' : '1'
         let PA_Cover = motorInsurance &&  motorInsurance.pa_cover != null ? motorInsurance.pa_cover : ''
         let tyre_cover_flag=  '0'
+        let policy_for = motorInsurance && motorInsurance.policy_for 
         
         for(var i = 0; i<covList.length; i++) {
             if(covList.indexOf('C101110')) tyre_cover_flag = '1'
@@ -663,6 +699,7 @@ class TwoWheelerOtherComprehensive extends Component {
         newInnitialArray.PA_flag = PA_flag   
         newInnitialArray.PA_Cover = PA_Cover
         newInnitialArray.tyre_cover_flag = tyre_cover_flag
+        newInnitialArray.policy_for = policy_for
         let newInitialValues = Object.assign(initialValue, newInnitialArray );
 
         const policyCoverageList =  policyCoverage && policyCoverage.length > 0 ?
@@ -890,6 +927,38 @@ console.log("errors--------------------> ", errors)
                                                                 {values.tyre_cover_flag == '1' && values[coverage.code] == 'C101110' ?
                                                                     this.handleClaims(values, errors, touched, setFieldTouched, setFieldValue) : null
                                                                 }
+                                                            </Row>
+                                                            ))}
+
+                                                            {motorInsurance && motorInsurance.policy_for == '2' && moreCoverage.map((coverage, qIndex) => (
+                                                            <Row key={qIndex}>   
+                                                            {/* {console.log("coverage.name-------> ", coverage)} */}
+                                                            {coverage.code == "C101072" || coverage.code == "C101108" ? 
+                                                                <Col sm={12} md={11} lg={6} key={qIndex+"a"} >
+                                                                    <label className="customCheckBox formGrp formGrp">{coverage.name}
+                                                                        <OverlayTrigger overlay={<Tooltip id="tooltip-disabled">{coverage.description}</Tooltip>}>
+                                                                            <a className="infoIcon"><img src={require('../../assets/images/i.svg')} alt="" className="premtool" /></a>
+                                                                        </OverlayTrigger>
+                                                                        <Field
+                                                                            type="checkbox"
+                                                                            // name={`moreCov_${qIndex}`}
+                                                                            name={coverage.code}
+                                                                            value={coverage.code}
+                                                                            className="user-self"
+                                                                            // checked={values.roadsideAssistance ? true : false}
+                                                                            onClick={(e) =>{
+                                                                                if( e.target.checked == false && values[coverage.code] == 'B00015') {
+                                                                                    swal(phrases.SwalIRDAI)
+                                                                                }
+                                                                                this.onRowSelect(e.target.value, e.target.checked, setFieldTouched, setFieldValue)         
+                                                                            }
+                                                                            }
+                                                                            checked = {values[coverage.code] == coverage.code ? true : false}
+                                                                        />
+                                                                        <span className="checkmark mL-0"></span>
+                                                                        <span className="error-message"></span>
+                                                                    </label>
+                                                                </Col> : null}                            
                                                             </Row>
                                                             ))}
                                                             
