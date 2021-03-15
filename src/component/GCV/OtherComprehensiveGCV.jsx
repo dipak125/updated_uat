@@ -525,6 +525,7 @@ class OtherComprehensiveGCV extends Component {
                 trailer_array = trailer_array!=null ? JSON.parse(trailer_array) : []
                 let values = []
                 let add_more_coverage = []
+                let bodySliderVal = motorInsurance && motorInsurance.body_idv_value ? motorInsurance.body_idv_value : 0
                 if(vehicleDetails && vehicleDetails.varientmodel && (vehicleDetails.varientmodel.fueltype.id == 8 || vehicleDetails.varientmodel.fueltype.id == 9)) {
                     if(motorInsurance && motorInsurance.policy_for == '1' && motorInsurance.add_more_coverage == null) {
                         // var cov_val = ['B00015', 'B00005']
@@ -599,7 +600,7 @@ class OtherComprehensiveGCV extends Component {
                 values.trailer_array = trailer_array
                 
                 this.setState({
-                    motorInsurance, add_more_coverage,request_data, vehicleDetails, 
+                    motorInsurance, add_more_coverage,request_data, vehicleDetails, bodySliderVal,
                     showCNG: motorInsurance.cng_kit == 1 ? true : false,
                     vahanVerify: motorInsurance.chasis_no && motorInsurance.engine_no ? true : false,
                     selectFlag: motorInsurance && motorInsurance.add_more_coverage != null ? '0' : '1',

@@ -684,7 +684,7 @@ class OtherComprehensiveOD extends Component {
 
         formData.append('enc_data', encryption.encrypt(JSON.stringify(post_data)))
         this.props.loadingStart();
-        axios.post('update-insured-value', formData).then(res => {
+        axios.post('/four-wh-stal/update-insured-value', formData).then(res => {
             this.props.loadingStop();
             if (res.data.error == false) {
                 this.props.history.push(`/Additional_detailsOD/${productId}`);

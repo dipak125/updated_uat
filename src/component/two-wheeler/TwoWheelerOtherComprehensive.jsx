@@ -21,7 +21,6 @@ import {
   } from "../../shared/validationFunctions";
 
 let encryption = new Encryption()
-let translation = localStorage.getItem("phrases") ? JSON.parse(localStorage.getItem("phrases")) : []
 
  let initialValue = {
     // add_more_coverage: "",
@@ -50,11 +49,11 @@ const ComprehensiveValidation = Yup.object().shape({
         otherwise: Yup.string()
     }),
 
-    tyre_rim_array: Yup.array().when(['policy_for'], {
-        is: policy_for => policy_for == '1',
-        then: Yup.array().of(
-            Yup.object().shape({
-                tyreMfgYr : Yup.string().required('MFG year required')
+    tyre_rim_array: Yup.array().of(
+        Yup.object().shape({
+            tyreMfgYr : Yup.string().when(['policy_for'], {
+                is: policy_for => policy_for == '1',
+                then: Yup.string().required('MFG year required')
                     .test(
                         "checkGreaterTimes",
                         "Mfg date must be greater than registration date",
@@ -69,68 +68,27 @@ const ComprehensiveValidation = Yup.object().shape({
                         "checkGreaterTimes",
                         "Mfg date must be less than today",
                         function (value) {
-                            if (value) {
+                            if (value && this.parent.policy_for == '1') {
                                 return compareStartEndYear(value, new Date());
                             }
                             return true;
                         }
                     ),
-                tyreSerialNo : Yup.string().required('Serial No Required')
+                otherwise: Yup.string()
+            }),
+
+            tyreSerialNo : Yup.string().when(['policy_for'], {
+                is: policy_for => policy_for == '1',
+                then: Yup.string().required('Serial No Required')
                     .matches(/^[a-zA-Z0-9]*$/, function() {
                         return "Invalid Serial No"
-                    })
-                }),
-        ),
-        otherwise: Yup.string()
-    }),
-
-    // tyre_rim_array: Yup.array().of(
-    //     Yup.object().shape({
-    //         tyreMfgYr : Yup.string().required('MFG year required')
-    //             .test(
-    //                 "checkGreaterTimes",
-    //                 "Mfg date must be greater than registration date",
-    //                 function (value) {
-    //                     if (value) { 
-    //                         return compareStartEndYear(new Date(this.parent.vehicleRegDate), value);
-    //                     }
-    //                     return true;
-    //                 }
-    //             )
-    //             .test(
-    //                 "checkGreaterTimes",
-    //                 "Mfg date must be less than today",
-    //                 function (value) {
-    //                     if (value) {
-    //                         return compareStartEndYear(value, new Date());
-    //                     }
-    //                     return true;
-    //                 }
-    //             ),
-    //         tyreSerialNo : Yup.string().required('Serial No Required')
-    //             .matches(/^[a-zA-Z0-9]*$/, function() {
-    //                 return "Invalid Serial No"
-    //             })
-    //         }),
-    // ),
-
-
-});
-
-
-const Coverage = {
-    "B00002":translation["B00002"],
-    "B00008":translation["B00008"],
-    "B00013":translation["B00013"],
-    "B00015":translation["B00015"],
-    "B00075":translation["B00075"],
-    "B00009":translation["B00009"],
-    "C101072":translation["C101072"],
-    "C101108":translation["C101108"],
-    "C101110":translation["C101110"],
-    "NCB":translation["NCB"],
-    "TOTALOD":translation["TOTALOD"]
-}
+                    }),
+                otherwise: Yup.string()
+            })
+           
+        }),
+    )
+})
 
 
 class TwoWheelerOtherComprehensive extends Component {
@@ -213,6 +171,7 @@ class TwoWheelerOtherComprehensive extends Component {
                 let vehicleDetails = decryptResp.data.policyHolder ? decryptResp.data.policyHolder.vehiclebrandmodel : {};
                 let step_completed = decryptResp.data.policyHolder ? decryptResp.data.policyHolder.step_no : "";
                 let vehicleRegDate = motorInsurance &&  motorInsurance.registration_date != null ? motorInsurance.registration_date : ''
+                let policy_for = motorInsurance && motorInsurance.policy_for 
                 let tyre_rim_array = motorInsurance.tyre_rim_array && motorInsurance.tyre_rim_array!=null ? motorInsurance.tyre_rim_array : null
                 tyre_rim_array = tyre_rim_array!=null ? JSON.parse(tyre_rim_array) : []
 
@@ -226,7 +185,7 @@ class TwoWheelerOtherComprehensive extends Component {
                  values.tyre_rim_array = tyre_rim_array
                 
                 this.setState({
-                    motorInsurance,vehicleDetails,step_completed,tyre_rim_array,vehicleRegDate,
+                    motorInsurance,vehicleDetails,step_completed,tyre_rim_array,vehicleRegDate,policy_for,
                     add_more_coverage: add_more_coverage, 
                     selectFlag: motorInsurance && motorInsurance.policy_for == '2' ? [] : (motorInsurance.add_more_coverage != null ? '0' : '1') 
                     
@@ -452,7 +411,7 @@ class TwoWheelerOtherComprehensive extends Component {
                 'pa_cover': values.PA_flag ? values.PA_Cover : "0",
                 'pa_flag' : values.PA_cover_flag,
                 'page_name': `two_wheeler_OtherComprehensive/${productId}`,
-                'tyre_rim_array' : values.tyre_rim_array,
+                'tyre_rim_array' : values.tyre_rim_array && values.tyre_rim_array.length > 0 ? values.tyre_rim_array : null ,
             }
         }
         else {
@@ -501,13 +460,15 @@ class TwoWheelerOtherComprehensive extends Component {
             add_more_coverage.push(value);
             if(value == 'C101110') {
                 var array_length = 2
+                var newTyreMfgYr = new Date(this.state.vehicleRegDate)
                  if(values.tyre_rim_array.length < array_length) {
                     for(var i = values.tyre_rim_array.length ; i < array_length ; i++) {
                         values.tyre_rim_array.push(
                                 {
                                     tyreSerialNo : "",
-                                    tyreMfgYr : "",
-                                    vehicleRegDate: this.state.vehicleRegDate
+                                    tyreMfgYr : newTyreMfgYr.getFullYear(),
+                                    vehicleRegDate: this.state.vehicleRegDate,
+                                    policy_for: this.state.policy_for
                             } )
                     }
                 }
@@ -560,16 +521,20 @@ class TwoWheelerOtherComprehensive extends Component {
 
     initClaimDetailsList = () => {
         let innicialClaimList = []
-        const {tyre_rim_array,vehicleRegDate} = this.state
+        const {tyre_rim_array,vehicleRegDate, policy_for} = this.state
+        if(tyre_rim_array && tyre_rim_array.length > 0) {
             for (var i = 0; i < this.state.no_of_claim ; i++) {
                 innicialClaimList.push(
                     {
                         tyreSerialNo :  tyre_rim_array && tyre_rim_array[i] && tyre_rim_array[i].tyreSerialNo ? tyre_rim_array[i].tyreSerialNo : "",
                         tyreMfgYr :  tyre_rim_array && tyre_rim_array[i] && tyre_rim_array[i].tyreMfgYr ? tyre_rim_array[i].tyreMfgYr : "",
                         vehicleRegDate : vehicleRegDate ,
+                        policy_for : policy_for
                     }
                 )
             }   
+        }
+            
 
     return innicialClaimList
     
@@ -583,8 +548,8 @@ class TwoWheelerOtherComprehensive extends Component {
             field_array.push(
                 <Col sm={12} md={12} lg={12}>
                     <Row >
-                        <Col sm={1} md={1} lg={1}><span className="indexing"> {i+1} </span></Col>
-                        <Col sm={12} md={5} lg={4}>
+                        <Col sm={1} md={1} lg={2}><span className="indexing"> Tyre{i+1} </span></Col>
+                        <Col sm={12} md={5} lg={3}>
                             <FormGroup>
                                 <div className="formSection">
                                 <Field
@@ -641,13 +606,27 @@ class TwoWheelerOtherComprehensive extends Component {
         const { vahanDetails, error, policyCoverage, vahanVerify, fulQuoteResp, PolicyArray, motorInsurance, serverResponse, add_more_coverage,
             step_completed, vehicleDetails, selectFlag, sliderVal, moreCoverage, ncbDiscount} = this.state
         const { productId } = this.props.match.params
+        let translation = localStorage.getItem("phrases") ? JSON.parse(localStorage.getItem("phrases")) : []
         let covList = motorInsurance && motorInsurance.add_more_coverage ? motorInsurance.add_more_coverage.split(",") : ""
         let newInnitialArray = {}
         let PA_flag = motorInsurance && (motorInsurance.pa_cover == null || motorInsurance.pa_cover == "") ? '0' : '1'
         let PA_Cover = motorInsurance &&  motorInsurance.pa_cover != null ? motorInsurance.pa_cover : ''
         let tyre_cover_flag=  '0'
-        let policy_for = motorInsurance && motorInsurance.policy_for 
         
+        const Coverage = {
+            "B00002":translation["B00002"],
+            "B00008":translation["B00008"],
+            "B00013":translation["B00013"],
+            "B00015":translation["B00015"],
+            "B00075":translation["B00075"],
+            "B00009":translation["B00009"],
+            "C101072":translation["C101072"],
+            "C101108":translation["C101108"],
+            "C101110":translation["C101110"],
+            "NCB":translation["NCB"],
+            "TOTALOD":translation["TOTALOD"]
+        }
+
         for(var i = 0; i<covList.length; i++) {
             if(covList.indexOf('C101110')) tyre_cover_flag = '1'
         }
@@ -699,7 +678,6 @@ class TwoWheelerOtherComprehensive extends Component {
         newInnitialArray.PA_flag = PA_flag   
         newInnitialArray.PA_Cover = PA_Cover
         newInnitialArray.tyre_cover_flag = tyre_cover_flag
-        newInnitialArray.policy_for = policy_for
         let newInitialValues = Object.assign(initialValue, newInnitialArray );
 
         const policyCoverageList =  policyCoverage && policyCoverage.length > 0 ?

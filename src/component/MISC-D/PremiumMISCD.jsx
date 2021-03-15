@@ -835,8 +835,11 @@ class PremiumMISCD extends Component {
                                                             <Row>&nbsp;</Row>
                                                             <div className="d-flex justify-content-left resmb">
                                                                 <Button className="backBtn" type="button" onClick={this.additionalDetails.bind(this, productId)}>{phrases['Back']}</Button>
-                                                                <Button type="button" className="proceedBtn" onClick = {this.sendPaymentLink.bind(this)}>  {phrases['PaymentLink']}  </Button>
-                                                                &nbsp;&nbsp;&nbsp;&nbsp;
+                                                                {bcMaster && bcMaster.eligible_for_payment_link == 1 ?
+                                                                    <div>
+                                                                    <Button type="button" className="proceedBtn" onClick = {this.sendPaymentLink.bind(this)}>  {phrases['PaymentLink']}  </Button>
+                                                                    &nbsp;&nbsp;&nbsp;&nbsp;
+                                                                    </div> : null }
                                                                 
                                                                 {smsButton === true ?
                                                                 <Button className="backBtn" type="button" onClick={this.handleModal.bind(this)}>{phrases['SendSMS']}</Button>

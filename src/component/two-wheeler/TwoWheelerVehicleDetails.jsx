@@ -210,7 +210,8 @@ class TwoWheelerVehicleDetails extends Component {
     handleSubmit = (values, actions) => {
         const {productId} = this.props.match.params 
         const {motorInsurance} = this.state
-        let newPolStartDate = addDays(new Date(), 1)           
+        let newPolStartDate = addDays(new Date(), 2)     
+        console.log("newPolStartDate---------- ", newPolStartDate)     
         let newPolEndDate = addDays(new Date(newPolStartDate), 364) 
         let vehicleAge = Math.floor(moment(newPolStartDate).diff(values.registration_date, 'months', true))
         let vehicleAgeDays = Math.floor(moment(newPolStartDate).diff(values.registration_date, 'days', true))

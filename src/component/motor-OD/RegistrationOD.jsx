@@ -189,7 +189,7 @@ class RegistrationOD extends Component {
 
             this.props.loadingStart();
             axios
-                .post(`/update-registration`, formData)
+                .post(`/four-wh-stal/update-registration`, formData)
                 .then(res => {
                     if (res.data.error == false) {
                         this.props.history.push(`/select-brandOD/${productId}`);

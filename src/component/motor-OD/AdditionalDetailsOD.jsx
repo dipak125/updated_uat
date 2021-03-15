@@ -369,7 +369,7 @@ console.log('post_data', post_data);
         formData.append('enc_data',encryption.encrypt(JSON.stringify(post_data)))
         this.props.loadingStart();
         axios
-        .post(`/owner-details`, formData)
+        .post(`/four-wh-stal/owner-details`, formData)
         .then(res => { 
             // this.props.loadingStop();
             this.props.history.push(`/PremiumOD/${productId}`);

@@ -88,7 +88,7 @@ fetchData=()=>{
         formData.append('enc_data',encryption.encrypt(JSON.stringify(post_data)))
         this.props.loadingStart();
         axios
-        .post(`/registration`, formData)
+        .post(`four-wh-stal/registration`, formData)
         .then(res => {
                 localStorage.setItem('policyHolder_id', res.data.data.policyHolder_id);
                 localStorage.setItem('policyHolder_refNo', res.data.data.policyHolder_refNo);
