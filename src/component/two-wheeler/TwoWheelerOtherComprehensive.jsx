@@ -52,7 +52,7 @@ const ComprehensiveValidation = Yup.object().shape({
     tyre_rim_array: Yup.array().of(
         Yup.object().shape({
             tyreMfgYr : Yup.string().when(['policy_for'], {
-                is: policy_for => policy_for == '1',
+                is: policy_for => [policy_for == '1', policy_for == '2'],
                 then: Yup.string().required('MFG year required')
                     .test(
                         "checkGreaterTimes",
@@ -68,7 +68,7 @@ const ComprehensiveValidation = Yup.object().shape({
                         "checkGreaterTimes",
                         "Mfg date must be less than today",
                         function (value) {
-                            if (value && this.parent.policy_for == '1') {
+                            if (value) {
                                 return compareStartEndYear(value, new Date());
                             }
                             return true;
@@ -78,7 +78,7 @@ const ComprehensiveValidation = Yup.object().shape({
             }),
 
             tyreSerialNo : Yup.string().when(['policy_for'], {
-                is: policy_for => policy_for == '1',
+                is: policy_for => [policy_for == '1', policy_for == '2'],
                 then: Yup.string().required('Serial No Required')
                     .matches(/^[a-zA-Z0-9]*$/, function() {
                         return "Invalid Serial No"
@@ -461,7 +461,7 @@ class TwoWheelerOtherComprehensive extends Component {
             if(value == 'C101110') {
                 var array_length = 2
                 var newTyreMfgYr = new Date(this.state.vehicleRegDate)
-                 if(values.tyre_rim_array.length < array_length) {
+                 if(values.tyre_rim_array && values.tyre_rim_array.length < array_length) {
                     for(var i = values.tyre_rim_array.length ; i < array_length ; i++) {
                         values.tyre_rim_array.push(
                                 {
@@ -908,10 +908,9 @@ console.log("errors--------------------> ", errors)
                                                             </Row>
                                                             ))}
 
-                                                            {motorInsurance && motorInsurance.policy_for == '2' && moreCoverage.map((coverage, qIndex) => (
+                                                            {motorInsurance && motorInsurance.policy_for == '2' && moreCoverage.map((coverage, qIndex) => (                                                            
                                                             <Row key={qIndex}>   
-                                                            {/* {console.log("coverage.name-------> ", coverage)} */}
-                                                            {coverage.code == "C101072" || coverage.code == "C101108" ? 
+                                                            {coverage.code == "C101072" || coverage.code == "C101108" || coverage.code == "C101110" ?
                                                                 <Col sm={12} md={11} lg={6} key={qIndex+"a"} >
                                                                     <label className="customCheckBox formGrp formGrp">{coverage.name}
                                                                         <OverlayTrigger overlay={<Tooltip id="tooltip-disabled">{coverage.description}</Tooltip>}>
@@ -928,7 +927,7 @@ console.log("errors--------------------> ", errors)
                                                                                 if( e.target.checked == false && values[coverage.code] == 'B00015') {
                                                                                     swal(phrases.SwalIRDAI)
                                                                                 }
-                                                                                this.onRowSelect(e.target.value, e.target.checked, setFieldTouched, setFieldValue)         
+                                                                                this.onRowSelect(e.target.value, e.target.checked, setFieldTouched, setFieldValue,values)         
                                                                             }
                                                                             }
                                                                             checked = {values[coverage.code] == coverage.code ? true : false}
@@ -936,7 +935,12 @@ console.log("errors--------------------> ", errors)
                                                                         <span className="checkmark mL-0"></span>
                                                                         <span className="error-message"></span>
                                                                     </label>
-                                                                </Col> : null}                            
+                                                                </Col> : null }
+                                                        
+                                                                {values.tyre_cover_flag == '0' ? values.tyre_rim_array = [] : null }
+                                                                {values.tyre_cover_flag == '1' && values[coverage.code] == 'C101110' ?
+                                                                    this.handleClaims(values, errors, touched, setFieldTouched, setFieldValue) : null
+                                                                }
                                                             </Row>
                                                             ))}
                                                             
