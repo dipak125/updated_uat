@@ -216,15 +216,17 @@ const ComprehensiveValidation = Yup.object().shape({
             return true;
         }
     ),
+
     previous_city:Yup.string()
-    .notRequired('Previous city is required')
+    .notRequired('PleaseEPICC')
     .test(
         "currentMonthChecking",
         function() {
             return "PleaseEPICC"
         },
         function (value) {
-            if (this.parent.policy_type_id == 2 && !value) {   
+            const ageObj = new PersonAge();
+            if (ageObj.whatIsCurrentMonth(this.parent.registration_date) > 0 && !value) {   
                 return false;    
             }
             return true;
@@ -232,11 +234,14 @@ const ComprehensiveValidation = Yup.object().shape({
     )
     .matches(/^[a-zA-Z0-9][a-zA-Z0-9-/.,\s]*$/, 
         function() {
-            return "Please enter valid address"
-        }),
+            return "PleaseEnterValidAddress"
+    })
+    .max(100, function() {
+        return "AddressMustBeMaximum100Chracters"
+    }),
 
     previous_policy_no:Yup.string()
-    .notRequired('Previous policy number is required')
+    .notRequired()
     .test(
         "currentMonthChecking",
         function() {

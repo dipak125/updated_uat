@@ -176,7 +176,7 @@ const vehicleRegistrationValidation = Yup.object().shape({
         }
     ),
     previous_city:Yup.string()
-    .notRequired('Previous city is required')
+    .notRequired('PleaseEPICC')
     .test(
         "currentMonthChecking",
         function() {
@@ -192,11 +192,14 @@ const vehicleRegistrationValidation = Yup.object().shape({
     )
     .matches(/^[a-zA-Z0-9][a-zA-Z0-9-/.,\s]*$/, 
         function() {
-            return "Please enter valid address"
-        }),
+            return "PleaseEnterValidAddress"
+    })
+    .max(100, function() {
+        return "AddressMustBeMaximum100Chracters"
+    }),
 
     previous_policy_no:Yup.string()
-    .notRequired('Previous policy number is required')
+    .notRequired('PleaseEPPN')
     .test(
         "currentMonthChecking",
         function() {
@@ -212,16 +215,16 @@ const vehicleRegistrationValidation = Yup.object().shape({
     )
     .matches(/^[a-zA-Z0-9][a-zA-Z0-9\s-/]*$/, 
         function() {
-            return "Please enter valid policy number"
+            return "PleasePolicyNumber"
         }).min(6, function() {
             return "PolicyMinCharacter"
         })
         .max(28, function() {
-            return "Policy No. must be maximum 18 chracters"
+            return "PolicyMaxCharacter"
         }),
 
     previous_claim_bonus:Yup.string()
-    .notRequired('No Claim bonus is required')
+    .notRequired()
     .test(
         "currentMonthChecking",
         function() {
@@ -247,7 +250,7 @@ const vehicleRegistrationValidation = Yup.object().shape({
         }
     ),
     previous_is_claim:Yup.string()
-    .notRequired('Please select one option')
+    .notRequired()
     .test(
         "currentMonthChecking",
         function() {
@@ -632,7 +635,7 @@ class VehicleDetails extends Component {
                     <div className="brand-bg">
                         <Formik initialValues={newInitialValues} onSubmit={this.handleSubmit} validationSchema={vehicleRegistrationValidation}>
                             {({ values, errors, setFieldValue, setFieldTouched, isValid, isSubmitting, touched }) => {
-
+console.log("errors------------ ", errors)
                                 return (
                                     <Form>
                                         <Row>

@@ -440,7 +440,6 @@ class OtherComprehensiveMISCD extends Component {
     sliderValue = (value) => {
         this.setState({
             sliderVal: value,
-            // bodySliderVal: '',
             serverResponse: [],
             error: []
         })
@@ -480,6 +479,9 @@ class OtherComprehensiveMISCD extends Component {
                 let valid_previous_policy =  motorInsurance ? motorInsurance.valid_previous_policy : "0"
                 let policytype_id = motorInsurance ? motorInsurance.policytype_id : ""
                 let vehicle_age = 0
+                let bodySliderVal = motorInsurance && motorInsurance.body_idv_value ? motorInsurance.body_idv_value : 0
+                let sliderVal = motorInsurance && motorInsurance.idv_value ? motorInsurance.idv_value : 0
+                
 
                 if(Math.floor(moment().diff(previous_end_date, 'months', true)) >1 || valid_previous_policy == "0" || policytype_id == "1") {
                     let val = moment().format("YYYY-MM-DD")
@@ -566,7 +568,7 @@ class OtherComprehensiveMISCD extends Component {
                 
 
                 this.setState({
-                    motorInsurance, add_more_coverage,request_data, vehicleDetails, 
+                    motorInsurance, add_more_coverage,request_data, vehicleDetails, bodySliderVal,sliderVal,
                     showCNG: motorInsurance.cng_kit == 1 ? true : false,
                     vahanVerify: motorInsurance.chasis_no && motorInsurance.engine_no ? true : false,
                     selectFlag: motorInsurance && motorInsurance.add_more_coverage != null ? '0' : '1',
@@ -812,7 +814,7 @@ class OtherComprehensiveMISCD extends Component {
             'trailer_array' : values.trailer_array,
             'fuel_type' : values.fuel_type ? values.fuel_type : (vehicleDetails && vehicleDetails.varientmodel && vehicleDetails.varientmodel.fueltype  ? vehicleDetails.varientmodel.fueltype.id : ""),
             'idv_value': sliderVal ? sliderVal : 0,
-            'body_idv_value' : bodySliderVal ? bodySliderVal : 0
+            'body_idv_value' : bodySliderVal ? bodySliderVal : defaultBodySliderValue
         }
         console.log('fullQuote_post_data', post_data)
         total_idv = parseInt(other_idv) + parseInt(post_data.idv_value)+parseInt(post_data.body_idv_value)
@@ -829,10 +831,11 @@ class OtherComprehensiveMISCD extends Component {
             .then(res => {
 
                 if (res.data.data.PolicyObject && res.data.data.UnderwritingResult && res.data.data.UnderwritingResult.Status == "Success") {
+                    let PolicyArray= res.data.data.PolicyObject.PolicyLobList
                     let ncbDiscount= (res.data.data.PolicyObject.PolicyLobList && res.data.data.PolicyObject.PolicyLobList[0].PolicyRiskList[0].IsNCB) ? res.data.data.PolicyObject.PolicyLobList[0].PolicyRiskList[0].OD_NCBAmount : 0
                     this.setState({
                         fulQuoteResp: res.data.data.PolicyObject,
-                        PolicyArray: res.data.data.PolicyObject.PolicyLobList,
+                        PolicyArray: PolicyArray,
                         chasis_price: res.data.data.chasis_price,
                         error: [],
                         validation_error: [],
@@ -1341,7 +1344,6 @@ class OtherComprehensiveMISCD extends Component {
                 add_more_coverage: motorInsurance.add_more_coverage ? motorInsurance.add_more_coverage : "",
                 engine_no: motorInsurance.engine_no ? motorInsurance.engine_no : (engine_no ? engine_no : ""),
                 vahanVerify: vahanVerify,
-                slider: defaultSliderValue,
                 newRegistrationNo: localStorage.getItem('registration_number') == "NEW" ? localStorage.getItem('registration_number') : "",
                 B00015: motorInsurance && motorInsurance.policy_for == '2' ? "" : "B00015",
                 // B00005 : vehicleDetails && vehicleDetails.varientmodel && (vehicleDetails.varientmodel.fueltype.id == 8 || vehicleDetails.varientmodel.fueltype.id == 9) ? "B00005" : "",
@@ -1376,7 +1378,6 @@ class OtherComprehensiveMISCD extends Component {
                     add_more_coverage: motorInsurance.add_more_coverage ? motorInsurance.add_more_coverage : "",
                     engine_no: motorInsurance.engine_no ? motorInsurance.engine_no : (engine_no ? engine_no : ""),
                     vahanVerify: vahanVerify,
-                    slider: defaultSliderValue,
                     newRegistrationNo: localStorage.getItem('registration_number') == "NEW" ? localStorage.getItem('registration_number') : "", 
                     PA_flag: '0',
                     PA_Cover: "",
@@ -1408,6 +1409,8 @@ class OtherComprehensiveMISCD extends Component {
         for (var i = 0 ; i < covList.length; i++) {
             newInnitialArray[covList[i]] = covList[i];
         }    
+        console.log("defaultSliderValue--1111--------- ", defaultSliderValue)
+        newInnitialArray.slider= defaultSliderValue
         newInnitialArray.PA_flag = PA_flag   
         newInnitialArray.trailer_flag = trailer_flag
         newInnitialArray.pa_coolie_flag = pa_coolie_flag
@@ -1575,7 +1578,7 @@ class OtherComprehensiveMISCD extends Component {
                     onSubmit={ serverResponse && serverResponse != "" ? (serverResponse.message ? this.getAccessToken : this.handleSubmit ) : this.getAccessToken} 
                     validationSchema={ComprehensiveValidation}>
                     {({ values, errors, setFieldValue, setFieldTouched, isValid, isSubmitting, touched }) => {
-
+console.log("values----------------- ", values)
                     return (
                         <Form>
                         <Row>
@@ -1761,6 +1764,7 @@ class OtherComprehensiveMISCD extends Component {
                                 </Col>
                                 {console.log("minIDV------------- ", minIDV)}
                                 {console.log("values.slider------------- ", values.slider)}
+                                {console.log("defaultSliderValue------------- ", defaultSliderValue)}
                                 {defaultSliderValue ? 
 
                                 <Col sm={12} md={12} lg={6}>
@@ -1778,7 +1782,6 @@ class OtherComprehensiveMISCD extends Component {
                                     this.sliderValue(e.target.value)
                                 }}
                                     />
-                                        {/* <img src={require('../../assets/images/slide.svg')} alt="" className="W-90" /> */}
                                     </FormGroup>
                                 </Col>
                                 : null}

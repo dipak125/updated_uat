@@ -910,7 +910,8 @@ console.log("errors--------------------> ", errors)
 
                                                             {motorInsurance && motorInsurance.policy_for == '2' && moreCoverage.map((coverage, qIndex) => (                                                            
                                                             <Row key={qIndex}>   
-                                                            {coverage.code == "C101072" || coverage.code == "C101108" || coverage.code == "C101110" ?
+                                                            {/* {coverage.code == "C101072" || coverage.code == "C101108" || coverage.code == "C101110" ? */}
+                                                            {coverage.code != "B00015" ?
                                                                 <Col sm={12} md={11} lg={6} key={qIndex+"a"} >
                                                                     <label className="customCheckBox formGrp formGrp">{coverage.name}
                                                                         <OverlayTrigger overlay={<Tooltip id="tooltip-disabled">{coverage.description}</Tooltip>}>
@@ -941,9 +942,38 @@ console.log("errors--------------------> ", errors)
                                                                 {values.tyre_cover_flag == '1' && values[coverage.code] == 'C101110' ?
                                                                     this.handleClaims(values, errors, touched, setFieldTouched, setFieldValue) : null
                                                                 }
+                                                                {values.PA_flag == '1' && values[coverage.code] == 'B00075' ?
+                                                                    <Col sm={12} md={11} lg={3} key={qIndex+"b"}>
+                                                                        <FormGroup>
+                                                                            <div className="formSection">
+                                                                                <Field
+                                                                                    name='PA_Cover'
+                                                                                    component="select"
+                                                                                    autoComplete="off"
+                                                                                    className="formGrp inputfs12"
+                                                                                    value = {values.PA_Cover}
+                                                                                    onChange={(e) => {
+                                                                                        setFieldTouched('PA_Cover')
+                                                                                        setFieldValue('PA_Cover', e.target.value);
+                                                                                        this.handleChange()
+                                                                                    }}
+                                                                                >
+                                                                                    <option value="">{phrases['SSI']}</option>
+                                                                                    <option value="50000">50000</option>
+                                                                                    <option value="100000">100000</option>  
+                                                                        
+                                                                                </Field>
+                                                                                {errors.PA_Cover ? (
+                                                                                    <span className="errorMsg">{phrases[errors.PA_Cover]}</span>
+                                                                                ) : null}
+                                                                            </div>
+                                                                        </FormGroup>
+                                                                    </Col> : null
+                                                                }
                                                             </Row>
                                                             ))}
                                                             
+                                                            <Row> &nbsp;</Row>
                                                             <div className="d-flex justify-content-left resmb">
                                                                 <Button className={`backBtn`} type="button" onClick={this.vehicleDetails.bind(this, productId)}>
                                                                 {phrases['Back']}
