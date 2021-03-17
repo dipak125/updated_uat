@@ -5,7 +5,6 @@ import { Formik, Field, Form } from "formik";
 import BaseComponent from '.././BaseComponent';
 import SideNav from '../common/side-nav/SideNav';
 import Footer from '../common/footer/Footer';
-import Otp from "./OtpOD"
 import axios from "../../shared/axios";
 import { withRouter, Link, Route } from "react-router-dom";
 import { loaderStart, loaderStop } from "../../store/actions/loader";
@@ -72,12 +71,6 @@ class PremiumOD extends Component {
         this.setState({ show: false, });
     }
 
-    handleOtp(e) {
-        console.log("otp", e)
-        this.setState({ show: false, });
-        this.props.history.push(`/ThankYou_motorOD`)
-    }
-
     changePlaceHoldClassAdd(e) {
         let element = e.target.parentElement;
         element.classList.add('active');
@@ -89,7 +82,7 @@ class PremiumOD extends Component {
     }
 
     additionalDetails = (productId) => {
-        this.props.history.push(`/Additional_details/${productId}`);
+        this.props.history.push(`/Additional_detailsOD/${productId}`);
     }
 
     handleSubmit = (values) => {
@@ -138,7 +131,7 @@ class PremiumOD extends Component {
                     nomineedetails: decryptResp.data.policyHolder ? decryptResp.data.policyHolder.request_data.nominee[0]:[]
                     
                 })
-                this.getAccessToken(motorInsurance)
+                this.fullQuote(motorInsurance)
             })
             .catch(err => {
                 // handle error
@@ -179,31 +172,13 @@ class PremiumOD extends Component {
         })  
     }
 
-    getAccessToken = (motorInsurance) => {
-        axios
-            .post(`/callTokenService`)
-            .then((res) => {
-                this.setState({
-                    accessToken: res.data.access_token,
-                });
-                this.fullQuote(res.data.access_token, motorInsurance)
-            })
-            .catch((err) => {
-                this.setState({
-                    accessToken: '',
-                });
-                this.props.loadingStop();
-            });
-    };
-
-    fullQuote = (access_token, motorInsurance) => {
+    fullQuote = (motorInsurance) => {
         const formData = new FormData();
         let encryption = new Encryption();
         let dateDiff = 0
         const {previousPolicy, request_data, policyHolder} = this.state
         const post_data = {
-            'ref_no':this.state.policyHolder_refNo ? this.state.policyHolder_refNo : '0',
-            'access_token':access_token,
+            'reference_no':this.state.policyHolder_refNo ? this.state.policyHolder_refNo : '0',
             'idv_value': motorInsurance.idv_value,
             'policy_type':  motorInsurance.policy_type,
             'add_more_coverage': motorInsurance.add_more_coverage,
@@ -213,9 +188,9 @@ class PremiumOD extends Component {
             'PA_Cover': motorInsurance && motorInsurance.pa_cover ? motorInsurance.pa_cover : '0',
         }
 
+        console.log("post_data--fullQuotePMCAR------- ", post_data)
         formData.append('enc_data',encryption.encrypt(JSON.stringify(post_data)))
-        console.log("post_data--fullQuotePMCAR- ", post_data)
-        axios.post('fullQuotePMCAR', formData)
+        axios.post('four-wh-stal/fullQuoteStlM4W', formData)
             .then(res => {
                 if (res.data.PolicyObject && res.data.UnderwritingResult && res.data.UnderwritingResult.Status == "Success") {
                     this.setState({

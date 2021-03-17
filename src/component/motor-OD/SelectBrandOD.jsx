@@ -116,11 +116,15 @@ class SelectBrandOD extends Component {
     getBrands = () => {
         const { productId } = this.props.match.params
         const {vehicleDetails} = this.state
+        let encryption = new Encryption();
+        let policyHolder_id = localStorage.getItem("policyHolder_id") ? localStorage.getItem("policyHolder_id") : 0;
         let brandId = vehicleDetails && vehicleDetails.vehiclebrand_id ? vehicleDetails.vehiclebrand_id : ""
         return new Promise(resolve => {
-            axios.get(`vehicle/brand-with-image`)
+            axios.get(`four-wh-stal/vehicle/brand-with-image`)
                 .then(res => {
-                    let brandList = res && res.data.data.list ? res.data.data.list : []
+                    let decryptResp = JSON.parse(encryption.decrypt(res.data))
+                    console.log("decrypt", decryptResp)
+                    let brandList = decryptResp && decryptResp.data.list ? decryptResp.data.list : []
                     this.setState({
                         brandList,
                         otherBrands: false
@@ -145,9 +149,12 @@ class SelectBrandOD extends Component {
     getOtherBrands = () => {
         let policyHolder_id = localStorage.getItem("policyHolder_id") ? localStorage.getItem("policyHolder_id") : 0;
         this.props.loadingStart();
-        axios.get(`vehicle/brand-without-image/${policyHolder_id}`).then(res => {
-            let selectedBrandDetails = res.data && res.data.data ? res.data.data : {};
-            let brandModelList = res.data && res.data.data ? res.data.data.list : [];
+        let encryption = new Encryption();
+        axios.get(`four-wh-stal/without-image/${policyHolder_id}`).then(res => {
+            let decryptResp = JSON.parse(encryption.decrypt(res.data))
+            console.log("decrypt", decryptResp)
+            let selectedBrandDetails = decryptResp && decryptResp.data ? decryptResp.data : {};
+            let brandModelList = decryptResp && decryptResp.data ? decryptResp.data.list : [];
 
             this.setState({
                 selectedBrandDetails,
@@ -180,7 +187,7 @@ class SelectBrandOD extends Component {
         let policyHolder_id = localStorage.getItem("policyHolder_refNo") ? localStorage.getItem("policyHolder_refNo") : 0;
         let encryption = new Encryption();
         this.props.loadingStart();
-        axios.get(`policy-holder/motor/${policyHolder_id}`)
+        axios.get(`four-wh-stal/details/${policyHolder_id}`)
             .then(res => {
                 let decryptResp = JSON.parse(encryption.decrypt(res.data));
                 console.log("decrypt", decryptResp)
@@ -239,10 +246,12 @@ class SelectBrandOD extends Component {
     setBrandName = (brand_id) => {
         let policyHolder_id = localStorage.getItem("policyHolder_id") ? localStorage.getItem("policyHolder_id") : 0;
         const formData = new FormData();
+        let encryption = new Encryption();
         this.props.loadingStart();
-        axios.get(`vehicle/model-with-varient/${brand_id}/${policyHolder_id}`).then(res => {
-            let selectedBrandDetails = res.data && res.data.data ? res.data.data : {};
-            let brandModelList = res.data && res.data.data.brand_models ? res.data.data.brand_models : [];
+        axios.get(`four-wh-stal/model-with-varient/${brand_id}/${policyHolder_id}`).then(res => {
+            let decryptResp = JSON.parse(encryption.decrypt(res.data))
+            let selectedBrandDetails = decryptResp && decryptResp.data ? decryptResp.data : {};
+            let brandModelList = decryptResp && decryptResp.data.brand_models ? decryptResp.data.brand_models : [];
 
             this.setState({
                 selectedBrandDetails,
@@ -303,7 +312,7 @@ class SelectBrandOD extends Component {
                 'brand_id': values.selectedBrandId,
                 'brand_model_id': values.selectedModelId,
                 'model_varient_id': values.selectedVarientId,
-                'page_name': `Select-brand/${productId}`,
+                'page_name': `Select-brandOD/${productId}`,
             }
         } else {
              post_data = {
@@ -312,16 +321,17 @@ class SelectBrandOD extends Component {
                 'brand_id': values.brand_id,
                 'brand_model_id': values.brand_model_id,
                 'model_varient_id': values.model_varient_id,
-                'page_name': `Select-brand/${productId}`,
+                'page_name': `Select-brandOD/${productId}`,
                 'fastlaneLog_id': values && values.fastlaneLog_id ? values.fastlaneLog_id : fastlanelog && fastlanelog.id ? fastlanelog.id : ""
             }
         }
         console.log('post_data---fastlane--- ', post_data)
         formData.append('enc_data', encryption.encrypt(JSON.stringify(post_data)))
         this.props.loadingStart();
-        axios.post('insert-brand-model-varient', formData).then(res => {
+        axios.post('four-wh-stal/insert-brand-model-varient', formData).then(res => {
             this.props.loadingStop();
-            if (res.data.error == false) {
+            let decryptResp = JSON.parse(encryption.decrypt(res.data))
+            if (decryptResp.error == false) {
                 if(this.state.otherBrands) {
                     localStorage.setItem('brandEdit', 2)
                     localStorage.removeItem('newBrandEdit')

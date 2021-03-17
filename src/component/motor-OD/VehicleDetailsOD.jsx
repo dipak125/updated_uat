@@ -21,16 +21,22 @@ import {
     checkGreaterTimes,
     checkGreaterStartEndTimes
   } from "../../shared/validationFunctions";
+import {fourwheelerODEndDate, prevEndDate} from "../../shared/reUseFunctions";
 
 const year = new Date('Y')
 const ageObj = new PersonAge();
 // const minDate = moment(moment().subtract(1, 'years').calendar()).add(1, 'day').calendar();
 // const maxDate = moment(minDate).add(30, 'day').calendar();
-const minDate = moment(moment().subtract(20, 'years').calendar()).add(1, 'day').calendar();
-const maxDate = moment(moment().subtract(1, 'years').calendar()).add(30, 'day').calendar();
-const startRegnDate = moment().subtract(20, 'years').calendar();
-const minRegnDate = moment(startRegnDate).startOf('year').format('YYYY-MM-DD hh:mm');
-const maxRegnDate = new Date();
+
+//const minDate = moment(moment().subtract(20, 'years').calendar()).add(1, 'day').calendar();
+//const maxDate = moment(moment().subtract(1, 'years').calendar()).add(30, 'day').calendar();
+// const startRegnDate = moment().subtract(20, 'years').calendar();
+//const minRegnDate = moment(startRegnDate).startOf('year').format('YYYY-MM-DD hh:mm');
+// const maxRegnDate = new Date();
+
+const minRegnDate = moment().subtract(1, 'years').calendar();
+const minDate = moment().subtract(1, 'years').calendar()
+const maxDate = moment()
 
 const initialValue = {
     registration_date: "",
@@ -38,7 +44,7 @@ const initialValue = {
     previous_is_claim:"",
     previous_city:"",
     insurance_company_id:"",
-    previous_policy_name:"",
+    previous_policy_name:"1",
     previous_end_date: "",
     previous_start_date: "",
     previous_claim_bonus: 1,
@@ -133,33 +139,7 @@ const vehicleRegistrationValidation = Yup.object().shape({
             return true;
         }
     ),
-    previous_policy_name:Yup.string()
-    .notRequired('Please select Policy Type')
-    .test(
-        "currentMonthChecking",
-        function() {
-            return "PleaseSPT"
-        },
-        function (value) {
-            const ageObj = new PersonAge();
-            if (ageObj.whatIsCurrentMonth(this.parent.registration_date) > 0 && !value) {   
-                return false;    
-            }
-            return true;
-        }
-    )
-    .test(
-        "currentMonthChecking",
-        function() {
-            return "Since previous policy is a liability policy, issuance of a package policy will be subjet to successful inspection of your vehicle. Our Customer care executive will call you to assit on same, shortly"
-        },
-        function (value) {
-            // if (value == '2' ) {   
-            //     return false;    
-            // }
-            return true;
-        }
-    ),
+
     insurance_company_id:Yup.number()
     .notRequired('Insurance company is required')
     .test(
@@ -415,85 +395,49 @@ class VehicleDetailsOD extends Component {
     handleSubmit = (values, actions) => {
         const {productId} = this.props.match.params 
         const {motorInsurance} = this.state
-        let policy_type = ageObj.whatIsCurrentMonth(values.registration_date) < 7 ? 6 : 1
-        // let vehicleAge = ageObj.whatIsMyVehicleAge(values.registration_date)
-        let vehicleAge = Math.floor(moment().diff(values.registration_date, 'months', true))
-        // let ageDiff = Math.floor(moment().diff(values.registration_date, 'days', true));
-        let ageDiff = ageObj.whatIsCurrentMonth(values.registration_date);
+        let policy_type = 9
+
+        let newPolStartDate = prevEndDate(values.previous_start_date) 
+        newPolStartDate = addDays(new Date(newPolStartDate), 1)        
+        let newPolEndDate = prevEndDate(newPolStartDate)
+
+        let vehicleAge = Math.floor(moment(newPolStartDate).diff(values.registration_date, 'months', true))
         const formData = new FormData(); 
         let encryption = new Encryption();
         let post_data = {}
-        if(ageObj.whatIsCurrentMonth(values.registration_date) > 0 && values.previous_policy_name == '1' ) {
-            post_data = {
-                'policy_holder_id':localStorage.getItem('policyHolder_id'),
-                'menumaster_id':1,
-                'registration_date':moment(values.registration_date).format("YYYY-MM-DD"),
-                'location_id':values.location_id,
-                'previous_start_date':moment(values.previous_start_date).format("YYYY-MM-DD"),
-                'previous_end_date':moment(values.previous_end_date).format("YYYY-MM-DD"),
-                'previous_policy_name':values.previous_policy_name,
-                'insurance_company_id':values.insurance_company_id,
-                'previous_city':values.previous_city,
-                'previous_policy_no': values.previous_policy_no,
-                'previous_is_claim':values.previous_is_claim ? values.previous_is_claim : '0' ,
-                'previous_claim_bonus': values.previous_claim_bonus ? values.previous_claim_bonus : 1,
-                'previous_claim_for': values.previous_claim_for,        
-                'vehicleAge': vehicleAge,
-                'policy_type': policy_type,
-                'prev_policy_flag': 1,
-                'page_name': `VehicleDetails/${productId}`          
-            } 
-        }
 
-        else if(ageObj.whatIsCurrentMonth(values.registration_date) > 0 && values.previous_policy_name == '2') {
-            post_data = {
-                'policy_holder_id':localStorage.getItem('policyHolder_id'),
-                'menumaster_id':1,
-                'registration_date':moment(values.registration_date).format("YYYY-MM-DD"),
-                'location_id':values.location_id,
-                'previous_start_date':moment(values.previous_start_date).format("YYYY-MM-DD"),
-                'previous_end_date':moment(values.previous_end_date).format("YYYY-MM-DD"),
-                'previous_policy_name':values.previous_policy_name,
-                'insurance_company_id':values.insurance_company_id,
-                'previous_city':values.previous_city,
-                'previous_policy_no': values.previous_policy_no,
-                'vehicleAge': vehicleAge,
-                'policy_type': policy_type,
-                'prev_policy_flag': 1,
-                'previous_is_claim':'0', 
-                'previous_claim_bonus': 1,
-                'page_name': `VehicleDetails/${productId}`          
-            } 
-        }
-        else if(ageObj.whatIsCurrentMonth(values.registration_date) <= 0)  {
-            post_data = {
-                'policy_holder_id':localStorage.getItem('policyHolder_id'),
-                'menumaster_id':1,
-                'registration_date':moment(values.registration_date).format("YYYY-MM-DD"),
-                'location_id':values.location_id,    
-                'previous_is_claim':'0', 
-                'previous_claim_bonus': 1,
-                'vehicleAge': vehicleAge ,
-                'policy_type': policy_type,
-                'prev_policy_flag': 0,
-                'page_name': `VehicleDetails/${productId}`
-            } 
-        }
+        post_data = {
+            'policy_holder_id':localStorage.getItem('policyHolder_id'),
+            'menumaster_id':1,
+            'registration_date':moment(values.registration_date).format("YYYY-MM-DD"),
+            'location_id':values.location_id,
+            'previous_start_date':moment(values.previous_start_date).format("YYYY-MM-DD"),
+            'previous_end_date':moment(values.previous_end_date).format("YYYY-MM-DD"),
+            'previous_policy_name':values.previous_policy_name,
+            'insurance_company_id':values.insurance_company_id,
+            'previous_city':values.previous_city,
+            'previous_policy_no': values.previous_policy_no,
+            'previous_is_claim':values.previous_is_claim ? values.previous_is_claim : '0' ,
+            'previous_claim_bonus': values.previous_claim_bonus ? values.previous_claim_bonus : 1,
+            'previous_claim_for': values.previous_claim_for,        
+            'vehicleAge': vehicleAge,
+            'pol_start_date': moment(newPolStartDate).format('YYYY-MM-DD'),
+            'pol_end_date': moment(newPolEndDate).format('YYYY-MM-DD'),
+            'policy_type': policy_type,
+            'prev_policy_flag': 1,
+            'page_name': `VehicleDetailsOD/${productId}`          
+        } 
 
-        if(ageDiff < 1 && motorInsurance && motorInsurance.registration_no == "") {
-            localStorage.setItem('registration_number', "NEW");
-        }
-        else {
-            localStorage.removeItem('registration_number');
-        }
         console.log("post_data", post_data)
         formData.append('enc_data',encryption.encrypt(JSON.stringify(post_data)))
         this.props.loadingStart();
         axios
         .post(`/four-wh-stal/insert-vehicle-details`, formData)
         .then(res => { 
+            let decryptResp = JSON.parse(encryption.decrypt(res.data))
+            console.log("decrypt-----resp----- ", decryptResp)
             this.props.loadingStop();
-            if(res.data.error == false){
+            if(decryptResp.error == false){
                 this.props.history.push(`/OtherComprehensiveOD/${productId}`);
             }
             else{
@@ -502,6 +446,8 @@ class VehicleDetailsOD extends Component {
             
         })
         .catch(err => {
+          let decryptResp = JSON.parse(encryption.decrypt(err.data))
+          console.log("decrypt-----errrr----- ", decryptResp)
           this.props.loadingStop();
           actions.setSubmitting(false)
         });
@@ -553,8 +499,10 @@ class VehicleDetailsOD extends Component {
                  let vehicleDetails = decryptResp.data.policyHolder ? decryptResp.data.policyHolder.vehiclebrandmodel : {};
                  let RTO_location = motorInsurance && motorInsurance.location && motorInsurance.location.RTO_LOCATION ? motorInsurance.location.RTO_LOCATION : ""
                  let previous_is_claim= previousPolicy && (previousPolicy.is_claim == 0 || previousPolicy.is_claim == 1) ? previousPolicy.is_claim : ""
-                this.setState({
-                    motorInsurance, previousPolicy, vehicleDetails,RTO_location, previous_is_claim
+                 let maxRegnDate= motorInsurance && motorInsurance.policytype_id == '1' ? moment() 
+                 :  moment(moment().subtract(1, 'years').calendar()).add(3, 'months').calendar() 
+                 this.setState({
+                    motorInsurance, previousPolicy, vehicleDetails,RTO_location, previous_is_claim, maxRegnDate
                 })
                 this.props.loadingStop();
             })
@@ -586,7 +534,7 @@ class VehicleDetailsOD extends Component {
     render() {
         const {productId} = this.props.match.params  
         const {insurerList, showClaim, previous_is_claim, motorInsurance, previousPolicy,
-            CustomerID,suggestions, vehicleDetails, RTO_location} = this.state
+            CustomerID,suggestions, vehicleDetails, RTO_location, maxRegnDate} = this.state
         
         let phrases = localStorage.getItem("phrases") ? JSON.parse(localStorage.getItem("phrases")) : null
 
@@ -595,7 +543,7 @@ class VehicleDetailsOD extends Component {
             location_id:  motorInsurance && motorInsurance.location_id ? motorInsurance.location_id : "",
             previous_start_date: previousPolicy && previousPolicy.start_date ? new Date(previousPolicy.start_date) : "",
             previous_end_date: previousPolicy && previousPolicy.end_date ? new Date(previousPolicy.end_date) : "",
-            previous_policy_name: previousPolicy && previousPolicy.name ? previousPolicy.name : "",
+            previous_policy_name: previousPolicy && previousPolicy.name ? previousPolicy.name : "1",
             insurance_company_id: previousPolicy && previousPolicy.insurancecompany && previousPolicy.insurancecompany.Id ? previousPolicy.insurancecompany.Id : "",
             previous_city: previousPolicy && previousPolicy.city ? previousPolicy.city : "",
             previous_policy_no: previousPolicy && previousPolicy.policy_no ? previousPolicy.policy_no : "",
@@ -632,7 +580,7 @@ class VehicleDetailsOD extends Component {
                     <div className="brand-bg">
                         <Formik initialValues={newInitialValues} onSubmit={this.handleSubmit} validationSchema={vehicleRegistrationValidation}>
                             {({ values, errors, setFieldValue, setFieldTouched, isValid, isSubmitting, touched }) => {
-
+console.log("values----------------- ", values)
                                 return (
                                     <Form>
                                         <Row>
@@ -711,20 +659,20 @@ class VehicleDetailsOD extends Component {
                                                         </FormGroup>
                                                     </Col>
                                                 </Row>
-                                            {ageObj.whatIsCurrentMonth(values.registration_date) > 0 || values.registration_date == "" ?
+                                            
                                                 <Fragment>
                                                 <Row>
                                                     <Col sm={12}>
                                                         <FormGroup>
                                                             <div className="carloan">
-                                                                <h4> {phrases['PPD']}</h4>
+                                                                <h4> {phrases['APD']}</h4>
                                                             </div>
                                                         </FormGroup>
                                                     </Col>
                                                 </Row>
 
                                                 <Row>
-                                                    <Col sm={12} md={11} lg={4}>
+                                                    <Col sm={12} md={11} lg={3}>
                                                         <FormGroup>
 
                                                             <DatePicker
@@ -732,7 +680,7 @@ class VehicleDetailsOD extends Component {
                                                                 minDate={new Date(minDate)}
                                                                 maxDate={new Date(maxDate)}
                                                                 dateFormat="dd MMM yyyy"
-                                                                placeholderText={phrases['PPSD']}
+                                                                placeholderText={phrases['APSD']}
                                                                 peekPreviousMonth
                                                                 peekPreviousYear
                                                                 showMonthDropdown
@@ -741,13 +689,8 @@ class VehicleDetailsOD extends Component {
                                                                 className="datePckr inputfs12"
                                                                 selected={values.previous_start_date}
                                                                 onChange={(val) => {
-                                                                    var date = new Date(val)
-                                                                    date = date.setFullYear(date.getFullYear() + 1);
-                                                                    var date2 = new Date(date)
-                                                                    date2 = date2.setDate(date2.getDate() - 1);
-
                                                                     setFieldTouched('previous_start_date')
-                                                                    setFieldValue("previous_end_date", new Date(date2));
+                                                                    setFieldValue("previous_end_date", fourwheelerODEndDate(val));
                                                                     setFieldValue('previous_start_date', val);
                                                                 }}
                                                             />
@@ -757,12 +700,12 @@ class VehicleDetailsOD extends Component {
                                                         </FormGroup>
                                                     </Col>
 
-                                                    <Col sm={12} md={11} lg={4}>
+                                                    <Col sm={12} md={11} lg={3}>
                                                         <FormGroup>
                                                             <DatePicker
                                                                 name="previous_end_date"
                                                                 dateFormat="dd MMM yyyy"
-                                                                placeholderText={phrases['PPED']}
+                                                                placeholderText={phrases['APED']}
                                                                 disabled = {true}
                                                                 dropdownMode="select"
                                                                 className="datePckr inputfs12"
@@ -777,24 +720,21 @@ class VehicleDetailsOD extends Component {
                                                             ) : null}
                                                         </FormGroup>
                                                     </Col>
-                                                    <Col sm={12} md={11} lg={3}>
+                                                    <Col sm={12} md={5} lg={5}>
                                                         <FormGroup>
-                                                            <div className="formSection">
+                                                            <div className="insurerName">
                                                                 <Field
-                                                                    name="previous_policy_name"
-                                                                    component="select"
+                                                                    name="previous_policy_no"
+                                                                    type="text"
+                                                                    placeholder={phrases['APolicyNumber']}
                                                                     autoComplete="off"
-                                                                    className="formGrp inputfs12"
-                                                                    value = {values.previous_policy_name}
-                                                                    // value={ageObj.whatIsCurrentMonth(values.registration_date) < 7 ? 6 : values.previous_policy_name}
-                                                                >
-                                                                    <option value="">{phrases['SPT']}</option>
-                                                                    <option value="1">{phrases['Package']}</option>
-                                                                    <option value="2">{phrases['LiabilityOnly']}</option>  
-                                                        
-                                                                </Field>
-                                                                {errors.previous_policy_name && touched.previous_policy_name ? (
-                                                                    <span className="errorMsg">{phrases[errors.previous_policy_name]}</span>
+                                                                    maxLength="28"
+                                                                    onFocus={e => this.changePlaceHoldClassAdd(e)}
+                                                                    onBlur={e => this.changePlaceHoldClassRemove(e)}
+                                                                    
+                                                                />
+                                                                {errors.previous_policy_no && touched.previous_policy_no ? (
+                                                                    <span className="errorMsg">{phrases[errors.previous_policy_no]}</span>
                                                                 ) : null}
                                                             </div>
                                                         </FormGroup>
@@ -829,7 +769,7 @@ class VehicleDetailsOD extends Component {
                                                                 <Field
                                                                     name="previous_city"
                                                                     type="text"
-                                                                    placeholder={phrases['PInsurerAddress']}
+                                                                    placeholder={phrases['AInsurerAddress']}
                                                                     autoComplete="off"
                                                                     onFocus={e => this.changePlaceHoldClassAdd(e)}
                                                                     onBlur={e => this.changePlaceHoldClassRemove(e)}
@@ -842,27 +782,7 @@ class VehicleDetailsOD extends Component {
                                                         </FormGroup>
                                                     </Col>
                                                 </Row>
-                                                <Row>
-                                                <Col sm={12} md={5} lg={5}>
-                                                        <FormGroup>
-                                                            <div className="insurerName">
-                                                                <Field
-                                                                    name="previous_policy_no"
-                                                                    type="text"
-                                                                    placeholder={phrases['PPolicyNumber']}
-                                                                    autoComplete="off"
-                                                                    maxLength="28"
-                                                                    onFocus={e => this.changePlaceHoldClassAdd(e)}
-                                                                    onBlur={e => this.changePlaceHoldClassRemove(e)}
-                                                                    
-                                                                />
-                                                                {errors.previous_policy_no && touched.previous_policy_no ? (
-                                                                    <span className="errorMsg">{phrases[errors.previous_policy_no]}</span>
-                                                                ) : null}
-                                                            </div>
-                                                        </FormGroup>
-                                                    </Col>
-                                                </Row>
+                                                <Row>&nbsp;</Row>
                                                 { values.previous_policy_name == '1' && Math.floor(moment().diff(values.previous_end_date, 'days', true)) <= 90 ?
                                                     <Fragment>
                                                     <Row>
@@ -1002,7 +922,7 @@ class VehicleDetailsOD extends Component {
                                                 : null} 
                                                 </Fragment> : null}
                                                 
-                                            </Fragment> : null }
+                                            </Fragment>  
 
                                                 <div className="d-flex justify-content-left resmb">
                                                 <Button className={`backBtn`} type="button"  disabled={isSubmitting ? true : false} onClick= {this.selectBrand.bind(this,productId)}>

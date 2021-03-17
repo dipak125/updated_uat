@@ -22,6 +22,15 @@ import {  validRegistrationNumber } from "../../shared/validationFunctions";
 
 let translation = localStorage.getItem("phrases") ? JSON.parse(localStorage.getItem("phrases")) : []
 
+const insert = (arr, index, newItem) => [
+    // part of the array before the specified index
+    ...arr.slice(0, index),
+    // inserted item
+    newItem,
+    // part of the array after the specified index
+    ...arr.slice(index)
+  ]
+
 const ComprehensiveValidation = Yup.object().shape({
     // is_carloan: Yup.number().required('Please select one option')
 
@@ -80,9 +89,19 @@ const ComprehensiveValidation = Yup.object().shape({
 
     B00004_value: Yup.string().when(['electric_flag'], {
         is: electric_flag => electric_flag == '1',
-        then: Yup.string().required('pleaseProvideElecIDV').matches(/^[0-9]*$/, 'PleaseValidIDV').max(8, function() {
-                return "Value should be maximum 8 characters"
-            }),
+        then: Yup.string().required('pleaseProvideElecIDV').matches(/^[0-9]*$/, 'PleaseValidIDV')
+        .test(
+            "maxMinIDVCheck",
+            function() {
+                return "Idv1to5Lakh"
+            },
+            function (value) {
+                if (parseInt(value) < 1000 || value > 500000) {   
+                    return false;    
+                }
+                return true;
+            }
+        ),
         otherwise: Yup.string()
     }),
 
@@ -94,9 +113,19 @@ const ComprehensiveValidation = Yup.object().shape({
 
     B00003_value: Yup.string().when(['nonElectric_flag'], {
         is: nonElectric_flag => nonElectric_flag == '1',
-        then: Yup.string().required('Please provide non-electrical IDV').matches(/^[0-9]*$/, 'PleaseValidIDV').max(8, function() {
-                return "Value should be maximum 8 characters"
-            }),
+        then: Yup.string().required('pleaseProvideNonElecIDV').matches(/^[0-9]*$/, 'PleaseValidIDV')
+        .test(
+            "maxMinIDVCheck",
+            function() {
+                return "Idv1to5Lakh"
+            },
+            function (value) {
+                if (parseInt(value) < 1000 || value > 500000) {   
+                    return false;    
+                }
+                return true;
+            }
+        ),
         otherwise: Yup.string()
     }),
 
@@ -211,6 +240,8 @@ const Coverage = {
     "C101111":translation["C101111"], 
     "NCB":translation["NCB"],
     "TOTALOD":translation["TOTALOD"],
+    "GEOGRAPHYOD":translation["GEOGRAPHYOD"],
+    "GEOGRAPHYTP":translation["GEOGRAPHYTP"],
 
     "B00016":translation["B00016"],
     "B00002":  translation["B00002"],
@@ -282,6 +313,7 @@ class OtherComprehensiveOD extends Component {
             request_data: [],
             geographical_extension: [],
             add_more_coverage_request_array: [],
+            ncbDiscount: 0
         };
     }
 
@@ -353,6 +385,7 @@ class OtherComprehensiveOD extends Component {
                 let values = []
                 let add_more_coverage = motorInsurance && motorInsurance.add_more_coverage != null ? motorInsurance.add_more_coverage.split(",") : ['B00015']
                 add_more_coverage = add_more_coverage.flat()
+                let sliderVal = motorInsurance && motorInsurance.idv_value ? motorInsurance.idv_value : 0
 
                 let add_more_coverage_request_json = motorInsurance && motorInsurance.add_more_coverage_request_json != null ? motorInsurance.add_more_coverage_request_json : ""
                 let add_more_coverage_request_array = add_more_coverage_request_json != "" ? JSON.parse(add_more_coverage_request_json) : []
@@ -368,37 +401,19 @@ class OtherComprehensiveOD extends Component {
                 values.B00003_description = add_more_coverage_request_array.B00003 ? add_more_coverage_request_array.B00003.description : ""
 
                 this.setState({
-                    motorInsurance, add_more_coverage,request_data,geographical_extension,add_more_coverage_request_array,
+                    motorInsurance, add_more_coverage,request_data,geographical_extension,add_more_coverage_request_array,sliderVal,
                     showCNG: motorInsurance.cng_kit == 1 ? true : false,
                     vahanVerify: motorInsurance.chasis_no && motorInsurance.engine_no ? true : false,
                     selectFlag: motorInsurance && motorInsurance.add_more_coverage != null ? '0' : '1'
                 })
                 this.props.loadingStop();
-                this.getAccessToken(values)
+                this.fullQuote(values)
             })
             .catch(err => {
                 // handle error
                 this.props.loadingStop();
             })
     }
-
-    getAccessToken = (values) => {
-        this.props.loadingStart();
-        axios
-          .post(`/callTokenService`)
-          .then((res) => {
-            this.setState({
-              accessToken: res.data.access_token,
-            });
-            this.fullQuote(res.data.access_token, values)
-          })
-          .catch((err) => {
-            this.setState({
-              accessToken: '',
-            });
-            this.props.loadingStop();
-          });
-      };
 
     getMoreCoverage = () => {
         this.props.loadingStart();
@@ -492,7 +507,7 @@ class OtherComprehensiveOD extends Component {
 
 
 
-    fullQuote = (access_token, values) => {
+    fullQuote = (values) => {
         const { PolicyArray, sliderVal, add_more_coverage, motorInsurance, geographical_extension } = this.state
         // let cng_kit_flag = 0;
         // let cngKit_Cost = 0;
@@ -535,8 +550,7 @@ class OtherComprehensiveOD extends Component {
         }
 
         const post_data = {
-            'ref_no':localStorage.getItem('policyHolder_refNo'),
-            'access_token':access_token,
+            'reference_no':localStorage.getItem('policyHolder_refNo'),
             'idv_value': sliderVal ? sliderVal : defaultSliderValue.toString(),
             'policy_type': motorInsurance.policy_type,
             'add_more_coverage': add_more_coverage.toString(),
@@ -555,16 +569,54 @@ class OtherComprehensiveOD extends Component {
         }
 
         let encryption = new Encryption();
+        this.props.loadingStart();
         formData.append('enc_data',encryption.encrypt(JSON.stringify(post_data)))
-        axios.post('fullQuotePMCAR',formData)
+        axios.post('four-wh-stal/fullQuoteStlM4W',formData)
             .then(res => {
                 if (res.data.PolicyObject && res.data.UnderwritingResult && res.data.UnderwritingResult.Status == "Success") {
+                    let policyCoverage= res.data.PolicyObject.PolicyLobList ? res.data.PolicyObject.PolicyLobList[0].PolicyRiskList[0].PolicyCoverageList : []
+                    let ncbDiscount= res.data.PolicyObject.PolicyLobList ? res.data.PolicyObject.PolicyLobList[0].PolicyRiskList[0].OD_NCBAmount : 0
+                    let IsGeographicalExtension= res.data.PolicyObject.PolicyLobList ? res.data.PolicyObject.PolicyLobList[0].PolicyRiskList[0].IsGeographicalExtension : 0
+                    if(ncbDiscount != '0') {
+                        let ncbArr = {}
+                        ncbArr.PolicyBenefitList = [{
+                            BeforeVatPremium : 0 - Math.round(ncbDiscount),
+                            ProductElementCode : 'NCB'
+                        }]
+    
+                        let totOD = {}
+                        totOD.PolicyBenefitList = [{
+                            BeforeVatPremium : Math.round(policyCoverage[0]['GrossPremium'] + policyCoverage[0]['LoadingAmount']) - Math.round(ncbDiscount),
+                            ProductElementCode : 'TOTALOD'
+                        }]
+    
+                        policyCoverage = ncbDiscount != '0' ?  insert(policyCoverage, 1, ncbArr) : ""
+                        policyCoverage = ncbDiscount != '0' ?  insert(policyCoverage, 2, totOD) : ""
+                    }
+
+                    if(IsGeographicalExtension == '1') {
+                        let geoArrOD = {}
+                        let geoArrTP = {}
+                        geoArrOD.PolicyBenefitList = [{
+                            BeforeVatPremium : res.data.PolicyObject.PolicyLobList && res.data.PolicyObject.PolicyLobList[0].PolicyRiskList[0].PolicyCoverageList ? Math.round(res.data.PolicyObject.PolicyLobList[0].PolicyRiskList[0].PolicyCoverageList[0].LoadingAmount) : 0,
+                            ProductElementCode : 'GEOGRAPHYOD'
+                        }]
+
+                        geoArrTP.PolicyBenefitList = [{
+                            BeforeVatPremium : res.data.PolicyObject.PolicyLobList && res.data.PolicyObject.PolicyLobList[0].PolicyRiskList[0].PolicyCoverageList ? Math.round(res.data.PolicyObject.PolicyLobList[0].PolicyRiskList[0].PolicyCoverageList[1].LoadingAmount) : 0,
+                            ProductElementCode : 'GEOGRAPHYTP'
+                        }]
+    
+                        policyCoverage = IsGeographicalExtension == '1' ?  insert(policyCoverage, 1, geoArrOD) : ""
+                        policyCoverage = IsGeographicalExtension == '1' ?  insert(policyCoverage, 2, geoArrTP) : ""
+                    }
+
                     this.setState({
                       fulQuoteResp: res.data.PolicyObject,
                       PolicyArray: res.data.PolicyObject.PolicyLobList,
                       error: [],
-                      serverResponse: res.data.PolicyObject,
-                      policyCoverage: res.data.PolicyObject.PolicyLobList ? res.data.PolicyObject.PolicyLobList[0].PolicyRiskList[0].PolicyCoverageList : [],
+                      serverResponse: res.data.PolicyObject,policyCoverage
+                    //   policyCoverage: res.data.PolicyObject.PolicyLobList ? res.data.PolicyObject.PolicyLobList[0].PolicyRiskList[0].PolicyCoverageList : [],
                     });
                   } 
                 else if (res.data.PolicyObject && res.data.UnderwritingResult && res.data.UnderwritingResult.Status == "Fail") {
@@ -655,7 +707,7 @@ class OtherComprehensiveOD extends Component {
                 'puc': values.puc,
                 'pa_cover': values.PA_flag ? values.PA_Cover : "0",
                 'pa_flag' : values.PA_cover_flag,
-                'page_name': `OtherComprehensive/${productId}`
+                'page_name': `OtherComprehensiveOD/${productId}`
             }
         }
         else {
@@ -670,7 +722,7 @@ class OtherComprehensiveOD extends Component {
                 'engine_no': values.engine_no,
                 'idv_value': sliderVal ? sliderVal : defaultSliderValue.toString(),
                 'puc': values.puc,
-                'page_name': `OtherComprehensive/${productId}`
+                'page_name': `OtherComprehensiveOD/${productId}`
             }
         }
         console.log('post_data',post_data)
@@ -686,10 +738,11 @@ class OtherComprehensiveOD extends Component {
         this.props.loadingStart();
         axios.post('/four-wh-stal/update-insured-value', formData).then(res => {
             this.props.loadingStop();
-            if (res.data.error == false) {
+            let decryptResp = JSON.parse(encryption.decrypt(res.data))
+            console.log("decrypt-----resp----- ", decryptResp)
+            if (decryptResp.error == false) {
                 this.props.history.push(`/Additional_detailsOD/${productId}`);
             }
-
         })
             .catch(err => {
                 // handle error
@@ -841,7 +894,7 @@ class OtherComprehensiveOD extends Component {
 
 
     render() {
-        const {showCNG, vahanDetails,error, policyCoverage, vahanVerify, selectFlag, fulQuoteResp, PolicyArray, geographical_extension,
+        const {showCNG, vahanDetails,error, policyCoverage, vahanVerify, selectFlag, fulQuoteResp, PolicyArray, geographical_extension,ncbDiscount,
             moreCoverage, sliderVal, motorInsurance, serverResponse, engine_no, chasis_no, initialValue, add_more_coverage, add_more_coverage_request_array} = this.state
         const {productId} = this.props.match.params 
         let defaultSliderValue = PolicyArray.length > 0 ? Math.round(PolicyArray[0].PolicyRiskList[0].IDV_Suggested) : 0
@@ -912,6 +965,7 @@ class OtherComprehensiveOD extends Component {
         for (var i = 0 ; i < covList.length; i++) {
             newInnitialArray[covList[i]] = covList[i];
         }    
+        newInnitialArray.slider= defaultSliderValue
         newInnitialArray.PA_flag = PA_flag   
         newInnitialArray.PA_Cover = PA_Cover
         newInnitialArray.Geographical_flag = Geographical_flag
@@ -938,53 +992,49 @@ class OtherComprehensiveOD extends Component {
 
         let OD_TP_premium = serverResponse.PolicyLobList ? serverResponse.PolicyLobList[0].PolicyRiskList[0] : []
 
-        const policyCoverageList = policyCoverage && policyCoverage.length > 0 ?
-        policyCoverage.map((coverage, qIndex) => (
-            coverage.PolicyBenefitList ?
-                coverage.PolicyBenefitList.map((coverage1, qIndex) => (
-                <div>
-                    {coverage1.AnnualPremium > 0 ? 
-                    <Row>
-                        <Col sm={12} md={6}>
-                        <FormGroup>{Coverage[coverage1.ProductElementCode]}</FormGroup>
-                        </Col>
-                        <Col sm={12} md={6}>
-                        <FormGroup>₹ {Math.round(coverage1.AnnualPremium)}  </FormGroup>                      
-                        </Col>
-                    </Row> : null }
-                </div>)) :
-                <div>
-                    <Row>
-                        <Col sm={12} md={6}>
-                        <FormGroup>{Coverage[coverage.ProductElementCode]}</FormGroup>
-                        </Col>
-                        <Col sm={12} md={6}>
-                        <FormGroup>₹ {Math.round(coverage.AnnualPremium)}  </FormGroup>                      
-                        </Col>
-                    </Row> 
-                </div>
-        )) : null
+        console.log("policyCoverage--------------- ", policyCoverage)
+
+        const policyCoverageList =  policyCoverage && policyCoverage.length > 0 ?
+            policyCoverage.map((coverage, qIndex) => (
+                coverage.PolicyBenefitList ? coverage.PolicyBenefitList.map((benefit, bIndex) => (
+                    benefit.BeforeVatPremium != 0 ?
+                    <div>
+                        <Row>
+                            <Col sm={12} md={6}>
+                                <FormGroup>{Coverage[benefit.ProductElementCode]}</FormGroup>
+                            </Col>
+                            <Col sm={12} md={6}>
+                                <FormGroup>₹ {Math.round(benefit.BeforeVatPremium)}</FormGroup>
+                            </Col>
+                        </Row>
+                    </div> : null
+            )) : 
+            <div>
+                <Row>
+                    <Col sm={12} md={6}>
+                    <FormGroup>{Coverage[coverage.ProductElementCode]}</FormGroup>
+                    </Col>
+                    <Col sm={12} md={6}>
+                    <FormGroup>₹ {Math.round(coverage.AnnualPremium)}  </FormGroup>                      
+                    </Col>
+                </Row> 
+            </div>
+        )) : null 
 
         const premiumBreakup = policyCoverage && policyCoverage.length > 0 ?
-        policyCoverage.map((coverage, qIndex) => (
-            coverage.PolicyBenefitList ?
-                coverage.PolicyBenefitList && coverage.PolicyBenefitList.map((coverage1, qIndex) => (
-                    <Fragment>      
-                        {coverage1.AnnualPremium > 0 ?         
+            policyCoverage.map((coverage, qIndex) => (
+                coverage.PolicyBenefitList ? coverage.PolicyBenefitList.map((benefit, bIndex) => (
+                    benefit.BeforeVatPremium != 0 ?
                         <tr>
-                            <td>{Coverage[coverage1.ProductElementCode]}</td>
-                            {/* <td>{coverage1.ProductElementCode}</td> */}
-                            <td>₹ {Math.round(coverage1.BeforeVatPremium)}  </td>                      
-                        </tr> : null }
-                    </Fragment>           
+                            <td>{Coverage[benefit.ProductElementCode]}:</td>
+                            <td>₹ {Math.round(benefit.BeforeVatPremium)}</td>
+                        </tr>  : null
                 )) : 
-                    <Fragment>           
-                        <tr>
-                            <td>{Coverage[coverage.ProductElementCode]}</td>
-                            <td>₹ {Math.round(coverage.BeforeVatPremium)}  </td>                      
-                        </tr> 
-                    </Fragment>  
-        )) : null
+                    <tr>
+                        <td>{Coverage[coverage.ProductElementCode]}</td>
+                        <td>₹ {Math.round(coverage.BeforeVatPremium)}  </td>                      
+                    </tr> 
+            )) : null
 
         // const premiumBreakup = policyCoverage && policyCoverage.length > 0 ?
         //     policyCoverage.map((coverage, qIndex) => {
@@ -1034,12 +1084,12 @@ class OtherComprehensiveOD extends Component {
                 <section className="brand colpd m-b-25">
                     <div className="d-flex justify-content-left">
                         <div className="brandhead m-b-10">
-                            <h4 className="m-b-30">{phrases['CoversYourCar']}</h4>
+                            <h4 className="m-b-30">{phrases['CoversM4WOD']}</h4>
                             <h5>{errMsg}</h5>
                         </div>
                     </div>
                     <Formik initialValues={newInitialValues} 
-                    onSubmit={ serverResponse && serverResponse != "" ? (serverResponse.message ? this.getAccessToken : this.handleSubmit ) : this.getAccessToken} 
+                    onSubmit={ serverResponse && serverResponse != "" ? (serverResponse.message ? this.fullQuote : this.handleSubmit ) : this.fullQuote} 
                     validationSchema={ComprehensiveValidation}>
                     {({ values, errors, setFieldValue, setFieldTouched, isValid, isSubmitting, touched }) => {
 
@@ -1241,7 +1291,7 @@ class OtherComprehensiveOD extends Component {
                                     value={values.slider}
                                     onChange= {(e) =>{
                                     setFieldTouched("slider");
-                                    setFieldValue("slider",values.slider);
+                                    setFieldValue("slider",e.target.value);
                                     this.sliderValue(e.target.value)
                                 }}
                                     />
@@ -1419,7 +1469,7 @@ class OtherComprehensiveOD extends Component {
                                                     >                                     
                                                     </Field>
                                                     {errors.B00003_value ? (
-                                                        <span className="errorMsg">{errors.B00003_value}</span>
+                                                        <span className="errorMsg">{phrases[errors.B00003_value]}</span>
                                                     ) : null}
                                                 </div>
                                             </FormGroup>
@@ -1703,6 +1753,12 @@ class OtherComprehensiveOD extends Component {
                             </thead>
                             <tbody>
                             {premiumBreakup}
+                            {ncbDiscount != 0 ? (
+                                <tr>
+                                    <td>{phrases['NCBDiscount']}:</td>
+                                    <td>₹ -{Math.round(ncbDiscount)}</td>
+                                </tr>
+                                ) : ""}
                                 <tr>
                                     <td>{phrases['GrossPremium']}:</td>
                                     <td>₹ {Math.round(fulQuoteResp.BeforeVatPremium)}</td>

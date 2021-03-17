@@ -632,7 +632,7 @@ class Routes extends Component {
                         <PrivateRoute exact path="/Select-brandOD/:productId" component={SelectBrandOD} />
                         <PrivateRoute exact path="/VehicleDetailsOD/:productId" component={VehicleDetailsOD} />
                         <PrivateRoute exact path="/OtherComprehensiveOD/:productId" component={OtherComprehensiveOD} />
-                        {/*<PrivateRoute exact path="/Additional_detailsOD/:productId" component={AdditionalDetailsOD} />*/}
+                        <PrivateRoute exact path="/Additional_detailsOD/:productId" component={AdditionalDetailsOD} />
                         <PrivateRoute exact path="/PremiumOD/:productId" component={PremiumOD} />
                         {/* <PrivateRoute exact path="/ThankYou_motor/:policyId" component={ThankYou_motor} /> */}
 						

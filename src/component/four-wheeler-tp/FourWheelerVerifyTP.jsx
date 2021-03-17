@@ -218,15 +218,14 @@ const ComprehensiveValidation = Yup.object().shape({
     ),
 
     previous_city:Yup.string()
-    .notRequired('PleaseEPICC')
+    .notRequired()
     .test(
         "currentMonthChecking",
         function() {
             return "PleaseEPICC"
         },
         function (value) {
-            const ageObj = new PersonAge();
-            if (ageObj.whatIsCurrentMonth(this.parent.registration_date) > 0 && !value) {   
+            if (this.parent.policy_type_id == 2 && !value) {   
                 return false;    
             }
             return true;
@@ -239,6 +238,7 @@ const ComprehensiveValidation = Yup.object().shape({
     .max(100, function() {
         return "AddressMustBeMaximum100Chracters"
     }),
+
 
     previous_policy_no:Yup.string()
     .notRequired()

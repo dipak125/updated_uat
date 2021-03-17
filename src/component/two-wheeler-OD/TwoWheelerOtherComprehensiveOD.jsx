@@ -277,7 +277,8 @@ class TwoWheelerOtherComprehensiveOD extends Component {
                 let tyre_rim_array = motorInsurance.tyre_rim_array && motorInsurance.tyre_rim_array!=null ? motorInsurance.tyre_rim_array : null
                 tyre_rim_array = tyre_rim_array!=null ? JSON.parse(tyre_rim_array) : []
 
-                let add_more_coverage = motorInsurance && motorInsurance.policy_for == '2' ? [] : (motorInsurance.add_more_coverage != null ? motorInsurance.add_more_coverage.split(",") : []) 
+                let add_more_coverage = motorInsurance && motorInsurance.policy_for == '2' ? (motorInsurance.add_more_coverage != null ? motorInsurance.add_more_coverage.split(",") : [])
+                    : (motorInsurance.add_more_coverage != null ? motorInsurance.add_more_coverage.split(",") : ['B00015']) 
                 add_more_coverage = add_more_coverage.flat()
 
                 let add_more_coverage_request_json = motorInsurance && motorInsurance.add_more_coverage_request_json != null ? motorInsurance.add_more_coverage_request_json : ""
@@ -563,44 +564,32 @@ class TwoWheelerOtherComprehensiveOD extends Component {
         let post_data = {}
         let total_idv = 0
         let other_idv = 0
-        if (add_more_coverage.length > 0) {
-            post_data = {
-                'policy_holder_id': localStorage.getItem('policyHolder_id'),
-                'menumaster_id': 3,
-                'cng_kit': values.cng_kit,
-                'registration_no': values.registration_no,
-                'chasis_no': values.chasis_no,
-                'chasis_no_last_part': values.chasis_no_last_part,
-                'engine_no': values.engine_no,
-                'puc': values.puc,
-                'idv_value': sliderVal ? sliderVal : defaultSliderValue.toString(),
-                'add_more_coverage': add_more_coverage,
-                'pa_cover': values.PA_flag ? values.PA_Cover : "0",
-                'pa_flag' : values.PA_cover_flag,
-                'page_name': `two_wheeler_OtherComprehensiveOD/${productId}`,
-                'tyre_rim_array' : values.tyre_rim_array,
-                'coverage_data': JSON.stringify(coverage_data),
-            }
-            if(values.B00004_value){
-                other_idv = other_idv + parseInt(values.B00004_value)
-            }
-            if(values.B00003_value){
-                other_idv = other_idv + parseInt(values.B00003_value)
-            }
-            total_idv=parseInt(post_data.idv_value)+parseInt(post_data.body_idv_value)+other_idv
+
+        post_data = {
+            'policy_holder_id': localStorage.getItem('policyHolder_id'),
+            'menumaster_id': 3,
+            'cng_kit': values.cng_kit,
+            'registration_no': values.registration_no,
+            'chasis_no': values.chasis_no,
+            'chasis_no_last_part': values.chasis_no_last_part,
+            'engine_no': values.engine_no,
+            'puc': values.puc,
+            'idv_value': sliderVal ? sliderVal : defaultSliderValue.toString(),
+            'add_more_coverage': add_more_coverage,
+            'pa_cover': values.PA_flag ? values.PA_Cover : "0",
+            'pa_flag' : values.PA_cover_flag,
+            'page_name': `two_wheeler_OtherComprehensiveOD/${productId}`,
+            'tyre_rim_array' : values.tyre_rim_array,
+            'coverage_data': JSON.stringify(coverage_data),
         }
-        else {
-            post_data = {
-                'policy_holder_id': localStorage.getItem('policyHolder_id'),
-                'menumaster_id': 3,
-                'cng_kit': values.cng_kit,
-                'registration_no': motorInsurance.registration_no,
-                'idv_value': sliderVal ? sliderVal : defaultSliderValue.toString(),
-                'pa_flag' : values.PA_cover_flag,
-                'page_name': `two_wheeler_OtherComprehensiveOD/${productId}`,
-            }
-            total_idv=parseInt(post_data.idv_value)+parseInt(post_data.body_idv_value)
+        if(values.B00004_value){
+            other_idv = other_idv + parseInt(values.B00004_value)
         }
+        if(values.B00003_value){
+            other_idv = other_idv + parseInt(values.B00003_value)
+        }
+        total_idv=parseInt(post_data.idv_value)+parseInt(post_data.body_idv_value)+other_idv
+
 
         console.log('post_data', post_data)
         if(((total_idv > 5000000) && csc_user_type == "POSP" ) || ((total_idv > 5000000) && bc_data && bc_data.master_data.vendor_name == "PayPoint" ) ) {
@@ -983,7 +972,7 @@ class TwoWheelerOtherComprehensiveOD extends Component {
                                 <section className="brand colpd m-b-25">
                                     <div className="d-flex justify-content-left">
                                         <div className="brandhead m-b-10">
-                                            <h4 className="m-b-30">{phrases['CoversComprehensive']}</h4>
+                                            <h4 className="m-b-30">{phrases['CoversM2WOD']}</h4>
                                             <h5>{errMsg}</h5>
                                         </div>
                                     </div>
@@ -992,8 +981,6 @@ class TwoWheelerOtherComprehensiveOD extends Component {
                                         validationSchema={ComprehensiveValidation}
                                         >
                                         {({ values, errors, setFieldValue, setFieldTouched, isValid, isSubmitting, touched }) => {
-console.log("values--------------------> ", values)
-console.log("errors--------------------> ", errors)
 
                                             return (
                                                 <Form>
@@ -1387,6 +1374,71 @@ console.log("errors--------------------> ", errors)
 
                                                                 {values.tyre_cover_flag == '1' && values[coverage.code] == 'C101110' ?
                                                                     this.handleClaims(values, errors, touched, setFieldTouched, setFieldValue) : null
+                                                                }
+                                                            </Row>
+                                                            ))}
+
+                                                            {motorInsurance && motorInsurance.policy_for == '2' && moreCoverage.map((coverage, qIndex) => (                                                            
+                                                            <Row key={qIndex}>   
+                                                            {/* {coverage.code == "C101072" || coverage.code == "C101108" || coverage.code == "C101110" ? */}
+                                                            {coverage.code != "B00015" ?
+                                                                <Col sm={12} md={11} lg={6} key={qIndex+"a"} >
+                                                                    <label className="customCheckBox formGrp formGrp">{coverage.name}
+                                                                        <OverlayTrigger overlay={<Tooltip id="tooltip-disabled">{coverage.description}</Tooltip>}>
+                                                                            <a className="infoIcon"><img src={require('../../assets/images/i.svg')} alt="" className="premtool" /></a>
+                                                                        </OverlayTrigger>
+                                                                        <Field
+                                                                            type="checkbox"
+                                                                            // name={`moreCov_${qIndex}`}
+                                                                            name={coverage.code}
+                                                                            value={coverage.code}
+                                                                            className="user-self"
+                                                                            // checked={values.roadsideAssistance ? true : false}
+                                                                            onClick={(e) =>{
+                                                                                if( e.target.checked == false && values[coverage.code] == 'B00015') {
+                                                                                    swal(phrases.SwalIRDAI)
+                                                                                }
+                                                                                this.onRowSelect(e.target.value, e.target.checked, setFieldTouched, setFieldValue,values)         
+                                                                            }
+                                                                            }
+                                                                            checked = {values[coverage.code] == coverage.code ? true : false}
+                                                                        />
+                                                                        <span className="checkmark mL-0"></span>
+                                                                        <span className="error-message"></span>
+                                                                    </label>
+                                                                </Col> : null }
+                                                        
+                                                                {values.tyre_cover_flag == '0' ? values.tyre_rim_array = [] : null }
+                                                                {values.tyre_cover_flag == '1' && values[coverage.code] == 'C101110' ?
+                                                                    this.handleClaims(values, errors, touched, setFieldTouched, setFieldValue) : null
+                                                                }
+                                                                {values.PA_flag == '1' && values[coverage.code] == 'B00075' ?
+                                                                    <Col sm={12} md={11} lg={3} key={qIndex+"b"}>
+                                                                        <FormGroup>
+                                                                            <div className="formSection">
+                                                                                <Field
+                                                                                    name='PA_Cover'
+                                                                                    component="select"
+                                                                                    autoComplete="off"
+                                                                                    className="formGrp inputfs12"
+                                                                                    value = {values.PA_Cover}
+                                                                                    onChange={(e) => {
+                                                                                        setFieldTouched('PA_Cover')
+                                                                                        setFieldValue('PA_Cover', e.target.value);
+                                                                                        this.handleChange()
+                                                                                    }}
+                                                                                >
+                                                                                    <option value="">{phrases['SSI']}</option>
+                                                                                    <option value="50000">50000</option>
+                                                                                    <option value="100000">100000</option>  
+                                                                        
+                                                                                </Field>
+                                                                                {errors.PA_Cover ? (
+                                                                                    <span className="errorMsg">{phrases[errors.PA_Cover]}</span>
+                                                                                ) : null}
+                                                                            </div>
+                                                                        </FormGroup>
+                                                                    </Col> : null
                                                                 }
                                                             </Row>
                                                             ))}

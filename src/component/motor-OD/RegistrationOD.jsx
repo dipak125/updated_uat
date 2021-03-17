@@ -89,7 +89,7 @@ class RegistrationOD extends Component {
         let policyHolder_id = localStorage.getItem("policyHolder_refNo") ? localStorage.getItem("policyHolder_refNo") : 0;
         let encryption = new Encryption();
         this.props.loadingStart();
-        axios.get(`policy-holder/motor/${policyHolder_id}`)
+        axios.get(`four-wh-stal/details/${policyHolder_id}`)
             .then(res => {
                 let decryptResp = JSON.parse(encryption.decrypt(res.data))
                 console.log("decrypt", decryptResp)
@@ -165,7 +165,7 @@ class RegistrationOD extends Component {
                     'agent_name': sessionStorage.getItem('agent_name') ? sessionStorage.getItem('agent_name') : "",
                     'product_id': sessionStorage.getItem('product_id') ? sessionStorage.getItem('product_id') : "",
                     'bcmaster_id': "5",
-                    'page_name': `Registration/${productId}`,
+                    'page_name': `RegistrationOD/${productId}`,
 
                 }
             }
@@ -179,7 +179,7 @@ class RegistrationOD extends Component {
                     'bcmaster_id': bc_data ? bc_data.agent_id : "",
                     'bc_token': bc_data ? bc_data.token : "",
                     'bc_agent_id': bc_data ? bc_data.user_info.data.user.username : "",
-                    'page_name': `Registration/${productId}`,
+                    'page_name': `RegistrationOD/${productId}`,
 
                 }
             }
@@ -191,11 +191,13 @@ class RegistrationOD extends Component {
             axios
                 .post(`/four-wh-stal/update-registration`, formData)
                 .then(res => {
-                    if (res.data.error == false) {
+                    let decryptResp = JSON.parse(encryption.decrypt(res.data))
+                    console.log("decrypt", decryptResp)
+                    if (decryptResp.error == false) {
                         this.props.history.push(`/select-brandOD/${productId}`);
                     }
                     else {
-                        swal(res.data.msg)
+                        swal(decryptResp.msg)
                     }
                     this.props.loadingStop();
 
@@ -218,7 +220,7 @@ class RegistrationOD extends Component {
                     'agent_name': sessionStorage.getItem('agent_name') ? sessionStorage.getItem('agent_name') : "",
                     'product_id': sessionStorage.getItem('product_id') ? sessionStorage.getItem('product_id') : "",
                     'bcmaster_id': "5",
-                    'page_name': `Registration/${productId}`,
+                    'page_name': `RegistrationOD/${productId}`,
 
                 }
             }
@@ -228,10 +230,11 @@ class RegistrationOD extends Component {
                     'check_registration': values.check_registration,
                     'menumaster_id': 1,
                     'vehicle_type_id': productId,
+					'product_id': productId,
                     'bcmaster_id': bc_data ? bc_data.agent_id : "",
                     'bc_token': bc_data ? bc_data.token : "",
                     'bc_agent_id': bc_data ? bc_data.user_info.data.user.username : "",
-                    'page_name': `Registration/${productId}`,
+                    'page_name': `RegistrationOD/${productId}`,
 
                 }
             }
@@ -239,8 +242,11 @@ class RegistrationOD extends Component {
             formData.append('enc_data', encryption.encrypt(JSON.stringify(post_data)))
             this.props.loadingStart();
             axios
-                .post(`/registration`, formData)
+                .post(`/four-wh-stal/registration`, formData)
                 .then(res => {
+
+					res.data = JSON.parse(encryption.decrypt(res.data));
+						
                     if (res.data.error == false) {
                         localStorage.setItem('policyHolder_id', res.data.data.policyHolder_id);
                         localStorage.setItem('policyHolder_refNo', res.data.data.policyHolder_refNo);
@@ -253,6 +259,9 @@ class RegistrationOD extends Component {
                 })
                 .catch(err => {
                     if (err && err.data) {
+						
+						console.log( 'Error' );
+						console.log( JSON.parse(encryption.decrypt(err.data)) );
                         swal('Please check..something went wrong!!');
                     }
                     this.props.loadingStop();

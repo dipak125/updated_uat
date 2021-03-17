@@ -28,7 +28,7 @@ import {
 const ageObj = new PersonAge();
 let encryption = new Encryption();
 // const maxRegnDate = moment(moment().subtract(1, 'years').calendar()).add(1, 'day').calendar();
-const minRegnDate = moment().subtract(20, 'years').calendar();
+const minRegnDate = moment().subtract(1, 'years').calendar();
 const minDate = moment().subtract(1, 'years').calendar()
 const maxDate = moment()
 

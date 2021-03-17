@@ -263,19 +263,28 @@ class Registration_sme extends Component {
             formData
             ).then(res=>{     
                 let decryptResp = JSON.parse(encryption.decrypt(res.data));   
-                localStorage.setItem('policy_holder_ref_no',decryptResp.data.policyHolder_refNo);
-                this.props.loadingStop();
-                this.props.setData({
-                    start_date:values.pol_start_date,
-                    end_date:values.pol_end_date,
+                console.log('decryptResp-----', decryptResp)
+                if (decryptResp.error === false ){
+                    localStorage.setItem('policy_holder_ref_no',decryptResp.data.policyHolder_refNo);
+                    this.props.loadingStop();
+                    this.props.setData({
+                        start_date:values.pol_start_date,
+                        end_date:values.pol_end_date,
+                        
+                        policy_holder_id:decryptResp.data.policyHolder_id,
+                        policy_holder_ref_no:decryptResp.data.policyHolder_refNo,
+                        request_data_id:decryptResp.data.request_data_id,
+                        completed_step:decryptResp.data.completedStep,
+                        menumaster_id:decryptResp.data.menumaster_id,
+                    });
+                    this.props.history.push(`/RiskDetails/${productId}`);
+                }
+                else {
+                    swal("Thank you for showing your interest for buying product.Due to some reasons, we are not able to issue the policy online.Please call 1800 22 1111");
+                    this.props.loadingStop();
+                }
                     
-                    policy_holder_id:decryptResp.data.policyHolder_id,
-                    policy_holder_ref_no:decryptResp.data.policyHolder_refNo,
-                    request_data_id:decryptResp.data.request_data_id,
-                    completed_step:decryptResp.data.completedStep,
-                    menumaster_id:decryptResp.data.menumaster_id,
-                });
-                this.props.history.push(`/RiskDetails/${productId}`);
+               
             }).
             catch(err=>{
                 this.props.loadingStop();

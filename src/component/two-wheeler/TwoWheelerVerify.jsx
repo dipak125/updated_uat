@@ -270,7 +270,11 @@ const ComprehensiveValidation = Yup.object().shape({
     .matches(/^[a-zA-Z0-9][a-zA-Z0-9-/.,\s]*$/, 
         function() {
             return "Please enter valid address"
-        }),
+    })
+    .matches(/^[a-zA-Z0-9][a-zA-Z0-9-/.,\s]*$/, 
+        function() {
+            return "PleaseValidAddress"
+    }),
 
     previous_policy_no:Yup.string()
     .notRequired('Previous policy number is required')

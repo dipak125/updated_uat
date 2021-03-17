@@ -207,7 +207,7 @@ const vehicleRegistrationValidation = Yup.object().shape({
         }
     ),
     previous_city:Yup.string()
-    .notRequired('Previous city is required')
+    .notRequired()
     .test(
         "currentMonthChecking",
         function() {
@@ -222,8 +222,11 @@ const vehicleRegistrationValidation = Yup.object().shape({
     )
     .matches(/^[a-zA-Z0-9][a-zA-Z0-9-/.,\s]*$/, 
         function() {
-            return "Please enter valid address"
-        }),
+            return "PleaseValidAddress"
+    })
+    .max(100, function() {
+        return "AddressMustBeMaximum100Chracters"
+    }),
 
     previous_policy_no:Yup.string()
     .notRequired('Previous policy number is required')

@@ -95,7 +95,11 @@ const ownerValidation = Yup.object().shape({
     .matches(/^[a-zA-Z0-9\s,/.-]*$/, 
     function() {
         return "Please enter valid address"
+    })
+    .max(100, function() {
+        return "AddressMustBeMaximum100Chracters"
     }),
+
     phone: Yup.string()
     .matches(/^[6-9][0-9]{9}$/,'Invalid Mobile number').required('PhoneRequired'),
     

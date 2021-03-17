@@ -112,8 +112,12 @@ const ownerValidation = Yup.object().shape({
     // .matches(/^(?![0-9._])(?!.*[0-9._]$)(?!.*\d_)(?!.*_\d)[a-zA-Z0-9_.,-\\]+$/, 
     .matches(/^[a-zA-Z0-9][a-zA-Z0-9\s,/.-]*$/, 
     function() {
-        return "Please enter valid address"
+        return "PleaseValidAddress"
+    })
+    .max(100, function() {
+        return "AddressMustBeMaximum100Chracters"
     }),
+    
     phone: Yup.string()
         .matches(/^[6-9][0-9]{9}$/,'Invalid Mobile number').required('PhoneRequired'),
         
@@ -684,7 +688,6 @@ class TwoWheelerAdditionalDetails extends Component {
             pancard: policyHolder && policyHolder.pancard ? policyHolder.pancard : "",
             pincode_id: addressDetails && addressDetails.id ? addressDetails.id : "",
             pincode: policyHolder && policyHolder.pincode ? policyHolder.pincode : "",
-            address: policyHolder && policyHolder.address ? policyHolder.address : "",
             is_carloan:is_loan_account,
             bank_name: bankDetails ? bankDetails.bank_name : "",
             bank_branch: bankDetails ? bankDetails.bank_branch : "",

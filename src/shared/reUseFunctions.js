@@ -38,9 +38,22 @@ export const prevEndDate = (value) => {
 }
 
 export const currentEndDate = (value) => {
-    var day =  value.getDate() - 1
-    var month = value.getMonth()
-    var year =   value.getFullYear() + 5
-    var endDate = new Date(year,month,day)
-    return endDate
+    if(value){
+        var day =  value.getDate() - 1
+        var month = value.getMonth()
+        var year =   value.getFullYear() + 5
+        var endDate = new Date(year,month,day)
+        return endDate
+    }
+    
+}
+export const fourwheelerODEndDate = (value) => {
+    if(value){
+        var day =  value.getDate() - 1
+        var month = value.getMonth()
+        var year =   value.getFullYear() + 3
+        var endDate = new Date(year,month,day)
+        return endDate
+    }
+    
 }
