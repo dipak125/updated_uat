@@ -515,12 +515,11 @@ class TwoWheelerAdditionalDetailsOD extends Component {
         let policyHolder_id = localStorage.getItem("policyHolder_refNo") ? localStorage.getItem("policyHolder_refNo") : 0;
         let encryption = new Encryption();
         this.props.loadingStart();
-        axios.get(`two-wh-stal/details/${policyHolder_id}`)
+        axios.get(`two-wh-stal/policy-holder/motor-saod/${policyHolder_id}`)
             .then(res => {
                  let decryptResp = JSON.parse(encryption.decrypt(res.data))
                  console.log("decrypt---", decryptResp)
                  let motorInsurance = decryptResp.data.policyHolder ? decryptResp.data.policyHolder.motorinsurance : {};
-                 let previousPolicy = decryptResp.data.policyHolder ? decryptResp.data.policyHolder.previouspolicy : {};
                  let vehicleDetails = decryptResp.data.policyHolder ? decryptResp.data.policyHolder.vehiclebrandmodel : {};
                  let policyHolder = decryptResp.data.policyHolder ? decryptResp.data.policyHolder : {};
                  let nomineeDetails = decryptResp.data.policyHolder ? decryptResp.data.policyHolder.request_data.nominee[0] : {}
@@ -533,7 +532,7 @@ class TwoWheelerAdditionalDetailsOD extends Component {
             
                 //  return false;
                  this.setState({
-                    quoteId, motorInsurance, previousPolicy, vehicleDetails, policyHolder, nomineeDetails, is_loan_account, 
+                    quoteId, motorInsurance, vehicleDetails, policyHolder, nomineeDetails, is_loan_account, 
                     is_eia_account, bankDetails, addressDetails, step_completed,
                     is_appointee: nomineeDetails ? nomineeDetails.is_appointee : ""
                     

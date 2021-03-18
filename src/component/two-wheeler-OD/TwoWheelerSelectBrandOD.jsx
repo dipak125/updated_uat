@@ -225,7 +225,7 @@ class TwoWheelerSelectBrandOD extends Component {
         let policyHolder_id = localStorage.getItem("policyHolder_refNo") ? localStorage.getItem("policyHolder_refNo") : 0;
         let encryption = new Encryption();
         this.props.loadingStart();
-        axios.get(`two-wh-stal/details/${policyHolder_id}`)
+        axios.get(`two-wh-stal/policy-holder/motor-saod/${policyHolder_id}`)
             .then(res => {
                 let decryptResp = JSON.parse(encryption.decrypt(res.data));
                 console.log('decryptResp', decryptResp)

@@ -409,10 +409,6 @@ const TwoWheelerOtherComprehensiveOD = Loadable({
     loader: () => import(/*webpackChunkName: "Products" */"../two-wheeler-OD/TwoWheelerOtherComprehensiveOD.jsx"),
     loading: () => loadingContent
 });
-const TwoWheelerVerifyOD = Loadable({
-    loader: () => import(/*webpackChunkName: "Products" */"../two-wheeler-OD/TwoWheelerVerifyOD.jsx"),
-    loading: () => loadingContent
-});
 const TwoWheelerAdditionalDetailsOD = Loadable({
     loader: () => import(/*webpackChunkName: "Products" */"../two-wheeler-OD/TwoWheelerAdditionalDetailsOD.jsx"),
     loading: () => loadingContent
@@ -548,7 +544,6 @@ class Routes extends Component {
                         <PrivateRoute exact path="/two_wheeler_Select-brandOD/:productId" component={TwoWheelerSelectBrandOD} />
                         <PrivateRoute exact path="/two_wheeler_Vehicle_detailsOD/:productId" component={TwoWheelerVehicleDetailsOD} />
                         <PrivateRoute exact path="/two_wheeler_OtherComprehensiveOD/:productId" component={TwoWheelerOtherComprehensiveOD} />
-                        <PrivateRoute exact path="/two_wheeler_verifyOD/:productId" component={TwoWheelerVerifyOD} />
                         <PrivateRoute exact path="/two_wheeler_additional_detailsOD/:productId" component={TwoWheelerAdditionalDetailsOD} />  
                         <PrivateRoute exact path="/two_wheeler_policy_premium_detailsOD/:productId" component={TwoWheelerPolicyPremiumDetailsOD} />
 

@@ -110,7 +110,7 @@ class PremiumOD extends Component {
         let policyHolder_id = this.state.policyHolder_refNo ? this.state.policyHolder_refNo : '0'
         let encryption = new Encryption();
     
-        axios.get(`policy-holder/motor/${policyHolder_id}`)
+        axios.get(`four-wh-stal/policy-holder/motor-saod/${policyHolder_id}`)
             .then(res => {
                 let decryptResp = JSON.parse(encryption.decrypt(res.data))
                 console.log("decrypt", decryptResp)

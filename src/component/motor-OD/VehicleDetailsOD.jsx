@@ -26,16 +26,12 @@ import {fourwheelerODEndDate, prevEndDate} from "../../shared/reUseFunctions";
 const year = new Date('Y')
 const ageObj = new PersonAge();
 // const minDate = moment(moment().subtract(1, 'years').calendar()).add(1, 'day').calendar();
-// const maxDate = moment(minDate).add(30, 'day').calendar();
-
-//const minDate = moment(moment().subtract(20, 'years').calendar()).add(1, 'day').calendar();
-//const maxDate = moment(moment().subtract(1, 'years').calendar()).add(30, 'day').calendar();
-// const startRegnDate = moment().subtract(20, 'years').calendar();
 //const minRegnDate = moment(startRegnDate).startOf('year').format('YYYY-MM-DD hh:mm');
-// const maxRegnDate = new Date();
 
-const minRegnDate = moment().subtract(1, 'years').calendar();
-const minDate = moment().subtract(1, 'years').calendar()
+let maxRegnDate=  moment(moment().subtract(1, 'years').calendar()).add(3, 'months').calendar() 
+const activeMinDate =  moment(moment().subtract(3, 'years').calendar()).add(1, 'day').calendar();
+const minRegnDate = moment(moment().subtract(3, 'years').calendar()).add(1, 'day').calendar();
+const minDate =  moment(moment().subtract(1, 'years').calendar()).add(1, 'day').calendar();
 const maxDate = moment()
 
 const initialValue = {
@@ -59,6 +55,16 @@ const vehicleRegistrationValidation = Yup.object().shape({
         function (value) {
             if (value) {
                 return checkGreaterStartEndTimes(value, this.parent.previous_start_date);
+            }
+            return true;
+        }
+    )
+    .test(
+        "checkGreaterTimes",
+        "RegistrationLessActive",
+        function (value) {
+            if (value) {
+                return checkGreaterStartEndTimes(value, this.parent.active_start_date);
             }
             return true;
         }
@@ -87,9 +93,10 @@ const vehicleRegistrationValidation = Yup.object().shape({
             }
             return true;
         }
-    ).test(
+    )
+    .test(
         "checkGreaterTimes",
-        "Start date must be less than end date",
+        "StartDateLessEnd",
         function (value) {
             if (value) {
                 return checkGreaterStartEndTimes(value, this.parent.previous_end_date);
@@ -122,7 +129,7 @@ const vehicleRegistrationValidation = Yup.object().shape({
         }
     ).test( 
         "checkGreaterTimes",
-        "End date must be greater than start date",
+        "EndDateGreaterStart",
         function (value) {
             if (value) {
                 return checkGreaterTimes(value, this.parent.previous_start_date);
@@ -172,7 +179,7 @@ const vehicleRegistrationValidation = Yup.object().shape({
     )
     .matches(/^[a-zA-Z0-9][a-zA-Z0-9-/.,\s]*$/, 
         function() {
-            return "Please enter valid address"
+            return "PleaseValidAddress"
         }),
 
     previous_policy_no:Yup.string()
@@ -192,12 +199,12 @@ const vehicleRegistrationValidation = Yup.object().shape({
     )
     .matches(/^[a-zA-Z0-9][a-zA-Z0-9\s-/]*$/, 
         function() {
-            return "Please enter valid policy number"
+            return "PleasePolicyNumber"
         }).min(6, function() {
             return "PolicyMinCharacter"
         })
         .max(28, function() {
-            return "Policy No. must be maximum 18 chracters"
+            return "PolicyNo18Char "
         }),
 
     previous_claim_bonus:Yup.string()
@@ -247,6 +254,165 @@ const vehicleRegistrationValidation = Yup.object().shape({
         then: Yup.string().required('PleasePPCF'),
         otherwise: Yup.string()
     }),
+
+    previous_policy_name:Yup.string()
+    .required("PleaseSPT")
+    .test(
+        "currentMonthChecking",
+        function() {
+            return "PreviousPolicyLiabilityPolicy"
+        },
+        function (value) {
+            if (value == '2' ) {   
+                return false;    
+            }
+            return true;
+        }
+    ),
+
+
+    active_policy_name:Yup.string()
+    .required("PleaseSPT")
+    .test(
+        "currentMonthChecking",
+        function() {
+            return "ActivePolLiability"
+        },
+        function (value) {
+            if (value == '1' ) {   
+                return false;    
+            }
+            return true;
+        }
+    ),
+    active_start_date:Yup.date()
+    .notRequired()
+    .test(
+        "currentMonthChecking",
+        function() {
+            return "PleaseESD"
+        },
+        function (value) {
+            const ageObj = new PersonAge();
+            if (ageObj.whatIsCurrentMonth(this.parent.registration_date) > 0 && !value) {   
+                return false;    
+            }
+            return true;
+        }
+    ).test(
+        "checkGreaterTimes",
+        "StartDateLessEnd",
+        function (value) {
+            if (value) {
+                return checkGreaterStartEndTimes(value, this.parent.active_end_date);
+            }
+            return true;
+        }
+    ).test(
+      "checkStartDate",
+      "PleaseESD",
+      function (value) {       
+          if ( this.parent.active_end_date != undefined && value == undefined) {
+              return false;
+          }
+          return true;
+      }
+    ),
+    active_end_date:Yup.date()
+    .notRequired('Previous end date is required')
+    .test(
+        "currentMonthChecking",
+        function() {
+            return "PleaseEED"
+        },
+        function (value) {
+            const ageObj = new PersonAge();
+            if (ageObj.whatIsCurrentMonth(this.parent.registration_date) > 0 && !value) {   
+                return false;    
+            }
+            return true;
+        }
+    ).test( 
+        "checkGreaterTimes",
+        function() {
+            return "EndDateGreaterStart"
+        },
+        function (value) {
+            if (value) {
+                return checkGreaterTimes(value, this.parent.active_start_date);
+            }
+            return true;
+        }
+        ).test(
+        "checkEndDate",
+        "PleaseEED",
+        function (value) {     
+            if ( this.parent.active_start_date != undefined && value == undefined) {
+                return false;
+            }
+            return true;
+        }
+    ),
+
+    active_insurance_company_id:Yup.number()
+    .notRequired('Insurance company is required')
+    .test(
+        "currentMonthChecking",
+        function() {
+            return "PleaseEAIC"
+        },
+        function (value) {
+            const ageObj = new PersonAge();
+            if (ageObj.whatIsCurrentMonth(this.parent.registration_date) > 0 && !value) {   
+                return false;    
+            }
+            return true;
+        }
+    ),
+    active_policy_address:Yup.string()
+    .notRequired('Previous city is required')
+    .test(
+        "currentMonthChecking",
+        function() {
+            return "PleaseEAICC"
+        },
+        function (value) {
+            const ageObj = new PersonAge();
+            if (ageObj.whatIsCurrentMonth(this.parent.registration_date) > 0 && !value) {   
+                return false;    
+            }
+            return true;
+        }
+    )
+    .matches(/^[a-zA-Z0-9][a-zA-Z0-9-/.,\s]*$/, 
+        function() {
+            return "PleaseValidAddress"
+        }),
+
+    active_policy_no:Yup.string()
+    .notRequired('Previous policy number is required')
+    .test(
+        "currentMonthChecking",
+        function() {
+            return "PleaseEAPN"
+        },
+        function (value) {
+            const ageObj = new PersonAge();
+            if (ageObj.whatIsCurrentMonth(this.parent.registration_date) > 0 && !value) {   
+                return false;    
+            }
+            return true;
+        }
+    )
+    .matches(/^[a-zA-Z0-9][a-zA-Z0-9\s-/]*$/, 
+        function() {
+            return "PleasePolicyNumber"
+        }).min(6, function() {
+            return "PolicyMinCharacter"
+        })
+        .max(28, function() {
+            return "PolicyNo18Char"
+        }),
    
 });
 
@@ -425,6 +591,13 @@ class VehicleDetailsOD extends Component {
             'pol_end_date': moment(newPolEndDate).format('YYYY-MM-DD'),
             'policy_type': policy_type,
             'prev_policy_flag': 1,
+
+            'active_start_date': moment(values.active_start_date).format("YYYY-MM-DD"),
+            'active_end_date': moment(values.active_end_date).format("YYYY-MM-DD"),
+            'active_policy_name': values.active_policy_name,
+            'active_insurance_company_id': values.active_insurance_company_id,
+            'active_policy_address': values.active_policy_address,
+            'active_policy_no': values.active_policy_no,
             'page_name': `VehicleDetailsOD/${productId}`          
         } 
 
@@ -490,19 +663,17 @@ class VehicleDetailsOD extends Component {
         let policyHolder_id = localStorage.getItem("policyHolder_refNo") ? localStorage.getItem("policyHolder_refNo") : 0;
         let encryption = new Encryption();
         this.props.loadingStart();
-        axios.get(`policy-holder/motor/${policyHolder_id}`)
+        axios.get(`four-wh-stal/policy-holder/motor-saod/${policyHolder_id}`)
             .then(res => {
                  let decryptResp = JSON.parse(encryption.decrypt(res.data))
                  console.log("decrypt", decryptResp)
                  let motorInsurance = decryptResp.data.policyHolder ? decryptResp.data.policyHolder.motorinsurance : {};
-                 let previousPolicy = decryptResp.data.policyHolder ? decryptResp.data.policyHolder.previouspolicy : {};
+                 let previousPolicy = decryptResp.data.policyHolder ? decryptResp.data.policyHolder.previouspolicyforsaod : {};
                  let vehicleDetails = decryptResp.data.policyHolder ? decryptResp.data.policyHolder.vehiclebrandmodel : {};
                  let RTO_location = motorInsurance && motorInsurance.location && motorInsurance.location.RTO_LOCATION ? motorInsurance.location.RTO_LOCATION : ""
-                 let previous_is_claim= previousPolicy && (previousPolicy.is_claim == 0 || previousPolicy.is_claim == 1) ? previousPolicy.is_claim : ""
-                 let maxRegnDate= motorInsurance && motorInsurance.policytype_id == '1' ? moment() 
-                 :  moment(moment().subtract(1, 'years').calendar()).add(3, 'months').calendar() 
+                 let previous_is_claim= previousPolicy && previousPolicy[0] && (previousPolicy[0].is_claim == 0 || previousPolicy[0].is_claim == 1) ? previousPolicy[0].is_claim : "" 
                  this.setState({
-                    motorInsurance, previousPolicy, vehicleDetails,RTO_location, previous_is_claim, maxRegnDate
+                    motorInsurance, previousPolicy, vehicleDetails,RTO_location, previous_is_claim
                 })
                 this.props.loadingStop();
             })
@@ -534,22 +705,29 @@ class VehicleDetailsOD extends Component {
     render() {
         const {productId} = this.props.match.params  
         const {insurerList, showClaim, previous_is_claim, motorInsurance, previousPolicy,
-            CustomerID,suggestions, vehicleDetails, RTO_location, maxRegnDate} = this.state
+            CustomerID,suggestions, vehicleDetails, RTO_location} = this.state
         
         let phrases = localStorage.getItem("phrases") ? JSON.parse(localStorage.getItem("phrases")) : null
 
         let newInitialValues = Object.assign(initialValue, {
             registration_date: motorInsurance && motorInsurance.registration_date ? new Date(motorInsurance.registration_date) : "",
             location_id:  motorInsurance && motorInsurance.location_id ? motorInsurance.location_id : "",
-            previous_start_date: previousPolicy && previousPolicy.start_date ? new Date(previousPolicy.start_date) : "",
-            previous_end_date: previousPolicy && previousPolicy.end_date ? new Date(previousPolicy.end_date) : "",
-            previous_policy_name: previousPolicy && previousPolicy.name ? previousPolicy.name : "1",
-            insurance_company_id: previousPolicy && previousPolicy.insurancecompany && previousPolicy.insurancecompany.Id ? previousPolicy.insurancecompany.Id : "",
-            previous_city: previousPolicy && previousPolicy.city ? previousPolicy.city : "",
-            previous_policy_no: previousPolicy && previousPolicy.policy_no ? previousPolicy.policy_no : "",
+            previous_start_date: previousPolicy && previousPolicy[0] && previousPolicy[0].start_date ? new Date(previousPolicy[0].start_date) : "",
+            previous_end_date: previousPolicy && previousPolicy[0] && previousPolicy[0].end_date ? new Date(previousPolicy[0].end_date) : "",
+            previous_policy_name: "1",
+            insurance_company_id: previousPolicy && previousPolicy[0] && previousPolicy[0].insurancecompany && previousPolicy[0].insurancecompany.Id ? previousPolicy[0].insurancecompany.Id : "",
+            previous_city: previousPolicy && previousPolicy[0] && previousPolicy[0].city ? previousPolicy[0].city : "",
+            previous_policy_no: previousPolicy && previousPolicy[0] && previousPolicy[0].policy_no ? previousPolicy[0].policy_no : "",
             previous_is_claim: previous_is_claim,
-            previous_claim_bonus: previousPolicy && (previousPolicy.claim_bonus || previousPolicy.claim_bonus == 0) ? previousPolicy.claim_bonus.toString() : "1",
-            previous_claim_for: previousPolicy && previousPolicy.claim_for ? previousPolicy.claim_for : "",
+            previous_claim_bonus: previousPolicy && previousPolicy[0] && (previousPolicy[0].claim_bonus || previousPolicy[0].claim_bonus == 0) ? previousPolicy[0].claim_bonus.toString() : "1",
+            previous_claim_for: previousPolicy && previousPolicy[0] && previousPolicy[0].claim_for ? previousPolicy[0].claim_for : "",
+
+            active_start_date: previousPolicy && previousPolicy[1] && previousPolicy[1].start_date ? new Date(previousPolicy[1].start_date) : "",
+            active_end_date: previousPolicy && previousPolicy[1] && previousPolicy[1].end_date ? new Date(previousPolicy[1].end_date) : "",
+            active_policy_name: '2',
+            active_insurance_company_id: previousPolicy && previousPolicy[1] && previousPolicy[1].insurancecompany && previousPolicy[1].insurancecompany.Id ? previousPolicy[1].insurancecompany.Id : "",
+            active_policy_address: previousPolicy && previousPolicy[1] && previousPolicy[1].address ? previousPolicy[1].address : "",
+            active_policy_no: previousPolicy && previousPolicy[1] && previousPolicy[1].policy_no ? previousPolicy[1].policy_no : "",
 
         });
 
@@ -580,7 +758,7 @@ class VehicleDetailsOD extends Component {
                     <div className="brand-bg">
                         <Formik initialValues={newInitialValues} onSubmit={this.handleSubmit} validationSchema={vehicleRegistrationValidation}>
                             {({ values, errors, setFieldValue, setFieldTouched, isValid, isSubmitting, touched }) => {
-console.log("values----------------- ", values)
+console.log("errors----------------- ", errors)
                                 return (
                                     <Form>
                                         <Row>
@@ -616,6 +794,8 @@ console.log("values----------------- ", values)
 
                                                                     setFieldValue('previous_end_date', ""); 
                                                                     setFieldValue('previous_start_date', ""); 
+                                                                    setFieldValue('active_end_date', ""); 
+                                                                    setFieldValue('active_start_date', ""); 
                                                                     
                                                                 }}
                                                                 
@@ -672,12 +852,12 @@ console.log("values----------------- ", values)
                                                 </Row>
 
                                                 <Row>
-                                                    <Col sm={12} md={11} lg={3}>
+                                                    <Col sm={12} md={11} lg={4}>
                                                         <FormGroup>
 
                                                             <DatePicker
-                                                                name={phrases['previous_start_date']}
-                                                                minDate={new Date(minDate)}
+                                                                name={phrases['active_start_date']}
+                                                                minDate={new Date(activeMinDate)}
                                                                 maxDate={new Date(maxDate)}
                                                                 dateFormat="dd MMM yyyy"
                                                                 placeholderText={phrases['APSD']}
@@ -687,10 +867,158 @@ console.log("values----------------- ", values)
                                                                 showYearDropdown
                                                                 dropdownMode="select"
                                                                 className="datePckr inputfs12"
+                                                                selected={values.active_start_date}
+                                                                onChange={(val) => {
+                                                                    setFieldTouched('active_start_date')
+                                                                    setFieldValue("active_end_date", fourwheelerODEndDate(val));
+                                                                    setFieldValue('active_start_date', val);
+                                                                }}
+                                                            />
+                                                            {errors.active_start_date && touched.active_start_date ? (
+                                                                <span className="errorMsg">{phrases[errors.active_start_date]}</span>
+                                                            ) : null}
+                                                        </FormGroup>
+                                                    </Col>
+
+                                                    <Col sm={12} md={11} lg={4}>
+                                                        <FormGroup>
+                                                            <DatePicker
+                                                                name="active_end_date"
+                                                                dateFormat="dd MMM yyyy"
+                                                                placeholderText={phrases['APED']}
+                                                                disabled = {true}
+                                                                dropdownMode="select"
+                                                                className="datePckr inputfs12"
+                                                                selected={values.active_end_date}
+                                                                onChange={(val) => {
+                                                                    setFieldTouched('active_end_date');
+                                                                    setFieldValue('active_end_date', val);
+                                                                }}
+                                                            />
+                                                            {errors.active_end_date && touched.active_end_date ? (
+                                                                <span className="errorMsg">{phrases[errors.active_end_date]}</span>
+                                                            ) : null}
+                                                        </FormGroup>
+                                                    </Col>
+                                                    <Col sm={12} md={11} lg={3}>
+                                                        <FormGroup>
+                                                            <div className="formSection">
+                                                                <Field
+                                                                    name="active_policy_name"
+                                                                    component="select"
+                                                                    autoComplete="off"
+                                                                    className="formGrp inputfs12"
+                                                                    value = {values.active_policy_name}
+                                                                    disabled={true}
+                                                                    // value={ageObj.whatIsCurrentMonth(values.registration_date) < 7 ? 6 : values.active_policy_name}
+                                                                >
+                                                                    <option value="">{phrases['SPT']}</option>
+                                                                    <option value="1" disabled={true}>{phrases['Package']}</option>
+                                                                    <option value="2">{phrases['LiabilityOnly']}</option>  
+                                                        
+                                                                </Field>
+                                                                {errors.active_policy_name && touched.active_policy_name ? (
+                                                                    <span className="errorMsg">{phrases[errors.active_policy_name]}</span>
+                                                                ) : null}
+                                                            </div>
+                                                        </FormGroup>
+                                                    </Col>
+                                                </Row>
+
+                                                <Row>
+                                                    <Col sm={12} md={6} lg={6}>
+                                                    <FormGroup>
+                                                        <div className="formSection">
+                                                        <Field
+                                                            name="active_insurance_company_id"
+                                                            component="select"
+                                                            autoComplete="off"                                                                        
+                                                            className="formGrp"
+                                                        >
+                                                            <option value="">{phrases['SelectActiveInsurer']}</option>
+                                                            {insurerList.map((insurer, qIndex) => ( 
+                                                                <option value= {insurer.Id}>{insurer.name}</option>
+                                                            ))}
+                                                        </Field>     
+                                                        {errors.active_insurance_company_id && touched.active_insurance_company_id ? (
+                                                        <span className="errorMsg">{phrases[errors.active_insurance_company_id]}</span>
+                                                        ) : null}          
+                                                        </div>
+                                                    </FormGroup>
+                                                    </Col>
+
+                                                    <Col sm={12} md={5} lg={5}>
+                                                        <FormGroup>
+                                                            <div className="insurerName">
+                                                                <Field
+                                                                    name="active_policy_address"
+                                                                    type="text"
+                                                                    placeholder={phrases['AInsurerAddress']}
+                                                                    autoComplete="off"
+                                                                    onFocus={e => this.changePlaceHoldClassAdd(e)}
+                                                                    onBlur={e => this.changePlaceHoldClassRemove(e)}
+                                                                    
+                                                                />
+                                                                {errors.active_policy_address && touched.active_policy_address ? (
+                                                                    <span className="errorMsg">{phrases[errors.active_policy_address]}</span>
+                                                                ) : null}
+                                                            </div>
+                                                        </FormGroup>
+                                                    </Col>
+                                                </Row>        
+                                                <Row>
+                                                    <Col sm={12} md={5} lg={5}>
+                                                        <FormGroup>
+                                                            <div className="insurerName">
+                                                                <Field
+                                                                    name="active_policy_no"
+                                                                    type="text"
+                                                                    placeholder={phrases['APolicyNumber']}
+                                                                    autoComplete="off"
+                                                                    maxLength="28"
+                                                                    onFocus={e => this.changePlaceHoldClassAdd(e)}
+                                                                    onBlur={e => this.changePlaceHoldClassRemove(e)}
+                                                                    
+                                                                />
+                                                                {errors.active_policy_no && touched.active_policy_no ? (
+                                                                    <span className="errorMsg">{phrases[errors.active_policy_no]}</span>
+                                                                ) : null}
+                                                            </div>
+                                                        </FormGroup>
+                                                    </Col>
+                                                </Row>   
+                                                <Row>&nbsp;</Row>   
+
+                                                <Row>
+                                                    <Col sm={12}>
+                                                        <FormGroup>
+                                                            <div className="carloan">
+                                                                <h4> {phrases['PPD']}</h4>
+                                                            </div>
+                                                        </FormGroup>
+                                                    </Col>
+                                                </Row>
+
+                                                <Row>
+                                                    <Col sm={12} md={11} lg={4}>
+                                                        <FormGroup>
+
+                                                            <DatePicker
+                                                                name={phrases['previous_start_date']}
+                                                                minDate={new Date(minDate)}
+                                                                maxDate={new Date(maxDate)}
+                                                                dateFormat="dd MMM yyyy"
+                                                                placeholderText={phrases['PPSD']}
+                                                                peekPreviousMonth
+                                                                peekPreviousYear
+                                                                showMonthDropdown
+                                                                showYearDropdown
+                                                                dropdownMode="select"
+                                                                className="datePckr inputfs12"
                                                                 selected={values.previous_start_date}
                                                                 onChange={(val) => {
                                                                     setFieldTouched('previous_start_date')
-                                                                    setFieldValue("previous_end_date", fourwheelerODEndDate(val));
+                                                                    setFieldValue("previous_end_date", prevEndDate(val));
                                                                     setFieldValue('previous_start_date', val);
                                                                 }}
                                                             />
@@ -700,12 +1028,12 @@ console.log("values----------------- ", values)
                                                         </FormGroup>
                                                     </Col>
 
-                                                    <Col sm={12} md={11} lg={3}>
+                                                    <Col sm={12} md={11} lg={4}>
                                                         <FormGroup>
                                                             <DatePicker
                                                                 name="previous_end_date"
                                                                 dateFormat="dd MMM yyyy"
-                                                                placeholderText={phrases['APED']}
+                                                                placeholderText={phrases['PPED']}
                                                                 disabled = {true}
                                                                 dropdownMode="select"
                                                                 className="datePckr inputfs12"
@@ -720,21 +1048,25 @@ console.log("values----------------- ", values)
                                                             ) : null}
                                                         </FormGroup>
                                                     </Col>
-                                                    <Col sm={12} md={5} lg={5}>
+                                                    <Col sm={12} md={11} lg={3}>
                                                         <FormGroup>
-                                                            <div className="insurerName">
+                                                            <div className="formSection">
                                                                 <Field
-                                                                    name="previous_policy_no"
-                                                                    type="text"
-                                                                    placeholder={phrases['APolicyNumber']}
+                                                                    name="previous_policy_name"
+                                                                    component="select"
                                                                     autoComplete="off"
-                                                                    maxLength="28"
-                                                                    onFocus={e => this.changePlaceHoldClassAdd(e)}
-                                                                    onBlur={e => this.changePlaceHoldClassRemove(e)}
-                                                                    
-                                                                />
-                                                                {errors.previous_policy_no && touched.previous_policy_no ? (
-                                                                    <span className="errorMsg">{phrases[errors.previous_policy_no]}</span>
+                                                                    className="formGrp inputfs12"
+                                                                    value = {values.previous_policy_name}
+                                                                    disabled = {true}
+                                                                    // value={ageObj.whatIsCurrentMonth(values.registration_date) < 7 ? 6 : values.previous_policy_name}
+                                                                >
+                                                                    <option value="">{phrases['SPT']}</option>
+                                                                    <option value="1">{phrases['Package']}</option>
+                                                                    <option value="2" disabled = {true}>{phrases['LiabilityOnly']}</option>  
+                                                        
+                                                                </Field>
+                                                                {errors.previous_policy_name && touched.previous_policy_name ? (
+                                                                    <span className="errorMsg">{phrases[errors.previous_policy_name]}</span>
                                                                 ) : null}
                                                             </div>
                                                         </FormGroup>
@@ -769,7 +1101,7 @@ console.log("values----------------- ", values)
                                                                 <Field
                                                                     name="previous_city"
                                                                     type="text"
-                                                                    placeholder={phrases['AInsurerAddress']}
+                                                                    placeholder={phrases['PInsurerAddress']}
                                                                     autoComplete="off"
                                                                     onFocus={e => this.changePlaceHoldClassAdd(e)}
                                                                     onBlur={e => this.changePlaceHoldClassRemove(e)}
@@ -782,6 +1114,27 @@ console.log("values----------------- ", values)
                                                         </FormGroup>
                                                     </Col>
                                                 </Row>
+                                                <Row>
+                                                <Col sm={12} md={5} lg={5}>
+                                                        <FormGroup>
+                                                            <div className="insurerName">
+                                                                <Field
+                                                                    name="previous_policy_no"
+                                                                    type="text"
+                                                                    placeholder={phrases['PPolicyNumber']}
+                                                                    autoComplete="off"
+                                                                    maxLength="28"
+                                                                    onFocus={e => this.changePlaceHoldClassAdd(e)}
+                                                                    onBlur={e => this.changePlaceHoldClassRemove(e)}
+                                                                    
+                                                                />
+                                                                {errors.previous_policy_no && touched.previous_policy_no ? (
+                                                                    <span className="errorMsg">{phrases[errors.previous_policy_no]}</span>
+                                                                ) : null}
+                                                            </div>
+                                                        </FormGroup>
+                                                    </Col>
+                                                </Row>                               
                                                 <Row>&nbsp;</Row>
                                                 { values.previous_policy_name == '1' && Math.floor(moment().diff(values.previous_end_date, 'days', true)) <= 90 ?
                                                     <Fragment>

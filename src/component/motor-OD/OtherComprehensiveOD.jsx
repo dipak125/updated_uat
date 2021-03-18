@@ -210,27 +210,8 @@ const ComprehensiveValidation = Yup.object().shape({
 });
 
 
-// const Coverage = {
-//         "C101064":"Own Damage",
-//         "C101065":"Legal Liability to Third Party",
-//         "C101066":"PA Cover",
-//         "C101069":"Basic Road Side Assistance",
-//         "C101072":"Depreciation Reimbursement",
-//         "C101067":"Return to Invoice",
-//         "C101108":"Engine Guard",
-//         "C101111":"Cover for consumables",
-//         "B00002": "Own Damage Basic",
-//         "B00008": "Third Party Bodily Injury",
-//         "B00013": "Legal Liability to Paid Drivers",
-//         "B00015": "PA -  Owner Driver",
-//         "B00016": "PA for Unnamed Passenger",
-//         "B00009": "Third Party Property Damage Limit",
-//         "NCB": "NCB Discount",
-//         "TOTALOD": "Total Own Damage"
-// }
-
 const Coverage = {
-    "C101064":translation["C101064"],
+    "C101064":translation["C101064"],   
     "C101065":translation["C101065"],
     "C101066":translation["C101066"],
     "C101069":translation["C101069"],
@@ -376,7 +357,7 @@ class OtherComprehensiveOD extends Component {
         let policyHolder_id = localStorage.getItem("policyHolder_refNo") ? localStorage.getItem("policyHolder_refNo") : 0;
         let encryption = new Encryption();
         this.props.loadingStart();
-        axios.get(`policy-holder/motor/${policyHolder_id}`)
+        axios.get(`four-wh-stal/policy-holder/motor-saod/${policyHolder_id}`)
             .then(res => {
                 let decryptResp = JSON.parse(encryption.decrypt(res.data))
                 console.log("decrypt--fetchData-- ", decryptResp)
@@ -996,7 +977,7 @@ class OtherComprehensiveOD extends Component {
 
         const policyCoverageList =  policyCoverage && policyCoverage.length > 0 ?
             policyCoverage.map((coverage, qIndex) => (
-                coverage.PolicyBenefitList ? coverage.PolicyBenefitList.map((benefit, bIndex) => (
+                coverage.PolicyBenefitList && coverage.ProductElementCode != "C101069" ? coverage.PolicyBenefitList.map((benefit, bIndex) => (
                     benefit.BeforeVatPremium != 0 ?
                     <div>
                         <Row>

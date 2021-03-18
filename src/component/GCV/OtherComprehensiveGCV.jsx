@@ -862,6 +862,7 @@ class OtherComprehensiveGCV extends Component {
                         PolicyArray: res.data.PolicyObject.PolicyLobList,
                         error: [],
                         ncbDiscount,
+                        sliderVal: res.data.PolicyObject.PolicyLobList ? Math.round(res.data.PolicyObject.PolicyLobList[0].PolicyRiskList[0].IDV_Suggested) : 0,
                         serverResponse: res.data.PolicyObject,
                         policyCoverage: res.data.PolicyObject.PolicyLobList ? res.data.PolicyObject.PolicyLobList[0].PolicyRiskList[0].PolicyCoverageList : [],
                     });
@@ -954,7 +955,7 @@ class OtherComprehensiveGCV extends Component {
                 'cng_kit': values.cng_kit,
                 // 'cngkit_cost': values.cngKit_Cost,
                 'engine_no': values.engine_no,
-                'idv_value': sliderVal ? sliderVal : defaultSliderValue.toString(),
+                'idv_value': sliderVal ? sliderVal.toString() : defaultSliderValue.toString(),
                 'add_more_coverage': add_more_coverage,
                 'puc': values.puc,
                 'pa_cover': values.PA_flag ? values.PA_Cover : "0",
@@ -983,7 +984,7 @@ class OtherComprehensiveGCV extends Component {
                 'cng_kit': values.cng_kit,
                 // 'cngkit_cost': values.cngKit_Cost,
                 'engine_no': values.engine_no,
-                'idv_value': sliderVal ? sliderVal : defaultSliderValue.toString(),
+                'idv_value': sliderVal ? sliderVal.toString() : defaultSliderValue.toString(),
                 'puc': values.puc,
                 'page_name': `OtherComprehensive_GCV/${productId}`,
                 'body_idv_value' : bodySliderVal ? bodySliderVal : defaultBodySliderValue,
@@ -1346,8 +1347,8 @@ class OtherComprehensiveGCV extends Component {
         const {add_more_coverage, is_CNG_account, vahanDetails,error, policyCoverage, vahanVerify, selectFlag, fulQuoteResp, PolicyArray, fuelList, vehicleDetails, geographical_extension,
             moreCoverage, sliderVal, bodySliderVal, motorInsurance, serverResponse, engine_no, chasis_no, initialValue, add_more_coverage_request_array,ncbDiscount} = this.state
         const {productId} = this.props.match.params 
-        let defaultSliderValue = PolicyArray.length > 0 ? Math.round(PolicyArray[0].PolicyRiskList[0].IDV_Suggested) : 0
-        let sliderValue = sliderVal
+        //let defaultSliderValue = PolicyArray.length > 0 ? Math.round(PolicyArray[0].PolicyRiskList[0].IDV_Suggested) : 0
+        let defaultSliderValue = sliderVal
         let min_IDV_suggested = PolicyArray.length > 0 ? PolicyArray[0].PolicyRiskList[0].MinIDV_Suggested : 0
         let max_IDV_suggested = PolicyArray.length > 0 ? PolicyArray[0].PolicyRiskList[0].MaxIDV_Suggested : 0
         let minIDV = min_IDV_suggested
@@ -1362,8 +1363,8 @@ class OtherComprehensiveGCV extends Component {
         
         let minBodyIDV = 0
         let maxBodyIDV = PolicyArray.length > 0 ? Math.round(PolicyArray[0].PolicyRiskList[0].IDV_Suggested/5) : 0
-        let defaultBodySliderValue =  motorInsurance && motorInsurance.body_idv_value ? Math.round(motorInsurance.body_idv_value) : 0
-        let bodySliderValue = bodySliderVal
+        //let defaultBodySliderValue =  motorInsurance && motorInsurance.body_idv_value ? Math.round(motorInsurance.body_idv_value) : 0
+        let defaultBodySliderValue = bodySliderVal
 
         let covList = motorInsurance && motorInsurance.add_more_coverage ? motorInsurance.add_more_coverage.split(",") : ""
         let newInnitialArray = {}
@@ -1808,7 +1809,7 @@ console.log("values------------> ", values)
                                             className="premiumslid"
                                             onFocus={e => this.changePlaceHoldClassAdd(e)}
                                             onBlur={e => this.changePlaceHoldClassRemove(e)}
-                                            value={sliderValue ? sliderValue : defaultSliderValue}  
+                                            value={defaultSliderValue}  
                                         />
                                         {errors.IDV && touched.IDV ? (
                                             <span className="errorMsg">{errors.IDV}</span>
@@ -1823,11 +1824,10 @@ console.log("values------------> ", values)
                                     <FormGroup>
                                     <input type="range" className="W-90" 
                                     name= 'slider'
-                                    defaultValue= {defaultSliderValue}
                                     min= {minIDV}
                                     max= {maxIDV}
                                     step= '1'
-                                    value={values.slider}
+                                    value={defaultSliderValue}
                                     onChange= {(e) =>{
                                     setFieldTouched("slider");
                                     setFieldValue("slider",e.target.value);
@@ -1858,7 +1858,7 @@ console.log("values------------> ", values)
                                             className="premiumslid"
                                             onFocus={e => this.changePlaceHoldClassAdd(e)}
                                             onBlur={e => this.changePlaceHoldClassRemove(e)}
-                                            value={bodySliderValue ? bodySliderValue : defaultBodySliderValue}  
+                                            value={defaultBodySliderValue}  
                                         />
                                         {errors.body_idv_value && touched.body_idv_value ? (
                                             <span className="errorMsg">{errors.body_idv_value}</span>
@@ -1872,11 +1872,10 @@ console.log("values------------> ", values)
                                     <FormGroup>
                                     <input type="range" className="W-90" 
                                     name= 'slider1'
-                                    defaultValue= {defaultBodySliderValue}
                                     min= {minBodyIDV}
                                     max= {maxBodyIDV}
                                     step= '1'
-                                    value={values.slider1}
+                                    value={defaultBodySliderValue}
                                     onChange= {(e) =>{
                                     setFieldTouched("slider1");
                                     setFieldValue("slider1",values.slider1);
