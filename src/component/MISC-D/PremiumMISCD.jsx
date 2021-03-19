@@ -235,8 +235,7 @@ class PremiumMISCD extends Component {
 
                 if(previousPolicy && policyHolder.break_in_status != "Vehicle Recommended and Reports Uploaded"){
                     let dateDiff = Math.floor(moment().diff(previousPolicy.end_date, 'days', true));
-                    if(dateDiff > 0 || previousPolicy.name == "2") {
-                        this.setState({breakin_flag: 1})
+                    if(dateDiff > 0 || previousPolicy.name == "2") {                     
                             const formData1 = new FormData();
                             let policyHolder_id = this.state.policyHolder_refNo ? this.state.policyHolder_refNo : '0'
                             formData1.append('policy_ref_no',policyHolder_id)
@@ -246,7 +245,8 @@ class PremiumMISCD extends Component {
                                 let break_in_inspection_no = res.data.data.break_in_inspection_no
                                 let break_in_status = res.data.data.break_in_status
                                 if( break_in_checking == true){
-                                    if( break_in_inspection_no == "" && (break_in_status == null || break_in_status == "0")) {
+                                    this.setState({breakin_flag: 1})
+                                    if( break_in_inspection_no == "" && (break_in_status == null || break_in_status == "0")) {        
                                         swal({
                                             title: "Breakin",
                                             text: `Your Quotation number is ${request_data.quote_id}. Your vehicle needs inspection. Do you want to raise inspection.`,
