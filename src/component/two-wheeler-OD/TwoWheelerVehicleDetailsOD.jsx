@@ -28,8 +28,8 @@ import {
 const ageObj = new PersonAge();
 let encryption = new Encryption();
 let maxRegnDate=  moment(moment().subtract(1, 'years').calendar()).add(3, 'months').calendar() 
-const activeMinDate =  moment(moment().subtract(5, 'years').calendar()).add(1, 'day').calendar();
-const minRegnDate = moment(moment().subtract(5, 'years').calendar()).add(1, 'day').calendar();
+const activeMinDate =  moment(moment().subtract(1, 'years').calendar()).add(1, 'day').calendar();
+const minRegnDate = moment(moment().subtract(1, 'years').calendar()).add(1, 'day').calendar();
 const minDate =  moment(moment().subtract(1, 'years').calendar()).add(1, 'day').calendar();
 const maxDate = moment()
 
@@ -784,7 +784,7 @@ class TwoWheelerVehicleDetailsOD extends Component {
                                                         ) : null}
                                                     </FormGroup>
                                                 </Col>
-                                                <Col sm={12} md={11} lg={3}>
+                                                {/* <Col sm={12} md={11} lg={3}>
                                                     <FormGroup>
                                                         <div className="formSection">
                                                             <Field
@@ -806,7 +806,7 @@ class TwoWheelerVehicleDetailsOD extends Component {
                                                             ) : null}
                                                         </div>
                                                     </FormGroup>
-                                                </Col>
+                                                </Col> */}
                                             </Row>
 
                                             <Row>
@@ -830,27 +830,6 @@ class TwoWheelerVehicleDetailsOD extends Component {
                                                     </div>
                                                 </FormGroup>
                                                 </Col>
-
-                                                <Col sm={12} md={5} lg={5}>
-                                                    <FormGroup>
-                                                        <div className="insurerName">
-                                                            <Field
-                                                                name="active_policy_address"
-                                                                type="text"
-                                                                placeholder={phrases['AInsurerAddress']}
-                                                                autoComplete="off"
-                                                                onFocus={e => this.changePlaceHoldClassAdd(e)}
-                                                                onBlur={e => this.changePlaceHoldClassRemove(e)}
-                                                                
-                                                            />
-                                                            {errors.active_policy_address && touched.active_policy_address ? (
-                                                                <span className="errorMsg">{phrases[errors.active_policy_address]}</span>
-                                                            ) : null}
-                                                        </div>
-                                                    </FormGroup>
-                                                </Col>
-                                            </Row>        
-                                            <Row>
                                                 <Col sm={12} md={5} lg={5}>
                                                     <FormGroup>
                                                         <div className="insurerName">
@@ -870,7 +849,27 @@ class TwoWheelerVehicleDetailsOD extends Component {
                                                         </div>
                                                     </FormGroup>
                                                 </Col>
-                                            </Row>   
+
+                                                {/* <Col sm={12} md={5} lg={5}>
+                                                    <FormGroup>
+                                                        <div className="insurerName">
+                                                            <Field
+                                                                name="active_policy_address"
+                                                                type="text"
+                                                                placeholder={phrases['AInsurerAddress']}
+                                                                autoComplete="off"
+                                                                onFocus={e => this.changePlaceHoldClassAdd(e)}
+                                                                onBlur={e => this.changePlaceHoldClassRemove(e)}
+                                                                
+                                                            />
+                                                            {errors.active_policy_address && touched.active_policy_address ? (
+                                                                <span className="errorMsg">{phrases[errors.active_policy_address]}</span>
+                                                            ) : null}
+                                                        </div>
+                                                    </FormGroup>
+                                                </Col> */}
+                                            </Row>        
+                                            
                                             <Row>&nbsp;</Row>   
 
                                             <Row>
@@ -932,7 +931,7 @@ class TwoWheelerVehicleDetailsOD extends Component {
                                                         ) : null}
                                                     </FormGroup>
                                                 </Col>
-                                                <Col sm={12} md={11} lg={3}>
+                                                {/* <Col sm={12} md={11} lg={3}>
                                                     <FormGroup>
                                                         <div className="formSection">
                                                             <Field
@@ -954,7 +953,7 @@ class TwoWheelerVehicleDetailsOD extends Component {
                                                             ) : null}
                                                         </div>
                                                     </FormGroup>
-                                                </Col>
+                                                </Col> */}
                                             </Row>
 
                                             <Row>

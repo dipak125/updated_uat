@@ -1249,14 +1249,14 @@ class TwoWheelerOtherComprehensiveOD extends Component {
                                                                     </FormGroup>
                                                                 </Col> : null }
                                                             </Row>
-
+                                                            {moreCoverage && moreCoverage.length > 0 ? 
                                                             <Row>
                                                                 <Col sm={12} md={12} lg={12}>
                                                                     <FormGroup>
                                                                         <span className="fs-18"> {phrases['AddMoreCoverage']}</span>
                                                                     </FormGroup>
                                                                 </Col>
-                                                            </Row> 
+                                                            </Row> : null }
 
                                                             {motorInsurance && motorInsurance.policy_for == '1' && moreCoverage.map((coverage, qIndex) => (
                                                             <Row key={qIndex}>   

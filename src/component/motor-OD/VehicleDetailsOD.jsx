@@ -29,8 +29,8 @@ const ageObj = new PersonAge();
 //const minRegnDate = moment(startRegnDate).startOf('year').format('YYYY-MM-DD hh:mm');
 
 let maxRegnDate=  moment(moment().subtract(1, 'years').calendar()).add(3, 'months').calendar() 
-const activeMinDate =  moment(moment().subtract(3, 'years').calendar()).add(1, 'day').calendar();
-const minRegnDate = moment(moment().subtract(3, 'years').calendar()).add(1, 'day').calendar();
+const activeMinDate =  moment(moment().subtract(1, 'years').calendar()).add(1, 'day').calendar();
+const minRegnDate = moment(moment().subtract(1, 'years').calendar()).add(1, 'day').calendar();
 const minDate =  moment(moment().subtract(1, 'years').calendar()).add(1, 'day').calendar();
 const maxDate = moment()
 
@@ -369,25 +369,25 @@ const vehicleRegistrationValidation = Yup.object().shape({
             return true;
         }
     ),
-    active_policy_address:Yup.string()
-    .notRequired('Previous city is required')
-    .test(
-        "currentMonthChecking",
-        function() {
-            return "PleaseEAICC"
-        },
-        function (value) {
-            const ageObj = new PersonAge();
-            if (ageObj.whatIsCurrentMonth(this.parent.registration_date) > 0 && !value) {   
-                return false;    
-            }
-            return true;
-        }
-    )
-    .matches(/^[a-zA-Z0-9][a-zA-Z0-9-/.,\s]*$/, 
-        function() {
-            return "PleaseValidAddress"
-        }),
+    // active_policy_address:Yup.string()
+    // .notRequired('Previous city is required')
+    // .test(
+    //     "currentMonthChecking",
+    //     function() {
+    //         return "PleaseEAICC"
+    //     },
+    //     function (value) {
+    //         const ageObj = new PersonAge();
+    //         if (ageObj.whatIsCurrentMonth(this.parent.registration_date) > 0 && !value) {   
+    //             return false;    
+    //         }
+    //         return true;
+    //     }
+    // )
+    // .matches(/^[a-zA-Z0-9][a-zA-Z0-9-/.,\s]*$/, 
+    //     function() {
+    //         return "PleaseValidAddress"
+    //     }),
 
     active_policy_no:Yup.string()
     .notRequired('Previous policy number is required')
@@ -900,7 +900,7 @@ console.log("errors----------------- ", errors)
                                                             ) : null}
                                                         </FormGroup>
                                                     </Col>
-                                                    <Col sm={12} md={11} lg={3}>
+                                                    {/* <Col sm={12} md={11} lg={3}>
                                                         <FormGroup>
                                                             <div className="formSection">
                                                                 <Field
@@ -922,7 +922,7 @@ console.log("errors----------------- ", errors)
                                                                 ) : null}
                                                             </div>
                                                         </FormGroup>
-                                                    </Col>
+                                                    </Col> */}
                                                 </Row>
 
                                                 <Row>
@@ -946,27 +946,6 @@ console.log("errors----------------- ", errors)
                                                         </div>
                                                     </FormGroup>
                                                     </Col>
-
-                                                    <Col sm={12} md={5} lg={5}>
-                                                        <FormGroup>
-                                                            <div className="insurerName">
-                                                                <Field
-                                                                    name="active_policy_address"
-                                                                    type="text"
-                                                                    placeholder={phrases['AInsurerAddress']}
-                                                                    autoComplete="off"
-                                                                    onFocus={e => this.changePlaceHoldClassAdd(e)}
-                                                                    onBlur={e => this.changePlaceHoldClassRemove(e)}
-                                                                    
-                                                                />
-                                                                {errors.active_policy_address && touched.active_policy_address ? (
-                                                                    <span className="errorMsg">{phrases[errors.active_policy_address]}</span>
-                                                                ) : null}
-                                                            </div>
-                                                        </FormGroup>
-                                                    </Col>
-                                                </Row>        
-                                                <Row>
                                                     <Col sm={12} md={5} lg={5}>
                                                         <FormGroup>
                                                             <div className="insurerName">
@@ -986,7 +965,26 @@ console.log("errors----------------- ", errors)
                                                             </div>
                                                         </FormGroup>
                                                     </Col>
-                                                </Row>   
+
+                                                    {/* <Col sm={12} md={5} lg={5}>
+                                                        <FormGroup>
+                                                            <div className="insurerName">
+                                                                <Field
+                                                                    name="active_policy_address"
+                                                                    type="text"
+                                                                    placeholder={phrases['AInsurerAddress']}
+                                                                    autoComplete="off"
+                                                                    onFocus={e => this.changePlaceHoldClassAdd(e)}
+                                                                    onBlur={e => this.changePlaceHoldClassRemove(e)}
+                                                                    
+                                                                />
+                                                                {errors.active_policy_address && touched.active_policy_address ? (
+                                                                    <span className="errorMsg">{phrases[errors.active_policy_address]}</span>
+                                                                ) : null}
+                                                            </div>
+                                                        </FormGroup>
+                                                    </Col> */}
+                                                </Row>                                      
                                                 <Row>&nbsp;</Row>   
 
                                                 <Row>
@@ -1048,7 +1046,7 @@ console.log("errors----------------- ", errors)
                                                             ) : null}
                                                         </FormGroup>
                                                     </Col>
-                                                    <Col sm={12} md={11} lg={3}>
+                                                    {/* <Col sm={12} md={11} lg={3}>
                                                         <FormGroup>
                                                             <div className="formSection">
                                                                 <Field
@@ -1070,7 +1068,7 @@ console.log("errors----------------- ", errors)
                                                                 ) : null}
                                                             </div>
                                                         </FormGroup>
-                                                    </Col>
+                                                    </Col> */}
                                                 </Row>
 
                                                 <Row>
