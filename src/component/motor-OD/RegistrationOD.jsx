@@ -12,7 +12,7 @@ import swal from 'sweetalert';
 import Encryption from '../../shared/payload-encryption';
 import { Formik, Form, Field, ErrorMessage } from 'formik';
 import { setData } from "../../store/actions/data";
-import { validRegistrationNumber } from "../../shared/validationFunctions";
+import { validRegistrationNumberOD } from "../../shared/validationFunctions";
 // let phrases = localStorage.getItem("phrases") ? JSON.parse(localStorage.getItem("phrases")) : null
 
 // const { t, i18n } = useTranslation();
@@ -20,34 +20,21 @@ import { validRegistrationNumber } from "../../shared/validationFunctions";
 
 const initialValues = {
     regNumber: '',
-    check_registration: 2
+    check_registration: '2'
 }
 
 const vehicleRegistrationValidation = Yup.object().shape({
 
-    check_registration: Yup.string().notRequired(),
 
-    regNumber: Yup.string()
+    regNumber: Yup.string().required("RegistrationNumber")
         .test(
-            "registrationNumberCheck",
-            function () {
-                return "RegistrationNumber"
-            },
-            function (value) {
-                // console.log('YUP', value)
-                if ((value == "" || value == undefined) && this.parent.check_registration == 2) {
-                    return false;
-                }
-                return true;
-            }
-        ).test(
             "last4digitcheck",
             function () {
                 return "InvalidRegistrationNumber"
             },
             function (value) {
-                if (value && this.parent.check_registration == 2 && (value != "" || value != undefined)) {
-                    return validRegistrationNumber(value);
+                if (value && (value != "" || value != undefined)) {
+                    return validRegistrationNumberOD(value);
                 }
                 return true;
             }
@@ -109,32 +96,27 @@ class RegistrationOD extends Component {
 
     fetchFastlane = (values) => {
         const formData = new FormData();
-        if (values.check_registration == '2') {
-            formData.append('registration_no', values.regNumber)
-            formData.append('menumaster_id', '1')
-            this.props.loadingStart();
-            axios.post('fastlane', formData).then(res => {
+        formData.append('registration_no', values.regNumber)
+        formData.append('menumaster_id', '1')
+        this.props.loadingStart();
+        axios.post('fastlane', formData).then(res => {
 
-                if (res.data.error == false) {
-                    this.props.loadingStop();
-                    this.setState({ fastLaneData: res.data.data, brandView: '0' })
-                    let fastLaneData = { 'fastLaneData': res.data.data }
-                    this.props.setData(fastLaneData)
-                }
-                else {
-                    this.props.loadingStop();
-                    this.props.setData([])
-                    this.setState({ fastLaneData: [], brandView: '1', vehicleDetails: [] })
-                }
-                this.handleSubmit(values, res.data.data)
-            })
-                .catch(err => {
-                    this.props.loadingStop();
-                })
-        } else {
-            this.props.setData([])
-            this.handleSubmit(values, [])
-        }
+            if (res.data.error == false) {
+                this.props.loadingStop();
+                this.setState({ fastLaneData: res.data.data, brandView: '0' })
+                let fastLaneData = { 'fastLaneData': res.data.data }
+                this.props.setData(fastLaneData)
+            }
+            else {
+                this.props.loadingStop();
+                this.props.setData([])
+                this.setState({ fastLaneData: [], brandView: '1', vehicleDetails: [] })
+            }
+            this.handleSubmit(values, res.data.data)
+        })
+        .catch(err => {
+            this.props.loadingStop();
+        })
 
     }
 
@@ -360,8 +342,6 @@ class RegistrationOD extends Component {
                                                                         maxLength={this.state.length}
                                                                         onInput={e => {
                                                                             this.regnoFormat(e, setFieldTouched, setFieldValue)
-                                                                            setFieldTouched('check_registration')
-                                                                            setFieldValue('check_registration', '2');
                                                                         }}
 
                                                                     />
@@ -369,47 +349,7 @@ class RegistrationOD extends Component {
                                                                         <span className="errorMsg">{phrases[errors.regNumber]}</span>
                                                                     ) : null}
                                                                 </div>
-                                                            </div>
-                                                            <div className="row formSection">
-                                                                <label className="customCheckBox formGrp formGrp">
-                                                                    {phrases['WithoutNo']}
-                                                                    <Field
-                                                                        type="checkbox"
-                                                                        name="check_registration"
-                                                                        value="1"
-                                                                        className="user-self"
-                                                                        onChange={(e) => {
-                                                                            if (e.target.checked === true) {
-                                                                                setFieldTouched('regNumber')
-                                                                                setFieldValue('regNumber', 'NEW');
-                                                                                setFieldTouched('check_registration')
-                                                                                setFieldValue('check_registration', e.target.value);
-
-                                                                            } else {
-                                                                                setFieldValue('check_registration', '2');
-                                                                                setFieldValue('regNumber', '');
-                                                                            }
-                                                                            if (this.setValueData()) {
-                                                                                this.setState({
-                                                                                    check_registration: 1
-                                                                                })
-                                                                            }
-                                                                            else {
-                                                                                this.setState({
-                                                                                    check_registration: 2
-                                                                                })
-                                                                            }
-                                                                        }}
-                                                                        checked={values.check_registration == '1' ? true : false}
-                                                                    />
-                                                                    <span className="checkmark mL-0"></span>
-                                                                </label>
-                                                                {/* {console.log('phrases[errors.check_registration]----',errors.check_registration)} */}
-                                                                {errors.check_registration ?
-                                                                    <span className="error-message">{errors.check_registration}</span> : ""
-                                                                }
-                                                                
-                                                            </div>
+                                                            </div> 
                                                             <div className="cntrbtn">
                                                                 <Button className={`btnPrimary`} type="submit" >
                                                                     {phrases['Go']}

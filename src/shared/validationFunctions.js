@@ -220,6 +220,23 @@ export const validRegistrationNumber = (value) => {
      return true;
 }
 
+export const validRegistrationNumberOD = (value) => {
+    var str = /^[A-Z]{2}(?:[A-Z])?(?:[0-9]{1,2})?(?:[ABCDEFGHJKLMNPQRSTUVWXYZ])?(?:[ABCDEFGHJKLMNPQRSTUVWXYZ]{2})?[0-9]{4}$/;
+    
+    if ( value && (value != '' || value != undefined) ) {  
+        if(value.match(str)) {    
+            let regnoLength = value && value !="" && value.length > 4 ? value.length : 0
+            let subString = regnoLength > 4 ? value.substring(regnoLength-4, regnoLength) : 0
+            if (subString <= 0) {
+                return false;
+            }         
+            else return true;  
+        }
+        else return false;
+    }
+     return false;
+}
+
 export const validSGTINcheck = (value) => {
     var str = /^[0-9]{2}[A-Z]{3}[A,B,C,F,G,H,L,J,P,T]{1}[A-Z]{1}[0-9]{4}[A-Z]{1}[0-9]{1}[Z]{1}[A-Z0-9]{1}$/;
     

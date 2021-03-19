@@ -16,6 +16,9 @@ import axios from "../../shared/axios"
 import Encryption from '../../shared/payload-encryption';
 import * as Yup from "yup";
 import swal from 'sweetalert';
+import {
+    compareStartEndYear
+  } from "../../shared/validationFunctions";
 import {  validRegistrationNumber } from "../../shared/validationFunctions";
 
 let encryption = new Encryption()
@@ -65,6 +68,54 @@ const ComprehensiveValidation = Yup.object().shape({
             }
         ),
     }),
+    B00003_value: Yup.string().when(['nonElectric_flag'], {
+        is: nonElectric_flag => nonElectric_flag == '1',
+        then: Yup.string().required('pleaseProvideNonElecIDV').matches(/^[0-9]*$/, 'PleaseProvideValidIDV')
+        .test(
+            "maxMinIDVCheck",
+            function() {
+                return "IDVShouldBe1000To1000000"
+            },
+            function (value) {
+                if (parseInt(value) < 1000 || value > 1000000) {   
+                    return false;    
+                }
+                return true;
+            }
+        ),
+        otherwise: Yup.string()
+    }),
+
+    B00003_description: Yup.string().when(['nonElectric_flag'], {
+        is: nonElectric_flag => nonElectric_flag == '1',
+        then: Yup.string().required('pleaseProvideAccessory').matches(/^[a-zA-Z0-9]*$/, 'PleaseValidDescription'),
+        otherwise: Yup.string()
+    }),
+    
+    B00004_value: Yup.string().when(['electric_flag'], {
+        is: electric_flag => electric_flag == '1',
+        then: Yup.string().required('pleaseProvideElecIDV').matches(/^[0-9]*$/, 'PleaseProvideValidIDV')
+        .test(
+            "maxMinIDVCheck",
+            function() {
+                return "IDVShouldBe1000To1000000"
+            },
+            function (value) {
+                if (parseInt(value) < 1000 || value > 1000000) {   
+                    return false;    
+                }
+                return true;
+            }
+        ),
+        otherwise: Yup.string()
+    }),
+
+    B00004_description: Yup.string().when(['electric_flag'], {
+        is: electric_flag => electric_flag == '1',
+        then: Yup.string().required('pleaseProvideAccessory').matches(/^[a-zA-Z0-9]*$/, 'PleaseValidDescription'),
+        otherwise: Yup.string()
+    }),
+
     B00005_value: Yup.string().when(['CNG_OD_flag'], {
         is: CNG_OD_flag => CNG_OD_flag == '1',
         then: Yup.string().required('PleaseProvideIDV').test(
@@ -135,29 +186,43 @@ const ComprehensiveValidation = Yup.object().shape({
 
     tyre_rim_array: Yup.array().of(
         Yup.object().shape({
-            tyreMfgYr : Yup.string().when(['tyre_cover_flag'], {
-                is: tyre_cover_flag => tyre_cover_flag == '1',
+            tyreMfgYr : Yup.string().when(['policy_for'], {
+                is: policy_for => [policy_for == '1', policy_for == '2'],
                 then: Yup.string().required('MFG year required')
-                    .min(4, function() {
-                        return "Invalid year"
-                    })
-                    .max(4, function() {
-                        return "Invalid year"
-                    }),
+                    .test(
+                        "checkGreaterTimes",
+                        "Mfg date must be greater than registration date",
+                        function (value) {
+                            if (value) { 
+                                return compareStartEndYear(new Date(this.parent.vehicleRegDate), value);
+                            }
+                            return true;
+                        }
+                    )
+                    .test(
+                        "checkGreaterTimes",
+                        "Mfg date must be less than today",
+                        function (value) {
+                            if (value) {
+                                return compareStartEndYear(value, new Date());
+                            }
+                            return true;
+                        }
+                    ),
                 otherwise: Yup.string()
             }),
 
-            tyreSerialNo : Yup.string().when(['tyre_cover_flag'], {
-                is: tyre_cover_flag => tyre_cover_flag == '1',
+            tyreSerialNo : Yup.string().when(['policy_for'], {
+                is: policy_for => [policy_for == '1', policy_for == '2'],
                 then: Yup.string().required('Serial No Required')
                     .matches(/^[a-zA-Z0-9]*$/, function() {
                         return "Invalid Serial No"
                     }),
                 otherwise: Yup.string()
-            }),
-        })
-    ),
-
+            })
+           
+        }),
+    )
 });
 
 
@@ -274,6 +339,7 @@ class TwoWheelerOtherComprehensiveOD extends Component {
                 let request_data = decryptResp.data.policyHolder ? decryptResp.data.policyHolder.request_data : {};
                 let vehicleDetails = decryptResp.data.policyHolder ? decryptResp.data.policyHolder.vehiclebrandmodel : {};
                 let step_completed = decryptResp.data.policyHolder ? decryptResp.data.policyHolder.step_no : "";
+                let vehicleRegDate = motorInsurance &&  motorInsurance.registration_date != null ? motorInsurance.registration_date : ''
                 let tyre_rim_array = motorInsurance.tyre_rim_array && motorInsurance.tyre_rim_array!=null ? motorInsurance.tyre_rim_array : null
                 tyre_rim_array = tyre_rim_array!=null ? JSON.parse(tyre_rim_array) : []
 
@@ -295,7 +361,7 @@ class TwoWheelerOtherComprehensiveOD extends Component {
                 
                 this.setState({
                     motorInsurance,vehicleDetails,step_completed,tyre_rim_array, request_data,
-                    add_more_coverage: add_more_coverage, add_more_coverage_request_array,
+                    add_more_coverage: add_more_coverage, add_more_coverage_request_array,vehicleRegDate,
                     selectFlag: motorInsurance && motorInsurance.policy_for == '2' ? [] : (motorInsurance.add_more_coverage != null ? '0' : '1') ,
                     vahanVerify: motorInsurance.chasis_no && motorInsurance.engine_no ? true : false,
                     
@@ -482,7 +548,8 @@ class TwoWheelerOtherComprehensiveOD extends Component {
     
                         let totOD = {}
                         totOD.PolicyBenefitList = [{
-                            BeforeVatPremium : Math.round(policyCoverage[0]['PolicyBenefitList'][0]['BeforeVatPremium']) - Math.round(ncbDiscount),
+                            BeforeVatPremium : res.data.PolicyObject.PolicyLobList ? res.data.PolicyObject.PolicyLobList[0].PolicyRiskList[0].OD_NCBAmount : 0,
+                            // BeforeVatPremium : Math.round(policyCoverage[0]['PolicyBenefitList'][0]['BeforeVatPremium']) - Math.round(ncbDiscount),
                             ProductElementCode : 'TOTALOD'
                         }]
     
@@ -579,7 +646,7 @@ class TwoWheelerOtherComprehensiveOD extends Component {
             'pa_cover': values.PA_flag ? values.PA_Cover : "0",
             'pa_flag' : values.PA_cover_flag,
             'page_name': `two_wheeler_OtherComprehensiveOD/${productId}`,
-            'tyre_rim_array' : values.tyre_rim_array,
+            'tyre_rim_array' : values.tyre_rim_array && values.tyre_rim_array.length > 0 ? values.tyre_rim_array : null ,
             'coverage_data': JSON.stringify(coverage_data),
         }
         if(values.B00004_value){
@@ -626,12 +693,15 @@ class TwoWheelerOtherComprehensiveOD extends Component {
             add_more_coverage.push(value);
             if(value == 'C101110') {
                 var array_length = 2
-                 if(values.tyre_rim_array.length < array_length) {
+                var newTyreMfgYr = new Date(this.state.vehicleRegDate)
+                 if(values.tyre_rim_array && values.tyre_rim_array.length < array_length) {
                     for(var i = values.tyre_rim_array.length ; i < array_length ; i++) {
                         values.tyre_rim_array.push(
                                 {
                                     tyreSerialNo : "",
-                                    tyreMfgYr : ""
+                                    tyreMfgYr : newTyreMfgYr.getFullYear(),
+                                    vehicleRegDate: this.state.vehicleRegDate,
+                                    policy_for: this.state.policy_for
                             } )
                     }
                 }
@@ -717,15 +787,20 @@ class TwoWheelerOtherComprehensiveOD extends Component {
 
     initClaimDetailsList = () => {
         let innicialClaimList = []
-        const {tyre_rim_array} = this.state
+        const {tyre_rim_array,vehicleRegDate, policy_for} = this.state
+        if(tyre_rim_array && tyre_rim_array.length > 0) {
             for (var i = 0; i < this.state.no_of_claim ; i++) {
                 innicialClaimList.push(
                     {
                         tyreSerialNo :  tyre_rim_array && tyre_rim_array[i] && tyre_rim_array[i].tyreSerialNo ? tyre_rim_array[i].tyreSerialNo : "",
-                        tyreMfgYr :  tyre_rim_array && tyre_rim_array[i] && tyre_rim_array[i].tyreMfgYr ? tyre_rim_array[i].tyreMfgYr : ""
+                        tyreMfgYr :  tyre_rim_array && tyre_rim_array[i] && tyre_rim_array[i].tyreMfgYr ? tyre_rim_array[i].tyreMfgYr : "",
+                        vehicleRegDate : vehicleRegDate ,
+                        policy_for : policy_for
                     }
                 )
             }   
+        }
+            
 
     return innicialClaimList
     
@@ -739,8 +814,8 @@ class TwoWheelerOtherComprehensiveOD extends Component {
             field_array.push(
                 <Col sm={12} md={12} lg={12}>
                     <Row >
-                        <Col sm={1} md={1} lg={1}><span className="indexing"> {i+1} </span></Col>
-                        <Col sm={12} md={5} lg={4}>
+                        <Col sm={1} md={1} lg={2}><span className="indexing"> Tyre{i+1} </span></Col>
+                        <Col sm={12} md={5} lg={3}>
                             <FormGroup>
                                 <div className="formSection">
                                 <Field
@@ -1378,70 +1453,202 @@ class TwoWheelerOtherComprehensiveOD extends Component {
                                                             </Row>
                                                             ))}
 
-                                                            {motorInsurance && motorInsurance.policy_for == '2' && moreCoverage.map((coverage, qIndex) => (                                                            
+                                                            {motorInsurance && motorInsurance.policy_for == '2' && moreCoverage.map((coverage, qIndex) => (                                                             
                                                             <Row key={qIndex}>   
                                                             {/* {coverage.code == "C101072" || coverage.code == "C101108" || coverage.code == "C101110" ? */}
                                                             {coverage.code != "B00015" ?
-                                                                <Col sm={12} md={11} lg={6} key={qIndex+"a"} >
-                                                                    <label className="customCheckBox formGrp formGrp">{coverage.name}
-                                                                        <OverlayTrigger overlay={<Tooltip id="tooltip-disabled">{coverage.description}</Tooltip>}>
-                                                                            <a className="infoIcon"><img src={require('../../assets/images/i.svg')} alt="" className="premtool" /></a>
-                                                                        </OverlayTrigger>
-                                                                        <Field
-                                                                            type="checkbox"
-                                                                            // name={`moreCov_${qIndex}`}
-                                                                            name={coverage.code}
-                                                                            value={coverage.code}
-                                                                            className="user-self"
-                                                                            // checked={values.roadsideAssistance ? true : false}
-                                                                            onClick={(e) =>{
-                                                                                if( e.target.checked == false && values[coverage.code] == 'B00015') {
-                                                                                    swal(phrases.SwalIRDAI)
-                                                                                }
-                                                                                this.onRowSelect(e.target.value, e.target.checked, setFieldTouched, setFieldValue,values)         
+                                                            <Col sm={12} md={11} lg={6} key={qIndex+"a"} >
+                                                                <label className="customCheckBox formGrp formGrp">{coverage.name}
+                                                                    <OverlayTrigger overlay={<Tooltip id="tooltip-disabled">{coverage.description}</Tooltip>}>
+                                                                        <a className="infoIcon"><img src={require('../../assets/images/i.svg')} alt="" className="premtool" /></a>
+                                                                    </OverlayTrigger>
+                                                                    <Field
+                                                                        type="checkbox"
+                                                                        // name={`moreCov_${qIndex}`}
+                                                                        name={coverage.code}
+                                                                        value={coverage.code}
+                                                                        className="user-self"
+                                                                        // checked={values.roadsideAssistance ? true : false}
+                                                                        onClick={(e) =>{
+                                                                            if( e.target.checked == false && values[coverage.code] == 'B00015') {
+                                                                                swal(phrases.SwalIRDAI)
                                                                             }
-                                                                            }
-                                                                            checked = {values[coverage.code] == coverage.code ? true : false}
-                                                                        />
-                                                                        <span className="checkmark mL-0"></span>
-                                                                        <span className="error-message"></span>
-                                                                    </label>
-                                                                </Col> : null }
-                                                        
-                                                                {values.tyre_cover_flag == '0' ? values.tyre_rim_array = [] : null }
-                                                                {values.tyre_cover_flag == '1' && values[coverage.code] == 'C101110' ?
-                                                                    this.handleClaims(values, errors, touched, setFieldTouched, setFieldValue) : null
-                                                                }
-                                                                {values.PA_flag == '1' && values[coverage.code] == 'B00075' ?
-                                                                    <Col sm={12} md={11} lg={3} key={qIndex+"b"}>
+                                                                            this.onRowSelect(e.target.value, e.target.checked, setFieldTouched, setFieldValue,values)         
+                                                                        }
+                                                                        }
+                                                                        checked = {values[coverage.code] == coverage.code ? true : false}
+                                                                    />
+                                                                    <span className="checkmark mL-0"></span>
+                                                                    <span className="error-message"></span>
+                                                                </label>
+                                                            </Col> : null }
+                                                            {values.PA_flag == '1' && values[coverage.code] == 'B00075' ?
+                                                                <Col sm={12} md={11} lg={3} key={qIndex+"b"}>
+                                                                    <FormGroup>
+                                                                        <div className="formSection">
+                                                                            <Field
+                                                                                name='PA_Cover'
+                                                                                component="select"
+                                                                                autoComplete="off"
+                                                                                className="formGrp inputfs12"
+                                                                                value = {values.PA_Cover}
+                                                                                onChange={(e) => {
+                                                                                    setFieldTouched('PA_Cover')
+                                                                                    setFieldValue('PA_Cover', e.target.value);
+                                                                                    this.handleChange()
+                                                                                }}
+                                                                            >
+                                                                                <option value="">{phrases['SSI']}</option>
+                                                                                <option value="50000">50000</option>
+                                                                                <option value="100000">100000</option>  
+                                                                    
+                                                                            </Field>
+                                                                            {errors.PA_Cover ? (
+                                                                                <span className="errorMsg">{phrases[errors.PA_Cover]}</span>
+                                                                            ) : null}
+                                                                        </div>
+                                                                    </FormGroup>
+                                                                </Col> : null
+                                                            }
+                                                            {values.nonElectric_flag == '1' && values[coverage.code] == 'B00003' ?
+                                                                <Fragment>
+                                                                    <Col sm={12} md={11} lg={2} key={qIndex+"b"}>
                                                                         <FormGroup>
                                                                             <div className="formSection">
                                                                                 <Field
-                                                                                    name='PA_Cover'
-                                                                                    component="select"
+                                                                                    name="B00003_value"
+                                                                                    type="text"
+                                                                                    placeholder={phrases['ValueOfAccessory']}
                                                                                     autoComplete="off"
-                                                                                    className="formGrp inputfs12"
-                                                                                    value = {values.PA_Cover}
+                                                                                    maxLength="8"
+                                                                                    onFocus={e => this.changePlaceHoldClassAdd(e)}
+                                                                                    onBlur={e => this.changePlaceHoldClassRemove(e)}
                                                                                     onChange={(e) => {
-                                                                                        setFieldTouched('PA_Cover')
-                                                                                        setFieldValue('PA_Cover', e.target.value);
+                                                                                        setFieldTouched('B00003_value')
+                                                                                        setFieldValue('B00003_value', e.target.value);
                                                                                         this.handleChange()
                                                                                     }}
-                                                                                >
-                                                                                    <option value="">{phrases['SSI']}</option>
-                                                                                    <option value="50000">50000</option>
-                                                                                    <option value="100000">100000</option>  
-                                                                        
+                                                                                >                                     
                                                                                 </Field>
-                                                                                {errors.PA_Cover ? (
-                                                                                    <span className="errorMsg">{phrases[errors.PA_Cover]}</span>
+                                                                                {errors.B00003_value ? (
+                                                                                    <span className="errorMsg">{phrases[errors.B00003_value]}</span>
                                                                                 ) : null}
                                                                             </div>
                                                                         </FormGroup>
-                                                                    </Col> : null
-                                                                }
-                                                            </Row>
-                                                            ))}
+                                                                    </Col>
+                                                                    <Col sm={12} md={11} lg={3} key={qIndex+"c"}>
+                                                                        <FormGroup>
+                                                                            <div className="formSection">
+                                                                                <Field
+                                                                                    name="B00003_description"
+                                                                                    type="text"
+                                                                                    placeholder={phrases['AccessoryDescription']}
+                                                                                    autoComplete="off"
+                                                                                    // maxLength="28"
+                                                                                    onFocus={e => this.changePlaceHoldClassAdd(e)}
+                                                                                    onBlur={e => this.changePlaceHoldClassRemove(e)}
+                                                                                    onChange={(e) => {
+                                                                                        setFieldTouched('B00003_description')
+                                                                                        setFieldValue('B00003_description', e.target.value);
+                                                                                        this.handleChange()
+                                                                                    }}
+                                                                                >                                     
+                                                                                </Field>
+                                                                                {errors.B00003_description ? (
+                                                                                    <span className="errorMsg">{phrases[errors.B00003_description]}</span>
+                                                                                ) : null}
+                                                                            </div>
+                                                                        </FormGroup>
+                                                                    </Col> </Fragment> : null
+                                                            }
+                                                            {values.electric_flag == '1' && values[coverage.code] == 'B00004' ?
+                                                                <Fragment>
+                                                                <Col sm={12} md={11} lg={2} key={qIndex+"b"}>
+                                                                    <FormGroup>
+                                                                        <div className="formSection">
+                                                                            <Field
+                                                                                name="B00004_value"
+                                                                                type="text"
+                                                                                placeholder={phrases['ValueOfAccessory']}
+                                                                                autoComplete="off"
+                                                                                maxLength="7"
+                                                                                onFocus={e => this.changePlaceHoldClassAdd(e)}
+                                                                                onBlur={e => this.changePlaceHoldClassRemove(e)}
+                                                                                onChange={(e) => {
+                                                                                    setFieldTouched('B00004_value')
+                                                                                    setFieldValue('B00004_value', e.target.value);
+                                                                                    this.handleChange()
+                                                                                }}
+                                                                            >                                     
+                                                                            </Field>
+                                                                            {errors.B00004_value ? (
+                                                                                <span className="errorMsg">{phrases[errors.B00004_value]}</span>
+                                                                            ) : null}
+                                                                        </div>
+                                                                    </FormGroup>
+                                                                </Col>
+                                                                <Col sm={12} md={11} lg={3} key={qIndex+"c"}>
+                                                                    <FormGroup>
+                                                                        <div className="formSection">
+                                                                            <Field
+                                                                                name="B00004_description"
+                                                                                type="text"
+                                                                                placeholder={phrases['AccessoryDescription']}
+                                                                                autoComplete="off"
+                                                                                // maxLength="28"
+                                                                                onFocus={e => this.changePlaceHoldClassAdd(e)}
+                                                                                onBlur={e => this.changePlaceHoldClassRemove(e)}
+                                                                                onChange={(e) => {
+                                                                                    setFieldTouched('B00004_description')
+                                                                                    setFieldValue('B00004_description', e.target.value);
+                                                                                    this.handleChange()
+                                                                                }}
+                                                                            >                                     
+                                                                            </Field>
+                                                                            {errors.B00004_description ? (
+                                                                                <span className="errorMsg">{phrases[errors.B00004_description]}</span>
+                                                                            ) : null}
+                                                                        </div>
+                                                                    </FormGroup>
+                                                                </Col> </Fragment> : null
+                                                            }
+                                                            {values.CNG_OD_flag == '1' && values[coverage.code] == 'B00005' ?
+                                                                <Fragment>
+                                                                <Col sm={12} md={11} lg={2} key={qIndex+"b"}>
+                                                                    <FormGroup>
+                                                                        <div className="formSection">
+                                                                            <Field
+                                                                                name="B00005_value"
+                                                                                type="text"
+                                                                                placeholder="Sum insured"
+                                                                                autoComplete="off"
+                                                                                maxLength="7"
+                                                                                onFocus={e => this.changePlaceHoldClassAdd(e)}
+                                                                                onBlur={e => this.changePlaceHoldClassRemove(e)}
+                                                                                onChange={(e) => {
+                                                                                    setFieldTouched('B00005_value')
+                                                                                    setFieldValue('B00005_value', e.target.value);
+                                                                                    this.handleChange()
+                                                                                }}
+                                                                                >                                     
+                                                                            </Field>
+                                                                            {errors.B00005_value ? (
+                                                                                <span className="errorMsg">{phrases[errors.B00005_value]}</span>
+                                                                            ) : null}
+                                                                        </div>
+                                                                    </FormGroup>
+                                                                </Col>
+                                                                </Fragment> : null
+                                                            }
+
+                                                            {values.tyre_cover_flag == '0' ? values.tyre_rim_array = [] : null }
+                                                            {/* {values.tyre_cover_flag == '0' ? values.B00007_value = "" : null } */}
+
+                                                            {values.tyre_cover_flag == '1' && values[coverage.code] == 'C101110' ?
+                                                                this.handleClaims(values, errors, touched, setFieldTouched, setFieldValue) : null
+                                                            }
+                                                        </Row>
+                                                        ))}
 
                                                             <Row>
                                                                 <Col sm={12}>

@@ -406,6 +406,7 @@ class OtherComprehensiveGCV extends Component {
             serverResponse: [],
             fulQuoteResp: [],
             PolicyArray: [],
+            chasis_price: '',
             show: false,
             sliderVal: '',
             motorInsurance: [],
@@ -442,7 +443,11 @@ class OtherComprehensiveGCV extends Component {
             no_of_claim: [],
             trailer_array: [],
             ncbDiscount:0,
-            geographical_extension: []
+            geographical_extension: [],
+	    validation_error: [],
+            vehicle_age: "",
+            depreciationPercentage: "",
+            bodyIdvStatus: 0
         };
     }
 
@@ -754,7 +759,7 @@ class OtherComprehensiveGCV extends Component {
 
 
     fullQuote = (access_token, values) => {
-        const { PolicyArray, sliderVal, add_more_coverage, motorInsurance, bodySliderVal ,vehicleDetails, geographical_extension} = this.state
+        const { PolicyArray, sliderVal, add_more_coverage, motorInsurance, bodySliderVal ,vehicleDetails, geographical_extension, chasis_price} = this.state
         // let cng_kit_flag = 0;
         // let cngKit_Cost = 0;
         // if(values.toString()) {            
@@ -808,7 +813,7 @@ class OtherComprehensiveGCV extends Component {
         const post_data = {
             'ref_no':localStorage.getItem('policyHolder_refNo'),
             'access_token':access_token,
-            'idv_value': sliderVal ? sliderVal : defaultSliderValue.toString(),
+            'idv_value': sliderVal ? sliderVal : 0,
             'policy_type': motorInsurance.policy_type,
             'add_more_coverage': add_more_coverage.toString(),
             'PA_Cover': values.PA_flag ? values.PA_Cover : "0",
@@ -1344,7 +1349,7 @@ class OtherComprehensiveGCV extends Component {
 
 
     render() {
-        const {add_more_coverage, is_CNG_account, vahanDetails,error, policyCoverage, vahanVerify, selectFlag, fulQuoteResp, PolicyArray, fuelList, vehicleDetails, geographical_extension,
+        const {add_more_coverage, is_CNG_account, vahanDetails,error, policyCoverage, vahanVerify, selectFlag, fulQuoteResp, PolicyArray, fuelList, depreciationPercentage, vehicleDetails, geographical_extension,
             moreCoverage, sliderVal, bodySliderVal, motorInsurance, serverResponse, engine_no, chasis_no, initialValue, add_more_coverage_request_array,ncbDiscount} = this.state
         const {productId} = this.props.match.params 
         //let defaultSliderValue = PolicyArray.length > 0 ? Math.round(PolicyArray[0].PolicyRiskList[0].IDV_Suggested) : 0
@@ -1360,9 +1365,10 @@ class OtherComprehensiveGCV extends Component {
             minIDV = minIDV + 1;
             // maxIDV = maxIDV - 1;
         }
+        let maxBodyVal =  PolicyArray.length > 0 ? (PolicyArray[0].PolicyRiskList[0].MSP - (PolicyArray[0].PolicyRiskList[0].MSP * (depreciationPercentage/100))) : 0
         
         let minBodyIDV = 0
-        let maxBodyIDV = PolicyArray.length > 0 ? Math.round(PolicyArray[0].PolicyRiskList[0].IDV_Suggested/5) : 0
+        let maxBodyIDV = PolicyArray.length > 0 ? Math.floor(maxBodyVal/2) : 0
         //let defaultBodySliderValue =  motorInsurance && motorInsurance.body_idv_value ? Math.round(motorInsurance.body_idv_value) : 0
         let defaultBodySliderValue = bodySliderVal
 
@@ -1532,7 +1538,7 @@ class OtherComprehensiveGCV extends Component {
         const policyCoverageList =  policyCoverage && policyCoverage.length > 0 ?
             policyCoverage.map((coverage, qIndex) => (
                 coverage.PolicyBenefitList && coverage.PolicyBenefitList.map((benefit, bIndex) => (
-                    <div>
+                    <div key= {bIndex}>
                         {(benefit.ProductElementCode != 'B00007') ?
                             <Row><Col sm={12} md={6}>
                                 <FormGroup>{Coverage[benefit.ProductElementCode]}</FormGroup>
@@ -1700,7 +1706,7 @@ console.log("values------------> ", values)
                                             <Col sm={12} md={5} lg={6}>
                                                 <FormGroup>
                                                     <div className="insurerName">
-                                                    {phrases['ChassisNo']}.
+                                                    {phrases['ChassisNo']}
                                                     </div>
                                                 </FormGroup>
                                             </Col>
@@ -1817,7 +1823,9 @@ console.log("values------------> ", values)
                                         </div>
                                     </FormGroup>
                                 </Col>
-
+                                {console.log("minIDV------------- ", minIDV)}
+                                {console.log("maxIDV------------- ", maxIDV)}
+                                {console.log("IDV_Suggested------------- ", defaultSliderValue)}
                                 {defaultSliderValue ? 
 
                                 <Col sm={12} md={12} lg={6}>
@@ -1927,7 +1935,7 @@ console.log("values------------> ", values)
                             <Row>
                                 <Col sm={12} md={12} lg={12}>
                                     <FormGroup>
-                                        <span className="fs-18"> {phrases['AddMoreCoverage']}.</span>
+                                        <span className="fs-18">{phrases['AddMoreCoverage']}</span>
                                     </FormGroup>
                                 </Col>
                             </Row>
@@ -2013,7 +2021,7 @@ console.log("values------------> ", values)
                                                     >
                                                         <option value="">{phrases['NoOfTrailer']}</option>
                                                         {JSON.parse(coverage.covarage_value).value.length > 0 && JSON.parse(coverage.covarage_value).value.map((insurer, qIndex) => (
-                                                                <option value= {insurer}>{insurer}</option>
+                                                                <option key={qIndex} value= {insurer}>{insurer}</option>
                                                             ))}  
                                             
                                                     </Field>

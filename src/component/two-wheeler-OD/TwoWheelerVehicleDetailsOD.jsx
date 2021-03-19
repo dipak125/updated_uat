@@ -76,6 +76,14 @@ const vehicleRegistrationValidation = Yup.object().shape({
         }
     ),
 
+    location_id: Yup.string()
+    .required(function() {
+        return "CityRequired"
+    })
+    .matches(/^([0-9]*)$/, function() {
+        return "No special Character allowed"
+    }),
+
     previous_is_claim: Yup.string().when("policy_type_Id", {
         is: 1,       
         then: Yup.string(),
@@ -319,7 +327,9 @@ class TwoWheelerVehicleDetailsOD extends Component {
         selectedCustomerRecords: [],
         CustIdkeyword: "",
         RTO_location: "",
-        maxRegnDate: ""
+        maxRegnDate: "",
+        location_reset_flag: 0,
+        changeFlag: 0,
     };
 
     changePlaceHoldClassAdd(e) {
@@ -385,9 +395,12 @@ class TwoWheelerVehicleDetailsOD extends Component {
     onChangeCustomerID = (event, { newValue, method }) => {
         //const input = newValue;
            // if (/^[a-zA-Z]+$/.test(input) || input === "") {
+            let location_reset_flag = this.state.motorInsurance && this.state.motorInsurance.location_id ? 1 : 0
                 this.setState({
                     CustomerID: newValue,
-                    RTO_location: ""
+                    RTO_location: "",
+                    location_reset_flag,
+                    changeFlag: 1
                     });
             //}
         
@@ -406,16 +419,23 @@ class TwoWheelerVehicleDetailsOD extends Component {
         
         }
       
+    SuggestionSelected = (setFieldTouched,setFieldValue,suggestion) => {
+        this.setState({
+            changeFlag: 0, 
+        });
+        setFieldTouched('location_id')
+        setFieldValue("location_id", suggestion.id)
+    }
   
-  onSuggestionsFetchCustomerID = ({ value }) => {
-    this.setState({
-      suggestions: this.getCustomerIDSuggestions(value)
-    });
-  };
+    onSuggestionsFetchCustomerID = ({ value }) => {
+        this.setState({
+        suggestions: this.getCustomerIDSuggestions(value)
+        });
+    };
 
    getCustomerIDSuggestionValue = (suggestion) => {
     this.setState({
-      selectedCustomerRecords: suggestion
+      selectedCustomerRecords: suggestion, changeFlag: 0,
     });
     return suggestion.RTO_LOCATION+" - "+suggestion.NameCode;
   }
@@ -429,16 +449,19 @@ class TwoWheelerVehicleDetailsOD extends Component {
 
     handleSubmit = (values, actions) => {
         const {productId} = this.props.match.params 
-        const {motorInsurance} = this.state
+        const {motorInsurance,changeFlag} = this.state
         let newPolStartDate = prevEndDate(values.previous_start_date) 
         newPolStartDate = addDays(new Date(newPolStartDate), 1)        
         let newPolEndDate = prevEndDate(newPolStartDate)
         let vehicleAge = Math.floor(moment(newPolStartDate).diff(values.registration_date, 'months', true))
-        let vehicleAgeDays = Math.floor(moment(newPolStartDate).diff(values.registration_date, 'days', true))
         let policy_type = 9
-        // console.log("vehicleAge===", vehicleAgeDays)
         const formData = new FormData(); 
         let post_data = {}
+
+        // if(changeFlag == 1) {
+        //     swal("Registration city is required")
+        //     return false
+        // }
 
             post_data = {
                 'policy_holder_id':localStorage.getItem("policyHolder_id"),
@@ -568,12 +591,12 @@ class TwoWheelerVehicleDetailsOD extends Component {
     render() {
         const {productId} = this.props.match.params  
         const {insurerList, showClaim, previous_is_claim, motorInsurance, previousPolicy,
-            CustomerID,suggestions, vehicleDetails, RTO_location} = this.state
+            CustomerID,suggestions, vehicleDetails, RTO_location, location_reset_flag} = this.state
 
         let phrases = localStorage.getItem("phrases") ? JSON.parse(localStorage.getItem("phrases")) : null
         let newInitialValues = Object.assign(initialValue, {
             registration_date: motorInsurance && motorInsurance.registration_date ? new Date(motorInsurance.registration_date) : "",
-            location_id:  motorInsurance && motorInsurance.location_id ? motorInsurance.location_id : "",
+            location_id:  motorInsurance && motorInsurance.location_id && location_reset_flag == 0 ? motorInsurance.location_id : "",
             previous_start_date: previousPolicy && previousPolicy[0] && previousPolicy[0].start_date ? new Date(previousPolicy[0].start_date) : "",
             previous_end_date: previousPolicy && previousPolicy[0] && previousPolicy[0].end_date ? new Date(previousPolicy[0].end_date) : "",
             previous_policy_name: "1",

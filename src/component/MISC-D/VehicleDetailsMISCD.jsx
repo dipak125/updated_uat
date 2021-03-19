@@ -260,7 +260,8 @@ const vehicleRegistrationValidation = Yup.object().shape({
             return "PleaseEPCB"
         },
         function (value) {
-            if (this.parent.previous_is_claim == '0' && this.parent.previous_policy_name == '1' && (!value || value == '1')) {   
+            if (this.parent.previous_is_claim == '0' && this.parent.previous_policy_name == '1' && (!value || value == '1') &&
+            Math.floor(moment().diff(this.parent.previous_end_date, 'days', true)) <= 90) {   
                 return false;    
             }
             return true;
@@ -269,10 +270,11 @@ const vehicleRegistrationValidation = Yup.object().shape({
     .test(
         "previousClaimChecking",
         function() {
-            return "Please enter previous claim bonus"
+            return "PleaseEPCB"
         },
         function (value) {
-            if (this.parent.previous_is_claim == '1' && !value && this.parent.no_of_claim == '2') {   
+            if (this.parent.previous_is_claim == '1' && !value && this.parent.no_of_claim == '2' &&
+            Math.floor(moment().diff(this.parent.previous_end_date, 'days', true)) <= 90) {   
                 return false;    
             }
             return true;
