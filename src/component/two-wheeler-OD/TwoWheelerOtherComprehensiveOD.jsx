@@ -339,6 +339,7 @@ class TwoWheelerOtherComprehensiveOD extends Component {
                 let request_data = decryptResp.data.policyHolder ? decryptResp.data.policyHolder.request_data : {};
                 let vehicleDetails = decryptResp.data.policyHolder ? decryptResp.data.policyHolder.vehiclebrandmodel : {};
                 let step_completed = decryptResp.data.policyHolder ? decryptResp.data.policyHolder.step_no : "";
+                let sliderVal = motorInsurance && motorInsurance.idv_value ? motorInsurance.idv_value : 0
                 let vehicleRegDate = motorInsurance &&  motorInsurance.registration_date != null ? motorInsurance.registration_date : ''
                 let tyre_rim_array = motorInsurance.tyre_rim_array && motorInsurance.tyre_rim_array!=null ? motorInsurance.tyre_rim_array : null
                 tyre_rim_array = tyre_rim_array!=null ? JSON.parse(tyre_rim_array) : []
@@ -360,7 +361,7 @@ class TwoWheelerOtherComprehensiveOD extends Component {
                  values.tyre_rim_array = tyre_rim_array
                 
                 this.setState({
-                    motorInsurance,vehicleDetails,step_completed,tyre_rim_array, request_data,
+                    motorInsurance,vehicleDetails,step_completed,tyre_rim_array, request_data,sliderVal,
                     add_more_coverage: add_more_coverage, add_more_coverage_request_array,vehicleRegDate,
                     selectFlag: motorInsurance && motorInsurance.policy_for == '2' ? [] : (motorInsurance.add_more_coverage != null ? '0' : '1') ,
                     vahanVerify: motorInsurance.chasis_no && motorInsurance.engine_no ? true : false,
@@ -471,7 +472,7 @@ class TwoWheelerOtherComprehensiveOD extends Component {
         //     cng_kit_flag = values.cng_kit
         //     cngKit_Cost = values.cngKit_Cost
         // }
-        let defaultSliderValue = PolicyArray.length > 0 ? Math.floor(PolicyArray[0].PolicyRiskList[0].IDV_Suggested) : 0
+        let defaultSliderValue = PolicyArray.length > 0 ? Math.floor(PolicyArray[0].PolicyRiskList[0].IDV_User) : 0
         const formData = new FormData();
 
         let csc_data = localStorage.getItem('users') ? localStorage.getItem('users') : "";
@@ -596,7 +597,7 @@ class TwoWheelerOtherComprehensiveOD extends Component {
     handleSubmit = (values) => {
         const { productId } = this.props.match.params
         const { motorInsurance, PolicyArray, sliderVal, add_more_coverage } = this.state
-        let defaultSliderValue = PolicyArray.length > 0 ? Math.round(PolicyArray[0].PolicyRiskList[0].IDV_Suggested) : 0
+        let defaultSliderValue = PolicyArray.length > 0 ? Math.round(PolicyArray[0].PolicyRiskList[0].IDV_User) : 0
         let coverage_data = {}
 
         let csc_data = localStorage.getItem('users') ? localStorage.getItem('users') : "";
@@ -886,7 +887,7 @@ class TwoWheelerOtherComprehensiveOD extends Component {
             if(covList.indexOf('C101110')) tyre_cover_flag = '1'
         }
 
-        let defaultSliderValue = PolicyArray.length > 0 ? Math.round(PolicyArray[0].PolicyRiskList[0].IDV_Suggested) : 0
+        let defaultSliderValue = PolicyArray.length > 0 ? Math.round(PolicyArray[0].PolicyRiskList[0].IDV_User) : 0
         let sliderValue = sliderVal
         let min_IDV_suggested = PolicyArray.length > 0 ? PolicyArray[0].PolicyRiskList[0].MinIDV_Suggested : 0
         let max_IDV_suggested = PolicyArray.length > 0 ? PolicyArray[0].PolicyRiskList[0].MaxIDV_Suggested : 0

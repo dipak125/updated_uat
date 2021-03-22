@@ -697,7 +697,7 @@ class TwoWheelerSelectBrandOD extends Component {
                                                         </div>
                                                         
                                                         <div className="brandhead">
-                                                        <h4 className="m-b-30">{phrases['About']}</h4></div>
+                                                        <h4 className="m-b-30">{phrases['AboutVehicle']}</h4></div>
                                                         <Row className="m-b-15">
                                                             <Col sm={12}>
                                                             

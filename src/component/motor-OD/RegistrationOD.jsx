@@ -319,7 +319,7 @@ class RegistrationOD extends Component {
                                     <h4 className="text-center mt-3 mb-3">{phrases['SBIGICL']}</h4>
                                     <section className="brand">
                                         <div className="boxpd">
-                                            <h4 className="m-b-30">{phrases['About']}</h4>
+                                            <h4 className="m-b-30">{phrases['AboutVehicle']}</h4>
                                             <Formik initialValues={newInitialValues}
                                                 onSubmit={this.fetchFastlane}
                                                 validationSchema={vehicleRegistrationValidation}>

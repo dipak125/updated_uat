@@ -50,24 +50,24 @@ const initialValue = {
 const ownerValidation = Yup.object().shape({
     first_name: Yup.string().required('NameRequired')
         .min(3, function() {
-            return "First name must be 3 chracters & last name 1 characters long"
+            return "FirstNameMin"
         })
         .max(40, function() {
-            return "Full name must be maximum 40 chracters"
+            return "FullNameMax"
         })
         .matches(/^[a-zA-Z]+([\s]?[a-zA-Z]+)([\s]?[a-zA-Z]+)$/, function() {
-            return "Please enter valid name"
+            return "ValidName"
         }),
     // last_name:Yup.string().required('Last name is required'),
     gender: Yup.string().required('GenderRequired')
     .matches(/^[MmFf]$/, function() {
-        return "Please select valid gender"
+        return "ValidGender"
     }),
     dob:Yup.date().required('DOBRequired')
     .test(
         "18YearsChecking",
         function() {
-            return "Age should me minium 18 years and maximum 100 years"
+            return "AgeRange"
         },
         function (value) {
             if (value) {
@@ -79,34 +79,34 @@ const ownerValidation = Yup.object().shape({
     ),
     pancard: Yup.string()
     .notRequired(function() {
-        return "Enter PAN number"
+        return "EnterPan"
     }).matches(/^[A-Z]{3}[CPHFATBLJG]{1}[A-Z]{1}[0-9]{4}[A-Z]{1}$/, function() {
-        return "Please enter valid Pan Number"
+        return "ValidPan"
     }),
     pincode_id:Yup.string().required('LocationRequired'),
 
     pincode:Yup.string().required('PincodeRequired')
     .matches(/^[0-9]{6}$/, function() {
-        return "Please enter valid pin code"
+        return "ValidPin"
     }),
 
     address:Yup.string().required('AddressRequired')
     // .matches(/^(?![0-9._])(?!.*[0-9._]$)(?!.*\d_)(?!.*_\d)[a-zA-Z0-9_.,-\\]+$/, 
     .matches(/^[a-zA-Z0-9\s,/.-]*$/, 
     function() {
-        return "Please enter valid address"
+        return "PleaseEnterValidAddress"
     }),
     phone: Yup.string()
-    .matches(/^[6-9][0-9]{9}$/,'Invalid Mobile number').required('PhoneRequired'),
+    .matches(/^[6-9][0-9]{9}$/,'ValidMobile').required('PhoneRequired'),
     
     email:Yup.string().email().required('EmailRequired').min(8, function() {
-        return "Email must be minimum 8 chracters"
+        return "EmainMin"
     })
     .max(75, function() {
-        return "Email must be maximum 75 chracters"
+        return "EmailMax"
     }).matches(/^[a-zA-Z0-9]+([._\-]?[a-zA-Z0-9]+)*@\w+([-]?\w+)*(\.\w{2,3})+$/,'Invalid Email Id'),
 
-    is_carloan: Yup.mixed().required('This field is required'),
+    is_carloan: Yup.mixed().required('RequiredField'),
     bank_name:Yup.string().notRequired('BankNameReq')
     .test(
         "isLoanChecking",
@@ -120,7 +120,7 @@ const ownerValidation = Yup.object().shape({
             return true;
         }
     ).matches(/^[A-Za-z][A-Za-z\s]*$/, function() {
-        return "PleaseEnterBank"
+        return "EnterValidBank"
     }),
     bank_branch: Yup.string().notRequired('BankBranchReq')
     .test(
@@ -135,7 +135,7 @@ const ownerValidation = Yup.object().shape({
             return true;
         }
     ).matches(/^[A-Za-z][A-Za-z\s]*$/, function() {
-        return "PleaseEnterBranch"
+        return "EnterValidBankBranch"
     }),
     salutation_id: Yup.string().
         required('Title is required').nullable(),
@@ -156,7 +156,7 @@ const ownerValidation = Yup.object().shape({
                     return "NameReqMax"
                 })
                 .matches(/^[a-zA-Z]+([\s]?[a-zA-Z]+)([\s]?[a-zA-Z]+)$/, function() {
-                    return "Please enter valid name"
+                    return "ValidName"
                 }),
         otherwise: Yup.string().nullable()
     }),
@@ -171,7 +171,7 @@ const ownerValidation = Yup.object().shape({
                 .test(
                     "3monthsChecking",
                     function() {
-                        return "Age should be minium 3 months"
+                        return "NomineeMinAge"
                     },
                     function (value) {
                         if (value) {
@@ -184,7 +184,7 @@ const ownerValidation = Yup.object().shape({
         otherwise: Yup.date()   
     }),
 
-    appointee_name: Yup.string().notRequired("Please enter appointee name")
+    appointee_name: Yup.string().notRequired()
                 .min(3, function() {
                     return "NameReqMin"
                 })
@@ -192,7 +192,7 @@ const ownerValidation = Yup.object().shape({
                     return "NameReqMax"
                 })        
                 .matches(/^[a-zA-Z]+([\s]?[a-zA-Z]+)([\s]?[a-zA-Z]+)$/, function() {
-                    return "Please enter valid name"
+                    return "ValidName"
                 }).test(
                     "18YearsChecking",
                     function() {
@@ -208,7 +208,7 @@ const ownerValidation = Yup.object().shape({
                 ),
 
 
-    appointee_relation_with: Yup.string().notRequired("Please select relation")
+    appointee_relation_with: Yup.string().notRequired()
                 .test(
                     "18YearsChecking",
                     function() {
