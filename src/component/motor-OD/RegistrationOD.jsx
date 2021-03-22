@@ -145,7 +145,7 @@ class RegistrationOD extends Component {
                     'vehicle_type_id': productId,
                     'csc_id': sessionStorage.getItem('csc_id') ? sessionStorage.getItem('csc_id') : "",
                     'agent_name': sessionStorage.getItem('agent_name') ? sessionStorage.getItem('agent_name') : "",
-                    'product_id': sessionStorage.getItem('product_id') ? sessionStorage.getItem('product_id') : "",
+                    'product_id': productId,
                     'bcmaster_id': "5",
                     'page_name': `RegistrationOD/${productId}`,
 
@@ -161,6 +161,7 @@ class RegistrationOD extends Component {
                     'bcmaster_id': bc_data ? bc_data.agent_id : "",
                     'bc_token': bc_data ? bc_data.token : "",
                     'bc_agent_id': bc_data ? bc_data.user_info.data.user.username : "",
+                    'product_id': productId,
                     'page_name': `RegistrationOD/${productId}`,
 
                 }
@@ -200,7 +201,7 @@ class RegistrationOD extends Component {
                     'vehicle_type_id': productId,
                     'csc_id': sessionStorage.getItem('csc_id') ? sessionStorage.getItem('csc_id') : "",
                     'agent_name': sessionStorage.getItem('agent_name') ? sessionStorage.getItem('agent_name') : "",
-                    'product_id': sessionStorage.getItem('product_id') ? sessionStorage.getItem('product_id') : "",
+                    'product_id': productId,
                     'bcmaster_id': "5",
                     'page_name': `RegistrationOD/${productId}`,
 

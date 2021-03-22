@@ -973,8 +973,6 @@ class OtherComprehensiveOD extends Component {
 
         let OD_TP_premium = serverResponse.PolicyLobList ? serverResponse.PolicyLobList[0].PolicyRiskList[0] : []
 
-        console.log("policyCoverage--------------- ", policyCoverage)
-
         const policyCoverageList =  policyCoverage && policyCoverage.length > 0 ?
             policyCoverage.map((coverage, qIndex) => (
                 coverage.PolicyBenefitList && coverage.ProductElementCode != "C101069" ? coverage.PolicyBenefitList.map((benefit, bIndex) => (
@@ -1004,7 +1002,7 @@ class OtherComprehensiveOD extends Component {
 
         const premiumBreakup = policyCoverage && policyCoverage.length > 0 ?
             policyCoverage.map((coverage, qIndex) => (
-                coverage.PolicyBenefitList ? coverage.PolicyBenefitList.map((benefit, bIndex) => (
+                coverage.PolicyBenefitList && coverage.ProductElementCode != "C101069" ? coverage.PolicyBenefitList.map((benefit, bIndex) => (
                     benefit.BeforeVatPremium != 0 ?
                         <tr>
                             <td>{Coverage[benefit.ProductElementCode]}:</td>

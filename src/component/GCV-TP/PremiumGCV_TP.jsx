@@ -551,7 +551,7 @@ class PremiumGCV extends Component {
                                                                                                 </Row> : 
                                                                                                 <Row>
                                                                                                 <Col sm={12} md={6}>
-                                                                                                    <FormGroup>{phrases['DateOfIncorporation']}:</FormGroup>
+                                                                                                    <FormGroup>{phrases['IncorporationDate']}:</FormGroup>
                                                                                                 </Col>
                                                                                                 <Col sm={12} md={6}>
                                                                                                     <FormGroup>{ memberdetails ? moment(memberdetails.date_of_incorporation).format("DD-MM-YYYY") : null}</FormGroup>
@@ -753,7 +753,7 @@ class PremiumGCV extends Component {
                                                             <Row>&nbsp;</Row>
                                                             <div className="d-flex justify-content-left resmb">
                                                                 <Button className="backBtn" type="button" onClick={this.additionalDetails.bind(this, productId)}>{phrases['Back']}</Button>
- 								{bcMaster && bcMaster.eligible_for_payment_link == 1 ?
+ 								                                    {bcMaster && bcMaster.eligible_for_payment_link == 1 ?
                                                                     <div>
                                                                     <Button type="button" className="proceedBtn" onClick = {this.sendPaymentLink.bind(this)}>  Send Payment Link  </Button>
                                                                     &nbsp;&nbsp;&nbsp;&nbsp;

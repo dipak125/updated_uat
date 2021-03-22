@@ -61,7 +61,7 @@ const vehicleRegistrationValidation = Yup.object().shape({
     registration_date: Yup.string().required('RegistrationRequired')
     .test(
         "checkMaxDateRollover",
-        "Registration date must be one year old",
+        "RegistrationDateOld",
         function (value) {
             if (value && this.parent.policy_type_id == '2') {
                 return checkGreaterStartEndTimes(value, maxDateForValidtion);
@@ -71,7 +71,7 @@ const vehicleRegistrationValidation = Yup.object().shape({
     )
     .test(
         "checkMinDate_MaxDate_NewPolicy",
-        "Registration date cannot be older than one month",
+        "RegistrationDateOneMonth",
         function (value) {
             if (value && this.parent.policy_type_id == '1') {
                 // return checkGreaterStartEndTimes(value, new Date()) && checkGreaterStartEndTimes(minRegnDateNew, value);
@@ -82,7 +82,7 @@ const vehicleRegistrationValidation = Yup.object().shape({
     )
     .test(
         "checkGreaterTimes",
-        "Registration date must be less than Previous policy start date",
+        "RegistrationLessPrevious",
         function (value) {
             if (value) {
                 return checkGreaterStartEndTimes(value, this.parent.previous_start_date);
@@ -97,7 +97,7 @@ const vehicleRegistrationValidation = Yup.object().shape({
         return "CityRequired"
     })
     .matches(/^([0-9]*)$/, function() {
-        return "No special Character allowed"
+        return "NoCharacterAllowed"
     }),
 
     previous_start_date:Yup.date()
@@ -116,7 +116,7 @@ const vehicleRegistrationValidation = Yup.object().shape({
         }
     ).test(
         "checkGreaterTimes",
-        "Start date must be less than end date",
+        "StartDateLessEnd",
         function (value) {
             if (value && this.parent.policy_type_id == '2'  && this.parent.valid_previous_policy == '1'  && this.parent.valid_previous_policy == '1') {
                 return checkGreaterStartEndTimes(value, this.parent.previous_end_date);
@@ -125,7 +125,7 @@ const vehicleRegistrationValidation = Yup.object().shape({
         }
     ).test(
       "checkStartDate",
-      "Enter Start Date",
+      "PleaseESD",
       function (value) {       
           if ( this.parent.previous_end_date != undefined && value == undefined && this.parent.policy_type_id == '2'  && this.parent.valid_previous_policy == '1') {
               return false;
@@ -134,7 +134,7 @@ const vehicleRegistrationValidation = Yup.object().shape({
       }
     ),
     previous_end_date:Yup.date()
-    .notRequired('Previous end date is required')
+    .notRequired()
     .test(
         "currentMonthChecking",
         function() {
@@ -149,7 +149,7 @@ const vehicleRegistrationValidation = Yup.object().shape({
         }
     ).test( 
         "checkGreaterTimes",
-        "End date must be greater than start date",
+        "EndDateGreaterStart",
         function (value) {
             if (value && this.parent.policy_type_id == '2'  && this.parent.valid_previous_policy == '1') {
                 return checkGreaterTimes(value, this.parent.previous_start_date);
@@ -158,7 +158,7 @@ const vehicleRegistrationValidation = Yup.object().shape({
         }
         ).test(
         "checkEndDate",
-        "Enter End Date",
+        "PleaseEED",
         function (value) {     
             if ( this.parent.previous_start_date != undefined && value == undefined && this.parent.policy_type_id == '2'  && this.parent.valid_previous_policy == '1') {
                 return false;
@@ -183,7 +183,7 @@ const vehicleRegistrationValidation = Yup.object().shape({
     .test(
         "currentMonthChecking",
         function() {
-            return "Since previous policy is a liability policy, issuance of a package policy will be subjet to successful inspection of your vehicle. Our Customer care executive will call you to assit on same, shortly"
+            return "PreviousPolicyLiabilityPolicy"
         },
         function (value) {
             // if (value == '2' ) {   
@@ -229,7 +229,7 @@ const vehicleRegistrationValidation = Yup.object().shape({
     }),
 
     previous_policy_no:Yup.string()
-    .notRequired('Previous policy number is required')
+    .notRequired()
     .test(
         "currentMonthChecking",
         function() {
@@ -244,7 +244,7 @@ const vehicleRegistrationValidation = Yup.object().shape({
     )
     .matches(/^[a-zA-Z0-9][a-zA-Z0-9\s-/]*$/, 
         function() {
-            return "Please enter valid policy number"
+            return "ValidPolicyNumber"
         }).min(6, function() {
             return "PolicyMinCharacter"
         })
@@ -253,7 +253,7 @@ const vehicleRegistrationValidation = Yup.object().shape({
         }),
 
     previous_claim_bonus:Yup.string()
-    .notRequired('No Claim bonus is required')
+    .notRequired()
     .test(
         "currentMonthChecking",
         function() {
@@ -281,7 +281,7 @@ const vehicleRegistrationValidation = Yup.object().shape({
         }
     ),
     previous_is_claim:Yup.string()
-    .notRequired('Please select one option')
+    .notRequired()
     .test(
         "currentMonthChecking",
         function() {
@@ -302,45 +302,22 @@ const vehicleRegistrationValidation = Yup.object().shape({
         otherwise: Yup.string()
     }),
 
-    // goodscarriedtypes_id: Yup.string()
-    // .required(function() {
-    //     return "Please select type of goods"
-    // }).test(
+    valid_previous_policy: Yup.string()
+    .required(function() {
+        return "RequiredField"
+    }),
+    // .test(
     //     "currentMonthChecking",
     //     function() {
-    //         return "Hazardous goods not allowed"
+    //         return "ValidPrevPolicy "
     //     },
     //     function (value) {
-    //         if (value == '1' ) {   
+    //         if (value == '0' && this.parent.policy_type_id != '1') {   
     //             return false;    
     //         }
     //         return true;
     //     }
     // ),
-    // averagemonthlyusages_id: Yup.string()
-    // .required(function() {
-    //     return "Please select average monthly use"
-    // }),
-    // permittypes_id: Yup.string()
-    // .required(function() {
-    //     return "Please select type of permit"
-    // }),
-    valid_previous_policy: Yup.string()
-    .required(function() {
-        return "This field is required"
-    })
-    .test(
-        "currentMonthChecking",
-        function() {
-            return "Since you do not have valid previous policy, issuance of a package policy will be subjet to successful inspection of your vehicle. Our Customer care executive will call you to assit on same, shortly"
-        },
-        function (value) {
-            // if (value == '0' && this.parent.policy_type_id != '1') {   
-            //     return false;    
-            // }
-            return true;
-        }
-    ),
 
 
     claim_array: Yup.array().of(
