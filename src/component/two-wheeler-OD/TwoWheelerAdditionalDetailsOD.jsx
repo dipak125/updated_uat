@@ -56,16 +56,16 @@ const ownerValidation = Yup.object().shape({
         is: policy_for => policy_for == '1',       
         then: Yup.string().required('NameRequired')
         .min(3, function() {
-            return "First name must be 3 chracters"
+            return "FirstNameMin"
         })
         .max(40, function() {
-            return "Full name must be maximum 40 chracters"
+            return "FullNameMax"
         })
         .matches(/^[a-zA-Z]+([\s]?[a-zA-Z]+)([\s]?[a-zA-Z]+)$/, function() {
-            return "Please enter valid name"
+            return "ValidName"
         }),
         otherwise: Yup.string().required('Company name is required').min(3, function() {
-            return "Company name must be min 3 chracters"
+            return "CompanyNameMin"
         })
     }),
 
@@ -108,24 +108,27 @@ const ownerValidation = Yup.object().shape({
 
     pincode:Yup.string().required('PincodeRequired')
     .matches(/^[0-9]{6}$/, function() {
-        return "Please enter valid pin code"
+        return "ValidPin"
     }),
 
     address:Yup.string().required('AddressRequired')
     // .matches(/^(?![0-9._])(?!.*[0-9._]$)(?!.*\d_)(?!.*_\d)[a-zA-Z0-9_.,-\\]+$/, 
-    .matches(/^[a-zA-Z0-9][a-zA-Z0-9\s,/.-]*$/, 
+    .matches(/^[a-zA-Z0-9]+([\s]?[a-zA-Z0-9\s,/.-])*$/, 
     function() {
-        return "Please enter valid address"
+        return "PleaseEnterValidAddress"
+    })
+    .max(100, function() {
+        return "AddressMustBeMaximum100Chracters"
     }),
     phone: Yup.string()
-        .matches(/^[6-9][0-9]{9}$/,'Invalid Mobile number').required('PhoneRequired'),
+        .matches(/^[6-9][0-9]{9}$/,'ValidMobile').required('PhoneRequired'),
         
     email:Yup.string().email().required('EmailRequired').min(8, function() {
-            return "Email must be minimum 8 chracters"
+            return "EmainMin"
         })
         .max(75, function() {
-            return "Email must be maximum 75 chracters"
-        }).matches(/^[a-zA-Z0-9]+([._\-]?[a-zA-Z0-9]+)*@\w+([-]?\w+)*(\.\w{2,3})+$/,'Invalid Email Id'),
+            return "EmailMax"
+        }).matches(/^[a-zA-Z0-9]+([._\-]?[a-zA-Z0-9]+)*@\w+([-]?\w+)*(\.\w{2,3})+$/,'InvalidEmail'),
     salutation_id: Yup.string().when(['policy_for'], {
             is: policy_for => policy_for == '1',  
             then: Yup.string().required('Title is required'),
@@ -336,7 +339,7 @@ const ownerValidation = Yup.object().shape({
             return true;
         }
     ).matches(/^[A-Za-z][A-Za-z\s]*$/, function() {
-        return "PleaseEnterBank"
+        return "EnterValidBank"
     }),
     bank_branch: Yup.string().notRequired('BankBranchReq')
     .test(
@@ -351,7 +354,7 @@ const ownerValidation = Yup.object().shape({
             return true;
         }
     ).matches(/^[A-Za-z][A-Za-z\s]*$/, function() {
-        return "PleaseEnterBranch"
+        return "EnterValidBankBranch"
     }),
 })
 

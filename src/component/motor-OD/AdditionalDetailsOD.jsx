@@ -104,7 +104,7 @@ const ownerValidation = Yup.object().shape({
     })
     .max(75, function() {
         return "EmailMax"
-    }).matches(/^[a-zA-Z0-9]+([._\-]?[a-zA-Z0-9]+)*@\w+([-]?\w+)*(\.\w{2,3})+$/,'Invalid Email Id'),
+    }).matches(/^[a-zA-Z0-9]+([._\-]?[a-zA-Z0-9]+)*@\w+([-]?\w+)*(\.\w{2,3})+$/,'InvalidEmail'),
 
     is_carloan: Yup.mixed().required('RequiredField'),
     bank_name:Yup.string().notRequired('BankNameReq')

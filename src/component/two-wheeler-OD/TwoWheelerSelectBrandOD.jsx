@@ -812,7 +812,7 @@ class TwoWheelerSelectBrandOD extends Component {
                                                                         -  <strong>{fastLaneData && fastLaneData.brand_text ? fastLaneData.brand_text  : vehicleDetails && vehicleDetails.vehiclebrand && vehicleDetails.vehiclebrand.name ? vehicleDetails.vehiclebrand.name : ""}</strong>
                                                                     </div>
 
-                                                                    <div> <button type="button" className="rgistrBtn" onClick={this.selectVehicle.bind(this, productId)}>{phrases['Edit']}</button></div>
+                                                                    {/* <div> <button type="button" className="rgistrBtn" onClick={this.selectVehicle.bind(this, productId)}>{phrases['Edit']}</button></div> */}
                                                                 </div>
 
                                                                 <div className="d-flex justify-content-between flex-lg-row flex-md-column m-b-25">

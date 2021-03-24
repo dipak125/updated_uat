@@ -468,6 +468,14 @@ const VedvagGateway = Loadable({
 });
 
 
+//  ************ Renewal ******************
+
+const Renewal = Loadable({
+    loader: () => import(/*webpackChunkName: "Products" */"../Renewal/Renewal.jsx"),
+    loading: () => loadingContent
+});
+
+
 
 class Routes extends Component {
     render() {
@@ -630,6 +638,10 @@ class Routes extends Component {
                         <PrivateRoute exact path="/Additional_detailsOD/:productId" component={AdditionalDetailsOD} />
                         <PrivateRoute exact path="/PremiumOD/:productId" component={PremiumOD} />
                         {/* <PrivateRoute exact path="/ThankYou_motor/:policyId" component={ThankYou_motor} /> */}
+                        
+
+                        {/************ Renewal ******************/}
+						<PrivateRoute exact path="/Renewal" component={Renewal} />                    
 						
                         <Redirect from="/" to="/Dashboard" />
                     </Switch>

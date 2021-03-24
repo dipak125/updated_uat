@@ -10,6 +10,7 @@ class SideNav extends Component {
   state = {
     BC_check : "0"
   }
+  
   handleLogout = () => {
     const formData = new FormData();
     let encryption = new Encryption();
@@ -129,6 +130,17 @@ class SideNav extends Component {
                   />
                 </span>
                 {childPhrase['Services']}
+              </Link>
+            </li>
+            <li>
+              <Link to="/Renewal" activeClassName="active">
+                <span className="leftIcon01">
+                  <img
+                    src={require("../../../assets/images/support.png")}
+                    alt=""
+                  />
+                </span>
+                Renewal
               </Link>
             </li>
            { BC_check.is_permission == true ?
