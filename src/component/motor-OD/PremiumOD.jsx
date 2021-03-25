@@ -413,7 +413,7 @@ sendPaymentLink = () => {
                                                                                 </Col>
                                                                                 <Col sm={12} md={3}>
                                                                                 <div className="premamount">
-                                                                                    {menumaster && menumaster.name ? menumaster.name : null}
+                                                                                {vehicleDetails && vehicleDetails.vehicletype ? vehicleDetails.vehicletype.description : null}
                                                                                 </div>
                                                                                 </Col>
                                                                             </Row>
@@ -423,7 +423,7 @@ sendPaymentLink = () => {
                                                                 </div>
 
                                                             <div className="rghtsideTrigr">
-                                                                <Collapsible trigger={phrases['RMPolicy']} >
+                                                                <Collapsible trigger={phrases['RMPolicy']} open = {true}>
                                                                     <div className="listrghtsideTrigr">
                                                                         <Row>
                                                                             <Col sm={12} md={3}>

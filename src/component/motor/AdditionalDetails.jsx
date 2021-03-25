@@ -256,6 +256,7 @@ const ownerValidation = Yup.object().shape({
 
 class AdditionalDetails extends Component {
 
+        
 
     state = {
         showEIA: false,
@@ -272,7 +273,8 @@ class AdditionalDetails extends Component {
         is_appointee:0,
         appointeeFlag: false,
         motorInsurance: [],
-        titleList: []
+        titleList: [],
+		tpaInsurance: []
     };
 
     ageCheck = (value) => {
@@ -419,7 +421,25 @@ console.log('post_data', post_data);
                 // handle error
                 this.props.loadingStop();
             })
+			
+			
+
     }
+	
+	tpaInsuranceRepository = () => {
+				axios.get(`/tpaInsuranceRepository`)
+            .then(res => {
+					
+					let tpaInsurance = res.data ? res.data : {};
+					console.log("tpaInsuranceRepository===", tpaInsurance);
+					
+					//let titleList = decryptResp.data.salutationlist
+					this.setState({
+					  tpaInsurance
+					});
+				});
+			console.log("tpaInsuranceRepository=");	
+	}
 
     fetchAreadetails=(e)=>{
         let pinCode = e.target.value;      
@@ -530,13 +550,14 @@ console.log('post_data', post_data);
 
     componentDidMount() {
         this.fetchData();
-        this.fetchRelationships();
+        this.fetchRelationships(); 
+		this.tpaInsuranceRepository();
     }
 
    
 
     render() {
-        const {showEIA, is_eia_account, showLoan, is_loan_account, nomineeDetails, is_appointee,appointeeFlag, titleList,
+        const {showEIA, is_eia_account, showLoan, is_loan_account, nomineeDetails, is_appointee,appointeeFlag, titleList,tpaInsurance,
             bankDetails,policyHolder, stateName, pinDataArr, quoteId, addressDetails, relation, motorInsurance} = this.state
         const {productId} = this.props.match.params 
         let phrases = localStorage.getItem("phrases") ? JSON.parse(localStorage.getItem("phrases")) : null        
@@ -885,7 +906,7 @@ console.log('post_data', post_data);
                                                     value={values.pincode_id}
                                                     className="formGrp"
                                                 >
-                                                <option value="">{phrases['SelectArea']}</option>
+                                                <option value="">{phrases['Selectea']}</option>
                                                 {pinDataArr && pinDataArr.length > 0 && pinDataArr.map((resource,rindex)=>
                                                     <option value={resource.id}>{resource.LCLTY_SUBRB_TALUK_TEHSL_NM}</option>
                                                 )}
@@ -1184,7 +1205,44 @@ console.log('post_data', post_data);
                                             </div>
                                         </FormGroup>
                                     </Col> : ''}
-                                </Row> 
+									
+									
+							</Row> 		
+									
+									
+							{showEIA==false && is_eia_account == '0' ?
+								<Row>
+                                    <Col sm={12} md={4} lg={4}>
+                                        <FormGroup>
+                                            <div className="insurerName">
+                                                <h4 className="fs-16">{phrases['Your_preferred_TPA']}</h4>
+                                            </div>
+                                        </FormGroup>
+                                    </Col>
+									<Col sm={12} md={4} lg={5}>
+										 <FormGroup>
+                                                    <div className="formSection">                                                           
+                                                        <Field
+                                                            name="tpaInsurance"
+                                                            component="select"
+                                                            autoComplete="off"
+                                                            value={values.tpaInsurance}
+                                                            className="formGrp"
+                                                        >
+                                                        <option value="">{phrases['SELECT_TPA']}</option>
+                                                        { tpaInsurance.map((relations, qIndex) => 
+                                                            <option value={relations.repository_id}>{relations.name}</option>                                        
+                                                        )}
+                                                        </Field>     
+                                                               
+                                                    </div>
+                                                </FormGroup>
+									</Col>
+								</Row> 
+									: ''}
+									
+									
+                                
                                 <div className="d-flex justify-content-left resmb">
                                 <Button className={`backBtn`} type="button"  disabled={isSubmitting ? true : false} onClick= {this.otherComprehensive.bind(this,productId)}>
                                     {isSubmitting ? phrases['Wait'] : phrases['Back']}

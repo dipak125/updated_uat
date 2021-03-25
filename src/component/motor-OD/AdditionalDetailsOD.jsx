@@ -55,7 +55,7 @@ const ownerValidation = Yup.object().shape({
         .max(40, function() {
             return "FullNameMax"
         })
-        .matches(/^[a-zA-Z]+([\s]?[a-zA-Z]+)([\s]?[a-zA-Z]+)$/, function() {
+        .matches(/^[a-zA-Z]+([\s]?[a-zA-Z]+)([\s]+[a-zA-Z]+)$/, function() {
             return "ValidName"
         }),
     // last_name:Yup.string().required('Last name is required'),
@@ -70,6 +70,7 @@ const ownerValidation = Yup.object().shape({
             return "AgeRange"
         },
         function (value) {
+            console.log("dob-val-----> ", value)
             if (value) {
                 const ageObj = new PersonAge();
                 return ageObj.whatIsMyAge(value) <= 100 && ageObj.whatIsMyAge(value) >= 18;
@@ -92,10 +93,14 @@ const ownerValidation = Yup.object().shape({
 
     address:Yup.string().required('AddressRequired')
     // .matches(/^(?![0-9._])(?!.*[0-9._]$)(?!.*\d_)(?!.*_\d)[a-zA-Z0-9_.,-\\]+$/, 
-    .matches(/^[a-zA-Z0-9\s,/.-]*$/, 
+    .matches(/^[a-zA-Z0-9]+([\s]?[a-zA-Z0-9\s,/.-])*$/, 
     function() {
         return "PleaseEnterValidAddress"
+    })
+    .max(100, function() {
+        return "AddressMustBeMaximum100Chracters"
     }),
+
     phone: Yup.string()
     .matches(/^[6-9][0-9]{9}$/,'ValidMobile').required('PhoneRequired'),
     
@@ -155,7 +160,7 @@ const ownerValidation = Yup.object().shape({
                 .max(40, function() {
                     return "NameReqMax"
                 })
-                .matches(/^[a-zA-Z]+([\s]?[a-zA-Z]+)([\s]?[a-zA-Z]+)$/, function() {
+                .matches(/^[a-zA-Z]+([\s]?[a-zA-Z]+)([\s]+[a-zA-Z]+)$/, function() {
                     return "ValidName"
                 }),
         otherwise: Yup.string().nullable()
@@ -264,7 +269,8 @@ class AdditionalDetailsOD extends Component {
         is_appointee:0,
         appointeeFlag: false,
         motorInsurance: [],
-        titleList: []
+        titleList: [],
+		tpaInsurance: []
     };
 
     ageCheck = (value) => {
@@ -518,17 +524,31 @@ console.log('post_data', post_data);
             });
           })
       }
-
+	tpaInsuranceRepository = () => {
+				axios.get(`/tpaInsuranceRepository`)
+            .then(res => {
+					
+					let tpaInsurance = res.data ? res.data : {};
+					console.log("tpaInsuranceRepository===", tpaInsurance);
+					
+					//let titleList = decryptResp.data.salutationlist
+					this.setState({
+					  tpaInsurance
+					});
+				});
+			console.log("tpaInsuranceRepository=");	
+	}
 
     componentDidMount() {
         this.fetchData();
         this.fetchRelationships();
+		this.tpaInsuranceRepository();
     }
 
    
 
     render() {
-        const {showEIA, is_eia_account, showLoan, is_loan_account, nomineeDetails, is_appointee,appointeeFlag, titleList,
+        const {showEIA, is_eia_account, showLoan, is_loan_account, nomineeDetails, is_appointee,appointeeFlag, titleList,tpaInsurance,
             bankDetails,policyHolder, stateName, pinDataArr, quoteId, addressDetails, relation, motorInsurance} = this.state
         const {productId} = this.props.match.params 
         let phrases = localStorage.getItem("phrases") ? JSON.parse(localStorage.getItem("phrases")) : null        
@@ -588,9 +608,7 @@ console.log('post_data', post_data);
                         {({ values, errors, setFieldValue, setFieldTouched, isValid, isSubmitting, touched }) => {
                              let value = values.nominee_first_name;
 
-                            //  value = value.replace(/[^A-Za-z]/ig, '')
-                            //  values.nominee_first_name = value;
-                            
+                        console.log("errors--------------> ", errors)
                         return (
                         <Form>
                         <Row>
@@ -791,7 +809,7 @@ console.log('post_data', post_data);
                                                 value = {values.email}                                                                            
                                             />
                                             {errors.email && touched.email ? (
-                                            <span className="errorMsg">{phrases[errors.email]}</span>
+                                            <span className="errorMsg">{errors.email == "email must be a valid email" ? errors.email : phrases[errors.email]}</span>
                                             ) : null}  
                                             </div>
                                         </FormGroup>
@@ -929,7 +947,7 @@ console.log('post_data', post_data);
                                                     }                                                                           
                                             />
                                             {errors.pancard && touched.pancard ? (
-                                            <span className="errorMsg">{errors.pancard}</span>
+                                            <span className="errorMsg">{phrases[errors.pancard]}</span>
                                             ) : null} 
                                             </div>
                                         </FormGroup>
@@ -963,7 +981,7 @@ console.log('post_data', post_data);
                                             </div>
                                         </FormGroup>
                                     </Col>
-                                    <Col sm={12} md={4} lg={4}>
+                                    <Col sm={12} md={4} lg={5}>
                                         <FormGroup>
                                             <div className="insurerName">
                                             <Field
@@ -981,7 +999,7 @@ console.log('post_data', post_data);
                                             </div>
                                         </FormGroup>
                                     </Col>
-                                    <Col sm={12} md={4} lg={4}>
+                                    <Col sm={12} md={4} lg={5}>
                                         <FormGroup>
                                             <div className="formSection">
                                             <Field
@@ -1041,7 +1059,7 @@ console.log('post_data', post_data);
                                             >
                                             <option value="">{phrases['PrimaryRelation']}</option>
                                            { relation.map((relations, qIndex) => 
-                                            <option value={relations.id}>{relations.name}</option>                                        
+                                            relations.name != "Self" ? <option value={relations.id}>{relations.name}</option> : null                                       
                                            )}
                                             </Field>     
                                             {errors.nominee_relation_with && touched.nominee_relation_with ? (
@@ -1092,7 +1110,7 @@ console.log('post_data', post_data);
                                                         >
                                                         <option value="">{phrases['NomineeRelation']}</option>
                                                         { relation.map((relations, qIndex) => 
-                                                            <option value={relations.id}>{relations.name}</option>                                        
+                                                            relations.name != "Self" ? <option value={relations.id}>{relations.name}</option> : null                                        
                                                         )}
                                                         </Field>     
                                                         {errors.appointee_relation_with && touched.appointee_relation_with ? (
@@ -1177,6 +1195,42 @@ console.log('post_data', post_data);
                                         </FormGroup>
                                     </Col> : ''}
                                 </Row> 
+								
+								
+								
+								{showEIA==false && is_eia_account == '0' ?
+								<Row>
+                                    <Col sm={12} md={4} lg={4}>
+                                        <FormGroup>
+                                            <div className="insurerName">
+                                                <h4 className="fs-16">{phrases['Your_preferred_TPA']}</h4>
+                                            </div>
+                                        </FormGroup>
+                                    </Col>
+									<Col sm={12} md={4} lg={5}>
+										 <FormGroup>
+                                                    <div className="formSection">                                                           
+                                                        <Field
+                                                            name="tpaInsurance"
+                                                            component="select"
+                                                            autoComplete="off"
+                                                            value={values.tpaInsurance}
+                                                            className="formGrp"
+                                                        >
+                                                        <option value="">{phrases['SELECT_TPA']}</option>
+                                                        { tpaInsurance.map((relations, qIndex) => 
+                                                            <option value={relations.repository_id}>{relations.name}</option>                                        
+                                                        )}
+                                                        </Field>     
+                                                               
+                                                    </div>
+                                                </FormGroup>
+									</Col>
+								</Row> 
+									: ''}
+								
+								
+								
                                 <div className="d-flex justify-content-left resmb">
                                 <Button className={`backBtn`} type="button"  disabled={isSubmitting ? true : false} onClick= {this.otherComprehensive.bind(this,productId)}>
                                     {isSubmitting ? phrases['Wait'] : phrases['Back']}

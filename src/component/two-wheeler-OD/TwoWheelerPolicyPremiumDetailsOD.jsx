@@ -558,7 +558,7 @@ class TwoWheelerPolicyPremiumDetailsOD extends Component {
                                                                                                     <Col sm={12} md={6}>	
                                                                                                         <FormGroup>{ memberdetails ? moment(memberdetails.date_of_incorporation).format("DD-MM-YYYY") : null}</FormGroup>	
                                                                                                     </Col>	
-                                                                                                </Row>}}
+                                                                                                </Row>}
                                                                                             <Row>
                                                                                                 <Col sm={12} md={6}>
                                                                                                     <FormGroup>{phrases['MobileNo']}:</FormGroup>

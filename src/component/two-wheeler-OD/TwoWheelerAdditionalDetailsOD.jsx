@@ -47,7 +47,8 @@ const initialValue = {
     stateName: "",
     pinDataArr: [],
     pincode_id: "",
-    org_level: ""
+    org_level: "",
+	tpaInsurance: []
 }
 
 const ownerValidation = Yup.object().shape({
@@ -61,12 +62,15 @@ const ownerValidation = Yup.object().shape({
         .max(40, function() {
             return "FullNameMax"
         })
-        .matches(/^[a-zA-Z]+([\s]?[a-zA-Z]+)([\s]?[a-zA-Z]+)$/, function() {
+        .matches(/^[a-zA-Z]+([\s]?[a-zA-Z]+)([\s]+[a-zA-Z]+)$/, function() {
             return "ValidName"
         }),
-        otherwise: Yup.string().required('Company name is required').min(3, function() {
+        otherwise: Yup.string().required('CompanyNameReq').min(3, function() {
             return "CompanyNameMin"
         })
+        .matches(/^[a-zA-Z]+([\s]?[a-zA-Z])*$/, function() {
+            return "ValidName"
+        }),
     }),
 
 
@@ -86,7 +90,7 @@ const ownerValidation = Yup.object().shape({
             .test(
                 "18YearsChecking",
                 function() {
-                    return "Age should me minium 18 years and maximum 100 years"
+                    return "AgeRange"
                 },
                 function (value) {
                     if (value) {
@@ -100,9 +104,9 @@ const ownerValidation = Yup.object().shape({
 
     pancard: Yup.string()
     .notRequired(function() {
-        return "Enter PAN number"
+        return "EnterPan"
     }).matches(/^[A-Z]{3}[CPHFATBLJG]{1}[A-Z]{1}[0-9]{4}[A-Z]{1}$/, function() {
-        return "Please enter valid Pan Number"
+        return "ValidPan"
     }),
     pincode_id:Yup.string().required('LocationRequired'),
 
@@ -131,12 +135,12 @@ const ownerValidation = Yup.object().shape({
         }).matches(/^[a-zA-Z0-9]+([._\-]?[a-zA-Z0-9]+)*@\w+([-]?\w+)*(\.\w{2,3})+$/,'InvalidEmail'),
     salutation_id: Yup.string().when(['policy_for'], {
             is: policy_for => policy_for == '1',  
-            then: Yup.string().required('Title is required'),
+            then: Yup.string().required('TitleIsRequired'),
             otherwise: Yup.string().nullable()
         }),
     nominee_salutation: Yup.string().when(['policy_for'], {
             is: policy_for => policy_for == '1',  
-            then: Yup.string().required('Title is required'),
+            then: Yup.string().required('TitleIsRequired'),
             otherwise: Yup.string().nullable()
         }),
 
@@ -177,8 +181,8 @@ const ownerValidation = Yup.object().shape({
                 .max(40, function() {
                     return "NameReqMax"
                 })
-                .matches(/^[a-zA-Z]+([\s]?[a-zA-Z]+)([\s]?[a-zA-Z]+)$/, function() {
-                    return "Please enter valid name"
+                .matches(/^[a-zA-Z]+([\s]?[a-zA-Z]+)([\s]+[a-zA-Z]+)$/, function() {
+                    return "ValidName"
                 }),
         otherwise: Yup.string().nullable()
     }),
@@ -217,7 +221,7 @@ const ownerValidation = Yup.object().shape({
                 .test(
                     "3monthsChecking",
                     function() {
-                        return "Age should be minium 3 months"
+                        return "NomineeMinAge"
                     },
                     function (value) {
                         if (value) {
@@ -253,7 +257,7 @@ const ownerValidation = Yup.object().shape({
 
     appointee_name: Yup.string().when(['policy_for'], {
         is: policy_for => policy_for == '1',       
-        then: Yup.string().notRequired("Please enter appointee name")
+        then: Yup.string().notRequired()
                 .min(3, function() {
                     return "NameReqMin"
                 })
@@ -261,7 +265,7 @@ const ownerValidation = Yup.object().shape({
                     return "NameReqMax"
                 })        
                 .matches(/^[a-zA-Z]+([\s]?[a-zA-Z]+)([\s]?[a-zA-Z]+)$/, function() {
-                    return "Please enter valid name"
+                    return "ValidName"
                 }).test(
                     "18YearsChecking",
                     function() {
@@ -280,7 +284,7 @@ const ownerValidation = Yup.object().shape({
 
     appointee_relation_with: Yup.string().when(['policy_for'], {
         is: policy_for => policy_for == '1',       
-        then: Yup.string().notRequired("Please select relation")
+        then: Yup.string().notRequired()
                 .test(
                     "18YearsChecking",
                     function() {
@@ -314,7 +318,7 @@ const ownerValidation = Yup.object().shape({
     .test(
         "first2digitcheck",
         function() {
-            return "Invalid GSTIN"
+            return "ValidGST"
         },
         function (value) {
             if (value && (value != "" || value != undefined) ) {             
@@ -325,7 +329,7 @@ const ownerValidation = Yup.object().shape({
     )
     .nullable(),
 
-    is_carloan: Yup.mixed().required('This field is required'),
+    is_carloan: Yup.mixed().required('RequiredField'),
     bank_name:Yup.string().notRequired('BankNameReq')
     .test(
         "isLoanChecking",
@@ -421,6 +425,21 @@ class TwoWheelerAdditionalDetailsOD extends Component {
     //         })
     //     }
     // }
+	
+	showEIAText = (value) =>{
+        if(value == 1){
+            this.setState({
+                showEIA:true,
+                is_eia_account:1
+            })
+        }
+        else{
+            this.setState({
+                showEIA:false,
+                is_eia_account:0
+            })
+        }
+    }
 
     showLoanText = (value) =>{
         if(value == 1){
@@ -549,6 +568,21 @@ class TwoWheelerAdditionalDetailsOD extends Component {
             })
     }
 
+	tpaInsuranceRepository = () => {
+				axios.get(`/tpaInsuranceRepository`)
+            .then(res => {
+					
+					let tpaInsurance = res.data ? res.data : {};
+					console.log("tpaInsuranceRepository===", tpaInsurance);
+					
+					//let titleList = decryptResp.data.salutationlist
+					this.setState({
+					  tpaInsurance
+					});
+				});
+			console.log("tpaInsuranceRepository=");	
+	}
+
     fetchAreadetails=(e)=>{
         let pinCode = e.target.value;      
 
@@ -653,12 +687,13 @@ class TwoWheelerAdditionalDetailsOD extends Component {
 
     componentDidMount() {
         this.fetchData();
+		this.tpaInsuranceRepository();
     }
 
    
 
     render() {
-        const {showLoan, is_eia_account, is_loan_account, nomineeDetails, motorInsurance,appointeeFlag, is_appointee,titleList,
+        const {showEIA,showLoan, is_eia_account, is_loan_account, nomineeDetails, motorInsurance,appointeeFlag, is_appointee,titleList,tpaInsurance,
             bankDetails,policyHolder, stateName, pinDataArr, quoteId, addressDetails, relation,step_completed,vehicleDetails} = this.state
         const {productId} = this.props.match.params 
         let phrases = localStorage.getItem("phrases") ? JSON.parse(localStorage.getItem("phrases")) : null
@@ -974,7 +1009,7 @@ class TwoWheelerAdditionalDetailsOD extends Component {
                                                 value = {values.email}                                                                            
                                             />
                                             {errors.email && touched.email ? (
-                                            <span className="errorMsg">{phrases[errors.email]}</span>
+                                            <span className="errorMsg">{errors.email == "email must be a valid email" ? errors.email : phrases[errors.email]}</span>
                                             ) : null}  
                                             </div>
                                         </FormGroup>
@@ -1146,7 +1181,7 @@ class TwoWheelerAdditionalDetailsOD extends Component {
                                                     }                                                                           
                                             />
                                             {errors.pancard && touched.pancard ? (
-                                            <span className="errorMsg">{errors.pancard}</span>
+                                            <span className="errorMsg">{phrases[errors.pancard]}</span>
                                             ) : null} 
                                             </div>
                                         </FormGroup>
@@ -1264,7 +1299,7 @@ class TwoWheelerAdditionalDetailsOD extends Component {
                                             >
                                             <option value="">{phrases['PrimaryRelation']}</option>
                                            { relation.map((relations, qIndex) => 
-                                            <option value={relations.id}>{relations.name}</option>                                        
+                                            relations.name != "Self" ? <option value={relations.id}>{relations.name}</option> : null                                        
                                            )}
                                             </Field>     
                                             {errors.nominee_relation_with && touched.nominee_relation_with ? (
@@ -1314,7 +1349,7 @@ class TwoWheelerAdditionalDetailsOD extends Component {
                                                         >
                                                         <option value="">{phrases['NomineeRelation']}</option>
                                                         { relation.map((relations, qIndex) => 
-                                                            <option value={relations.id}>{relations.name}</option>                                        
+                                                             relations.name != "Self" ? <option value={relations.id}>{relations.name}</option> : null                                       
                                                         )}
                                                         </Field>     
                                                         {errors.appointee_relation_with && touched.appointee_relation_with ? (
@@ -1404,6 +1439,129 @@ class TwoWheelerAdditionalDetailsOD extends Component {
                                         </FormGroup>
                                     </Col> : ''}
                                 </Row>  */}
+								
+								
+								
+								
+								
+								
+								                                <Row>
+                                    <Col sm={12} md={4} lg={4}>
+                                        <FormGroup>
+                                            <div className="insurerName">
+                                                <h4 className="fs-16">{phrases['EIAAccount']}</h4>
+                                            </div>
+                                        </FormGroup>
+                                    </Col>
+                                    <Col sm={12} md={4} lg={4}>
+                                        <FormGroup>
+                                            <div className="d-inline-flex m-b-35">
+                                                <div className="p-r-25">
+                                                    <label className="customRadio3">
+                                                    <Field
+                                                        type="radio"
+                                                        name='is_eia_account'                                            
+                                                        value='1'
+                                                        key='1'  
+                                                        onChange={(e) => {
+                                                            setFieldValue(`is_eia_account`, e.target.value);
+                                                            this.showEIAText(1);
+                                                        }}
+                                                        checked={values.is_eia_account == '1' ? true : false}
+                                                    />
+                                                        <span className="checkmark " /><span className="fs-14"> {phrases['Yes']}</span>
+                                                    </label>
+                                                </div>
+
+                                                <div className="">
+                                                    <label className="customRadio3">
+                                                        <Field
+                                                        type="radio"
+                                                        name='is_eia_account'                                            
+                                                        value='0'
+                                                        key='1'  
+                                                        onChange={(e) => {
+                                                            setFieldValue(`is_eia_account`, e.target.value);
+                                                            this.showEIAText(0);
+                                                        }}
+                                                        checked={values.is_eia_account == '0' ? true : false}
+                                                    />
+                                                        <span className="checkmark" />
+                                                        <span className="fs-14">{phrases['No']}</span>
+                                                        {errors.is_eia_account && touched.is_eia_account ? (
+                                                        <span className="errorMsg">{phrases[errors.is_eia_account]}</span>
+                                                    ) : null}
+                                                    </label>
+                                                </div>
+                                            </div>
+                                        </FormGroup>
+                                    </Col>
+                                    {showEIA || is_eia_account == '1' ?
+                                    <Col sm={12} md={4} lg={4}>
+                                        <FormGroup>
+                                        <div className="insurerName">   
+                                            <Field
+                                                name="eia_no"
+                                                type="text"
+                                                placeholder={phrases['EIANumber']}
+                                                autoComplete="off"
+                                                value = {values.eia_no}
+                                                maxLength="13"
+                                                onFocus={e => this.changePlaceHoldClassAdd(e)}
+                                                onBlur={e => this.changePlaceHoldClassRemove(e)}
+                                            />
+                                            {errors.eia_no && touched.eia_no ? (
+                                            <span className="errorMsg">{phrases[errors.eia_no]}</span>
+                                            ) : null}                                             
+                                            </div>
+                                        </FormGroup>
+                                    </Col> : ''}
+									
+									
+							</Row> 		
+									
+									
+							{showEIA==false && is_eia_account == '0' ?
+								<Row>
+                                    <Col sm={12} md={4} lg={4}>
+                                        <FormGroup>
+                                            <div className="insurerName">
+                                                <h4 className="fs-16">{phrases['Your_preferred_TPA']}</h4>
+                                            </div>
+                                        </FormGroup>
+                                    </Col>
+									<Col sm={12} md={4} lg={5}>
+										 <FormGroup>
+                                                    <div className="formSection">                                                           
+                                                        <Field
+                                                            name="tpaInsurance"
+                                                            component="select"
+                                                            autoComplete="off"
+                                                            value={values.tpaInsurance}
+                                                            className="formGrp"
+                                                        >
+                                                        <option value="">{phrases['SELECT_TPA']}</option>
+                                                        { tpaInsurance.map((relations, qIndex) => 
+                                                            <option value={relations.repository_id}>{relations.name}</option>                                        
+                                                        )}
+                                                        </Field>     
+                                                               
+                                                    </div>
+                                                </FormGroup>
+									</Col>
+								</Row> 
+									: ''}
+								
+								
+								
+								
+								
+								
+								
+								
+								
+								
+								
 
                                 <div className="d-flex justify-content-left carloan">
                                     <h4> </h4>

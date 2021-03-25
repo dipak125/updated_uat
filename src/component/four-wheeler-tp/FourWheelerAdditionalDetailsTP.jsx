@@ -389,7 +389,8 @@ class TwoWheelerAdditionalDetails extends Component {
         appointeeFlag: false,
         is_appointee:0,
         request_data: [],
-        titleList: []
+        titleList: [],
+		tpaInsurance: []
     };
     
     ageCheck = (value) => {
@@ -433,6 +434,22 @@ class TwoWheelerAdditionalDetails extends Component {
     //         })
     //     }
     // }
+	
+	
+	showEIAText = (value) =>{
+        if(value == 1){
+            this.setState({
+                showEIA:true,
+                is_eia_account:1
+            })
+        }
+        else{
+            this.setState({
+                showEIA:false,
+                is_eia_account:0
+            })
+        }
+    }
 
     showLoanText = (value) =>{
         if(value == 1){
@@ -666,14 +683,30 @@ class TwoWheelerAdditionalDetails extends Component {
     
 }
 
+	tpaInsuranceRepository = () => {
+				axios.get(`/tpaInsuranceRepository`)
+            .then(res => {
+					
+					let tpaInsurance = res.data ? res.data : {};
+					console.log("tpaInsuranceRepository===", tpaInsurance);
+					
+					//let titleList = decryptResp.data.salutationlist
+					this.setState({
+					  tpaInsurance
+					});
+				});
+			console.log("tpaInsuranceRepository=");	
+	}
+
     componentDidMount() {
         this.fetchRelationships();
+		this.tpaInsuranceRepository();
     }
 
    
 
     render() {
-        const {showLoan, is_eia_account, is_loan_account, nomineeDetails, motorInsurance,appointeeFlag, is_appointee,titleList,
+        const {showEIA, showLoan, is_eia_account, is_loan_account, nomineeDetails, motorInsurance,appointeeFlag, is_appointee,titleList, tpaInsurance,
             bankDetails,policyHolder, stateName, pinDataArr, quoteId, addressDetails, relation,step_completed,vehicleDetails} = this.state
         const {productId} = this.props.match.params 
         let phrases = localStorage.getItem("phrases") ? JSON.parse(localStorage.getItem("phrases")) : null
@@ -1415,6 +1448,118 @@ class TwoWheelerAdditionalDetails extends Component {
                                         </FormGroup>
                                     </Col> : ''}
                                 </Row>  */}
+								
+								
+								
+								<Row>
+                                    <Col sm={12} md={4} lg={4}>
+                                        <FormGroup>
+                                            <div className="insurerName">
+                                                <h4 className="fs-16">{phrases['EIAAccount']}</h4>
+                                            </div>
+                                        </FormGroup>
+                                    </Col>
+                                    <Col sm={12} md={4} lg={4}>
+                                        <FormGroup>
+                                            <div className="d-inline-flex m-b-35">
+                                                <div className="p-r-25">
+                                                    <label className="customRadio3">
+                                                    <Field
+                                                        type="radio"
+                                                        name='is_eia_account'                                            
+                                                        value='1'
+                                                        key='1'  
+                                                        onChange={(e) => {
+                                                            setFieldValue(`is_eia_account`, e.target.value);
+                                                            this.showEIAText(1);
+                                                        }}
+                                                        checked={values.is_eia_account == '1' ? true : false}
+                                                    />
+                                                        <span className="checkmark " /><span className="fs-14"> {phrases['Yes']}</span>
+                                                    </label>
+                                                </div>
+
+                                                <div className="">
+                                                    <label className="customRadio3">
+                                                        <Field
+                                                        type="radio"
+                                                        name='is_eia_account'                                            
+                                                        value='0'
+                                                        key='1'  
+                                                        onChange={(e) => {
+                                                            setFieldValue(`is_eia_account`, e.target.value);
+                                                            this.showEIAText(0);
+                                                        }}
+                                                        checked={values.is_eia_account == '0' ? true : false}
+                                                    />
+                                                        <span className="checkmark" />
+                                                        <span className="fs-14">{phrases['No']}</span>
+                                                        {errors.is_eia_account && touched.is_eia_account ? (
+                                                        <span className="errorMsg">{phrases[errors.is_eia_account]}</span>
+                                                    ) : null}
+                                                    </label>
+                                                </div>
+                                            </div>
+                                        </FormGroup>
+                                    </Col>
+                                    {showEIA || is_eia_account == '1' ?
+                                    <Col sm={12} md={4} lg={4}>
+                                        <FormGroup>
+                                        <div className="insurerName">   
+                                            <Field
+                                                name="eia_no"
+                                                type="text"
+                                                placeholder={phrases['EIANumber']}
+                                                autoComplete="off"
+                                                value = {values.eia_no}
+                                                maxLength="13"
+                                                onFocus={e => this.changePlaceHoldClassAdd(e)}
+                                                onBlur={e => this.changePlaceHoldClassRemove(e)}
+                                            />
+                                            {errors.eia_no && touched.eia_no ? (
+                                            <span className="errorMsg">{phrases[errors.eia_no]}</span>
+                                            ) : null}                                             
+                                            </div>
+                                        </FormGroup>
+                                    </Col> : ''}
+									
+									
+							</Row> 		
+									
+									
+							{showEIA==false && is_eia_account == '0' ?
+								<Row>
+                                    <Col sm={12} md={4} lg={4}>
+                                        <FormGroup>
+                                            <div className="insurerName">
+                                                <h4 className="fs-16">{phrases['Your_preferred_TPA']}</h4>
+                                            </div>
+                                        </FormGroup>
+                                    </Col>
+									<Col sm={12} md={4} lg={5}>
+										 <FormGroup>
+                                                    <div className="formSection">                                                           
+                                                        <Field
+                                                            name="tpaInsurance"
+                                                            component="select"
+                                                            autoComplete="off"
+                                                            value={values.tpaInsurance}
+                                                            className="formGrp"
+                                                        >
+                                                        <option value="">{phrases['SELECT_TPA']}</option>
+                                                        { tpaInsurance.map((relations, qIndex) => 
+                                                            <option value={relations.repository_id}>{relations.name}</option>                                        
+                                                        )}
+                                                        </Field>     
+                                                               
+                                                    </div>
+                                                </FormGroup>
+									</Col>
+								</Row> 
+									: ''}
+								
+								
+								
 
                                 <div className="d-flex justify-content-left carloan">
                                     <h4> </h4>
