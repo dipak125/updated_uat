@@ -475,6 +475,18 @@ const Renewal = Loadable({
     loading: () => loadingContent
 });
 
+const MotorSummery = Loadable({
+    loader: () => import(/*webpackChunkName: "Products" */"../Renewal/Motor/MotorSummery.jsx"),
+    loading: () => loadingContent
+});
+
+//  ************ Claim Intimation ******************
+
+const ClaimIntimation = Loadable({
+    loader: () => import(/*webpackChunkName: "Products" */"../Claim_Intimation/ClaimIntimation.jsx"),
+    loading: () => loadingContent
+});
+
 
 
 class Routes extends Component {
@@ -639,9 +651,12 @@ class Routes extends Component {
                         <PrivateRoute exact path="/PremiumOD/:productId" component={PremiumOD} />
                         {/* <PrivateRoute exact path="/ThankYou_motor/:policyId" component={ThankYou_motor} /> */}
                         
+                        {/************ Claim Intimation ******************/}
+                        <PrivateRoute exact path="/ClaimIntimation" component={ClaimIntimation} />      
 
                         {/************ Renewal ******************/}
-						<PrivateRoute exact path="/Renewal" component={Renewal} />                    
+						<PrivateRoute exact path="/Renewal" component={Renewal} />     
+                        <PrivateRoute exact path="/MotorSummery" component={MotorSummery} />                
 						
                         <Redirect from="/" to="/Dashboard" />
                     </Switch>

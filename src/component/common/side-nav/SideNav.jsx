@@ -133,6 +133,17 @@ class SideNav extends Component {
               </Link>
             </li>
             <li>
+              <Link to="/ClaimIntimation" activeClassName="active">
+                <span className="leftIcon01">
+                  <img
+                    src={require("../../../assets/images/support.png")}
+                    alt=""
+                  />
+                </span>
+                {childPhrase['ClaimIntimation']}
+              </Link>
+            </li>
+            <li>
               <Link to="/Renewal" activeClassName="active">
                 <span className="leftIcon01">
                   <img

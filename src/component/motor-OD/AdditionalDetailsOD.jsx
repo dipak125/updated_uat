@@ -15,6 +15,7 @@ import axios from "../../shared/axios"
 import moment from "moment";
 import {  PersonAge } from "../../shared/dateFunctions";
 import Encryption from '../../shared/payload-encryption';
+import {  fullNameValidation, addressValidation } from "../../shared/validationFunctions";
 
 
 const minDobAdult = moment(moment().subtract(100, 'years').calendar())
@@ -55,6 +56,15 @@ const ownerValidation = Yup.object().shape({
         .max(40, function() {
             return "FullNameMax"
         })
+        .test(
+            "nameChecking",
+            function() {
+                return "FirstNameMin"
+            },
+            function(value) {   
+                return fullNameValidation(value);
+            }
+        )
         .matches(/^[a-zA-Z]+([\s]?[a-zA-Z]+)([\s]+[a-zA-Z]+)$/, function() {
             return "ValidName"
         }),
@@ -70,7 +80,6 @@ const ownerValidation = Yup.object().shape({
             return "AgeRange"
         },
         function (value) {
-            console.log("dob-val-----> ", value)
             if (value) {
                 const ageObj = new PersonAge();
                 return ageObj.whatIsMyAge(value) <= 100 && ageObj.whatIsMyAge(value) >= 18;
@@ -92,11 +101,15 @@ const ownerValidation = Yup.object().shape({
     }),
 
     address:Yup.string().required('AddressRequired')
-    // .matches(/^(?![0-9._])(?!.*[0-9._]$)(?!.*\d_)(?!.*_\d)[a-zA-Z0-9_.,-\\]+$/, 
-    .matches(/^[a-zA-Z0-9]+([\s]?[a-zA-Z0-9\s,/.-])*$/, 
-    function() {
-        return "PleaseEnterValidAddress"
-    })
+    .test(
+        "addressChecking",
+        function() {
+            return "PleaseEnterValidAddress"
+        },
+        function(value) {   
+            return addressValidation(value);
+        }
+    )
     .max(100, function() {
         return "AddressMustBeMaximum100Chracters"
     }),
@@ -155,11 +168,20 @@ const ownerValidation = Yup.object().shape({
         is: pa_flag => pa_flag == '1',       
         then: Yup.string().required("NomineeNameRequired")
                 .min(3, function() {
-                    return "NameReqMin"
+                    return "FirstNameMin"
                 })
                 .max(40, function() {
                     return "NameReqMax"
                 })
+                .test(
+                    "nameChecking",
+                    function() {
+                        return "FirstNameMin"
+                    },
+                    function(value) {   
+                        return fullNameValidation(value);
+                    }
+                )
                 .matches(/^[a-zA-Z]+([\s]?[a-zA-Z]+)([\s]+[a-zA-Z]+)$/, function() {
                     return "ValidName"
                 }),
@@ -269,8 +291,7 @@ class AdditionalDetailsOD extends Component {
         is_appointee:0,
         appointeeFlag: false,
         motorInsurance: [],
-        titleList: [],
-		tpaInsurance: []
+        titleList: []
     };
 
     ageCheck = (value) => {
@@ -524,31 +545,17 @@ console.log('post_data', post_data);
             });
           })
       }
-	tpaInsuranceRepository = () => {
-				axios.get(`/tpaInsuranceRepository`)
-            .then(res => {
-					
-					let tpaInsurance = res.data ? res.data : {};
-					console.log("tpaInsuranceRepository===", tpaInsurance);
-					
-					//let titleList = decryptResp.data.salutationlist
-					this.setState({
-					  tpaInsurance
-					});
-				});
-			console.log("tpaInsuranceRepository=");	
-	}
+
 
     componentDidMount() {
         this.fetchData();
         this.fetchRelationships();
-		this.tpaInsuranceRepository();
     }
 
    
 
     render() {
-        const {showEIA, is_eia_account, showLoan, is_loan_account, nomineeDetails, is_appointee,appointeeFlag, titleList,tpaInsurance,
+        const {showEIA, is_eia_account, showLoan, is_loan_account, nomineeDetails, is_appointee,appointeeFlag, titleList,
             bankDetails,policyHolder, stateName, pinDataArr, quoteId, addressDetails, relation, motorInsurance} = this.state
         const {productId} = this.props.match.params 
         let phrases = localStorage.getItem("phrases") ? JSON.parse(localStorage.getItem("phrases")) : null        
@@ -608,7 +615,7 @@ console.log('post_data', post_data);
                         {({ values, errors, setFieldValue, setFieldTouched, isValid, isSubmitting, touched }) => {
                              let value = values.nominee_first_name;
 
-                        console.log("errors--------------> ", errors)
+                        // console.log("errors--------------> ", errors)
                         return (
                         <Form>
                         <Row>
@@ -1195,42 +1202,6 @@ console.log('post_data', post_data);
                                         </FormGroup>
                                     </Col> : ''}
                                 </Row> 
-								
-								
-								
-								{showEIA==false && is_eia_account == '0' ?
-								<Row>
-                                    <Col sm={12} md={4} lg={4}>
-                                        <FormGroup>
-                                            <div className="insurerName">
-                                                <h4 className="fs-16">{phrases['Your_preferred_TPA']}</h4>
-                                            </div>
-                                        </FormGroup>
-                                    </Col>
-									<Col sm={12} md={4} lg={5}>
-										 <FormGroup>
-                                                    <div className="formSection">                                                           
-                                                        <Field
-                                                            name="tpaInsurance"
-                                                            component="select"
-                                                            autoComplete="off"
-                                                            value={values.tpaInsurance}
-                                                            className="formGrp"
-                                                        >
-                                                        <option value="">{phrases['SELECT_TPA']}</option>
-                                                        { tpaInsurance.map((relations, qIndex) => 
-                                                            <option value={relations.repository_id}>{relations.name}</option>                                        
-                                                        )}
-                                                        </Field>     
-                                                               
-                                                    </div>
-                                                </FormGroup>
-									</Col>
-								</Row> 
-									: ''}
-								
-								
-								
                                 <div className="d-flex justify-content-left resmb">
                                 <Button className={`backBtn`} type="button"  disabled={isSubmitting ? true : false} onClick= {this.otherComprehensive.bind(this,productId)}>
                                     {isSubmitting ? phrases['Wait'] : phrases['Back']}

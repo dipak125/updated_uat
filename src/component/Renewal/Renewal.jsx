@@ -55,42 +55,12 @@ class renewal extends Component {
     back = () => {
         this.props.history.push(`/Products`);
     }
-
-
-    componentDidMount() {
-        this.fetchData();
-
-    }
-
-    fetchData = () => {
-        const { productId } = this.props.match.params
-        let policyHolder_id = localStorage.getItem("policyHolder_refNo") ? localStorage.getItem("policyHolder_refNo") : 0;
-        let encryption = new Encryption();
-        this.props.loadingStart();
-        axios.get(`policy-holder/motor/${policyHolder_id}`)
-            .then(res => {
-                let decryptResp = JSON.parse(encryption.decrypt(res.data))
-                console.log("decrypt", decryptResp)
-
-                let motorInsurance = decryptResp.data.policyHolder.motorinsurance
-                let fastlanelog = decryptResp.data.policyHolder ? decryptResp.data.policyHolder.fastlanelog : {};
-                this.setState({
-                    motorInsurance, fastlanelog
-                })
-                this.props.loadingStop();
-            })
-            .catch(err => {
-                // handle error
-                this.props.loadingStop();
-            })
+    forward = () => {
+        this.props.history.push(`/MotorSummery`);
     }
 
 
     handleSubmit = (values, actions) => {
-
-        const { productId } = this.props.match.params;
-        const { fastlanelog } = this.state;
-
         const formData = new FormData();
         let encryption = new Encryption();
         let post_data = {}
@@ -98,8 +68,6 @@ class renewal extends Component {
         post_data = {
             'policy_number': values.policy_number,
         }
-           
-        console.log('post_data', post_data)
         // formData.append('enc_data', encryption.encrypt(JSON.stringify(post_data)))
         formData.append('policy_number', values.policy_number)
 
@@ -108,6 +76,10 @@ class renewal extends Component {
             .post(`/renewal/policy-search`, formData)
             .then(res => {
                if(res.data.error == false){
+                actions.setSubmitting(false)
+                if(res.data.data.eligible_for_renewal == 1) {
+                    this.quoteDetails(values.policy_number, actions)
+                }
                 this.props.loadingStop();
                }
                else {
@@ -118,9 +90,37 @@ class renewal extends Component {
             })
             .catch(err => {
                 if (err && err.data) {
-                    swal('Registratioon number required...');
                     actions.setSubmitting(false)
                 }
+                this.props.loadingStop();
+            });
+        }
+
+    quoteDetails = (policy_number, actions) => {
+        const formData = new FormData();
+        let encryption = new Encryption();
+        let post_data = {}
+
+        post_data = {
+            'policy_number': policy_number,
+        }
+        // formData.append('enc_data', encryption.encrypt(JSON.stringify(post_data)))
+        formData.append('policy_number', policy_number)
+
+        this.props.loadingStart();
+        axios
+            .post(`/renewal/quote-detail`, formData)
+            .then(res => {
+                if(res.data.error == false){
+                localStorage.setItem("policyHolder_refNo", res.data.data.reference_no)	
+                this.forward()
+                }
+                else {
+                swal(res.data.msg);
+                this.props.loadingStop();
+                }              
+            })
+            .catch(err => {
                 this.props.loadingStop();
             });
         }

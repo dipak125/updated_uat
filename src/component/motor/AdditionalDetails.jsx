@@ -373,7 +373,8 @@ class AdditionalDetails extends Component {
             'is_appointee': this.state.is_appointee,
             'salutation_id': values['salutation_id'],
             'nominee_title_id': values['nominee_salutation'],
-            'page_name': `Additional_details/${productId}`,
+            'page_name': `Additional_details/${productId}`, 
+			'tpaInsurance': values['tpaInsurance'],
         }
 console.log('post_data', post_data);
         formData.append('enc_data',encryption.encrypt(JSON.stringify(post_data)))

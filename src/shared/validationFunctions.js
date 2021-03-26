@@ -263,3 +263,37 @@ export const alphanumericCheck = (value) => {
         }   
     else return false;  
 }
+
+export const fullNameValidation = (value) => {
+    
+    if ( value && (value != '' || value != undefined) ) {  
+        var dataArr = value.split(" ")
+        if(dataArr.length > 1 && dataArr[1] != "")
+        return true
+    }
+     return false;
+}
+
+export const addressValidation = (value) => {
+    var str1 = /^[0-9]*$/g ;
+    var str2 = /^[a-zA-Z]*$/g ;
+    var str3 = /^([a-zA-Z0-9]+[-,./]?\s?)*[a-zA-Z0-9-,./]+$/g
+    var a = 0
+    var b = 0
+    
+    if ( value && (value != '' || value != undefined) && value.match(str3)) {  
+        var dataArr = value.split("")     
+        for(var i =0 ; i<dataArr.length; i++) {
+            if( dataArr[i].match(str1) ) {
+                a++
+            }   
+            else if( dataArr[i].match(str2) ) {
+                b++
+            }   
+        }  
+        if(a > 0 && b > 0){
+            return true;
+        }    
+    }
+     return false;
+}

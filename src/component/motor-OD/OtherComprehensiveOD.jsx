@@ -56,7 +56,7 @@ const ComprehensiveValidation = Yup.object().shape({
 
     chasis_no_last_part:Yup.string().required('RequiredField')
     .matches(/^([0-9]*)$/, function() {
-        return "Invalid number"
+        return "InvalidNumber"
     })
     .min(5, function() {
         return "ChasisLastDigit"
@@ -1077,7 +1077,7 @@ class OtherComprehensiveOD extends Component {
                         <Row>
                             <Col sm={12} md={9} lg={9}>
                                 <div className="rghtsideTrigr W-90 m-b-30">
-                                    <Collapsible trigger={phrases['DefaultCovered']} >
+                                    <Collapsible trigger={phrases['DefaultCovered']} open = {true}>
                                         <div className="listrghtsideTrigr">
                                             {policyCoverageList}
                                         </div>
@@ -1137,7 +1137,7 @@ class OtherComprehensiveOD extends Component {
                                         <Col sm={12} md={5} lg={6}>
                                             <FormGroup>
                                                 <div className="insurerName">
-                                                {phrases['ChassisNo']}.
+                                                {phrases['ChassisNo']}
                                                 </div>
                                             </FormGroup>
                                         </Col>
@@ -1375,9 +1375,7 @@ class OtherComprehensiveOD extends Component {
                                 <Row key={qIndex}>   
                                     <Col sm={12} md={11} lg={6} key={qIndex+"a"} >
                                         <label className="customCheckBox formGrp formGrp">{coverage.name}
-                                            <OverlayTrigger overlay={<Tooltip id="tooltip-disabled">{coverage.description}</Tooltip>}>
-                                                <a className="infoIcon"><img src={require('../../assets/images/i.svg')} alt="" className="premtool" /></a>
-                                            </OverlayTrigger>
+                                           
                                             <Field
                                                 type="checkbox"
                                                 // name={`moreCov_${qIndex}`}
