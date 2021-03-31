@@ -140,7 +140,7 @@ class SideNav extends Component {
                     alt=""
                   />
                 </span>
-                {childPhrase['ClaimIntimation']}
+                {childPhrase['ClaimModule']}
               </Link>
             </li>
             <li>

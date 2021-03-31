@@ -50,7 +50,7 @@ class ClaimIntimation extends Component {
                                                 <Col sm={12}>
                                                     <Nav variant="pills" className="flex-column">
                                                         <div className="d-flex justify-content-left messageDeskTab">
-                                                        <div><Nav.Item><Nav.Link eventKey="first">{phrases['ClaimIntimation']}</Nav.Link></Nav.Item></div>
+                                                        <div><Nav.Item><Nav.Link eventKey="first">{phrases['ClaimModule']}</Nav.Link></Nav.Item></div>
                                                         
                                                         </div>
                                                     </Nav>

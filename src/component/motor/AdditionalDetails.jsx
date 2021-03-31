@@ -41,6 +41,7 @@ const initialValue = {
     email: "",
     address: "",
     is_eia_account: "",
+	is_eia_account2: "",
     eia_no: "",
     stateName: "",
     pinDataArr: [],
@@ -260,7 +261,9 @@ class AdditionalDetails extends Component {
 
     state = {
         showEIA: false,
+		showEIA2: false,
         is_eia_account: '',
+		is_eia_account2: '',
         showLoan: false,
         is_loan_account: '',
         insurerList: [],
@@ -316,6 +319,20 @@ class AdditionalDetails extends Component {
             this.setState({
                 showEIA:false,
                 is_eia_account:0
+            })
+        }
+    }
+	showEIAText2 = (value) =>{
+        if(value == 1){
+            this.setState({
+                showEIA2:true,
+                is_eia_account2:1
+            })
+        }
+        else{
+            this.setState({
+                showEIA2:false,
+                is_eia_account2:0
             })
         }
     }
@@ -409,6 +426,9 @@ console.log('post_data', post_data);
                  let is_loan_account = decryptResp.data.policyHolder ? decryptResp.data.policyHolder.is_carloan : 0
                  let quoteId = decryptResp.data.policyHolder ? decryptResp.data.policyHolder.request_data.quote_id : ""
                  let is_eia_account=  policyHolder && (policyHolder.is_eia_account == 0 || policyHolder.is_eia_account == 1) ? policyHolder.is_eia_account : ""
+                 
+				 let is_eia_account2=  policyHolder && (policyHolder.is_eia_account2 == 0 || policyHolder.is_eia_account2 == 1) ? policyHolder.is_eia_account2 : ""
+				 
                  let bankDetails = decryptResp.data.policyHolder && decryptResp.data.policyHolder.bankdetail ? decryptResp.data.policyHolder.bankdetail[0] : {};
                  let addressDetails = JSON.parse(decryptResp.data.policyHolder.pincode_response)
                  this.setState({
@@ -558,7 +578,7 @@ console.log('post_data', post_data);
    
 
     render() {
-        const {showEIA, is_eia_account, showLoan, is_loan_account, nomineeDetails, is_appointee,appointeeFlag, titleList,tpaInsurance,
+        const {showEIA, showEIA2, is_eia_account,is_eia_account2, showLoan, is_loan_account, nomineeDetails, is_appointee,appointeeFlag, titleList,tpaInsurance,
             bankDetails,policyHolder, stateName, pinDataArr, quoteId, addressDetails, relation, motorInsurance} = this.state
         const {productId} = this.props.match.params 
         let phrases = localStorage.getItem("phrases") ? JSON.parse(localStorage.getItem("phrases")) : null        
@@ -584,6 +604,7 @@ console.log('post_data', post_data);
             email:  policyHolder && policyHolder.email_id ? policyHolder.email_id : "",
             address: policyHolder && policyHolder.address ? policyHolder.address : "",
             is_eia_account:  is_eia_account,
+			is_eia_account2:  is_eia_account2,
             eia_no: policyHolder && policyHolder.eia_no ? policyHolder.eia_no : "",
             appointee_relation_with: nomineeDetails && nomineeDetails.appointee_relation_with ? nomineeDetails.appointee_relation_with : "",
             appointee_name: nomineeDetails && nomineeDetails.appointee_name ? nomineeDetails.appointee_name : "",
@@ -1209,9 +1230,62 @@ console.log('post_data', post_data);
 									
 									
 							</Row> 		
-									
-									
+							
 							{showEIA==false && is_eia_account == '0' ?
+								<Row>
+                                    <Col sm={12} md={4} lg={4}>
+                                        <FormGroup>
+                                            <div className="insurerName">
+                                                <h4 className="fs-16">{phrases['wish_to_create_EIA_Account']}</h4>
+                                            </div>
+                                        </FormGroup>
+                                    </Col>
+                                    <Col sm={12} md={4} lg={4}>
+                                        <FormGroup>
+                                            <div className="d-inline-flex m-b-35">
+                                                <div className="p-r-25">
+                                                    <label className="customRadio3">
+                                                    <Field
+                                                        type="radio"
+                                                        name='is_eia_account2'                                            
+                                                        value='1'
+                                                        key='1'  
+                                                        onChange={(e) => {
+                                                            setFieldValue(`is_eia_account2`, e.target.value);
+                                                            this.showEIAText2(1);
+                                                        }}
+                                                        checked={values.is_eia_account2 == '1' ? true : false}
+                                                    />
+                                                        <span className="checkmark " /><span className="fs-14"> {phrases['Yes']}</span>
+                                                    </label>
+                                                </div>
+
+                                                <div className="">
+                                                    <label className="customRadio3">
+                                                        <Field
+                                                        type="radio"
+                                                        name='is_eia_account2'                                            
+                                                        value='0'
+                                                        key='1'  
+                                                        onChange={(e) => {
+                                                            setFieldValue(`is_eia_account2`, e.target.value);
+                                                            this.showEIAText2(0);
+                                                        }}
+                                                        checked={values.is_eia_account2 == '0' ? true : false}
+                                                    />
+                                                        <span className="checkmark" />
+                                                        <span className="fs-14">{phrases['No']}</span>
+                                                        
+                                                    </label>
+                                                </div>
+                                            </div>
+                                        </FormGroup>
+                                    </Col>							
+								</Row> 
+							: ''}
+
+									
+							{showEIA2 || is_eia_account2 == '1' ?
 								<Row>
                                     <Col sm={12} md={4} lg={4}>
                                         <FormGroup>

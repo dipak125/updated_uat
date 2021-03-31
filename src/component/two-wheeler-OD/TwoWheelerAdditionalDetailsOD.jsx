@@ -44,6 +44,7 @@ const initialValue = {
     email: "",
     address: "",
     is_eia_account: "0",
+	is_eia_account2: "",
     eia_no: "",
     stateName: "",
     pinDataArr: [],
@@ -389,7 +390,9 @@ class TwoWheelerAdditionalDetailsOD extends Component {
 
     state = {
         showEIA: false,
+		showEIA2: false,
         is_eia_account: '',
+		is_eia_account2: '',
         showLoan: false,
         is_loan_account: '',
         insurerList: [],
@@ -403,7 +406,8 @@ class TwoWheelerAdditionalDetailsOD extends Component {
         appointeeFlag: false,
         is_appointee:0,
         titleList: [],
-        nominee_titleList: []
+        nominee_titleList: [],
+		tpaInsurance: []
     };
     
     ageCheck = (value) => {
@@ -447,6 +451,35 @@ class TwoWheelerAdditionalDetailsOD extends Component {
     //         })
     //     }
     // }
+	
+	showEIAText = (value) =>{
+        if(value == 1){
+            this.setState({
+                showEIA:true,
+                is_eia_account:1
+            })
+        }
+        else{
+            this.setState({
+                showEIA:false,
+                is_eia_account:0
+            })
+        }
+    }
+	showEIAText2 = (value) =>{
+        if(value == 1){
+            this.setState({
+                showEIA2:true,
+                is_eia_account2:1
+            })
+        }
+        else{
+            this.setState({
+                showEIA2:false,
+                is_eia_account2:0
+            })
+        }
+    }
 
     showLoanText = (value) =>{
         if(value == 1){
@@ -488,12 +521,14 @@ class TwoWheelerAdditionalDetailsOD extends Component {
             'phone': values['phone'],
             'email': values['email'],
             'is_eia_account': values['is_eia_account'],
+			'is_eia_account2': values['is_eia_account2'],
             'eia_no': values['eia_no'],
             'address': values['address'],          
             'gstn_no': values['gstn_no'],
             'salutation_id': values['salutation_id'],
             'nominee_title_id': values['nominee_salutation'],
             'page_name': `two_wheeler_additional_detailsOD/${productId}`,
+			'tpaInsurance': values['tpaInsurance'],
         }
         if(motorInsurance.policy_for == '1' && motorInsurance.pa_flag == '1'){
             post_data['dob'] = moment(values['dob']).format("YYYY-MM-DD")
@@ -555,6 +590,9 @@ class TwoWheelerAdditionalDetailsOD extends Component {
                  let is_loan_account = decryptResp.data.policyHolder ? decryptResp.data.policyHolder.is_carloan : 0
                  let quoteId = decryptResp.data.policyHolder ? decryptResp.data.policyHolder.request_data.quote_id : ""
                  let is_eia_account=  policyHolder && (policyHolder.is_eia_account == 0 || policyHolder.is_eia_account == 1) ? policyHolder.is_eia_account : ""
+				 
+				 let is_eia_account2=  policyHolder && (policyHolder.is_eia_account2 == 0 || policyHolder.is_eia_account2 == 1) ? policyHolder.is_eia_account2 : ""
+				 
                  let bankDetails = decryptResp.data.policyHolder && decryptResp.data.policyHolder.bankdetail ? decryptResp.data.policyHolder.bankdetail[0] : {};
                  let addressDetails = JSON.parse(decryptResp.data.policyHolder.pincode_response)
                  let step_completed = decryptResp.data.policyHolder ? decryptResp.data.policyHolder.step_no : "";
@@ -562,7 +600,7 @@ class TwoWheelerAdditionalDetailsOD extends Component {
                 //  return false;
                  this.setState({
                     quoteId, motorInsurance, vehicleDetails, policyHolder, nomineeDetails, is_loan_account, 
-                    is_eia_account, bankDetails, addressDetails, step_completed,
+                    is_eia_account, is_eia_account2, bankDetails, addressDetails, step_completed,
                     is_appointee: nomineeDetails ? nomineeDetails.is_appointee : ""
                     
                 })
@@ -574,6 +612,9 @@ class TwoWheelerAdditionalDetailsOD extends Component {
                 this.props.loadingStop();
             })
     }
+
+
+
 
     fetchAreadetails=(e)=>{
         let pinCode = e.target.value;      
@@ -676,15 +717,31 @@ class TwoWheelerAdditionalDetailsOD extends Component {
                 });
             })       
     }
+	
+		tpaInsuranceRepository = () => {
+				axios.get(`/tpaInsuranceRepository`)
+            .then(res => {
+					
+					let tpaInsurance = res.data ? res.data : {};
+					console.log("tpaInsuranceRepository===", tpaInsurance);
+					
+					//let titleList = decryptResp.data.salutationlist
+					this.setState({
+					  tpaInsurance
+					});
+				});
+			console.log("tpaInsuranceRepository=");	
+	}
 
     componentDidMount() {
         this.fetchData();
+		this.tpaInsuranceRepository();
     }
 
    
 
     render() {
-        const {showLoan, is_eia_account, is_loan_account, nomineeDetails, motorInsurance,appointeeFlag, is_appointee,titleList,
+        const {showEIA, showEIA2, showLoan, is_eia_account,is_eia_account2, is_loan_account, nomineeDetails, motorInsurance,appointeeFlag, is_appointee,titleList,tpaInsurance,
             bankDetails,policyHolder, stateName, pinDataArr, quoteId, addressDetails, relation,step_completed,vehicleDetails} = this.state
         const {productId} = this.props.match.params 
         let phrases = localStorage.getItem("phrases") ? JSON.parse(localStorage.getItem("phrases")) : null
@@ -1352,6 +1409,173 @@ class TwoWheelerAdditionalDetailsOD extends Component {
                                         </Row>
                                 </div>  : null } 
                                 </Fragment> : null }
+								
+							
+								<Row>
+                                    <Col sm={12} md={4} lg={4}>
+                                        <FormGroup>
+                                            <div className="insurerName">
+                                                <h4 className="fs-16">{phrases['EIAAccount']}</h4>
+                                            </div>
+                                        </FormGroup>
+                                    </Col>
+                                    <Col sm={12} md={4} lg={4}>
+                                        <FormGroup>
+                                            <div className="d-inline-flex m-b-35">
+                                                <div className="p-r-25">
+                                                    <label className="customRadio3">
+                                                    <Field
+                                                        type="radio"
+                                                        name='is_eia_account'                                            
+                                                        value='1'
+                                                        key='1'  
+                                                        onChange={(e) => {
+                                                            setFieldValue(`is_eia_account`, e.target.value);
+                                                            this.showEIAText(1);
+                                                        }}
+                                                        checked={values.is_eia_account == '1' ? true : false}
+                                                    />
+                                                        <span className="checkmark " /><span className="fs-14"> {phrases['Yes']}</span>
+                                                    </label>
+                                                </div>
+
+                                                <div className="">
+                                                    <label className="customRadio3">
+                                                        <Field
+                                                        type="radio"
+                                                        name='is_eia_account'                                            
+                                                        value='0'
+                                                        key='1'  
+                                                        onChange={(e) => {
+                                                            setFieldValue(`is_eia_account`, e.target.value);
+                                                            this.showEIAText(0);
+                                                        }}
+                                                        checked={values.is_eia_account == '0' ? true : false}
+                                                    />
+                                                        <span className="checkmark" />
+                                                        <span className="fs-14">{phrases['No']}</span>
+                                                        {errors.is_eia_account && touched.is_eia_account ? (
+                                                        <span className="errorMsg">{phrases[errors.is_eia_account]}</span>
+                                                    ) : null}
+                                                    </label>
+                                                </div>
+                                            </div>
+                                        </FormGroup>
+                                    </Col>
+                                    {showEIA || is_eia_account == '1' ?
+                                    <Col sm={12} md={4} lg={4}>
+                                        <FormGroup>
+                                        <div className="insurerName">   
+                                            <Field
+                                                name="eia_no"
+                                                type="text"
+                                                placeholder={phrases['EIANumber']}
+                                                autoComplete="off"
+                                                value = {values.eia_no}
+                                                maxLength="13"
+                                                onFocus={e => this.changePlaceHoldClassAdd(e)}
+                                                onBlur={e => this.changePlaceHoldClassRemove(e)}
+                                            />
+                                            {errors.eia_no && touched.eia_no ? (
+                                            <span className="errorMsg">{phrases[errors.eia_no]}</span>
+                                            ) : null}                                             
+                                            </div>
+                                        </FormGroup>
+                                    </Col> : ''}
+									
+									
+							</Row> 	
+
+							
+								
+							{showEIA==false && is_eia_account == '0' ?
+								<Row>
+                                    <Col sm={12} md={4} lg={4}>
+                                        <FormGroup>
+                                            <div className="insurerName">
+                                                <h4 className="fs-16">{phrases['wish_to_create_EIA_Account']}</h4>
+                                            </div>
+                                        </FormGroup>
+                                    </Col>
+                                    <Col sm={12} md={4} lg={4}>
+                                        <FormGroup>
+                                            <div className="d-inline-flex m-b-35">
+                                                <div className="p-r-25">
+                                                    <label className="customRadio3">
+                                                    <Field
+                                                        type="radio"
+                                                        name='is_eia_account2'                                            
+                                                        value='1'
+                                                        key='1'  
+                                                        onChange={(e) => {
+                                                            setFieldValue(`is_eia_account2`, e.target.value);
+                                                            this.showEIAText2(1);
+                                                        }}
+                                                        checked={values.is_eia_account2 == '1' ? true : false}
+                                                    />
+                                                        <span className="checkmark " /><span className="fs-14"> {phrases['Yes']}</span>
+                                                    </label>
+                                                </div>
+
+                                                <div className="">
+                                                    <label className="customRadio3">
+                                                        <Field
+                                                        type="radio"
+                                                        name='is_eia_account2'                                            
+                                                        value='0'
+                                                        key='1'  
+                                                        onChange={(e) => {
+                                                            setFieldValue(`is_eia_account2`, e.target.value);
+                                                            this.showEIAText2(0);
+                                                        }}
+                                                        checked={values.is_eia_account2 == '0' ? true : false}
+                                                    />
+                                                        <span className="checkmark" />
+                                                        <span className="fs-14">{phrases['No']}</span>
+                                                        
+                                                    </label>
+                                                </div>
+                                            </div>
+                                        </FormGroup>
+                                    </Col>							
+								</Row> 
+							: ''}
+
+									
+							{showEIA2 || is_eia_account2 == '1' ?
+								<Row>
+                                    <Col sm={12} md={4} lg={4}>
+                                        <FormGroup>
+                                            <div className="insurerName">
+                                                <h4 className="fs-16">{phrases['Your_preferred_TPA']}</h4>
+                                            </div>
+                                        </FormGroup>
+                                    </Col>
+									<Col sm={12} md={4} lg={5}>
+										 <FormGroup>
+                                                    <div className="formSection">                                                           
+                                                        <Field
+                                                            name="tpaInsurance"
+                                                            component="select"
+                                                            autoComplete="off"
+                                                            value={values.tpaInsurance}
+                                                            className="formGrp"
+                                                        >
+                                                        <option value="">{phrases['SELECT_TPA']}</option>
+                                                        { tpaInsurance.map((relations, qIndex) => 
+                                                            <option value={relations.repository_id}>{relations.name}</option>                                        
+                                                        )}
+                                                        </Field>     
+                                                               
+                                                    </div>
+                                                </FormGroup>
+									</Col>
+								</Row> 
+									: ''}
+								
+								
+								
+								
 
                                 <div className="d-flex justify-content-left carloan">
                                     <h4> </h4>

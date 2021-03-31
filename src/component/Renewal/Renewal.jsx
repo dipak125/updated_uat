@@ -80,7 +80,7 @@ class renewal extends Component {
                 if(res.data.data.eligible_for_renewal == 1) {
                     this.quoteDetails(values.policy_number, actions)
                 }
-                this.props.loadingStop();
+                else this.props.loadingStop();
                }
                else {
                 swal(res.data.msg);
@@ -113,6 +113,7 @@ class renewal extends Component {
             .then(res => {
                 if(res.data.error == false){
                 localStorage.setItem("policyHolder_refNo", res.data.data.reference_no)	
+                this.props.loadingStop();
                 this.forward()
                 }
                 else {

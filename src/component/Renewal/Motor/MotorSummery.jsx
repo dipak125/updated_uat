@@ -103,7 +103,8 @@ class MotorSummery extends Component {
     	
         axios.get(`renewal/policy-details/${policyHolder_id}`)	
             .then(res => {	
-                let decryptResp = JSON.parse(encryption.decrypt(res.data))	
+                // let decryptResp = JSON.parse(encryption.decrypt(res.data))
+                let decryptResp = res.data
                 console.log("decrypt", decryptResp)	
                 let motorInsurance = decryptResp.data.policyHolder ? decryptResp.data.policyHolder.motorinsurance : {}	
                 let policyHolder = decryptResp.data.policyHolder ? decryptResp.data.policyHolder : [];	
@@ -123,7 +124,8 @@ class MotorSummery extends Component {
                     nomineedetails: decryptResp.data.policyHolder ? decryptResp.data.policyHolder.request_data.nominee[0]:[]	
                     	
                 })	
-                this.getAccessToken(motorInsurance)       	
+                this.props.loadingStop();
+                // this.getAccessToken(motorInsurance)       	
             })	
             .catch(err => {	
                 // handle error	
@@ -273,7 +275,7 @@ class MotorSummery extends Component {
     }	
     Razor_payment = () => {	
         const { refNumber } = this.state;	
-        window.location = `${process.env.REACT_APP_PAYMENT_URL}/razorpay/pay.php?refrence_no=${refNumber}`	
+        window.location = `${process.env.REACT_APP_PAYMENT_URL}/razorpay/smefire_pay.php?refrence_no=${refNumber}`	
     }	
     paypoint_payment = () => {	
         const { refNumber } = this.state;	
@@ -354,7 +356,7 @@ class MotorSummery extends Component {
                             <div className="col-sm-12 col-md-12 col-lg-2 col-xl-2 pd-l-0">	
                                 <SideNav />	
                             </div>	
-                            { step_completed >= '4' && vehicleDetails.vehicletype_id == '8' ?	
+                            {/* { step_completed >= '4' && vehicleDetails.vehicletype_id == '8' ?	 */}
                             <div className="col-sm-12 col-md-12 col-lg-10 col-xl-10 infobox">	
                                 <h4 className="text-center mt-3 mb-3">{phrases['SBIGICL']}</h4>	
                                 <Formik initialValues={initialValue} onSubmit={this.handleSubmit}	
@@ -779,7 +781,7 @@ class MotorSummery extends Component {
                                                             </Row>	
                                                             <Row>&nbsp;</Row>	
                                                             <div className="d-flex justify-content-left resmb">	
-                                                                <Button className="backBtn" type="button" onClick={this.additionalDetails.bind(this, productId)}>{phrases['Back']}</Button>	
+                                                                {/* <Button className="backBtn" type="button" onClick={this.additionalDetails.bind(this, productId)}>{phrases['Back']}</Button>	 */}
                                                             {bcMaster && bcMaster.eligible_for_payment_link == 1 ?
                                                                 <div>
                                                                 <Button type="button" className="proceedBtn" onClick = {this.sendPaymentLink.bind(this)}>  {phrases['PaymentLink']}  </Button>	
@@ -804,7 +806,7 @@ class MotorSummery extends Component {
                                     }}	
                                 </Formik>	
                             </div> 	
-                            : step_completed == "" ? "Forbidden" : null }	
+                            {/* : step_completed == "" ? "Forbidden" : null }	 */}
                             <Footer />	
                         </div>	
                     </div>	
