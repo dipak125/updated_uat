@@ -28,11 +28,11 @@ const ageObj = new PersonAge();
 // const minDate = moment(moment().subtract(1, 'years').calendar()).add(1, 'day').calendar();
 //const minRegnDate = moment(startRegnDate).startOf('year').format('YYYY-MM-DD hh:mm');
 
-let maxRegnDate=  moment(moment().subtract(1, 'years').calendar()).add(3, 'months').calendar() 
+let maxRegnDate=  moment(moment().subtract(1, 'years').calendar()).add(0, 'day').calendar() 
 const activeMinDate =  moment(moment().subtract(1, 'years').calendar()).add(1, 'day').calendar();
 const minRegnDate = moment(moment().subtract(1, 'years').calendar()).add(0, 'day').calendar();
 const minDate =  moment(moment().subtract(1, 'years').calendar()).add(1, 'day').calendar();
-const maxDate = moment()
+const maxDate = moment(moment().subtract(1, 'years').calendar()).add(1, 'day').calendar();
 
 const initialValue = {
     registration_date: "",
