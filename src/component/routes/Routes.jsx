@@ -282,32 +282,32 @@ const PremiumGCVTP = Loadable({
 
 // ======================== SME Fire ========================================
 
-// const RegistrationSME = Loadable({
-//     loader: () => import(/*webpackChunkName: "Products" */"../sme-fire/Registration_sme.jsx"),
-//     loading: () => loadingContent
-// });
+const RegistrationSME = Loadable({
+    loader: () => import(/*webpackChunkName: "Products" */"../sme-fire/Registration_sme.jsx"),
+    loading: () => loadingContent
+});
 
-// const RiskDetails = Loadable({
-//     loader: () => import(/*webpackChunkName: "Products" */"../sme-fire/RiskDetails.jsx"),
-//     loading: () => loadingContent
-// });
-// const OtherDetails = Loadable({
-//     loader: () => import(/*webpackChunkName: "Products" */"../sme-fire/OtherDetails.jsx"),
-//     loading: () => loadingContent
-// });
-// const AdditionalDetailsSME = Loadable({
-//     loader: () => import(/*webpackChunkName: "Products" */"../sme-fire/AdditionalDetails_sme.jsx"),
-//     loading: () => loadingContent
-// });
-// const PremiumSME = Loadable({
-//     loader: () => import(/*webpackChunkName: "Products" */"../sme-fire/Premium_sme.jsx"),
-//     loading: () => loadingContent
-// });
+const RiskDetails = Loadable({
+    loader: () => import(/*webpackChunkName: "Products" */"../sme-fire/RiskDetails.jsx"),
+    loading: () => loadingContent
+});
+const OtherDetails = Loadable({
+    loader: () => import(/*webpackChunkName: "Products" */"../sme-fire/OtherDetails.jsx"),
+    loading: () => loadingContent
+});
+const AdditionalDetailsSME = Loadable({
+    loader: () => import(/*webpackChunkName: "Products" */"../sme-fire/AdditionalDetails_sme.jsx"),
+    loading: () => loadingContent
+});
+const PremiumSME = Loadable({
+    loader: () => import(/*webpackChunkName: "Products" */"../sme-fire/Premium_sme.jsx"),
+    loading: () => loadingContent
+});
 
-// const SummarySME = Loadable({
-//     loader: () => import(/*webpackChunkName: "Products" */"../sme-fire/Summary_sme.jsx"),
-//     loading: () => loadingContent
-// });
+const SummarySME = Loadable({
+    loader: () => import(/*webpackChunkName: "Products" */"../sme-fire/Summary_sme.jsx"),
+    loading: () => loadingContent
+});
 
 //  =================================== Landing Page ==================================
 
@@ -417,47 +417,47 @@ const TwoWheelerAdditionalDetailsOD = Loadable({
 
 // =================== GRAMIN SAMRIDDHI BIMA =============================== //
 
-// const SelectPlan_GSB = Loadable({
-//     loader: () => import(/*webpackChunkName: "Products" */"../GSB/SelectPlan_GSB"),
-//     loading: () => loadingContent
-// });
-// const AdditionalDetails_GSB = Loadable({
-//     loader: () => import(/*webpackChunkName: "Products" */"../GSB/AdditionalDetails_GSB"),
-//     loading: () => loadingContent
-// });
-// const PolicyDetails_GSB = Loadable({
-//     loader: () => import(/*webpackChunkName: "Products" */"../GSB/PolicyDetails_GSB"),
-//     loading: () => loadingContent
-// });
+const SelectPlan_GSB = Loadable({
+    loader: () => import(/*webpackChunkName: "Products" */"../GSB/SelectPlan_GSB"),
+    loading: () => loadingContent
+});
+const AdditionalDetails_GSB = Loadable({
+    loader: () => import(/*webpackChunkName: "Products" */"../GSB/AdditionalDetails_GSB"),
+    loading: () => loadingContent
+});
+const PolicyDetails_GSB = Loadable({
+    loader: () => import(/*webpackChunkName: "Products" */"../GSB/PolicyDetails_GSB"),
+    loading: () => loadingContent
+});
 // ====================================================================
 
 // ========== Four-Wheeler OD =============================================
 						
-        const RegistrationOD = Loadable({
-            loader: () => import(/*webpackChunkName: "Products" */"../motor-OD/RegistrationOD.jsx"),
-            loading: () => loadingContent
-        });
-        const SelectBrandOD = Loadable({
-            loader: () => import(/*webpackChunkName: "Products" */"../motor-OD/SelectBrandOD.jsx"),
-            loading: () => loadingContent
-        });
-        const VehicleDetailsOD = Loadable({
-            loader: () => import(/*webpackChunkName: "Products" */"../motor-OD/VehicleDetailsOD.jsx"),
-            loading: () => loadingContent
-        });
-        const OtherComprehensiveOD = Loadable({
-            loader: () => import(/*webpackChunkName: "Products" */"../motor-OD/OtherComprehensiveOD.jsx"),
-            loading: () => loadingContent
-        });
-        const AdditionalDetailsOD = Loadable({
-            loader: () => import(/*webpackChunkName: "Products" */"../motor-OD/AdditionalDetailsOD.jsx"),
-            loading: () => loadingContent
-        });
-        const PremiumOD = Loadable({
-            loader: () => import("../motor-OD/PremiumOD.jsx"),
-            loading: () => loadingContent
-        });
-    /**/
+					const RegistrationOD = Loadable({
+						loader: () => import(/*webpackChunkName: "Products" */"../motor-OD/RegistrationOD.jsx"),
+						loading: () => loadingContent
+					});
+					const SelectBrandOD = Loadable({
+						loader: () => import(/*webpackChunkName: "Products" */"../motor-OD/SelectBrandOD.jsx"),
+						loading: () => loadingContent
+					});
+					const VehicleDetailsOD = Loadable({
+						loader: () => import(/*webpackChunkName: "Products" */"../motor-OD/VehicleDetailsOD.jsx"),
+						loading: () => loadingContent
+					});
+					const OtherComprehensiveOD = Loadable({
+						loader: () => import(/*webpackChunkName: "Products" */"../motor-OD/OtherComprehensiveOD.jsx"),
+						loading: () => loadingContent
+					});
+					const AdditionalDetailsOD = Loadable({
+						loader: () => import(/*webpackChunkName: "Products" */"../motor-OD/AdditionalDetailsOD.jsx"),
+						loading: () => loadingContent
+					});
+					const PremiumOD = Loadable({
+						loader: () => import("../motor-OD/PremiumOD.jsx"),
+						loading: () => loadingContent
+					});
+				/**/
 
 
 //  ************ Vedvag Payment Gateway ******************
@@ -592,12 +592,12 @@ class Routes extends Component {
                         <PrivateRoute exact path="/Premium_GCV_TP/:productId" component={PremiumGCVTP} />
 
                         {/************ SME - Fire ******************/}
-                        {/* <PrivateRoute exact path="/Registration_SME/:productId" component={RegistrationSME} />
+                        <PrivateRoute exact path="/Registration_SME/:productId" component={RegistrationSME} />
                         <PrivateRoute exact path="/RiskDetails/:productId" component={RiskDetails} />
                         <PrivateRoute exact path="/OtherDetails/:productId" component={OtherDetails} />
                         <PrivateRoute exact path="/AdditionalDetails_SME/:productId" component={AdditionalDetailsSME} />
                         <PrivateRoute exact path="/Summary_SME/:productId" component={SummarySME} />  
-                        <PrivateRoute exact path="/Premium_SME/:productId" component={PremiumSME} />   */}
+                        <PrivateRoute exact path="/Premium_SME/:productId" component={PremiumSME} />  
 
                         {/************ Support ******************/}
                         <PrivateRoute exact path="/Documents" component={Documents} />
@@ -632,9 +632,9 @@ class Routes extends Component {
                         <PrivateRoute exact path="/PolicyDetails_KSB/:productId" component={PolicyDetails_KSB} />
                         
                         {/************ GSB ******************/}
-                        {/* <PrivateRoute exact path="/SelectPlan_GSB/:productId" component={SelectPlan_GSB} />
+                        <PrivateRoute exact path="/SelectPlan_GSB/:productId" component={SelectPlan_GSB} />
                         <PrivateRoute exact path="/AdditionalDetails_GSB/:productId" component={AdditionalDetails_GSB} /> 
-                        <PrivateRoute exact path="/PolicyDetails_GSB/:productId" component={PolicyDetails_GSB} /> */}
+                        <PrivateRoute exact path="/PolicyDetails_GSB/:productId" component={PolicyDetails_GSB} />
 
                         {/************ Vedvag Payment Gateway ******************/}
                         <PrivateRoute exact path="/Vedvag_gateway/:productId" component={VedvagGateway} />

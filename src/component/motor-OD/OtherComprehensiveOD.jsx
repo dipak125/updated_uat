@@ -500,7 +500,7 @@ class OtherComprehensiveOD extends Component {
         let coverage_data = {}
         const formData = new FormData();
 
-        let csc_data = localStorage.getItem('users') ? localStorage.getItem('users') : "";
+        let csc_data = sessionStorage.getItem('users') ? sessionStorage.getItem('users') : "";
         let csc_user_type = "";
         let total_idv=0
         let other_idv=0
@@ -541,7 +541,7 @@ class OtherComprehensiveOD extends Component {
             // 'cngKit_Cost': cngKit_Cost
         }
         console.log('fullQuote_post_data', post_data)
-        total_idv = parseInt(other_idv) + parseInt(post_data.idv_value)+parseInt(post_data.body_idv_value)
+        total_idv = parseInt(other_idv) + parseInt(post_data.idv_value)
 
         if(( total_idv> 5000000) && csc_user_type == "POSP" ) {
             swal("Quote cannot proceed with IDV greater than 5000000")
@@ -634,7 +634,7 @@ class OtherComprehensiveOD extends Component {
         let total_idv=0
         let other_idv=0
 
-        let csc_data = localStorage.getItem('users') ? localStorage.getItem('users') : "";
+        let csc_data = sessionStorage.getItem('users') ? sessionStorage.getItem('users') : "";
         let csc_user_type = "";
         let bc_data = sessionStorage.getItem('bcLoginData') ? sessionStorage.getItem('bcLoginData') : "";
 
@@ -651,6 +651,8 @@ class OtherComprehensiveOD extends Component {
                 bc_data = JSON.parse(encryption.decrypt(bc_data));
             }
         }
+
+        console.log("csc_data----------------- ", csc_data)
 
         if(add_more_coverage) {
             coverage_data = {
@@ -707,7 +709,7 @@ class OtherComprehensiveOD extends Component {
             }
         }
         console.log('post_data',post_data)
-        total_idv = parseInt(other_idv) + parseInt(post_data.idv_value)+parseInt(post_data.body_idv_value)
+        total_idv = parseInt(other_idv) + parseInt(post_data.idv_value)
 
         if(((total_idv> 5000000) && csc_user_type == "POSP" ) || (total_idv> 5000000 && bc_data && bc_data.master_data.vendor_name == "PayPoint" )) {
             swal("Quote cannot proceed with IDV greater than 5000000")

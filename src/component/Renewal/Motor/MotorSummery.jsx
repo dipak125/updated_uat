@@ -40,7 +40,6 @@ class MotorSummery extends Component {
             error: [],	
             purchaseData: [],	
             error1: [],	
-            refNumber: "",	
             paymentStatus: [],	
             accessToken: "",	
             PolicyArray: [],	
@@ -118,7 +117,6 @@ class MotorSummery extends Component {
                 	
                 this.setState({	
                     motorInsurance,policyHolder,vehicleDetails,previousPolicy,request_data,menumaster,step_completed, bcMaster,	
-                    refNumber: decryptResp.data.policyHolder.reference_no,	
                     paymentStatus: decryptResp.data.policyHolder.payment ? decryptResp.data.policyHolder.payment[0] : [],	
                     memberdetails : decryptResp.data.policyHolder ? decryptResp.data.policyHolder : [],	
                     nomineedetails: decryptResp.data.policyHolder ? decryptResp.data.policyHolder.request_data.nominee[0]:[]	
@@ -161,125 +159,19 @@ class MotorSummery extends Component {
             this.props.loadingStop();	
         })  	
     }	
-    getAccessToken = (motorInsurance) => {	
-        axios	
-            .post(`/callTokenService`)	
-            .then((res) => {	
-                this.setState({	
-                    accessToken: res.data.access_token,	
-                });	
-                this.fullQuote(res.data.access_token, motorInsurance)	
-            })	
-            .catch((err) => {	
-                this.setState({	
-                    accessToken: '',	
-                });	
-                this.props.loadingStop();	
-            });	
-    };	
-    fullQuote = (access_token, motorInsurance) => {	
-        const formData = new FormData();	
-        let encryption = new Encryption();	
-        let dateDiff = 0	
-        const {previousPolicy, request_data, policyHolder} = this.state	
-        let trailer_array = motorInsurance.trailers ? motorInsurance.trailers : null
-        trailer_array = trailer_array ? JSON.parse(trailer_array) : []	
-        const post_data = {	
-            'ref_no':this.state.policyHolder_refNo ? this.state.policyHolder_refNo : '0',	
-            'access_token':access_token,	
-            'idv_value': motorInsurance.idv_value,	
-            'policy_type':  motorInsurance.policy_type,	
-            'add_more_coverage': motorInsurance.add_more_coverage,	
-            // 'cng_kit': motorInsurance.cng_kit,	
-            // 'cngKit_Cost': Math.floor(motorInsurance.cngkit_cost),	
-            'PA_Cover': motorInsurance && motorInsurance.pa_cover ? motorInsurance.pa_cover : '0',	
-            'coverage_data': motorInsurance && motorInsurance.add_more_coverage_request_json != null ? motorInsurance.add_more_coverage_request_json : "",	
-            'body_idv_value' : motorInsurance && motorInsurance.body_idv_value ? motorInsurance.body_idv_value : '0',	
-            'trailer_array' : trailer_array,	
-        }	
-        formData.append('enc_data',encryption.encrypt(JSON.stringify(post_data)))	
-        console.log("post_data--fullQuotePMGCV- ", post_data)	
-        axios.post('fullQuotePMGCV', formData)	
-            .then(res => {	
-                if (res.data.PolicyObject) {	
-                    this.setState({	
-                        fulQuoteResp: res.data.PolicyObject,	
-                        PolicyArray: res.data.PolicyObject.PolicyLobList,	
-                        error: [],	
-                    });	
-                }	
-                else if(res.data.ValidateResult) {	
-                    swal(res.data.ValidateResult.message)	
-                }	
-                 else {	
-                    this.setState({	
-                        fulQuoteResp: [],	
-                        error: res.data,	
-                    });	
-                }	
-                this.props.loadingStop();	
-                if(previousPolicy && policyHolder.break_in_status != "Vehicle Recommended and Reports Uploaded"){	
-                    dateDiff = Math.floor(moment().diff(previousPolicy.end_date, 'days', true));	
-                    if(dateDiff > 0 || previousPolicy.name == "2") {	
-                        this.setState({breakin_flag: 1})	
-                            const formData1 = new FormData();	
-                            let policyHolder_id = this.state.policyHolder_refNo ? this.state.policyHolder_refNo : '0'	
-                            formData1.append('policy_ref_no',policyHolder_id)	
-                            axios.post('breakin/checking', formData1)	
-                            .then(res => {	
-                                let break_in_checking = res.data.data.break_in_checking	
-                                let break_in_inspection_no = res.data.data.break_in_inspection_no	
-                                let break_in_status = res.data.data.break_in_status	
-                                if( break_in_checking == true && break_in_inspection_no == "" && (break_in_status == null || break_in_status == "0")) {	
-                                    swal({	
-                                        title: "Breakin",	
-                                        text: `Your Quotation number is ${request_data.quote_id}. Your vehicle needs inspection. Do you want to raise inspection.`,	
-                                        icon: "warning",	
-                                        buttons: true,	
-                                        dangerMode: true,	
-                                    })	
-                                    .then((willCreate) => {	
-                                        if (willCreate) {	
-                                            this.callBreakin(motorInsurance && motorInsurance.registration_no)	
-                                        }	
-                                        else {	
-                                            this.props.loadingStop();	
-                                        }	
-                                    })                                                           	
-                                }	
-                                else {	
-                                    swal({	
-                                        title: "Breakin",	
-                                        text: `Breakin already raised. \nBreaking number ${break_in_inspection_no}.`,	
-                                        icon: "warning",	
-                                    })	
-                                }	
-                            })	
-                            .catch(err => {	
-                                this.setState({breakin_flag: 1})	
-                                this.props.loadingStop();	
-                            })	
-                    }	
-                }	
-            })	
-            .catch(err => {	
-                this.setState({	
-                    serverResponse: [],	
-                });	
-                this.props.loadingStop();	
-            })	
-    }	
+	
+
     payment = () => {	
-        const { refNumber } = this.state;	
-        window.location = `${process.env.REACT_APP_PAYMENT_URL}/ConnectPG/payment_motor.php?refrence_no=${refNumber}`	
+        const { policyHolder_refNo } = this.state;	
+        window.location = `${process.env.REACT_APP_PAYMENT_URL}/ConnectPG/payment_motor.php?refrence_no=${policyHolder_refNo}`	
     }	
     Razor_payment = () => {	
-        const { refNumber } = this.state;	
-        window.location = `${process.env.REACT_APP_PAYMENT_URL}/razorpay/smefire_pay.php?refrence_no=${refNumber}`	
+        const { policyHolder_refNo } = this.state;	
+        window.location = `${process.env.REACT_APP_PAYMENT_URL}/razorpay/pay.php?refrence_no=${policyHolder_refNo}`	
     }	
     paypoint_payment = () => {	
-        const { refNumber } = this.state;	
-        window.location = `${process.env.REACT_APP_PAYMENT_URL}/ppinl/pay.php?refrence_no=${refNumber}`	
+        const { policyHolder_refNo } = this.state;	
+        window.location = `${process.env.REACT_APP_PAYMENT_URL}/ppinl/pay.php?refrence_no=${policyHolder_refNo}`	
     }	
     fetchRelationships=()=>{	
         this.props.loadingStart();	
@@ -322,7 +214,7 @@ class MotorSummery extends Component {
         this.fetchRelationships()	
     }	
     render() {	
-        const { policyHolder, show, fulQuoteResp, motorInsurance, error, error1, refNumber, paymentStatus, bcMaster,	
+        const { policyHolder, show, fulQuoteResp, motorInsurance, error, error1, paymentStatus, bcMaster,	
              relation, memberdetails,nomineedetails, vehicleDetails, breakin_flag, step_completed, request_data,menumaster, } = this.state	
         const { productId } = this.props.match.params	
         let phrases = localStorage.getItem("phrases") ? JSON.parse(localStorage.getItem("phrases")) : null	
@@ -375,7 +267,7 @@ class MotorSummery extends Component {
                                                         <h5>{errMsg}</h5>	
                                                         <h5>{paymentErrMsg}</h5>	
                                                         <h4>	
-                                                        {phrases['PolRefNumber']} {fulQuoteResp.QuotationNo}	
+                                                        {phrases['PolRefNumber']} {request_data.quote_id}	
                                                         </h4>	
                                                     </div>	
                                                     <Row>	
@@ -431,7 +323,7 @@ class MotorSummery extends Component {
                                                                             </Col>	
                                                                             <Col sm={12} md={3}>	
                                                                                 <div className="premamount">	
-                                                                                    ₹ {fulQuoteResp.DuePremium}	
+                                                                                    ₹ {request_data.payable_premium}	
                                                                                 </div>	
                                                                             </Col>	
                                                                             <Col sm={12} md={3}>	
@@ -441,7 +333,7 @@ class MotorSummery extends Component {
                                                                             </Col>	
                                                                             <Col sm={12} md={3}>	
                                                                                 <div className="premamount">	
-                                                                                    ₹ {Math.round(fulQuoteResp.BeforeVatPremium)}	
+                                                                                    ₹ {Math.round(request_data.gross_premium)}	
                                                                                 </div>	
                                                                             </Col>	
                                                                             <Col sm={12} md={3}>	
@@ -451,7 +343,7 @@ class MotorSummery extends Component {
                                                                             </Col>	
                                                                             <Col sm={12} md={3}>	
                                                                                 <div className="premamount">	
-                                                                                    ₹ {Math.round(fulQuoteResp.TGST)}	
+                                                                                    ₹ {Math.round(request_data.service_tax)}	
                                                                                 </div>	
                                                                             </Col>	
                                                                         </Row>	
@@ -787,7 +679,7 @@ class MotorSummery extends Component {
                                                                 <Button type="button" className="proceedBtn" onClick = {this.sendPaymentLink.bind(this)}>  {phrases['PaymentLink']}  </Button>	
                                                                 &nbsp;&nbsp;&nbsp;&nbsp;	
                                                                 </div> : null }
-                                                                {fulQuoteResp.QuotationNo && breakin_flag == 0 && values.gateway != "" ?	
+                                                                {request_data.quote_id && breakin_flag == 0 && values.gateway != "" ?	
                                                                     <Button type="submit"	
                                                                         className="proceedBtn"	
                                                                     >	

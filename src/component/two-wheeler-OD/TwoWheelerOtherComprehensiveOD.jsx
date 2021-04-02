@@ -475,7 +475,7 @@ class TwoWheelerOtherComprehensiveOD extends Component {
         let defaultSliderValue = PolicyArray.length > 0 ? Math.floor(PolicyArray[0].PolicyRiskList[0].IDV_User) : 0
         const formData = new FormData();
 
-        let csc_data = localStorage.getItem('users') ? localStorage.getItem('users') : "";
+        let csc_data = sessionStorage.getItem('users') ? sessionStorage.getItem('users') : "";
         let csc_user_type = "";
 
         if(csc_data && sessionStorage.getItem('csc_id')) {
@@ -514,7 +514,7 @@ class TwoWheelerOtherComprehensiveOD extends Component {
             'coverage_data': JSON.stringify(coverage_data),
         }
         console.log('fullQuote_post_data', post_data)
-        total_idv = parseInt(other_idv) + parseInt(post_data.idv_value)+parseInt(post_data.body_idv_value)
+        total_idv = parseInt(other_idv) + parseInt(post_data.idv_value)
 
         if(( total_idv> 5000000) && csc_user_type == "POSP" ) {
             swal("Quote cannot proceed with total IDV (including IDV, Body IDV, Electrical and Non-Electrical IDV) greater than 5000000")
@@ -600,7 +600,7 @@ class TwoWheelerOtherComprehensiveOD extends Component {
         let defaultSliderValue = PolicyArray.length > 0 ? Math.round(PolicyArray[0].PolicyRiskList[0].IDV_User) : 0
         let coverage_data = {}
 
-        let csc_data = localStorage.getItem('users') ? localStorage.getItem('users') : "";
+        let csc_data = sessionStorage.getItem('users') ? sessionStorage.getItem('users') : "";
         let csc_user_type = "";
         let bc_data = sessionStorage.getItem('bcLoginData') ? sessionStorage.getItem('bcLoginData') : "";
         let phrases = localStorage.getItem("phrases") ? JSON.parse(localStorage.getItem("phrases")) : []
@@ -656,7 +656,7 @@ class TwoWheelerOtherComprehensiveOD extends Component {
         if(values.B00003_value){
             other_idv = other_idv + parseInt(values.B00003_value)
         }
-        total_idv=parseInt(post_data.idv_value)+parseInt(post_data.body_idv_value)+other_idv
+        total_idv=parseInt(post_data.idv_value)+other_idv
 
 
         console.log('post_data', post_data)

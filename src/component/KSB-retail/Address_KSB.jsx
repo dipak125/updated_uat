@@ -51,6 +51,7 @@ const initialValues = {
     proposerDob: "",
     proposerGender: "",
     is_eia_account: "",
+	is_eia_account2: "",
     is_ckyc_account: "",
     eia_no: "",
     ckyc_account_no: ""
@@ -322,7 +323,10 @@ class Address extends Component {
             policy_holder:{},
             familyMembers:[],
             addressDetails:{},
+			showEIA: false,
+			showEIA2: false,
             is_eia_account:'',
+			is_eia_account2:'',
             is_ckyc_account: '',
             selfFlag:false,
             pinDataArr:[],
@@ -330,7 +334,8 @@ class Address extends Component {
             showEIA:false,
             showckyc_no:false,
             pincode_Details: [],
-            ksbinfo: []
+            ksbinfo: [],
+			tpaInsurance: []
 		}
 	}
 
@@ -341,9 +346,27 @@ class Address extends Component {
         let element = e.target.parentElement;
         element.classList.add('active');
     }
+	
+	
+	tpaInsuranceRepository = () => {
+				axios.get(`/tpaInsuranceRepository`)
+            .then(res => {
+					
+					let tpaInsurance = res.data ? res.data : {};
+					console.log("tpaInsuranceRepository===", tpaInsurance);
+					
+					//let titleList = decryptResp.data.salutationlist
+					this.setState({
+					  tpaInsurance
+					});
+				});
+			console.log("tpaInsuranceRepository=");	
+	}
+	
 
     componentDidMount(){       
         this.fetchData();
+		this.tpaInsuranceRepository();
     }
 
     fetchData=()=>{
@@ -356,6 +379,10 @@ class Address extends Component {
                 let family_members = res.data.data.policyHolder.request_data.family_members
                 let addressDetails = JSON.parse(res.data.data.policyHolder.address)
                 let is_eia_account = res.data.data.policyHolder.is_eia_account == 2 ? "" : res.data.data.policyHolder.is_eia_account
+				
+				let is_eia_account2 = res.data.data.policyHolder.is_eia_account2 == 2 ? "" : res.data.data.policyHolder.is_eia_account2
+				
+				
                 let is_ckyc_account =  res.data.data.policyHolder.ckyc_no == 2 ? "" : res.data.data.policyHolder.ckyc_no
                 let selfFlag = false;
                 let pincode_Details = JSON.parse(res.data.data.policyHolder.pincode_response)
@@ -373,6 +400,7 @@ class Address extends Component {
                     familyMembers:family_members,
                     addressDetails,
                     is_eia_account,
+					is_eia_account2,
                     is_ckyc_account,
                     pincode_Details,
                     ksbinfo
@@ -485,9 +513,14 @@ class Address extends Component {
         formArr['policy_holder_id'] = policyHolder_id;
         formArr['phoneNo'] = values.phoneNo;
         formArr['email_id'] = values.email;
-        formArr['is_eia_account'] = values.is_eia_account;      
+        formArr['is_eia_account'] = values.is_eia_account;     
+		formArr['is_eia_account2'] = values.is_eia_account2; 		
         formArr['ckyc_no'] = values.is_ckyc_account;
-        formArr['page_name'] = `Address_KSB/${productId}`
+        formArr['page_name'] = `Address_KSB/${productId}`;
+		
+		formArr['tpaInsurance'] = values.tpaInsurance; 
+		
+		
         
 
         let address_object = {}
@@ -572,6 +605,21 @@ class Address extends Component {
             })
         }
     }
+	
+	showEIAText2 = (value) =>{
+        if(value == 1){
+            this.setState({
+                showEIA2:true,
+                is_eia_account2:1
+            })
+        }
+        else{
+            this.setState({
+                showEIA2:false,
+                is_eia_account2:0
+            })
+        }
+    }
 
 
     showCKYCText = (value) =>{
@@ -591,8 +639,10 @@ class Address extends Component {
 
     
     render() {
-        const {policy_holder,familyMembers,addressDetails,is_eia_account,is_ckyc_account,selfFlag,pinDataArr,stateName,showEIA, pincode_Details,showckyc_no, ksbinfo} = this.state    
-
+        const {policy_holder,familyMembers,addressDetails,is_eia_account,is_eia_account2,is_ckyc_account,selfFlag,pinDataArr,stateName,showEIA,showEIA2, pincode_Details,showckyc_no, ksbinfo,tpaInsurance} = this.state    
+		
+		let phrases = localStorage.getItem("phrases") ? JSON.parse(localStorage.getItem("phrases")) : null
+		
         let newInitialValues = Object.assign(initialValues, {
             proposerAsInsured: sessionStorage.getItem('proposed_insured') ? sessionStorage.getItem('proposed_insured') : (selfFlag ? 1:0),
             family_members:this.initFamilyDetailsList(
@@ -607,7 +657,8 @@ class Address extends Component {
             pincode: addressDetails && addressDetails.pincode ? addressDetails.pincode: "",
             pincode_id: pincode_Details && pincode_Details.id ? pincode_Details.id : "",
             state: addressDetails && addressDetails.state ? addressDetails.state:"",
-            is_eia_account: is_eia_account,            
+            is_eia_account: is_eia_account,
+			is_eia_account2: is_eia_account2,            
             eia_no : policy_holder && policy_holder.eia_no ?  policy_holder.eia_no : '',
 
             proposerName : policy_holder && policy_holder.first_name ?  policy_holder.first_name : '',
@@ -616,6 +667,7 @@ class Address extends Component {
             proposerGender : policy_holder && policy_holder.gender ?  policy_holder.gender : '',
             is_ckyc_account: is_ckyc_account,
             ckyc_account_no: policy_holder && policy_holder.ckyc_account_no ?  policy_holder.ckyc_account_no : '',
+			
         });
 
         const {productId} = this.props.match.params
@@ -1192,7 +1244,7 @@ class Address extends Component {
                                                         <FormGroup>
                                                             <div className="insurerName">
                                                                 <h4 className="fs-16">
-                                                                    Do you have EIA account 
+                                                                    Do you have EIA account
                                                                 </h4>
                                                             </div>
                                                         </FormGroup>
@@ -1262,6 +1314,92 @@ class Address extends Component {
                                                         </FormGroup>
                                                     </Col> : ''}
                                                 </Row> 
+												
+												
+												{showEIA==false && is_eia_account == '0' ?
+								<Row>
+                                    <Col sm={12} md={4} lg={4}>
+                                        <FormGroup>
+                                            <div className="insurerName">
+                                                <h4 className="fs-16">{phrases['wish_to_create_EIA_Account']}</h4>
+                                            </div>
+                                        </FormGroup>
+                                    </Col>
+                                    <Col sm={12} md={4} lg={4}>
+                                        <FormGroup>
+                                            <div className="d-inline-flex m-b-35">
+                                                <div className="p-r-25">
+                                                    <label className="customRadio3">
+                                                    <Field
+                                                        type="radio"
+                                                        name='is_eia_account2'                                            
+                                                        value='1'
+                                                        key='1'  
+                                                        onChange={(e) => {
+                                                            setFieldValue(`is_eia_account2`, e.target.value);
+                                                            this.showEIAText2(1);
+                                                        }}
+                                                        checked={values.is_eia_account2 == '1' ? true : false}
+                                                    />
+                                                        <span className="checkmark " /><span className="fs-14"> {phrases['Yes']}</span>
+                                                    </label>
+                                                </div>
+
+                                                <div className="">
+                                                    <label className="customRadio3">
+                                                        <Field
+                                                        type="radio"
+                                                        name='is_eia_account2'                                            
+                                                        value='0'
+                                                        key='1'  
+                                                        onChange={(e) => {
+                                                            setFieldValue(`is_eia_account2`, e.target.value);
+                                                            this.showEIAText2(0);
+                                                        }}
+                                                        checked={values.is_eia_account2 == '0' ? true : false}
+                                                    />
+                                                        <span className="checkmark" />
+                                                        <span className="fs-14">{phrases['No']}</span>
+                                                        
+                                                    </label>
+                                                </div>
+                                            </div>
+                                        </FormGroup>
+                                    </Col>							
+								</Row> 
+							: ''}
+
+									
+							{showEIA2 || is_eia_account2 == '1' ?
+								<Row>
+                                    <Col sm={12} md={4} lg={4}>
+                                        <FormGroup>
+                                            <div className="insurerName">
+                                                <h4 className="fs-16">{phrases['Your_preferred_TPA']}</h4>
+                                            </div>
+                                        </FormGroup>
+                                    </Col>
+									<Col sm={12} md={4} lg={5}>
+										 <FormGroup>
+                                                    <div className="formSection">                                                           
+                                                        <Field
+                                                            name="tpaInsurance"
+                                                            component="select"
+                                                            autoComplete="off"
+                                                            value={values.tpaInsurance}
+                                                            className="formGrp"
+                                                        >
+                                                        <option value="">{phrases['SELECT_TPA']}</option>
+                                                        { tpaInsurance.map((relations, qIndex) => 
+                                                            <option value={relations.repository_id}>{relations.name}</option>                                        
+                                                        )}
+                                                        </Field>     
+                                                               
+                                                    </div>
+                                                </FormGroup>
+									</Col>
+								</Row> 
+									: ''}
 
                                         
                                         <div className="d-flex justify-content-left resmb">
