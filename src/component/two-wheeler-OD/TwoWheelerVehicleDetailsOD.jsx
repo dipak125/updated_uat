@@ -32,6 +32,7 @@ const activeMinDate =  moment(moment().subtract(1, 'years').calendar()).add(1, '
 const minRegnDate = moment(moment().subtract(1, 'years').calendar()).add(0, 'day').calendar();
 const minDate =  moment(moment().subtract(1, 'years').calendar()).add(1, 'day').calendar();
 const maxDate = moment(moment().subtract(1, 'years').calendar()).add(1, 'day').calendar();
+const maxDatePyp = moment(moment().subtract(1, 'years').calendar()).add(1, 'month').calendar();
 
 const ncbArr = {
     0:"0",
@@ -889,7 +890,7 @@ class TwoWheelerVehicleDetailsOD extends Component {
                                                         <DatePicker
                                                             name={phrases['previous_start_date']}
                                                             minDate={new Date(minDate)}
-                                                            maxDate={new Date(maxDate)}
+                                                            maxDate={new Date(maxDatePyp)}
                                                             dateFormat="dd MMM yyyy"
                                                             placeholderText={phrases['PPSD']}
                                                             peekPreviousMonth

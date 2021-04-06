@@ -599,6 +599,11 @@ class OtherComprehensiveOD extends Component {
                       serverResponse: res.data.PolicyObject,policyCoverage
                     //   policyCoverage: res.data.PolicyObject.PolicyLobList ? res.data.PolicyObject.PolicyLobList[0].PolicyRiskList[0].PolicyCoverageList : [],
                     });
+                    if(( res.data.PolicyObject.SumInsured > 5000000) && csc_user_type == "POSP" ) {
+                        swal("Quote cannot proceed with IDV greater than 5000000")
+                        this.props.loadingStop();
+                        return false
+                    }
                   } 
                 else if (res.data.PolicyObject && res.data.UnderwritingResult && res.data.UnderwritingResult.Status == "Fail") {
                     this.setState({
@@ -607,6 +612,11 @@ class OtherComprehensiveOD extends Component {
                         serverResponse: [],
                         policyCoverage: res.data.PolicyObject.PolicyLobList ? res.data.PolicyObject.PolicyLobList[0].PolicyRiskList[0].PolicyCoverageList : [],
                     });
+                    if(( res.data.PolicyObject.SumInsured > 5000000) && csc_user_type == "POSP" ) {
+                        swal("Quote cannot proceed with IDV greater than 5000000")
+                        this.props.loadingStop();
+                        return false
+                    }
                 }
                 else {
                     this.setState({

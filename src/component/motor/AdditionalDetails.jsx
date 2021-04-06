@@ -312,7 +312,9 @@ class AdditionalDetails extends Component {
         if(value == 1){
             this.setState({
                 showEIA:true,
-                is_eia_account:1
+                is_eia_account:1,
+				showEIA2:false,
+				is_eia_account2:0
             })
         }
         else{
@@ -391,6 +393,7 @@ class AdditionalDetails extends Component {
             'salutation_id': values['salutation_id'],
             'nominee_title_id': values['nominee_salutation'],
             'page_name': `Additional_details/${productId}`, 
+			'create_eia_account': values['is_eia_account2'],
 			'tpaInsurance': values['tpaInsurance'],
         }
 console.log('post_data', post_data);
@@ -427,12 +430,16 @@ console.log('post_data', post_data);
                  let quoteId = decryptResp.data.policyHolder ? decryptResp.data.policyHolder.request_data.quote_id : ""
                  let is_eia_account=  policyHolder && (policyHolder.is_eia_account == 0 || policyHolder.is_eia_account == 1) ? policyHolder.is_eia_account : ""
                  
-				 let is_eia_account2=  policyHolder && (policyHolder.is_eia_account2 == 0 || policyHolder.is_eia_account2 == 1) ? policyHolder.is_eia_account2 : ""
+				 let is_eia_account2=  policyHolder && (policyHolder.create_eia_account == 0 || policyHolder.create_eia_account == 1) ? policyHolder.create_eia_account : ""
+				 
+				 
+				 let tpaInsurance = policyHolder.T_Insurance_Repository_id ? policyHolder.T_Insurance_Repository_id : ""
+				 
 				 
                  let bankDetails = decryptResp.data.policyHolder && decryptResp.data.policyHolder.bankdetail ? decryptResp.data.policyHolder.bankdetail[0] : {};
                  let addressDetails = JSON.parse(decryptResp.data.policyHolder.pincode_response)
                  this.setState({
-                    quoteId, motorInsurance, previousPolicy, vehicleDetails, policyHolder, nomineeDetails, is_loan_account, is_eia_account, bankDetails, addressDetails,
+                    quoteId, motorInsurance, previousPolicy, vehicleDetails, policyHolder, nomineeDetails, is_loan_account, is_eia_account,is_eia_account2, bankDetails, addressDetails,
                     is_appointee: nomineeDetails ? nomineeDetails.is_appointee : ""
                 })
                 this.props.loadingStop();
@@ -610,6 +617,9 @@ console.log('post_data', post_data);
             appointee_name: nomineeDetails && nomineeDetails.appointee_name ? nomineeDetails.appointee_name : "",
             salutation_id: policyHolder && policyHolder.salutation_id ? policyHolder.salutation_id : "",        
             nominee_salutation: nomineeDetails && nomineeDetails.gender ? nomineeDetails.title_id : "",
+			
+			tpaInsurance: policyHolder && policyHolder.T_Insurance_Repository_id ? policyHolder.T_Insurance_Repository_id : "",
+			
 
         });
 
@@ -1303,6 +1313,7 @@ console.log('post_data', post_data);
                                                             autoComplete="off"
                                                             value={values.tpaInsurance}
                                                             className="formGrp"
+															 selected="2"
                                                         >
                                                         <option value="">{phrases['SELECT_TPA']}</option>
                                                         { tpaInsurance.map((relations, qIndex) => 
