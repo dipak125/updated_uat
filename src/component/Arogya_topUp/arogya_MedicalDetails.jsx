@@ -442,12 +442,19 @@ class arogya_MedicalDetails extends Component {
         return (
             <>
                 <BaseComponent>
+				 <div className="page-wrapper">
                 <div className="container-fluid">
                     <div className="row">
-                        <div className="col-sm-12 col-md-12 col-lg-2 col-xl-2 pd-l-0">
-                            <SideNav />
-                        </div>
-                        <div className="col-sm-12 col-md-12 col-lg-10 col-xl-10 infobox">
+					
+					
+                        <aside className="left-sidebar">
+ <div className="scroll-sidebar ps-container ps-theme-default ps-active-y">
+<SideNav />
+ </div>
+</aside>
+						
+						
+                        <div className="col-sm-12 col-md-12 col-lg-12 col-xl-12 infobox argmedical">
                         <h4 className="text-center mt-3 mb-3">Arogya Top Up Policy</h4>
                             <section className="d-flex justify-content-center brand m-t-60">
                                 <div className="brand-bg pd-30">
@@ -673,6 +680,7 @@ class arogya_MedicalDetails extends Component {
                         </Modal>
                       </div>      
                       </div>
+					    </div>
                 </BaseComponent>
             </>
         );

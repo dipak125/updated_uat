@@ -1,6 +1,6 @@
 import { 
     GET_DATA, 
-    SET_DATA, 
+    SET_DATA
 } from "../actions/actionTypes";
 
 

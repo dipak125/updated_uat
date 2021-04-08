@@ -304,13 +304,20 @@ class TwoWheelerPolicyPremiumDetailsOD extends Component {
         return (
             <>
                 <BaseComponent>
+				<div className="page-wrapper">
                     <div className="container-fluid">
                         <div className="row">
-                            <div className="col-sm-12 col-md-12 col-lg-2 col-xl-2 pd-l-0">
-                                <SideNav />
-                            </div>
+						
+						
+                           <aside className="left-sidebar">
+ <div className="scroll-sidebar ps-container ps-theme-default ps-active-y">
+<SideNav />
+ </div>
+</aside>
+							
+							
                             { step_completed >= '4' && vehicleDetails.vehicletype_id == productId ?
-                            <div className="col-sm-12 col-md-12 col-lg-10 col-xl-10 infobox">
+                            <div className="col-sm-12 col-md-12 col-lg-12 col-xl-12 infobox twopremiumOd">
                                 <h4 className="text-center mt-3 mb-3">{phrases['SBIGICL']}</h4>
                                 <Formik initialValues={initialValue} onSubmit={this.handleSubmit}
                                 validationSchema={validatePremium}
@@ -334,23 +341,23 @@ class TwoWheelerPolicyPremiumDetailsOD extends Component {
                                                     </div>
 
                                                     <Row>
-                                                        <Col sm={12} md={9} lg={9}>
+                                                        <Col sm={12} md={12} lg={9}>
                                                             <div className="rghtsideTrigr">
                                                                 <Collapsible trigger={phrases['PolicyDetails']}>
                                                                     <div className="listrghtsideTrigr">
                                                                         <Row>                                                                       
-                                                                            <Col sm={12} md={3}>
+                                                                            <Col sm={12} md={6}>
                                                                                 <div className="motopremium">
                                                                                     Policy Start date:
                                                                                 </div>
                                                                             </Col>
-                                                                            <Col sm={12} md={3}>
+                                                                            <Col sm={12} md={6}>
                                                                                 <div className="premamount">
                                                                                     {request_data && request_data.start_date ? moment(request_data.start_date).format('DD-MM-yyy') : null}
                                                                                 </div>
                                                                             </Col>
 
-                                                                            <Col sm={12} md={3}>
+                                                                            <Col sm={12} md={6}>
                                                                                 <div className="motopremium">
                                                                                     Policy End Date:
                                                                                 </div>
@@ -360,7 +367,7 @@ class TwoWheelerPolicyPremiumDetailsOD extends Component {
                                                                                 {request_data && request_data.end_date ? moment(request_data.end_date).format('DD-MM-yyy') : null}
                                                                                 </div>
                                                                             </Col>
-                                                                            <Col sm={12} md={3}>
+                                                                            <Col sm={12} md={6}>
                                                                                 <div className="motopremium">
                                                                                     Product Name:
                                                                                 </div>
@@ -380,38 +387,38 @@ class TwoWheelerPolicyPremiumDetailsOD extends Component {
                                                                 <Collapsible trigger={phrases['RMPolicy']} open = {true}>
                                                                     <div className="listrghtsideTrigr">
                                                                         <Row>
-                                                                            <Col sm={12} md={3}>
+                                                                            <Col sm={12} md={6}>
                                                                                 <div className="motopremium">
                                                                                 {phrases['Premium']}:
                                                                                 </div>
                                                                             </Col>
 
 
-                                                                            <Col sm={12} md={3}>
+                                                                            <Col sm={12} md={6}>
                                                                                 <div className="premamount">
                                                                                     ₹ {fulQuoteResp.DuePremium}
                                                                                 </div>
                                                                             </Col>
 
-                                                                            <Col sm={12} md={3}>
+                                                                            <Col sm={12} md={6}>
                                                                                 <div className="motopremium">
                                                                                 {phrases['GrossPremium']}:
                                                                                 </div>
                                                                             </Col>
 
 
-                                                                            <Col sm={12} md={3}>
+                                                                            <Col sm={12} md={6}>
                                                                                 <div className="premamount">
                                                                                     ₹ {Math.round(fulQuoteResp.BeforeVatPremium)}
                                                                                 </div>
                                                                             </Col>
 
-                                                                            <Col sm={12} md={3}>
+                                                                            <Col sm={12} md={6}>
                                                                                 <div className="motopremium">
                                                                                 {phrases['GST']}:
                                                                                 </div>
                                                                             </Col>
-                                                                            <Col sm={12} md={3}>
+                                                                            <Col sm={12} md={6}>
                                                                                 <div className="premamount">
                                                                                     ₹ {Math.round(fulQuoteResp.TGST)}
                                                                                 </div>
@@ -429,7 +436,7 @@ class TwoWheelerPolicyPremiumDetailsOD extends Component {
 
                                                                                 <div>
                                                                                     <Row>
-                                                                                        <Col sm={12} md={6}>
+                                                                                        <Col sm={12} md={12}>
                                                                                             <Row>
                                                                                                 <Col sm={12} md={6}>
                                                                                                     <FormGroup>{phrases['RegNo']}:</FormGroup>
@@ -533,7 +540,7 @@ class TwoWheelerPolicyPremiumDetailsOD extends Component {
                                                                                     <strong>{phrases['OwnerDetails']}:</strong>
                                                                                     <br/>
                                                                                     <Row>
-                                                                                        <Col sm={12} md={6}>
+                                                                                        <Col sm={12} md={12}>
                                                                                             <Row>
                                                                                                 <Col sm={12} md={6}>
                                                                                                 {motorInsurance.policy_for == '1' ?  <FormGroup>{phrases['Name']}:</FormGroup> : <FormGroup>{phrases['CompanyName']}:</FormGroup> }
@@ -558,7 +565,7 @@ class TwoWheelerPolicyPremiumDetailsOD extends Component {
                                                                                                     <Col sm={12} md={6}>	
                                                                                                         <FormGroup>{ memberdetails ? moment(memberdetails.date_of_incorporation).format("DD-MM-YYYY") : null}</FormGroup>	
                                                                                                     </Col>	
-                                                                                                </Row>}
+                                                                                                </Row>}}
                                                                                             <Row>
                                                                                                 <Col sm={12} md={6}>
                                                                                                     <FormGroup>{phrases['MobileNo']}:</FormGroup>
@@ -605,7 +612,7 @@ class TwoWheelerPolicyPremiumDetailsOD extends Component {
                                                                             <strong>{phrases['NomineeDetails']} :</strong>
                                                                                 <br/>
                                                                                 <Row>
-                                                                                    <Col sm={12} md={6}>
+                                                                                    <Col sm={12} md={12}>
                                                                                         <Row>
                                                                                             <Col sm={12} md={6}>
                                                                                                 <FormGroup>{phrases['Name']}:</FormGroup>
@@ -656,7 +663,7 @@ class TwoWheelerPolicyPremiumDetailsOD extends Component {
                                                                             <strong>{phrases['AppoDetails']} :</strong>
                                                                                 <br/>
                                                                                 <Row>
-                                                                                    <Col sm={12} md={6}>
+                                                                                    <Col sm={12} md={12}>
                                                                                         <Row>
                                                                                             <Col sm={12} md={6}>
                                                                                                 <FormGroup>{phrases['Name']}:</FormGroup>
@@ -792,6 +799,7 @@ class TwoWheelerPolicyPremiumDetailsOD extends Component {
                             <Footer />
                         </div>
                     </div>
+					 </div>
                 </BaseComponent>
             </>
         );

@@ -37,14 +37,27 @@ class Documents extends Component {
         return (
             <>
             <BaseComponent>
+			
+			<div className="page-wrapper">
                 <section className="d-flex justify-content-left">
                     <div className="flex-fill w-100">
                         <div className="container-fluid">
                             <div className="row">
-                                <div className="col-sm-12 col-md-12 col-lg-2 col-xl-2">
-                                    <SideNav />
-                                </div>
-                                <div className="col-sm-12 col-md-12 col-lg-10 col-xl-10 infobox">
+							
+							<aside className="left-sidebar">
+							 	 <div className="scroll-sidebar ps-container ps-theme-default ps-active-y">
+							 		<SideNav />
+								 </div>
+								</aside>
+										
+								{/*<div className="col-sm-12 col-md-12 col-lg-2 col-xl-2 col-xl-2">               
+									<SideNav />
+								 </div>*/}							
+								
+								
+								
+								
+                                <div className="col-sm-12 col-md-12 col-lg-12 col-xl-12 infobox">
                                     <div className="messageDeskSec">
                                         <Tab.Container id="left-tabs-example" defaultActiveKey= "first"> 
                                             <Row>
@@ -80,6 +93,7 @@ class Documents extends Component {
                         </div>
                     </div>
                 </section>
+				</div>
             </BaseComponent>
             </>
         );

@@ -283,12 +283,24 @@ class PolicySearch extends Component {
           
         return (
             <BaseComponent>
+			
+			<div className="page-wrapper">
+			
                 <div className="container-fluid">
                     <div className="row">
-                        <div className="col-sm-12 col-md-12 col-lg-2 col-xl-2 pd-l-0">
-                            <SideNav />
-                        </div>
-                        <div className="col-sm-12 col-md-12 col-lg-10 col-xl-10 infobox">
+					
+					
+					<aside className="left-sidebar">
+		  <div className="scroll-sidebar ps-container ps-theme-default ps-active-y">
+		 <SideNav />
+		 </div>
+		</aside>
+					
+					 {/*<div className="col-sm-12 col-md-12 col-lg-2 col-xl-2 pd-l-0">               
+						<SideNav />
+             		 </div>*/}
+						
+                        <div className="col-sm-12 col-md-12 col-lg-12 col-xl-12 infobox">
                         <h4 className="text-center mt-3 mb-3">{phrases['SBIGICL']}</h4>
                             <div className="contBox m-b-45 tickedTable">
                             <h4 className="text-center mt-3 mb-3">{phrases['PolicySearch']}</h4>
@@ -301,20 +313,20 @@ class PolicySearch extends Component {
 
                                 return (
                                     <Form>
-                                        <div className="rghtsideTrigr collinput W-90 m-b-30">
-                                            <Collapsible trigger={phrases['SearchPolicyNumber']} open={false} onClose = {this.handleClose.bind(this,1,setFieldValue,setFieldTouched)}>
+                                        <div className="rghtsideTrigr collinput W-90 m-b-30 collaps_area">
+                                            <Collapsible openedClassName = "custom_ovberflow" trigger={phrases['SearchPolicyNumber']} open={false} onClose = {this.handleClose.bind(this,1,setFieldValue,setFieldTouched)}>
                                                 <div className="listrghtsideTrigr">
                                                 <Row>
-                                                <Col sm={12} md={6} lg={10}>
+                                                <Col sm={12} md={12} lg={10}>
                                                     <Row>
-                                                    <Col sm={12} md={2} lg={4}>
+                                                    <Col sm={12} md={6} lg={4}>
                                                         <FormGroup>
                                                             <div className="insurerName">
                                                                 <span className="fs-16">{phrases['EnterPolicyNumber']}</span>
                                                             </div>
                                                         </FormGroup>
                                                     </Col>
-                                                    <Col sm={12} md={3} lg={4}>
+                                                    <Col sm={12} md={6} lg={4}>
                                                         <FormGroup>
                                                             <div className="insurerName">
                                                                 <Field
@@ -344,10 +356,10 @@ class PolicySearch extends Component {
                                                 <Row><Col>&nbsp;</Col></Row>
                                                 </div>                    
                                             </Collapsible>
-                                            <Collapsible trigger={phrases['SearchProposerDetails']} open={false} onClose = {this.handleClose.bind(this,2,setFieldValue,setFieldTouched)}>
+                                            <Collapsible openedClassName = "custom_ovberflow" trigger={phrases['SearchProposerDetails']} open={false} onClose = {this.handleClose.bind(this,2,setFieldValue,setFieldTouched)}>
                                                 <div className="listrghtsideTrigr">
                                                 <Row>
-                                                <Col sm={12} md={6} lg={5}>
+                                                <Col sm={12} md={12} lg={5}>
                                                 <Row>
                                                     <Col sm={12} md={6} lg={6}>
                                                         <FormGroup>
@@ -378,7 +390,7 @@ class PolicySearch extends Component {
                                                     </Row>
                                                     </Col>
                                                
-                                                    <Col sm={12} md={6} lg={5}>
+                                                    <Col sm={12} md={12} lg={5}>
                                                     <Row>
                                                     <Col sm={12} md={6} lg={6}>
                                                         <FormGroup>
@@ -415,19 +427,19 @@ class PolicySearch extends Component {
                                                 
                                                 </div>
                                             </Collapsible>
-                                            <Collapsible trigger={phrases['SeachDates']} open={false} onClose = {this.handleClose.bind(this,3,setFieldValue,setFieldTouched)}>
+                                            <Collapsible openedClassName = "custom_ovberflow" trigger={phrases['SeachDates']} open={false} onClose = {this.handleClose.bind(this,3,setFieldValue,setFieldTouched)}>
                                                 <div className="listrghtsideTrigr">
                                                 <Row>
-                                                <Col sm={12} md={5}>
+                                                <Col sm={12} md={12} lg={5}>
                                                     <Row>
-                                                    <Col sm={12} md={4} lg={4}>
+                                                    <Col sm={12} md={6} lg={4}>
                                                         <FormGroup>
                                                             <div className="insurerName">
                                                                 <span className="fs-16"> {phrases['FromDate']} </span>
                                                             </div>
                                                         </FormGroup>
                                                     </Col>
-                                                    <Col sm={12} md={3} lg={6}>
+                                                    <Col sm={12} md={6} lg={6}>
                                                         <FormGroup>
                                                             <DatePicker
                                                                 name="start_date"
@@ -457,16 +469,16 @@ class PolicySearch extends Component {
                                                     </Row>
                                                     </Col>
                                                 
-                                                    <Col sm={12} md={5}>
+                                                    <Col sm={12} md={12} lg={5}>
                                                     <Row>
-                                                    <Col sm={12} md={4} lg={4}>
+                                                    <Col sm={12} md={6} lg={4}>
                                                         <FormGroup>
                                                             <div className="insurerName">
                                                                 <span className="fs-16">{phrases['ToDate']}</span>
                                                             </div>
                                                         </FormGroup>
                                                     </Col>
-                                                    <Col sm={12} md={3} lg={6}>
+                                                    <Col sm={12} md={6} lg={6}>
                                                         <FormGroup>
                                                             <DatePicker
                                                                 name="end_date"
@@ -503,10 +515,10 @@ class PolicySearch extends Component {
                                                 <Row><Col>&nbsp;</Col></Row>
                                                 </div>
                                             </Collapsible>
-                                            <Collapsible trigger={phrases['SearchDatesProducts']} open={false} onClose = {this.handleClose.bind(this,3,setFieldValue,setFieldTouched)}>
+                                            <Collapsible openedClassName = "custom_ovberflow" trigger={phrases['SearchDatesProducts']} open={false} onClose = {this.handleClose.bind(this,3,setFieldValue,setFieldTouched)}>
                                                 <div  className="listrghtsideTrigr">
                                                 <Row className="m-b-20">
-                                                <Col sm={12} md={6} lg={5}>
+                                                <Col sm={12} md={12} lg={5}>
                                                     <Row>
                                                     <Col sm={12} md={4} lg={4}>
                                                         <FormGroup>
@@ -515,7 +527,7 @@ class PolicySearch extends Component {
                                                             </div>
                                                         </FormGroup>
                                                     </Col>
-                                                    <Col sm={12} md={6} lg={6}>
+                                                    <Col sm={12} md={8} lg={6} className ="dateSBI">
                                                         <FormGroup>
                                                             <DatePicker
                                                                 name="start_date"
@@ -544,7 +556,7 @@ class PolicySearch extends Component {
                                                     </Col>
                                                     </Row>
                                                     </Col>
-                                                    <Col sm={12} md={6} lg={5}>
+                                                    <Col sm={12} md={12} lg={5}>
                                                     <Row>
                                                     <Col sm={12} md={4} lg={4}>
                                                         <FormGroup>
@@ -553,7 +565,7 @@ class PolicySearch extends Component {
                                                             </div>
                                                         </FormGroup>
                                                     </Col>
-                                                    <Col sm={12} md={6} lg={6}>
+                                                    <Col sm={12} md={8} lg={6}>
                                                         <FormGroup>
                                                             <DatePicker
                                                                 name="end_date"
@@ -584,16 +596,16 @@ class PolicySearch extends Component {
                                                     </Col>
                                                 </Row>
                                                 <Row>
-                                                <Col sm={12} md={6} lg={10}>
+                                                <Col sm={12} md={12} lg={5}>
                                                     <Row>
-                                                    <Col sm={12} md={2} lg={4}>
+                                                    <Col sm={12} md={4} lg={4}>
                                                         <FormGroup>
                                                             <div className="insurerName">
                                                                 <span className="fs-16">{phrases['Products']}</span>
                                                             </div>
                                                         </FormGroup>
                                                     </Col>
-                                                    <Col sm={12} md={3} lg={4}>
+                                                    <Col sm={12} md={8} lg={6}>
                                                         <FormGroup>
                                                             <div className="formSection">
                                                             <Field
@@ -635,7 +647,7 @@ class PolicySearch extends Component {
                                     &nbsp;
                                 </Row>
                                 {policyHolder ? 
-                                <div className="customInnerTable">
+                                <div className="customInnerTable policytab">
                                 <BootstrapTable ref="table"
                                     data={policyHolder}
                                     pagination={true}
@@ -669,6 +681,7 @@ class PolicySearch extends Component {
                         <Footer />
                     </div>
                 </div>
+				</div>
             </BaseComponent>
         );
     }

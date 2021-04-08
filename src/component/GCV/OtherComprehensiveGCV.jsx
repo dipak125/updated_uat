@@ -1621,12 +1621,24 @@ class OtherComprehensiveGCV extends Component {
         return (
             <>
                 <BaseComponent>
+				<div className="page-wrapper">
                 <div className="container-fluid">
                 <div className="row">
-                    <div className="col-sm-12 col-md-12 col-lg-2 col-xl-2 pd-l-0">
-                        <SideNav />
-                    </div>
-                <div className="col-sm-12 col-md-12 col-lg-10 col-xl-10 infobox">
+				
+				
+                  <aside className="left-sidebar">
+		 				 <div className="scroll-sidebar ps-container ps-theme-default ps-active-y">
+						 <SideNav />
+						</div>
+						</aside>
+								
+					 {/*<div className="col-sm-12 col-md-12 col-lg-2 col-xl-2 pd-l-0">        
+						<SideNav />
+             		 </div>*/}
+					
+					
+					
+                <div className="col-sm-12 col-md-12 col-lg-12 col-xl-12 infobox ocGcv">
                 <h4 className="text-center mt-3 mb-3">{phrases['SBIGICL']}</h4>
                 <section className="brand colpd m-b-25">
                     <div className="d-flex justify-content-left">
@@ -1655,7 +1667,7 @@ console.log("values------------> ", values)
                                 </div>
 
                             <Row>
-                                <Col sm={12} md={6} lg={5}>
+                                <Col sm={12} md={12} lg={5}>
                                 <Row>
                                 <Col sm={12} md={5} lg={5}>
                                     <FormGroup>
@@ -1701,7 +1713,7 @@ console.log("values------------> ", values)
                                     </Row>
                                     </Col>
 
-                                    <Col sm={12} md={6} lg={5}>
+                                    <Col sm={12} md={12} lg={5}>
                                         <Row>
                                             <Col sm={12} md={5} lg={6}>
                                                 <FormGroup>
@@ -1735,7 +1747,7 @@ console.log("values------------> ", values)
                                                     </div>
                                                 </FormGroup>
                                             </Col>
-                                            <Col sm={12} md={1} lg={2}>
+                                            <Col sm={12} md={5} lg={2}>
                                                 <Button className="btn btn-primary vrifyBtn" onClick= {!errors.chasis_no_last_part ? this.getVahanDetails.bind(this,values, setFieldTouched, setFieldValue, errors) : null}>{phrases['Verify']}</Button>
                                                 {errors.vahanVerify ? (
                                                         <span className="errorMsg">{phrases[errors.vahanVerify]}</span>
@@ -1797,14 +1809,14 @@ console.log("values------------> ", values)
                             : null}
 
                             <Row>
-                                <Col sm={12} md={4} lg={4}>
+                                <Col sm={12} md={5} lg={4}>
                                     <FormGroup>
                                         <div className="insurerName">
                                             {phrases['IDV']}
                                         </div>
                                     </FormGroup>
                                 </Col>
-                                <Col sm={12} md={3} lg={2}>
+                                <Col sm={12} md={5} lg={2}>
                                     <FormGroup>
                                         <div className="insurerName">
                                         <Field
@@ -1848,14 +1860,14 @@ console.log("values------------> ", values)
                             </Row>
 
                             <Row>
-                                <Col sm={12} md={4} lg={4}>
+                                <Col sm={12} md={5} lg={4}>
                                     <FormGroup>
                                         <div className="insurerName">
                                             {phrases['BodyIDV']}
                                         </div>
                                     </FormGroup>
                                 </Col>
-                                <Col sm={12} md={3} lg={2}>
+                                <Col sm={12} md={5} lg={2}>
                                     <FormGroup>
                                         <div className="insurerName">
                                         <Field
@@ -2666,6 +2678,7 @@ console.log("values------------> ", values)
                 </div>
                 </div>
                 </div>
+				</div>
                 </BaseComponent>
                 <Modal className="customModal" bsSize="md"
                     show={this.state.show}

@@ -649,12 +649,18 @@ class TwoWheelerVerify extends Component {
         return (
             <>
                 <BaseComponent>
+				 <div className="page-wrapper">
                 <div className="container-fluid">
                 <div className="row">
-                    <div className="col-sm-12 col-md-12 col-lg-2 col-xl-2 pd-l-0">
-                        <SideNav />
-                    </div>
-                <div className="col-sm-12 col-md-12 col-lg-10 col-xl-10 infobox">
+				
+                    <aside className="left-sidebar">
+ <div className="scroll-sidebar ps-container ps-theme-default ps-active-y">
+<SideNav />
+ </div>
+</aside>
+					
+					
+                <div className="col-sm-12 col-md-12 col-lg-12 col-xl-12 infobox twoVerify">
                 <h4 className="text-center mt-3 mb-3">{phrases['SBIGICL']}</h4>
                 <section className="brand m-b-25">
                     <div className="d-flex justify-content-left">
@@ -677,9 +683,9 @@ class TwoWheelerVerify extends Component {
                                 </div>
                             </FormGroup>
                         <Row>
-                            <Col sm={12} md={9} lg={8}>
+                            <Col sm={12} md={11} lg={8}>
                                 <Row>
-                                <Col sm={12} md={6} lg={5}>
+                                <Col sm={12} md={12} lg={5}>
                                 <Row>
                                     
                                 <Col sm={12} md={5} lg={6}>
@@ -724,7 +730,7 @@ class TwoWheelerVerify extends Component {
                                 </Row>
                                 </Col>
 
-                                <Col sm={12} md={6} lg={5}>
+                                <Col sm={12} md={12} lg={5}>
                                 <Row >
                                 <Col sm={12} md={5} lg={7}>
                                     <FormGroup>
@@ -1076,6 +1082,7 @@ class TwoWheelerVerify extends Component {
                     </div>
                     </div>
                     </div>
+					</div>
                 </BaseComponent>
 
             </>

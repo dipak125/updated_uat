@@ -98,8 +98,10 @@ const ownerValidation = Yup.object().shape({
     }),
 
     pancard: Yup.string()
-    .notRequired(function() {
-        return "Enter PAN number"
+    .required(function() {
+        	if (document.querySelector('input[name="is_eia_account2"]:checked').value == 1 ) {
+                return "Enter PAN number"; 
+            }
     }).matches(/^[A-Z]{3}[CPHFATBLJG]{1}[A-Z]{1}[0-9]{4}[A-Z]{1}$/, function() {
         return "Please enter valid Pan Number"
     }),
@@ -443,7 +445,9 @@ class TwoWheelerAdditionalDetails extends Component {
         if(value == 1){
             this.setState({
                 showEIA:true,
-                is_eia_account:1
+                is_eia_account:1,
+				showEIA2:false,
+				is_eia_account2:0
             })
         }
         else{
@@ -509,13 +513,14 @@ class TwoWheelerAdditionalDetails extends Component {
             'phone': values['phone'],
             'email': values['email'],
             'is_eia_account': values['is_eia_account'],
-			'is_eia_account2': values['is_eia_account2'],
+			
             'eia_no': values['eia_no'],
             'address': values['address'],          
             'gstn_no': values['gstn_no'],
             'salutation_id': values['salutation_id'],
             'nominee_title_id': values['nominee_salutation'],
             'page_name': `four_wheeler_additional_detailsTP/${productId}`,
+			'create_eia_account': values['is_eia_account2'],
 			'tpaInsurance': values['tpaInsurance'],
         }
         if(motorInsurance.policy_for == '1'){
@@ -578,7 +583,10 @@ class TwoWheelerAdditionalDetails extends Component {
                  let quoteId = decryptResp.data.policyHolder ? decryptResp.data.policyHolder.request_data.quote_id : ""
                  let is_eia_account=  policyHolder && (policyHolder.is_eia_account == 0 || policyHolder.is_eia_account == 1) ? policyHolder.is_eia_account : ""
 				 
-				 let is_eia_account2=  policyHolder && (policyHolder.is_eia_account2 == 0 || policyHolder.is_eia_account2 == 1) ? policyHolder.is_eia_account2 : ""
+				 let is_eia_account2=  policyHolder && (policyHolder.create_eia_account == 0 || policyHolder.create_eia_account == 1) ? policyHolder.create_eia_account : ""
+				 
+				 
+				 let tpaInsurance = policyHolder.T_Insurance_Repository_id ? policyHolder.T_Insurance_Repository_id : ""
 				 
                  let bankDetails = decryptResp.data.policyHolder && decryptResp.data.policyHolder.bankdetail ? decryptResp.data.policyHolder.bankdetail[0] : {};
                  let addressDetails = JSON.parse(decryptResp.data.policyHolder.pincode_response)
@@ -765,6 +773,8 @@ class TwoWheelerAdditionalDetails extends Component {
             pa_flag: motorInsurance && motorInsurance.pa_flag ? motorInsurance.pa_flag : "",
             salutation_id: policyHolder && policyHolder.salutation_id ? policyHolder.salutation_id : "",       
             nominee_salutation: nomineeDetails && nomineeDetails.gender ? nomineeDetails.title_id : "",
+			
+			tpaInsurance: policyHolder && policyHolder.T_Insurance_Repository_id ? policyHolder.T_Insurance_Repository_id : "",			
         });
 
         const quoteNumber =
@@ -776,12 +786,23 @@ class TwoWheelerAdditionalDetails extends Component {
         return (
             <>
                 <BaseComponent>
+				
+				<div className="page-wrapper">
+				
                 <div className="container-fluid">
                 <div className="row">
-                    <div className="col-sm-12 col-md-12 col-lg-2 col-xl-2 pd-l-0">
-                        <SideNav />
-                    </div>
-                <div className="col-sm-12 col-md-12 col-lg-10 col-xl-10 infobox">
+				
+				<aside className="left-sidebar">
+		 				 <div className="scroll-sidebar ps-container ps-theme-default ps-active-y">
+						 <SideNav />
+						</div>
+						</aside>
+								
+					 {/*<div className="col-sm-12 col-md-12 col-lg-2 col-xl-2 pd-l-0">               
+						<SideNav />
+             		 </div>*/}	
+					
+                <div className="col-sm-12 col-md-12 col-lg-12 col-xl-12 infobox">
                 <h4 className="text-center mt-3 mb-3">{phrases['SBIGICL']}</h4>
                 { step_completed >= '4' && vehicleDetails.vehicletype_id == '6' ?
                 <section className="brand m-b-25">
@@ -796,7 +817,7 @@ class TwoWheelerAdditionalDetails extends Component {
                         return (
                         <Form>
                         <Row>
-                            <Col sm={12} md={9} lg={9}>
+                            <Col sm={12} md={12} lg={11}>
                                 <div className="d-flex justify-content-left brandhead">
                                 {quoteNumber}
                                 </div>
@@ -1669,6 +1690,7 @@ class TwoWheelerAdditionalDetails extends Component {
                 <Footer />
                 </div>
                 </div>
+				 </div>
                 </BaseComponent>
             </>
         );

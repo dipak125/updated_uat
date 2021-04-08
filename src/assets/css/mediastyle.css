@@ -7,13 +7,13 @@
 }
 
 @media (max-width: 1199px) {
-  .leftNav{ width: 120px;}
-  ul.navPan li a { font-size: 12px;  padding: 12px; margin-bottom: 10px;}
+  /*.leftNav{ width: 120px;}*/
+ /* ul.navPan li a { font-size: 12px;  padding: 12px; margin-bottom: 10px;}*/
   ul.navPan li a{ text-align: center; }
-  .leftIcon01 { display: block !important;  margin-right: 0; margin-bottom: 0;}
+  .leftIcon01 { display: block !important;  /*margin-right: 0; margin-bottom: 0;*/}
   .btn-lg{ width: 100%;}
   .btn-lg a{ font-size: 12px;}
-  .brand-table {max-width: 569px;}
+  .brand-table {max-width: 569px; overflow-x:auto;}
   .brand-table td {padding: 12px;}
   .brand-table td img {width: 80px;}
   .brand-table {max-width: 527px;}
@@ -26,14 +26,61 @@
   h4 { font-size: 15px;  line-height: 18px;}
   .customModalfamlyForm h4 { font-size: 15px;  line-height: 18px;}
   
-  
-  
-  
+  .ticketTable .form-control {
+    font-size: 12px;
+}
+.selctGcv .regisBox .flex-lg-row{  flex-direction: column !important;}
+  .vehicalOd .vehbox .m-b-25.row {
+    flex-direction: column;
+}
+.vehicalOd .vehbox .m-b-25.row .col-md-7.col-sm-12 {
+    flex: 100%;
+    max-width: 100%;
+}
+.twoVtp .vehbox .m-b-25.row, .twoverifytp .vehbox .m-b-25.row, .twovehiDetail .vehbox .m-b-25.row{
+    flex-flow: column;
+}
+.twoverifytp .vehbox  {
+    padding: 30px 13px 50px;
+}
+.twovehiDetail .vehbox{  padding: 30px 15px 50px;}
   
 }
 
 @media (max-width: 991px) {
-  .infobox{ padding-left: 150px;}
+	
+	.arogyaa_address .regisBox, .agrAddress2 .regisBox, .argnominee3 .regisBox{ margin-top:15px;}
+	.custom_widthadd .col-md-6.col-sm-12 {
+    max-width: 100%;
+    flex: 50%;
+}
+	.healthAddress .regisBox.medpd {
+    margin-top: 15px;
+}
+	.vehicalOd .mdsize {
+    max-width: 100%;
+    flex: 100%;
+    margin-top: 15px;
+}
+.vehicalOd .vehbox .m-b-25.row .col-md-7.col-sm-12 {
+    flex: 0 0 58.333333%;
+    max-width: 58.333333%;
+}
+.vehicalOd .vehbox .m-b-25.row {
+    flex-direction: row;
+}
+	.tickedTable .ticketTable table thead {
+    background: rgb(133, 192, 255);
+}
+.tickedTable .ticketTable table {
+    width: 1000px;
+}
+.ticketTable .react-bs-table.react-bs-table-bordered {
+    overflow-x: auto;
+    width: 100%;
+}
+	.otherComprehens .rghtsideTrigr .Collapsible__trigger{ font-size:14px;}
+  /*.infobox{ padding-left: 150px;}*/
   .lginpg{ margin-left: 15px; margin-right: 15px;}
   .login-box-body, .register-box-body{ padding: 0!important;}
   .brand { padding: 25px;}
@@ -50,10 +97,51 @@
   .nomfs16 {font-size: 16px !important;}
   .prsnlinfo .W12 {margin-right: 20px;}
   .medihead { font-size: 16px;  line-height: normal;}
-  
+  .rupee{ font-size:23px;}
+  .regisBox {
+    padding: 30px 10px 90px;
+}
+.premamnt{ font-size:15px;}
+}
+
+@media (max-width: 880px){
+.otherGcvt span.Collapsible__trigger {
+    font-size: 13px !important;
+}
+.otherGcvt .customCheckBox{ font-size:13px;}
+.othercomOd span.Collapsible__trigger, 
+.twoComprehens span.Collapsible__trigger, 
+.twocomp2 span.Collapsible__trigger, .ocGcv span.Collapsible__trigger,
+.otherCom span.Collapsible__trigger, 
+.healthplicyDetail span.Collapsible__trigger, 
+.argDetail span.Collapsible__trigger, .helpolicy span.Collapsible__trigger{
+    font-size: 13px !important;
+}
+.heathDuration .regisBox.medpd, 
+.healthnominee2 .regisBox.medpd,
+.argmedical .regisBox.medpd, .aragyaMedical .regisBox.medpd{
+    padding: 30px 15px !important;
+}
+.heathDuration .regisBox.medpd h3.medihead, 
+.healthnominee2 .regisBox.medpd h3.medihead,
+.premium3 .regisBox h3.medihead, .healthplicyDetail .regisBox h3.medihead,
+.arogyaa_address .regisBox h3.medihead, .argDetail .regisBox h3.medihead,
+.aragyaMedical .regisBox h3.medihead{
+    font-size: 14px;
+}
+
 }
 
 @media (max-width: 767px) {
+	
+	.twowheelBrand .row.formSection button.btn.btn-primary {
+    margin-left: 15px;
+    margin-top: 5px;
+}
+	.twoSLtp button.btn.btn-primary {
+    margin-left: 15px;
+    margin-top: 5px;
+}
   .brand{ min-height: inherit; background-image: inherit; background: #f6faff;}
   .tablecontent td { font-size: 14px;  padding: 15px;}
   .infobox .nav-pills .nav-link { padding: 15px 20px; }
@@ -92,10 +180,10 @@
   .headerTop .align-self-center:first-child img{ width: 100px;}
   .headerTop .listSelect{ top: 25px!important; left: 0!important;}
   .userTopRtSec .notiBell { width: 49px; height: 20px;  margin-right: 7px; background-size: contain;}
-  .leftNav { width: 80px;  }
+  /*.leftNav { width: 80px;  }*/
   ul.navPan li a{ line-height: 15px;}
   .btn-lg{ border-radius: 0; line-height: 1; height: auto;}
-  .infobox { padding-left: 97px;}
+ /* .infobox { padding-left: 97px;}*/
   .infobox .nav-pills .nav-link { padding: 15px 10px;  font-size: 11px;}
   .rghtsideTrigr .Collapsible__trigger {height: 50px; margin-bottom: 0 !important;}
   .policy {font-size: 14px;}
@@ -103,12 +191,31 @@
   .form-control.placeHCenter {width: 40px !important; height: 40px !important;}
   .m-r-60 {margin-right: 15px;}
   .prsnlinfo .W12 {margin-right: 40px;}
+  .dashboardBrand .col-sm-12 {
+    flex: 0 0 100%;
+    max-width: 100%;
+}
+.dashboardBrand .card{ margin-bottom:10px;}
 }
 
 @media (max-width: 479px) {
 }
 
 @media (max-width: 380px) {
+	.registerbr label.customCheckBox.formGrp.formGrp {
+    line-height: 18px;
+    padding-top: 5px;
+}
+.collaps_area span.Collapsible__trigger {
+    font-size:14px;
+}
+}
+
+@media (max-width: 360px){
+.messageDeskSec .nav-pills .nav-link {
+    padding: 8px 7px;
+    font-size: 10px;
+}
 }
 
 @media (max-width: 350px) {

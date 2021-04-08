@@ -163,7 +163,7 @@ class MotorSummery extends Component {
 
     payment = () => {	
         const { policyHolder_refNo } = this.state;	
-        window.location = `${process.env.REACT_APP_PAYMENT_URL}/ConnectPG/payment_motor.php?refrence_no=${policyHolder_refNo}`	
+        window.location = `${process.env.REACT_APP_PAYMENT_URL}/ConnectPG/payment_renewal.php?refrence_no=${policyHolder_refNo}`	
     }	
     Razor_payment = () => {	
         const { policyHolder_refNo } = this.state;	
@@ -243,11 +243,15 @@ class MotorSummery extends Component {
         return (	
             <>	
                 <BaseComponent>	
-                    <div className="container-fluid">	
-                        <div className="row">	
-                            <div className="col-sm-12 col-md-12 col-lg-2 col-xl-2 pd-l-0">	
-                                <SideNav />	
-                            </div>	
+                <div className="page-wrapper">
+                    <div className="container-fluid">
+                        <div className="row">					
+                           <aside className="left-sidebar">
+                            <div className="scroll-sidebar ps-container ps-theme-default ps-active-y">
+                            <SideNav />
+                            </div>
+                            </aside>
+
                             {/* { step_completed >= '4' && vehicleDetails.vehicletype_id == '8' ?	 */}
                             <div className="col-sm-12 col-md-12 col-lg-10 col-xl-10 infobox">	
                                 <h4 className="text-center mt-3 mb-3">{phrases['SBIGICL']}</h4>	
@@ -474,13 +478,13 @@ class MotorSummery extends Component {
                                                                                         <Col sm={12} md={6}>	
                                                                                             <Row>	
                                                                                                 <Col sm={12} md={6}>	
-                                                                                                {motorInsurance.policy_for == '1' ?  <FormGroup>{phrases['Name']}:</FormGroup> : <FormGroup>{phrases['CompanyName']}:</FormGroup> }	
+                                                                                                {motorInsurance && motorInsurance.policy_for == '1' ?  <FormGroup>{phrases['Name']}:</FormGroup> : <FormGroup>{phrases['CompanyName']}:</FormGroup> }	
                                                                                                 </Col>	
                                                                                                 <Col sm={12} md={6}>	
                                                                                                     <FormGroup>{memberdetails.first_name }</FormGroup>	
                                                                                                 </Col>	
                                                                                             </Row>	
-                                                                                            {motorInsurance.policy_for == '1' ?     	
+                                                                                            { motorInsurance && motorInsurance.policy_for == '1' ?     	
                                                                                                 <Row>	
                                                                                                     <Col sm={12} md={6}>	
                                                                                                         <FormGroup>{phrases['DateOfBirth']}:</FormGroup>	
@@ -513,7 +517,7 @@ class MotorSummery extends Component {
                                                                                                     <FormGroup>{memberdetails.email_id}</FormGroup>	
                                                                                                 </Col>	
                                                                                             </Row>	
-                                                                                            {motorInsurance.policy_for == '1' ?	
+                                                                                            {motorInsurance && motorInsurance.policy_for == '1' ?	
                                                                                                 <Row>	
                                                                                                     <Col sm={12} md={6}>	
                                                                                                         <FormGroup>{phrases['Gender']}</FormGroup>	
@@ -537,7 +541,7 @@ class MotorSummery extends Component {
                                                                                     </Row>	
                                                                                 </div>	
                                                                             : (<p></p>)}	
-                                                                        {motorInsurance.policy_for == '1' && motorInsurance.pa_flag == '1' ?             	
+                                                                        {motorInsurance && motorInsurance.policy_for == '1' && motorInsurance.pa_flag == '1' ?             	
                                                                         <div>	
                                                                         <strong>{phrases['NomineeDetails']} :</strong>	
                                                                             <br/>	
@@ -584,7 +588,7 @@ class MotorSummery extends Component {
                                                                                 <p></p>	
                                                                             </Row>	
                                                                         </div> : null}	
-                                                                        {motorInsurance.policy_for == '1' && nomineedetails && nomineedetails.is_appointee == '1' && motorInsurance.pa_flag == '1' ?      	
+                                                                        {motorInsurance && motorInsurance.policy_for == '1' && nomineedetails && nomineedetails.is_appointee == '1' && motorInsurance.pa_flag == '1' ?      	
                                                                             <div>	
                                                                             <strong>{phrases['AppoDetails']} :</strong>	
                                                                                 <br/>	
@@ -702,6 +706,7 @@ class MotorSummery extends Component {
                             <Footer />	
                         </div>	
                     </div>	
+                    </div>
                 </BaseComponent>	
             </>	
         );	

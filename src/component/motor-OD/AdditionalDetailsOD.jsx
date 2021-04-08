@@ -89,8 +89,11 @@ const ownerValidation = Yup.object().shape({
         }
     ),
     pancard: Yup.string()
-    .notRequired(function() {
-        return "EnterPan"
+    .required(function() {
+        	if ((document.querySelector('input[name="is_eia_account2"]:checked')) && (document.querySelector('input[name="is_eia_account2"]:checked').value == 1 )) {
+				
+                return "ValidPan"; 
+            }
     }).matches(/^[A-Z]{3}[CPHFATBLJG]{1}[A-Z]{1}[0-9]{4}[A-Z]{1}$/, function() {
         return "ValidPan"
     }),
@@ -294,7 +297,8 @@ class AdditionalDetailsOD extends Component {
         is_appointee:0,
         appointeeFlag: false,
         motorInsurance: [],
-        titleList: []
+        titleList: [],
+		tpaInsurance: []
     };
 
     ageCheck = (value) => {
@@ -329,7 +333,9 @@ class AdditionalDetailsOD extends Component {
         if(value == 1){
             this.setState({
                 showEIA:true,
-                is_eia_account:1
+                is_eia_account:1,
+				showEIA2:false,
+				is_eia_account2:0
             })
         }
         else{
@@ -401,7 +407,7 @@ class AdditionalDetailsOD extends Component {
             'phone': values['phone'],
             'email': values['email'],
             'is_eia_account': values['is_eia_account'],
-			'is_eia_account2': values['is_eia_account2'],
+			
             'eia_no': values['eia_no'],
             'address': values['address'],
             'appointee_name': values['appointee_name'],
@@ -410,6 +416,8 @@ class AdditionalDetailsOD extends Component {
             'salutation_id': values['salutation_id'],
             'nominee_title_id': values['nominee_salutation'],
             'page_name': `Additional_detailsOD/${productId}`,
+			
+			'create_eia_account': values['is_eia_account2'],
 			'tpaInsurance': values['tpaInsurance'],
         }
 console.log('post_data', post_data);
@@ -446,7 +454,9 @@ console.log('post_data', post_data);
                  let quoteId = decryptResp.data.policyHolder ? decryptResp.data.policyHolder.request_data.quote_id : ""
                  let is_eia_account=  policyHolder && (policyHolder.is_eia_account == 0 || policyHolder.is_eia_account == 1) ? policyHolder.is_eia_account : ""
 				 
-				 let is_eia_account2=  policyHolder && (policyHolder.is_eia_account2 == 0 || policyHolder.is_eia_account2 == 1) ? policyHolder.is_eia_account2 : ""
+				 let is_eia_account2=  policyHolder && (policyHolder.create_eia_account == 0 || policyHolder.create_eia_account == 1) ? policyHolder.create_eia_account : ""				 
+				 
+				 let tpaInsurance = policyHolder.T_Insurance_Repository_id ? policyHolder.T_Insurance_Repository_id : ""
 				 
                  let bankDetails = decryptResp.data.policyHolder && decryptResp.data.policyHolder.bankdetail ? decryptResp.data.policyHolder.bankdetail[0] : {};
                  let addressDetails = JSON.parse(decryptResp.data.policyHolder.pincode_response)
@@ -627,6 +637,8 @@ console.log('post_data', post_data);
             appointee_name: nomineeDetails && nomineeDetails.appointee_name ? nomineeDetails.appointee_name : "",
             salutation_id: policyHolder && policyHolder.salutation_id ? policyHolder.salutation_id : "",        
             nominee_salutation: nomineeDetails && nomineeDetails.gender ? nomineeDetails.title_id : "",
+			
+			tpaInsurance: policyHolder && policyHolder.T_Insurance_Repository_id ? policyHolder.T_Insurance_Repository_id : "",
 
         });
 
@@ -640,12 +652,20 @@ console.log('post_data', post_data);
             <>
                 <BaseComponent>
                 {phrases ? 
+				 <div className="page-wrapper">
                 <div className="container-fluid">
                 <div className="row">
-                    <div className="col-sm-12 col-md-12 col-lg-2 col-xl-2 pd-l-0">
-                        <SideNav />
-                    </div>
-                <div className="col-sm-12 col-md-12 col-lg-10 col-xl-10 infobox">
+				
+				
+                   <aside className="left-sidebar">
+ <div className="scroll-sidebar ps-container ps-theme-default ps-active-y">
+<SideNav />
+ </div>
+</aside>
+					
+					
+					
+                <div className="col-sm-12 col-md-12 col-lg-12 col-xl-12 infobox addiOd">
                 <h4 className="text-center mt-3 mb-3">{phrases['SBIGICL']}</h4>
                 <section className="brand m-b-25">
                     <div className="brand-bg">
@@ -660,7 +680,7 @@ console.log('post_data', post_data);
                         return (
                         <Form>
                         <Row>
-                            <Col sm={12} md={9} lg={9}>
+                            <Col sm={12} md={12} lg={9}>
                             <div className="d-flex justify-content-left brandhead">
                             {quoteNumber}
                             </div>
@@ -1029,7 +1049,7 @@ console.log('post_data', post_data);
                                             </div>
                                         </FormGroup>
                                     </Col>
-                                    <Col sm={12} md={4} lg={5}>
+                                    <Col sm={12} md={4} lg={4}>
                                         <FormGroup>
                                             <div className="insurerName">
                                             <Field
@@ -1047,7 +1067,7 @@ console.log('post_data', post_data);
                                             </div>
                                         </FormGroup>
                                     </Col>
-                                    <Col sm={12} md={4} lg={5}>
+                                    <Col sm={12} md={4} lg={4}>
                                         <FormGroup>
                                             <div className="formSection">
                                             <Field
@@ -1356,6 +1376,7 @@ console.log('post_data', post_data);
                 </div>
                 <Footer />
                 </div>
+				</div>
                 </div> : null }
                 </BaseComponent>
             </>

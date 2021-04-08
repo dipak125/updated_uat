@@ -581,12 +581,24 @@ regnoFormat = (e, setFieldTouched, setFieldValue) => {
         return (
             <>
                 <BaseComponent>
+				
+				<div className="page-wrapper">
+				
                 <div className="container-fluid">
                 <div className="row">
-                    <div className="col-sm-12 col-md-12 col-lg-2 col-xl-2 pd-l-0">
-                        <SideNav />
-                    </div>
-                <div className="col-sm-12 col-md-12 col-lg-10 col-xl-10 infobox">
+				
+				
+						<aside className="left-sidebar">
+		 				 <div className="scroll-sidebar ps-container ps-theme-default ps-active-y">
+						 <SideNav />
+						</div>
+						</aside>
+								
+								 {/*<div className="col-sm-12 col-md-12 col-lg-2 col-xl-2 pd-l-0">               
+									<SideNav />
+             					 </div>*/}				
+                   					
+                <div className="col-sm-12 col-md-12 col-lg-12 col-xl-12 infobox">
                 <h4 className="text-center mt-3 mb-3">{phrases['SBIGICL']}</h4>
                 { step_completed >= '3' && vehicleDetails.vehicletype_id == '6' ?
                 <section className="brand m-b-25">
@@ -612,7 +624,7 @@ regnoFormat = (e, setFieldTouched, setFieldValue) => {
                         <Row>
                             <Col sm={12} md={9} lg={9}>
                                 <Row>
-                                <Col sm={12} md={6} lg={5}>
+                                <Col sm={12} md={12} lg={5}>
                                 <Row>
                                     
                                 <Col sm={12} md={5} lg={6}>
@@ -646,7 +658,7 @@ regnoFormat = (e, setFieldTouched, setFieldValue) => {
                                 </Row>
                                 </Col>
 
-                                <Col sm={12} md={6} lg={4}>
+                                <Col sm={12} md={12} lg={4}>
                                 <Row sm={12} md={6} lg={4}>
                                 <Col sm={12} md={5} lg={6}>
                                     <FormGroup>
@@ -1023,6 +1035,7 @@ regnoFormat = (e, setFieldTouched, setFieldValue) => {
                     </div>
                     </div>
                     </div>
+					</div>
                 </BaseComponent>
             </>
         );

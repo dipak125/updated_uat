@@ -674,12 +674,20 @@ class Address extends Component {
         return (
             <>
                 <BaseComponent>
+				 <div className="page-wrapper">
                     <div className="container-fluid">
                         <div className="row">
-                            <div className="col-sm-12 col-md-12 col-lg-2 col-xl-2 pd-l-0">
-                                <SideNav />
-                            </div>
-                            <div className="col-sm-12 col-md-12 col-lg-10 col-xl-10 infobox">
+						
+						
+                            <aside className="left-sidebar">
+ <div className="scroll-sidebar ps-container ps-theme-default ps-active-y">
+<SideNav />
+ </div>
+</aside>
+							
+							
+							
+                            <div className="col-sm-12 col-md-12 col-lg-12 col-xl-12 infobox healthAddress">
                                 <h4 className="text-center mt-3 mb-3">KSB Retail Policy</h4>
                                 <section className="brand">
                                     <div className="boxpd">
@@ -734,7 +742,7 @@ class Address extends Component {
                                             </div>
                                         </div>
                                         <Row>
-                                        <Col sm={12} md={9} lg={9}>
+                                        <Col sm={12} md={12} lg={9}>
                                         <>
                                         {newInitialValues.proposerAsInsured == '0' ? 
                                        
@@ -870,7 +878,7 @@ class Address extends Component {
                                                             />
                                                         </div> &nbsp;&nbsp;
                                                         <Row>
-                                                        <Col sm={12} md={3} lg={3}>
+                                                        <Col sm={12} md={6} lg={3}>
                                                             <FormGroup>
                                                                 <div className="insurerName">
                                                                     <Field
@@ -888,7 +896,7 @@ class Address extends Component {
                                                                 </div>
                                                             </FormGroup>
                                                         </Col>
-                                                        <Col sm={12} md={3} lg={3}>
+                                                        <Col sm={12} md={6} lg={3}>
                                                             <FormGroup>
                                                                 <div className="insurerName">
                                                                     <Field
@@ -906,7 +914,7 @@ class Address extends Component {
                                                                 </div>
                                                             </FormGroup>
                                                         </Col>
-                                                        <Col sm={12} md={3} lg={3}>
+                                                        <Col sm={12} md={6} lg={3}>
                                                             <FormGroup>
                                                                 <DatePicker
                                                                     name={`family_members.${index}.dob`}
@@ -935,7 +943,7 @@ class Address extends Component {
                                                                 ) : null}  
                                                             </FormGroup>
                                                         </Col>
-                                                        <Col sm={12} md={3} lg={3}>
+                                                        <Col sm={12} md={6} lg={3}>
                                                             <FormGroup>
                                                                 <div className="formSection">
                                                                     <Field
@@ -1027,7 +1035,7 @@ class Address extends Component {
                                                 </div>
 
                                                 <Row className="m-b-45">
-                                                    <Col sm={12} md={5} lg={4}>
+                                                    <Col sm={12} md={6} lg={4}>
                                                         <FormGroup>
                                                             <div className="insurerName">
                                                                 <Field
@@ -1049,7 +1057,7 @@ class Address extends Component {
                                                             </div>
                                                         </FormGroup>
                                                     </Col>
-                                                    <Col sm={12} md={5} lg={4}>
+                                                    <Col sm={12} md={6} lg={4}>
                                                         <FormGroup>
                                                             <div className="insurerName">
                                                                 <Field
@@ -1070,7 +1078,7 @@ class Address extends Component {
                                                             </div>
                                                         </FormGroup>
                                                     </Col>
-                                                    <Col sm={12} md={5} lg={4}>
+                                                    <Col sm={12} md={6} lg={4}>
                                                         <FormGroup>
                                                             <div className="insurerName">
                                                                 <Field
@@ -1091,7 +1099,7 @@ class Address extends Component {
                                                             </div>
                                                         </FormGroup>
                                                     </Col>
-                                                    <Col sm={12} md={5} lg={4}>
+                                                    <Col sm={12} md={6} lg={4}>
                                                         <FormGroup>
                                                             <div className="insurerName">
                                                                 <Field
@@ -1118,7 +1126,7 @@ class Address extends Component {
                                                             </div>
                                                         </FormGroup>
                                                     </Col>
-                                                    <Col sm={12} md={4} lg={4}>
+                                                    <Col sm={12} md={6} lg={4}>
                                                         <FormGroup>
                                                         <div className="formSection">
                                                                 <Field
@@ -1141,7 +1149,7 @@ class Address extends Component {
                                                                 </div>
                                                         </FormGroup>
                                                     </Col>
-                                                    <Col sm={12} md={4} lg={4}>
+                                                    <Col sm={12} md={6} lg={4}>
                                                         <FormGroup>
                                                             <div className="insurerName">
                                                                 <Field
@@ -1164,7 +1172,7 @@ class Address extends Component {
                                                 </Row>
 
                                                 <Row>
-                                                    <Col sm={12} md={4} lg={4}>
+                                                    <Col sm={12} md={6} lg={4}>
                                                         <FormGroup>
                                                             <div className="insurerName">
                                                                 <h4 className="fs-16">
@@ -1173,7 +1181,7 @@ class Address extends Component {
                                                             </div>
                                                         </FormGroup>
                                                     </Col>
-                                                    <Col sm={12} md={4} lg={4}>
+                                                    <Col sm={12} md={6} lg={4}>
                                                         <FormGroup>
                                                             <div className="d-inline-flex m-b-35">
                                                                 <div className="p-r-25">
@@ -1218,7 +1226,7 @@ class Address extends Component {
                                                     </Col>
                                                     
                                                     {showckyc_no || is_ckyc_account == '1' ?
-                                                    <Col sm={12} md={4} lg={4}>
+                                                    <Col sm={12} md={10} lg={4}>
                                                         <FormGroup>
                                                         <div className="insurerName">   
                                                             <Field
@@ -1240,16 +1248,16 @@ class Address extends Component {
                                                 </Row> 
 
                                                 <Row>
-                                                    <Col sm={12} md={4} lg={4}>
+                                                    <Col sm={12} md={6} lg={4}>
                                                         <FormGroup>
                                                             <div className="insurerName">
                                                                 <h4 className="fs-16">
-                                                                    Do you have EIA account
+                                                                    Do you have EIA account 
                                                                 </h4>
                                                             </div>
                                                         </FormGroup>
                                                     </Col>
-                                                    <Col sm={12} md={4} lg={4}>
+                                                    <Col sm={12} md={6} lg={4}>
                                                         <FormGroup>
                                                             <div className="d-inline-flex m-b-35">
                                                                 <div className="p-r-25">
@@ -1294,7 +1302,7 @@ class Address extends Component {
                                                     </Col>
                                                     
                                                     {showEIA || is_eia_account == '1' ?
-                                                    <Col sm={12} md={4} lg={4}>
+                                                    <Col sm={12} md={10} lg={4}>
                                                         <FormGroup>
                                                         <div className="insurerName">   
                                                             <Field
@@ -1412,7 +1420,7 @@ class Address extends Component {
                                             
                                         </div>
                                         </Col>                                       
-                                            <Col sm={12} md={3}>
+                                            <Col sm={12} md={12} lg={3}>
                                                 <div className="regisBox medpd">
                                                     <h3 className="medihead">
                                                     Kutumb Swasthya Bima is for anyone and everyone who is looking for health insurance that is cost effective and offers great value
@@ -1430,6 +1438,7 @@ class Address extends Component {
                             </div>
                         </div>
                     </div>
+					</div>
                 </BaseComponent>
             </>
         );

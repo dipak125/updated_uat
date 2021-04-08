@@ -17,8 +17,12 @@ class ThankYouPage extends Component {
   state = {
     accessToken: "",
     response_text: [],
-    policyNo: this.props.match.params.policyId,
+    policyNo: "",
     vehicletype: [],
+    receipt_no:"",
+    quoteNo:"",
+    retry : 2,
+    retryCount: 0,
     refNumber:  queryString.parse(this.props.location.search).access_id ? 
                 queryString.parse(this.props.location.search).access_id : 
                 localStorage.getItem("policyHolder_refNo")
@@ -27,9 +31,9 @@ class ThankYouPage extends Component {
   // ------------------------ Custom PDF----------------------------
 
   generateDoc = () => {
-    const { policyId } = this.props.match.params
+    const { policyNo } = this.state
     const formData = new FormData();
-    formData.append('policyNo', policyId)
+    formData.append('policyNo', policyNo)
     this.props.loadingStart();
     axios
       .post(`/policy-download/policy-pdf`, formData)
@@ -188,30 +192,6 @@ class ThankYouPage extends Component {
     document.body.appendChild(pom);
     pom.click(); 
     window.URL.revokeObjectURL(url);
-
-    // fetch(file_path,{
-    //   mode: 'no-cors' // 'cors' by default
-    // })
-    //   .then(resp => resp.blob())
-    //   .then(blob => {
-    //     const url = window.URL.createObjectURL(blob);
-    //     const a = document.createElement('a');
-    //     a.style.display = 'none';
-    //     a.href = url;
-    //     // the filename you want
-    //     // a.download = 'b7b98d12c9da4f44b7f5e372945fbf7f.pdf';
-    //     a.download = policyNo+'.pdf';
-    //     document.body.appendChild(a);
-    //     a.click();
-    //     window.URL.revokeObjectURL(url);
-    //     this.props.loadingStop();
-    //     //alert('your file has downloaded!'); // or you know, something with better UX...
-    //   })
-     
-    //   .catch(() => {
-    //    this.props.loadingStop();
-
-    //   });
       
   }
 
@@ -221,31 +201,34 @@ class ThankYouPage extends Component {
   fetchData = () => {
     const { productId } = this.props.match.params
     let encryption = new Encryption();
-
+    this.props.loadingStart();
     axios.get(`policy-holder-additional-details/${this.state.refNumber}`)
         .then(res => {
             let decryptResp = JSON.parse(encryption.decrypt(res.data))
             console.log("decrypt", decryptResp)
-            let vehicletype = decryptResp.data.policyHolder && decryptResp.data.policyHolder.vehiclebrandmodel ? decryptResp.data.policyHolder.vehiclebrandmodel.vehicletype : {};
-
-            console.log('vehicletype', vehicletype)
+            if(decryptResp.error == false) {
+              let vehicletype = decryptResp.data.policyHolder && decryptResp.data.policyHolder.vehiclebrandmodel ? decryptResp.data.policyHolder.vehiclebrandmodel.vehicletype : {};        
+              localStorage.removeItem("policyHolder_id");
+              localStorage.removeItem("policyHolder_refNo");
+              localStorage.removeItem("policy_type");
+              localStorage.removeItem("brandEdit");
+              localStorage.removeItem("newBrandEdit");
+              sessionStorage.removeItem('pan_data');
+              sessionStorage.removeItem('email_data');
+              sessionStorage.removeItem('proposed_insured');
+              sessionStorage.removeItem('display_looking_for');
+              sessionStorage.removeItem('display_dob');
+              
+              this.getAgentReceipt()
+              this.setState({
+                  vehicletype       
+              })
+            }
+            else {
+              swal(decryptResp.msg)
+              this.props.loadingStop();
+            }
             
-            localStorage.removeItem("policyHolder_id");
-            localStorage.removeItem("policyHolder_refNo");
-            localStorage.removeItem("policy_type");
-            localStorage.removeItem("brandEdit");
-            localStorage.removeItem("newBrandEdit");
-            sessionStorage.removeItem('pan_data');
-            sessionStorage.removeItem('email_data');
-            sessionStorage.removeItem('proposed_insured');
-            sessionStorage.removeItem('display_looking_for');
-            sessionStorage.removeItem('display_dob');
-            
-            this.getCustomerMsg()
-            this.setState({
-                vehicletype       
-            })
-
             setTimeout(
               function() {
                 this.noBackButton()
@@ -256,9 +239,125 @@ class ThankYouPage extends Component {
         })
         .catch(err => {
             // handle error
+            let decryptErr = JSON.parse(encryption.decrypt(err.data))
+            console.log("decryptErr", decryptErr)
             this.props.loadingStop();
         })
 }
+
+getAgentReceipt = () => {
+  const formData = new FormData();
+  formData.append('policy_ref_no', this.state.refNumber);
+  if(this.state.retryCount < 3){
+    this.setState({
+      retryCount: this.state.retryCount + 1
+    });
+    this.props.loadingStart();
+      if(this.state.receipt_no === null || this.state.receipt_no == "") {
+        axios
+        .post(`/renewal/agent-receipt`, formData)
+        .then(res => {
+          if(res.data.error === false ) {
+            this.setState(
+              {
+                receipt_no:res.data.data.receipt_no,
+                quoteNo:res.data.data.quoteNo,
+              }
+            )
+            this.issuePolicy()
+          }    
+          else {         
+            this.props.loadingStop()
+            swal(res.data.msg)
+          }   
+        })
+        .catch(err => {
+          this.setState({
+            accessToken: []
+          });
+          this.props.loadingStop();
+        });
+      }
+      else {
+        this.issuePolicy()
+      }  
+  }
+  else {
+    this.props.loadingStop();
+    swal({
+      title: "Alert",
+      text: "Maximum Retry attempt limit is crossed. Now refund process would be initiated",
+      icon: "warning",
+      // buttons: true,
+      dangerMode: true,
+    })
+    .then((willRefund) => {
+      if (willRefund) {
+      // this.handleRefund()
+      }
+    })
+  }
+}
+
+issuePolicy = () => {
+  const formData = new FormData();
+  formData.append('policy_ref_no', this.state.refNumber);
+  this.props.loadingStart();
+  axios
+    .post(`/renewal/issue-policy`, formData)
+    .then(res => {
+      if(res.data.error === false) {
+        this.setState({
+          policyNo: res.data.data.PolicyNo, retry: 0
+        });
+        this.getCustomerMsg(res.data.data.PolicyNo)
+        this.props.loadingStop();   
+      }
+      else { 
+        if(this.state.retryCount <= 1){   
+          this.getAgentReceipt()
+        }else {
+          this.setState({
+            retry: 1
+          }); 
+          this.props.loadingStop();   
+          swal("Due to some reason, policy could not be created at this moment. Please retry in some time.")
+        }
+       
+      }      
+    })
+    .catch(err => {
+      this.setState({
+        accessToken: []
+      });
+      this.props.loadingStop();
+    });
+}
+
+handleRefund = (values) => {
+  const {policyHolder} = this.state
+  
+  if(policyHolder && policyHolder.bcmaster && policyHolder.bcmaster.paymentgateway && policyHolder.bcmaster.paymentgateway.slug) {
+      if(policyHolder.bcmaster.paymentgateway.slug == "csc_wallet") {
+          this.CSCRefund()
+      }
+      if(policyHolder.bcmaster.paymentgateway.slug == "razorpay") {
+          this.RazorpayRefund()
+      }     
+  }
+}
+
+CSCRefund = () => {
+  const { refNumber } = this.state;
+  window.location = `${process.env.REACT_APP_PAYMENT_URL}/ConnectPG/sme_fire_refund.php?refrence_no=${refNumber}`
+}
+// http://14.140.119.44/sbig-csc/razorpay/smefire_pay.php?refrence_no=b6682aa3f5bc9003623cdee5506dfb2d
+RazorpayRefund = () => {
+  const { refNumber } = this.state;
+  window.location = `${process.env.REACT_APP_PAYMENT_URL}/razorpay/sme_fire_refund.php?refrence_no=${refNumber}`
+}
+
+
 
 getCustomerMsg = () => {
   const { productId } = this.props.match.params
@@ -270,7 +369,7 @@ getCustomerMsg = () => {
 
   axios.post(`customer-msg`, formData)
       .then(res => {
-        // custom Msg
+        // custom Msg 
       })
       .catch(err => {
           // handle error
@@ -305,7 +404,6 @@ downloadWordingGSB = () => {
 }
 
   componentDidMount() {      
-    const { policyId } = this.props.match.params
     this.fetchData()
 
   }
@@ -323,27 +421,19 @@ downloadWordingGSB = () => {
     const { vehicletype } = this.state
     let phrases = localStorage.getItem("phrases") ? JSON.parse(localStorage.getItem("phrases")) : null
 
-
     return (
       <>
         <BaseComponent>
         {phrases ? 
-		
-		<div className="page-wrapper">
-          <div className="container-fluid fg">
-            <div className="row">
-			
-			<aside className="left-sidebar">
-		 				 <div className="scroll-sidebar ps-container ps-theme-default ps-active-y">
-						 <SideNav />
-						</div>
-						</aside>
-								
-					 {/*<div className="col-sm-12 col-md-12 col-lg-2 col-xl-2 pd-l-0">             
-						<SideNav />
-             		 </div>*/}
-					 
-            			  
+         <div className="page-wrapper">
+         <div className="container-fluid fg">
+           <div className="row">
+            <aside className="left-sidebar">
+              <div className="scroll-sidebar ps-container ps-theme-default ps-active-y">
+              <SideNav />
+            </div>
+            </aside>
+
               <div className="col-sm-12 col-md-12 col-lg-10 col-xl-10">
                 <section className="thankuBox">
                   <div className="thankuinfo">
@@ -357,18 +447,10 @@ downloadWordingGSB = () => {
                             :
                             <button className="policy m-l-20" onClick={this.getAccessToken}>{phrases['PolicyCopy']} </button>
                         } */}
+                        {this.state.policyNo ? 
                         <button className="policy m-l-20" onClick={this.generateDoc}>{phrases['PolicyCopy']} </button>
-                        {vehicletype && vehicletype.id && vehicletype.id == 13 ?
-                            <button className="policy m-l-20" onClick={this.downloadWording}>Policy Wording </button>
-                            :
-                           null
-                        }
-                        
-                        {vehicletype && vehicletype.id && vehicletype.id == 14 ?
-                            <button className="policy m-l-20" onClick={this.downloadWordingGSB}>Policy Wording </button>
-                            :
-                           null
-                        }
+                        : null }
+
                         </div>
                     </div>
                   </div>
@@ -377,7 +459,7 @@ downloadWordingGSB = () => {
                 <Footer />
               </div>
             </div>
-			  </div>
+            </div>
           </div> : null }
         </BaseComponent>
       </>

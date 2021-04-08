@@ -375,12 +375,23 @@ class SelectBrand extends Component {
             <>
                 <BaseComponent>
                     {phrases ?
+					<div className="page-wrapper">
                     <div className="container-fluid">
                         <div className="row">
-                            <div className="col-sm-12 col-md-12 col-lg-2 col-xl-2 pd-l-0">
-                                <SideNav />
-                            </div>
-                            <div className="col-sm-12 col-md-12 col-lg-10 col-xl-10 infobox">
+						
+						<aside className="left-sidebar">
+		 				 <div className="scroll-sidebar ps-container ps-theme-default ps-active-y">
+						 <SideNav />
+						</div>
+						</aside>
+								
+					 {/*<div className="col-sm-12 col-md-12 col-lg-2 col-xl-2 pd-l-0">               
+						<SideNav />
+             		 </div>*/}
+						
+						
+                           
+                            <div className="col-sm-12 col-md-12 col-lg-12 col-xl-12 infobox">
                                 <h4 className="text-center mt-3 mb-3">{phrases['SBIGICL']}</h4>
                                 {this.props.data && this.props.data.brandEdit && this.props.data.brandEdit == '1' || pageLoad == '1' ?
                                 <Formik initialValues={newInitialValues}
@@ -401,7 +412,7 @@ class SelectBrand extends Component {
                                                         </div>
 
                                                         <Row>
-                                                            <Col sm={12} md={9}>
+                                                            <Col sm={12} md={8}>
                                                                 <BrandTable brandList={brandList && brandList.length > 0 ? brandList : []} selectBrandFunc={this.setBrandName} otherBrandFunc={this.getOtherBrands}/>
 
 
@@ -418,7 +429,7 @@ class SelectBrand extends Component {
 
                                                             </Col>
 
-                                                            <Col sm={12} md={3}>
+                                                            <Col sm={12} md={4}>
                                                                 <div className="regisBox">
                                                                     <div className="d-flex justify-content-between flex-lg-row flex-md-column m-b-25">
 
@@ -464,6 +475,7 @@ class SelectBrand extends Component {
                             </div>
 
                         </div>
+						</div>
                     </div> : null}
                 </BaseComponent>
 

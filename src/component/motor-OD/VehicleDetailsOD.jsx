@@ -743,12 +743,19 @@ class VehicleDetailsOD extends Component {
             <>
                 <BaseComponent>
                 {phrases ? 
+				<div className="page-wrapper">
                 <div className="container-fluid">
                 <div className="row">
-                    <div className="col-sm-12 col-md-12 col-lg-2 col-xl-2 pd-l-0">
-                        <SideNav />
-                    </div>
-                <div className="col-sm-12 col-md-12 col-lg-10 col-xl-10 infobox">
+				
+				
+                   <aside className="left-sidebar">
+ <div className="scroll-sidebar ps-container ps-theme-default ps-active-y">
+<SideNav />
+ </div>
+</aside>
+					
+					
+                <div className="col-sm-12 col-md-12 col-lg-12 col-xl-12 infobox vehicalOd">
                 <h4 className="text-center mt-3 mb-3">{phrases['SBIGICL']}</h4>
                 <section className="brand m-b-25">
                     <div className="d-flex justify-content-left">
@@ -763,7 +770,7 @@ console.log("errors----------------- ", errors)
                                 return (
                                     <Form>
                                         <Row>
-                                            <Col sm={12} md={9} lg={9}>
+                                            <Col sm={12} md={12} lg={9}>
 
                                                 <Row>
                                                     <Col sm={12} md={6} lg={6}>
@@ -1287,7 +1294,7 @@ console.log("errors----------------- ", errors)
 
                                             </Col>
 
-                                            <Col sm={12} md={3}>
+                                            <Col sm={12} md={3} className="mdsize">
                                                 <div className="vehbox">
                                                     <Row className="m-b-25">
                                                         <Col sm={12} md={7}>
@@ -1340,6 +1347,7 @@ console.log("errors----------------- ", errors)
                 <Footer />
                 </div>
                 </div>
+				</div>
                 </div> : null }
             </BaseComponent>
             </>

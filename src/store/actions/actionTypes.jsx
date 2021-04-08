@@ -11,6 +11,7 @@ export const GET_LOGGED_IN_DETAILS = 'GET_LOGGED_IN_DETAILS';
 
 export const GET_DATA = 'GET_DATA';
 export const SET_DATA = 'SET_DATA';
+export const TOGGLE = 'TOGGLE';
 
 //SVJT
 

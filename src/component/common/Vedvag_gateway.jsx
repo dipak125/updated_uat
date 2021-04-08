@@ -235,12 +235,23 @@ class Vedvag_gateway extends Component {
         return (
             <>
                 <BaseComponent>
+				
+				<div className="page-wrapper">
                     <div className="container-fluid">
                         <div className="row">
-                            <div className="col-sm-12 col-md-12 col-lg-2 col-xl-2 pd-l-0">
-                                <SideNav />
-                            </div>
-                            <div className="col-sm-12 col-md-12 col-lg-10 col-xl-10 infobox">
+						
+						<aside className="left-sidebar">
+		 				 <div className="scroll-sidebar ps-container ps-theme-default ps-active-y">
+						 <SideNav />
+						</div>
+						</aside>
+								
+					 {/*<div className="col-sm-12 col-md-12 col-lg-2 col-xl-2 pd-l-0">               
+						<SideNav />
+             		 </div>*/}
+						
+                            							
+                            <div className="col-sm-12 col-md-12 col-lg-12 col-xl-12 infobox vedgetway">
                                 <h4 className="text-center mt-3 mb-3">SBI General Insurance Company Limited</h4>
                                 <Formik initialValues={initialValue} onSubmit={this.handleSubmit}
                                 validationSchema={validatePremium}
@@ -262,7 +273,7 @@ class Vedvag_gateway extends Component {
                                                     </div>
 
                                                     <Row>
-                                                        <Col sm={12} md={9} lg={9}>
+                                                        <Col sm={12} md={12} lg={9}>
                                                             <div className="rghtsideTrigr">
                                                                     <div className="listrghtsideTrigr">
                                                                         <Row>
@@ -344,6 +355,7 @@ class Vedvag_gateway extends Component {
                             <Footer />
                         </div>
                     </div>
+					</div>
                 </BaseComponent>
             </>
         );

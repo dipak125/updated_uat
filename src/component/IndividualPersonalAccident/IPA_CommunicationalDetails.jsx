@@ -524,12 +524,20 @@ class AccidentAdditionalDetails extends Component {
     return (
       <>
         <BaseComponent>
+		 <div className="page-wrapper">
           <div className="container-fluid">
             <div className="row">
-              <div className="col-sm-12 col-md-12 col-lg-2 col-xl-2 pd-l-0">
-                <SideNav />
-              </div>
-              <div className="col-sm-12 col-md-12 col-lg-10 col-xl-10 infobox">
+			
+			
+             <aside className="left-sidebar">
+ <div className="scroll-sidebar ps-container ps-theme-default ps-active-y">
+<SideNav />
+ </div>
+</aside>
+			  
+			  
+			  
+              <div className="col-sm-12 col-md-12 col-lg-12 col-xl-12 infobox cmdpol2">
                 <h4 className="text-center mt-3 mb-3">
                   SBI General Insurance Company Limited
                 </h4>
@@ -560,7 +568,7 @@ class AccidentAdditionalDetails extends Component {
                             </div>
 
                             <Row>
-                              <Col sm={6} md={3} lg={3}>
+                              <Col sm={6} md={4} lg={3}>
                                 <FormGroup>
                                   <div className="formSection">
                                     <Field
@@ -582,7 +590,7 @@ class AccidentAdditionalDetails extends Component {
                                 </FormGroup>
                               </Col>
 
-                              <Col sm={6} md={3} lg={3}>
+                              <Col sm={6} md={4} lg={3}>
                                 <FormGroup>
                                   <div className="insurerName">
                                     <Field
@@ -608,7 +616,7 @@ class AccidentAdditionalDetails extends Component {
                                 </FormGroup>
                               </Col>
 
-                              <Col sm={6} md={3} lg={3}>
+                              <Col sm={6} md={4} lg={3}>
                                 <FormGroup>
                                   <div className="insurerName">
                                     <Field
@@ -635,7 +643,7 @@ class AccidentAdditionalDetails extends Component {
                               </Col>
                             </Row>
                             <Row>
-                              <Col sm={6} md={3} lg={3}>
+                              <Col sm={6} md={4} lg={3}>
                                 <FormGroup>
                                   <DatePicker
                                     name="date_of_birth"
@@ -664,7 +672,7 @@ class AccidentAdditionalDetails extends Component {
                                     ) : null}
                                 </FormGroup>
                               </Col>
-                              <Col sm={6} md={3} lg={3}>
+                              <Col sm={6} md={4} lg={3}>
                                 <FormGroup className="m-b-25">
                                   <div className="insurerName nmbract">
                                     <span>+91</span>
@@ -692,7 +700,7 @@ class AccidentAdditionalDetails extends Component {
                                   </div>
                                 </FormGroup>
                               </Col>
-                              <Col sm={6} md={3} lg={3}>
+                              <Col sm={6} md={4} lg={3}>
                                 <FormGroup>
                                   <div className="insurerName">
                                     <Field
@@ -719,7 +727,7 @@ class AccidentAdditionalDetails extends Component {
                               </Col>
                             </Row>
                             <Row>
-                              <Col sm={6} md={3} lg={3}>
+                              <Col sm={6} md={4} lg={3}>
                                 <FormGroup>
                                   <div className="insurerName">
                                     <Field
@@ -747,7 +755,7 @@ class AccidentAdditionalDetails extends Component {
                                   </div>
                                 </FormGroup>
                               </Col>
-                              <Col sm={6} md={3} lg={3}>
+                              <Col sm={6} md={4} lg={3}>
                                 <FormGroup>
                                   <div className="formSection">
                                     <Field
@@ -780,7 +788,7 @@ class AccidentAdditionalDetails extends Component {
                                 </FormGroup>
                               </Col>
 
-                              <Col sm={6} md={3} lg={3}>
+                              <Col sm={6} md={4} lg={3}>
                                 <FormGroup>
                                   <div className="insurerName">
                                     <Field
@@ -807,7 +815,7 @@ class AccidentAdditionalDetails extends Component {
                               </Col>
                             </Row>
                             <Row>
-                              <Col sm={6} md={3} lg={3}>
+                              <Col sm={6} md={4} lg={3}>
                                 <FormGroup>
                                   <div className="insurerName">
                                     <Field
@@ -831,7 +839,7 @@ class AccidentAdditionalDetails extends Component {
                                   </div>
                                 </FormGroup>
                               </Col>
-                              <Col sm={6} md={3} lg={3}>
+                              <Col sm={6} md={4} lg={3}>
                                 <FormGroup>
                                   <div className="insurerName">
                                     <Field
@@ -856,7 +864,7 @@ class AccidentAdditionalDetails extends Component {
                                   </div>
                                 </FormGroup>
                               </Col>
-                              <Col sm={6} md={3} lg={3}>
+                              <Col sm={6} md={4} lg={3}>
                                 <FormGroup>
                                   <div className="insurerName">
                                     <Field
@@ -883,7 +891,7 @@ class AccidentAdditionalDetails extends Component {
                               </Col>
                             </Row>
                             <Row>
-                            <Col sm={6} md={3} lg={3}>
+                            <Col sm={6} md={4} lg={3}>
                                 <FormGroup>
                                   <div className="formSection">
                                     <Field
@@ -921,7 +929,7 @@ class AccidentAdditionalDetails extends Component {
                               </div>
                             </div>
                             <Row>
-                              <Col sm={6} md={3} lg={3}>
+                              <Col sm={6} md={4} lg={3}>
                                 <FormGroup>
                                   <div className="formSection">
                                     <Field
@@ -942,7 +950,7 @@ class AccidentAdditionalDetails extends Component {
                                 </FormGroup>
                               </Col>
 
-                              <Col sm={6} md={3} lg={3}>
+                              <Col sm={6} md={4} lg={3}>
                                 <FormGroup>
                                   <div className="insurerName">
                                     <Field
@@ -968,7 +976,7 @@ class AccidentAdditionalDetails extends Component {
                                 </FormGroup>
                               </Col>
 
-                              <Col sm={6} md={3} lg={3}>
+                              <Col sm={6} md={4} lg={3}>
                                 <FormGroup>
                                   <div className="insurerName">
                                     <Field
@@ -995,7 +1003,7 @@ class AccidentAdditionalDetails extends Component {
                               </Col>
                             </Row>
                             <Row >
-                              <Col sm={6} md={3} lg={3}>
+                              <Col sm={6} md={4} lg={3}>
                                 <FormGroup>
                                   <DatePicker
                                     name="nominee_dob"
@@ -1024,7 +1032,7 @@ class AccidentAdditionalDetails extends Component {
                                   ) : null}
                                 </FormGroup>
                               </Col>
-                              <Col sm={6} md={3} lg={3}>
+                              <Col sm={6} md={4} lg={3}>
                                 <FormGroup>
                                   <div className="insurerName">
                                     <Field
@@ -1039,7 +1047,7 @@ class AccidentAdditionalDetails extends Component {
                                   </div>
                                 </FormGroup>
                               </Col>
-                              <Col sm={6} md={3} lg={3}>
+                              <Col sm={6} md={4} lg={3}>
                                 <FormGroup>
                                   <div className="formSection">
                                     <Field
@@ -1067,7 +1075,7 @@ class AccidentAdditionalDetails extends Component {
                               </Col> 
                             </Row>  
                             <Row className="m-b-45">
-                            <Col sm={6} md={3} lg={3}>
+                            <Col sm={6} md={8} lg={3}>
                                 <FormGroup>
                                   <div className="formSection">
                                     <Field
@@ -1183,6 +1191,7 @@ class AccidentAdditionalDetails extends Component {
               </div>
             </div>
           </div>
+		  </div>
         </BaseComponent>
       </>
     );

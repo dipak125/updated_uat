@@ -412,12 +412,19 @@ class RiskDetails extends Component {
         return (
             <>
                 <BaseComponent>
+				<div className="page-wrapper">
                 <div className="container-fluid">
                 <div className="row">
-                    <div className="col-sm-12 col-md-12 col-lg-2 col-xl-2 pd-l-0">
-                        <SideNav />
-                    </div>
-                <div className="col-sm-12 col-md-12 col-lg-10 col-xl-10 infobox">
+				
+                    <aside className="left-sidebar">
+ <div className="scroll-sidebar ps-container ps-theme-default ps-active-y">
+<SideNav />
+ </div>
+</aside>
+
+					
+					
+                <div className="col-sm-12 col-md-12 col-lg-12 col-xl-12 infobox riskdetail">
                 <h4 className="text-center mt-3 mb-3">SME Pre UW</h4>
                 <section className="brand m-b-25">
                     <div className="brand-bg">
@@ -427,7 +434,7 @@ class RiskDetails extends Component {
                                 return (
                                     <Form>
                                         <Row>
-                                            <Col sm={12} md={9} lg={9}>
+                                            <Col sm={12} md={12} lg={9}>
 
                                                 <div className="d-flex justify-content-left">
                                                 <div className="brandhead">
@@ -624,7 +631,7 @@ class RiskDetails extends Component {
                                                         </FormGroup>                                                        
                                                     </Col> */}
                                                     <Row> 
-                                                            <Col sm={6} md={4} lg={4}>
+                                                            <Col sm={6} md={6} lg={4}>
                                                         <label>
                                                         Fire-Building-Sum Insured:
                                                         </label>
@@ -632,7 +639,7 @@ class RiskDetails extends Component {
                                                             <a className="infoIcon"><img src={require('../../assets/images/i.svg')} alt="" className="premtool" /></a>
                                                         </OverlayTrigger>
                                                         </Col>
-                                                        <Col sm={12} md={4} lg={4}>
+                                                        <Col sm={12} md={6} lg={4}>
                                                         <FormGroup>
                                                             <div className="insurerName">
                                                             <Field
@@ -663,7 +670,7 @@ class RiskDetails extends Component {
                                                         </Col>
                                                     </Row>
                                                     <Row>
-                                                            <Col sm={6} md={4} lg={4}>
+                                                            <Col sm={6} md={6} lg={4}>
                                                         <label>
                                                         Fire-Contents Sum Insured:
                                                         </label>
@@ -671,7 +678,7 @@ class RiskDetails extends Component {
                                                             <a className="infoIcon"><img src={require('../../assets/images/i.svg')} alt="" className="premtool" /></a>
                                                         </OverlayTrigger>
                                                         </Col>
-                                                    <Col sm={12} md={4} lg={4}>
+                                                    <Col sm={12} md={6} lg={4}>
                                                     <FormGroup>
                                                         <div className="insurerName">
                                                             <Field
@@ -696,7 +703,7 @@ class RiskDetails extends Component {
                                                     </Col>
                                                     </Row>
                                                     <Row>
-                                                            <Col sm={6} md={4} lg={4}>
+                                                            <Col sm={6} md={6} lg={4}>
                                                         <label>
                                                         Fire-Stock Sum Insured:
                                                         </label>
@@ -704,7 +711,7 @@ class RiskDetails extends Component {
                                                             <a className="infoIcon"><img src={require('../../assets/images/i.svg')} alt="" className="premtool" /></a>
                                                         </OverlayTrigger>
                                                         </Col>
-                                                    <Col sm={12} md={4} lg={4}>
+                                                    <Col sm={12} md={6} lg={4}>
                                                         <FormGroup>
                                                             <div className="insurerName">
                                                             <Field
@@ -730,7 +737,7 @@ class RiskDetails extends Component {
                                                 </Row>
                                                 
                                                 <Row>
-                                                            <Col sm={6} md={4} lg={4}>
+                                                            <Col sm={6} md={6} lg={4}>
                                                         <label>
                                                         Fire-Total Sum Insured:
                                                         </label>
@@ -738,7 +745,7 @@ class RiskDetails extends Component {
                                                             <a className="infoIcon"><img src={require('../../assets/images/i.svg')} alt="" className="premtool" /></a>
                                                         </OverlayTrigger>
                                                         </Col>
-                                                    <Col sm={12} md={4} lg={4}>
+                                                    <Col sm={12} md={6} lg={4}>
                                                         <FormGroup>
                                                             <div className="insurerName">
                                                             <Field
@@ -801,6 +808,7 @@ class RiskDetails extends Component {
                 </div>
                 </div>
                 </div>
+				 </div>
             </BaseComponent>
             </>
         );

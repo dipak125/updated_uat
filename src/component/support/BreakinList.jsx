@@ -161,16 +161,26 @@ class BreakinList extends Component {
         };
         return (
             <BaseComponent>
+			
+			<div className="page-wrapper">
                 <div className="container-fluid">
                     <div className="row">
-                        <div className="col-sm-12 col-md-12 col-lg-2 col-xl-2 pd-l-0">
-                            <SideNav />
-                        </div>
-                        <div className="col-sm-12 col-md-12 col-lg-10 col-xl-10 infobox">
+					
+								<aside className="left-sidebar">
+							 	 <div className="scroll-sidebar ps-container ps-theme-default ps-active-y">
+							 		<SideNav />
+								 </div>
+								</aside>
+										
+								{/*<div className="col-sm-12 col-md-12 col-lg-2 col-xl-2 pd-l-0">               
+									<SideNav />
+								 </div>*/}
+						
+                        <div className="col-sm-12 col-md-12 col-lg-12 col-xl-12 infobox breakin">
                         <h4 className="text-center mt-3 mb-3">{phrases['SBIGICL']}</h4>
                         <div className="contBox m-b-45 tickedTable">
                             <h4 className="text-center mt-3 mb-3">{phrases['BreakIn']}</h4>  
-                            <div className="customInnerTable">
+                            <div className="customInnerTable dataTableCustom">
                                 <BootstrapTable ref="table"
                                     data={breakinList}
                                     pagination={true}
@@ -180,13 +190,13 @@ class BreakinList extends Component {
                                     wrapperClasses="table-responsive"
                                 >
 
-                                    <TableHeaderColumn width='200px' dataField='breakin' dataFormat={breakinFormatter} isKey dataSort>{phrases['choiceNo']}</TableHeaderColumn>
-                                    <TableHeaderColumn width='100px' dataField="vehiclebrandmodel" dataFormat={productFormatter} >{phrases['Product']}</TableHeaderColumn>
+                                    <TableHeaderColumn width='300px' dataField='breakin' dataFormat={breakinFormatter} isKey dataSort>{phrases['choiceNo']}</TableHeaderColumn>
+                                    <TableHeaderColumn width='150px' dataField="vehiclebrandmodel" dataFormat={productFormatter} >{phrases['Product']}</TableHeaderColumn>
                                     <TableHeaderColumn width='100px' dataField="breakin" dataFormat={(cell) => (cell && cell.created_at !== '0000-00-00 00:00:00' ? moment(cell.created_at).format("DD-MM-YYYY") : '')}>{phrases['InspectionDate']}</TableHeaderColumn>
                                     <TableHeaderColumn width='100px' dataField="request_data" dataFormat={premiumFormatter} >{phrases['Premium']}</TableHeaderColumn>
                                     {/* <TableHeaderColumn width='200px' dataField="break_in_status"  dataFormat={(cell) => (cell == 1 ? "Approval pending" : "Approved")} >Status</TableHeaderColumn> */}
                                     <TableHeaderColumn width='200px' dataField="break_in_status" >{phrases['Status']}</TableHeaderColumn>
-                                    <TableHeaderColumn width='100px' dataField="request_data" dataFormat={(cell) =>(cell.quote_id) } >{phrases['QuotatioinNo']}.</TableHeaderColumn>
+                                    <TableHeaderColumn width='200px' dataField="request_data" dataFormat={(cell) =>(cell.quote_id) } >{phrases['QuotatioinNo']}.</TableHeaderColumn>
                                     <TableHeaderColumn width='150px' dataField="getstatus" dataAlign="center" dataFormat={ actionFormatter(this) }>{phrases['Status']}</TableHeaderColumn>
 
                                 </BootstrapTable>
@@ -195,6 +205,7 @@ class BreakinList extends Component {
                         <Footer />
                     </div>
                 </div>
+				</div>
             </BaseComponent>
         );
     }

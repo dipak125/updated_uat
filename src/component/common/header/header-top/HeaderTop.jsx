@@ -2,11 +2,13 @@ import React, { Component } from 'react';
 import { Dropdown } from 'react-bootstrap';
 import Loader from "react-loader-spinner";
 import { connect } from "react-redux";
+import SideNav from "../../../common/side-nav/SideNav";
 import { authLogout } from "../../../../store/actions/auth";
 import axios from "../../../../shared/axios"
 import Encryption from '../../../../shared/payload-encryption';
 import Blink from 'react-blink-text';
 import { loaderStart, loaderStop } from "../../../../store/actions/loader";
+import {logoToggle } from "../../../../store/actions/toggle";
 
 // let logo = sessionStorage.getItem('logo') && sessionStorage.getItem('logo') != "undefined" ? sessionStorage.getItem('logo') : "search.svg"
 
@@ -16,7 +18,8 @@ class HeaderTop extends Component {
         logo: sessionStorage.getItem('logo') && sessionStorage.getItem('logo') != "undefined" ? sessionStorage.getItem('logo') : "",
         bc_data: {},
         csc_data: {},
-        phrases: []
+        phrases: [],
+        toggle1: true
     }
 
     // handleLogout = () => {
@@ -41,6 +44,24 @@ class HeaderTop extends Component {
         window.onpopstate = function () {
           window.history.go(1);
         };
+    }
+
+    toggle = () => {
+        var data = this.props.logo_toggle
+        if(data == true) {
+            this.props.logoToggle(false);
+        }
+        else this.props.logoToggle(true);
+        
+    }
+
+    toggle1 = () => {
+        var data = this.state.toggle1
+        if(data == true) {
+            this.setState({toggle1:false});
+        }
+        else this.setState({toggle1:true});
+        
     }
 
     fetchPhrases = () => {
@@ -88,18 +109,58 @@ class HeaderTop extends Component {
 
       
     render() {
-        // console.log("BC_data---", bc_data.user_info )
         const { logo, bc_data, csc_data } = this.state
 
         let phrases = localStorage.getItem("phrases") ? JSON.parse(localStorage.getItem("phrases")) : null
         
         return (
             <>
-                <section className="container-fluid headerTop d-flex justify-content-between">
-                    <div className="align-self-center"><img src={require('../../../../assets/images/logo.svg')} alt="" /></div>
-                    {sessionStorage.getItem("auth_token") && phrases ? 
-                    <div className="align-self-right langDrop">
-                        <select
+				
+			
+		<header class="topbar" data-navbarbg="skin1">
+            <nav class="navbar top-navbar navbar-expand-md navbar-dark">
+                <div class="navbar-header expand-logo" data-logobg="skin1">
+                    
+                    <a class="nav-toggler waves-effect waves-light d-block d-md-none" href="javascript:void(0)" onClick= {this.toggle}>
+					<img src={require('../../../../assets/images/toggle-icon.png')} alt="" />
+					</a>
+					
+                    
+                    <a class="navbar-brand logoActive" href="javascript:void(0)" >
+                    
+                        <b class="logo-icon text-center">
+							<img src={require('../../../../assets/images/smallLogo.png')} alt="" />
+                        </b>
+                        
+						
+                        
+                        <span class="logo-text text-center" >
+							<img src={require('../../../../assets/images/logo.svg')} alt="" />
+                        </span>
+                    </a>
+                    
+					
+                  
+                    <a class="topbartoggler d-block d-md-none waves-effect waves-light" href="javascript:void(0)" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation" onClick= {this.toggle1}>
+						<img src={require('../../../../assets/images/toggler.png')} alt="" />
+					</a>
+                </div>
+				
+                <div class= {this.state.toggle1 ? "navbar-collapse collapse pushWrap" : "navbar-collapse collapse pushWrap displayshow"} id="navbarSupportedContent" data-navbarbg="skin1">
+                    
+                    <ul class="navbar-nav me-auto">
+						<li class="nav-item"> 
+							<a class="nav-link sidebartoggler d-none d-md-block waves-effect waves-dark" href="javascript:void(0)" onClick= {this.toggle}>
+							<img src={require('../../../../assets/images/toggle-icon.png')} alt="" />
+							
+							</a>
+						</li>
+                    </ul>
+					
+                   
+                    <ul class="navbar-nav">
+						<li class="nav-item dropdown">
+                             <select
                             name="langauage"
                             className="listSelect"
                             defaultValue={localStorage.getItem('lang_name')}
@@ -118,12 +179,10 @@ class HeaderTop extends Component {
                             <option value="en">English</option>
                             <option value="hi">Hindi</option>
                         </select>
-                    </div> 
-                     : null } 
-
-                    
-                    <div className="align-self-center userTopRtSec">
-                        <Dropdown alignRight>
+                        </li>
+						
+                        <li class="nav-item dropdown dropmodify">
+                            <Dropdown alignRight>
                             <Dropdown.Toggle variant="" id="dropdown-basic">
                                 <div className="d-flex topUserBtn">
                                 {sessionStorage.getItem("auth_token") && bc_data.user_info && phrases ?
@@ -161,17 +220,16 @@ class HeaderTop extends Component {
                             {/* <Dropdown.Menu>
                                 <Dropdown.Item >Logout</Dropdown.Item> 
                             </Dropdown.Menu> */}
-                        </Dropdown>                       
-                    </div>
-                    
-                    
-                    {this.props.loading ? (
-                        <div className="loading">
-                            <Loader type="Oval" color="#edae21" height="50" width="50" />
-                        </div>
-                    ) : null}
-                </section>
-            </>
+                        </Dropdown>
+                        </li>
+						
+                                              
+                    </ul>
+                </div>
+            </nav>
+        </header>
+
+           </>
         )
     }
 }
@@ -181,12 +239,14 @@ const mapDispatchToProps = dispatch => {
         logout: () => dispatch(authLogout()),
         loadingStart: () => dispatch(loaderStart()),
         loadingStop: () => dispatch(loaderStop()),
+        logoToggle: (data) => dispatch(logoToggle(data)),
     }
 }
 
 const mapStateToProps = state => {
     return {
-        loading: state.loader.loading
+        loading: state.loader.loading,
+        logo_toggle: state.toggle.logo_toggle
     };
 };
 

@@ -64,12 +64,32 @@ class renewal extends Component {
         const formData = new FormData();
         let encryption = new Encryption();
         let post_data = {}
+        let user_id = ""
+        let user_type = ""
+        let csc_data = sessionStorage.getItem('users') ? sessionStorage.getItem('users') : "";
+        let bc_data = sessionStorage.getItem('bcLoginData') ? sessionStorage.getItem('bcLoginData') : "";
+
+        if(bc_data) {
+            bc_data = JSON.parse(encryption.decrypt(bc_data));
+            user_id = bc_data ? bc_data.agent_id : ""
+            user_type = 'bc'
+        }
+        else if(csc_data && sessionStorage.getItem('csc_id')) {
+            let encryption = new Encryption();
+            csc_data = JSON.parse(csc_data)        
+            csc_data = csc_data.user
+            csc_data = JSON.parse(encryption.decrypt(csc_data));          
+            user_id = csc_data.csc_digital_seva_id 
+            user_type = 'csc'  
+        }
 
         post_data = {
             'policy_number': values.policy_number,
         }
         // formData.append('enc_data', encryption.encrypt(JSON.stringify(post_data)))
         formData.append('policy_number', values.policy_number)
+        formData.append('user_id', user_id)
+        formData.append('user_type', user_type)
 
         this.props.loadingStart();
         axios
@@ -136,11 +156,14 @@ class renewal extends Component {
             <>
                 <BaseComponent>
                     {phrases ?
+                        <div className="page-wrapper">				
                         <div className="container-fluid">
-                            <div className="row">
-                                <div className="col-sm-12 col-md-12 col-lg-2 col-xl-2 pd-l-0">
-                                    <SideNav />
-                                </div>
+                            <div className="row">						
+                                <aside className="left-sidebar">
+		 						 <div className="scroll-sidebar ps-container ps-theme-default ps-active-y">
+								 <SideNav />
+								 </div>
+								</aside>
                                 <div className="col-sm-12 col-md-12 col-lg-10 col-xl-10 infobox">
                                     <h4 className="text-center mt-3 mb-3">{phrases['SBIGICL']}</h4>
                                     <section className="brand">
@@ -193,6 +216,7 @@ class renewal extends Component {
                                     </section>
                                     <Footer />
                                 </div>
+                            </div>
                             </div>
                         </div> : null}
                 </BaseComponent>

@@ -468,12 +468,19 @@ class SelectPlan_GSB extends Component {
         return (
             <>
                 <BaseComponent>
+				<div className="page-wrapper">
                     <div className="container-fluid">
                         <div className="row">
-                            <div className="col-sm-12 col-md-12 col-lg-2 col-xl-2 pd-l-0">
-                                <SideNav />
-                            </div>
-                            <div className="col-sm-12 col-md-12 col-lg-10 col-xl-10 infobox">
+						
+						
+                            <aside className="left-sidebar">
+ <div className="scroll-sidebar ps-container ps-theme-default ps-active-y">
+<SideNav />
+ </div>
+</aside>
+							
+							
+                            <div className="col-sm-12 col-md-12 col-lg-12 col-xl-12 infobox gsbplan1">
                                 <h4 className="text-center mt-3 mb-3">SBI General Insurance Company Limited </h4>
                                 <section className="brand">
                                     <div className="boxpd">
@@ -537,10 +544,10 @@ class SelectPlan_GSB extends Component {
                                                 </div>
                                             </div>
                                             <Row>
-                                                <Col sm={6} md={5} lg={5}>
+                                                <Col sm={6} md={7} lg={5}>
                                                     <h6>Policy start date & time:</h6>
                                                 </Col>
-                                                <Col sm={6} md={11} lg={4}>
+                                                <Col sm={6} md={5} lg={4}>
                                                     <FormGroup>
                                                         <div className="formSection">
                                                             <DatePicker
@@ -574,10 +581,10 @@ class SelectPlan_GSB extends Component {
                                                 </Col>
                                                 </Row>
                                                 <Row>
-                                                <Col sm={6} md={5} lg={5}>
+                                                <Col sm={6} md={7} lg={5}>
                                                     <h6>Policy end date & time:</h6>
                                                 </Col>
-                                                <Col sm={6} md={11} lg={4}>
+                                                <Col sm={6} md={5} lg={4}>
                                                     <FormGroup>
                                                         <div className="formSection">
                                                             <DatePicker
@@ -615,7 +622,7 @@ class SelectPlan_GSB extends Component {
                                             <div className="brandhead"> 
                                                 <h4 className="fs-18 m-b-30">RISK DETAILS</h4>
                                             </div>   
-                                            <Row><Col sm={6} md={3} lg={3}>
+                                            <Row><Col sm={6} md={4} lg={3}>
                                                 <FormGroup>
                                                 <div className="insurerName">
                                                     <Field
@@ -639,7 +646,7 @@ class SelectPlan_GSB extends Component {
                                                 </div>
                                                 </FormGroup>
                                             </Col>
-                                            <Col sm={6} md={3} lg={3}>
+                                            <Col sm={6} md={4} lg={3}>
                                                 <FormGroup>
                                                 <div className="insurerName">
                                                     <Field
@@ -664,7 +671,7 @@ class SelectPlan_GSB extends Component {
                                                 </div>
                                                 </FormGroup>
                                             </Col>
-                                            <Col sm={6} md={3} lg={3}>
+                                            <Col sm={6} md={4} lg={3}>
                                                 <FormGroup>
                                                 <div className="insurerName">
                                                     <Field
@@ -692,7 +699,7 @@ class SelectPlan_GSB extends Component {
                                             </Row>
                                             <Row>
                                             
-                                            <Col sm={6} md={3} lg={3}>
+                                            <Col sm={6} md={4} lg={3}>
                                                 <FormGroup>
                                                 <div className="insurerName">
                                                     <Field
@@ -720,7 +727,7 @@ class SelectPlan_GSB extends Component {
                                                 </div>
                                                 </FormGroup>
                                             </Col>
-                                            <Col sm={6} md={3} lg={3}>
+                                            <Col sm={6} md={4} lg={3}>
                                                 <FormGroup>
                                                 <div className="formSection">
                                                     <Field
@@ -751,7 +758,7 @@ class SelectPlan_GSB extends Component {
                                                 </div>
                                                 </FormGroup>
                                             </Col>
-                                            <Col sm={6} md={3} lg={3}>
+                                            <Col sm={6} md={4} lg={3}>
                                                 <FormGroup>
                                                 <div className="insurerName">
                                                     <Field
@@ -779,7 +786,7 @@ class SelectPlan_GSB extends Component {
                                             </Row>
                                             
                                             <Row>                                            
-                                            <Col sm={6} md={3} lg={3}>
+                                            <Col sm={6} md={4} lg={3}>
                                                 <FormGroup>
                                                 <div className="insurerName">
                                                     <Field
@@ -921,6 +928,7 @@ class SelectPlan_GSB extends Component {
                             </div>        
                         </div>
                     </div>
+					</div>
                 </BaseComponent>
             </>
         );

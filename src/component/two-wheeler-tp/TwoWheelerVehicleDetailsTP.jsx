@@ -327,12 +327,19 @@ console.log("step-completed----->",step_completed)
         return (
             <>        
                 <BaseComponent>
+				 <div className="page-wrapper">
                 <div className="container-fluid">
                 <div className="row">
-                    <div className="col-sm-12 col-md-12 col-lg-2 col-xl-2 pd-l-0">
-                        <SideNav />
-                    </div>
-                <div className="col-sm-12 col-md-12 col-lg-10 col-xl-10 infobox">
+				
+                    <aside className="left-sidebar">
+ <div className="scroll-sidebar ps-container ps-theme-default ps-active-y">
+<SideNav />
+ </div>
+</aside>
+
+					
+					
+                <div className="col-sm-12 col-md-12 col-lg-12 col-xl-12 infobox twoVtp">
                 <h4 className="text-center mt-3 mb-3">{phrases['SBIGICL']}</h4>
                 { step_completed >= '1' && vehicleDetails.vehicletype_id == '3' ?
                 <section className="brand m-b-25">
@@ -353,7 +360,7 @@ console.log("step-completed----->",step_completed)
                                             <Col sm={12} md={9} lg={9}>
 
                                                 <Row>
-                                                    <Col sm={12} md={6} lg={6}>
+                                                    <Col sm={12} md={12} lg={6}>
                                                         <FormGroup>
                                                             <div className="fs-18">
                                                             {phrases['FirstRegDate']}
@@ -490,6 +497,7 @@ console.log("step-completed----->",step_completed)
                 </div>
                 </div>
                 </div>
+				</div>
             </BaseComponent>
             </>
         );

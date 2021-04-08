@@ -447,12 +447,16 @@ class IPA_Premium extends Component {
     return (
       <>
         <BaseComponent>
+		<div className="page-wrapper">
           <div className="container-fluid">
             <div className="row">
-              <div className="col-sm-12 col-md-12 col-lg-2 col-xl-2 pd-l-0">
-                <SideNav />
-              </div>
-              <div className="col-sm-12 col-md-12 col-lg-10 col-xl-10 infobox">
+			
+<aside className="left-sidebar">
+ <div className="scroll-sidebar ps-container ps-theme-default ps-active-y">
+<SideNav />
+ </div>
+</aside>			  
+              <div className="col-sm-12 col-md-12 col-lg-12 col-xl-12 infobox premium3">
                 <h4 className="text-center mt-3 mb-3">
                 SBI General Insurance Company Limited
                 </h4>
@@ -482,26 +486,26 @@ class IPA_Premium extends Component {
                                             <Collapsible trigger="Policy Details" >
                                               <div className="listrghtsideTrigr">
                                                 <Row>
-                                                  <Col sm={12} md={3}>
+                                                  <Col sm={12} md={6} lg={3}>
                                                     <FormGroup>Policy Start Date:</FormGroup>
                                                   </Col>
-                                                  <Col sm={12} md={3}>
+                                                  <Col sm={12} md={6} lg={3}>
                                                     <FormGroup>
                                                       {policyHolderDetails && policyHolderDetails.request_data ? moment(policyHolderDetails.request_data.start_date).format('DD-MM-yyyy') : null}
                                                     </FormGroup>
                                                   </Col>
-                                                  <Col sm={12} md={3}>
+                                                  <Col sm={12} md={6} lg={3}>
                                                     <FormGroup>Policy End Date:</FormGroup>
                                                   </Col>
-                                                  <Col sm={12} md={3}>
+                                                  <Col sm={12} md={6} lg={3}>
                                                     <FormGroup>
                                                       {policyHolderDetails && policyHolderDetails.request_data ? moment(policyHolderDetails.request_data.end_date).format('DD-MM-yyyy') : null}
                                                     </FormGroup>
                                                   </Col>
-                                                  <Col sm={12} md={3}>
+                                                  <Col sm={12} md={6} lg={3}>
                                                       <FormGroup>Product Name:</FormGroup>
                                                     </Col>
-                                                    <Col sm={12} md={6}>
+                                                    <Col sm={12} md={6} lg={3}>
                                                       <FormGroup>
                                                       {vehicleDetails && vehicleDetails.vehicletype ? vehicleDetails.vehicletype.description : null}
                                                       </FormGroup>
@@ -523,36 +527,36 @@ class IPA_Premium extends Component {
                                             <Collapsible trigger="Premium Summary" open={true}>
                                               <div className="listrghtsideTrigr">
                                                 <Row> 
-                                                  <Col sm={12} md={3}>
+                                                  <Col sm={12} md={6} lg={3}>
                                                     <FormGroup>Sum Insured:</FormGroup>
                                                   </Col>
-                                                  <Col sm={12} md={3}>
+                                                  <Col sm={12} md={6} lg={3}>
                                                     <FormGroup>
                                                       <strong>Rs:</strong>{" "}
                                                       {fulQuoteResp.SumInsured}
                                                     </FormGroup>
                                                   </Col>
-                                                  <Col sm={12} md={3}>
+                                                  <Col sm={12} md={6} lg={3}>
                                                     <FormGroup>Applicable Taxes:</FormGroup>
                                                   </Col>
-                                                  <Col sm={12} md={3}>
+                                                  <Col sm={12} md={6} lg={3}>
                                                     <FormGroup>
                                                       <strong>Rs:</strong> {fulQuoteResp.TGST}
                                                     </FormGroup>
                                                   </Col>
-                                                  <Col sm={12} md={3}>
+                                                  <Col sm={12} md={6} lg={3}>
                                                     <FormGroup>Gross Premium:</FormGroup>
                                                   </Col>
-                                                  <Col sm={12} md={3}>
+                                                  <Col sm={12} md={6} lg={3}>
                                                     <FormGroup>
                                                       <strong>Rs:</strong>{" "}
                                                       {Math.round(fulQuoteResp.GrossPremium)}
                                                     </FormGroup>
                                                   </Col>
-                                                  <Col sm={12} md={3}>
+                                                  <Col sm={12} md={6} lg={3}>
                                                     <FormGroup>Net Premium:</FormGroup>
                                                   </Col>
-                                                  <Col sm={12} md={3}>
+                                                  <Col sm={12} md={6} lg={3}>
                                                     <FormGroup>
                                                       <strong>Rs:</strong>{" "}
                                                       {fulQuoteResp.DuePremium}
@@ -563,7 +567,7 @@ class IPA_Premium extends Component {
                                             </Collapsible>
                                           </div>
 
-                                          <div className="rghtsideTrigr">
+                                          <div className="rghtsideTrigr custom_widthadd">
                                             <Collapsible trigger=" Member Details">
                                             <strong>Member Details :</strong>
                                               <div className="listrghtsideTrigr">{memberDetails}</div>
@@ -581,7 +585,7 @@ class IPA_Premium extends Component {
                                                   <Link to ={`/AccidentSelectPlan/${productId}`}> Edit</Link>
                                                 </div>
                                                 <Row>
-                                                  <Col sm={12} md={6}>
+                                                  <Col sm={12} md={12} lg={6}>
                                                     <Row>
                                                       <Col sm={12} md={6}>
                                                         Mobile number:
@@ -704,6 +708,7 @@ class IPA_Premium extends Component {
               </div>
             </div>
           </div>
+		  </div>
         </BaseComponent>
       </>
     );

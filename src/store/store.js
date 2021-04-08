@@ -6,6 +6,7 @@ import Auth from "./reducers/auth";
 import Loader from "./reducers/loader";
 import ProcessData from "./reducers/data";
 import Sme from "./reducers/sme_fire";
+import Toggle from "./reducers/toggle";
 
 // const composeEnhancers = window.__REDUX_DEVTOOLS_EXTENSION_COMPOSE__ || compose;
 const composeEnhancers = compose;
@@ -15,7 +16,8 @@ const rootReducer = combineReducers(
         auth: Auth,
         loader: Loader,
         processData: ProcessData,
-        sme_fire:Sme
+        sme_fire:Sme,
+        toggle:Toggle
     }
 )
 

@@ -8,7 +8,7 @@ class ThankYouPage extends Component {
         return (
             <>
                  <BaseComponent>
-                 <div className="container-fluid">
+                 <div className="container-fluid gfd">
                         <div className="row">
                             <div className="col-sm-12 col-md-12 col-lg-2 col-xl-2 pd-l-0">
                                 <SideNav />

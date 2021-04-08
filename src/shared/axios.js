@@ -14,6 +14,9 @@ instance.interceptors.request.use(config => {
     const auth_token = sessionStorage.getItem('auth_token');
     const lang_name = localStorage.getItem('lang_name');
     if( auth_token ) config.headers['Authorization'] = auth_token;
+    // config.headers['Access-Control-Allow-Origin'] = "*"
+    // config.headers['Access-Control-Allow-Headers'] = "X-Requested-With"
+    
     if( lang_name && auth_token ) {
         config.headers['X-localization'] = lang_name;
     } else {

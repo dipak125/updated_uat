@@ -136,6 +136,7 @@ const ThankYouCCM = Loadable({
     loader: () => import(/*webpackChunkName: "Products" */"../health/ThankYouCCM.jsx"),
     loading: () => loadingContent
 });
+
 //============================ Motor Comprehensive=============================
 const SelectBrand = Loadable({
     loader: () => import(/*webpackChunkName: "Products" */"../motor/SelectBrand.jsx"),
@@ -480,6 +481,11 @@ const MotorSummery = Loadable({
     loading: () => loadingContent
 });
 
+const ThankYouRenewal = Loadable({
+    loader: () => import(/*webpackChunkName: "Products" */"../Renewal/ThankYouRenewal.jsx"),
+    loading: () => loadingContent
+});
+
 //  ************ Claim Intimation ******************
 
 const ClaimIntimation = Loadable({
@@ -656,7 +662,8 @@ class Routes extends Component {
 
                         {/************ Renewal ******************/}
 						<PrivateRoute exact path="/Renewal" component={Renewal} />     
-                        <PrivateRoute exact path="/MotorSummery" component={MotorSummery} />                
+                        <PrivateRoute exact path="/MotorSummery" component={MotorSummery} />   
+                        <PrivateRoute exact path="/ThankYouRenewal" component={ThankYouRenewal} />             
 						
                         <Redirect from="/" to="/Dashboard" />
                     </Switch>

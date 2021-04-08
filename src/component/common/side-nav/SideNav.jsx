@@ -82,7 +82,7 @@ class SideNav extends Component {
                     alt=""
                   />
                 </span>
-                {childPhrase['Dashboard']}
+                <span className="hidemenu">{childPhrase['Dashboard']}</span>
               </Link>
             </li>
             <li>
@@ -93,11 +93,14 @@ class SideNav extends Component {
                     alt=""
                   />
                 </span>
-                {childPhrase['PolicySearch']}
+                <span className="hidemenu">{childPhrase['PolicySearch']}</span>
               </Link>
             </li>
             <li>
-							<Link to="/QuoteHistory" activeClassName="active"><span className="leftIcon01"><img src={require('../../../assets/images/document.png')} alt="" /></span> {childPhrase['QuoteHistory']}</Link>
+			<Link to="/QuoteHistory" activeClassName="active">
+			<span className="leftIcon01"><img src={require('../../../assets/images/document.png')} alt="" /></span>
+			 <span className="hidemenu">{childPhrase['QuoteHistory']}</span>
+			 </Link>
             </li>
             <li>
               <Link to="/Products" activeClassName="active">
@@ -107,7 +110,7 @@ class SideNav extends Component {
                     alt=""
                   />
                 </span>
-                {childPhrase['Products']}
+                <span className="hidemenu">{childPhrase['Products']}</span>
               </Link>
             </li>
             <li>
@@ -118,20 +121,10 @@ class SideNav extends Component {
                     alt=""
                   />
                 </span>
-                {childPhrase['Documents']}
+                <span className="hidemenu">{childPhrase['Documents']}</span>
               </Link>
             </li>
-            <li>
-              <Link to="/Services" activeClassName="active">
-                <span className="leftIcon01">
-                  <img
-                    src={require("../../../assets/images/support.png")}
-                    alt=""
-                  />
-                </span>
-                {childPhrase['Services']}
-              </Link>
-            </li>
+
             <li>
               <Link to="/ClaimIntimation" activeClassName="active">
                 <span className="leftIcon01">
@@ -140,10 +133,10 @@ class SideNav extends Component {
                     alt=""
                   />
                 </span>
-                {childPhrase['ClaimModule']}
+                <span className="hidemenu">{childPhrase['ClaimModule']}</span>
               </Link>
-            </li>
-            <li>
+              </li>
+              <li>
               <Link to="/Renewal" activeClassName="active">
                 <span className="leftIcon01">
                   <img
@@ -151,14 +144,29 @@ class SideNav extends Component {
                     alt=""
                   />
                 </span>
-                Renewal
+                <span className="hidemenu">Renewal</span>
+              </Link>
+            </li>
+
+            <li>
+              <Link to="/Services" activeClassName="active">
+                <span className="leftIcon01">
+                  <img
+                    src={require("../../../assets/images/support.png")}
+                    alt=""
+                  />
+                </span>
+                <span className="hidemenu">{childPhrase['Services']}</span>
               </Link>
             </li>
            { BC_check.is_permission == true ?
-            <li>
-							<Link to="/Supports" activeClassName="active"><span className="leftIcon01"><img src={require('../../../assets/images/support.png')} alt="" /></span>{childPhrase['Support']}</Link>
-            </li> 
-             : [] } 
+              <li>
+                <Link to="/Supports" activeClassName="active">
+                <span className="leftIcon01"><img src={require('../../../assets/images/support.png')} alt="" /></span>
+                <span className="hidemenu">{childPhrase['Support']}</span>
+                </Link>
+              </li> 
+            : [] } 
             <li>
               <Link to="/Break_in" activeClassName="active">
                 <span className="leftIcon01">
@@ -167,15 +175,12 @@ class SideNav extends Component {
                     alt=""
                   />
                 </span>
-                {childPhrase['BreakIn']}
+                <span className="hidemenu">{childPhrase['BreakIn']}</span>
               </Link>
-            </li>
-            {/* <li>
-							<Link to="/UnderMaintenance" activeClassName="active"><span className="leftIcon01"><img src={require('../../../assets/images/leftIcon05.svg')} alt="" /></span>Support</Link>
-                        </li> */}
-          </ul>
-
-          <button className="btn-lg" onClick={this.handleLogout}>
+            </li>						
+						
+					<li class="logoutbtn">
+					 <button className="btn-lg" onClick={this.handleLogout}>
             <a activeClassName="active">
               <span className="leftIcon01">
                 <img
@@ -183,9 +188,16 @@ class SideNav extends Component {
                   alt=""
                 />
               </span>
-              {childPhrase['Logout']}
+             <span class="valuetxt"> {childPhrase['Logout']}</span>
             </a>
           </button>
+					</li>	
+						
+						
+						
+          </ul>
+
+          
         </nav> : null }
       </>
     );

@@ -359,7 +359,7 @@ paypoint_payment = () => {
         return (
           <div>
           <Row>
-            <Col sm={12} md={6}>
+            <Col sm={12} md={12}>
               <h6><strong>Nominee</strong></h6>
               <Row>
                 <Col sm={12} md={6}>
@@ -412,7 +412,7 @@ paypoint_payment = () => {
         return (
           <div>
           <Row>
-            <Col sm={12} md={6}>
+            <Col sm={12} md={12}>
               <h6><strong>Appointee </strong></h6>
               <Row>
                 <Col sm={12} md={6}>
@@ -479,12 +479,18 @@ paypoint_payment = () => {
     return (
       <>
         <BaseComponent>
+		 <div className="page-wrapper">
           <div className="container-fluid">
             <div className="row">
-              <div className="col-sm-12 col-md-12 col-lg-2 col-xl-2 pd-l-0">
-                <SideNav />
-              </div>
-              <div className="col-sm-12 col-md-12 col-lg-10 col-xl-10 infobox">
+			
+              <aside className="left-sidebar">
+ <div className="scroll-sidebar ps-container ps-theme-default ps-active-y">
+<SideNav />
+ </div>
+</aside>
+			  
+			  
+              <div className="col-sm-12 col-md-12 col-lg-12 col-xl-12 infobox argDetail">
                 <h4 className="text-center mt-3 mb-3">
                   Arogya Top Up Policy
                 </h4>
@@ -514,26 +520,26 @@ paypoint_payment = () => {
                                               <Collapsible trigger="Policy Details">
                                                 <div className="listrghtsideTrigr">
                                                   <Row>
-                                                    <Col sm={12} md={3}>
+                                                    <Col sm={12} md={6} lg={3}>
                                                       <FormGroup>Policy Start date:</FormGroup>
                                                     </Col>
-                                                    <Col sm={12} md={3}>
+                                                   <Col sm={12} md={6} lg={3}>
                                                       <FormGroup>
                                                         {request_data && request_data.start_date ? moment(request_data.start_date).format('DD-MM-yyy') : null}
                                                       </FormGroup>
                                                     </Col>
-                                                    <Col sm={12} md={3}>
+                                                   <Col sm={12} md={6} lg={3}>
                                                       <FormGroup>Policy End Date:</FormGroup>
                                                     </Col>
-                                                    <Col sm={12} md={3}>
+                                                   <Col sm={12} md={6} lg={3}>
                                                       <FormGroup>
                                                         {request_data && request_data.end_date ? moment(request_data.end_date).format('DD-MM-yyy') : null}
                                                       </FormGroup>
                                                     </Col>
-                                                    <Col sm={12} md={3}>
+                                                    <Col sm={12} md={6} lg={3}>
                                                       <FormGroup>Product Name:</FormGroup>
                                                     </Col>
-                                                    <Col sm={12} md={3}>
+                                                    <Col sm={12} md={6} lg={3}>
                                                       <FormGroup>
                                                         {menumaster && menumaster.name ? menumaster.name : null}
                                                       </FormGroup>
@@ -547,37 +553,37 @@ paypoint_payment = () => {
                                             <Collapsible trigger="Arogya Top Up Policy, SBI General Insurance Company Limited"  open= {true}>
                                               <div className="listrghtsideTrigr">
                                                 <Row>
-                                                  <Col sm={12} md={3}>
+                                                 <Col sm={12} md={6} lg={3}>
                                                     <FormGroup>Sum Insured:</FormGroup>
                                                   </Col>
-                                                  <Col sm={12} md={3}>
+                                                 <Col sm={12} md={6} lg={3}>
                                                     <FormGroup>
                                                       <strong>Rs:</strong>{" "}
                                                       {policyHolderDetails && policyHolderDetails.request_data ? Math.round(policyHolderDetails.request_data.sum_insured) : null}
                                                     </FormGroup>
                                                   </Col>
-                                                  <Col sm={12} md={3}>
+                                                <Col sm={12} md={6} lg={3}>
                                                     <FormGroup>Applicable Taxes:</FormGroup>
                                                   </Col>
-                                                  <Col sm={12} md={3}>
+                                                 <Col sm={12} md={6} lg={3}>
                                                     <FormGroup>
                                                       <strong>Rs:</strong>{" "}
                                                       {policyHolderDetails && policyHolderDetails.request_data ? Math.round(policyHolderDetails.request_data.service_tax) : null}
                                                     </FormGroup>
                                                   </Col>
-                                                  <Col sm={12} md={3}>
+                                                 <Col sm={12} md={6} lg={3}>
                                                     <FormGroup>Gross Premium:</FormGroup>
                                                   </Col>
-                                                  <Col sm={12} md={3}>
+                                                  <Col sm={12} md={6} lg={3}>
                                                     <FormGroup>
                                                       <strong>Rs:</strong>{" "}
                                                       {policyHolderDetails && policyHolderDetails.request_data ? Math.round(policyHolderDetails.request_data.gross_premium) : null}
                                                     </FormGroup>
                                                   </Col>
-                                                  <Col sm={12} md={3}>
+                                                  <Col sm={12} md={6} lg={3}>
                                                     <FormGroup>Net Premium:</FormGroup>
                                                   </Col>
-                                                  <Col sm={12} md={3}>
+                                                 <Col sm={12} md={6} lg={3}>
                                                     <FormGroup>
                                                       <strong>Rs:</strong>{" "}
                                                       {policyHolderDetails && policyHolderDetails.request_data ? Math.round(policyHolderDetails.request_data.net_premium) : null}
@@ -588,7 +594,7 @@ paypoint_payment = () => {
                                             </Collapsible>
                                           </div>
 
-                                          <div className="rghtsideTrigr">
+                                          <div className="rghtsideTrigr custom_widthadd">
                                             <Collapsible trigger=" Member Details">
                                               <div className="listrghtsideTrigr">{items}</div>
                                             </Collapsible>
@@ -601,48 +607,48 @@ paypoint_payment = () => {
                                                   <Link to ={`/arogya_Address/${productId}`}> Edit</Link>
                                                 </div>
                                                 <Row>
-                                                  <Col sm={12} md={18}>
+                                                  <Col sm={12} md={12}>
 
                                                     <Row>
-                                                      <Col sm={12} md={3}>
+                                                      <Col sm={12} md={6} lg={3}>
                                                         Mobile number:
                                                       </Col>
-                                                      <Col sm={12} md={9}>
+                                                      <Col sm={12} md={6} lg={3}>
                                                         {policyHolderDetails.mobile}
                                                       </Col>
                                                     </Row>
                                                     <Row>
-                                                      <Col sm={12} md={3}>
+                                                       <Col sm={12} md={6} lg={3}>
                                                       &nbsp;
                                                       </Col>
                                                     </Row>
                                                     <Row>
-                                                      <Col sm={12} md={3}>
+                                                      <Col sm={12} md={6} lg={3}>
                                                         Email:
                                                       </Col>
-                                                      <Col sm={12} md={6}>
+                                                       <Col sm={12} md={6} lg={3}>
                                                         {policyHolderDetails.email_id}
                                                       </Col>
                                                     </Row>
                                                     <Row>
-                                                      <Col sm={12} md={3}>
+                                                      <Col sm={12} md={6} lg={3}>
                                                       &nbsp;
                                                       </Col>
                                                     </Row>
                                                     <Row >
-                                                      <Col sm={12} md={3}>
+                                                       <Col sm={12} md={6} lg={3}>
                                                         Address:
                                                       </Col>
-                                                      <Col sm={12} md={6}>
+                                                      <Col sm={12} md={6} lg={3}>
                                                         {AddressDetails} 
                                                       </Col>
                                                     </Row>
                                                     
                                                     <Row>
-                                                      <Col sm={12} md={3}>
+                                                       <Col sm={12} md={6} lg={3}>
                                                         Pincode:
                                                       </Col>
-                                                      <Col sm={12} md={9}>
+                                                       <Col sm={12} md={6} lg={3}>
                                                         {PincodeDetails}
                                                       </Col>
                                                     </Row>
@@ -765,6 +771,7 @@ paypoint_payment = () => {
               </div>
             </div>
           </div>
+		   </div>
         </BaseComponent>
       </>
     );
