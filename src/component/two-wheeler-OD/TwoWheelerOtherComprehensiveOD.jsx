@@ -1052,13 +1052,11 @@ class TwoWheelerOtherComprehensiveOD extends Component {
                         <div className="row">
 						
                           <aside className="left-sidebar">
- <div className="scroll-sidebar ps-container ps-theme-default ps-active-y">
-<SideNav />
- </div>
-</aside>
-
-							
-							
+                            <div className="scroll-sidebar ps-container ps-theme-default ps-active-y">
+                            <SideNav />
+                            </div>
+                            </aside>
+	
                             <div className="col-sm-12 col-md-12 col-lg-12 col-xl-12 infobox twocomp2">
                                 <h4 className="text-center mt-3 mb-3">{phrases['SBIGICL']}</h4>
                                 { step_completed >= '2' && vehicleDetails.vehicletype_id == productId ?
@@ -1278,7 +1276,7 @@ class TwoWheelerOtherComprehensiveOD extends Component {
 
                                                             {motorInsurance && motorInsurance.policy_for == '1' && moreCoverage.map((coverage, qIndex) => (
                                                             <Row key={qIndex}>   
-                                                                <Col sm={12} md={11} lg={6} key={qIndex+"a"} >
+                                                                <Col sm={12} md={11} lg={5} key={qIndex+"a"} >
                                                                     <label className="customCheckBox formGrp formGrp">{coverage.name}
                                                                         <OverlayTrigger overlay={<Tooltip id="tooltip-disabled">{coverage.description}</Tooltip>}>
                                                                             <a className="infoIcon"><img src={require('../../assets/images/i.svg')} alt="" className="premtool" /></a>
@@ -1333,7 +1331,7 @@ class TwoWheelerOtherComprehensiveOD extends Component {
                                                                 }
                                                                 {values.nonElectric_flag == '1' && values[coverage.code] == 'B00003' ?
                                                                     <Fragment>
-                                                                        <Col sm={12} md={11} lg={2} key={qIndex+"b"}>
+                                                                        <Col sm={12} md={11} lg={3} key={qIndex+"b"}>
                                                                             <FormGroup>
                                                                                 <div className="formSection">
                                                                                     <Field
@@ -1384,7 +1382,7 @@ class TwoWheelerOtherComprehensiveOD extends Component {
                                                                 }
                                                                 {values.electric_flag == '1' && values[coverage.code] == 'B00004' ?
                                                                     <Fragment>
-                                                                    <Col sm={12} md={11} lg={2} key={qIndex+"b"}>
+                                                                    <Col sm={12} md={11} lg={3} key={qIndex+"b"}>
                                                                         <FormGroup>
                                                                             <div className="formSection">
                                                                                 <Field
@@ -1435,7 +1433,7 @@ class TwoWheelerOtherComprehensiveOD extends Component {
                                                                 }
                                                                 {values.CNG_OD_flag == '1' && values[coverage.code] == 'B00005' ?
                                                                     <Fragment>
-                                                                    <Col sm={12} md={11} lg={2} key={qIndex+"b"}>
+                                                                    <Col sm={12} md={11} lg={3} key={qIndex+"b"}>
                                                                         <FormGroup>
                                                                             <div className="formSection">
                                                                                 <Field
@@ -1475,7 +1473,7 @@ class TwoWheelerOtherComprehensiveOD extends Component {
                                                             <Row key={qIndex}>   
                                                             {/* {coverage.code == "C101072" || coverage.code == "C101108" || coverage.code == "C101110" ? */}
                                                             {coverage.code != "B00015" ?
-                                                            <Col sm={12} md={11} lg={6} key={qIndex+"a"} >
+                                                            <Col sm={12} md={11} lg={5} key={qIndex+"a"} >
                                                                 <label className="customCheckBox formGrp formGrp">{coverage.name}
                                                                     <OverlayTrigger overlay={<Tooltip id="tooltip-disabled">{coverage.description}</Tooltip>}>
                                                                         <a className="infoIcon"><img src={require('../../assets/images/i.svg')} alt="" className="premtool" /></a>
@@ -1530,7 +1528,7 @@ class TwoWheelerOtherComprehensiveOD extends Component {
                                                             }
                                                             {values.nonElectric_flag == '1' && values[coverage.code] == 'B00003' ?
                                                                 <Fragment>
-                                                                    <Col sm={12} md={11} lg={2} key={qIndex+"b"}>
+                                                                    <Col sm={12} md={11} lg={3} key={qIndex+"b"}>
                                                                         <FormGroup>
                                                                             <div className="formSection">
                                                                                 <Field
@@ -1581,7 +1579,7 @@ class TwoWheelerOtherComprehensiveOD extends Component {
                                                             }
                                                             {values.electric_flag == '1' && values[coverage.code] == 'B00004' ?
                                                                 <Fragment>
-                                                                <Col sm={12} md={11} lg={2} key={qIndex+"b"}>
+                                                                <Col sm={12} md={11} lg={3} key={qIndex+"b"}>
                                                                     <FormGroup>
                                                                         <div className="formSection">
                                                                             <Field
@@ -1632,7 +1630,7 @@ class TwoWheelerOtherComprehensiveOD extends Component {
                                                             }
                                                             {values.CNG_OD_flag == '1' && values[coverage.code] == 'B00005' ?
                                                                 <Fragment>
-                                                                <Col sm={12} md={11} lg={2} key={qIndex+"b"}>
+                                                                <Col sm={12} md={11} lg={3} key={qIndex+"b"}>
                                                                     <FormGroup>
                                                                         <div className="formSection">
                                                                             <Field

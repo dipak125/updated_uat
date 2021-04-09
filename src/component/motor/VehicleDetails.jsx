@@ -741,7 +741,7 @@ console.log("errors------------ ", errors)
                                                         <FormGroup>
 
                                                             <DatePicker
-                                                                name={phrases['previous_start_date']}
+                                                                name='previous_start_date'
                                                                 minDate={new Date(minDate)}
                                                                 maxDate={new Date(maxDate)}
                                                                 dateFormat="dd MMM yyyy"

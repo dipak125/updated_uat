@@ -102,8 +102,7 @@ class LogIn extends Component {
         }
         else{
             this.fetchCustDetail()
-        }
-        
+        }     
     }
 
     fetchCustDetail=()=>{
@@ -160,16 +159,15 @@ class LogIn extends Component {
         .then(res=>{
             
             if(res.data.error == false) {
-                let bcLoginData = res.data.data ? res.data.data : []                      
+                let bcLoginData = res.data.data ? res.data.data : []    
+                actions.setSubmitting(false)                  
                 this.fetchTokenDetails(bcLoginData.token)
             }
             else {
                 sessionStorage.removeItem('bcLoginData');
                 actions.setSubmitting(false)
                 this.props.loadingStop();
-            }
-            
-            
+            } 
         }).
         catch(err=>{
             this.props.loadingStop();
@@ -209,10 +207,9 @@ class LogIn extends Component {
             }
             else {
                 sessionStorage.removeItem('bcLoginData');
+                this.props.loadingStop();
                 swal(res.data.msg)
             }
-            
-            this.props.loadingStop();
         }).
         catch(err=>{
             this.props.loadingStop();
@@ -285,7 +282,7 @@ class LogIn extends Component {
 
         });
 
-        console.log("queryString.parse(this.props.location.search)---", )
+  
         return (
             <BaseComponent>
                 <div className="d-flex justify-content-center brand lginpg">

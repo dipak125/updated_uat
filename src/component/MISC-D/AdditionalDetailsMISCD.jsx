@@ -129,10 +129,14 @@ const ownerValidation = Yup.object().shape({
     }),
 
     pancard: Yup.string()
-    .notRequired().test(
+    .required().test(
         "1LakhChecking",
         function() {
-            return "Enter PAN number"
+            //return "Enter PAN number"
+			if ((document.querySelector('input[name="is_eia_account2"]:checked')) && (document.querySelector('input[name="is_eia_account2"]:checked').value == 1 )) {
+				
+                return "Enter PAN number";
+            }
         },
         function (value) {
             if (!value) {
@@ -444,7 +448,9 @@ class AdditionalDetailsMISCD extends Component {
         if(value == 1){
             this.setState({
                 showEIA:true,
-                is_eia_account:1
+                is_eia_account:1,
+				showEIA2:false,
+				is_eia_account2:0
             })
         }
         else{
@@ -517,6 +523,7 @@ class AdditionalDetailsMISCD extends Component {
             'salutation_id': values['salutation_id'],
             'nominee_title_id': values['nominee_salutation'],
             'page_name': `AdditionalDetails_MISCD/${productId}`,
+			'create_eia_account': values['is_eia_account2'],
 			'tpaInsurance': values['tpaInsurance'],
         }
         if(motorInsurance.policy_for == '1'){
@@ -580,7 +587,10 @@ class AdditionalDetailsMISCD extends Component {
                  let quoteId = decryptResp.data.policyHolder ? decryptResp.data.policyHolder.request_data.quote_id : ""
                  let is_eia_account=  policyHolder && (policyHolder.is_eia_account == 0 || policyHolder.is_eia_account == 1) ? policyHolder.is_eia_account : ""
 				 
-				 let is_eia_account2=  policyHolder && (policyHolder.is_eia_account2 == 0 || policyHolder.is_eia_account2 == 1) ? policyHolder.is_eia_account2 : ""	
+				 let is_eia_account2=  policyHolder && (policyHolder.create_eia_account == 0 || policyHolder.create_eia_account == 1) ? policyHolder.create_eia_account : ""
+				 
+				 
+				 let tpaInsurance = policyHolder.T_Insurance_Repository_id ? policyHolder.T_Insurance_Repository_id : ""	
 				 
                  let bankDetails = decryptResp.data.policyHolder && decryptResp.data.policyHolder.bankdetail ? decryptResp.data.policyHolder.bankdetail[0] : {};
                  let addressDetails = JSON.parse(decryptResp.data.policyHolder.pincode_response)
@@ -768,6 +778,8 @@ class AdditionalDetailsMISCD extends Component {
             net_premium: request_data && request_data.net_premium ? request_data.net_premium : "0",
             salutation_id: policyHolder && policyHolder.salutation_id ? policyHolder.salutation_id : "",     
             nominee_salutation: nomineeDetails && nomineeDetails.gender ? nomineeDetails.title_id : "",
+			
+			tpaInsurance: policyHolder && policyHolder.T_Insurance_Repository_id ? policyHolder.T_Insurance_Repository_id : "",
         });
 
         const quoteNumber =

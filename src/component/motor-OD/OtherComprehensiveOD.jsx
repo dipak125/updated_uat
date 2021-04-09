@@ -1069,12 +1069,11 @@ class OtherComprehensiveOD extends Component {
                 <div className="row">
 				
                    <aside className="left-sidebar">
- <div className="scroll-sidebar ps-container ps-theme-default ps-active-y">
-<SideNav />
- </div>
-</aside>
-					
-					
+                    <div className="scroll-sidebar ps-container ps-theme-default ps-active-y">
+                    <SideNav />
+                    </div>
+                    </aside>
+	
                 <div className="col-sm-12 col-md-12 col-lg-12 col-xl-12 infobox othercomOd">
                 <h4 className="text-center mt-3 mb-3">{phrases['SBIGICL']}</h4>
                 <section className="brand colpd m-b-25">
@@ -1390,7 +1389,7 @@ class OtherComprehensiveOD extends Component {
 
                                 {moreCoverage && moreCoverage.length > 0 ? moreCoverage.map((coverage, qIndex) => (
                                 <Row key={qIndex}>   
-                                    <Col sm={12} md={11} lg={6} key={qIndex+"a"} >
+                                    <Col sm={12} md={11} lg={5} key={qIndex+"a"} >
                                         <label className="customCheckBox formGrp formGrp">{coverage.name}
                                            
                                             <Field
@@ -1444,7 +1443,7 @@ class OtherComprehensiveOD extends Component {
                                     }
                                     {values.nonElectric_flag == '1' && values[coverage.code] == 'B00003' ?
                                      <Fragment>
-                                        <Col sm={12} md={11} lg={2} key={qIndex+"b"}>
+                                        <Col sm={12} md={11} lg={3} key={qIndex+"b"}>
                                             <FormGroup>
                                                 <div className="formSection">
                                                     <Field
@@ -1495,7 +1494,7 @@ class OtherComprehensiveOD extends Component {
                                     }
                                     {values.electric_flag == '1' && values[coverage.code] == 'B00004' ?
                                         <Fragment>
-                                        <Col sm={12} md={11} lg={2} key={qIndex+"b"}>
+                                        <Col sm={12} md={11} lg={3} key={qIndex+"b"}>
                                             <FormGroup>
                                                 <div className="formSection">
                                                     <Field
@@ -1572,7 +1571,7 @@ class OtherComprehensiveOD extends Component {
                                     }
                                     {values.CNG_OD_flag == '1' && values[coverage.code] == 'B00005' ?
                                         <Fragment>
-                                        <Col sm={12} md={11} lg={2} key={qIndex+"b"}>
+                                        <Col sm={12} md={11} lg={3} key={qIndex+"b"}>
                                             <FormGroup>
                                                 <div className="formSection">
                                                     <Field

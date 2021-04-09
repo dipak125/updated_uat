@@ -56,7 +56,8 @@ const initialValues = {
     nominee_last_name: "",
     nominee_gender: "",
     nominee_dob: "",
-    nominee_relation_with: ""
+    nominee_relation_with: "",
+	is_eia_account2: ""
     };
 
 const validateAddress =  Yup.object().shape({
@@ -94,7 +95,14 @@ const validateAddress =  Yup.object().shape({
    
     panNo: Yup.string().when(['netPremiumCheckCount'], {
         is: netPremiumCheckCount => netPremiumCheckCount == 1,       
-        then: Yup.string().required("PAN number is required")
+        then: Yup.string()		
+		.required(function() {
+        
+			if ((document.querySelector('input[name="is_eia_account2"]:checked')) && (document.querySelector('input[name="is_eia_account2"]:checked').value == 1 )) {
+				
+                return "PAN number is required";
+            }
+		})
     .matches(/^[A-Z]{3}[CPHFATBLJG]{1}[A-Z]{1}[0-9]{4}[A-Z]{1}$/,'Invalid PAN number'),
         otherwise: Yup.string().matches(/^[A-Z]{3}[CPHFATBLJG]{1}[A-Z]{1}[0-9]{4}[A-Z]{1}$/,'Invalid PAN number').nullable()}),
     pincode: Yup.string()
@@ -303,7 +311,9 @@ class arogya_Address extends Component {
             stateName:[],
             showEIA:false,
             pincode_Details: [],
-            titleList: []
+            titleList: [],
+			is_eia_account2: '',
+			tpaInsurance: []
 		}
 	}
 
@@ -317,7 +327,9 @@ class arogya_Address extends Component {
 
     componentDidMount(){       
         this.fetchData();
+		this.tpaInsuranceRepository();
     }
+
 
     fetchData=()=>{
         const {productId } = this.props.match.params
@@ -335,6 +347,14 @@ class arogya_Address extends Component {
                 let selfFlag = false;
                 let pincode_Details = JSON.parse(decryptResp.data.policyHolder.pincode_response)
                 let netPremiumCheck = policy_holder.request_data.net_premium;
+				
+				
+				let is_eia_account2 = decryptResp.data.policyHolder.create_eia_account == 1 ? "" : decryptResp.data.policyHolder.create_eia_account;
+				 
+				 
+				 let tpaInsurance = decryptResp.data.policyHolder.T_Insurance_Repository_id ? decryptResp.data.policyHolder.T_Insurance_Repository_id : "";
+				
+				
                 console.log("netPremiumCheck----",netPremiumCheck);
                 for(let i=0;i<family_members.length;i++){
                     if(family_members[i].relation_with=='self'){
@@ -350,7 +370,8 @@ class arogya_Address extends Component {
                     addressDetails,
                     is_eia_account,
                     pincode_Details,
-                    netPremiumCheck
+                    netPremiumCheck,
+					is_eia_account2
                 })
                 this.props.loadingStop();
                 this.fetchSalutation(pincode_Details);
@@ -503,10 +524,16 @@ class arogya_Address extends Component {
         formArr['proposerGender'] = values.proposerGender;
         formArr['pincode_id'] = values.pincode_id;
         formArr['salutation_id'] = values.salutation_id;
+		
+		
         
         if(values.eIA == 1){
             formArr['eia_account_no'] = values.eia_account_no;
-        }       
+        }  
+			
+		formArr['create_eia_account'] = values.is_eia_account2;
+        formArr['tpaInsurance'] = values.tpaInsurance;
+		
 
         let formObj = {}
         Object.assign(formObj,formArr);
@@ -534,6 +561,21 @@ class arogya_Address extends Component {
         this.props.loadingStop();
         });
     }
+	
+	tpaInsuranceRepository = () => {
+				axios.get(`/tpaInsuranceRepository`)
+            .then(res => {
+					
+					let tpaInsurance = res.data ? res.data : {};
+					console.log("tpaInsuranceRepository===", tpaInsurance);
+					
+					//let titleList = decryptResp.data.salutationlist
+					this.setState({
+					  tpaInsurance
+					});
+				});
+			console.log("tpaInsuranceRepository=");	
+	}
 
     initFamilyDetailsList = familyDetails => {
 		if (familyDetails.length > 0) {
@@ -556,13 +598,30 @@ class arogya_Address extends Component {
         if(value == 1){
             this.setState({
                 showEIA:true,
-                is_eia_account:1
+                is_eia_account:1,
+				showEIA2:false,
+				is_eia_account2:0
             })
         }
         else{
             this.setState({
                 showEIA:false,
                 is_eia_account:0
+            })
+        }
+    }
+	
+	showEIAText2 = (value) =>{
+        if(value == 1){
+            this.setState({
+                showEIA2:true,
+                is_eia_account2:1
+            })
+        }
+        else{
+            this.setState({
+                showEIA2:false,
+                is_eia_account2:0
             })
         }
     }
@@ -598,10 +657,12 @@ class arogya_Address extends Component {
         let formatVal = firstString+subString
         return formatVal
     }
-    
+ 
     
     render() {
-        const {policy_holder,familyMembers,addressDetails,is_eia_account,selfFlag,pinDataArr,stateName,showEIA, pincode_Details, netPremiumCheck, titleList} = this.state    
+        const {policy_holder,familyMembers,is_eia_account2, tpaInsurance, addressDetails,is_eia_account,selfFlag,pinDataArr,stateName,showEIA,showEIA2, pincode_Details, netPremiumCheck, titleList} = this.state    
+		
+		 let phrases = localStorage.getItem("phrases") ? JSON.parse(localStorage.getItem("phrases")) : null
 
         let newInitialValues = Object.assign(initialValues, {
             proposerAsInsured: sessionStorage.getItem('proposed_insured') ? sessionStorage.getItem('proposed_insured') : (selfFlag ? 1:0),
@@ -624,7 +685,11 @@ class arogya_Address extends Component {
             proposerLname : policy_holder && policy_holder.last_name ?  policy_holder.last_name : '',
             proposerDob : policy_holder && policy_holder.dob ?  new Date(policy_holder.dob) : '',
             proposerGender : policy_holder && policy_holder.gender ?  policy_holder.gender : '',
-            netPremiumCheckCount: netPremiumCheck > 100000 ? 1 : 0
+            netPremiumCheckCount: netPremiumCheck > 100000 ? 1 : 0,
+			
+			is_eia_account2:  is_eia_account2,
+			
+			tpaInsurance: policy_holder && policy_holder.T_Insurance_Repository_id ? policy_holder.T_Insurance_Repository_id : "",
         });
 
         const {productId} = this.props.match.params
@@ -1227,6 +1292,94 @@ class arogya_Address extends Component {
                                             
                                         
                                         </div>:''}
+										
+										
+										{showEIA==false && is_eia_account == '0' ?
+								<Row>
+                                    <Col sm={12} md={4} lg={4}>
+                                        <FormGroup>
+                                            <div className="insurerName">
+                                                <h4 className="fs-16">{phrases['wish_to_create_EIA_Account']}</h4>
+                                            </div>
+                                        </FormGroup>
+                                    </Col>
+                                    <Col sm={12} md={4} lg={4}>
+                                        <FormGroup>
+                                            <div className="d-inline-flex m-b-35">
+                                                <div className="p-r-25">
+                                                    <label className="customRadio3">
+                                                    <Field
+                                                        type="radio"
+                                                        name='is_eia_account2'                                            
+                                                        value='1'
+                                                        key='1'  
+                                                        onChange={(e) => {
+                                                            setFieldValue(`is_eia_account2`, e.target.value);
+                                                            this.showEIAText2(1);
+                                                        }}
+                                                        checked={values.is_eia_account2 == '1' ? true : false}
+                                                    />
+                                                        <span className="checkmark " /><span className="fs-14"> {phrases['Yes']}</span>
+                                                    </label>
+                                                </div>
+
+                                                <div className="">
+                                                    <label className="customRadio3">
+                                                        <Field
+                                                        type="radio"
+                                                        name='is_eia_account2'                                            
+                                                        value='0'
+                                                        key='1'  
+                                                        onChange={(e) => {
+                                                            setFieldValue(`is_eia_account2`, e.target.value);
+                                                            this.showEIAText2(0);
+                                                        }}
+                                                        checked={values.is_eia_account2 == '0' ? true : false}
+                                                    />
+                                                        <span className="checkmark" />
+                                                        <span className="fs-14">{phrases['No']}</span>
+                                                        
+                                                    </label>
+                                                </div>
+                                            </div>
+                                        </FormGroup>
+                                    </Col>							
+								</Row> 
+							: ''}
+
+									
+							{showEIA2 || is_eia_account2 == '1' ?
+								<Row>
+                                    <Col sm={12} md={4} lg={4}>
+                                        <FormGroup>
+                                            <div className="insurerName">
+                                                <h4 className="fs-16">{phrases['Your_preferred_TPA']}</h4>
+                                            </div>
+                                        </FormGroup>
+                                    </Col>
+									<Col sm={12} md={4} lg={5}>
+										 <FormGroup>
+                                                    <div className="formSection">                                                           
+                                                        <Field
+                                                            name="tpaInsurance"
+                                                            component="select"
+                                                            autoComplete="off"
+                                                            value={values.tpaInsurance}
+                                                            className="formGrp"
+                                                        >
+                                                        <option value="">{phrases['SELECT_TPA']}</option>
+                                                        { tpaInsurance.map((relations, qIndex) => 
+                                                            <option value={relations.repository_id}>{relations.name}</option>                                        
+                                                        )}
+                                                        </Field>     
+                                                               
+                                                    </div>
+                                                </FormGroup>
+									</Col>
+								</Row> 
+									: ''}
+										
+										
                                         <div className="d-flex justify-content-left resmb">
                                         <Button className={`backBtn`} type="button"  disabled={isSubmitting ? true : false} onClick= {this.sumInsured.bind(this, productId )}>
                                             {isSubmitting ? 'Wait..' : 'Back'}

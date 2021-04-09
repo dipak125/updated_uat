@@ -594,7 +594,7 @@ class Address extends Component {
 							
 							
                             <div className="col-sm-12 col-md-12 col-lg-12 col-xl-12 infobox agrAddress2">
-                                <h4 className="text-center mt-3 mb-3">Arogya Sanjeevani Policy</h4>
+                                <h4 className="text-center mt-3 mb-3">Arogya Sanjeevani Policy+</h4>
                                 <section className="brand">
                                     <div className="boxpd">
 

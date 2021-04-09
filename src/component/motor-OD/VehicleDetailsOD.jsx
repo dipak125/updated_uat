@@ -28,7 +28,7 @@ const ageObj = new PersonAge();
 // const minDate = moment(moment().subtract(1, 'years').calendar()).add(1, 'day').calendar();
 //const minRegnDate = moment(startRegnDate).startOf('year').format('YYYY-MM-DD hh:mm');
 
-let maxRegnDate=  moment(moment().subtract(1, 'years').calendar()).add(0, 'day').calendar() 
+let maxRegnDate=  moment()
 const activeMinDate =  moment(moment().subtract(1, 'years').calendar()).add(1, 'day').calendar();
 const minRegnDate = moment(moment().subtract(1, 'years').calendar()).add(0, 'day').calendar();
 const minDate =  moment(moment().subtract(1, 'years').calendar()).add(1, 'day').calendar();
@@ -793,6 +793,7 @@ console.log("errors----------------- ", errors)
                                                                 peekPreviousYear
                                                                 showMonthDropdown
                                                                 showYearDropdown
+                                                                openToDate = {values.registration_date ? values.registration_date : new Date(minRegnDate)}
                                                                 dropdownMode="select"
                                                                 className="datePckr inputfs12"
                                                                 selected={values.registration_date}
@@ -1019,6 +1020,7 @@ console.log("errors----------------- ", errors)
                                                                 peekPreviousYear
                                                                 showMonthDropdown
                                                                 showYearDropdown
+                                                                openToDate = {values.previous_start_date ? values.previous_start_date : new Date(minDate)}
                                                                 dropdownMode="select"
                                                                 className="datePckr inputfs12"
                                                                 selected={values.previous_start_date}

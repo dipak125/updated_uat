@@ -784,7 +784,7 @@ class PremiumMISCD extends Component {
 
                                                                 </Collapsible>
                                                             </div>
-                                                          
+                                                          {fulQuoteResp.QuotationNo && breakin_flag == 0  ? 
                                                             <Row>
                                                             <Col sm={12} md={6}>
                                                             </Col>
@@ -839,18 +839,18 @@ class PremiumMISCD extends Component {
                                                                     </div>
                                                                     </FormGroup>
                                                                 </Col>
-                                                            </Row>
+                                                            </Row> : null }
 
                                                             <Row>&nbsp;</Row>
                                                             <div className="d-flex justify-content-left resmb">
                                                                 <Button className="backBtn" type="button" onClick={this.additionalDetails.bind(this, productId)}>{phrases['Back']}</Button>
-                                                                {bcMaster && bcMaster.eligible_for_payment_link == 1 ?
+                                                                {bcMaster && bcMaster.eligible_for_payment_link == 1 && breakin_flag == 0 ?
                                                                     <div>
                                                                     <Button type="button" className="proceedBtn" onClick = {this.sendPaymentLink.bind(this)}>  {phrases['PaymentLink']}  </Button>
                                                                     &nbsp;&nbsp;&nbsp;&nbsp;
                                                                     </div> : null }
                                                                 
-                                                                {smsButton === true ?
+                                                                {smsButton === true && breakin_flag == 0 ?
                                                                 <Button className="backBtn" type="button" onClick={this.handleModal.bind(this)}>{phrases['SendSMS']}</Button>
                                                                 : null}
 

@@ -99,8 +99,9 @@ const ownerValidation = Yup.object().shape({
 
     pancard: Yup.string()
     .required(function() {
-        	if (document.querySelector('input[name="is_eia_account2"]:checked').value == 1 ) {
-                return "Enter PAN number"; 
+			if ((document.querySelector('input[name="is_eia_account2"]:checked')) && (document.querySelector('input[name="is_eia_account2"]:checked').value == 1 )) {
+				
+                return "Enter PAN number";
             }
     }).matches(/^[A-Z]{3}[CPHFATBLJG]{1}[A-Z]{1}[0-9]{4}[A-Z]{1}$/, function() {
         return "Please enter valid Pan Number"

@@ -27,7 +27,7 @@ import {
 
 const ageObj = new PersonAge();
 let encryption = new Encryption();
-let maxRegnDate=  moment(moment().subtract(1, 'years').calendar()).add(0, 'day').calendar() 
+let maxRegnDate=  moment() 
 const activeMinDate =  moment(moment().subtract(1, 'years').calendar()).add(1, 'day').calendar();
 const minRegnDate = moment(moment().subtract(1, 'years').calendar()).add(0, 'day').calendar();
 const minDate =  moment(moment().subtract(1, 'years').calendar()).add(1, 'day').calendar();
@@ -679,6 +679,7 @@ class TwoWheelerVehicleDetailsOD extends Component {
                                                                 peekPreviousYear
                                                                 showMonthDropdown
                                                                 showYearDropdown
+                                                                openToDate = {values.registration_date ? values.registration_date : new Date(minRegnDate)}
                                                                 dropdownMode="select"
                                                                 className="datePckr inputfs12"
                                                                 selected={values.registration_date}
@@ -903,6 +904,7 @@ class TwoWheelerVehicleDetailsOD extends Component {
                                                             peekPreviousYear
                                                             showMonthDropdown
                                                             showYearDropdown
+                                                            openToDate = {values.previous_start_date ? values.previous_start_date : new Date(minDate)}
                                                             dropdownMode="select"
                                                             className="datePckr inputfs12"
                                                             selected={values.previous_start_date}

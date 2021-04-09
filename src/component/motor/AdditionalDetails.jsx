@@ -79,8 +79,11 @@ const ownerValidation = Yup.object().shape({
         }
     ),
     pancard: Yup.string()
-    .notRequired(function() {
-        return "Enter PAN number"
+    .required(function() {		
+			if ((document.querySelector('input[name="is_eia_account2"]:checked')) && (document.querySelector('input[name="is_eia_account2"]:checked').value == 1 )) {
+				
+                return "Enter PAN number";
+            }
     }).matches(/^[A-Z]{3}[CPHFATBLJG]{1}[A-Z]{1}[0-9]{4}[A-Z]{1}$/, function() {
         return "Please enter valid Pan Number"
     }),
@@ -633,23 +636,12 @@ console.log('post_data', post_data);
             <>
                 <BaseComponent>
                 {phrases ? 
-				<div className="page-wrapper">				
                 <div className="container-fluid">
                 <div className="row">
-				
-					<aside className="left-sidebar">
-		 				 <div className="scroll-sidebar ps-container ps-theme-default ps-active-y">
-						 <SideNav />
-						</div>
-						</aside>
-								
-					 {/*<div className="col-sm-12 col-md-12 col-lg-2 col-xl-2 pd-l-0">               
-						<SideNav />
-             		 </div>*/}
-				
-                    				
-					
-                <div className="col-sm-12 col-md-12 col-lg-12 col-xl-12 infobox aditionalDetail2">
+                    <div className="col-sm-12 col-md-12 col-lg-2 col-xl-2 pd-l-0">
+                        <SideNav />
+                    </div>
+                <div className="col-sm-12 col-md-12 col-lg-10 col-xl-10 infobox">
                 <h4 className="text-center mt-3 mb-3">{phrases['SBIGICL']}</h4>
                 <section className="brand m-b-25">
                     <div className="brand-bg">
@@ -666,7 +658,7 @@ console.log('post_data', post_data);
                         return (
                         <Form>
                         <Row>
-                            <Col sm={12} md={12} lg={9}>
+                            <Col sm={12} md={9} lg={9}>
                             <div className="d-flex justify-content-left brandhead">
                             {quoteNumber}
                             </div>
@@ -949,7 +941,7 @@ console.log('post_data', post_data);
                                                     value={values.pincode_id}
                                                     className="formGrp"
                                                 >
-                                                <option value="">{phrases['SelectArea']}</option>
+                                                <option value="">{phrases['Selectea']}</option>
                                                 {pinDataArr && pinDataArr.length > 0 && pinDataArr.map((resource,rindex)=>
                                                     <option value={resource.id}>{resource.LCLTY_SUBRB_TALUK_TEHSL_NM}</option>
                                                 )}
@@ -1364,7 +1356,6 @@ console.log('post_data', post_data);
                 </div>
                 <Footer />
                 </div>
-				</div>
                 </div> : null }
                 </BaseComponent>
             </>
