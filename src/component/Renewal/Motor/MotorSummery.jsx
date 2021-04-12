@@ -52,6 +52,7 @@ class MotorSummery extends Component {
             previousPolicy: [],	
             request_data: [],	
             breakin_flag: 0,	
+            policyCoverage: [],
             policyHolder_refNo: queryString.parse(this.props.location.search).access_id ? 	
                                 queryString.parse(this.props.location.search).access_id : 	
                                 localStorage.getItem("policyHolder_refNo")	
@@ -113,10 +114,11 @@ class MotorSummery extends Component {
                 let step_completed = decryptResp.data.policyHolder ? decryptResp.data.policyHolder.step_no : "";	
                 let bcMaster = decryptResp.data.policyHolder ? decryptResp.data.policyHolder.bcmaster : {};	
                 let menumaster = decryptResp.data.policyHolder ? decryptResp.data.policyHolder.menumaster : {};
+                let policyCoverage = decryptResp.data.policyHolder && decryptResp.data.policyHolder.renewalinfo && decryptResp.data.policyHolder.renewalinfo.renewalcoverage ? decryptResp.data.policyHolder.renewalinfo.renewalcoverage : []
                 let dateDiff = 0	
                 	
                 this.setState({	
-                    motorInsurance,policyHolder,vehicleDetails,previousPolicy,request_data,menumaster,step_completed, bcMaster,	
+                    motorInsurance,policyHolder,vehicleDetails,previousPolicy,request_data,menumaster,step_completed, bcMaster,	policyCoverage,
                     paymentStatus: decryptResp.data.policyHolder.payment ? decryptResp.data.policyHolder.payment[0] : [],	
                     memberdetails : decryptResp.data.policyHolder ? decryptResp.data.policyHolder : [],	
                     nomineedetails: decryptResp.data.policyHolder ? decryptResp.data.policyHolder.request_data.nominee[0]:[]	
@@ -172,7 +174,8 @@ class MotorSummery extends Component {
     paypoint_payment = () => {	
         const { policyHolder_refNo } = this.state;	
         window.location = `${process.env.REACT_APP_PAYMENT_URL}/ppinl/pay.php?refrence_no=${policyHolder_refNo}`	
-    }	
+    }
+
     fetchRelationships=()=>{	
         this.props.loadingStart();	
         axios.get('relations')	
@@ -191,6 +194,7 @@ class MotorSummery extends Component {
         })	
     	
     }	
+    
     sendPaymentLink = () => {	
         let encryption = new Encryption();	
         const formData = new FormData();	
@@ -214,7 +218,7 @@ class MotorSummery extends Component {
         this.fetchRelationships()	
     }	
     render() {	
-        const { policyHolder, show, fulQuoteResp, motorInsurance, error, error1, paymentStatus, bcMaster,	
+        const { policyHolder, show, fulQuoteResp, motorInsurance, error, error1, paymentStatus, bcMaster,policyCoverage,	
              relation, memberdetails,nomineedetails, vehicleDetails, breakin_flag, step_completed, request_data,menumaster, } = this.state	
         const { productId } = this.props.match.params	
         let phrases = localStorage.getItem("phrases") ? JSON.parse(localStorage.getItem("phrases")) : null	
@@ -240,6 +244,34 @@ class MotorSummery extends Component {
                     </h6>	
                 </span>	
             ) : null;	
+
+        const policyCoverageList =  policyCoverage && policyCoverage.length > 0 ?
+            policyCoverage.map((coverage, qIndex) => (
+                coverage.renewalsubcoverage ? coverage.renewalsubcoverage.map((benefit, bIndex) => (
+                    benefit.interest_premium != "0" ?
+                    <div>
+                        <Row>
+                            <Col sm={12} md={6}>
+                                <FormGroup>{benefit.interest_name}</FormGroup>
+                            </Col>
+                            <Col sm={12} md={6}>
+                                <FormGroup>₹ {Math.round(benefit.interest_premium)}</FormGroup>
+                            </Col>
+                        </Row>
+                    </div> : null
+            )) : 
+            <div>
+                <Row>
+                    <Col sm={12} md={6}>
+                    <FormGroup>{coverage.cover_name}</FormGroup>
+                    </Col>
+                    <Col sm={12} md={6}>
+                    <FormGroup>₹ {Math.round(coverage.annual_premium)}  </FormGroup>                      
+                    </Col>
+                </Row> 
+            </div>
+        )) : null 
+
         return (	
             <>	
                 <BaseComponent>	
@@ -253,7 +285,7 @@ class MotorSummery extends Component {
                             </aside>
 
                             {/* { step_completed >= '4' && vehicleDetails.vehicletype_id == '8' ?	 */}
-                            <div className="col-sm-12 col-md-12 col-lg-10 col-xl-10 infobox">	
+                            <div className="col-sm-12 col-md-12 col-lg-12 col-xl-12 infobox">	
                                 <h4 className="text-center mt-3 mb-3">{phrases['SBIGICL']}</h4>	
                                 <Formik initialValues={initialValue} onSubmit={this.handleSubmit}	
                                 validationSchema={validatePremium}	
@@ -316,6 +348,13 @@ class MotorSummery extends Component {
                                                                 </Collapsible>	
                                                             </div>	
                                                             
+                                                            <div className="rghtsideTrigr">
+                                                                <Collapsible trigger={phrases['DefaultCovered']} >
+                                                                    <div className="listrghtsideTrigr">
+                                                                        {policyCoverageList}
+                                                                    </div>
+                                                                </Collapsible>
+                                                            </div>
                                                             <div className="rghtsideTrigr">	
                                                                 <Collapsible trigger={phrases['RMPolicy']}  open= {true}>	
                                                                     <div className="listrghtsideTrigr">	

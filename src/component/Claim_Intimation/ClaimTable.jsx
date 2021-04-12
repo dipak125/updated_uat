@@ -17,11 +17,11 @@ class Table extends Component {
                 "product": "ClaimIntimation",
                 "image" : "Miscellaneous-car.svg"
               } ,
-              // {
-              //   "id": "2",
-              //   "product": "ClaimStatus",
-              //   "image" : "Miscellaneous-car.svg"
-              // } ,
+              {
+                "id": "2",
+                "product": "ClaimStatus",
+                "image" : "Miscellaneous-car.svg"
+              } ,
           ]
       };
 
@@ -31,9 +31,9 @@ class Table extends Component {
         if(productId == '1'){          
             window.open('https://www.sbigeneral.in/portal/claim/claims-intimation')
         }
-        // else if(productId == '2') {
-        //     window.open('https://www.sbigeneral.in/portal/contact-us/hospital')
-        // }
+        else if(productId == '2') {
+          this.props.history.push(`/ClaimStatus`);
+        }
     }   
 
     downloadDoc = (filePath,fileName) => {

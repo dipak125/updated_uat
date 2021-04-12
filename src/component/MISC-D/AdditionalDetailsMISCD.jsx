@@ -61,18 +61,18 @@ const ownerValidation = Yup.object().shape({
         is: policy_for => policy_for == '1',       
         then: Yup.string().required('NameRequired')
         .min(3, function() {
-            return "First name must be 3 characters"
+            return "FirstNameMin"
         })
         .max(40, function() {
-            return "Full name must be maximum 40 characters"
+            return "FullNameMax"
         })
         .matches(/^[a-zA-Z]+([\s]?[a-zA-Z]+)([\s]?[a-zA-Z]+)$/, function() {
-            return "Please enter valid name"
+            return "ValidName"
         }),
-        otherwise: Yup.string().required('Company name is required').min(3, function() {
-            return "Company name must be min 3 characters"
+        otherwise: Yup.string().required('CompanyNameReq').min(3, function() {
+            return "CompanyNameMin"
         }).matches(/^[a-zA-Z]+([\s]?[a-zA-Z]+)([\s]?[a-zA-Z]+)$/, function() {
-            return "Please enter valid name"
+            return "ValidName"
         })
     }),
 
@@ -128,30 +128,31 @@ const ownerValidation = Yup.object().shape({
         otherwise: Yup.date().nullable()
     }),
 
-    pancard: Yup.string()
-    .required().test(
-        "1LakhChecking",
-        function() {
-            //return "Enter PAN number"
-			if ((document.querySelector('input[name="is_eia_account2"]:checked')) && (document.querySelector('input[name="is_eia_account2"]:checked').value == 1 )) {
-				
-                return "Enter PAN number";
-            }
-        },
-        function (value) {
-            if (!value) {
-                return this.parent.net_premium <= 100000
-            }
-             return true;
-    }).matches(/^[A-Z]{3}[CPHFATBLJG]{1}[A-Z]{1}[0-9]{4}[A-Z]{1}$/, function() {
-        return "Please enter valid Pan Number"
-    }),
+    pancard: Yup.string().when(['policy_for'], {
+        is: policy_for => policy_for == '1', 
+        then: Yup.string().required().test(
+            "1LakhChecking",
+            function() {
+                if ((document.querySelector('input[name="is_eia_account2"]:checked')) && (document.querySelector('input[name="is_eia_account2"]:checked').value == 1 )) { 
+                    return "EnterPan";
+                }
+            },
+            function (value) {
+                if (!value) {
+                    return this.parent.net_premium <= 100000
+                }
+                 return true;
+        }).matches(/^[A-Z]{3}[CPHFATBLJG]{1}[A-Z]{1}[0-9]{4}[A-Z]{1}$/, function() {
+            return "ValidPan"
+        }),
+        otherwise: Yup.string()
+    }), 
     
     pincode_id:Yup.string().required('LocationRequired'),
 
     pincode:Yup.string().required('PincodeRequired')
     .matches(/^[0-9]{6}$/, function() {
-        return "Please enter valid pin code"
+        return "ValidPin"
     }),
 
     address:Yup.string().required('AddressRequired')
@@ -165,14 +166,14 @@ const ownerValidation = Yup.object().shape({
     }),
 
     phone: Yup.string()
-    .matches(/^[6-9][0-9]{9}$/,'Invalid Mobile number').required('PhoneRequired'),
+    .matches(/^[6-9][0-9]{9}$/,'ValidMobile').required('PhoneRequired'),
     
     email:Yup.string().email().required('EmailRequired').min(8, function() {
-            return "Email must be minimum 8 characters"
+            return "EmainMin"
         })
         .max(75, function() {
-            return "Email must be maximum 75 characters"
-        }).matches(/^[a-zA-Z0-9]+([._\-]?[a-zA-Z0-9]+)*@\w+([-]?\w+)*(\.\w{2,3})+$/,'Invalid Email Id'),
+            return "EmailMax"
+        }).matches(/^[a-zA-Z0-9]+([._\-]?[a-zA-Z0-9]+)*@\w+([-]?\w+)*(\.\w{2,3})+$/,'InvalidEmail'),
         
     nominee_relation_with: Yup.string().when(['policy_for'], {
         is: policy_for => policy_for == '1',       
@@ -212,7 +213,7 @@ const ownerValidation = Yup.object().shape({
                     return "NameReqMax"
                 })
                 .matches(/^[a-zA-Z]+([\s]?[a-zA-Z]+)([\s]?[a-zA-Z]+)$/, function() {
-                    return "Please enter valid name"
+                    return "ValidName"
                 }),
         otherwise: Yup.string().nullable()
     }),
@@ -251,7 +252,7 @@ const ownerValidation = Yup.object().shape({
                 .test(
                     "3monthsChecking",
                     function() {
-                        return "Age should be minium 3 months"
+                        return "NomineeMinAge"
                     },
                     function (value) {
                         if (value) {
@@ -283,11 +284,11 @@ const ownerValidation = Yup.object().shape({
         })
         .max(13, function() {
             return "EIAMax"
-        }).matches(/^[1245][0-9]{0,13}$/,'Please enter valid EIA no').notRequired('EIA no is required'),
+        }).matches(/^[1245][0-9]{0,13}$/,'EIAValidReq').notRequired(),
 
     appointee_name: Yup.string().when(['policy_for'], {
         is: policy_for => policy_for == '1',       
-        then: Yup.string().notRequired("Please enter appointee name")
+        then: Yup.string().notRequired()
                 .min(3, function() {
                     return "NameReqMin"
                 })
@@ -295,7 +296,7 @@ const ownerValidation = Yup.object().shape({
                     return "NameReqMax"
                 })        
                 .matches(/^[a-zA-Z]+([\s]?[a-zA-Z]+)([\s]?[a-zA-Z]+)$/, function() {
-                    return "Please enter valid name"
+                    return "ValidName"
                 }).test(
                     "18YearsChecking",
                     function() {
@@ -359,7 +360,7 @@ const ownerValidation = Yup.object().shape({
     )
     .nullable(),
 
-    is_carloan: Yup.mixed().required('This field is required'),
+    is_carloan: Yup.mixed().required('RequiredField'),
     bank_name:Yup.string().notRequired()
     .test(
         "isLoanChecking",
@@ -820,7 +821,7 @@ class AdditionalDetailsMISCD extends Component {
                         >
                         {({ values, errors, setFieldValue, setFieldTouched, isValid, isSubmitting, touched }) => {
                              let value = values.nominee_first_name;
-                            // console.log("errors", errors)
+                            console.log("errors---------------- ", errors)
                         return (
                         <Form>
                         <Row>

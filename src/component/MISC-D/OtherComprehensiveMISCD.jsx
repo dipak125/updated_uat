@@ -392,7 +392,8 @@ class OtherComprehensiveMISCD extends Component {
             validation_error: [],
             vehicle_age: "",
             depreciationPercentage: "",
-            bodyIdvStatus: 0
+            bodyIdvStatus: 1,
+            userIdvStatus:1
         };
     }
 
@@ -440,6 +441,8 @@ class OtherComprehensiveMISCD extends Component {
     sliderValue = (value) => {
         this.setState({
             sliderVal: value,
+            userIdvStatus: 1,
+            bodyIdvStatus: 0,
             serverResponse: [],
             error: []
         })
@@ -449,6 +452,8 @@ class OtherComprehensiveMISCD extends Component {
 
         this.setState({
             bodySliderVal: value,
+            bodyIdvStatus: 1,
+            userIdvStatus: 0,
             serverResponse: [],
             error: [],
         })
@@ -614,11 +619,6 @@ class OtherComprehensiveMISCD extends Component {
 
     getAccessToken = (values) => {
         this.props.loadingStart();
-        var bodyIdvStatus = this.state.bodyIdvStatus
-        bodyIdvStatus = bodyIdvStatus + 1
-        this.setState({
-            bodyIdvStatus: bodyIdvStatus
-        })
         axios
           .post(`/callTokenService`)
           .then((res) => {
@@ -752,7 +752,7 @@ class OtherComprehensiveMISCD extends Component {
 
 
     fullQuote = (access_token, values) => {
-        const { PolicyArray, sliderVal, add_more_coverage, motorInsurance, bodySliderVal ,vehicleDetails, chasis_price} = this.state
+        const { PolicyArray, sliderVal, add_more_coverage, motorInsurance, bodySliderVal ,vehicleDetails, chasis_price, userIdvStatus, bodyIdvStatus} = this.state
 
         console.log("values----------------///--- ", values)
         // let cng_kit_flag = 0;
@@ -813,7 +813,9 @@ class OtherComprehensiveMISCD extends Component {
             'trailer_array' : values.trailer_array,
             'fuel_type' : values.fuel_type ? values.fuel_type : (vehicleDetails && vehicleDetails.varientmodel && vehicleDetails.varientmodel.fueltype  ? vehicleDetails.varientmodel.fueltype.id : ""),
             'idv_value': sliderVal ? sliderVal : 0,
-            'body_idv_value' : bodySliderVal ? bodySliderVal : defaultBodySliderValue
+            'body_idv_value' : bodySliderVal ? bodySliderVal : defaultBodySliderValue,
+            'userIdvStatus' : userIdvStatus ? userIdvStatus : 0,
+            'bodyIdvStatus' : bodyIdvStatus ? bodyIdvStatus : 0
         }
         console.log('fullQuote_post_data', post_data)
         total_idv = parseInt(other_idv) + parseInt(post_data.idv_value)+parseInt(post_data.body_idv_value)
@@ -838,6 +840,8 @@ class OtherComprehensiveMISCD extends Component {
                         chasis_price: res.data.data.chasis_price,
                         error: [],
                         validation_error: [],
+                        userIdvStatus:1,
+                        bodyIdvStatus:1,
                         sliderVal: res.data.data.PolicyObject.PolicyLobList ? Math.round(res.data.data.PolicyObject.PolicyLobList[0].PolicyRiskList[0].IDV_Suggested) : 0,
                         ncbDiscount,
                         serverResponse: res.data.data.PolicyObject,
@@ -855,8 +859,11 @@ class OtherComprehensiveMISCD extends Component {
                         error: {"message": 0},
                         validation_error: validationErrors,
                         serverResponse: [],
+                        userIdvStatus:1,
+                        bodyIdvStatus:1,
                         policyCoverage: res.data.data.PolicyObject.PolicyLobList ? res.data.data.PolicyObject.PolicyLobList[0].PolicyRiskList[0].PolicyCoverageList : [],
                     });
+                    
                 }
                 else if (res.data.data.code && res.data.data.message && res.data.data.code == "validation failed" && res.data.data.message == "validation failed") {
                     var validationErrors = []
@@ -866,18 +873,20 @@ class OtherComprehensiveMISCD extends Component {
                        this.setState({
                         fulQuoteResp: [], add_more_coverage,
                         validation_error: validationErrors,
+                        userIdvStatus:1,
+                        bodyIdvStatus:1,
                         serverResponse: []
                     });
-                    // swal(res.data.data.messages[0].message)
                 }
                 else {
                     this.setState({
                         fulQuoteResp: [], add_more_coverage,
                         error: res.data.data,
                         serverResponse: [],
+                        userIdvStatus:1,
+                        bodyIdvStatus:1,
                         validation_error: []
                     });
-                    swal(res.data.msg)
                 }
                 this.props.loadingStop();
             })
@@ -1545,7 +1554,7 @@ class OtherComprehensiveMISCD extends Component {
         const validationErrors = 
             validation_error ? (
                 validation_error.map((errors, qIndex) => (
-                    <span className="errorMsg">
+                    <span className="errorMsg" key={qIndex}>
                         <li>
                             <strong>
                             {errors}
@@ -1786,6 +1795,7 @@ console.log("values----------------- ", values)
                                     min= {minIDV}
                                     max= {maxIDV}
                                     step= '1'
+                                    disabled = {(this.state.userIdvStatus == 0)? "disabled" : ""}
                                     value={defaultSliderValue}
                                     onChange= {(e) =>{
                                     setFieldTouched("slider");
@@ -1834,6 +1844,7 @@ console.log("values----------------- ", values)
                                     min= {minBodyIDV}
                                     max= {maxBodyIDV}
                                     step= '1'
+                                    disabled = {(this.state.bodyIdvStatus == 0)? "disabled" : ""}
                                     value={defaultBodySliderValue}
                                     onChange= {(e) =>{
                                     setFieldTouched("slider1");

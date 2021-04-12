@@ -481,6 +481,11 @@ const MotorSummery = Loadable({
     loading: () => loadingContent
 });
 
+// const HealthSummery = Loadable({
+//     loader: () => import(/*webpackChunkName: "Products" */"../Renewal/Health/HealthSummery.jsx"),
+//     loading: () => loadingContent
+// });
+
 const ThankYouRenewal = Loadable({
     loader: () => import(/*webpackChunkName: "Products" */"../Renewal/ThankYouRenewal.jsx"),
     loading: () => loadingContent
@@ -490,6 +495,11 @@ const ThankYouRenewal = Loadable({
 
 const ClaimIntimation = Loadable({
     loader: () => import(/*webpackChunkName: "Products" */"../Claim_Intimation/ClaimIntimation.jsx"),
+    loading: () => loadingContent
+});
+
+const ClaimStatus = Loadable({
+    loader: () => import(/*webpackChunkName: "Products" */"../Claim_Intimation/ClaimStatus/ClaimStatus.jsx"),
     loading: () => loadingContent
 });
 
@@ -658,11 +668,14 @@ class Routes extends Component {
                         {/* <PrivateRoute exact path="/ThankYou_motor/:policyId" component={ThankYou_motor} /> */}
                         
                         {/************ Claim Intimation ******************/}
-                        <PrivateRoute exact path="/ClaimIntimation" component={ClaimIntimation} />      
+                        <PrivateRoute exact path="/ClaimIntimation" component={ClaimIntimation} />  
+                        <PrivateRoute exact path="/ClaimStatus" component={ClaimStatus} />      
+
 
                         {/************ Renewal ******************/}
 						<PrivateRoute exact path="/Renewal" component={Renewal} />     
                         <PrivateRoute exact path="/MotorSummery" component={MotorSummery} />   
+                        {/* <PrivateRoute exact path="/HealthSummery" component={HealthSummery} />    */}
                         <PrivateRoute exact path="/ThankYouRenewal" component={ThankYouRenewal} />             
 						
                         <Redirect from="/" to="/Dashboard" />

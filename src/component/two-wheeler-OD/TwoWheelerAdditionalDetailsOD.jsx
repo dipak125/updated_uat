@@ -112,16 +112,26 @@ const ownerValidation = Yup.object().shape({
         otherwise: Yup.date().nullable()
     }),
 
-    pancard: Yup.string()
-    .required(function() {
-        
-			if ((document.querySelector('input[name="is_eia_account2"]:checked')) && (document.querySelector('input[name="is_eia_account2"]:checked').value == 1 )) {
-				
-                return "EnterPan"
-            }
-    }).matches(/^[A-Z]{3}[CPHFATBLJG]{1}[A-Z]{1}[0-9]{4}[A-Z]{1}$/, function() {
-        return "ValidPan"
-    }),
+    pancard: Yup.string().when(['policy_for'], {
+        is: policy_for => policy_for == '1', 
+        then: Yup.string().required().test(
+            "1LakhChecking",
+            function() {
+                if ((document.querySelector('input[name="is_eia_account2"]:checked')) && (document.querySelector('input[name="is_eia_account2"]:checked').value == 1 )) { 
+                    return "EnterPan";
+                }
+            },
+            function (value) {
+                if (!value) {
+                    return this.parent.net_premium <= 100000
+                }
+                 return true;
+        }).matches(/^[A-Z]{3}[CPHFATBLJG]{1}[A-Z]{1}[0-9]{4}[A-Z]{1}$/, function() {
+            return "ValidPan"
+        }),
+        otherwise: Yup.string()
+    }), 
+
     pincode_id:Yup.string().required('LocationRequired'),
 
     pincode:Yup.string().required('PincodeRequired')
@@ -460,9 +470,7 @@ class TwoWheelerAdditionalDetailsOD extends Component {
         if(value == 1){
             this.setState({
                 showEIA:true,
-                is_eia_account:1,
-				showEIA2:false,
-				is_eia_account2:0
+                is_eia_account:1
             })
         }
         else{
@@ -527,14 +535,13 @@ class TwoWheelerAdditionalDetailsOD extends Component {
             'phone': values['phone'],
             'email': values['email'],
             'is_eia_account': values['is_eia_account'],
-			
+			'is_eia_account2': values['is_eia_account2'],
             'eia_no': values['eia_no'],
             'address': values['address'],          
             'gstn_no': values['gstn_no'],
             'salutation_id': values['salutation_id'],
             'nominee_title_id': values['nominee_salutation'],
             'page_name': `two_wheeler_additional_detailsOD/${productId}`,
-			'create_eia_account': values['is_eia_account2'],
 			'tpaInsurance': values['tpaInsurance'],
         }
         if(motorInsurance.policy_for == '1' && motorInsurance.pa_flag == '1'){
@@ -598,9 +605,7 @@ class TwoWheelerAdditionalDetailsOD extends Component {
                  let quoteId = decryptResp.data.policyHolder ? decryptResp.data.policyHolder.request_data.quote_id : ""
                  let is_eia_account=  policyHolder && (policyHolder.is_eia_account == 0 || policyHolder.is_eia_account == 1) ? policyHolder.is_eia_account : ""
 				 
-				 let is_eia_account2=  policyHolder && (policyHolder.create_eia_account == 0 || policyHolder.create_eia_account == 1) ? policyHolder.create_eia_account : ""				 
-				 
-				 let tpaInsurance = policyHolder.T_Insurance_Repository_id ? policyHolder.T_Insurance_Repository_id : ""
+				 let is_eia_account2=  policyHolder && (policyHolder.is_eia_account2 == 0 || policyHolder.is_eia_account2 == 1) ? policyHolder.is_eia_account2 : ""
 				 
                  let bankDetails = decryptResp.data.policyHolder && decryptResp.data.policyHolder.bankdetail ? decryptResp.data.policyHolder.bankdetail[0] : {};
                  let addressDetails = JSON.parse(decryptResp.data.policyHolder.pincode_response)
@@ -784,9 +789,6 @@ class TwoWheelerAdditionalDetailsOD extends Component {
             org_level: policyHolder && policyHolder.org_level ? policyHolder.org_level : "",
             salutation_id: policyHolder && policyHolder.salutation_id ? policyHolder.salutation_id : "",           
             nominee_salutation: nomineeDetails && nomineeDetails.gender ? nomineeDetails.title_id : "",
-			
-			is_eia_account2:  is_eia_account2,
-			tpaInsurance: policyHolder && policyHolder.T_Insurance_Repository_id ? policyHolder.T_Insurance_Repository_id : "",
         });
 
         const quoteNumber =

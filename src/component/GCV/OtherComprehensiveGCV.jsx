@@ -444,10 +444,11 @@ class OtherComprehensiveGCV extends Component {
             trailer_array: [],
             ncbDiscount:0,
             geographical_extension: [],
-	    validation_error: [],
+	        validation_error: [],
             vehicle_age: "",
             depreciationPercentage: "",
-            bodyIdvStatus: 0
+            bodyIdvStatus: 1,
+            userIdvStatus:1
         };
     }
 
@@ -495,6 +496,8 @@ class OtherComprehensiveGCV extends Component {
     sliderValue = (value) => {
         this.setState({
             sliderVal: value,
+            userIdvStatus: 1,
+            bodyIdvStatus: 0,
             serverResponse: [],
             error: []
         })
@@ -503,6 +506,8 @@ class OtherComprehensiveGCV extends Component {
     bodySliderValue = (value) => {
         this.setState({
             bodySliderVal: value,
+            bodyIdvStatus: 1,
+            userIdvStatus: 0,
             serverResponse: [],
             error: []
         })
@@ -759,7 +764,7 @@ class OtherComprehensiveGCV extends Component {
 
 
     fullQuote = (access_token, values) => {
-        const { PolicyArray, sliderVal, add_more_coverage, motorInsurance, bodySliderVal ,vehicleDetails, geographical_extension, chasis_price} = this.state
+        const { PolicyArray, sliderVal, add_more_coverage, motorInsurance, bodySliderVal ,vehicleDetails, geographical_extension, chasis_price, userIdvStatus,bodyIdvStatus} = this.state
         // let cng_kit_flag = 0;
         // let cngKit_Cost = 0;
         // if(values.toString()) {            
@@ -820,6 +825,9 @@ class OtherComprehensiveGCV extends Component {
             'coverage_data': JSON.stringify(coverage_data),
             'body_idv_value' : bodySliderVal ? bodySliderVal : defaultBodySliderValue,
             'trailer_array' : values.trailer_array,
+            'userIdvStatus' : userIdvStatus ? userIdvStatus : 0,
+            'bodyIdvStatus' : bodyIdvStatus ? bodyIdvStatus : 0,
+            'trailer_array' : values.trailer_array,            
             'fuel_type' : values.fuel_type ? values.fuel_type : (vehicleDetails && vehicleDetails.varientmodel && vehicleDetails.varientmodel.fueltype  ? vehicleDetails.varientmodel.fueltype.id : "")
             // 'cng_kit': cng_kit_flag,
             // 'cngKit_Cost': cngKit_Cost
@@ -867,6 +875,8 @@ class OtherComprehensiveGCV extends Component {
                         PolicyArray: res.data.PolicyObject.PolicyLobList,
                         error: [],
                         ncbDiscount,
+                        userIdvStatus:1,
+                        bodyIdvStatus:1,
                         sliderVal: res.data.PolicyObject.PolicyLobList ? Math.round(res.data.PolicyObject.PolicyLobList[0].PolicyRiskList[0].IDV_Suggested) : 0,
                         serverResponse: res.data.PolicyObject,
                         policyCoverage: res.data.PolicyObject.PolicyLobList ? res.data.PolicyObject.PolicyLobList[0].PolicyRiskList[0].PolicyCoverageList : [],
@@ -875,6 +885,8 @@ class OtherComprehensiveGCV extends Component {
                 else if (res.data.PolicyObject && res.data.UnderwritingResult && res.data.UnderwritingResult.Status == "Fail") {
                     this.setState({
                         fulQuoteResp: res.data.PolicyObject,
+                        userIdvStatus:1,
+                        bodyIdvStatus:1,
                         error: {"message": 1},
                         serverResponse: [],
                         policyCoverage: res.data.PolicyObject.PolicyLobList ? res.data.PolicyObject.PolicyLobList[0].PolicyRiskList[0].PolicyCoverageList : [],
@@ -883,6 +895,8 @@ class OtherComprehensiveGCV extends Component {
                 else {
                     this.setState({
                         fulQuoteResp: [], add_more_coverage,
+                        userIdvStatus:1,
+                        bodyIdvStatus:1,
                         error: res.data,
                         serverResponse: []
                     });
@@ -1847,6 +1861,7 @@ console.log("values------------> ", values)
                                     min= {minIDV}
                                     max= {maxIDV}
                                     step= '1'
+                                    disabled = {(this.state.userIdvStatus == 0)? "disabled" : ""}
                                     value={defaultSliderValue}
                                     onChange= {(e) =>{
                                     setFieldTouched("slider");
@@ -1895,6 +1910,7 @@ console.log("values------------> ", values)
                                     min= {minBodyIDV}
                                     max= {maxBodyIDV}
                                     step= '1'
+                                    disabled = {(this.state.bodyIdvStatus == 0)? "disabled" : ""}
                                     value={defaultBodySliderValue}
                                     onChange= {(e) =>{
                                     setFieldTouched("slider1");
