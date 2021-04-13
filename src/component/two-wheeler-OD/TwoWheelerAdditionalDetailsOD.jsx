@@ -397,6 +397,17 @@ const ownerValidation = Yup.object().shape({
     ).matches(/^[A-Za-z][A-Za-z\s]*$/, function() {
         return "EnterValidBankBranch"
     }),
+	
+	
+	is_eia_account2: Yup.string().when(['is_eia_account'], {
+        is: is_eia_account => is_eia_account == 0, 
+        then: Yup.string().required('RequiredField')
+    }), 
+	
+	tpaInsurance: Yup.string().when(['is_eia_account2'], {
+        is: is_eia_account2 => is_eia_account2 == 1, 
+        then: Yup.string().required('RequiredField')
+    }),
 })
 
 class TwoWheelerAdditionalDetailsOD extends Component {
@@ -520,6 +531,17 @@ class TwoWheelerAdditionalDetailsOD extends Component {
         const {motorInsurance} = this.state
         const formData = new FormData(); 
         let encryption = new Encryption();
+		
+		let create_eia_account;
+		if(values['is_eia_account2']==='')
+		{
+			 create_eia_account = 2;
+		}
+		else
+		{
+			 create_eia_account = values['is_eia_account2'];
+		}
+		
         let post_data = {
             'policy_holder_id':localStorage.getItem('policyHolder_id'),
             'menumaster_id':1,
@@ -535,13 +557,14 @@ class TwoWheelerAdditionalDetailsOD extends Component {
             'phone': values['phone'],
             'email': values['email'],
             'is_eia_account': values['is_eia_account'],
-			'is_eia_account2': values['is_eia_account2'],
+			
             'eia_no': values['eia_no'],
             'address': values['address'],          
             'gstn_no': values['gstn_no'],
             'salutation_id': values['salutation_id'],
             'nominee_title_id': values['nominee_salutation'],
             'page_name': `two_wheeler_additional_detailsOD/${productId}`,
+			'create_eia_account': create_eia_account,
 			'tpaInsurance': values['tpaInsurance'],
         }
         if(motorInsurance.policy_for == '1' && motorInsurance.pa_flag == '1'){
@@ -605,7 +628,7 @@ class TwoWheelerAdditionalDetailsOD extends Component {
                  let quoteId = decryptResp.data.policyHolder ? decryptResp.data.policyHolder.request_data.quote_id : ""
                  let is_eia_account=  policyHolder && (policyHolder.is_eia_account == 0 || policyHolder.is_eia_account == 1) ? policyHolder.is_eia_account : ""
 				 
-				 let is_eia_account2=  policyHolder && (policyHolder.is_eia_account2 == 0 || policyHolder.is_eia_account2 == 1) ? policyHolder.is_eia_account2 : ""
+				 let is_eia_account2=  policyHolder && (policyHolder.create_eia_account == 0 || policyHolder.create_eia_account == 1) ? policyHolder.create_eia_account : ""
 				 
                  let bankDetails = decryptResp.data.policyHolder && decryptResp.data.policyHolder.bankdetail ? decryptResp.data.policyHolder.bankdetail[0] : {};
                  let addressDetails = JSON.parse(decryptResp.data.policyHolder.pincode_response)
@@ -780,6 +803,7 @@ class TwoWheelerAdditionalDetailsOD extends Component {
             email:  policyHolder && policyHolder.email_id ? policyHolder.email_id : "",
             address: policyHolder && policyHolder.address ? policyHolder.address : "",
             // is_eia_account:  is_eia_account,
+			is_eia_account2:  is_eia_account2,
             eia_no: policyHolder && policyHolder.eia_no ? policyHolder.eia_no : "",
             policy_for : motorInsurance ? motorInsurance.policy_for : "",
             pa_flag : motorInsurance ? motorInsurance.pa_flag : 0,
@@ -789,6 +813,8 @@ class TwoWheelerAdditionalDetailsOD extends Component {
             org_level: policyHolder && policyHolder.org_level ? policyHolder.org_level : "",
             salutation_id: policyHolder && policyHolder.salutation_id ? policyHolder.salutation_id : "",           
             nominee_salutation: nomineeDetails && nomineeDetails.gender ? nomineeDetails.title_id : "",
+			
+			tpaInsurance: policyHolder && policyHolder.T_Insurance_Repository_id ? policyHolder.T_Insurance_Repository_id : "",
         });
 
         const quoteNumber =
@@ -1554,6 +1580,10 @@ class TwoWheelerAdditionalDetailsOD extends Component {
                                                     />
                                                         <span className="checkmark" />
                                                         <span className="fs-14">{phrases['No']}</span>
+														{errors.is_eia_account2 && touched.is_eia_account2 ? (
+                                                        <span className="errorMsg">{phrases[errors.is_eia_account2]}</span>
+                                                    ) : null}
+														
                                                         
                                                     </label>
                                                 </div>
@@ -1587,7 +1617,10 @@ class TwoWheelerAdditionalDetailsOD extends Component {
                                                         { tpaInsurance.map((relations, qIndex) => 
                                                             <option value={relations.repository_id}>{relations.name}</option>                                        
                                                         )}
-                                                        </Field>     
+                                                        </Field>   
+														{errors.tpaInsurance && touched.tpaInsurance ? (
+                                                        <span className="errorMsg">{phrases[errors.tpaInsurance]}</span>
+														) : null}
                                                                
                                                     </div>
                                                 </FormGroup>

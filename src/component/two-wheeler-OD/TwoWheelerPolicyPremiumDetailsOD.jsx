@@ -307,15 +307,13 @@ class TwoWheelerPolicyPremiumDetailsOD extends Component {
 				<div className="page-wrapper">
                     <div className="container-fluid">
                         <div className="row">
-						
-						
+			
                            <aside className="left-sidebar">
- <div className="scroll-sidebar ps-container ps-theme-default ps-active-y">
-<SideNav />
- </div>
-</aside>
-							
-							
+                            <div className="scroll-sidebar ps-container ps-theme-default ps-active-y">
+                            <SideNav />
+                            </div>
+                            </aside>
+											
                             { step_completed >= '4' && vehicleDetails.vehicletype_id == productId ?
                             <div className="col-sm-12 col-md-12 col-lg-12 col-xl-12 infobox twopremiumOd">
                                 <h4 className="text-center mt-3 mb-3">{phrases['SBIGICL']}</h4>
@@ -565,7 +563,7 @@ class TwoWheelerPolicyPremiumDetailsOD extends Component {
                                                                                                     <Col sm={12} md={6}>	
                                                                                                         <FormGroup>{ memberdetails ? moment(memberdetails.date_of_incorporation).format("DD-MM-YYYY") : null}</FormGroup>	
                                                                                                     </Col>	
-                                                                                                </Row>}}
+                                                                                                </Row>}
                                                                                             <Row>
                                                                                                 <Col sm={12} md={6}>
                                                                                                     <FormGroup>{phrases['MobileNo']}:</FormGroup>

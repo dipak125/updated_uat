@@ -56,7 +56,7 @@ class renewal extends Component {
         this.props.history.push(`/Products`);
     }
     forward = (policy_type) => {
-        if(policy_type == '2') {
+        if(policy_type == '1') {
             this.props.history.push(`/MotorSummery`);
         }
         else {

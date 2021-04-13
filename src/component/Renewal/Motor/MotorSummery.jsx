@@ -247,8 +247,8 @@ class MotorSummery extends Component {
 
         const policyCoverageList =  policyCoverage && policyCoverage.length > 0 ?
             policyCoverage.map((coverage, qIndex) => (
-                coverage.renewalsubcoverage ? coverage.renewalsubcoverage.map((benefit, bIndex) => (
-                    benefit.interest_premium != "0" ?
+                coverage.renewalsubcoverage && coverage.renewalsubcoverage.length > 0 ? coverage.renewalsubcoverage.map((benefit, bIndex) => (
+                    parseInt(benefit.interest_premium) != 0 ?
                     <div>
                         <Row>
                             <Col sm={12} md={6}>
@@ -270,7 +270,7 @@ class MotorSummery extends Component {
                     </Col>
                 </Row> 
             </div>
-        )) : null 
+        )) : null  
 
         return (	
             <>	

@@ -389,6 +389,17 @@ const ownerValidation = Yup.object().shape({
     ).matches(/^[A-Za-z][A-Za-z\s]*$/, function() {
         return "Invalid Bank Branch"
     }),
+	
+	is_eia_account2: Yup.string().when(['is_eia_account'], {
+        is: is_eia_account => is_eia_account == 0, 
+        then: Yup.string().required('RequiredField')
+    }), 
+	
+	tpaInsurance: Yup.string().when(['is_eia_account2'], {
+        is: is_eia_account2 => is_eia_account2 == 1, 
+        then: Yup.string().required('RequiredField')
+    }),
+	
 })
 
 class AdditionalDetailsGCV extends Component {
@@ -500,6 +511,17 @@ class AdditionalDetailsGCV extends Component {
         const {motorInsurance, request_data} = this.state
         const formData = new FormData(); 
         let encryption = new Encryption();
+		
+		let create_eia_account;
+		if(values['is_eia_account2']==='')
+		{
+			 create_eia_account = 2;
+		}
+		else
+		{
+			 create_eia_account = values['is_eia_account2'];
+		}
+		
         let post_data = {
             'policy_holder_id':request_data.policyholder_id,
             'menumaster_id':4,
@@ -522,7 +544,7 @@ class AdditionalDetailsGCV extends Component {
             'salutation_id': values['salutation_id'],
             'nominee_title_id': values['nominee_salutation'],
             'page_name': `AdditionalDetails_GCV/${productId}`,
-			'create_eia_account': values['is_eia_account2'],
+			'create_eia_account': create_eia_account,
 			'tpaInsurance': values['tpaInsurance'],
         }
         if(motorInsurance.policy_for == '1'){
@@ -1559,6 +1581,9 @@ class AdditionalDetailsGCV extends Component {
                                                     />
                                                         <span className="checkmark" />
                                                         <span className="fs-14">{phrases['No']}</span>
+														{errors.is_eia_account2 && touched.is_eia_account2 ? (
+                                                        <span className="errorMsg">{phrases[errors.is_eia_account2]}</span>
+														) : null}
                                                         
                                                     </label>
                                                 </div>
@@ -1592,7 +1617,10 @@ class AdditionalDetailsGCV extends Component {
                                                         { tpaInsurance.map((relations, qIndex) => 
                                                             <option value={relations.repository_id}>{relations.name}</option>                                        
                                                         )}
-                                                        </Field>     
+                                                        </Field> 
+													{errors.tpaInsurance && touched.tpaInsurance ? (
+                                                        <span className="errorMsg">{phrases[errors.tpaInsurance]}</span>
+                                                    ) : null}														
                                                                
                                                     </div>
                                                 </FormGroup>
