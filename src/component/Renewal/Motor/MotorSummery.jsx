@@ -260,6 +260,7 @@ class MotorSummery extends Component {
                         </Row>
                     </div> : null
             )) : 
+            parseInt(coverage.annual_premium) != 0 ?
             <div>
                 <Row>
                     <Col sm={12} md={6}>
@@ -269,7 +270,7 @@ class MotorSummery extends Component {
                     <FormGroup>₹ {Math.round(coverage.annual_premium)}  </FormGroup>                      
                     </Col>
                 </Row> 
-            </div>
+            </div> : null
         )) : null  
 
         return (	
