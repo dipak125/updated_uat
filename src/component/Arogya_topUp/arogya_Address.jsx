@@ -285,6 +285,16 @@ const validateAddress =  Yup.object().shape({
             }
             return true;
     }),
+	
+		is_eia_account2: Yup.string().when(['eIA'], {
+			is: eIA => eIA == 0, 
+			then: Yup.string().required('RequiredField')
+		}), 
+		
+		tpaInsurance: Yup.string().when(['is_eia_account2'], {
+			is: is_eia_account2 => is_eia_account2 == 1, 
+			then: Yup.string().required('RequiredField')
+		})
 
 });
 
@@ -349,7 +359,9 @@ class arogya_Address extends Component {
                 let netPremiumCheck = policy_holder.request_data.net_premium;
 				
 				
-				let is_eia_account2 = decryptResp.data.policyHolder.create_eia_account == 1 ? "" : decryptResp.data.policyHolder.create_eia_account;
+				//let is_eia_account2 = decryptResp.data.policyHolder.create_eia_account == 1 ? "" : decryptResp.data.policyHolder.create_eia_account;
+				
+				let is_eia_account2 = ((decryptResp.data.policyHolder.create_eia_account === 1) || (decryptResp.data.policyHolder.create_eia_account === 0))? decryptResp.data.policyHolder.create_eia_account : "";
 				 
 				 
 				 let tpaInsurance = decryptResp.data.policyHolder.T_Insurance_Repository_id ? decryptResp.data.policyHolder.T_Insurance_Repository_id : "";
@@ -456,6 +468,16 @@ class arogya_Address extends Component {
         const policyHolder_id =  localStorage.getItem('policyHolder_id');
         const formData = new FormData();
 
+			let create_eia_account;
+			if(values.is_eia_account2==='')
+			{
+				 create_eia_account = 2;
+			}
+			else
+			{
+				 create_eia_account = values.is_eia_account2;
+			}
+
         let formArr = []
         
         formArr['policy_holder_id'] = policyHolder_id;
@@ -531,7 +553,7 @@ class arogya_Address extends Component {
             formArr['eia_account_no'] = values.eia_account_no;
         }  
 			
-		formArr['create_eia_account'] = values.is_eia_account2;
+		formArr['create_eia_account'] = create_eia_account;
         formArr['tpaInsurance'] = values.tpaInsurance;
 		
 
@@ -1339,6 +1361,11 @@ class arogya_Address extends Component {
                                                         <span className="checkmark" />
                                                         <span className="fs-14">{phrases['No']}</span>
                                                         
+														{errors.is_eia_account2 && touched.is_eia_account2 ? (
+                                                        <span className="errorMsg">{phrases[errors.is_eia_account2]}</span>
+														) : null}
+														
+														
                                                     </label>
                                                 </div>
                                             </div>
@@ -1371,7 +1398,10 @@ class arogya_Address extends Component {
                                                         { tpaInsurance.map((relations, qIndex) => 
                                                             <option value={relations.repository_id}>{relations.name}</option>                                        
                                                         )}
-                                                        </Field>     
+                                                        </Field>
+														{errors.tpaInsurance && touched.tpaInsurance ? (
+                                                        <span className="errorMsg">{phrases[errors.tpaInsurance]}</span>
+														) : null}		
                                                                
                                                     </div>
                                                 </FormGroup>

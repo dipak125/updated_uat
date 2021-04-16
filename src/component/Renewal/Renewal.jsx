@@ -57,7 +57,7 @@ class renewal extends Component {
     }
     forward = (policy_type) => {
         if(policy_type == '1') {
-            this.props.history.push(`/MotorSummery`);
+            this.props.history.push(`/MotorCoverages`);
         }
         else {
             this.props.history.push(`/HealthSummery`);
@@ -139,6 +139,7 @@ class renewal extends Component {
             .then(res => {
                 if(res.data.error == false){
                 localStorage.setItem("policyHolder_refNo", res.data.data.reference_no)	
+                localStorage.setItem("policyHolder_id", res.data.data.policyHolder_id)
                 let policy_type = res.data.data.policy_type ? res.data.data.policy_type : "";
                 this.props.loadingStop();
                 this.forward(policy_type)

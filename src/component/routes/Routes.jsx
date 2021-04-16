@@ -481,6 +481,11 @@ const MotorSummery = Loadable({
     loading: () => loadingContent
 });
 
+const MotorCoverages = Loadable({
+    loader: () => import(/*webpackChunkName: "Products" */"../Renewal/Motor/MotorCoverages.jsx"),
+    loading: () => loadingContent
+});
+
 const HealthSummery = Loadable({
     loader: () => import(/*webpackChunkName: "Products" */"../Renewal/Health/HealthSummery.jsx"),
     loading: () => loadingContent
@@ -675,6 +680,7 @@ class Routes extends Component {
                         {/************ Renewal ******************/}
 						<PrivateRoute exact path="/Renewal" component={Renewal} />     
                         <PrivateRoute exact path="/MotorSummery" component={MotorSummery} />   
+                        <PrivateRoute exact path="/MotorCoverages" component={MotorCoverages} />
                         <PrivateRoute exact path="/HealthSummery" component={HealthSummery} />   
                         <PrivateRoute exact path="/ThankYouRenewal" component={ThankYouRenewal} />             
 						

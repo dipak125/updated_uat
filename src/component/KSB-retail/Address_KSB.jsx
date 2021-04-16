@@ -90,12 +90,23 @@ const validateAddress =  Yup.object().shape({
     phoneNo: Yup.string()
     .matches(/^[6-9][0-9]{9}$/,'Invalid Mobile number').required('Mobile No. is required'),
    
-    panNo: Yup.string()
+    /*panNo: Yup.string()
         .notRequired(function() {
             return "Enter PAN number"
         }).matches(/^[A-Z]{3}[CPHFATBLJG]{1}[A-Z]{1}[0-9]{4}[A-Z]{1}$/, function() {
             return "Please enter valid Pan Number"
         }),
+		*/
+	panNo: Yup.string()
+    .required(function() {		
+			if ((document.querySelector('input[name="is_eia_account2"]:checked')) && (document.querySelector('input[name="is_eia_account2"]:checked').value == 1 )) {
+				
+                return "Enter PAN number";
+            }
+    }).matches(/^[A-Z]{3}[CPHFATBLJG]{1}[A-Z]{1}[0-9]{4}[A-Z]{1}$/, function() {
+        return "Please enter valid Pan Number"
+    }),
+		
     pincode: Yup.string()
         .required(function() {
             return "Enter pin code"
@@ -302,6 +313,17 @@ const validateAddress =  Yup.object().shape({
         .max(14, function() {
             return "CKYC no must be maximum 14 characters"
         }).matches(/^[1245][0-9]{0,13}$/,'Please enter valid CKYC no').notRequired('CKYC no is required'),
+		
+		
+		is_eia_account2: Yup.string().when(['is_eia_account'], {
+			is: is_eia_account => is_eia_account == 0, 
+			then: Yup.string().required('RequiredField')
+		}), 
+		
+		tpaInsurance: Yup.string().when(['is_eia_account2'], {
+			is: is_eia_account2 => is_eia_account2 == 1, 
+			then: Yup.string().required('RequiredField')
+		}),
 
 
 });
@@ -375,12 +397,14 @@ class Address extends Component {
         this.props.loadingStart();
         axios.get(`ksb/details/${policyHolder_refNo}`)
             .then(res=>{
+				
                 let policy_holder =  res.data.data.policyHolder;
                 let family_members = res.data.data.policyHolder.request_data.family_members
                 let addressDetails = JSON.parse(res.data.data.policyHolder.address)
                 let is_eia_account = res.data.data.policyHolder.is_eia_account == 2 ? "" : res.data.data.policyHolder.is_eia_account
 				
-				let is_eia_account2 = res.data.data.policyHolder.is_eia_account2 == 2 ? "" : res.data.data.policyHolder.is_eia_account2
+				
+				let is_eia_account2 = ((res.data.data.policyHolder.create_eia_account === 1) || (res.data.data.policyHolder.create_eia_account === 0))? res.data.data.policyHolder.create_eia_account : "";
 				
 				
                 let is_ckyc_account =  res.data.data.policyHolder.ckyc_no == 2 ? "" : res.data.data.policyHolder.ckyc_no
@@ -403,7 +427,8 @@ class Address extends Component {
 					is_eia_account2,
                     is_ckyc_account,
                     pincode_Details,
-                    ksbinfo
+                    ksbinfo,
+					is_eia_account2
                 })
                 this.fetchPrevAreaDetails(pincode_Details)
                 
@@ -477,6 +502,16 @@ class Address extends Component {
         const {productId } = this.props.match.params
         const policyHolder_id =  localStorage.getItem('policyHolder_id');
         const formData = new FormData();
+		
+			let create_eia_account;
+			if(values.is_eia_account2==='')
+			{
+				 create_eia_account = 2;
+			}
+			else
+			{
+				 create_eia_account = values.is_eia_account2;
+			}
 
         let formArr = []
         
@@ -514,10 +549,11 @@ class Address extends Component {
         formArr['phoneNo'] = values.phoneNo;
         formArr['email_id'] = values.email;
         formArr['is_eia_account'] = values.is_eia_account;     
-		formArr['is_eia_account2'] = values.is_eia_account2; 		
+		//formArr['is_eia_account2'] = values.is_eia_account2; 		
         formArr['ckyc_no'] = values.is_ckyc_account;
         formArr['page_name'] = `Address_KSB/${productId}`;
 		
+		formArr['create_eia_account'] = create_eia_account;
 		formArr['tpaInsurance'] = values.tpaInsurance; 
 		
 		
@@ -549,8 +585,8 @@ class Address extends Component {
         if(values.is_ckyc_account == 1){
             formArr['ckyc_account_no'] = values.ckyc_account_no;
         }  
-        
-
+   console.log('formArr==');     
+console.log(formArr);
         let formObj = {}
         Object.assign(formObj,formArr);
         let encryption = new Encryption();
@@ -595,7 +631,9 @@ class Address extends Component {
         if(value == 1){
             this.setState({
                 showEIA:true,
-                is_eia_account:1
+                is_eia_account:1,
+				showEIA2:false,
+				is_eia_account2:0
             })
         }
         else{
@@ -667,6 +705,8 @@ class Address extends Component {
             proposerGender : policy_holder && policy_holder.gender ?  policy_holder.gender : '',
             is_ckyc_account: is_ckyc_account,
             ckyc_account_no: policy_holder && policy_holder.ckyc_account_no ?  policy_holder.ckyc_account_no : '',
+			
+			tpaInsurance: policy_holder && policy_holder.T_Insurance_Repository_id ? policy_holder.T_Insurance_Repository_id : ""
 			
         });
 
@@ -1368,7 +1408,9 @@ class Address extends Component {
                                                     />
                                                         <span className="checkmark" />
                                                         <span className="fs-14">{phrases['No']}</span>
-                                                        
+                                                        {errors.is_eia_account2 && touched.is_eia_account2 ? (
+                                                        <span className="errorMsg">{phrases[errors.is_eia_account2]}</span>
+                                                    ) : null}
                                                     </label>
                                                 </div>
                                             </div>
@@ -1401,7 +1443,10 @@ class Address extends Component {
                                                         { tpaInsurance.map((relations, qIndex) => 
                                                             <option value={relations.repository_id}>{relations.name}</option>                                        
                                                         )}
-                                                        </Field>     
+                                                        </Field>  
+														{errors.tpaInsurance && touched.tpaInsurance ? (
+                                                        <span className="errorMsg">{phrases[errors.tpaInsurance]}</span>
+														) : null}
                                                                
                                                     </div>
                                                 </FormGroup>

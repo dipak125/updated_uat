@@ -169,7 +169,7 @@ class MotorSummery extends Component {
     }	
     Razor_payment = () => {	
         const { policyHolder_refNo } = this.state;	
-        window.location = `${process.env.REACT_APP_PAYMENT_URL}/razorpay/pay.php?refrence_no=${policyHolder_refNo}`	
+        window.location = `${process.env.REACT_APP_PAYMENT_URL}/razorpay/renewal_pay.php?refrence_no=${policyHolder_refNo}`	
     }	
     paypoint_payment = () => {	
         const { policyHolder_refNo } = this.state;	

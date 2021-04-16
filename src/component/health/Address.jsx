@@ -278,6 +278,16 @@ const validateAddress =  Yup.object().shape({
             }
             return true;
     }),
+	
+		is_eia_account2: Yup.string().when(['eIA'], {
+			is: eIA => eIA == 0, 
+			then: Yup.string().required('RequiredField')
+		}), 
+		
+		tpaInsurance: Yup.string().when(['is_eia_account2'], {
+			is: is_eia_account2 => is_eia_account2 == 1, 
+			then: Yup.string().required('RequiredField')
+		}),
 
 });
 
@@ -363,11 +373,9 @@ class Address extends Component {
                     }
                 }
 				
-				let is_eia_account2 = res.data.data.policyHolder.create_eia_account == 1 ? res.data.data.policyHolder.create_eia_account : "";
-				//let is_eia_account2 = res.data.data.policyHolder.create_eia_account;
-				 
-				//console.log('is_eia_account2==');
-				//console.log(is_eia_account2);
+				//let is_eia_account2 = res.data.data.policyHolder.create_eia_account == 1 ? res.data.data.policyHolder.create_eia_account : "";
+				
+				let is_eia_account2 = ((res.data.data.policyHolder.create_eia_account === 1) || (res.data.data.policyHolder.create_eia_account === 0))? res.data.data.policyHolder.create_eia_account : "";
 				 
 				let tpaInsurance = res.data.data.policyHolder.T_Insurance_Repository_id ? res.data.data.policyHolder.T_Insurance_Repository_id : "";
                 
@@ -465,6 +473,16 @@ class Address extends Component {
         const policyHolder_id =  localStorage.getItem('policyHolder_id');
         const formData = new FormData();
 
+			let create_eia_account;
+			if(values.is_eia_account2==='')
+			{
+				 create_eia_account = 2;
+			}
+			else
+			{
+				 create_eia_account = values.is_eia_account2;
+			}
+			
         let formArr = []
         
         formArr['policy_holder_id'] = policyHolder_id;
@@ -534,8 +552,9 @@ class Address extends Component {
             formArr['eia_account_no'] = values.eia_account_no;
         } 
 
-		formArr['create_eia_account'] = values.is_eia_account2;
-        formArr['tpaInsurance'] = values.tpaInsurance;		
+		formArr['create_eia_account'] = create_eia_account;
+        formArr['tpaInsurance'] = values.tpaInsurance;	
+		
 
         let formObj = {}
         Object.assign(formObj,formArr);
@@ -1266,7 +1285,9 @@ class Address extends Component {
                                                     />
                                                         <span className="checkmark" />
                                                         <span className="fs-14">{phrases['No']}</span>
-                                                        
+                                                        {errors.is_eia_account2 && touched.is_eia_account2 ? (
+                                                        <span className="errorMsg">{phrases[errors.is_eia_account2]}</span>
+														) : null}
                                                     </label>
                                                 </div>
                                             </div>
@@ -1299,7 +1320,10 @@ class Address extends Component {
                                                         { tpaInsurance.map((relations, qIndex) => 
                                                             <option value={relations.repository_id}>{relations.name}</option>                                        
                                                         )}
-                                                        </Field>     
+                                                        </Field>   
+														{errors.tpaInsurance && touched.tpaInsurance ? (
+                                                        <span className="errorMsg">{phrases[errors.tpaInsurance]}</span>
+														) : null}
                                                                
                                                     </div>
                                                 </FormGroup>
