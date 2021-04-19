@@ -27,11 +27,12 @@ import {
 
 const ageObj = new PersonAge();
 let encryption = new Encryption();
-let maxRegnDate=  moment() 
-const activeMinDate =  moment(moment().subtract(1, 'years').calendar()).add(1, 'day').calendar();
+
 const minRegnDate = moment(moment().subtract(1, 'years').calendar()).add(0, 'day').calendar();
-const minDate =  moment(moment().subtract(1, 'years').calendar()).add(1, 'day').calendar();
-const maxDate = moment(moment().subtract(1, 'years').calendar()).add(1, 'day').calendar();
+let maxRegnDate=  moment()
+const activeMinDate =  moment(moment().subtract(1, 'years').calendar()).add(1, 'day').calendar();
+const activeMaxDate = moment(activeMinDate).endOf('month').format('YYYY-MM-DD hh:mm');
+const minDatePyp =  moment(moment().subtract(1, 'years').calendar()).add(1, 'day').calendar();
 const maxDatePyp = moment(moment().subtract(1, 'years').calendar()).add(1, 'month').calendar();
 
 const ncbArr = {
@@ -750,7 +751,7 @@ class TwoWheelerVehicleDetailsOD extends Component {
                                                         <DatePicker
                                                             name={phrases['active_start_date']}
                                                             minDate={new Date(activeMinDate)}
-                                                            maxDate={new Date(maxDate)}
+                                                            maxDate={new Date(activeMaxDate)}
                                                             dateFormat="dd MMM yyyy"
                                                             placeholderText={phrases['APSD']}
                                                             peekPreviousMonth
@@ -896,7 +897,7 @@ class TwoWheelerVehicleDetailsOD extends Component {
 
                                                         <DatePicker
                                                             name={phrases['previous_start_date']}
-                                                            minDate={new Date(minDate)}
+                                                            minDate={new Date(minDatePyp)}
                                                             maxDate={new Date(maxDatePyp)}
                                                             dateFormat="dd MMM yyyy"
                                                             placeholderText={phrases['PPSD']}
@@ -904,7 +905,7 @@ class TwoWheelerVehicleDetailsOD extends Component {
                                                             peekPreviousYear
                                                             showMonthDropdown
                                                             showYearDropdown
-                                                            openToDate = {values.previous_start_date ? values.previous_start_date : new Date(minDate)}
+                                                            openToDate = {values.previous_start_date ? values.previous_start_date : new Date(minDatePyp)}
                                                             dropdownMode="select"
                                                             className="datePckr inputfs12"
                                                             selected={values.previous_start_date}
