@@ -106,11 +106,21 @@ class ClaimStatus extends Component {
         this.props.loadingStart();
         axios.post(`/claim/search`, formData)
             .then(res => {
-                let claim_search = res.data.data.claim_search
-                this.setState({
-                    claim_search
-                })
-                this.props.loadingStop();
+                if(res.data.error == false){
+                    let claim_search = res.data.data.claim_search
+                    this.setState({
+                        claim_search
+                    })
+                    this.props.loadingStop();
+                }
+                else {
+                    swal(res.data.msg)
+                    this.setState({
+                        claim_search : []
+                    })
+                    this.props.loadingStop();
+                }
+               
             })
             .catch(err => {
                 // handle error

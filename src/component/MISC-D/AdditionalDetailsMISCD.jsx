@@ -128,8 +128,8 @@ const ownerValidation = Yup.object().shape({
         otherwise: Yup.date().nullable()
     }),
 
-    pancard: Yup.string().when(['policy_for','is_eia_account2','net_premium'], {
-        is: (policy_for,is_eia_account2,net_premium) => (policy_for == '1' && is_eia_account2=='1') || (policy_for == '1' && net_premium >= 100000), 
+    pancard: Yup.string().when(['is_eia_account2','net_premium'], {
+        is: (is_eia_account2,net_premium) => (is_eia_account2=='1') || (net_premium >= 100000), 
         then: Yup.string().required().test(
             "1LakhChecking",
 			function(){return "EnterPan"; },
@@ -1252,6 +1252,28 @@ class AdditionalDetailsMISCD extends Component {
                                             </div>
                                         </FormGroup>
                                     </Col>
+                                    {showEIA2 || is_eia_account2 == '1' ?
+                                    <Col sm={12} md={4} lg={4}>
+                                        <FormGroup>
+                                            <div className="insurerName">
+                                            <Field
+                                                name='pancard'
+                                                type="text"
+                                                placeholder={phrases['PAN']}
+                                                autoComplete="off"
+                                                onFocus={e => this.changePlaceHoldClassAdd(e)}
+                                                onBlur={e => this.changePlaceHoldClassRemove(e)}
+                                                value = {values.pancard.toUpperCase()} 
+                                                onChange= {(e)=> 
+                                                    setFieldValue('pancard', e.target.value.toUpperCase())
+                                                    }                                                                           
+                                            />
+                                            {errors.pancard && touched.pancard ? (
+                                            <span className="errorMsg">{errors.pancard}</span>
+                                            ) : null} 
+                                            </div>
+                                        </FormGroup>
+                                    </Col> : null }
                                 </Row> : null }
                                 
                                 <Row>

@@ -381,7 +381,7 @@ const Coverage = {
     "B00069":  translation["B00069"],
     "B00070":  translation["B00070"],
     "B00071":  translation["B00071"],
-    "B00015":  translation["B00015"],
+    "700000353":  translation["700000353"],
     "B00073":  translation["B00073"],
 
     "B00018":  translation["B00018"],
@@ -412,7 +412,7 @@ class MotorCoverages extends Component {
             show: false,
             sliderVal: '',
             motorInsurance: [],
-            add_more_coverage: ['B00015'],
+            add_more_coverage: [],
             vahanDetails: [],
             vahanVerify: false,
             policyCoverage: [],
@@ -532,13 +532,11 @@ class MotorCoverages extends Component {
                 // let decryptResp = JSON.parse(encryption.decrypt(res.data))
                 let decryptResp = res.data
                 let add_more_coverage = []
+                let add_more_coverage_request_array = []
                 let motorInsurance = decryptResp.data.policyHolder ? decryptResp.data.policyHolder.motorinsurance : {}
                 let request_data = decryptResp.data.policyHolder ? decryptResp.data.policyHolder.request_data : {};
                 let vehicleDetails = decryptResp.data.policyHolder ? decryptResp.data.policyHolder.vehiclebrandmodel : {};
                 let policyCoverage = decryptResp.data.policyHolder && decryptResp.data.policyHolder.renewalinfo && decryptResp.data.policyHolder.renewalinfo.renewalcoverage ? decryptResp.data.policyHolder.renewalinfo.renewalcoverage : []
-                // for(var i = 0; i<policyCoverage.length; i++) {
-                //     add_more_coverage.push()
-                // }
                 policyCoverage.map((coverage,Index) => {
                     add_more_coverage.push(coverage.cover_type_id)
                     coverage.renewalsubcoverage && coverage.renewalsubcoverage.length > 0 && coverage.renewalsubcoverage.map((benefit, bIndex) => (
@@ -546,8 +544,10 @@ class MotorCoverages extends Component {
                         ))
                 })
 
+                add_more_coverage_request_array = decryptResp.data.policyHolder && decryptResp.data.policyHolder.renewalinfo && decryptResp.data.policyHolder.renewalinfo.quote_response ? JSON.parse(decryptResp.data.policyHolder.renewalinfo.quote_response) : []
+                add_more_coverage_request_array = add_more_coverage_request_array && add_more_coverage_request_array.policySOABO.insuredSOABOList.policyCtSOABOList
                 this.setState({
-                    motorInsurance, request_data, vehicleDetails,policyCoverage,add_more_coverage,
+                    motorInsurance, request_data, vehicleDetails,policyCoverage,add_more_coverage,add_more_coverage_request_array,
                     selectFlag: motorInsurance && motorInsurance.add_more_coverage != null ? '0' : '1',
 
                 })
@@ -560,24 +560,7 @@ class MotorCoverages extends Component {
             })
     }
 
-    // getAccessToken = (values) => {
-    //     this.props.loadingStart();
-    //     axios
-    //       .post(`/callTokenService`)
-    //       .then((res) => {
-    //         this.setState({
-    //           accessToken: res.data.access_token,
-    //         });
-    //         this.fullQuote(res.data.access_token, values)
-    //       })
-    //       .catch((err) => {
-    //         this.setState({
-    //           accessToken: '',
-    //         });
-    //         this.props.loadingStop();
-    //       });
-    //   };
-
+  
       getFuelList = (values) => {
         this.props.loadingStart();
         axios
@@ -716,7 +699,7 @@ class MotorCoverages extends Component {
                 setFieldTouched("PA_flag");
                 setFieldValue("PA_flag", '1');
             }  
-            if(value == "B00015") {
+            if(value == "700000353") {
                 setFieldTouched("PA_cover_flag");
                 setFieldValue("PA_cover_flag", '1');
             }  
@@ -799,7 +782,7 @@ class MotorCoverages extends Component {
                 setFieldTouched("PA_Cover");
                 setFieldValue("PA_Cover", '');
             } 
-            if(value == "B00015") {
+            if(value == "700000353") {
                 setFieldTouched("PA_cover_flag");
                 setFieldValue("PA_cover_flag", '0');
             }      
@@ -1061,7 +1044,7 @@ class MotorCoverages extends Component {
         let nonElectric_flag= add_more_coverage_request_array.B00003 && add_more_coverage_request_array.B00003.value ? '1' : '0'
         let hospital_cash_OD_flag= add_more_coverage_request_array.B00020 && add_more_coverage_request_array.B00020.value ? '1' : '0'
         let hospital_cash_PD_flag= add_more_coverage_request_array.B00022 && add_more_coverage_request_array.B00022.value ? '1' : '0'
-        let LL_PD_flag= add_more_coverage["700000351"] ? '1' : '1'
+        let LL_PD_flag= add_more_coverage.indexOf("700000351") ? '1' : '0'
         let LL_Emp_flag= add_more_coverage_request_array.B00012 && add_more_coverage_request_array.B00012.value ? '1' : '0'
         let LL_Coolie_flag= add_more_coverage_request_array.B00069 && add_more_coverage_request_array.B00069.value ? '1' : '0'
         let enhance_PA_OD_flag= add_more_coverage_request_array.B00018 && add_more_coverage_request_array.B00018.value ? '1' : '0'
@@ -1084,7 +1067,7 @@ class MotorCoverages extends Component {
                 engine_no: motorInsurance.engine_no ? motorInsurance.engine_no : (engine_no ? engine_no : ""),
                 vahanVerify: vahanVerify,
                 newRegistrationNo: localStorage.getItem('registration_number') == "NEW" ? localStorage.getItem('registration_number') : "",
-                B00015: motorInsurance && motorInsurance.policy_for == '2' ? "" : "B00015",
+                // 700000353: motorInsurance && motorInsurance.policy_for == '2' ? "" : "700000353",
                 // B00005 : vehicleDetails && vehicleDetails.varientmodel && (vehicleDetails.varientmodel.fueltype.id == 8 || vehicleDetails.varientmodel.fueltype.id == 9) ? "B00005" : "",
                 B00006 : vehicleDetails && vehicleDetails.varientmodel && (vehicleDetails.varientmodel.fueltype.id == 3 || vehicleDetails.varientmodel.fueltype.id == 4) ? "B00006" : "",
                 B00010 : vehicleDetails && vehicleDetails.varientmodel && (vehicleDetails.varientmodel.fueltype.id == 3 || vehicleDetails.varientmodel.fueltype.id == 4) ? "B00010" : "",               
@@ -1138,7 +1121,7 @@ class MotorCoverages extends Component {
                     LL_workman_flag: '0',
                     fuel_type: fuel_type,
                     trailer_flag_TP: '0',
-                    B00015 : "",
+                    // 700000353 : "",
                     // B00005 : "",
                     B00010 : "",
                     trailer_array:  this.initClaimDetailsList(),
@@ -1176,7 +1159,7 @@ class MotorCoverages extends Component {
         newInnitialArray.B00018_value = add_more_coverage_request_array.B00018 ? add_more_coverage_request_array.B00018.value : ""
         newInnitialArray.B00069_value = add_more_coverage_request_array.B00069 ? add_more_coverage_request_array.B00069.value : ""
         newInnitialArray.B00012_value = add_more_coverage_request_array.B00012 ? add_more_coverage_request_array.B00012.value : ""
-        newInnitialArray['700000351_value'] = add_more_coverage_request_array.B00013 ? add_more_coverage_request_array.B00013.value : ""
+        // newInnitialArray['700000351_value'] = add_more_coverage_request_array.B00013 ? add_more_coverage_request_array.B00013.value : ""
         newInnitialArray.B00022_value = add_more_coverage_request_array.B00022 ? add_more_coverage_request_array.B00022.value : ""
         newInnitialArray.B00020_value = add_more_coverage_request_array.B00020 ? add_more_coverage_request_array.B00020.value : ""
         newInnitialArray.B00004_value = add_more_coverage_request_array.B00004 ? add_more_coverage_request_array.B00004.value : ""
@@ -1199,17 +1182,22 @@ class MotorCoverages extends Component {
         newInnitialArray.GeoExtnPakistan = geographical_extension ? geographical_extension[geographical_extension.indexOf("GeoExtnPakistan")] : ""
         newInnitialArray.GeoExtnSriLanka = geographical_extension ? geographical_extension[geographical_extension.indexOf("GeoExtnSriLanka")] : ""
 
+        add_more_coverage_request_array && add_more_coverage_request_array.map((value,index) => {   
+            value && value.policyCtAcceSOABOList && value.policyCtAcceSOABOList.length>0 && value.policyCtAcceSOABOList.map((subValue,subIndex)=>{
+                console.log("subValue-------------- ", subValue)
+                if(subValue.interestId == '700000351') {
+                    newInnitialArray['700000351_value'] = subValue.fieldValueMap.NoofPaidDrivers_BT
+                }
+
+            })
+        }
+        )   
+
         newInitialValues = Object.assign(initialValue, newInnitialArray );
 
 // -------------------------------------------------------
         let OD_TP_premium = serverResponse.PolicyLobList ? serverResponse.PolicyLobList[0].PolicyRiskList[0] : []
         let TRAILOR_OD_PREMIUM = 0
-
-        // policyCoverage.map((coverage, qIndex) => (
-        //     coverage.PolicyBenefitList && coverage.PolicyBenefitList.map((benefit, bIndex) => (
-        //         benefit.ProductElementCode == 'B00007' ? TRAILOR_OD_PREMIUM+=benefit.AnnualPremium : 0
-        //     ))
-        // ))
 
         let productCount = 1;
         let ncbCount = 1;
@@ -1319,12 +1307,6 @@ class MotorCoverages extends Component {
 						</div>
 						</aside>
 								
-					 {/*<div className="col-sm-12 col-md-12 col-lg-2 col-xl-2 pd-l-0">        
-						<SideNav />
-             		 </div>*/}
-					
-					
-					
                 <div className="col-sm-12 col-md-12 col-lg-12 col-xl-12 infobox ocGcv">
                 <h4 className="text-center mt-3 mb-3">{phrases['SBIGICL']}</h4>
                 <section className="brand colpd m-b-25">
@@ -1340,8 +1322,8 @@ class MotorCoverages extends Component {
                     // validationSchema={ComprehensiveValidation}
                     >
                     {({ values, errors, setFieldValue, setFieldTouched, isValid, isSubmitting, touched }) => {
-console.log("add_more_coverage-------------- ", add_more_coverage)
-console.log("values-------------- ", values)
+// console.log("add_more_coverage_request_array-------------- ", add_more_coverage_request_array)
+// console.log("values-------------- ", values)
                     return (
                         <Form>
                         <Row>

@@ -78,15 +78,23 @@ const ownerValidation = Yup.object().shape({
             return true;
         }
     ),
-    pancard: Yup.string()
-    .required(function() {		
-			if ((document.querySelector('input[name="is_eia_account2"]:checked')) && (document.querySelector('input[name="is_eia_account2"]:checked').value == 1 )) {
-				
-                return "Enter PAN number";
-            }
-    }).matches(/^[A-Z]{3}[CPHFATBLJG]{1}[A-Z]{1}[0-9]{4}[A-Z]{1}$/, function() {
-        return "Please enter valid Pan Number"
-    }),
+    pancard: Yup.string().when(['is_eia_account2','net_premium'], {
+        is: (is_eia_account2,net_premium) => (is_eia_account2=='1') || (net_premium >= 100000), 
+        then: Yup.string().required().test(
+            "1LakhChecking",
+			function(){return "EnterPan"; },
+            function (value) {
+                if (!value) {
+                    return this.parent.net_premium <= 100000
+                }
+                 return true;
+				 
+        }).matches(/^[A-Z]{3}[CPHFATBLJG]{1}[A-Z]{1}[0-9]{4}[A-Z]{1}$/, function() {
+            return "ValidPan"
+        }),
+        otherwise: Yup.string()
+    }), 
+
     pincode_id:Yup.string().required('LocationRequired'),
 
     pincode:Yup.string().required('PincodeRequired')
@@ -662,11 +670,15 @@ console.log('post_data', post_data);
             <>
                 <BaseComponent>
                 {phrases ? 
+                <div className="page-wrapper">				
                 <div className="container-fluid">
-                <div className="row">
-                    <div className="col-sm-12 col-md-12 col-lg-2 col-xl-2 pd-l-0">
-                        <SideNav />
+                    <div className="row">			
+                    <aside className="left-sidebar">
+                      <div className="scroll-sidebar ps-container ps-theme-default ps-active-y">
+                     <SideNav />
                     </div>
+                    </aside>
+
                 <div className="col-sm-12 col-md-12 col-lg-10 col-xl-10 infobox">
                 <h4 className="text-center mt-3 mb-3">{phrases['SBIGICL']}</h4>
                 <section className="brand m-b-25">
@@ -1388,7 +1400,7 @@ console.log('post_data', post_data);
                 </div>
                 <Footer />
                 </div>
-                </div> : null }
+                </div> </div> : null }
                 </BaseComponent>
             </>
         );
