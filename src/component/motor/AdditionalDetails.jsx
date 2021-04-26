@@ -465,19 +465,17 @@ console.log('post_data', post_data);
                  let nomineeDetails = decryptResp.data.policyHolder ? decryptResp.data.policyHolder.request_data.nominee[0] : {}
                  let is_loan_account = decryptResp.data.policyHolder ? decryptResp.data.policyHolder.is_carloan : 0
                  let quoteId = decryptResp.data.policyHolder ? decryptResp.data.policyHolder.request_data.quote_id : ""
-                 let is_eia_account=  policyHolder && (policyHolder.is_eia_account == 0 || policyHolder.is_eia_account == 1) ? policyHolder.is_eia_account : ""
-                 
+                 let is_eia_account=  policyHolder && (policyHolder.is_eia_account == 0 || policyHolder.is_eia_account == 1) ? policyHolder.is_eia_account : ""             
 				 let is_eia_account2=  policyHolder && (policyHolder.create_eia_account == 0 || policyHolder.create_eia_account == 1) ? policyHolder.create_eia_account : ""
-				 
 				 
 				 let tpaInsurance = policyHolder.T_Insurance_Repository_id ? policyHolder.T_Insurance_Repository_id : ""
 				 
-				 
+                 let request_data = decryptResp.data.policyHolder ? decryptResp.data.policyHolder.request_data : {};
                  let bankDetails = decryptResp.data.policyHolder && decryptResp.data.policyHolder.bankdetail ? decryptResp.data.policyHolder.bankdetail[0] : {};
                  let addressDetails = JSON.parse(decryptResp.data.policyHolder.pincode_response)
                  this.setState({
                     quoteId, motorInsurance, previousPolicy, vehicleDetails, policyHolder, nomineeDetails, is_loan_account, is_eia_account,is_eia_account2, bankDetails, addressDetails,
-                    is_appointee: nomineeDetails ? nomineeDetails.is_appointee : ""
+                    is_appointee: nomineeDetails ? nomineeDetails.is_appointee : "", request_data
                 })
                 this.props.loadingStop();
                 this.fetchPrevAreaDetails(addressDetails)
@@ -623,7 +621,7 @@ console.log('post_data', post_data);
 
     render() {
         const {showEIA, showEIA2, is_eia_account,is_eia_account2, showLoan, is_loan_account, nomineeDetails, is_appointee,appointeeFlag, titleList,tpaInsurance,
-            bankDetails,policyHolder, stateName, pinDataArr, quoteId, addressDetails, relation, motorInsurance} = this.state
+            bankDetails,policyHolder, stateName, pinDataArr, quoteId, addressDetails, relation, motorInsurance,request_data} = this.state
         const {productId} = this.props.match.params 
         let phrases = localStorage.getItem("phrases") ? JSON.parse(localStorage.getItem("phrases")) : null        
 
@@ -654,6 +652,7 @@ console.log('post_data', post_data);
             appointee_name: nomineeDetails && nomineeDetails.appointee_name ? nomineeDetails.appointee_name : "",
             salutation_id: policyHolder && policyHolder.salutation_id ? policyHolder.salutation_id : "",        
             nominee_salutation: nomineeDetails && nomineeDetails.gender ? nomineeDetails.title_id : "",
+            net_premium: request_data && request_data.net_premium ? request_data.net_premium : "0",
 			
 			tpaInsurance: policyHolder && policyHolder.T_Insurance_Repository_id ? policyHolder.T_Insurance_Repository_id : "",
 			

@@ -1,27 +1,25 @@
 import React, { Component, Fragment } from 'react';
 import { Row, Col, Modal, Button, FormGroup, OverlayTrigger, Tooltip } from 'react-bootstrap';
 import Collapsible from 'react-collapsible';
+import BackContinueButton from '../common/button/BackContinueButton';
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css"
 import 'react-datepicker/dist/react-datepicker-cssmodules.min.css'
 import { Formik, Field, Form, FieldArray } from "formik";
-import BaseComponent from '../.././BaseComponent';
-import SideNav from '../../common/side-nav/SideNav';
-import Footer from '../../common/footer/Footer';
+import BaseComponent from '.././BaseComponent';
+import SideNav from '../common/side-nav/SideNav';
+import Footer from '../common/footer/Footer';
 import { withRouter } from 'react-router-dom';
-import { loaderStart, loaderStop } from "../../../store/actions/loader";
+import { loaderStart, loaderStop } from "../../store/actions/loader";
 import { connect } from "react-redux";
-import axios from "../../../shared/axios"
-import Encryption from '../../../shared/payload-encryption';
+import axios from "../../shared/axios"
+import Encryption from '../../shared/payload-encryption';
 import * as Yup from "yup";
 import swal from 'sweetalert';
 import moment from "moment";
-import queryString from 'query-string';	
-import {  validRegistrationNumber } from "../../../shared/validationFunctions";
-// GCV Comprehensive copy-----------
+import {  validRegistrationNumber } from "../../shared/validationFunctions";
 
 let translation = localStorage.getItem("phrases") ? JSON.parse(localStorage.getItem("phrases")) : []
-
 
 const insert = (arr, index, newItem) => [
     // part of the array before the specified index
@@ -381,7 +379,7 @@ const Coverage = {
     "B00069":  translation["B00069"],
     "B00070":  translation["B00070"],
     "B00071":  translation["B00071"],
-    "700000353":  translation["700000353"],
+    "B00015":  translation["B00015"],
     "B00073":  translation["B00073"],
 
     "B00018":  translation["B00018"],
@@ -393,7 +391,7 @@ const Coverage = {
 
 }
 
-class MotorCoverages extends Component {
+class OtherComprehensiveGCV extends Component {
 
     constructor(props) {
         super(props);
@@ -412,7 +410,7 @@ class MotorCoverages extends Component {
             show: false,
             sliderVal: '',
             motorInsurance: [],
-            add_more_coverage: [],
+            add_more_coverage: ['B00015'],
             vahanDetails: [],
             vahanVerify: false,
             policyCoverage: [],
@@ -450,10 +448,7 @@ class MotorCoverages extends Component {
             vehicle_age: "",
             depreciationPercentage: "",
             bodyIdvStatus: 1,
-            userIdvStatus:1,
-            policyHolder_refNo: queryString.parse(this.props.location.search).access_id ? 	
-                                queryString.parse(this.props.location.search).access_id : 	
-                                localStorage.getItem("policyHolder_refNo")
+            userIdvStatus:1
         };
     }
 
@@ -519,74 +514,112 @@ class MotorCoverages extends Component {
     }
 
     vehicleDetails = (productId) => {      
-        this.props.history.push(`/VehicleDetails_GCV/${productId}`);
+        this.props.history.push(`/VehicleDetails_GCVST/${productId}`);
     }
 
 
     fetchData = () => {
         const { productId } = this.props.match.params
-        let policyHolder_id = this.state.policyHolder_refNo ? this.state.policyHolder_refNo : '0'
+        let policyHolder_id = localStorage.getItem("policyHolder_refNo") ? localStorage.getItem("policyHolder_refNo") : 0;
         let encryption = new Encryption();
-        axios.get(`renewal/policy-details/${policyHolder_id}`)	
+        axios.get(`gcv/policy-holder/details/${policyHolder_id}`)
             .then(res => {
-                // let decryptResp = JSON.parse(encryption.decrypt(res.data))
-                let decryptResp = res.data
-                let add_more_coverage = []
-                let add_more_coverage_request_array = []
-                let geo_extention = []
-                let geographical_extension = []
+                let decryptResp = JSON.parse(encryption.decrypt(res.data))
+                console.log("decrypt--fetchData-- ", decryptResp)
                 let motorInsurance = decryptResp.data.policyHolder ? decryptResp.data.policyHolder.motorinsurance : {}
                 let request_data = decryptResp.data.policyHolder ? decryptResp.data.policyHolder.request_data : {};
-                let sliderVal = request_data && request_data.sum_insured ? parseInt(request_data.sum_insured) : ""
                 let vehicleDetails = decryptResp.data.policyHolder ? decryptResp.data.policyHolder.vehiclebrandmodel : {};
-                let policyCoverage = decryptResp.data.policyHolder && decryptResp.data.policyHolder.renewalinfo && decryptResp.data.policyHolder.renewalinfo.renewalcoverage ? decryptResp.data.policyHolder.renewalinfo.renewalcoverage : []
-                policyCoverage.map((coverage,Index) => {
-                    add_more_coverage.push(coverage.cover_type_id)
-                    coverage.renewalsubcoverage && coverage.renewalsubcoverage.length > 0 && coverage.renewalsubcoverage.map((benefit, bIndex) => (
-                        // benefit.interest_premium && parseInt(benefit.interest_premium) > 0 ? add_more_coverage.push(benefit.interest_id) : null
-                        add_more_coverage.push(benefit.interest_id)
-                        ))
-                })
-
-                add_more_coverage_request_array = decryptResp.data.policyHolder && decryptResp.data.policyHolder.renewalinfo && decryptResp.data.policyHolder.renewalinfo.quote_response ? JSON.parse(decryptResp.data.policyHolder.renewalinfo.quote_response) : []
-                add_more_coverage_request_array = add_more_coverage_request_array && add_more_coverage_request_array.policySOABO.insuredSOABOList.policyCtSOABOList
+                // console.log('motorInsurance.trailers',motorInsurance.trailers)
+                let trailer_array = motorInsurance.trailers && motorInsurance.trailers!=null ? motorInsurance.trailers : null
                 
-                geo_extention = decryptResp.data.policyHolder && decryptResp.data.policyHolder.renewalinfo && decryptResp.data.policyHolder.renewalinfo.quote_response ? JSON.parse(decryptResp.data.policyHolder.renewalinfo.quote_response) : []
-                geo_extention = geo_extention && geo_extention.policySOABO.insuredSOABOList.dynamicObjectList
-                geo_extention.map((geoCoverage,index)=> {
-                    if(geoCoverage.bizTableName == "Extention_Country" && geoCoverage.dynamicAttributeVOList && geoCoverage.dynamicAttributeVOList.valueMap 
-                    &&(geoCoverage.dynamicAttributeVOList.valueMap.Bangladesh == '1' || geoCoverage.dynamicAttributeVOList.valueMap.Bhutan == '1'
-                    || geoCoverage.dynamicAttributeVOList.valueMap.Maldives == '1' || geoCoverage.dynamicAttributeVOList.valueMap.Nepal == '1'
-                    || geoCoverage.dynamicAttributeVOList.valueMap.Pakistan == '1' || geoCoverage.dynamicAttributeVOList.valueMap.SriLanka == '1')) {
-                        add_more_coverage.push("geographical_extension")
-                        if(geoCoverage.dynamicAttributeVOList.valueMap.Bangladesh == '1'){
-                            geographical_extension.push("GeoExtnBangladesh")
-                        }
-                        if(geoCoverage.dynamicAttributeVOList.valueMap.Bhutan == '1'){
-                            geographical_extension.push("GeoExtnBhutan")
-                        }
-                        if(geoCoverage.dynamicAttributeVOList.valueMap.Maldives == '1'){
-                            geographical_extension.push("GeoExtnMaldives")
-                        }
-                        if(geoCoverage.dynamicAttributeVOList.valueMap.Nepal == '1'){
-                            geographical_extension.push("GeoExtnNepal")
-                        }
-                        if(geoCoverage.dynamicAttributeVOList.valueMap.Pakistan == '1'){
-                            geographical_extension.push("GeoExtnPakistan")
-                        }
-                        if(geoCoverage.dynamicAttributeVOList.valueMap.SriLanka == '1'){
-                            geographical_extension.push("GeoExtnSriLanka")
-                        }
+                trailer_array = trailer_array!=null ? JSON.parse(trailer_array) : []
+                let values = []
+                let add_more_coverage = []
+                let bodySliderVal = motorInsurance && motorInsurance.body_idv_value ? motorInsurance.body_idv_value : 0
+                let sliderVal = motorInsurance && motorInsurance.idv_value ? motorInsurance.idv_value : 0
+                if(vehicleDetails && vehicleDetails.varientmodel && (vehicleDetails.varientmodel.fueltype.id == 8 || vehicleDetails.varientmodel.fueltype.id == 9)) {
+                    if(motorInsurance && motorInsurance.policy_for == '1' && motorInsurance.add_more_coverage == null) {
+                        // var cov_val = ['B00015', 'B00005']
+                        var cov_val = ['B00015']
+                        add_more_coverage.push(cov_val);
                     }
-                })
+                    else if(motorInsurance && motorInsurance.policy_for == '2' && motorInsurance.add_more_coverage == null) {
+                        // var cov_val = ['B00005']
+                        var cov_val = []
+                        add_more_coverage.push(cov_val);
+                    }
+                    else {
+                        var cov_val = motorInsurance.add_more_coverage.split(",")
+                        add_more_coverage.push(cov_val);
+                    }             
+                }
+                else if(vehicleDetails && vehicleDetails.varientmodel && (vehicleDetails.varientmodel.fueltype.id == 3 || vehicleDetails.varientmodel.fueltype.id == 4)) {
+                    if(motorInsurance && motorInsurance.policy_for == '1' && motorInsurance.add_more_coverage == null) {
+                        var cov_val = ['B00015', 'B00006', 'B00010']
+                        add_more_coverage.push(cov_val);
+                    }
+                    else if(motorInsurance && motorInsurance.policy_for == '2' && motorInsurance.add_more_coverage == null) {
+                        var cov_val = ['B00006', 'B00010']
+                        add_more_coverage.push(cov_val);
+                    }
+                    else {
+                        var cov_val = motorInsurance.add_more_coverage.split(",")
+                        add_more_coverage.push(cov_val);
+                    }             
+                }
+                else {
+                    if(motorInsurance && motorInsurance.policy_for == '1' && motorInsurance.add_more_coverage == null) {
+                        var cov_val = ['B00015']
+                        add_more_coverage.push(cov_val);
+                    }
+                    else if(motorInsurance && motorInsurance.policy_for == '2' && motorInsurance.add_more_coverage == null) {
+                        var cov_val = []
+                        add_more_coverage.push(cov_val);
+                    }
+                    else {
+                        var cov_val = motorInsurance.add_more_coverage.split(",")
+                        add_more_coverage.push(cov_val);
+                    }             
+                }
+                add_more_coverage = add_more_coverage.flat()
+                values.PA_flag = motorInsurance && motorInsurance.pa_cover != "" ? '1' : '0'
+                values.PA_Cover = motorInsurance && motorInsurance.pa_cover != "" ? motorInsurance.pa_cover : '0'
+                let add_more_coverage_request_json = motorInsurance && motorInsurance.add_more_coverage_request_json != null ? motorInsurance.add_more_coverage_request_json : ""
+
+                let add_more_coverage_request_array = add_more_coverage_request_json != "" ? JSON.parse(add_more_coverage_request_json) : []
+                var geographical_extension = add_more_coverage_request_array && add_more_coverage_request_array.geographical_extension ? add_more_coverage_request_array.geographical_extension : []
+
+                values.ATC_value = add_more_coverage_request_array.ATC ? add_more_coverage_request_array.ATC.value : ""
+                values.B00005_value = add_more_coverage_request_array.B00005 ? add_more_coverage_request_array.B00005.value : ""
+                values.B00018_value = add_more_coverage_request_array.B00018 ? add_more_coverage_request_array.B00018.value : ""
+                values.B00069_value = add_more_coverage_request_array.B00069 ? add_more_coverage_request_array.B00069.value : ""
+                values.B00012_value = add_more_coverage_request_array.B00012 ? add_more_coverage_request_array.B00012.value : ""
+                values.B00013_value = add_more_coverage_request_array.B00013 ? add_more_coverage_request_array.B00013.value : ""
+                values.B00022_value = add_more_coverage_request_array.B00022 ? add_more_coverage_request_array.B00022.value : ""
+                values.B00020_value = add_more_coverage_request_array.B00020 ? add_more_coverage_request_array.B00020.value : ""
+                values.B00004_value = add_more_coverage_request_array.B00004 ? add_more_coverage_request_array.B00004.value : ""
+                values.B00004_description = add_more_coverage_request_array.B00004 ? add_more_coverage_request_array.B00004.description : ""
+                values.B00003_value = add_more_coverage_request_array.B00003 ? add_more_coverage_request_array.B00003.value : ""
+                values.B00003_description = add_more_coverage_request_array.B00003 ? add_more_coverage_request_array.B00003.description : ""
+                values.B00073_value = add_more_coverage_request_array.B00073 ? add_more_coverage_request_array.B00073.value : ""
+                values.B00073_description = add_more_coverage_request_array.B00073 ? add_more_coverage_request_array.B00073.description : ""
+                values.B00007_value = add_more_coverage_request_array.B00007 ? add_more_coverage_request_array.B00007.value : ""
+                values.B00007_description = add_more_coverage_request_array.B00007 ? add_more_coverage_request_array.B00007.description : ""
+                values.B00070_value = add_more_coverage_request_array.B00070 ? add_more_coverage_request_array.B00070.value : ""
+                // values.B00011_value = add_more_coverage_request_array.B00011 ? add_more_coverage_request_array.B00011.value : ""
+                // values.B00011_description = add_more_coverage_request_array.B00011 ? add_more_coverage_request_array.B00011.description : ""
+                values.trailer_array = trailer_array
                 
                 this.setState({
-                    motorInsurance, request_data, vehicleDetails,policyCoverage,add_more_coverage,add_more_coverage_request_array,geographical_extension,
-                    selectFlag: motorInsurance && motorInsurance.add_more_coverage != null ? '0' : '1',sliderVal,
-
+                    motorInsurance, add_more_coverage,request_data, vehicleDetails, bodySliderVal,sliderVal,
+                    showCNG: motorInsurance.cng_kit == 1 ? true : false,
+                    vahanVerify: motorInsurance.chasis_no && motorInsurance.engine_no ? true : false,
+                    selectFlag: motorInsurance && motorInsurance.add_more_coverage != null ? '0' : '1',
+                    no_of_claim: add_more_coverage_request_array.B00007 ? add_more_coverage_request_array.B00007.value : "",
+                    add_more_coverage_request_array,trailer_array, geographical_extension
                 })
                 this.props.loadingStop();
-                // this.getAccessToken(values)
+                this.getAccessToken(values)
             })
             .catch(err => {
                 // handle error
@@ -594,7 +627,24 @@ class MotorCoverages extends Component {
             })
     }
 
-  
+    getAccessToken = (values) => {
+        this.props.loadingStart();
+        axios
+          .post(`/callTokenService`)
+          .then((res) => {
+            this.setState({
+              accessToken: res.data.access_token,
+            });
+            this.fullQuote(res.data.access_token, values)
+          })
+          .catch((err) => {
+            this.setState({
+              accessToken: '',
+            });
+            this.props.loadingStop();
+          });
+      };
+
       getFuelList = (values) => {
         this.props.loadingStart();
         axios
@@ -711,10 +761,284 @@ class MotorCoverages extends Component {
         }
     };
 
-    handleSubmit = () => {
-        this.props.history.push(`/MotorSummery`);     
+
+
+    fullQuote = (access_token, values) => {
+        const { PolicyArray, sliderVal, add_more_coverage, motorInsurance, bodySliderVal ,vehicleDetails, geographical_extension, chasis_price, userIdvStatus,bodyIdvStatus} = this.state
+        // let cng_kit_flag = 0;
+        // let cngKit_Cost = 0;
+        // if(values.toString()) {            
+        //     cng_kit_flag = values.cng_kit
+        //     cngKit_Cost = values.cngKit_Cost
+        // }
+        let defaultSliderValue = PolicyArray.length > 0 ? Math.round(PolicyArray[0].PolicyRiskList[0].IDV_Suggested) : 0
+        let defaultBodySliderValue =  0
+        let coverage_data = {}
+        const formData = new FormData();
+
+        let csc_data = localStorage.getItem('users') ? localStorage.getItem('users') : "";
+        let csc_user_type = "";
+        let total_idv=0
+        let other_idv=0
+
+        if(csc_data && sessionStorage.getItem('csc_id')) {
+            let encryption = new Encryption();
+            csc_data = JSON.parse(csc_data)        
+            csc_data = csc_data.user
+            csc_data = JSON.parse(encryption.decrypt(csc_data));           
+            csc_user_type = csc_data.type
+        }
+        if(add_more_coverage) {
+            coverage_data = {
+                'B00018' : {'value': values.B00018_value },
+                'B00069' : {'value': values.B00069_value},
+                'B00012' : {'value': values.B00012_value },
+                'B00013' : {'value': values.B00013_value},
+                'B00022' : {'value': values.B00022_value},
+                'B00020' : {'value': values.B00020_value},
+                'ATC' : {'value': values.ATC_value},
+                'B00004' : {'value': values.B00004_value, 'description': values.B00004_description},
+                'B00003' : {'value': values.B00003_value, 'description': values.B00003_description},
+                'B00073' : {'value': values.B00073_value, 'description': values.B00073_description},
+                'B00007' : {'value': values.B00007_value, 'description': values.B00007_description},
+                // 'B00011' : {'value': values.B00011_value, 'description': values.B00011_description},
+                'B00070' : {'value': values.B00070_value},
+                'B00005' : {'value': values.B00005_value},
+                geographical_extension
+            }
+            if(values.B00004_value){
+                other_idv = other_idv + parseInt(values.B00004_value)
+            }
+            if(values.B00003_value){
+                other_idv = other_idv + parseInt(values.B00003_value)
+            }
+            
+        }
+
+        const post_data = {
+            'ref_no':localStorage.getItem('policyHolder_refNo'),
+            'access_token':access_token,
+            'idv_value': sliderVal ? sliderVal : 0,
+            'policy_type': motorInsurance.policy_type,
+            'add_more_coverage': add_more_coverage.toString(),
+            'PA_Cover': values.PA_flag ? values.PA_Cover : "0",
+            'coverage_data': JSON.stringify(coverage_data),
+            'body_idv_value' : bodySliderVal ? bodySliderVal : defaultBodySliderValue,
+            'trailer_array' : values.trailer_array,
+            'userIdvStatus' : userIdvStatus ? userIdvStatus : 0,
+            'bodyIdvStatus' : bodyIdvStatus ? bodyIdvStatus : 0,
+            'trailer_array' : values.trailer_array,            
+            'fuel_type' : values.fuel_type ? values.fuel_type : (vehicleDetails && vehicleDetails.varientmodel && vehicleDetails.varientmodel.fueltype  ? vehicleDetails.varientmodel.fueltype.id : "")
+            // 'cng_kit': cng_kit_flag,
+            // 'cngKit_Cost': cngKit_Cost
+        }
+
+        total_idv = parseInt(other_idv) + parseInt(post_data.idv_value)+parseInt(post_data.body_idv_value)
+        console.log('fullQuote_post_data', post_data)
+
+
+        if(( total_idv> 5000000) && csc_user_type == "POSP" ) {
+            swal("Quote cannot proceed with total IDV (including IDV, Body IDV, Electrical and Non-Electrical IDV) greater than 5000000")
+            this.props.loadingStop();
+            return false
+        }
+
+        let encryption = new Encryption();
+        formData.append('enc_data',encryption.encrypt(JSON.stringify(post_data)))
+        axios.post('fullQuotePMGCV',formData)
+            .then(res => {
+
+                if (res.data.PolicyObject && res.data.UnderwritingResult && res.data.UnderwritingResult.Status == "Success") {
+                    let ncbDiscount= (res.data.PolicyObject.PolicyLobList && res.data.PolicyObject.PolicyLobList[0].PolicyRiskList[0].IsNCB) ? res.data.PolicyObject.PolicyLobList[0].PolicyRiskList[0].OD_NCBAmount : 0
+                    let policyCoverage= res.data.PolicyObject.PolicyLobList ? res.data.PolicyObject.PolicyLobList[0].PolicyRiskList[0].PolicyCoverageList : []
+                    let IsGeographicalExtension= res.data.PolicyObject.PolicyLobList ? res.data.PolicyObject.PolicyLobList[0].PolicyRiskList[0].IsGeographicalExtension : 0
+
+                    // if(IsGeographicalExtension == '1') {
+                    //     let geoArrOD = {}
+                    //     let geoArrTP = {}
+                    //     geoArrOD.PolicyBenefitList = [{
+                    //         BeforeVatPremium : res.data.PolicyObject.PolicyLobList && res.data.PolicyObject.PolicyLobList[0].PolicyRiskList[0].PolicyCoverageList ? Math.round(res.data.PolicyObject.PolicyLobList[0].PolicyRiskList[0].PolicyCoverageList[0].LoadingAmount) : 0,
+                    //         ProductElementCode : 'GEOGRAPHYOD'
+                    //     }]
+
+                    //     geoArrTP.PolicyBenefitList = [{
+                    //         BeforeVatPremium : res.data.PolicyObject.PolicyLobList && res.data.PolicyObject.PolicyLobList[0].PolicyRiskList[0].PolicyCoverageList ? Math.round(res.data.PolicyObject.PolicyLobList[0].PolicyRiskList[0].PolicyCoverageList[1].LoadingAmount) : 0,
+                    //         ProductElementCode : 'GEOGRAPHYTP'
+                    //     }]
+    
+                    //     policyCoverage = IsGeographicalExtension == '1' ?  insert(policyCoverage, 1, geoArrOD) : ""
+                    //     policyCoverage = IsGeographicalExtension == '1' ?  insert(policyCoverage, 2, geoArrTP) : ""
+                    // }
+
+                    this.setState({
+                        fulQuoteResp: res.data.PolicyObject,
+                        PolicyArray: res.data.PolicyObject.PolicyLobList,
+                        error: [],
+                        ncbDiscount,
+                        userIdvStatus:1,
+                        bodyIdvStatus:1,
+                        sliderVal: res.data.PolicyObject.PolicyLobList ? Math.round(res.data.PolicyObject.PolicyLobList[0].PolicyRiskList[0].IDV_Suggested) : 0,
+                        serverResponse: res.data.PolicyObject,
+                        policyCoverage: res.data.PolicyObject.PolicyLobList ? res.data.PolicyObject.PolicyLobList[0].PolicyRiskList[0].PolicyCoverageList : [],
+                    });
+                }
+                else if (res.data.PolicyObject && res.data.UnderwritingResult && res.data.UnderwritingResult.Status == "Fail") {
+                    this.setState({
+                        fulQuoteResp: res.data.PolicyObject,
+                        userIdvStatus:1,
+                        bodyIdvStatus:1,
+                        error: {"message": 1},
+                        serverResponse: [],
+                        policyCoverage: res.data.PolicyObject.PolicyLobList ? res.data.PolicyObject.PolicyLobList[0].PolicyRiskList[0].PolicyCoverageList : [],
+                    });
+                }
+                else {
+                    this.setState({
+                        fulQuoteResp: [], add_more_coverage,
+                        userIdvStatus:1,
+                        bodyIdvStatus:1,
+                        error: res.data,
+                        serverResponse: []
+                    });
+                }
+                this.props.loadingStop();
+            })
+            .catch(err => {
+                this.setState({
+                    serverResponse: [],
+                });
+                this.props.loadingStop();
+            })
     }
 
+
+    handleSubmit = (values) => {
+        const { productId } = this.props.match.params
+        const { motorInsurance, PolicyArray, sliderVal, add_more_coverage, bodySliderVal, geographical_extension } = this.state
+        let defaultSliderValue = PolicyArray.length > 0 ? Math.round(PolicyArray[0].PolicyRiskList[0].IDV_Suggested) : 0
+        let defaultBodySliderValue =  0
+        let coverage_data = {}
+
+        let csc_data = localStorage.getItem('users') ? localStorage.getItem('users') : "";
+        let csc_user_type = "";
+        let bc_data = sessionStorage.getItem('bcLoginData') ? sessionStorage.getItem('bcLoginData') : "";
+
+        if(csc_data && sessionStorage.getItem('csc_id')) {
+            let encryption = new Encryption();
+            csc_data = JSON.parse(csc_data)        
+            csc_data = csc_data.user
+            csc_data = JSON.parse(encryption.decrypt(csc_data));           
+            csc_user_type = csc_data.type
+        }
+        else {
+            if(bc_data) {
+                let encryption = new Encryption();
+                bc_data = JSON.parse(encryption.decrypt(bc_data));
+            }
+            // console.log("bc_data------ ", bc_data)
+        }
+
+        if(add_more_coverage) {
+            coverage_data = {
+                'B00018' : {'value': values.B00018_value },
+                'B00069' : {'value': values.B00069_value},
+                'B00012' : {'value': values.B00012_value },
+                'B00013' : {'value': values.B00013_value},
+                'B00022' : {'value': values.B00022_value},
+                'B00020' : {'value': values.B00020_value},
+                'ATC' : {'value': values.ATC_value},
+                'B00004' : {'value': values.B00004_value, 'description': values.B00004_description},
+                'B00003' : {'value': values.B00003_value, 'description': values.B00003_description},
+                'B00073' : {'value': values.B00073_value, 'description': values.B00073_description},
+                'B00007' : {'value': values.B00007_value, 'description': values.B00007_description},
+                // 'B00011' : {'value': values.B00011_value, 'description': values.B00011_description},
+                'B00070' : {'value': values.B00070_value},
+                'B00005' : {'value': values.B00005_value},
+                geographical_extension
+            }
+            
+        }
+
+        const formData = new FormData();
+        let encryption = new Encryption();
+        let total_idv = 0
+        let other_idv = 0
+        let post_data = {}
+        if(add_more_coverage.length > 0){
+            post_data = {
+                'policy_holder_id': localStorage.getItem('policyHolder_id'),
+                'menumaster_id': 4,
+                'registration_no': values.registration_no,
+                'chasis_no': values.chasis_no,
+                'chasis_no_last_part': values.chasis_no_last_part,
+                'cng_kit': values.cng_kit,
+                // 'cngkit_cost': values.cngKit_Cost,
+                'engine_no': values.engine_no,
+                'idv_value': sliderVal ? sliderVal.toString() : defaultSliderValue.toString(),
+                'add_more_coverage': add_more_coverage,
+                'puc': values.puc,
+                'pa_cover': values.PA_flag ? values.PA_Cover : "0",
+                'pa_flag' : values.PA_cover_flag,
+                'page_name': `OtherComprehensive_GCVST/${productId}`,
+                'coverage_data': JSON.stringify(coverage_data),
+                'body_idv_value' : bodySliderVal ? bodySliderVal : defaultBodySliderValue,
+                'fuel_type' : values.fuel_type,
+                'trailer_array' : values.trailer_array,
+            }
+            if(values.B00004_value){
+                other_idv = other_idv + parseInt(values.B00004_value)
+            }
+            if(values.B00003_value){
+                other_idv = other_idv + parseInt(values.B00003_value)
+            }
+            total_idv=parseInt(post_data.idv_value)+parseInt(post_data.body_idv_value)+other_idv
+        }
+        else {
+            post_data = {
+                'policy_holder_id': localStorage.getItem('policyHolder_id'),
+                'menumaster_id': 4,
+                'registration_no': values.registration_no,
+                'chasis_no': values.chasis_no,
+                'chasis_no_last_part': values.chasis_no_last_part,
+                'cng_kit': values.cng_kit,
+                // 'cngkit_cost': values.cngKit_Cost,
+                'engine_no': values.engine_no,
+                'idv_value': sliderVal ? sliderVal.toString() : defaultSliderValue.toString(),
+                'puc': values.puc,
+                'page_name': `OtherComprehensive_GCVST/${productId}`,
+                'body_idv_value' : bodySliderVal ? bodySliderVal : defaultBodySliderValue,
+                'fuel_type' : values.fuel_type
+            }
+            total_idv=parseInt(post_data.idv_value)+parseInt(post_data.body_idv_value)
+        }
+        // console.log("--total_idv------ ", total_idv)
+        if(((total_idv > 5000000) && csc_user_type == "POSP" ) || ((total_idv > 5000000) && bc_data && bc_data.master_data.vendor_name == "PayPoint" ) ) {
+            swal("Quote cannot proceed with total IDV (including IDV, Body IDV, Electrical and Non-Electrical IDV) greater than 5000000")
+            this.props.loadingStop();
+            return false
+        }
+        console.log("--post Data-- ", post_data)
+        formData.append('enc_data', encryption.encrypt(JSON.stringify(post_data)))
+        this.props.loadingStart();
+        axios.post('gcv/update-insured-value', formData).then(res => {
+            this.props.loadingStop();
+            let decryptResp = JSON.parse(encryption.decrypt(res.data))
+            console.log("decrypt--fetchData-- ", decryptResp)
+            if (decryptResp.error == false) {
+                this.props.history.push(`/AdditionalDetails_GCVST/${productId}`);
+            }
+            else{
+                swal(decryptResp.msg)
+            } 
+
+        })
+            .catch(err => {
+                // handle error
+                let decryptResp = JSON.parse(encryption.decrypt(err.data))
+            console.log("decryptErr--fetchData-- ", decryptResp)
+                this.props.loadingStop();
+            })
+    }
 
     onRowSelect = (value, values, isSelect, setFieldTouched, setFieldValue) => {
 
@@ -733,7 +1057,7 @@ class MotorCoverages extends Component {
                 setFieldTouched("PA_flag");
                 setFieldValue("PA_flag", '1');
             }  
-            if(value == "700000353") {
+            if(value == "B00015") {
                 setFieldTouched("PA_cover_flag");
                 setFieldValue("PA_cover_flag", '1');
             }  
@@ -762,7 +1086,7 @@ class MotorCoverages extends Component {
                 setFieldTouched("hospital_cash_PD_flag");
                 setFieldValue("hospital_cash_PD_flag", '1');
             }
-            if(value == "700000351") {
+            if(value == "B00013") {
                 setFieldTouched("LL_PD_flag");
                 setFieldValue("LL_PD_flag", '1');
             }
@@ -816,7 +1140,7 @@ class MotorCoverages extends Component {
                 setFieldTouched("PA_Cover");
                 setFieldValue("PA_Cover", '');
             } 
-            if(value == "700000353") {
+            if(value == "B00015") {
                 setFieldTouched("PA_cover_flag");
                 setFieldValue("PA_cover_flag", '0');
             }      
@@ -845,7 +1169,7 @@ class MotorCoverages extends Component {
                 setFieldTouched("hospital_cash_PD_flag");
                 setFieldValue("hospital_cash_PD_flag", '0');
             }
-            if(value == "700000351") {
+            if(value == "B00013") {
                 setFieldTouched("LL_PD_flag");
                 setFieldValue("LL_PD_flag", '0');
             }
@@ -1039,11 +1363,10 @@ class MotorCoverages extends Component {
 
 
     render() {
-        const {add_more_coverage, is_CNG_account, request_data,error, policyCoverage, vahanVerify, selectFlag, fulQuoteResp, PolicyArray, fuelList, depreciationPercentage, vehicleDetails, geographical_extension,
+        const {add_more_coverage, is_CNG_account, vahanDetails,error, policyCoverage, vahanVerify, selectFlag, fulQuoteResp, PolicyArray, fuelList, depreciationPercentage, vehicleDetails, geographical_extension,
             moreCoverage, sliderVal, bodySliderVal, motorInsurance, serverResponse, engine_no, chasis_no, initialValue, add_more_coverage_request_array,ncbDiscount} = this.state
         const {productId} = this.props.match.params 
         //let defaultSliderValue = PolicyArray.length > 0 ? Math.round(PolicyArray[0].PolicyRiskList[0].IDV_Suggested) : 0
-        let vehicletype_id = vehicleDetails ? vehicleDetails.vehicletype_id : ""
         let defaultSliderValue = sliderVal
         let min_IDV_suggested = PolicyArray.length > 0 ? PolicyArray[0].PolicyRiskList[0].MinIDV_Suggested : 0
         let max_IDV_suggested = PolicyArray.length > 0 ? PolicyArray[0].PolicyRiskList[0].MaxIDV_Suggested : 0
@@ -1063,10 +1386,7 @@ class MotorCoverages extends Component {
         //let defaultBodySliderValue =  motorInsurance && motorInsurance.body_idv_value ? Math.round(motorInsurance.body_idv_value) : 0
         let defaultBodySliderValue = bodySliderVal
 
-        // let covList = motorInsurance && motorInsurance.add_more_coverage ? motorInsurance.add_more_coverage.split(",") : ""
-        let covList = add_more_coverage ? add_more_coverage.toString() : ""
-        covList = covList ? covList.split(",") : ""
-        
+        let covList = motorInsurance && motorInsurance.add_more_coverage ? motorInsurance.add_more_coverage.split(",") : ""
         let newInnitialArray = {}
         let PA_flag = motorInsurance && (motorInsurance.pa_cover == null || motorInsurance.pa_cover == "") ? '0' : '1'
         let PA_Cover = motorInsurance &&  motorInsurance.pa_cover != null ? motorInsurance.pa_cover : ''
@@ -1078,7 +1398,7 @@ class MotorCoverages extends Component {
         let nonElectric_flag= add_more_coverage_request_array.B00003 && add_more_coverage_request_array.B00003.value ? '1' : '0'
         let hospital_cash_OD_flag= add_more_coverage_request_array.B00020 && add_more_coverage_request_array.B00020.value ? '1' : '0'
         let hospital_cash_PD_flag= add_more_coverage_request_array.B00022 && add_more_coverage_request_array.B00022.value ? '1' : '0'
-        let LL_PD_flag= add_more_coverage.indexOf("700000351") ? '1' : '0'
+        let LL_PD_flag= add_more_coverage_request_array.B00013 && add_more_coverage_request_array.B00013.value ? '1' : '0'
         let LL_Emp_flag= add_more_coverage_request_array.B00012 && add_more_coverage_request_array.B00012.value ? '1' : '0'
         let LL_Coolie_flag= add_more_coverage_request_array.B00069 && add_more_coverage_request_array.B00069.value ? '1' : '0'
         let enhance_PA_OD_flag= add_more_coverage_request_array.B00018 && add_more_coverage_request_array.B00018.value ? '1' : '0'
@@ -1093,15 +1413,14 @@ class MotorCoverages extends Component {
 
         if(selectFlag == '1') {
              newInitialValues = Object.assign(initialValue, {
-                registration_no: motorInsurance.registration_no ? motorInsurance.registration_no.replace(/ /g,'') : "",
+                registration_no: motorInsurance.registration_no ? motorInsurance.registration_no : "",
                 chasis_no: motorInsurance.chasis_no ? motorInsurance.chasis_no : (chasis_no ? chasis_no : ""),
                 chasis_no_last_part: motorInsurance.chasis_no_last_part ? motorInsurance.chasis_no_last_part : "",
-                // add_more_coverage: motorInsurance.add_more_coverage ? motorInsurance.add_more_coverage : "",
-                add_more_coverage: add_more_coverage ? add_more_coverage : "",
+                add_more_coverage: motorInsurance.add_more_coverage ? motorInsurance.add_more_coverage : "",
                 engine_no: motorInsurance.engine_no ? motorInsurance.engine_no : (engine_no ? engine_no : ""),
                 vahanVerify: vahanVerify,
                 newRegistrationNo: localStorage.getItem('registration_number') == "NEW" ? localStorage.getItem('registration_number') : "",
-                // 700000353: motorInsurance && motorInsurance.policy_for == '2' ? "" : "700000353",
+                B00015: motorInsurance && motorInsurance.policy_for == '2' ? "" : "B00015",
                 // B00005 : vehicleDetails && vehicleDetails.varientmodel && (vehicleDetails.varientmodel.fueltype.id == 8 || vehicleDetails.varientmodel.fueltype.id == 9) ? "B00005" : "",
                 B00006 : vehicleDetails && vehicleDetails.varientmodel && (vehicleDetails.varientmodel.fueltype.id == 3 || vehicleDetails.varientmodel.fueltype.id == 4) ? "B00006" : "",
                 B00010 : vehicleDetails && vehicleDetails.varientmodel && (vehicleDetails.varientmodel.fueltype.id == 3 || vehicleDetails.varientmodel.fueltype.id == 4) ? "B00010" : "",               
@@ -1133,8 +1452,7 @@ class MotorCoverages extends Component {
                     registration_no: motorInsurance.registration_no ? motorInsurance.registration_no : "",
                     chasis_no: motorInsurance.chasis_no ? motorInsurance.chasis_no : (chasis_no ? chasis_no : ""),
                     chasis_no_last_part: motorInsurance.chasis_no_last_part ? motorInsurance.chasis_no_last_part : "",
-                    // add_more_coverage: motorInsurance.add_more_coverage ? motorInsurance.add_more_coverage : "",
-                    add_more_coverage: add_more_coverage ? add_more_coverage : "",
+                    add_more_coverage: motorInsurance.add_more_coverage ? motorInsurance.add_more_coverage : "",
                     engine_no: motorInsurance.engine_no ? motorInsurance.engine_no : (engine_no ? engine_no : ""),
                     vahanVerify: vahanVerify,
                     newRegistrationNo: localStorage.getItem('registration_number') == "NEW" ? localStorage.getItem('registration_number') : "", 
@@ -1155,7 +1473,7 @@ class MotorCoverages extends Component {
                     LL_workman_flag: '0',
                     fuel_type: fuel_type,
                     trailer_flag_TP: '0',
-                    // 700000353 : "",
+                    B00015 : "",
                     // B00005 : "",
                     B00010 : "",
                     trailer_array:  this.initClaimDetailsList(),
@@ -1193,7 +1511,7 @@ class MotorCoverages extends Component {
         newInnitialArray.B00018_value = add_more_coverage_request_array.B00018 ? add_more_coverage_request_array.B00018.value : ""
         newInnitialArray.B00069_value = add_more_coverage_request_array.B00069 ? add_more_coverage_request_array.B00069.value : ""
         newInnitialArray.B00012_value = add_more_coverage_request_array.B00012 ? add_more_coverage_request_array.B00012.value : ""
-        // newInnitialArray['700000351_value'] = add_more_coverage_request_array.B00013 ? add_more_coverage_request_array.B00013.value : ""
+        newInnitialArray.B00013_value = add_more_coverage_request_array.B00013 ? add_more_coverage_request_array.B00013.value : ""
         newInnitialArray.B00022_value = add_more_coverage_request_array.B00022 ? add_more_coverage_request_array.B00022.value : ""
         newInnitialArray.B00020_value = add_more_coverage_request_array.B00020 ? add_more_coverage_request_array.B00020.value : ""
         newInnitialArray.B00004_value = add_more_coverage_request_array.B00004 ? add_more_coverage_request_array.B00004.value : ""
@@ -1216,53 +1534,40 @@ class MotorCoverages extends Component {
         newInnitialArray.GeoExtnPakistan = geographical_extension ? geographical_extension[geographical_extension.indexOf("GeoExtnPakistan")] : ""
         newInnitialArray.GeoExtnSriLanka = geographical_extension ? geographical_extension[geographical_extension.indexOf("GeoExtnSriLanka")] : ""
 
-        add_more_coverage_request_array && add_more_coverage_request_array.length>0 && add_more_coverage_request_array.map((value,index) => {   
-            value && value.policyCtAcceSOABOList && value.policyCtAcceSOABOList.length>0 && value.policyCtAcceSOABOList.map((subValue,subIndex)=>{
-                console.log("subValue-------------- ", subValue)
-                if(subValue.interestId == '700000351') {
-                    newInnitialArray['700000351_value'] = subValue.fieldValueMap.NoofPaidDrivers_BT
-                }
-
-            })
-        }
-        )   
-
         newInitialValues = Object.assign(initialValue, newInnitialArray );
 
 // -------------------------------------------------------
         let OD_TP_premium = serverResponse.PolicyLobList ? serverResponse.PolicyLobList[0].PolicyRiskList[0] : []
         let TRAILOR_OD_PREMIUM = 0
 
+        policyCoverage.map((coverage, qIndex) => (
+            coverage.PolicyBenefitList && coverage.PolicyBenefitList.map((benefit, bIndex) => (
+                benefit.ProductElementCode == 'B00007' ? TRAILOR_OD_PREMIUM+=benefit.AnnualPremium : 0
+            ))
+        ))
+
         let productCount = 1;
         let ncbCount = 1;
 
         const policyCoverageList =  policyCoverage && policyCoverage.length > 0 ?
             policyCoverage.map((coverage, qIndex) => (
-                coverage.renewalsubcoverage && coverage.renewalsubcoverage.length > 0 ? coverage.renewalsubcoverage.map((benefit, bIndex) => (
-                    parseInt(benefit.interest_premium) != 0 ?
-                    <div>
-                        <Row>
-                            <Col sm={12} md={6}>
-                                <FormGroup>{benefit.interest_name}</FormGroup>
+                coverage.PolicyBenefitList && coverage.PolicyBenefitList.map((benefit, bIndex) => (
+                    <div key= {bIndex}>
+                        {(benefit.ProductElementCode != 'B00007') ?
+                            <Row><Col sm={12} md={6}>
+                                <FormGroup>{Coverage[benefit.ProductElementCode]}</FormGroup>
                             </Col>
                             <Col sm={12} md={6}>
-                                <FormGroup>₹ {Math.round(benefit.interest_premium)}</FormGroup>
+                                <FormGroup>₹ {Math.round(benefit.AnnualPremium)}</FormGroup>
+                            </Col></Row> : (benefit.ProductElementCode == 'B00007' && productCount==1) ? <Row><Col sm={12} md={6}>
+                                <FormGroup>{Coverage[benefit.ProductElementCode]}</FormGroup>
                             </Col>
-                        </Row>
-                    </div> : null
-            )) : 
-            parseInt(coverage.annual_premium) != 0 ?
-            <div>
-                <Row>
-                    <Col sm={12} md={6}>
-                    <FormGroup>{coverage.cover_name}</FormGroup>
-                    </Col>
-                    <Col sm={12} md={6}>
-                    <FormGroup>₹ {Math.round(coverage.annual_premium)}  </FormGroup>                      
-                    </Col>
-                </Row> 
-            </div> : null
-        )) : null  
+                            <Col sm={12} md={6} data={productCount+=1}>
+                                <FormGroup>₹ {Math.round(TRAILOR_OD_PREMIUM)}</FormGroup>
+                            </Col></Row> : null}
+                   </div>
+            ))
+        )) : null
 
         const ncbStr = (ncbDiscount && ncbDiscount!=0 && ncbCount==1) ? <Row><Col sm={12} md={6}>
         <FormGroup>{phrases["NCBDiscount"]}</FormGroup>
@@ -1341,6 +1646,12 @@ class MotorCoverages extends Component {
 						</div>
 						</aside>
 								
+					 {/*<div className="col-sm-12 col-md-12 col-lg-2 col-xl-2 pd-l-0">        
+						<SideNav />
+             		 </div>*/}
+					
+					
+					
                 <div className="col-sm-12 col-md-12 col-lg-12 col-xl-12 infobox ocGcv">
                 <h4 className="text-center mt-3 mb-3">{phrases['SBIGICL']}</h4>
                 <section className="brand colpd m-b-25">
@@ -1351,12 +1662,10 @@ class MotorCoverages extends Component {
                         </div>
                     </div>
                     <Formik initialValues={newInitialValues} 
-                    // onSubmit={ serverResponse && serverResponse != "" ? (serverResponse.message ? this.getAccessToken : this.handleSubmit ) : this.getAccessToken} 
-                    onSubmit= {this.handleSubmit}  
-                    // validationSchema={ComprehensiveValidation}
-                    >
+                    onSubmit={ serverResponse && serverResponse != "" ? (serverResponse.message ? this.getAccessToken : this.handleSubmit ) : this.getAccessToken} 
+                    validationSchema={ComprehensiveValidation}>
                     {({ values, errors, setFieldValue, setFieldTouched, isValid, isSubmitting, touched }) => {
-console.log("benefit.values------------------ ", values)
+console.log("values------------> ", values)
                     return (
                         <Form>
                         <Row>
@@ -1385,6 +1694,7 @@ console.log("benefit.values------------------ ", values)
                                     <Col sm={12} md={5} lg={6}>
                                         <FormGroup>
                                             <div className="insurerName">
+                                            {values.newRegistrationNo != "NEW" ?
                                                 <Field
                                                     name="registration_no"
                                                     type="text"
@@ -1394,11 +1704,20 @@ console.log("benefit.values------------------ ", values)
                                                     onBlur={e => this.changePlaceHoldClassRemove(e)}
                                                     value= {values.registration_no}   
                                                     maxLength={this.state.length}
-                                                    disabled = {true}
                                                     onInput={e=>{
                                                         this.regnoFormat(e, setFieldTouched, setFieldValue)
                                                     }}        
-                                                /> 
+        
+                                                /> : 
+                                                <Field
+                                                        type="text"
+                                                        name='registration_no' 
+                                                        autoComplete="off"
+                                                        className="premiumslid"   
+                                                        value= {values.newRegistrationNo}    
+                                                        disabled = {true}                                                 
+                                                    />}
+
                                                 {errors.registration_no ? (
                                                     <span className="errorMsg">{phrases[errors.registration_no]}</span>
                                                 ) : null}
@@ -1418,7 +1737,7 @@ console.log("benefit.values------------------ ", values)
                                                 </FormGroup>
                                             </Col>
                                         
-                                            <Col sm={12} md={5} lg={5}>
+                                            <Col sm={12} md={5} lg={4}>
                                                 <FormGroup>
                                                     <div className="insurerName">
                                                             <Field
@@ -1428,7 +1747,6 @@ console.log("benefit.values------------------ ", values)
                                                                 className="premiumslid"       
                                                                 value= {values.chasis_no_last_part}
                                                                 maxLength="5"       
-                                                                disabled = {true}
                                                                 onChange = {(e) => {
                                                                     setFieldValue('vahanVerify', false)
 
@@ -1443,17 +1761,17 @@ console.log("benefit.values------------------ ", values)
                                                     </div>
                                                 </FormGroup>
                                             </Col>
-                                            {/* <Col sm={12} md={5} lg={2}>
+                                            <Col sm={12} md={5} lg={2}>
                                                 <Button className="btn btn-primary vrifyBtn" onClick= {!errors.chasis_no_last_part ? this.getVahanDetails.bind(this,values, setFieldTouched, setFieldValue, errors) : null}>{phrases['Verify']}</Button>
                                                 {errors.vahanVerify ? (
                                                         <span className="errorMsg">{phrases[errors.vahanVerify]}</span>
                                                     ) : null}       
-                                            </Col> */}
+                                            </Col>
                                         </Row>
                                         
                                     </Col>   
                             </Row>
-                            {/* {values.vahanVerify && !errors.chasis_no_last_part ? */}
+                            {values.vahanVerify && !errors.chasis_no_last_part ?
                             <Row>
                                 <Col sm={12} md={6} lg={5}>
                                     <FormGroup>
@@ -1467,7 +1785,6 @@ console.log("benefit.values------------------ ", values)
                                                 onBlur={e => this.changePlaceHoldClassRemove(e)}
                                                 value= {values.engine_no.toUpperCase()}
                                                 maxLength="17"
-                                                disabled = {true}
                                                 onChange = {(e) => {
                                                     setFieldTouched('engine_no')
                                                     setFieldValue('engine_no', e.target.value)                       
@@ -1491,7 +1808,6 @@ console.log("benefit.values------------------ ", values)
                                                 onBlur={e => this.changePlaceHoldClassRemove(e)}
                                                 value= {values.chasis_no.toUpperCase()}
                                                 maxLength="17"
-                                                disabled = {true}
                                                 onChange = {(e) => {
                                                     setFieldTouched('chasis_no')
                                                     setFieldValue('chasis_no', e.target.value)                       
@@ -1504,7 +1820,7 @@ console.log("benefit.values------------------ ", values)
                                     </FormGroup>
                                 </Col>
                             </Row>
-                            {/* : null} */}
+                            : null}
 
                             <Row>
                                 <Col sm={12} md={5} lg={4}>
@@ -1523,7 +1839,6 @@ console.log("benefit.values------------------ ", values)
                                             placeholder=""
                                             autoComplete="off"
                                             className="premiumslid"
-                                            disabled = {true}
                                             onFocus={e => this.changePlaceHoldClassAdd(e)}
                                             onBlur={e => this.changePlaceHoldClassRemove(e)}
                                             value={defaultSliderValue}  
@@ -1534,7 +1849,10 @@ console.log("benefit.values------------------ ", values)
                                         </div>
                                     </FormGroup>
                                 </Col>
-                                {defaultSliderValue && minIDV && minIDV ? 
+                                {console.log("minIDV------------- ", minIDV)}
+                                {console.log("maxIDV------------- ", maxIDV)}
+                                {console.log("IDV_Suggested------------- ", defaultSliderValue)}
+                                {defaultSliderValue ? 
 
                                 <Col sm={12} md={12} lg={6}>
                                     <FormGroup>
@@ -1545,7 +1863,6 @@ console.log("benefit.values------------------ ", values)
                                     step= '1'
                                     disabled = {(this.state.userIdvStatus == 0)? "disabled" : ""}
                                     value={defaultSliderValue}
-                                    disabled = {true}
                                     onChange= {(e) =>{
                                     setFieldTouched("slider");
                                     setFieldValue("slider",e.target.value);
@@ -1556,58 +1873,55 @@ console.log("benefit.values------------------ ", values)
                                 </Col>
                                 : null}
                             </Row>
-                            {vehicletype_id == "11" || vehicletype_id == "8" ?
-                                <Row>
-                                    <Col sm={12} md={5} lg={4}>
-                                        <FormGroup>
-                                            <div className="insurerName">
-                                                {phrases['BodyIDV']}
-                                            </div>
-                                        </FormGroup>
-                                    </Col>
-                                    <Col sm={12} md={5} lg={2}>
-                                        <FormGroup>
-                                            <div className="insurerName">
-                                            <Field
-                                                name="body_idv_value"
-                                                type="text"
-                                                placeholder=""
-                                                autoComplete="off"
-                                                className="premiumslid"
-                                                disabled = {true}
-                                                onFocus={e => this.changePlaceHoldClassAdd(e)}
-                                                onBlur={e => this.changePlaceHoldClassRemove(e)}
-                                                value={defaultBodySliderValue}  
-                                            />
-                                            {errors.body_idv_value && touched.body_idv_value ? (
-                                                <span className="errorMsg">{errors.body_idv_value}</span>
-                                            ) : null}
-                                            </div>
-                                        </FormGroup>
-                                    </Col>
-                                    
-                                {defaultBodySliderValue && minBodyIDV && maxBodyIDV ?
-                                    <Col sm={12} md={12} lg={6}>
-                                        <FormGroup>
-                                        <input type="range" className="W-90" 
-                                        name= 'slider1'
-                                        min= {minBodyIDV}
-                                        max= {maxBodyIDV}
-                                        step= '1'
-                                        disabled = {(this.state.bodyIdvStatus == 0)? "disabled" : ""}
-                                        value={defaultBodySliderValue}
-                                        disabled = {true}
-                                        onChange= {(e) =>{
-                                        setFieldTouched("slider1");
-                                        setFieldValue("slider1",values.slider1);
-                                        this.bodySliderValue(e.target.value)
-                                    }}
+
+                            <Row>
+                                <Col sm={12} md={5} lg={4}>
+                                    <FormGroup>
+                                        <div className="insurerName">
+                                            {phrases['BodyIDV']}
+                                        </div>
+                                    </FormGroup>
+                                </Col>
+                                <Col sm={12} md={5} lg={2}>
+                                    <FormGroup>
+                                        <div className="insurerName">
+                                        <Field
+                                            name="body_idv_value"
+                                            type="text"
+                                            placeholder=""
+                                            autoComplete="off"
+                                            className="premiumslid"
+                                            onFocus={e => this.changePlaceHoldClassAdd(e)}
+                                            onBlur={e => this.changePlaceHoldClassRemove(e)}
+                                            value={defaultBodySliderValue}  
                                         />
-                                        </FormGroup>
-                                    </Col>
-                                : null }
-                                </Row>
-                                : null }
+                                        {errors.body_idv_value && touched.body_idv_value ? (
+                                            <span className="errorMsg">{errors.body_idv_value}</span>
+                                        ) : null}
+                                        </div>
+                                    </FormGroup>
+                                </Col>
+                                
+                            {defaultSliderValue ?
+                                <Col sm={12} md={12} lg={6}>
+                                    <FormGroup>
+                                    <input type="range" className="W-90" 
+                                    name= 'slider1'
+                                    min= {minBodyIDV}
+                                    max= {maxBodyIDV}
+                                    step= '1'
+                                    disabled = {(this.state.bodyIdvStatus == 0)? "disabled" : ""}
+                                    value={defaultBodySliderValue}
+                                    onChange= {(e) =>{
+                                    setFieldTouched("slider1");
+                                    setFieldValue("slider1",values.slider1);
+                                    this.bodySliderValue(e.target.value)
+                                }}
+                                    />
+                                    </FormGroup>
+                                </Col>
+                            : null }
+                            </Row>
 
                             {/* <Row>
                                 <Col sm={12} md={5} lg={4}>
@@ -1653,37 +1967,38 @@ console.log("benefit.values------------------ ", values)
                                     </FormGroup>
                                 </Col>
                             </Row>
-                                {errors.B00007 ||  errors.B00011? (
-                                        <span className="errorMsg">{errors.B00007} &nbsp; &nbsp;{errors.B00011}</span>
-                                    ) : null}
+                                    {errors.B00007 ||  errors.B00011? (
+                                            <span className="errorMsg">{errors.B00007} &nbsp; &nbsp;{errors.B00011}</span>
+                                        ) : null}
 
                                 {moreCoverage && moreCoverage.length > 0 ? moreCoverage.map((coverage, qIndex) => (
                                 <Row key={qIndex}>   
+                                {(motorInsurance && motorInsurance.policy_for == '2' && coverage.code != 'B00015' && coverage.code != 'B00018') || (motorInsurance && motorInsurance.policy_for == '1') ?
+                                   
                                     <Col sm={12} md={11} lg={6} key={qIndex+"a"} >
                                         <label className="customCheckBox formGrp formGrp">{coverage.name}
                                             
                                             <Field
                                                 type="checkbox"
                                                 // name={`moreCov_${qIndex}`}
-                                                name={coverage.ebao_code}
-                                                value={coverage.ebao_code}
+                                                name={coverage.code}
+                                                value={coverage.code}
                                                 className="user-self"
-                                                disabled = {true}
                                                 // checked={values.roadsideAssistance ? true : false}
                                                 onClick={(e) =>{
-                                                    if( e.target.checked == false && values[coverage.ebao_code] == '700000353') {
+                                                    if( e.target.checked == false && values[coverage.code] == 'B00015') {
                                                         swal(phrases.SwalIRDAI)
                                                     }
                                                     this.onRowSelect(e.target.value, values, e.target.checked, setFieldTouched, setFieldValue)         
                                                 }
                                                 }
-                                                checked = {values[coverage.ebao_code] == coverage.ebao_code && coverage.ebao_code != null? true : false}
+                                                checked = {values[coverage.code] == coverage.code ? true : false}
                                             />
                                             <span className="checkmark mL-0"></span>
                                             <span className="error-message"></span>
                                         </label>
-                                    </Col>
-                                    {values.PA_cover_flag == '1' && values[coverage.ebao_code] == '700000353' ?
+                                    </Col> :  null }
+                                    {values.PA_cover_flag == '1' && values[coverage.code] == 'B00015' ?
                                         <Col sm={12} md={11} lg={3} key={qIndex+"b"}>
                                             <FormGroup>
                                                 <div className="formSection">
@@ -1693,7 +2008,6 @@ console.log("benefit.values------------------ ", values)
                                                         autoComplete="off"
                                                         className="formGrp inputfs12"
                                                         value = {values.PA_Cover_OD}
-                                                        disabled = {true}
                                                         onChange={(e) => {
                                                             setFieldTouched('PA_Cover_OD')
                                                             setFieldValue('PA_Cover_OD', e.target.value);
@@ -1727,7 +2041,6 @@ console.log("benefit.values------------------ ", values)
                                                         autoComplete="off"
                                                         className="formGrp inputfs12"
                                                         value = {values.B00007_value}
-                                                        disabled = {true}
                                                         onChange={(e) => {
                                                             setFieldTouched('B00007_value')
                                                             setFieldValue('B00007_value', e.target.value);
@@ -1755,7 +2068,6 @@ console.log("benefit.values------------------ ", values)
                                                         placeholder={phrases['TrailerIDV']}
                                                         autoComplete="off"
                                                         maxLength="8"
-                                                        disabled = {true}
                                                         onFocus={e => this.changePlaceHoldClassAdd(e)}
                                                         onBlur={e => this.changePlaceHoldClassRemove(e)}
                                                         onChange={(e) => {
@@ -1842,7 +2154,6 @@ console.log("benefit.values------------------ ", values)
                                                         autoComplete="off"
                                                         className="formGrp inputfs12"
                                                         value = {values.B00073_value}
-                                                        disabled = {true}
                                                         onChange={(e) => {
                                                             setFieldTouched('B00073_value')
                                                             setFieldValue('B00073_value', e.target.value);
@@ -1870,7 +2181,6 @@ console.log("benefit.values------------------ ", values)
                                                         placeholder={phrases['PaidDrivers']}
                                                         autoComplete="off"
                                                         maxLength="1"
-                                                        disabled = {true}
                                                         onFocus={e => this.changePlaceHoldClassAdd(e)}
                                                         onBlur={e => this.changePlaceHoldClassRemove(e)}
                                                         onChange={(e) => {
@@ -1898,7 +2208,6 @@ console.log("benefit.values------------------ ", values)
                                                         placeholder={phrases['ValueOfAccessory']}
                                                         autoComplete="off"
                                                         maxLength="8"
-                                                        disabled = {true}
                                                         onFocus={e => this.changePlaceHoldClassAdd(e)}
                                                         onBlur={e => this.changePlaceHoldClassRemove(e)}
                                                         onChange={(e) => {
@@ -1922,7 +2231,6 @@ console.log("benefit.values------------------ ", values)
                                                         type="text"
                                                         placeholder={phrases['AccessoryDescription']}
                                                         autoComplete="off"
-                                                        disabled = {true}
                                                         // maxLength="28"
                                                         onFocus={e => this.changePlaceHoldClassAdd(e)}
                                                         onBlur={e => this.changePlaceHoldClassRemove(e)}
@@ -1951,7 +2259,6 @@ console.log("benefit.values------------------ ", values)
                                                         placeholder={phrases['ValueOfAccessory']}
                                                         autoComplete="off"
                                                         maxLength="7"
-                                                        disabled = {true}
                                                         onFocus={e => this.changePlaceHoldClassAdd(e)}
                                                         onBlur={e => this.changePlaceHoldClassRemove(e)}
                                                         onChange={(e) => {
@@ -1975,7 +2282,6 @@ console.log("benefit.values------------------ ", values)
                                                         type="text"
                                                         placeholder={phrases['AccessoryDescription']}
                                                         autoComplete="off"
-                                                        disabled = {true}
                                                         // maxLength="28"
                                                         onFocus={e => this.changePlaceHoldClassAdd(e)}
                                                         onBlur={e => this.changePlaceHoldClassRemove(e)}
@@ -2004,7 +2310,6 @@ console.log("benefit.values------------------ ", values)
                                                         placeholder="Sum insured"
                                                         autoComplete="off"
                                                         maxLength="7"
-                                                        disabled = {true}
                                                         onFocus={e => this.changePlaceHoldClassAdd(e)}
                                                         onBlur={e => this.changePlaceHoldClassRemove(e)}
                                                         onChange={(e) => {
@@ -2031,7 +2336,6 @@ console.log("benefit.values------------------ ", values)
                                                         name='B00020_value'
                                                         component="select"
                                                         autoComplete="off"
-                                                        disabled = {true}
                                                         className="formGrp inputfs12"
                                                         value = {values.B00020_value}
                                                         onChange={(e) => {
@@ -2063,7 +2367,6 @@ console.log("benefit.values------------------ ", values)
                                                         name='B00022_value'
                                                         component="select"
                                                         autoComplete="off"
-                                                        disabled = {true}
                                                         className="formGrp inputfs12"
                                                         value = {values.B00022_value}
                                                         onChange={(e) => {
@@ -2086,21 +2389,20 @@ console.log("benefit.values------------------ ", values)
                                         </Col>
                                         </Fragment> : null
                                     }
-                                    {values.LL_PD_flag == '1' && values[coverage.ebao_code] == '700000351' ?
+                                    {values.LL_PD_flag == '1' && values[coverage.code] == 'B00013' ?
                                         <Fragment>
                                         <Col sm={12} md={11} lg={4} key={qIndex+"c"}>
                                             <FormGroup>
                                                 <div className="formSection">
                                                     <Field
-                                                        name='700000351_value'
+                                                        name='B00013_value'
                                                         component="select"
                                                         autoComplete="off"
-                                                        disabled = {true}
                                                         className="formGrp inputfs12"
-                                                        value = {values['700000351_value']}
+                                                        value = {values.B00013_value}
                                                         onChange={(e) => {
-                                                            setFieldTouched('700000351_value')
-                                                            setFieldValue('700000351_value', e.target.value);
+                                                            setFieldTouched('B00013_value')
+                                                            setFieldValue('B00013_value', e.target.value);
                                                             this.handleChange()
                                                         }}
                                                     >
@@ -2110,8 +2412,8 @@ console.log("benefit.values------------------ ", values)
                                                         ))} 
                                             
                                                     </Field>
-                                                    {errors['700000351_value'] ? (
-                                                        <span className="errorMsg">{phrases[errors['700000351_value']]}</span>
+                                                    {errors.B00013_value ? (
+                                                        <span className="errorMsg">{phrases[errors.B00013_value]}</span>
                                                     ) : null}
                                                 </div>
                                             </FormGroup>
@@ -2130,7 +2432,6 @@ console.log("benefit.values------------------ ", values)
                                                     placeholder={phrases['NoOfEmployees']}
                                                     autoComplete="off"
                                                     maxLength="1"
-                                                    disabled = {true}
                                                     onFocus={e => this.changePlaceHoldClassAdd(e)}
                                                     onBlur={e => this.changePlaceHoldClassRemove(e)}
                                                     onChange={(e) => {
@@ -2159,7 +2460,6 @@ console.log("benefit.values------------------ ", values)
                                                     placeholder={phrases['NoOfPerson']}
                                                     autoComplete="off"
                                                     maxLength="1"
-                                                    disabled = {true}
                                                     onFocus={e => this.changePlaceHoldClassAdd(e)}
                                                     onBlur={e => this.changePlaceHoldClassRemove(e)}
                                                     onChange={(e) => {
@@ -2188,7 +2488,6 @@ console.log("benefit.values------------------ ", values)
                                                     placeholder={phrases['ValueShould']}
                                                     autoComplete="off"
                                                     maxLength="7"
-                                                    disabled = {true}
                                                     onFocus={e => this.changePlaceHoldClassAdd(e)}
                                                     onBlur={e => this.changePlaceHoldClassRemove(e)}
                                                     onChange={(e) => {
@@ -2217,7 +2516,6 @@ console.log("benefit.values------------------ ", values)
                                                     placeholder={phrases['NoOfWorkman']}
                                                     autoComplete="off"
                                                     maxLength="1"
-                                                    disabled = {true}
                                                     onFocus={e => this.changePlaceHoldClassAdd(e)}
                                                     onBlur={e => this.changePlaceHoldClassRemove(e)}
                                                     onChange={(e) => {
@@ -2246,7 +2544,6 @@ console.log("benefit.values------------------ ", values)
                                                         component="select"
                                                         autoComplete="off"
                                                         className="formGrp inputfs12"
-                                                        disabled = {true}
                                                         value = {values.ATC_value}
                                                         onChange={(e) => {
                                                             setFieldTouched('ATC_value')
@@ -2280,7 +2577,6 @@ console.log("benefit.values------------------ ", values)
                                                     // name={`moreCov_${qIndex}`}
                                                     name={insurer.id}
                                                     value={insurer.id}
-                                                    disabled = {true}
                                                     className="user-self"
                                                     checked = {values[insurer.id] == insurer.id ? true : false}
                                                     onClick={(e) =>{
@@ -2323,7 +2619,6 @@ console.log("benefit.values------------------ ", values)
                                                                         value='1'
                                                                         key='1'
                                                                         checked = {values.puc == '1' ? true : false}
-                                                                        disabled = {true}
                                                                         onChange = {() =>{
                                                                             setFieldTouched('puc')
                                                                             setFieldValue('puc', '1');
@@ -2341,7 +2636,6 @@ console.log("benefit.values------------------ ", values)
                                                                         value='2'
                                                                         key='1'
                                                                         checked = {values.puc == '2' ? true : false}
-                                                                        disabled = {true}
                                                                         onChange = {() =>{
                                                                             setFieldTouched('puc')
                                                                             setFieldValue('puc', '2');
@@ -2367,24 +2661,22 @@ console.log("benefit.values------------------ ", values)
                                         {phrases['Back']}
                                     </Button> 
 
-                                        {/* { serverResponse && serverResponse != "" ? (serverResponse.message ? 
+                                        { serverResponse && serverResponse != "" ? (serverResponse.message ? 
                                         <Button className={`proceedBtn`} type="submit"  >
                                             {phrases['Recalculate']}
                                         </Button> : (values.puc == '1' ?  <Button className={`proceedBtn`} type="submit"  >
                                             {phrases['Continue']}
                                         </Button>  : null)) : <Button className={`proceedBtn`} type="submit"  >
                                             {phrases['Recalculate']}
-                                        </Button>} */}
-                                            <Button className={`proceedBtn`} type="submit"  >
-                                            {phrases['Continue']}
-                                        </Button>
+                                        </Button>}
+
                                     </div>
                                 </Col>
 
                                 <Col sm={12} md={3}>
                                     <div className="justify-content-left regisBox">
                                         <h3 className="premamnt"> {phrases['TPAmount']}</h3>
-                                        <div className="rupee"> ₹ {request_data.payable_premium ? parseInt(request_data.payable_premium) : ""}</div>
+                                        <div className="rupee"> ₹ {fulQuoteResp.DuePremium}</div>
                                         <div className="text-center">
                                             <Button className={`brkbtn`} type="button" onClick= {this.handleShow}>
                                             {phrases['Breakup']}
@@ -2457,4 +2749,4 @@ const mapStateToProps = state => {
     };
   };
 
-export default withRouter (connect( mapStateToProps, mapDispatchToProps)(MotorCoverages));
+export default withRouter (connect( mapStateToProps, mapDispatchToProps)(OtherComprehensiveGCV));

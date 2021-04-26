@@ -88,6 +88,7 @@ const ownerValidation = Yup.object().shape({
             return true;
         }
     ),
+	/*
     pancard: Yup.string()
     .required(function() {
         	if ((document.querySelector('input[name="is_eia_account2"]:checked')) && (document.querySelector('input[name="is_eia_account2"]:checked').value == 1 )) {
@@ -96,7 +97,27 @@ const ownerValidation = Yup.object().shape({
             }
     }).matches(/^[A-Z]{3}[CPHFATBLJG]{1}[A-Z]{1}[0-9]{4}[A-Z]{1}$/, function() {
         return "ValidPan"
+    }),*/
+	
+	
+	pancard: Yup.string().when(['is_eia_account2','net_premium'], {
+        is: (is_eia_account2,net_premium) => (is_eia_account2=='1') || (net_premium >= 100000), 
+        then: Yup.string().required().test(
+            "1LakhChecking",
+			function(){return "EnterPan"; },
+            function (value) {
+                if (!value) {
+                    return this.parent.net_premium <= 100000
+                }
+                 return true;
+				 
+        }).matches(/^[A-Z]{3}[CPHFATBLJG]{1}[A-Z]{1}[0-9]{4}[A-Z]{1}$/, function() {
+            return "ValidPan"
+        }),
+        otherwise: Yup.string()
     }),
+	
+	
     pincode_id:Yup.string().required('LocationRequired'),
 
     pincode:Yup.string().required('PincodeRequired')
@@ -1036,7 +1057,7 @@ console.log('post_data', post_data);
                                                     }                                                                           
                                             />
                                             {errors.pancard && touched.pancard ? (
-                                            <span className="errorMsg">{phrases[errors.pancard]}</span>
+                                            <span className="errorMsg">{errors.pancard}</span>
                                             ) : null} 
                                             </div>
                                         </FormGroup>

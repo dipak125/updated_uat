@@ -132,7 +132,7 @@ const ownerValidation = Yup.object().shape({
         otherwise: Yup.string()
     }), */
 	
-	
+	 /*
 	pancard: Yup.string().when(['policy_for','is_eia_account2','net_premium'], {
         is: (policy_for,is_eia_account2,net_premium) => (policy_for == '1' && is_eia_account2=='1') || (policy_for == '1' && net_premium >= 100000), 
         then: Yup.string().required().test(
@@ -148,7 +148,24 @@ const ownerValidation = Yup.object().shape({
             return "ValidPan"
         }),
         otherwise: Yup.string()
-    }), 
+    }),  */
+	
+	pancard: Yup.string().when(['is_eia_account2','net_premium'], {
+        is: (is_eia_account2,net_premium) => (is_eia_account2=='1') || (net_premium >= 100000), 
+        then: Yup.string().required().test(
+            "1LakhChecking",
+			function(){return "EnterPan"; },
+            function (value) {
+                if (!value) {
+                    return this.parent.net_premium <= 100000
+                }
+                 return true;
+				 
+        }).matches(/^[A-Z]{3}[CPHFATBLJG]{1}[A-Z]{1}[0-9]{4}[A-Z]{1}$/, function() {
+            return "ValidPan"
+        }),
+        otherwise: Yup.string()
+    }),
     
 
     pincode_id:Yup.string().required('LocationRequired'),
@@ -1296,7 +1313,7 @@ class TwoWheelerAdditionalDetailsOD extends Component {
                                                     }                                                                           
                                             />
                                             {errors.pancard && touched.pancard ? (
-                                            <span className="errorMsg">{phrases[errors.pancard]}</span>
+                                            <span className="errorMsg">{errors.pancard}</span>
                                             ) : null} 
                                             </div>
                                         </FormGroup>

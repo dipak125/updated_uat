@@ -1,5 +1,5 @@
 import React, { Component, Fragment } from 'react';
-import { Row, Col, Modal, Button, FormGroup, OverlayTrigger, Tooltip  } from 'react-bootstrap';
+import { Row, Col, Modal, Button, FormGroup, OverlayTrigger, Tooltip } from 'react-bootstrap';
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css"
 import 'react-datepicker/dist/react-datepicker-cssmodules.min.css'
@@ -17,6 +17,8 @@ import {  PersonAge } from "../../shared/dateFunctions";
 import Encryption from '../../shared/payload-encryption';
 import {  validSGTINcheck } from "../../shared/validationFunctions";
 
+
+const menumaster_id = 7
 const minDobAdult = moment(moment().subtract(100, 'years').calendar())
 const maxDobAdult = moment().subtract(18, 'years').calendar();
 const minDobNominee = moment(moment().subtract(100, 'years').calendar())
@@ -37,7 +39,7 @@ const initialValue = {
     bank_branch:"",
     nominee_relation_with:"",
     nominee_first_name:"",
-    nominee_last_name:"",
+    nominee_last_name:"test",
     nominee_gender:"",
     nominee_dob: "",
     phone: "",
@@ -114,7 +116,7 @@ const ownerValidation = Yup.object().shape({
             .test(
                 "18YearsChecking",
                 function() {
-                    return "AgeRange"
+                    return "Age should me minium 18 years and maximum 100 years"
                 },
                 function (value) {
                     if (value) {
@@ -125,28 +127,8 @@ const ownerValidation = Yup.object().shape({
             }),
         otherwise: Yup.date().nullable()
     }),
-/*
-    pancard: Yup.string().when(['policy_for'], {
-        is: policy_for => policy_for == '1', 
-        then: Yup.string().required().test(
-            "1LakhChecking",
-            function() {
-                if ((document.querySelector('input[name="is_eia_account2"]:checked')) && (document.querySelector('input[name="is_eia_account2"]:checked').value == 1 )) { 
-                    return "EnterPan";
-                }
-            },
-            function (value) {
-                if (!value) {
-                    return this.parent.net_premium <= 100000
-                }
-                 return true;
-        }).matches(/^[A-Z]{3}[CPHFATBLJG]{1}[A-Z]{1}[0-9]{4}[A-Z]{1}$/, function() {
-            return "ValidPan"
-        }),
-        otherwise: Yup.string()
-    }), */
-	
-	pancard: Yup.string().when(['is_eia_account2','net_premium'], {
+
+    pancard: Yup.string().when(['is_eia_account2','net_premium'], {
         is: (is_eia_account2,net_premium) => (is_eia_account2=='1') || (net_premium >= 100000), 
         then: Yup.string().required().test(
             "1LakhChecking",
@@ -161,8 +143,7 @@ const ownerValidation = Yup.object().shape({
             return "ValidPan"
         }),
         otherwise: Yup.string()
-    }),
-
+    }), 
     
     pincode_id:Yup.string().required('LocationRequired'),
 
@@ -180,7 +161,7 @@ const ownerValidation = Yup.object().shape({
     .max(100, function() {
         return "AddressMustBeMaximum100Chracters"
     }),
-    
+
     phone: Yup.string()
     .matches(/^[6-9][0-9]{9}$/,'ValidMobile').required('PhoneRequired'),
     
@@ -300,11 +281,11 @@ const ownerValidation = Yup.object().shape({
         })
         .max(13, function() {
             return "EIAMax"
-        }).matches(/^[1245][0-9]{0,13}$/,'EIAValidReq').notRequired('EIARequired'),
+        }).matches(/^[1245][0-9]{0,13}$/,'EIAValidReq').notRequired(),
 
     appointee_name: Yup.string().when(['policy_for'], {
         is: policy_for => policy_for == '1',       
-        then: Yup.string().notRequired("Please enter appointee name")
+        then: Yup.string().notRequired()
                 .min(3, function() {
                     return "NameReqMin"
                 })
@@ -365,7 +346,7 @@ const ownerValidation = Yup.object().shape({
     .test(
         "first2digitcheck",
         function() {
-            return "ValidGST"
+            return "Invalid GSTIN"
         },
         function (value) {
             if (value && (value != "" || value != undefined) ) {             
@@ -376,7 +357,7 @@ const ownerValidation = Yup.object().shape({
     )
     .nullable(),
 
-    is_carloan: Yup.mixed().required('This field is required'),
+    is_carloan: Yup.mixed().required('RequiredField'),
     bank_name:Yup.string().notRequired()
     .test(
         "isLoanChecking",
@@ -417,9 +398,10 @@ const ownerValidation = Yup.object().shape({
         is: is_eia_account2 => is_eia_account2 == 1, 
         then: Yup.string().required('RequiredField')
     }),
+	
 })
 
-class AdditionalDetailsGCV extends Component {
+class AdditionalDetailsMISCD extends Component {
 
 
     state = {
@@ -519,7 +501,7 @@ class AdditionalDetailsGCV extends Component {
     }
 
     otherComprehensive = (productId) => {
-        this.props.history.push(`/OtherComprehensive_GCV_TP/${productId}`);
+        this.props.history.push(`/OtherComprehensive_MISCDST/${productId}`);
     }
 
 
@@ -541,7 +523,7 @@ class AdditionalDetailsGCV extends Component {
 		
         let post_data = {
             'policy_holder_id':request_data.policyholder_id,
-            'menumaster_id':4,
+            'menumaster_id':menumaster_id,
             'first_name':values['first_name'],
             'last_name':values['last_name'],
             'pancard':values['pancard'],
@@ -554,14 +536,13 @@ class AdditionalDetailsGCV extends Component {
             'phone': values['phone'],
             'email': values['email'],
             'is_eia_account': values['is_eia_account'],
-			
+			'is_eia_account2': values['is_eia_account2'],
             'eia_no': values['eia_no'],
             'address': values['address'],          
             'gstn_no': values['gstn_no'],
             'salutation_id': values['salutation_id'],
             'nominee_title_id': values['nominee_salutation'],
-            'page_name': `AdditionalDetails_GCV_TP/${productId}`,
-			
+            'page_name': `AdditionalDetails_MISCD/${productId}`,
 			'create_eia_account': create_eia_account,
 			'tpaInsurance': values['tpaInsurance'],
         }
@@ -590,13 +571,13 @@ class AdditionalDetailsGCV extends Component {
         formData.append('enc_data',encryption.encrypt(JSON.stringify(post_data)))
         this.props.loadingStart();
         axios
-        .post(`gcv-tp/owner-details`, formData)
+        .post(`miscd/owner-details`, formData)
         .then(res => { 
-            let decryptResp = JSON.parse(encryption.decrypt(res.data))
-            console.log("decrypt", decryptResp)
+            let decryptResp = JSON.parse(encryption.decrypt(res.data));
+            console.log('decryptResp-----', decryptResp)
             this.props.loadingStop();
             if (decryptResp.error == false) {
-            this.props.history.push(`/Premium_GCV_TP/${productId}`);
+            this.props.history.push(`/Premium_MISCDST/${productId}`);
             }
         })
         .catch(err => { 
@@ -613,7 +594,7 @@ class AdditionalDetailsGCV extends Component {
         let policyHolder_id = localStorage.getItem("policyHolder_refNo") ? localStorage.getItem("policyHolder_refNo") : 0;
         let encryption = new Encryption();
         this.props.loadingStart();
-        axios.get(`gcv-tp/policy-holder/details/${policyHolder_id}`)
+        axios.get(`miscd/policy-holder/details/${policyHolder_id}`)
             .then(res => {
                  let decryptResp = JSON.parse(encryption.decrypt(res.data))
                  console.log("decrypt---", decryptResp)
@@ -626,9 +607,10 @@ class AdditionalDetailsGCV extends Component {
                  let quoteId = decryptResp.data.policyHolder ? decryptResp.data.policyHolder.request_data.quote_id : ""
                  let is_eia_account=  policyHolder && (policyHolder.is_eia_account == 0 || policyHolder.is_eia_account == 1) ? policyHolder.is_eia_account : ""
 				 
-				 let is_eia_account2=  policyHolder && (policyHolder.create_eia_account == 0 || policyHolder.create_eia_account == 1) ? policyHolder.create_eia_account : ""				 
+				 let is_eia_account2=  policyHolder && (policyHolder.create_eia_account == 0 || policyHolder.create_eia_account == 1) ? policyHolder.create_eia_account : ""
 				 
-				 let tpaInsurance = policyHolder.T_Insurance_Repository_id ? policyHolder.T_Insurance_Repository_id : ""
+				 
+				 let tpaInsurance = policyHolder.T_Insurance_Repository_id ? policyHolder.T_Insurance_Repository_id : ""	
 				 
                  let bankDetails = decryptResp.data.policyHolder && decryptResp.data.policyHolder.bankdetail ? decryptResp.data.policyHolder.bankdetail[0] : {};
                  let addressDetails = JSON.parse(decryptResp.data.policyHolder.pincode_response)
@@ -785,7 +767,6 @@ class AdditionalDetailsGCV extends Component {
         const {productId} = this.props.match.params 
         
         let phrases = localStorage.getItem("phrases") ? JSON.parse(localStorage.getItem("phrases")) : null
-
         let newInitialValues = Object.assign(initialValue, {
             first_name: policyHolder && policyHolder.first_name ? policyHolder.first_name : "",
             gender:  policyHolder && policyHolder.gender ? policyHolder.gender : "",
@@ -815,7 +796,7 @@ class AdditionalDetailsGCV extends Component {
             org_level: policyHolder && policyHolder.org_level ? policyHolder.org_level : "",
             pa_flag: motorInsurance && motorInsurance.pa_flag ? motorInsurance.pa_flag : "",
             net_premium: request_data && request_data.net_premium ? request_data.net_premium : "0",
-            salutation_id: policyHolder && policyHolder.salutation_id ? policyHolder.salutation_id : "",         
+            salutation_id: policyHolder && policyHolder.salutation_id ? policyHolder.salutation_id : "",     
             nominee_salutation: nomineeDetails && nomineeDetails.gender ? nomineeDetails.title_id : "",
 			
 			tpaInsurance: policyHolder && policyHolder.T_Insurance_Repository_id ? policyHolder.T_Insurance_Repository_id : "",
@@ -823,16 +804,19 @@ class AdditionalDetailsGCV extends Component {
 
         const quoteNumber =
         quoteId ? (
-            <h4>{phrases['PolicyReady']}: {quoteId}. {phrases['MoreDetailsPolicy']} </h4>
+            <h4>{phrases['PolicyReady']}: {quoteId} {phrases['MoreDetailsPolicy']} </h4>
         ) : null;
 
         
         return (
             <>
                 <BaseComponent>
+				
 				<div className="page-wrapper">
+				
                 <div className="container-fluid">
                 <div className="row">
+				
 				
                     <aside className="left-sidebar">
 		 				 <div className="scroll-sidebar ps-container ps-theme-default ps-active-y">
@@ -845,9 +829,9 @@ class AdditionalDetailsGCV extends Component {
              		 </div>*/}
 					
 					
-                <div className="col-sm-12 col-md-12 col-lg-12 col-xl-12 infobox aditionalGcv">
+                <div className="col-sm-12 col-md-12 col-lg-12 col-xl-12 infobox adiDetail">
                 <h4 className="text-center mt-3 mb-3">{phrases['SBIGICL']}</h4>
-                { step_completed >= '4' && vehicleDetails.vehicletype_id == '7' ?
+                { step_completed >= '4' && vehicleDetails.vehicletype_id == '11' ?
                 <section className="brand m-b-25">
                     <div className="brand-bg">
 
@@ -856,7 +840,7 @@ class AdditionalDetailsGCV extends Component {
                         >
                         {({ values, errors, setFieldValue, setFieldTouched, isValid, isSubmitting, touched }) => {
                              let value = values.nominee_first_name;
-                            // console.log("errors", errors)
+                            console.log("errors---------------- ", errors)
                         return (
                         <Form>
                         <Row>
@@ -865,7 +849,7 @@ class AdditionalDetailsGCV extends Component {
                             {quoteNumber}
                             </div>
                                 <div className="d-flex justify-content-left carloan">
-                                    <h4>  {phrases['VehicleLoan']}</h4>
+                                    <h4> {phrases['VehicleLoan']}</h4>
                                 </div>
 
                                 <Row>
@@ -955,7 +939,7 @@ class AdditionalDetailsGCV extends Component {
                                 </Row>
 
                                 <div className="d-flex justify-content-left carloan">
-                                    <h4>{phrases['OwnersDetails']}</h4>
+                                    <h4> {phrases['OwnersDetails']}</h4>
                                 </div>
 
                                 <Row>
@@ -1014,7 +998,7 @@ class AdditionalDetailsGCV extends Component {
                                                     value = {values.gstn_no.toUpperCase()} 
                                                     onChange= {(e)=> 
                                                         setFieldValue('gstn_no', e.target.value.toUpperCase())
-                                                        }                                                                                                           
+                                                        }                                                                                             
                                                 />
                                                     {errors.gstn_no && touched.gstn_no ? (
                                                 <span className="errorMsg">{errors.gstn_no}</span>
@@ -1153,7 +1137,7 @@ class AdditionalDetailsGCV extends Component {
                                                 type="test"
                                                 placeholder={phrases['Pincode']}
                                                 autoComplete="off"
-                                                maxlength = "6"
+                                                maxLength = "6"
                                                 onFocus={e => this.changePlaceHoldClassAdd(e)}
                                                 onBlur={e => this.changePlaceHoldClassRemove(e)}
                                                 onKeyUp={e=> this.fetchAreadetails(e)}
@@ -1212,7 +1196,7 @@ class AdditionalDetailsGCV extends Component {
                                                     
                                                 />
                                                 {errors.state && touched.state ? (
-                                                <span className="errorMsg">{errors.state}</span>
+                                                <span className="errorMsg">{phrases[errors.state]}</span>
                                                 ) : null}           
                                             </div>
                                         </FormGroup>
@@ -1245,7 +1229,7 @@ class AdditionalDetailsGCV extends Component {
                                            
                                             </Field>     
                                             {errors.org_level && touched.org_level ? (
-                                                <span className="errorMsg">{errors.org_level}</span>
+                                                <span className="errorMsg">{phrases[errors.org_level]}</span>
                                             ) : null}        
                                             </div>
                                         </FormGroup>
@@ -1268,6 +1252,28 @@ class AdditionalDetailsGCV extends Component {
                                             </div>
                                         </FormGroup>
                                     </Col>
+                                    {showEIA2 || is_eia_account2 == '1' ?
+                                    <Col sm={12} md={4} lg={4}>
+                                        <FormGroup>
+                                            <div className="insurerName">
+                                            <Field
+                                                name='pancard'
+                                                type="text"
+                                                placeholder={phrases['PAN']}
+                                                autoComplete="off"
+                                                onFocus={e => this.changePlaceHoldClassAdd(e)}
+                                                onBlur={e => this.changePlaceHoldClassRemove(e)}
+                                                value = {values.pancard.toUpperCase()} 
+                                                onChange= {(e)=> 
+                                                    setFieldValue('pancard', e.target.value.toUpperCase())
+                                                    }                                                                           
+                                            />
+                                            {errors.pancard && touched.pancard ? (
+                                            <span className="errorMsg">{errors.pancard}</span>
+                                            ) : null} 
+                                            </div>
+                                        </FormGroup>
+                                    </Col> : null }
                                 </Row> : null }
                                 
                                 <Row>
@@ -1311,8 +1317,7 @@ class AdditionalDetailsGCV extends Component {
                                             ) : null}  
                                             </div>
                                         </FormGroup>
-                                    </Col>
-                                    : null }
+                                    </Col> : null }
                                 </Row> 
 
                                 <div className="d-flex justify-content-left carloan">
@@ -1321,7 +1326,7 @@ class AdditionalDetailsGCV extends Component {
                                 {motorInsurance && motorInsurance.policy_for == '1' && motorInsurance.pa_flag == '1' ?
                                 <Fragment>
                                 <div className="d-flex justify-content-left carloan">
-                                    <h4> {phrases['NomineeName']}</h4>
+                                    <h4>{phrases['NomineeDetails']}</h4>
                                 </div>
 
                                 <Row>
@@ -1451,7 +1456,7 @@ class AdditionalDetailsGCV extends Component {
                                                         <Field
                                                             name="appointee_name"
                                                             type="text"
-                                                            placeholder="Appointee Name"
+                                                            placeholder={phrases['AppoName']}
                                                             autoComplete="off"
                                                             onFocus={e => this.changePlaceHoldClassAdd(e)}
                                                             onBlur={e => this.changePlaceHoldClassRemove(e)}
@@ -1497,7 +1502,7 @@ class AdditionalDetailsGCV extends Component {
                                     <Col sm={12} md={4} lg={4}>
                                         <FormGroup>
                                             <div className="insurerName">
-                                                <h4 className="fs-16">{phrases['EIAAccount']}
+                                                <h4 className="fs-16">{phrases['EIANumber']}
                                                     <OverlayTrigger overlay={<Tooltip id="tooltip-disabled">{eia_desc}</Tooltip>}>
                                                         <a className="infoIcon"><img src={require('../../assets/images/i.svg')} alt="" className="premtool" /></a>
                                                     </OverlayTrigger>
@@ -1521,7 +1526,7 @@ class AdditionalDetailsGCV extends Component {
                                                         }}
                                                         checked={values.is_eia_account == '1' ? true : false}
                                                     />
-                                                    <span className="checkmark " /><span className="fs-14"> {phrases['Yes']}</span>
+                                                        <span className="checkmark " /><span className="fs-14"> {phrases['Yes']}</span>
                                                     </label>
                                                 </div>
 
@@ -1571,9 +1576,6 @@ class AdditionalDetailsGCV extends Component {
                                     </Col> : ''}
                                 </Row> 
 								
-								
-								
-								
 								{showEIA==false && is_eia_account == '0' ?
 								<Row>
                                     <Col sm={12} md={4} lg={4}>
@@ -1618,6 +1620,7 @@ class AdditionalDetailsGCV extends Component {
                                                     />
                                                         <span className="checkmark" />
                                                         <span className="fs-14">{phrases['No']}</span>
+														
 														{errors.is_eia_account2 && touched.is_eia_account2 ? (
                                                         <span className="errorMsg">{phrases[errors.is_eia_account2]}</span>
                                                     ) : null}
@@ -1657,7 +1660,7 @@ class AdditionalDetailsGCV extends Component {
                                                         </Field> 
 														{errors.tpaInsurance && touched.tpaInsurance ? (
                                                         <span className="errorMsg">{phrases[errors.tpaInsurance]}</span>
-														) : null}
+                                                    ) : null}
                                                                
                                                     </div>
                                                 </FormGroup>
@@ -1665,17 +1668,16 @@ class AdditionalDetailsGCV extends Component {
 								</Row> 
 									: ''}
 								
-								
 
                                 <div className="d-flex justify-content-left carloan">
                                     <h4> </h4>
                                 </div>
                                 <div className="d-flex justify-content-left resmb">
                                 <Button className={`backBtn`} type="button"  disabled={isSubmitting ? true : false} onClick= {this.otherComprehensive.bind(this,productId)}>
-                                    {isSubmitting ? phrases['Wait..'] : phrases['Back']}
+                                    {isSubmitting ? phrases['Wait'] : phrases['Back']}
                                 </Button> 
                                 <Button className={`proceedBtn`} type="submit"  disabled={isSubmitting ? true : false}>
-                                    {isSubmitting ? phrases['Wait..'] : phrases['Next']}
+                                    {isSubmitting ? phrases['Wait'] : phrases['Next']}
                                 </Button> 
                                 </div>
 
@@ -1690,7 +1692,8 @@ class AdditionalDetailsGCV extends Component {
                         }}
                         </Formik>
                     </div>
-                </section> : step_completed == "" ? "Forbidden" : null }
+                </section> 
+                 : step_completed == "" ? "Forbidden" : null } 
                 </div>
                 <Footer />
                 </div>
@@ -1716,4 +1719,4 @@ const mapStateToProps = state => {
     };
   };
 
-export default withRouter (connect( mapStateToProps, mapDispatchToProps)(AdditionalDetailsGCV));
+export default withRouter (connect( mapStateToProps, mapDispatchToProps)(AdditionalDetailsMISCD));

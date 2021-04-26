@@ -99,20 +99,17 @@ const ownerValidation = Yup.object().shape({
         otherwise: Yup.date().nullable()
     }),
 
-    pancard: Yup.string().when(['policy_for'], {
-        is: policy_for => policy_for == '1', 
+    pancard: Yup.string().when(['is_eia_account2','net_premium'], {
+        is: (is_eia_account2,net_premium) => (is_eia_account2=='1') || (net_premium >= 100000), 
         then: Yup.string().required().test(
             "1LakhChecking",
-            function() {
-                if ((document.querySelector('input[name="is_eia_account2"]:checked')) && (document.querySelector('input[name="is_eia_account2"]:checked').value == 1 )) { 
-                    return "EnterPan";
-                }
-            },
+			function(){return "EnterPan"; },
             function (value) {
                 if (!value) {
                     return this.parent.net_premium <= 100000
                 }
                  return true;
+				 
         }).matches(/^[A-Z]{3}[CPHFATBLJG]{1}[A-Z]{1}[0-9]{4}[A-Z]{1}$/, function() {
             return "ValidPan"
         }),
@@ -616,13 +613,10 @@ class TwoWheelerAdditionalDetails extends Component {
                  let nomineeDetails = decryptResp.data.policyHolder ? decryptResp.data.policyHolder.request_data.nominee[0] : {}
                  let is_loan_account = decryptResp.data.policyHolder ? decryptResp.data.policyHolder.is_carloan : 0
                  let quoteId = decryptResp.data.policyHolder ? decryptResp.data.policyHolder.request_data.quote_id : ""
-                 let is_eia_account=  policyHolder && (policyHolder.is_eia_account == 0 || policyHolder.is_eia_account == 1) ? policyHolder.is_eia_account : ""
-				 
+                 let is_eia_account=  policyHolder && (policyHolder.is_eia_account == 0 || policyHolder.is_eia_account == 1) ? policyHolder.is_eia_account : ""	 
 				 let is_eia_account2=  policyHolder && (policyHolder.create_eia_account == 0 || policyHolder.create_eia_account == 1) ? policyHolder.create_eia_account : ""
-				 
-				 
+	 
 				 let tpaInsurance = policyHolder.T_Insurance_Repository_id ? policyHolder.T_Insurance_Repository_id : ""
-				 
                  let bankDetails = decryptResp.data.policyHolder && decryptResp.data.policyHolder.bankdetail ? decryptResp.data.policyHolder.bankdetail[0] : {};
                  let addressDetails = JSON.parse(decryptResp.data.policyHolder.pincode_response)
                  let step_completed = decryptResp.data.policyHolder ? decryptResp.data.policyHolder.step_no : "";
@@ -773,7 +767,7 @@ class TwoWheelerAdditionalDetails extends Component {
 
     render() {
         const {showEIA, showEIA2, showLoan, ishowEIA2, is_eia_account, is_eia_account2, is_loan_account, nomineeDetails, motorInsurance,appointeeFlag, is_appointee,titleList, tpaInsurance,
-            bankDetails,policyHolder, stateName, pinDataArr, quoteId, addressDetails, relation,step_completed,vehicleDetails} = this.state
+            bankDetails,policyHolder, stateName, pinDataArr, quoteId, addressDetails, relation,step_completed,vehicleDetails,request_data} = this.state
         const {productId} = this.props.match.params 
         let phrases = localStorage.getItem("phrases") ? JSON.parse(localStorage.getItem("phrases")) : null
 
@@ -808,6 +802,7 @@ class TwoWheelerAdditionalDetails extends Component {
             pa_flag: motorInsurance && motorInsurance.pa_flag ? motorInsurance.pa_flag : "",
             salutation_id: policyHolder && policyHolder.salutation_id ? policyHolder.salutation_id : "",       
             nominee_salutation: nomineeDetails && nomineeDetails.gender ? nomineeDetails.title_id : "",
+            net_premium: request_data && request_data.net_premium ? request_data.net_premium : "0",
 			
 			tpaInsurance: policyHolder && policyHolder.T_Insurance_Repository_id ? policyHolder.T_Insurance_Repository_id : "",			
         });
@@ -1256,7 +1251,7 @@ class TwoWheelerAdditionalDetails extends Component {
                                             </div>
                                         </FormGroup>
                                     </Col>
-                                    {motorInsurance && motorInsurance.policy_for == '1' ?
+                                    {motorInsurance && motorInsurance.policy_for == '1' ? 
                                     <Col sm={12} md={4} lg={4}>
                                         <FormGroup>
                                             <div className="insurerName">
@@ -1277,7 +1272,31 @@ class TwoWheelerAdditionalDetails extends Component {
                                             ) : null} 
                                             </div>
                                         </FormGroup>
-                                    </Col> : null }
+                                    </Col> 
+                                     :
+                                    motorInsurance && motorInsurance.policy_for == '2' && (showEIA2 || is_eia_account2 == '1' ) ? 
+                                    <Col sm={12} md={4} lg={4}>
+                                        <FormGroup>
+                                            <div className="insurerName">
+                                            <Field
+                                                name='pancard'
+                                                type="text"
+                                                placeholder={phrases['PAN']}
+                                                autoComplete="off"
+                                                onFocus={e => this.changePlaceHoldClassAdd(e)}
+                                                onBlur={e => this.changePlaceHoldClassRemove(e)}
+                                                value = {values.pancard.toUpperCase()} 
+                                                onChange= {(e)=> 
+                                                    setFieldValue('pancard', e.target.value.toUpperCase())
+                                                    }                                                                           
+                                            />
+                                            {errors.pancard && touched.pancard ? (
+                                            <span className="errorMsg">{errors.pancard}</span>
+                                            ) : null} 
+                                            </div>
+                                        </FormGroup>
+                                    </Col> 
+                                     : null }
                                 </Row>
 
                                 <div className="d-flex justify-content-left carloan">

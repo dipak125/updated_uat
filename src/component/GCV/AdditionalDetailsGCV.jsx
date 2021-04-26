@@ -126,20 +126,17 @@ const ownerValidation = Yup.object().shape({
         otherwise: Yup.date().nullable()
     }),
 
-    pancard: Yup.string().when(['policy_for'], {
-        is: policy_for => policy_for == '1', 
+    pancard: Yup.string().when(['is_eia_account2','net_premium'], {
+        is: (is_eia_account2,net_premium) => (is_eia_account2=='1') || (net_premium >= 100000), 
         then: Yup.string().required().test(
             "1LakhChecking",
-            function() {
-                if ((document.querySelector('input[name="is_eia_account2"]:checked')) && (document.querySelector('input[name="is_eia_account2"]:checked').value == 1 )) { 
-                    return "EnterPan";
-                }
-            },
+			function(){return "EnterPan"; },
             function (value) {
                 if (!value) {
                     return this.parent.net_premium <= 100000
                 }
                  return true;
+				 
         }).matches(/^[A-Z]{3}[CPHFATBLJG]{1}[A-Z]{1}[0-9]{4}[A-Z]{1}$/, function() {
             return "ValidPan"
         }),
@@ -1234,10 +1231,50 @@ class AdditionalDetailsGCV extends Component {
                                             </div>
                                         </FormGroup>
                                     </Col>
+                                    <Col sm={12} md={4} lg={4}>
+                                        <FormGroup>
+                                            <div className="insurerName">
+                                            <Field
+                                                name='email'
+                                                type="email"
+                                                placeholder={phrases['Email']}
+                                                autoComplete="off"
+                                                onFocus={e => this.changePlaceHoldClassAdd(e)}
+                                                onBlur={e => this.changePlaceHoldClassRemove(e)}
+                                                value = {values.email}                                                                            
+                                            />
+                                            {errors.email && touched.email ? (
+                                            <span className="errorMsg">{phrases[errors.email]}</span>
+                                            ) : null}  
+                                            </div>
+                                        </FormGroup>
+                                    </Col>
+                                    {showEIA2 || is_eia_account2 == '1' ?
+                                        <Col sm={12} md={4} lg={4}>
+                                            <FormGroup>
+                                                <div className="insurerName">
+                                                <Field
+                                                    name='pancard'
+                                                    type="text"
+                                                    placeholder={phrases['PAN']}
+                                                    autoComplete="off"
+                                                    onFocus={e => this.changePlaceHoldClassAdd(e)}
+                                                    onBlur={e => this.changePlaceHoldClassRemove(e)}
+                                                    value = {values.pancard.toUpperCase()} 
+                                                    onChange= {(e)=> 
+                                                        setFieldValue('pancard', e.target.value.toUpperCase())
+                                                        }                                                                           
+                                                />
+                                                {errors.pancard && touched.pancard ? (
+                                                <span className="errorMsg">{errors.pancard}</span>
+                                                ) : null} 
+                                                </div>
+                                            </FormGroup>
+                                        </Col> : null }
                                 </Row> : null }
                                 
-                                <Row>
                                 {motorInsurance && motorInsurance.policy_for == '1' ?
+                                <Row>
                                     <Col sm={12} md={4} lg={4}>
                                         <FormGroup>
                                             <div className="insurerName">
@@ -1258,7 +1295,7 @@ class AdditionalDetailsGCV extends Component {
                                             ) : null} 
                                             </div>
                                         </FormGroup>
-                                    </Col> : null }
+                                    </Col> 
                                     <Col sm={12} md={4} lg={4}>
                                         <FormGroup>
                                             <div className="insurerName">
@@ -1277,7 +1314,7 @@ class AdditionalDetailsGCV extends Component {
                                             </div>
                                         </FormGroup>
                                     </Col>
-                                </Row> 
+                                </Row> : null }
 
                                 <div className="d-flex justify-content-left carloan">
                                     <h4> </h4>

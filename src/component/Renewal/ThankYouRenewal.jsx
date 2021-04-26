@@ -36,7 +36,7 @@ class ThankYouPage extends Component {
     formData.append('policyNo', policyNo)
     this.props.loadingStart();
     axios
-      .post(`/policy-download/policy-pdf`, formData)
+      .post(`/policy-download/renewal-policy-pdf`, formData)
       .then(res => {
         this.props.loadingStop();
         if(res.data.error == false) {
@@ -376,7 +376,6 @@ getCustomerMsg = () => {
           this.props.loadingStop();
       })
 }
-
 
 
 downloadWording = () => {

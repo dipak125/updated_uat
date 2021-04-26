@@ -98,7 +98,7 @@ const ownerValidation = Yup.object().shape({
         otherwise: Yup.date().nullable()
     }),
 
-    pancard: Yup.string().when(['policy_for'], {
+/*  pancard: Yup.string().when(['policy_for'], {
         is: policy_for => policy_for == '1', 
         then: Yup.string().required().test(
             "1LakhChecking",
@@ -112,6 +112,23 @@ const ownerValidation = Yup.object().shape({
                     return this.parent.net_premium <= 100000
                 }
                  return true;
+        }).matches(/^[A-Z]{3}[CPHFATBLJG]{1}[A-Z]{1}[0-9]{4}[A-Z]{1}$/, function() {
+            return "ValidPan"
+        }),
+        otherwise: Yup.string()
+    }), */
+	
+	pancard: Yup.string().when(['is_eia_account2','net_premium'], {
+        is: (is_eia_account2,net_premium) => (is_eia_account2=='1') || (net_premium >= 100000), 
+        then: Yup.string().required().test(
+            "1LakhChecking",
+			function(){return "EnterPan"; },
+            function (value) {
+                if (!value) {
+                    return this.parent.net_premium <= 100000
+                }
+                 return true;
+				 
         }).matches(/^[A-Z]{3}[CPHFATBLJG]{1}[A-Z]{1}[0-9]{4}[A-Z]{1}$/, function() {
             return "ValidPan"
         }),

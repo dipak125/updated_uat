@@ -172,29 +172,29 @@ const ComprehensiveValidation = Yup.object().shape({
 
     B00004_value: Yup.string().when(['electric_flag'], {
         is: electric_flag => electric_flag == '1',
-        then: Yup.string().required('pleaseProvideElecIDV').matches(/^[0-9]*$/, 'Please provide valid IDV').max(8, function() {
-                return "Value should be maximum 8 characters"
+        then: Yup.string().required('pleaseProvideElecIDV').matches(/^[0-9]*$/, 'PleaseProvideValidIDV').max(8, function() {
+                return "valueMax8Char"
             }),
         otherwise: Yup.string()
     }),
 
     B00004_description: Yup.string().when(['electric_flag'], {
         is: electric_flag => electric_flag == '1',
-        then: Yup.string().required('pleaseProvideAccessory').matches(/^[a-zA-Z0-9]+[a-zA-Z0-9\s]*$/, 'Please provide valid description'),
+        then: Yup.string().required('pleaseProvideAccessory').matches(/^[a-zA-Z0-9]+[a-zA-Z0-9\s]*$/, 'PleaseValidDescription'),
         otherwise: Yup.string()
     }),
 
     B00003_value: Yup.string().when(['nonElectric_flag'], {
         is: nonElectric_flag => nonElectric_flag == '1',
-        then: Yup.string().required('pleaseProvideNonElecIDV').matches(/^[0-9]*$/, 'Please provide valid IDV').max(8, function() {
-                return "Value should be maximum 8 characters"
+        then: Yup.string().required('pleaseProvideNonElecIDV').matches(/^[0-9]*$/, 'PleaseProvideValidIDV').max(8, function() {
+                return "valueMax8Char"
             }),
         otherwise: Yup.string()
     }),
 
     B00003_description: Yup.string().when(['nonElectric_flag'], {
         is: nonElectric_flag => nonElectric_flag == '1',
-        then: Yup.string().required('pleaseProvideAccessory').matches(/^[a-zA-Z0-9]+[a-zA-Z0-9\s]*$/, 'Please provide valid description'),
+        then: Yup.string().required('pleaseProvideAccessory').matches(/^[a-zA-Z0-9]+[a-zA-Z0-9\s]*$/, 'PleaseValidDescription'),
         otherwise: Yup.string()
     }),
 
@@ -218,7 +218,7 @@ const ComprehensiveValidation = Yup.object().shape({
 
     B00007_description: Yup.string().when(['trailer_flag'], {
         is: trailer_flag => trailer_flag == '1',
-        then: Yup.string().required('pleaseProvideTrailerIDV').matches(/^[0-9]*$/, 'Please provide valid IDV'),
+        then: Yup.string().required('pleaseProvideTrailerIDV').matches(/^[0-9]*$/, 'PleaseProvideValidIDV'),
         otherwise: Yup.string()
     }),
     // B00011_value: Yup.string().when(['trailer_flag_TP'], {
@@ -229,7 +229,7 @@ const ComprehensiveValidation = Yup.object().shape({
 
     // B00011_description: Yup.string().when(['trailer_flag_TP'], {
     //     is: trailer_flag_TP => trailer_flag_TP == '1',
-    //     then: Yup.string().required('Please provide trailer IDV').matches(/^[0-9]*$/, 'Please provide valid IDV'),
+    //     then: Yup.string().required('Please provide trailer IDV').matches(/^[0-9]*$/, 'PleaseProvideValidIDV'),
     //     otherwise: Yup.string()
     // }),
 
@@ -1783,9 +1783,9 @@ console.log("values----------------- ", values)
                                         </div>
                                     </FormGroup>
                                 </Col>
-                                {console.log("minIDV------------- ", minIDV)}
+                                {/* {console.log("minIDV------------- ", minIDV)}
                                 {console.log("maxIDV------------- ", maxIDV)}
-                                {console.log("IDV_Suggested------------- ", defaultSliderValue)}
+                                {console.log("IDV_Suggested------------- ", defaultSliderValue)} */}
                                 {defaultSliderValue ? 
 
                                 <Col sm={12} md={12} lg={6}>

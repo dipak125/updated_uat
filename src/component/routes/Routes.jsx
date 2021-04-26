@@ -254,6 +254,33 @@ const PremiumGCV = Loadable({
     loading: () => loadingContent
 });
 
+// ======================== Motor GCV Short Term ========================================
+
+const RegistrationGCVST = Loadable({
+    loader: () => import(/*webpackChunkName: "Products" */"../GCV-ShortTerm/RegistrationGCVST.jsx"),
+    loading: () => loadingContent
+});
+const SelectBrandGCVST = Loadable({
+    loader: () => import(/*webpackChunkName: "Products" */"../GCV-ShortTerm/SelectBrandGCVST.jsx"),
+    loading: () => loadingContent
+});
+const VehicleDetailsGCVST = Loadable({
+    loader: () => import(/*webpackChunkName: "Products" */"../GCV-ShortTerm/VehicleDetailsGCVST.jsx"),
+    loading: () => loadingContent
+});
+const OtherComprehensiveGCVST = Loadable({
+    loader: () => import(/*webpackChunkName: "Products" */"../GCV-ShortTerm/OtherComprehensiveGCVST.jsx"),
+    loading: () => loadingContent
+});
+const AdditionalDetailsGCVST = Loadable({
+    loader: () => import(/*webpackChunkName: "Products" */"../GCV-ShortTerm/AdditionalDetailsGCVST.jsx"),
+    loading: () => loadingContent
+});
+const PremiumGCVST = Loadable({
+    loader: () => import(/*webpackChunkName: "Products" */"../GCV-ShortTerm/PremiumGCVST.jsx"),
+    loading: () => loadingContent
+});
+
 // ======================== Motor GCV tp ========================================
 
 const RegistrationGCVTP = Loadable({
@@ -342,6 +369,34 @@ const AdditionalDetailsMISCD = Loadable({
 });
 const PremiumMISCD = Loadable({
     loader: () => import(/*webpackChunkName: "Products" */"../MISC-D/PremiumMISCD.jsx"),
+    loading: () => loadingContent
+});
+
+
+// ======================== Motor MISC-D Short Term ========================================
+
+const RegistrationMISCDST = Loadable({
+    loader: () => import(/*webpackChunkName: "Products" */"../MISC-D ShortTerm/RegistrationMISCDST.jsx"),
+    loading: () => loadingContent
+});
+const SelectBrandMISCDST = Loadable({
+    loader: () => import(/*webpackChunkName: "Products" */"../MISC-D ShortTerm/SelectBrandMISCDST.jsx"),
+    loading: () => loadingContent
+});
+const VehicleDetailsMISCDST = Loadable({
+    loader: () => import(/*webpackChunkName: "Products" */"../MISC-D ShortTerm/VehicleDetailsMISCDST.jsx"),
+    loading: () => loadingContent
+});
+const OtherComprehensiveMISCDST = Loadable({
+    loader: () => import(/*webpackChunkName: "Products" */"../MISC-D ShortTerm/OtherComprehensiveMISCDST.jsx"),
+    loading: () => loadingContent
+});
+const AdditionalDetailsMISCDST = Loadable({
+    loader: () => import(/*webpackChunkName: "Products" */"../MISC-D ShortTerm/AdditionalDetailsMISCDST.jsx"),
+    loading: () => loadingContent
+});
+const PremiumMISCDST = Loadable({
+    loader: () => import(/*webpackChunkName: "Products" */"../MISC-D ShortTerm/PremiumMISCDST.jsx"),
     loading: () => loadingContent
 });
 
@@ -434,31 +489,31 @@ const PolicyDetails_GSB = Loadable({
 
 // ========== Four-Wheeler OD =============================================
 						
-					const RegistrationOD = Loadable({
-						loader: () => import(/*webpackChunkName: "Products" */"../motor-OD/RegistrationOD.jsx"),
-						loading: () => loadingContent
-					});
-					const SelectBrandOD = Loadable({
-						loader: () => import(/*webpackChunkName: "Products" */"../motor-OD/SelectBrandOD.jsx"),
-						loading: () => loadingContent
-					});
-					const VehicleDetailsOD = Loadable({
-						loader: () => import(/*webpackChunkName: "Products" */"../motor-OD/VehicleDetailsOD.jsx"),
-						loading: () => loadingContent
-					});
-					const OtherComprehensiveOD = Loadable({
-						loader: () => import(/*webpackChunkName: "Products" */"../motor-OD/OtherComprehensiveOD.jsx"),
-						loading: () => loadingContent
-					});
-					const AdditionalDetailsOD = Loadable({
-						loader: () => import(/*webpackChunkName: "Products" */"../motor-OD/AdditionalDetailsOD.jsx"),
-						loading: () => loadingContent
-					});
-					const PremiumOD = Loadable({
-						loader: () => import("../motor-OD/PremiumOD.jsx"),
-						loading: () => loadingContent
-					});
-				/**/
+const RegistrationOD = Loadable({
+    loader: () => import(/*webpackChunkName: "Products" */"../motor-OD/RegistrationOD.jsx"),
+    loading: () => loadingContent
+});
+const SelectBrandOD = Loadable({
+    loader: () => import(/*webpackChunkName: "Products" */"../motor-OD/SelectBrandOD.jsx"),
+    loading: () => loadingContent
+});
+const VehicleDetailsOD = Loadable({
+    loader: () => import(/*webpackChunkName: "Products" */"../motor-OD/VehicleDetailsOD.jsx"),
+    loading: () => loadingContent
+});
+const OtherComprehensiveOD = Loadable({
+    loader: () => import(/*webpackChunkName: "Products" */"../motor-OD/OtherComprehensiveOD.jsx"),
+    loading: () => loadingContent
+});
+const AdditionalDetailsOD = Loadable({
+    loader: () => import(/*webpackChunkName: "Products" */"../motor-OD/AdditionalDetailsOD.jsx"),
+    loading: () => loadingContent
+});
+const PremiumOD = Loadable({
+    loader: () => import("../motor-OD/PremiumOD.jsx"),
+    loading: () => loadingContent
+});
+/**/
 
 
 //  ************ Vedvag Payment Gateway ******************
@@ -604,6 +659,14 @@ class Routes extends Component {
                         <PrivateRoute exact path="/AdditionalDetails_GCV/:productId" component={AdditionalDetailsGCV} />  
                         <PrivateRoute exact path="/Premium_GCV/:productId" component={PremiumGCV} />
 
+                        {/************ MotorGCV Short Term******************/}
+                        <PrivateRoute exact path="/Registration_GCVST/:productId" component={RegistrationGCVST} />
+                        <PrivateRoute exact path="/SelectBrand_GCVST/:productId" component={SelectBrandGCVST} />
+                        <PrivateRoute exact path="/VehicleDetails_GCVST/:productId" component={VehicleDetailsGCVST} />
+                        <PrivateRoute exact path="/OtherComprehensive_GCVST/:productId" component={OtherComprehensiveGCVST} />
+                        <PrivateRoute exact path="/AdditionalDetails_GCVST/:productId" component={AdditionalDetailsGCVST} />  
+                        <PrivateRoute exact path="/Premium_GCVST/:productId" component={PremiumGCVST} />
+
                         {/************ MotorGCV - TP ******************/}
                         <PrivateRoute exact path="/Registration_GCV_TP/:productId" component={RegistrationGCVTP} />
                         <PrivateRoute exact path="/SelectBrand_GCV_TP/:productId" component={SelectBrandGCVTP} />
@@ -643,6 +706,14 @@ class Routes extends Component {
                         <PrivateRoute exact path="/OtherComprehensive_MISCD/:productId" component={OtherComprehensiveMISCD} />
                         <PrivateRoute exact path="/AdditionalDetails_MISCD/:productId" component={AdditionalDetailsMISCD} />  
                         <PrivateRoute exact path="/Premium_MISCD/:productId" component={PremiumMISCD} />
+
+                        {/************ Motor MISC-D Short Term******************/}
+                        <PrivateRoute exact path="/Registration_MISCDST/:productId" component={RegistrationMISCDST} />
+                        <PrivateRoute exact path="/SelectBrand_MISCDST/:productId" component={SelectBrandMISCDST} />
+                        <PrivateRoute exact path="/VehicleDetails_MISCDST/:productId" component={VehicleDetailsMISCDST} />
+                        <PrivateRoute exact path="/OtherComprehensive_MISCDST/:productId" component={OtherComprehensiveMISCDST} />
+                        <PrivateRoute exact path="/AdditionalDetails_MISCDST/:productId" component={AdditionalDetailsMISCDST} />  
+                        <PrivateRoute exact path="/Premium_MISCDST/:productId" component={PremiumMISCDST} />
 
                         {/************ KSB-Retail ******************/}
                         <PrivateRoute exact path="/Health_KSB/:productId" component={Health_KSB} />
