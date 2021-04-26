@@ -56,7 +56,7 @@ const vehicleRegistrationValidation = Yup.object().shape({
     registration_date: Yup.string().required('RegistrationRequired')
     .test(
         "checkMaxDateRollover",
-        "Registration date must be one year old",
+        "RegistrationDateOld",
         function (value) {
             if (value && this.parent.policy_type_id == '2') {
                 return checkGreaterStartEndTimes(value, maxDateForValidtion);
@@ -66,7 +66,7 @@ const vehicleRegistrationValidation = Yup.object().shape({
     )
     .test(
         "checkMinDate_MaxDate_NewPolicy",
-        "Registration date cannot be older than one month",
+        "RegistrationDateOneMonth",
         function (value) {
             if (value && this.parent.policy_type_id == '1') {
                 // return checkGreaterStartEndTimes(value, new Date()) && checkGreaterStartEndTimes(minRegnDateNew, value);
@@ -77,7 +77,7 @@ const vehicleRegistrationValidation = Yup.object().shape({
     )
     .test(
         "checkGreaterTimes",
-        "Registration date must be less than Previous policy start date",
+        "RegistrationLessPrevious",
         function (value) {
             if (value) {
                 return checkGreaterStartEndTimes(value, this.parent.previous_start_date);

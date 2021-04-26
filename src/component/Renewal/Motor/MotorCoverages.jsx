@@ -533,8 +533,10 @@ class MotorCoverages extends Component {
                 let decryptResp = res.data
                 let add_more_coverage = []
                 let add_more_coverage_request_array = []
-                let geo_extention = []
+                let temp_additional_coverage_extention = []
+                let additional_coverage = []
                 let geographical_extension = []
+                let trailer_array = []
                 let motorInsurance = decryptResp.data.policyHolder ? decryptResp.data.policyHolder.motorinsurance : {}
                 let request_data = decryptResp.data.policyHolder ? decryptResp.data.policyHolder.request_data : {};
                 let sliderVal = request_data && request_data.sum_insured ? parseInt(request_data.sum_insured) : ""
@@ -551,9 +553,9 @@ class MotorCoverages extends Component {
                 add_more_coverage_request_array = decryptResp.data.policyHolder && decryptResp.data.policyHolder.renewalinfo && decryptResp.data.policyHolder.renewalinfo.quote_response ? JSON.parse(decryptResp.data.policyHolder.renewalinfo.quote_response) : []
                 add_more_coverage_request_array = add_more_coverage_request_array && add_more_coverage_request_array.policySOABO.insuredSOABOList.policyCtSOABOList
                 
-                geo_extention = decryptResp.data.policyHolder && decryptResp.data.policyHolder.renewalinfo && decryptResp.data.policyHolder.renewalinfo.quote_response ? JSON.parse(decryptResp.data.policyHolder.renewalinfo.quote_response) : []
-                geo_extention = geo_extention && geo_extention.policySOABO.insuredSOABOList.dynamicObjectList
-                geo_extention.map((geoCoverage,index)=> {
+                temp_additional_coverage_extention = decryptResp.data.policyHolder && decryptResp.data.policyHolder.renewalinfo && decryptResp.data.policyHolder.renewalinfo.quote_response ? JSON.parse(decryptResp.data.policyHolder.renewalinfo.quote_response) : []
+                temp_additional_coverage_extention = temp_additional_coverage_extention && temp_additional_coverage_extention.policySOABO.insuredSOABOList.dynamicObjectList
+                temp_additional_coverage_extention.map((geoCoverage,index)=> {
                     if(geoCoverage.bizTableName == "Extention_Country" && geoCoverage.dynamicAttributeVOList && geoCoverage.dynamicAttributeVOList.valueMap 
                     &&(geoCoverage.dynamicAttributeVOList.valueMap.Bangladesh == '1' || geoCoverage.dynamicAttributeVOList.valueMap.Bhutan == '1'
                     || geoCoverage.dynamicAttributeVOList.valueMap.Maldives == '1' || geoCoverage.dynamicAttributeVOList.valueMap.Nepal == '1'
@@ -579,10 +581,34 @@ class MotorCoverages extends Component {
                         }
                     }
                 })
+
+                temp_additional_coverage_extention.map((moreCoverage,index)=> {
+                    if(moreCoverage.bizTableName == "TrailerDetails" && moreCoverage.dynamicAttributeVOList && moreCoverage.dynamicAttributeVOList.valueMap ) {
+                        var tempVal={B00007:{
+                            value: moreCoverage.dynamicAttributeVOList.valueMap.NoOfTrailers,
+                            description: moreCoverage.dynamicAttributeVOList.valueMap.NoOfTrailers
+                        }}
+                        this.setState({no_of_claim : moreCoverage.dynamicAttributeVOList.valueMap.NoOfTrailers})
+                        additional_coverage.push(tempVal) 
+                    }
+                })
+
+                add_more_coverage_request_array && add_more_coverage_request_array.length>0 && add_more_coverage_request_array.map((value,index) => {   
+                    value && value.policyCtAcceSOABOList && value.policyCtAcceSOABOList.length>0 && value.policyCtAcceSOABOList.map((subValue,subIndex)=>{
+                        // console.log("subValue-------------- ", subValue)
+                        if(subValue.interestId == '700001865') {
+                            var tempVal={
+                                chassisNo :  subValue.fieldValueMap.TrailerChassisNumbers1_BT ,
+                                regNo :  subValue.fieldValueMap.TrailerRegNo_BT
+                            }
+                            trailer_array.push(tempVal)
+                        }
+                    })
+                }) 
                 
                 this.setState({
                     motorInsurance, request_data, vehicleDetails,policyCoverage,add_more_coverage,add_more_coverage_request_array,geographical_extension,
-                    selectFlag: motorInsurance && motorInsurance.add_more_coverage != null ? '0' : '1',sliderVal,
+                    selectFlag: motorInsurance && motorInsurance.add_more_coverage != null ? '0' : '1',sliderVal,additional_coverage, trailer_array
 
                 })
                 this.props.loadingStop();
@@ -1039,9 +1065,11 @@ class MotorCoverages extends Component {
 
 
     render() {
-        const {add_more_coverage, is_CNG_account, request_data,error, policyCoverage, vahanVerify, selectFlag, fulQuoteResp, PolicyArray, fuelList, depreciationPercentage, vehicleDetails, geographical_extension,
+        const {add_more_coverage, additional_coverage, request_data,error, policyCoverage, vahanVerify, selectFlag, fulQuoteResp, PolicyArray, fuelList, depreciationPercentage, vehicleDetails, geographical_extension,
             moreCoverage, sliderVal, bodySliderVal, motorInsurance, serverResponse, engine_no, chasis_no, initialValue, add_more_coverage_request_array,ncbDiscount} = this.state
         const {productId} = this.props.match.params 
+        console.log("add_more_coverage_request_array-------------------------- ", add_more_coverage_request_array)
+        // console.log("additional_coverage-------------------------- ", additional_coverage)
         //let defaultSliderValue = PolicyArray.length > 0 ? Math.round(PolicyArray[0].PolicyRiskList[0].IDV_Suggested) : 0
         let vehicletype_id = vehicleDetails ? vehicleDetails.vehicletype_id : ""
         let defaultSliderValue = sliderVal
@@ -1072,14 +1100,14 @@ class MotorCoverages extends Component {
         let PA_Cover = motorInsurance &&  motorInsurance.pa_cover != null ? motorInsurance.pa_cover : ''
         let fuel_type = vehicleDetails && vehicleDetails.varientmodel && vehicleDetails.varientmodel.fueltype  ? vehicleDetails.varientmodel.fueltype.id : ""
 
-        let trailer_flag= add_more_coverage_request_array.B00007 && add_more_coverage_request_array.B00007.value ? '1' : '0'
-        let pa_coolie_flag= add_more_coverage_request_array.B00073 && add_more_coverage_request_array.B00073.value ? '1' : '0'
-        let electric_flag= add_more_coverage_request_array.B00004 && add_more_coverage_request_array.B00004.value ? '1' : '0'
-        let nonElectric_flag= add_more_coverage_request_array.B00003 && add_more_coverage_request_array.B00003.value ? '1' : '0'
+        let trailer_flag= add_more_coverage.indexOf("700001861") > 0 ? '1' : '0' 
+        let pa_coolie_flag= add_more_coverage.indexOf("900001147") > 0 ? '1' : '0'
+        let electric_flag= add_more_coverage.indexOf("700001865") > 0 ? '1' : '0'
+        let nonElectric_flag= add_more_coverage.indexOf("700001862") > 0 ? '1' : '0'
         let hospital_cash_OD_flag= add_more_coverage_request_array.B00020 && add_more_coverage_request_array.B00020.value ? '1' : '0'
         let hospital_cash_PD_flag= add_more_coverage_request_array.B00022 && add_more_coverage_request_array.B00022.value ? '1' : '0'
-        let LL_PD_flag= add_more_coverage.indexOf("700000351") ? '1' : '0'
-        let LL_Emp_flag= add_more_coverage_request_array.B00012 && add_more_coverage_request_array.B00012.value ? '1' : '0'
+        let LL_PD_flag= add_more_coverage.indexOf("700000351") > 0 || add_more_coverage.indexOf("900000687") > 0 ? '1' : '0' 
+        let LL_Emp_flag= add_more_coverage.indexOf("900000688") > 0 ? '1' : '0'
         let LL_Coolie_flag= add_more_coverage_request_array.B00069 && add_more_coverage_request_array.B00069.value ? '1' : '0'
         let enhance_PA_OD_flag= add_more_coverage_request_array.B00018 && add_more_coverage_request_array.B00018.value ? '1' : '0'
         let ATC_flag= add_more_coverage_request_array.ATC && add_more_coverage_request_array.ATC.value ? '1' : '0'
@@ -1106,7 +1134,7 @@ class MotorCoverages extends Component {
                 B00006 : vehicleDetails && vehicleDetails.varientmodel && (vehicleDetails.varientmodel.fueltype.id == 3 || vehicleDetails.varientmodel.fueltype.id == 4) ? "B00006" : "",
                 B00010 : vehicleDetails && vehicleDetails.varientmodel && (vehicleDetails.varientmodel.fueltype.id == 3 || vehicleDetails.varientmodel.fueltype.id == 4) ? "B00010" : "",               
                 PA_Cover: "",
-                PA_cover_flag: motorInsurance && motorInsurance.policy_for == '2' ? '0' : '1',
+                PA_cover_flag: add_more_coverage.indexOf("700000353") > 0 || add_more_coverage.indexOf("900000695") > 0 ? '1' : '0',
                 PA_flag: '0',
                 trailer_flag: '0',
                 pa_coolie_flag: '0',
@@ -1140,7 +1168,7 @@ class MotorCoverages extends Component {
                     newRegistrationNo: localStorage.getItem('registration_number') == "NEW" ? localStorage.getItem('registration_number') : "", 
                     PA_flag: '0',
                     PA_Cover: "",
-                    PA_cover_flag: motorInsurance && motorInsurance.pa_flag ? motorInsurance.pa_flag : '0',
+                    PA_cover_flag: add_more_coverage.indexOf("700000353") > 0 || add_more_coverage.indexOf("900000695") > 0 ? '1' : '0',
                     trailer_flag: '0',
                     pa_coolie_flag: '0',
                     electric_flag: '0',
@@ -1192,20 +1220,9 @@ class MotorCoverages extends Component {
         newInnitialArray.ATC_value = add_more_coverage_request_array.ATC ? add_more_coverage_request_array.ATC.value : ""
         newInnitialArray.B00018_value = add_more_coverage_request_array.B00018 ? add_more_coverage_request_array.B00018.value : ""
         newInnitialArray.B00069_value = add_more_coverage_request_array.B00069 ? add_more_coverage_request_array.B00069.value : ""
-        newInnitialArray.B00012_value = add_more_coverage_request_array.B00012 ? add_more_coverage_request_array.B00012.value : ""
-        // newInnitialArray['700000351_value'] = add_more_coverage_request_array.B00013 ? add_more_coverage_request_array.B00013.value : ""
+       
         newInnitialArray.B00022_value = add_more_coverage_request_array.B00022 ? add_more_coverage_request_array.B00022.value : ""
         newInnitialArray.B00020_value = add_more_coverage_request_array.B00020 ? add_more_coverage_request_array.B00020.value : ""
-        newInnitialArray.B00004_value = add_more_coverage_request_array.B00004 ? add_more_coverage_request_array.B00004.value : ""
-        newInnitialArray.B00004_description = add_more_coverage_request_array.B00004 ? add_more_coverage_request_array.B00004.description : ""
-        newInnitialArray.B00003_value = add_more_coverage_request_array.B00003 ? add_more_coverage_request_array.B00003.value : ""
-        newInnitialArray.B00003_description = add_more_coverage_request_array.B00003 ? add_more_coverage_request_array.B00003.description : ""
-        newInnitialArray.B00073_value = add_more_coverage_request_array.B00073 ? add_more_coverage_request_array.B00073.value : ""
-        newInnitialArray.B00073_description = add_more_coverage_request_array.B00073 ? add_more_coverage_request_array.B00073.description : ""
-        newInnitialArray.B00007_value = add_more_coverage_request_array.B00007 ? add_more_coverage_request_array.B00007.value : ""
-        newInnitialArray.B00007_description = add_more_coverage_request_array.B00007 ? add_more_coverage_request_array.B00007.description : ""
-        // newInnitialArray.B00011_value = add_more_coverage_request_array.B00011 ? add_more_coverage_request_array.B00011.value : ""
-        // newInnitialArray.B00011_description = add_more_coverage_request_array.B00011 ? add_more_coverage_request_array.B00011.description : ""
         newInnitialArray.B00070_value = add_more_coverage_request_array.B00070 ? add_more_coverage_request_array.B00070.value : ""    
         newInnitialArray.B00005_value = add_more_coverage_request_array.B00005 ? add_more_coverage_request_array.B00005.value : ""
 
@@ -1215,17 +1232,51 @@ class MotorCoverages extends Component {
         newInnitialArray.GeoExtnMaldives = geographical_extension ? geographical_extension[geographical_extension.indexOf("GeoExtnMaldives")] : ""
         newInnitialArray.GeoExtnPakistan = geographical_extension ? geographical_extension[geographical_extension.indexOf("GeoExtnPakistan")] : ""
         newInnitialArray.GeoExtnSriLanka = geographical_extension ? geographical_extension[geographical_extension.indexOf("GeoExtnSriLanka")] : ""
-
+        
+        // built array of insuredSOABOList=>policyCtSOABOList
         add_more_coverage_request_array && add_more_coverage_request_array.length>0 && add_more_coverage_request_array.map((value,index) => {   
             value && value.policyCtAcceSOABOList && value.policyCtAcceSOABOList.length>0 && value.policyCtAcceSOABOList.map((subValue,subIndex)=>{
-                console.log("subValue-------------- ", subValue)
+                // console.log("subValue-------------- ", subValue)
                 if(subValue.interestId == '700000351') {
-                    newInnitialArray['700000351_value'] = subValue.fieldValueMap.NoofPaidDrivers_BT
+                    newInnitialArray['B00013_value'] = subValue.fieldValueMap.NoofPaidDrivers_BT
+                }
+                if(subValue.interestId == '900000687') {
+                    newInnitialArray['B00013_value'] = subValue.fieldValueMap.NoOfPersons
+                }
+                if(subValue.interestId == '900000688') {
+                    newInnitialArray['B00012_value'] = subValue.fieldValueMap.NoOfPersons
+                }
+                if(subValue.interestId == '700001865') {
+                    newInnitialArray['B00007_description'] = subValue.calTotoalSumInsured
+                }
+                if(subValue.interestId == '700001862') {
+                    newInnitialArray['B00004_value'] = subValue.calTotoalSumInsured
+                    newInnitialArray['B00004_description'] = subValue.fieldValueMap.AccessoryDescripton1_BT
+                }
+                if(subValue.interestId == '700001861') {
+                    newInnitialArray['B00003_value'] = subValue.calTotoalSumInsured
+                    newInnitialArray['B00003_description'] = subValue.fieldValueMap.AccessoryDescripton1_BT
+                }
+                if(subValue.interestId == '900001147') {
+                    newInnitialArray['B00073_value'] = subValue.fieldValueMap.SumInsured_BT
+                    newInnitialArray['B00073_description'] = subValue.fieldValueMap.No_of_Cleaner_conductor_coolie
+                }
+                if(subValue.interestId == '900000695' || subValue.interestId == '700000353') {
+                    newInnitialArray['PA_Cover_OD'] = subValue.totoalSumInsured
                 }
 
+                
+
             })
-        }
-        )   
+        })   
+
+        // built array of insuredSOABOList=>dynamicObjectList=>dynamicAttributeVOList
+        additional_coverage && additional_coverage.length>0 && additional_coverage.map((value,index) => {   
+            if(value.B00007) {
+                newInnitialArray['B00007_value'] = value.B00007.value
+            }
+                   
+        }) 
 
         newInitialValues = Object.assign(initialValue, newInnitialArray );
 
@@ -1609,43 +1660,6 @@ console.log("benefit.values------------------ ", values)
                                 </Row>
                                 : null }
 
-                            {/* <Row>
-                                <Col sm={12} md={5} lg={4}>
-                                    <FormGroup>
-                                        <div className="insurerName">
-                                             Fuel Type
-                                        </div>
-                                    </FormGroup>
-                                </Col>
-                                <Col sm={12} md={3} lg={3}>
-                                    <FormGroup>                                      
-                                        <div className="formSection">
-                                            <Field
-                                                name='fuel_type'
-                                                component="select"
-                                                autoComplete="off"
-                                                className="formGrp inputfs12"
-                                                value = {values.fuel_type}
-                                                onChange={(e) => {
-                                                    setFieldTouched('fuel_type')
-                                                    setFieldValue('fuel_type', e.target.value);
-                                                    this.handleChange()
-                                                }}  
-                                            >
-                                                <option value="">Fuel Type</option>
-                                                {fuelList.map((fuel, qIndex) => ( 
-                                                    <option value= {fuel.id}>{fuel.descriptions}</option>
-                                                ))}
-                                    
-                                            </Field>
-                                            {errors.fuel_type && touched.fuel_type ? (
-                                                <span className="errorMsg">{errors.fuel_type}</span>
-                                            ) : null}
-                                        </div>               
-                                    </FormGroup>
-                                </Col>
-                            </Row>
-                             */}
                             <Row>
                                 <Col sm={12} md={12} lg={12}>
                                     <FormGroup>
@@ -1668,12 +1682,12 @@ console.log("benefit.values------------------ ", values)
                                                 name={coverage.ebao_code}
                                                 value={coverage.ebao_code}
                                                 className="user-self"
-                                                disabled = {true}
+                                                // disabled = {true}
                                                 // checked={values.roadsideAssistance ? true : false}
                                                 onClick={(e) =>{
-                                                    if( e.target.checked == false && values[coverage.ebao_code] == '700000353') {
-                                                        swal(phrases.SwalIRDAI)
-                                                    }
+                                                    // if( e.target.checked == false && values[coverage.ebao_code] == '700000353') {
+                                                    //     swal(phrases.SwalIRDAI)
+                                                    // }
                                                     this.onRowSelect(e.target.value, values, e.target.checked, setFieldTouched, setFieldValue)         
                                                 }
                                                 }
@@ -1683,7 +1697,7 @@ console.log("benefit.values------------------ ", values)
                                             <span className="error-message"></span>
                                         </label>
                                     </Col>
-                                    {values.PA_cover_flag == '1' && values[coverage.ebao_code] == '700000353' ?
+                                    {values.PA_cover_flag == '1' && (values[coverage.ebao_code] == '700000353' || values[coverage.ebao_code] == '900000695') ?
                                         <Col sm={12} md={11} lg={3} key={qIndex+"b"}>
                                             <FormGroup>
                                                 <div className="formSection">
@@ -1700,6 +1714,8 @@ console.log("benefit.values------------------ ", values)
                                                             this.handleChange()
                                                         }}
                                                     >
+                                                        <option value="">Select</option>
+                                                        <option value="1000000">1000000</option>
                                                         <option value="1500000">1500000</option>
                                                        
                                             
@@ -1716,7 +1732,7 @@ console.log("benefit.values------------------ ", values)
                                     {values.trailer_flag == '0' ?
                                         values.B00007_value = "" : null }
                                         
-                                     {values.trailer_flag == '1' && values[coverage.code] == 'B00007' ?
+                                     {values.trailer_flag == '1' && values[coverage.ebao_code] == '700001865' ?
                                      <Fragment>
                                         <Col sm={12} md={11} lg={2} key={qIndex+"b"}>
                                             <FormGroup>
@@ -1774,64 +1790,7 @@ console.log("benefit.values------------------ ", values)
                                         </Fragment> : null
                                     }
 
-
-                                   
-                                    {/* {values.trailer_flag_TP == '1' && values[coverage.code] == 'B00011' ?
-                                     <Fragment>
-                                        <Col sm={12} md={11} lg={2} key={qIndex+"b"}>
-                                            <FormGroup>
-                                                <div className="formSection">
-                                                    <Field
-                                                        name='B00011_value'
-                                                        component="select"
-                                                        autoComplete="off"
-                                                        className="formGrp inputfs12"
-                                                        value = {values.B00011_value}
-                                                        onChange={(e) => {
-                                                            setFieldTouched('B00011_value')
-                                                            setFieldValue('B00011_value', e.target.value);
-                                                            this.handleChange()
-                                                        }}
-                                                    >
-                                                        <option value="">No of Trailer</option>
-                                                        {JSON.parse(coverage.covarage_value).value.length > 0 && JSON.parse(coverage.covarage_value).value.map((insurer, qIndex) => (
-                                                                <option value= {insurer}>{insurer}</option>
-                                                            ))}  
-                                            
-                                                    </Field>
-                                                    {errors.B00011_value ? (
-                                                        <span className="errorMsg">{errors.B00011_value}</span>
-                                                    ) : null}
-                                                </div>
-                                            </FormGroup>
-                                        </Col>
-                                        <Col sm={12} md={11} lg={3} key={qIndex+"c"}>
-                                            <FormGroup>
-                                                <div className="formSection">
-                                                    <Field
-                                                        name="B00011_description"
-                                                        type="text"
-                                                        placeholder="Trailer IDV"
-                                                        autoComplete="off"
-                                                        maxLength="8"
-                                                        onFocus={e => this.changePlaceHoldClassAdd(e)}
-                                                        onBlur={e => this.changePlaceHoldClassRemove(e)}
-                                                        onChange={(e) => {
-                                                            setFieldTouched('B00011_description')
-                                                            setFieldValue('B00011_description', e.target.value);
-                                                            this.handleChange()
-                                                        }}
-                                                    >                                     
-                                                    </Field>
-                                                    {errors.B00011_description   ? (
-                                                        <span className="errorMsg">{errors.B00011_description   }</span>
-                                                    ) : null}
-                                                </div>
-                                            </FormGroup>
-                                        </Col>
-                                        </Fragment> : null
-                                    } */}
-                                    {values.pa_coolie_flag == '1' && values[coverage.code] == 'B00073' ?
+                                    {values.pa_coolie_flag == '1' && values[coverage.ebao_code] == '900001147' ?
                                      <Fragment>
                                         <Col sm={12} md={11} lg={2} key={qIndex+"b"}>
                                             <FormGroup>
@@ -1887,7 +1846,7 @@ console.log("benefit.values------------------ ", values)
                                             </FormGroup>
                                         </Col> </Fragment> : null
                                     }
-                                    {values.nonElectric_flag == '1' && values[coverage.code] == 'B00003' ?
+                                    {values.nonElectric_flag == '1' && values[coverage.ebao_code] == '700001862' ?
                                      <Fragment>
                                         <Col sm={12} md={11} lg={2} key={qIndex+"b"}>
                                             <FormGroup>
@@ -1940,7 +1899,7 @@ console.log("benefit.values------------------ ", values)
                                             </FormGroup>
                                         </Col> </Fragment> : null
                                     }
-                                    {values.electric_flag == '1' && values[coverage.code] == 'B00004' ?
+                                    {values.electric_flag == '1' && values[coverage.ebao_code] == '700001861' ?
                                         <Fragment>
                                         <Col sm={12} md={11} lg={2} key={qIndex+"b"}>
                                             <FormGroup>
@@ -1993,7 +1952,7 @@ console.log("benefit.values------------------ ", values)
                                             </FormGroup>
                                         </Col> </Fragment> : null
                                     }
-                                    {values.CNG_OD_flag == '1' && values[coverage.code] == 'B00005' ?
+                                    {values.CNG_OD_flag == '1' && values[coverage.ebao_code] == '700001863' ?
                                         <Fragment>
                                         <Col sm={12} md={11} lg={2} key={qIndex+"b"}>
                                             <FormGroup>
@@ -2022,7 +1981,7 @@ console.log("benefit.values------------------ ", values)
                                         </Col>
                                         </Fragment> : null
                                     }
-                                    {values.hospital_cash_OD_flag == '1' && values[coverage.code] == 'B00020' ?
+                                    {values.hospital_cash_OD_flag == '1' && values[coverage.ebao_code] == 'B00020' ?
                                         <Fragment>
                                         <Col sm={12} md={11} lg={2} key={qIndex+"b"}>
                                             <FormGroup>
@@ -2054,7 +2013,7 @@ console.log("benefit.values------------------ ", values)
                                         </Col>
                                         </Fragment> : null
                                     }
-                                    {values.hospital_cash_PD_flag == '1' && values[coverage.code] == 'B00022' ?
+                                    {values.hospital_cash_PD_flag == '1' && values[coverage.ebao_code] == 'B00022' ?
                                         <Fragment>
                                         <Col sm={12} md={11} lg={2} key={qIndex+"b"}>
                                             <FormGroup>
@@ -2086,21 +2045,21 @@ console.log("benefit.values------------------ ", values)
                                         </Col>
                                         </Fragment> : null
                                     }
-                                    {values.LL_PD_flag == '1' && values[coverage.ebao_code] == '700000351' ?
+                                    {values.LL_PD_flag == '1' && (values[coverage.ebao_code] == '700000351' || values[coverage.ebao_code] == '900000687') ?
                                         <Fragment>
                                         <Col sm={12} md={11} lg={4} key={qIndex+"c"}>
                                             <FormGroup>
                                                 <div className="formSection">
                                                     <Field
-                                                        name='700000351_value'
+                                                        name='B00013_value'
                                                         component="select"
                                                         autoComplete="off"
                                                         disabled = {true}
                                                         className="formGrp inputfs12"
-                                                        value = {values['700000351_value']}
+                                                        value = {values['B00013_value']}
                                                         onChange={(e) => {
-                                                            setFieldTouched('700000351_value')
-                                                            setFieldValue('700000351_value', e.target.value);
+                                                            setFieldTouched('B00013_value')
+                                                            setFieldValue('B00013_value', e.target.value);
                                                             this.handleChange()
                                                         }}
                                                     >
@@ -2110,8 +2069,8 @@ console.log("benefit.values------------------ ", values)
                                                         ))} 
                                             
                                                     </Field>
-                                                    {errors['700000351_value'] ? (
-                                                        <span className="errorMsg">{phrases[errors['700000351_value']]}</span>
+                                                    {errors['B00013_value'] ? (
+                                                        <span className="errorMsg">{phrases[errors['B00013_value']]}</span>
                                                     ) : null}
                                                 </div>
                                             </FormGroup>
@@ -2119,7 +2078,7 @@ console.log("benefit.values------------------ ", values)
                                         </Fragment> : null
                                     }
 
-                                    {values.LL_Emp_flag == '1' && values[coverage.code] == 'B00012' ?
+                                    {values.LL_Emp_flag == '1' && values[coverage.ebao_code] == '900000688' ?
                                         <Fragment>
                                         <Col sm={12} md={11} lg={4} key={qIndex+"b"}>
                                             <FormGroup>
@@ -2148,7 +2107,7 @@ console.log("benefit.values------------------ ", values)
                                         </Col>
                                         </Fragment> : null
                                     }
-                                    {values.LL_Coolie_flag == '1' && values[coverage.code] == 'B00069' ?
+                                    {values.LL_Coolie_flag == '1' && values[coverage.ebao_code] == 'B00069' ?
                                         <Fragment>
                                         <Col sm={12} md={11} lg={2} key={qIndex+"b"}>
                                             <FormGroup>
@@ -2177,7 +2136,7 @@ console.log("benefit.values------------------ ", values)
                                         </Col>
                                         </Fragment> : null
                                     }
-                                     {values.enhance_PA_OD_flag == '1' && values[coverage.code] == 'B00018' ?
+                                     {values.enhance_PA_OD_flag == '1' && values[coverage.ebao_code] == 'B00018' ?
                                         <Fragment>
                                         <Col sm={12} md={11} lg={3} key={qIndex+"b"}>
                                             <FormGroup>
@@ -2206,7 +2165,7 @@ console.log("benefit.values------------------ ", values)
                                         </Col>
                                         </Fragment> : null
                                     }
-                                    {values.LL_workman_flag == '1' && values[coverage.code] == 'B00070' ?
+                                    {values.LL_workman_flag == '1' && values[coverage.ebao_code] == 'B00070' ?
                                         <Fragment>
                                         <Col sm={12} md={11} lg={3} key={qIndex+"b"}>
                                             <FormGroup>
@@ -2236,7 +2195,7 @@ console.log("benefit.values------------------ ", values)
                                         </Fragment> : null
                                     }
 
-                                    {values.ATC_flag == '1' && values[coverage.code] == 'ATC' ?
+                                    {values.ATC_flag == '1' && values[coverage.ebao_code] == 'ATC' ?
                                         <Fragment>
                                         <Col sm={12} md={11} lg={2} key={qIndex+"c"}>
                                             <FormGroup>
@@ -2269,7 +2228,7 @@ console.log("benefit.values------------------ ", values)
                                         </Fragment> : null
                                     }
 
-                                     {values.Geographical_flag == '1' && values[coverage.code] == 'geographical_extension' ?
+                                     {values.Geographical_flag == '1' && values[coverage.ebao_code] == 'geographical_extension' ?
                                         <Fragment>
                                         <Col sm={12} md={11} lg={3} key={qIndex+"c"}>
                                         {coverage.covarage_value != null && JSON.parse(coverage.covarage_value).value.length > 0 && JSON.parse(coverage.covarage_value).value.map((insurer, qIndex) => (
@@ -2297,7 +2256,7 @@ console.log("benefit.values------------------ ", values)
                                         </Fragment> : null
                                     }
 
-                                    {values.trailer_flag == '1' && values[coverage.code] == 'B00007' && values.B00007_value != "" ?
+                                    {values.trailer_flag == '1' && values[coverage.ebao_code] == '700001865' && values.B00007_value != "" ?
                                       this.handleClaims(values, errors, touched, setFieldTouched, setFieldValue) : null
                                     }
                                 </Row>

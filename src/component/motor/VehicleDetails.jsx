@@ -83,7 +83,7 @@ const vehicleRegistrationValidation = Yup.object().shape({
         }
     ).test(
         "checkGreaterTimes",
-        "Start date must be less than end date",
+        "StartDateLessEnd",
         function (value) {
             if (value) {
                 return checkGreaterStartEndTimes(value, this.parent.previous_end_date);
@@ -116,7 +116,7 @@ const vehicleRegistrationValidation = Yup.object().shape({
         }
     ).test( 
         "checkGreaterTimes",
-        "End date must be greater than start date",
+        "EndDateGreaterStart",
         function (value) {
             if (value) {
                 return checkGreaterTimes(value, this.parent.previous_start_date);
@@ -125,7 +125,7 @@ const vehicleRegistrationValidation = Yup.object().shape({
         }
         ).test(
         "checkEndDate",
-        "Enter End Date",
+        "PleaseEED",
         function (value) {     
             if ( this.parent.previous_start_date != undefined && value == undefined) {
                 return false;
@@ -231,7 +231,10 @@ const vehicleRegistrationValidation = Yup.object().shape({
             return "PleaseEPCB"
         },
         function (value) {
-            if (this.parent.previous_is_claim == '0' && this.parent.previous_policy_name == '1' && (!value || value == '1')) {   
+            console.log('PleaseEPCB'+this.parent.previous_is_claim+' ==== '+this.parent.previous_policy_name+' ==== '+value)
+            let prevdate = new Date(this.parent.previous_end_date)
+            let todaydate = new Date()
+            if (prevdate > todaydate && this.parent.previous_is_claim == '0' && this.parent.previous_policy_name == '1' && (!value || value == '1')) {   
                 return false;    
             }
             return true;
