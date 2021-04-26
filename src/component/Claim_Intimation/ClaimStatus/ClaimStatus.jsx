@@ -186,7 +186,7 @@ class ClaimStatus extends Component {
                                                                 </div>
                                                             </div> 
 
-                                                            <div className="row formSection">
+                                                            {/* <div className="row formSection">
                                                                 <label className="col-md-3"></label>
                                                                 <label className="col-md-4">Or</label>
                                                             </div>
@@ -214,7 +214,7 @@ class ClaimStatus extends Component {
                                                                         <span className="errorMsg">{errors.policy_number}</span>
                                                                     ) : null}
                                                                 </div>
-                                                            </div> 
+                                                            </div>  */}
                                                             <div className="cntrbtn">
                                                                 <Button className={`btnPrimary`} type="submit" >
                                                                     {phrases['Go']}

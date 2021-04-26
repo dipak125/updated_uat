@@ -264,7 +264,8 @@ class IPA_Premium extends Component {
 
   payment = () => {
     const { policyHolder_refNo } = this.state;
-    window.location = `${process.env.REACT_APP_PAYMENT_URL}/ConnectPG/payment.php?refrence_no=${policyHolder_refNo}`
+    let csc_type = sessionStorage.getItem('type')
+    window.location = `${process.env.REACT_APP_PAYMENT_URL}/ConnectPG/payment.php?refrence_no=${policyHolder_refNo}&type=${csc_type}`
   }
 
   Razor_payment = () => {
