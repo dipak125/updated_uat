@@ -308,9 +308,9 @@ issuePolicy = () => {
     .then(res => {
       if(res.data.error === false) {
         this.setState({
-          policyNo: res.data.data.PolicyNo, retry: 0
+          policyNo: res.data.data.PolicyNumber, retry: 0
         });
-        this.getCustomerMsg(res.data.data.PolicyNo)
+        this.getCustomerMsg(res.data.data.PolicyNumber)
         this.props.loadingStop();   
       }
       else { 
@@ -359,13 +359,11 @@ RazorpayRefund = () => {
 
 
 
-getCustomerMsg = () => {
+getCustomerMsg = (PolicyNo) => {
   const { productId } = this.props.match.params
   // let encryption = new Encryption();
-  const { policyId } = this.props.match.params
-
   const formData = new FormData();
-  formData.append('policy_no', policyId);
+  formData.append('policy_no', PolicyNo);
 
   axios.post(`customer-msg`, formData)
       .then(res => {
@@ -416,8 +414,7 @@ downloadWordingGSB = () => {
 }
 
   render() {
-    const { policyId } = this.props.match.params
-    const { vehicletype } = this.state
+    const { vehicletype, policyNo, retry } = this.state
     let phrases = localStorage.getItem("phrases") ? JSON.parse(localStorage.getItem("phrases")) : null
 
     return (
@@ -439,13 +436,16 @@ downloadWordingGSB = () => {
                     <div className="text-center custtxt">
                       <img src={require('../../assets/images/like.svg')} alt="" className="m-b-30" />
                       <p>{phrases['ThankYouSBI']}</p>
-                      <p className="fs-16 m-b-30">{phrases['PolicyNo']} <span className="lghtBlue"> {policyId}</span></p>
+                      <p className="fs-16 m-b-30">{phrases['PolicyNo']} <span className="lghtBlue"> {policyNo}</span></p>
                         <div className="d-flex justify-content-center align-items-center">
-                        {/* {vehicletype.download_type == 0 ?
-                            <button className="policy m-l-20" onClick={this.generateDoc}>{phrases['PolicyCopy']} </button>
-                            :
-                            <button className="policy m-l-20" onClick={this.getAccessToken}>{phrases['PolicyCopy']} </button>
-                        } */}
+                        {retry === 1 ?
+                        <div className="d-flex justify-content-center align-items-center">
+                          <button className="policy m-l-20" onClick={this.getAgentReceipt}>Retry Policy Creation</button>
+                          {/* {this.state.retryCount > 3 ?
+                          <button className="policy m-l-20" onClick={this.handleRefund}>Refund</button> : null } */}
+
+                        </div> : null }
+                       
                         {this.state.policyNo ? 
                         <button className="policy m-l-20" onClick={this.generateDoc}>{phrases['PolicyCopy']} </button>
                         : null }

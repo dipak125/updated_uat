@@ -25,7 +25,7 @@ const initialValues = {
 const vehicleRegistrationValidation = Yup.object().shape({
 
     policy_number: Yup.string().required("RequiredField")
-    .matches(/^[a-zA-Z0-9]*$/, function() {
+    .matches(/^[a-zA-Z0-9-]*$/, function() {
         return "ValidPolicyNumber"
     }),
 
