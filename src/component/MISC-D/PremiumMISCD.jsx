@@ -154,6 +154,24 @@ class PremiumMISCD extends Component {
             })
     }
 
+    fetchRequestData = () => {
+        let policyHolder_id = this.state.policyHolder_refNo ? this.state.policyHolder_refNo : '0'
+        let encryption = new Encryption();
+    
+        axios.get(`miscd/policy-holder/details/${policyHolder_id}`)
+            .then(res => {
+                let decryptResp = JSON.parse(encryption.decrypt(res.data))
+                let request_data = decryptResp.data.policyHolder ? decryptResp.data.policyHolder.request_data : {}
+                this.setState({
+                    request_data                    
+                })   
+            })
+            .catch(err => {
+                // handle error
+                this.props.loadingStop();
+            })
+    }
+
     callBreakin=(regnNumber)=>{
 
         const formData = new FormData();
@@ -220,6 +238,7 @@ class PremiumMISCD extends Component {
                         PolicyArray: res.data.data.PolicyObject.PolicyLobList,
                         error: [],
                     });
+                    this.fetchRequestData()
                 }
                 else if(res.data.data.ValidateResult) {
                     swal(res.data.data.ValidateResult.message)

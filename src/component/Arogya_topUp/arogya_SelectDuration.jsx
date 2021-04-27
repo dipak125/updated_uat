@@ -141,8 +141,8 @@ class arogya_SelectDuration extends Component {
         // let defaultdeductibleSliderValue = 0
         // let defaulttenureSliderValue = 0
         const { productId } = this.props.match.params
-        const { serverResponse, SliderVal } = this.state
-        const formData = new FormData();
+        const { serverResponse, SliderVal, policyHolderDetails } = this.state
+        const formData = new FormData();    
         let encryption = new Encryption();
 
         // formData.append('policy_holder_id', localStorage.getItem('policyHolder_id'));
@@ -150,6 +150,37 @@ class arogya_SelectDuration extends Component {
         let SumInsuredsliderVal = values.slider_sum_insured ? values.slider_sum_insured : 0
         let deductibleSliderVal = values.slider_deductible ? values.slider_deductible : 0
         let tenureSliderVal = values.slider_tenure ? values.slider_tenure : 0
+
+        let csc_user_type = "";
+        let total_idv=0
+        let coverTypeId = policyHolderDetails && policyHolderDetails.request_data && policyHolderDetails.request_data.cover_type_id
+        let no_of_members = policyHolderDetails && policyHolderDetails.request_data && policyHolderDetails.request_data.family_members && policyHolderDetails.request_data.family_members.length
+        let csc_data = localStorage.getItem('users') ? localStorage.getItem('users') : "";
+        if(csc_data && sessionStorage.getItem('csc_id')) {
+            let encryption = new Encryption();
+            csc_data = JSON.parse(csc_data)        
+            csc_data = csc_data.user
+            csc_data = JSON.parse(encryption.decrypt(csc_data));           
+            csc_user_type = csc_data.type
+        }
+    
+        if (coverTypeId == '3' || coverTypeId == '1') {
+            total_idv = serverResponse && serverResponse.SumInsured
+        }
+        else if(coverTypeId == '2'){
+              
+            total_idv = serverResponse && serverResponse.SumInsured
+            total_idv = total_idv/no_of_members
+        }
+
+        csc_user_type = sessionStorage.getItem('type') ? sessionStorage.getItem('type') : csc_data.type
+
+
+        if(( total_idv> 500000) && csc_user_type == "POSP" ) {
+            swal("Quote cannot proceed with IDV greater than 500000 for each menber")
+            this.props.loadingStop();
+            return false
+        }
 
 
         const post_data = {
@@ -177,6 +208,7 @@ class arogya_SelectDuration extends Component {
         axios
             .post(`/arogya-topup/duration-premium`, formData)
             .then(res => {
+                this.props.loadingStop();
                 this.props.history.push(`/arogya_Address/${productId}`);
             })
             .catch(err => {
@@ -184,7 +216,7 @@ class arogya_SelectDuration extends Component {
                 console.log("decrypt---error--", decryptResp)
                 this.props.loadingStop();
             });
-        this.props.loadingStop();
+        
 
     }
 
@@ -257,7 +289,7 @@ class arogya_SelectDuration extends Component {
         let tenureSliderVal = values.slider_tenure ? values.slider_tenure : 0
         const formData = new FormData();
         this.props.loadingStart();
-        console.log("values--------------- ", values)
+
         const post_data = {
             'policy_reference_no': localStorage.getItem('policyHolder_refNo'),
             'start_date': polStartDate,

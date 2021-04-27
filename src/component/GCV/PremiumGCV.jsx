@@ -129,7 +129,26 @@ class PremiumGCV extends Component {
                 // handle error	
                 this.props.loadingStop();	
             })	
-    }	
+    }
+    
+    fetchRequestData = () => {	
+        let policyHolder_id = this.state.policyHolder_refNo ? this.state.policyHolder_refNo : '0'	
+        let encryption = new Encryption();	
+    	
+        axios.get(`gcv/policy-holder/details/${policyHolder_id}`)	
+            .then(res => {	
+                let decryptResp = JSON.parse(encryption.decrypt(res.data))	
+                let request_data = decryptResp.data.policyHolder ? decryptResp.data.policyHolder.request_data : {}
+                this.setState({
+                    request_data                    	
+                }) 	
+            })	
+            .catch(err => {	
+                // handle error	
+                this.props.loadingStop();	
+            })	
+    }
+
     callBreakin=(regnNumber)=>{	
         const formData = new FormData();	
         let encryption = new Encryption();	
@@ -204,7 +223,8 @@ class PremiumGCV extends Component {
                         fulQuoteResp: res.data.PolicyObject,	
                         PolicyArray: res.data.PolicyObject.PolicyLobList,	
                         error: [],	
-                    });	
+                    });
+                    this.fetchRequestData()
                 }	
                 else if(res.data.ValidateResult) {	
                     swal(res.data.ValidateResult.message)	
