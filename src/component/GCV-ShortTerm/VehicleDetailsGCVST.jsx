@@ -125,7 +125,7 @@ const vehicleRegistrationValidation = Yup.object().shape({
         }
     ).test(
       "checkStartDate",
-      "Enter Start Date",
+      "PleaseESD",
       function (value) {       
           if ( this.parent.previous_end_date != undefined && value == undefined && this.parent.policy_type_id == '2'  && this.parent.valid_previous_policy == '1') {
               return false;
@@ -158,7 +158,7 @@ const vehicleRegistrationValidation = Yup.object().shape({
         }
         ).test(
         "checkEndDate",
-        "Enter End Date",
+        "PleaseEED",
         function (value) {     
             if ( this.parent.previous_start_date != undefined && value == undefined && this.parent.policy_type_id == '2'  && this.parent.valid_previous_policy == '1') {
                 return false;
@@ -244,7 +244,7 @@ const vehicleRegistrationValidation = Yup.object().shape({
     )
     .matches(/^[a-zA-Z0-9][a-zA-Z0-9\s-/]*$/, 
         function() {
-            return "PleasePolicyNumber"
+            return "ValidPolicyNumber"
         }).min(6, function() {
             return "PolicyMinCharacter"
         })
@@ -650,7 +650,7 @@ class VehicleDetailsGCV extends Component {
                  console.log("decrypt", decryptResp)
                  let motorInsurance = decryptResp.data.policyHolder ? decryptResp.data.policyHolder.motorinsurance : {};
                  motorInsurance.valid_previous_policy = motorInsurance.policytype_id && motorInsurance.policytype_id == '1' ? '0' : motorInsurance.valid_previous_policy;
-                 let previousPolicy = decryptResp.data.policyHolder ? decryptResp.data.policyHolder.previouspolicy : {};
+                 let previousPolicy = decryptResp.data.policyHolder && decryptResp.data.policyHolder.previouspolicy ? decryptResp.data.policyHolder.previouspolicy : {};
                  let vehicleDetails = decryptResp.data.policyHolder ? decryptResp.data.policyHolder.vehiclebrandmodel : {};
                  let no_of_claim = previousPolicy && previousPolicy.previouspoliciesclaims ? previousPolicy.previouspoliciesclaims.length : ""
                  let RTO_location = motorInsurance && motorInsurance.rtolocation && motorInsurance.rtolocation.RTO_LOCATION ? motorInsurance.rtolocation.RTO_LOCATION : ""
@@ -1284,7 +1284,7 @@ class VehicleDetailsGCV extends Component {
                                                         >
                                                             <option value="">{phrases['SelectInsurer']}</option>
                                                             {insurerList.map((insurer, qIndex) => ( 
-                                                                <option value= {insurer.Id}>{insurer.name}</option>
+                                                                <option key={qIndex} value= {insurer.Id}>{insurer.name}</option>
                                                             ))}
                                                         </Field>     
                                                         {errors.insurance_company_id && touched.insurance_company_id ? (

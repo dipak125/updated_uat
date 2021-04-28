@@ -443,6 +443,7 @@ class MotorCoverages extends Component {
             fuelList: [],
             vehicleDetails: [],
             no_of_claim: [],
+            no_of_Tyreclaim : 2,
             trailer_array: [],
             ncbDiscount:0,
             geographical_extension: [],
@@ -537,7 +538,9 @@ class MotorCoverages extends Component {
                 let additional_coverage = []
                 let geographical_extension = []
                 let trailer_array = []
+                let tyre_rim_array = []
                 let motorInsurance = decryptResp.data.policyHolder ? decryptResp.data.policyHolder.motorinsurance : {}
+                let vehicleRegDate = motorInsurance &&  motorInsurance.registration_date != null ? motorInsurance.registration_date : ''
                 let request_data = decryptResp.data.policyHolder ? decryptResp.data.policyHolder.request_data : {};
                 let sliderVal = request_data && request_data.sum_insured ? parseInt(request_data.sum_insured) : ""
                 let vehicleDetails = decryptResp.data.policyHolder ? decryptResp.data.policyHolder.vehiclebrandmodel : {};
@@ -605,10 +608,25 @@ class MotorCoverages extends Component {
                         }
                     })
                 }) 
+
+                add_more_coverage_request_array && add_more_coverage_request_array.length>0 && add_more_coverage_request_array.map((value,index) => {   
+                    // console.log("subValue-------------- ", subValue)
+                    if(value.coverTypeId == '900009555') {
+                        var newTyreMfgYr = new Date(vehicleRegDate)
+                        var tempVal={
+                            tyreSerialNo : "",
+                            tyreMfgYr : newTyreMfgYr.getFullYear(),
+                            vehicleRegDate: vehicleRegDate,
+                            policy_for: this.state.policy_for
+                        }
+                        tyre_rim_array.push(tempVal)
+                    }
+                }) 
                 
                 this.setState({
                     motorInsurance, request_data, vehicleDetails,policyCoverage,add_more_coverage,add_more_coverage_request_array,geographical_extension,
-                    selectFlag: motorInsurance && motorInsurance.add_more_coverage != null ? '0' : '1',sliderVal,additional_coverage, trailer_array
+                    selectFlag: motorInsurance && motorInsurance.add_more_coverage != null ? '0' : '1',sliderVal,additional_coverage,vehicleRegDate,
+                     trailer_array,tyre_rim_array
 
                 })
                 this.props.loadingStop();
@@ -742,185 +760,6 @@ class MotorCoverages extends Component {
     }
 
 
-    onRowSelect = (value, values, isSelect, setFieldTouched, setFieldValue) => {
-
-        const { add_more_coverage } = this.state;
-        var drv = [];
-
-
-        if (isSelect) {
-            add_more_coverage.push(value);
-            this.setState({
-                add_more_coverage: add_more_coverage,
-                serverResponse: [],
-                error: []
-            });
-            if(value == "B00016") {
-                setFieldTouched("PA_flag");
-                setFieldValue("PA_flag", '1');
-            }  
-            if(value == "700000353") {
-                setFieldTouched("PA_cover_flag");
-                setFieldValue("PA_cover_flag", '1');
-            }  
-            if(value == "B00007") {
-                setFieldTouched("trailer_flag");
-                setFieldValue("trailer_flag", '1');
-            }     
-            if(value == "B00073") {
-                setFieldTouched("pa_coolie_flag");
-                setFieldValue("pa_coolie_flag", '1');
-            }     
-            if(value == "B00003") {
-                setFieldTouched("nonElectric_flag");
-                setFieldValue("nonElectric_flag", '1');
-                
-            }
-            if(value == "B00004") {
-                setFieldTouched("electric_flag");
-                setFieldValue("electric_flag", '1');
-            }
-            if(value == "B00020") {
-                setFieldTouched("hospital_cash_OD_flag");
-                setFieldValue("hospital_cash_OD_flag", '1');
-            }
-            if(value == "B00022") {
-                setFieldTouched("hospital_cash_PD_flag");
-                setFieldValue("hospital_cash_PD_flag", '1');
-            }
-            if(value == "700000351") {
-                setFieldTouched("LL_PD_flag");
-                setFieldValue("LL_PD_flag", '1');
-            }
-            if(value == "B00012") {
-                setFieldTouched("LL_Emp_flag");
-                setFieldValue("LL_Emp_flag", '1');
-            }
-            if(value == "B00069") {
-                setFieldTouched("LL_Coolie_flag");
-                setFieldValue("LL_Coolie_flag", '1');
-            }
-            if(value == "B00018") {
-                setFieldTouched("enhance_PA_OD_flag");
-                setFieldValue("enhance_PA_OD_flag", '1');
-            }
-            if(value == "B00070") {
-                setFieldTouched("LL_workman_flag");
-                setFieldValue("LL_workman_flag", '1');
-            }
-            if(value == "ATC") {
-                setFieldTouched("ATC_flag");
-                setFieldValue("ATC_flag", '1');
-            }
-            if(value == "B00011") {
-                setFieldTouched("trailer_flag_TP");
-                setFieldValue("trailer_flag_TP", '1');
-            }
-            if(value == "B00005") {
-                setFieldTouched("CNG_OD_flag");
-                setFieldValue("CNG_OD_flag", '1');
-            }
-            if(value == "geographical_extension") {
-                setFieldTouched("Geographical_flag");
-                setFieldValue("Geographical_flag", '1');
-            }        
-            
-        }
-        else {
-            const index = add_more_coverage.indexOf(value);
-            if (index !== -1) {
-                add_more_coverage.splice(index, 1);
-                this.setState({
-                    serverResponse: [],
-                    error: []
-                });
-            }
-
-            if(value == "B00016") {
-                setFieldTouched("PA_flag");
-                setFieldValue("PA_flag", '0');
-                setFieldTouched("PA_Cover");
-                setFieldValue("PA_Cover", '');
-            } 
-            if(value == "700000353") {
-                setFieldTouched("PA_cover_flag");
-                setFieldValue("PA_cover_flag", '0');
-            }      
-            if(value == "B00007") {
-                setFieldTouched("trailer_flag");
-                setFieldValue("trailer_flag", '0');
-            } 
-            if(value == "B00073") {
-                setFieldTouched("pa_coolie_flag");
-                setFieldValue("pa_coolie_flag", '0');
-            }
-            if(value == "B00003") {
-                setFieldTouched("nonElectric_flag");
-                setFieldValue("nonElectric_flag", '0');
-                
-            }
-            if(value == "B00004") {
-                setFieldTouched("electric_flag");
-                setFieldValue("electric_flag", '0');
-            }
-            if(value == "B00020") {
-                setFieldTouched("hospital_cash_OD_flag");
-                setFieldValue("hospital_cash_OD_flag", '0');
-            }
-            if(value == "B00022") {
-                setFieldTouched("hospital_cash_PD_flag");
-                setFieldValue("hospital_cash_PD_flag", '0');
-            }
-            if(value == "700000351") {
-                setFieldTouched("LL_PD_flag");
-                setFieldValue("LL_PD_flag", '0');
-            }
-            if(value == "B00012") {
-                setFieldTouched("LL_Emp_flag");
-                setFieldValue("LL_Emp_flag", '0');
-            }
-            if(value == "B00069") {
-                setFieldTouched("LL_Coolie_flag");
-                setFieldValue("LL_Coolie_flag", '0');
-            }
-            if(value == "B00018") {
-                setFieldTouched("enhance_PA_OD_flag");
-                setFieldValue("enhance_PA_OD_flag", '0');
-            }
-            if(value == "B00070") {
-                setFieldTouched("LL_workman_flag");
-                setFieldValue("LL_workman_flag", '0');
-            }
-            if(value == "ATC") {
-                setFieldTouched("ATC_flag");
-                setFieldValue("ATC_flag", '0');
-            }
-            if(value == "B00011") {
-                setFieldTouched("trailer_flag_TP");
-                setFieldValue("trailer_flag_TP", '0');
-            }
-            if(value == "B00005") {
-                setFieldTouched("CNG_OD_flag");
-                setFieldValue("CNG_OD_flag", '0');
-            }
-            if(value == "geographical_extension") {
-                setFieldTouched("Geographical_flag");
-                setFieldValue("Geographical_flag", '0');
-
-                setFieldValue("GeoExtnBhutan", '');
-                setFieldValue("GeoExtnNepal", '');
-                setFieldValue("GeoExtnMaldives", '');
-                setFieldValue("GeoExtnPakistan", '');
-                setFieldValue("GeoExtnSriLanka", '');
-                setFieldValue("GeoExtnBangladesh", '');
-                this.setState({
-                    geographical_extension: []
-                })
-            }
-        }
-        
-    }
-
     onGeoAreaSelect = (value, values, isSelect, setFieldTouched, setFieldValue) => {
 
         const { add_more_coverage, geographical_extension } = this.state;
@@ -1000,6 +839,24 @@ class MotorCoverages extends Component {
     
     };
 
+    initTyreClaimDetailsList = () => {
+        let innicialClaimList = []
+        const {tyre_rim_array,vehicleRegDate, policy_for} = this.state
+        if(tyre_rim_array && tyre_rim_array.length > 0) {
+            for (var i = 0; i < this.state.no_of_Tyreclaim ; i++) {
+                innicialClaimList.push(
+                    {
+                        tyreSerialNo :  tyre_rim_array && tyre_rim_array[i] && tyre_rim_array[i].tyreSerialNo ? tyre_rim_array[i].tyreSerialNo : "",
+                        tyreMfgYr :  tyre_rim_array && tyre_rim_array[i] && tyre_rim_array[i].tyreMfgYr ? tyre_rim_array[i].tyreMfgYr : "",
+                        vehicleRegDate : vehicleRegDate ,
+                        policy_for : policy_for
+                    }
+                )
+            }   
+        }
+    }
+            
+
 
     handleClaims = (values, errors, touched, setFieldTouched, setFieldValue) => {
         let field_array = []        
@@ -1059,6 +916,63 @@ class MotorCoverages extends Component {
 
     }
 
+    handleTyreClaims = (values, errors, touched, setFieldTouched, setFieldValue) => {
+        let field_array = []        
+        let phrases = localStorage.getItem("phrases") ? JSON.parse(localStorage.getItem("phrases")) : []
+        
+        for (var i = 0; i < 2 ; i++) {
+            field_array.push(
+                <Col sm={12} md={12} lg={12}>
+                    <Row >
+                        <Col sm={1} md={1} lg={2}><span className="indexing"> Tyre{i+1} </span></Col>
+                        <Col sm={12} md={5} lg={3}>
+                            <FormGroup>
+                                <div className="formSection">
+                                <Field
+                                        name={`tyre_rim_array[${i}].tyreMfgYr`}
+                                        type="text"
+                                        placeholder="MFG Year"
+                                        autoComplete="off"
+                                        onFocus={e => this.changePlaceHoldClassAdd(e)}
+                                        onBlur={e => this.changePlaceHoldClassRemove(e)}
+                                        // value = {values[`tyre_rim_array[${i}].chassisNo`]}
+
+                                    />
+                                    {errors.tyre_rim_array && errors.tyre_rim_array[i] && errors.tyre_rim_array[i].tyreMfgYr ? (
+                                    <span className="errorMsg">{errors.tyre_rim_array[i].tyreMfgYr}</span>
+                                    ) : null}    
+                                </div>
+                            </FormGroup>
+                        </Col>
+                        <Col sm={12} md={5} lg={4}>
+                            <FormGroup>
+                                <div className="formSection">
+                                    <Field
+                                        name={`tyre_rim_array[${i}].tyreSerialNo`}
+                                        type="text"
+                                        placeholder="Serial No"
+                                        autoComplete="off"
+                                        onFocus={e => this.changePlaceHoldClassAdd(e)}
+                                        onBlur={e => this.changePlaceHoldClassRemove(e)}
+                                        // value = {values[`tyre_rim_array[${i}].tyreSerialNo`]}
+
+                                    />
+                                    {errors.tyre_rim_array && errors.tyre_rim_array[i] && errors.tyre_rim_array[i].tyreSerialNo ? (
+                                    <span className="errorMsg">{errors.tyre_rim_array[i].tyreSerialNo}</span>
+                                    ) : null}   
+                                </div>
+                            </FormGroup>
+                        </Col>
+                    </Row>
+                </Col>
+            )
+            } 
+        return field_array
+
+    }
+
+
+
     componentDidMount() {
         this.getMoreCoverage()
     }
@@ -1091,19 +1005,17 @@ class MotorCoverages extends Component {
         //let defaultBodySliderValue =  motorInsurance && motorInsurance.body_idv_value ? Math.round(motorInsurance.body_idv_value) : 0
         let defaultBodySliderValue = bodySliderVal
 
-        // let covList = motorInsurance && motorInsurance.add_more_coverage ? motorInsurance.add_more_coverage.split(",") : ""
         let covList = add_more_coverage ? add_more_coverage.toString() : ""
         covList = covList ? covList.split(",") : ""
         
         let newInnitialArray = {}
-        let PA_flag = motorInsurance && (motorInsurance.pa_cover == null || motorInsurance.pa_cover == "") ? '0' : '1'
-        let PA_Cover = motorInsurance &&  motorInsurance.pa_cover != null ? motorInsurance.pa_cover : ''
         let fuel_type = vehicleDetails && vehicleDetails.varientmodel && vehicleDetails.varientmodel.fueltype  ? vehicleDetails.varientmodel.fueltype.id : ""
 
-        let trailer_flag= add_more_coverage.indexOf("700001861") > 0 ? '1' : '0' 
+        let trailer_flag= add_more_coverage.indexOf("700001865") > 0 ? '1' : '0' 
+        let tyre_cover_flag = add_more_coverage.indexOf("900009555") > 0 ? '1' : '0' 
         let pa_coolie_flag= add_more_coverage.indexOf("900001147") > 0 ? '1' : '0'
-        let electric_flag= add_more_coverage.indexOf("700001865") > 0 ? '1' : '0'
-        let nonElectric_flag= add_more_coverage.indexOf("700001862") > 0 ? '1' : '0'
+        let electric_flag= add_more_coverage.indexOf("700001865") > 0  || add_more_coverage.indexOf("700000342") > 0 ? '1' : '0'
+        let nonElectric_flag= add_more_coverage.indexOf("700001862") > 0 || add_more_coverage.indexOf("700000341") > 0 ? '1' : '0'  
         let hospital_cash_OD_flag= add_more_coverage_request_array.B00020 && add_more_coverage_request_array.B00020.value ? '1' : '0'
         let hospital_cash_PD_flag= add_more_coverage_request_array.B00022 && add_more_coverage_request_array.B00022.value ? '1' : '0'
         let LL_PD_flag= add_more_coverage.indexOf("700000351") > 0 || add_more_coverage.indexOf("900000687") > 0 ? '1' : '0' 
@@ -1114,8 +1026,7 @@ class MotorCoverages extends Component {
         let LL_workman_flag= add_more_coverage_request_array.B00070 && add_more_coverage_request_array.B00070.value ? '1' : '0'
         let trailer_flag_TP = add_more_coverage_request_array.B00011 && add_more_coverage_request_array.B00011.value ? '1' : '0'
         let CNG_OD_flag = add_more_coverage_request_array.B00005 && add_more_coverage_request_array.B00005.value ? '1' : '0'
-        let Geographical_flag = add_more_coverage && add_more_coverage[add_more_coverage.indexOf("geographical_extension")] ? '1' : '0'
-       
+        let Geographical_flag = add_more_coverage && add_more_coverage[add_more_coverage.indexOf("geographical_extension")] ? '1' : '0' 
    
         let newInitialValues = {}
 
@@ -1133,9 +1044,8 @@ class MotorCoverages extends Component {
                 // B00005 : vehicleDetails && vehicleDetails.varientmodel && (vehicleDetails.varientmodel.fueltype.id == 8 || vehicleDetails.varientmodel.fueltype.id == 9) ? "B00005" : "",
                 B00006 : vehicleDetails && vehicleDetails.varientmodel && (vehicleDetails.varientmodel.fueltype.id == 3 || vehicleDetails.varientmodel.fueltype.id == 4) ? "B00006" : "",
                 B00010 : vehicleDetails && vehicleDetails.varientmodel && (vehicleDetails.varientmodel.fueltype.id == 3 || vehicleDetails.varientmodel.fueltype.id == 4) ? "B00010" : "",               
-                PA_Cover: "",
-                PA_cover_flag: add_more_coverage.indexOf("700000353") > 0 || add_more_coverage.indexOf("900000695") > 0 ? '1' : '0',
-                PA_flag: '0',
+                PA_cover_flag: add_more_coverage.indexOf("700000452") > 0 || add_more_coverage.indexOf("700000353") > 0 || add_more_coverage.indexOf("900000695") > 0 ? '1' : '0',
+                PA_flag: add_more_coverage.indexOf("700000453") > 0 || add_more_coverage.indexOf("700000354") > 0 ? '1' : '0',
                 trailer_flag: '0',
                 pa_coolie_flag: '0',
                 electric_flag: '0',
@@ -1151,6 +1061,7 @@ class MotorCoverages extends Component {
                 fuel_type: fuel_type,
                 trailer_flag_TP: '0',
                 trailer_array:  this.initClaimDetailsList(),
+                tyre_rim_array:  this.initTyreClaimDetailsList(),
                 Geographical_flag: "0",
                 geographical_extension_length: geographical_extension && geographical_extension.length
 
@@ -1166,9 +1077,8 @@ class MotorCoverages extends Component {
                     engine_no: motorInsurance.engine_no ? motorInsurance.engine_no : (engine_no ? engine_no : ""),
                     vahanVerify: vahanVerify,
                     newRegistrationNo: localStorage.getItem('registration_number') == "NEW" ? localStorage.getItem('registration_number') : "", 
-                    PA_flag: '0',
-                    PA_Cover: "",
-                    PA_cover_flag: add_more_coverage.indexOf("700000353") > 0 || add_more_coverage.indexOf("900000695") > 0 ? '1' : '0',
+                    PA_flag: add_more_coverage.indexOf("700000453") > 0 || add_more_coverage.indexOf("700000354") > 0 ? '1' : '0',
+                    PA_cover_flag: add_more_coverage.indexOf("700000452") > 0 || add_more_coverage.indexOf("700000353") > 0 || add_more_coverage.indexOf("900000695") > 0 ? '1' : '0',
                     trailer_flag: '0',
                     pa_coolie_flag: '0',
                     electric_flag: '0',
@@ -1187,6 +1097,7 @@ class MotorCoverages extends Component {
                     // B00005 : "",
                     B00010 : "",
                     trailer_array:  this.initClaimDetailsList(),
+                    tyre_rim_array:  this.initTyreClaimDetailsList(),
                     Geographical_flag: "0",
                     geographical_extension_length: geographical_extension && geographical_extension.length
                 }
@@ -1198,9 +1109,9 @@ class MotorCoverages extends Component {
         for (var i = 0 ; i < covList.length; i++) {
             newInnitialArray[covList[i]] = covList[i];
         }    
-        newInnitialArray.slider= defaultSliderValue
-        newInnitialArray.PA_flag = PA_flag   
+        newInnitialArray.slider= defaultSliderValue 
         newInnitialArray.trailer_flag = trailer_flag
+        newInnitialArray.tyre_cover_flag = tyre_cover_flag
         newInnitialArray.pa_coolie_flag = pa_coolie_flag
         newInnitialArray.electric_flag = electric_flag
         newInnitialArray.nonElectric_flag = nonElectric_flag
@@ -1212,7 +1123,6 @@ class MotorCoverages extends Component {
         newInnitialArray.enhance_PA_OD_flag = enhance_PA_OD_flag
         newInnitialArray.ATC_flag = ATC_flag
         newInnitialArray.LL_workman_flag = LL_workman_flag   
-        newInnitialArray.PA_Cover = PA_Cover
         newInnitialArray.trailer_flag_TP = trailer_flag_TP
         newInnitialArray.CNG_OD_flag = CNG_OD_flag
         newInnitialArray.Geographical_flag = Geographical_flag
@@ -1220,7 +1130,6 @@ class MotorCoverages extends Component {
         newInnitialArray.ATC_value = add_more_coverage_request_array.ATC ? add_more_coverage_request_array.ATC.value : ""
         newInnitialArray.B00018_value = add_more_coverage_request_array.B00018 ? add_more_coverage_request_array.B00018.value : ""
         newInnitialArray.B00069_value = add_more_coverage_request_array.B00069 ? add_more_coverage_request_array.B00069.value : ""
-       
         newInnitialArray.B00022_value = add_more_coverage_request_array.B00022 ? add_more_coverage_request_array.B00022.value : ""
         newInnitialArray.B00020_value = add_more_coverage_request_array.B00020 ? add_more_coverage_request_array.B00020.value : ""
         newInnitialArray.B00070_value = add_more_coverage_request_array.B00070 ? add_more_coverage_request_array.B00070.value : ""    
@@ -1235,39 +1144,59 @@ class MotorCoverages extends Component {
         
         // built array of insuredSOABOList=>policyCtSOABOList
         add_more_coverage_request_array && add_more_coverage_request_array.length>0 && add_more_coverage_request_array.map((value,index) => {   
-            value && value.policyCtAcceSOABOList && value.policyCtAcceSOABOList.length>0 && value.policyCtAcceSOABOList.map((subValue,subIndex)=>{
-                // console.log("subValue-------------- ", subValue)
-                if(subValue.interestId == '700000351') {
-                    newInnitialArray['B00013_value'] = subValue.fieldValueMap.NoofPaidDrivers_BT
-                }
-                if(subValue.interestId == '900000687') {
-                    newInnitialArray['B00013_value'] = subValue.fieldValueMap.NoOfPersons
-                }
-                if(subValue.interestId == '900000688') {
-                    newInnitialArray['B00012_value'] = subValue.fieldValueMap.NoOfPersons
-                }
-                if(subValue.interestId == '700001865') {
-                    newInnitialArray['B00007_description'] = subValue.calTotoalSumInsured
-                }
-                if(subValue.interestId == '700001862') {
-                    newInnitialArray['B00004_value'] = subValue.calTotoalSumInsured
-                    newInnitialArray['B00004_description'] = subValue.fieldValueMap.AccessoryDescripton1_BT
-                }
-                if(subValue.interestId == '700001861') {
-                    newInnitialArray['B00003_value'] = subValue.calTotoalSumInsured
-                    newInnitialArray['B00003_description'] = subValue.fieldValueMap.AccessoryDescripton1_BT
-                }
-                if(subValue.interestId == '900001147') {
-                    newInnitialArray['B00073_value'] = subValue.fieldValueMap.SumInsured_BT
-                    newInnitialArray['B00073_description'] = subValue.fieldValueMap.No_of_Cleaner_conductor_coolie
-                }
-                if(subValue.interestId == '900000695' || subValue.interestId == '700000353') {
-                    newInnitialArray['PA_Cover_OD'] = subValue.totoalSumInsured
-                }
+            if(value && value.policyCtAcceSOABOList && value.policyCtAcceSOABOList.length>0 ){ 
+                value.policyCtAcceSOABOList.map((subValue,subIndex)=>{
+                    // console.log("subValue-------------- ", subValue)
+                    if(subValue.interestId == '700000351') {
+                        newInnitialArray['B00013_value'] = subValue.fieldValueMap.NoofPaidDrivers_BT
+                    }
+                    if(subValue.interestId == '900000687') {
+                        newInnitialArray['B00013_value'] = subValue.fieldValueMap.NoOfPersons
+                    }
+                    if(subValue.interestId == '900000688') {
+                        newInnitialArray['B00012_value'] = subValue.fieldValueMap.NoOfPersons
+                    }
+                    if(subValue.interestId == '700001865') {
+                        newInnitialArray['B00007_description'] = subValue.calTotoalSumInsured
+                    }
+                    if(subValue.interestId == '700001862') {
+                        newInnitialArray['B00004_value'] = subValue.calTotoalSumInsured
+                        newInnitialArray['B00004_description'] = subValue.fieldValueMap.AccessoryDescripton1_BT
+                    }
+                    if(subValue.interestId == '700001861' ) {
+                        newInnitialArray['B00003_value'] = subValue.calTotoalSumInsured
+                        newInnitialArray['B00003_description'] = subValue.fieldValueMap.AccessoryDescripton1_BT
+                    }
+                    if(subValue.interestId == '700000341' ) {
+                        newInnitialArray['B00003_value'] = subValue.calTotoalSumInsured
+                        newInnitialArray['B00003_description'] = subValue.fieldValueMap.AccessoryDescripton3_BT
+                    }
+                    if(subValue.interestId == '700000342' ) {
+                        newInnitialArray['B00004_value'] = subValue.calTotoalSumInsured
+                        newInnitialArray['B00004_description'] = subValue.fieldValueMap.AccessoryDescripton3_BT
+                    }
+                    if(subValue.interestId == '900001147') {
+                        newInnitialArray['B00073_value'] = subValue.fieldValueMap.SumInsured_BT
+                        newInnitialArray['B00073_description'] = subValue.fieldValueMap.No_of_Cleaner_conductor_coolie
+                    }
+                    if(subValue.interestId == '900000695' || subValue.interestId == '700000353' || subValue.interestId == '700000452' ) {
+                        newInnitialArray['PA_Cover_OD'] = subValue.totoalSumInsured
+                    }
+                    if(subValue.interestId == '700000453' || subValue.interestId == '700000354' ) {
+                        newInnitialArray['PA_Cover'] = subValue.fieldValueMap.SumInsured_BT
+                    }
 
+
+                })     
+            } 
+            else if(value.hasOwnProperty("policyCtAcceSOABOList")) {
+                if(value.policyCtAcceSOABOList.interestId == '700000452' || value.policyCtAcceSOABOList.interestId == '700000353') {
+                    newInnitialArray['PA_Cover_OD'] =  value.policyCtAcceSOABOList.calTotoalSumInsured
+                }
+            }
+            else {
                 
-
-            })
+            }
         })   
 
         // built array of insuredSOABOList=>dynamicObjectList=>dynamicAttributeVOList
@@ -1407,7 +1336,7 @@ class MotorCoverages extends Component {
                     // validationSchema={ComprehensiveValidation}
                     >
                     {({ values, errors, setFieldValue, setFieldTouched, isValid, isSubmitting, touched }) => {
-console.log("benefit.values------------------ ", values)
+// console.log("benefit.values------------------ ", values)
                     return (
                         <Form>
                         <Row>
@@ -1682,7 +1611,7 @@ console.log("benefit.values------------------ ", values)
                                                 name={coverage.ebao_code}
                                                 value={coverage.ebao_code}
                                                 className="user-self"
-                                                // disabled = {true}
+                                                disabled = {true}
                                                 // checked={values.roadsideAssistance ? true : false}
                                                 onClick={(e) =>{
                                                     // if( e.target.checked == false && values[coverage.ebao_code] == '700000353') {
@@ -1697,7 +1626,7 @@ console.log("benefit.values------------------ ", values)
                                             <span className="error-message"></span>
                                         </label>
                                     </Col>
-                                    {values.PA_cover_flag == '1' && (values[coverage.ebao_code] == '700000353' || values[coverage.ebao_code] == '900000695') ?
+                                    {values.PA_cover_flag == '1' && (values[coverage.ebao_code] == '700000353' || values[coverage.ebao_code] == '900000695' || values[coverage.ebao_code] == '700000452') ?
                                         <Col sm={12} md={11} lg={3} key={qIndex+"b"}>
                                             <FormGroup>
                                                 <div className="formSection">
@@ -1846,7 +1775,7 @@ console.log("benefit.values------------------ ", values)
                                             </FormGroup>
                                         </Col> </Fragment> : null
                                     }
-                                    {values.nonElectric_flag == '1' && values[coverage.ebao_code] == '700001862' ?
+                                    {values.nonElectric_flag == '1' && (values[coverage.ebao_code] == '700001862' || values[coverage.ebao_code] == '700000341') ?
                                      <Fragment>
                                         <Col sm={12} md={11} lg={2} key={qIndex+"b"}>
                                             <FormGroup>
@@ -1899,7 +1828,7 @@ console.log("benefit.values------------------ ", values)
                                             </FormGroup>
                                         </Col> </Fragment> : null
                                     }
-                                    {values.electric_flag == '1' && values[coverage.ebao_code] == '700001861' ?
+                                    {values.electric_flag == '1' && (values[coverage.ebao_code] == '700001861' || values[coverage.ebao_code] == '700000342') ?
                                         <Fragment>
                                         <Col sm={12} md={11} lg={2} key={qIndex+"b"}>
                                             <FormGroup>
@@ -2165,6 +2094,35 @@ console.log("benefit.values------------------ ", values)
                                         </Col>
                                         </Fragment> : null
                                     }
+                                     {values.PA_flag == '1' && (values[coverage.ebao_code] == '700000453' || values[coverage.ebao_code] == '700000354') ?
+                                        <Col sm={12} md={11} lg={3} key={qIndex+"b"}>
+                                            <FormGroup>
+                                                <div className="formSection">
+                                                    <Field
+                                                        name='PA_Cover'
+                                                        component="select"
+                                                        autoComplete="off"
+                                                        className="formGrp inputfs12"
+                                                        value = {values.PA_Cover}
+                                                        disabled = {true}
+                                                        onChange={(e) => {
+                                                            setFieldTouched('PA_Cover')
+                                                            setFieldValue('PA_Cover', e.target.value);
+                                                            this.handleChange()
+                                                        }}
+                                                    >
+                                                        <option value="">{phrases['SSI']}</option>
+                                                        <option value="50000">50000</option>
+                                                        <option value="100000">100000</option>  
+                                            
+                                                    </Field>
+                                                    {errors.PA_Cover ? (
+                                                        <span className="errorMsg">{phrases[errors.PA_Cover]}</span>
+                                                    ) : null}
+                                                </div>
+                                            </FormGroup>
+                                        </Col> : null
+                                    }
                                     {values.LL_workman_flag == '1' && values[coverage.ebao_code] == 'B00070' ?
                                         <Fragment>
                                         <Col sm={12} md={11} lg={3} key={qIndex+"b"}>
@@ -2258,6 +2216,9 @@ console.log("benefit.values------------------ ", values)
 
                                     {values.trailer_flag == '1' && values[coverage.ebao_code] == '700001865' && values.B00007_value != "" ?
                                       this.handleClaims(values, errors, touched, setFieldTouched, setFieldValue) : null
+                                    }
+                                    {values.tyre_cover_flag == '1' && values[coverage.ebao_code] == '900009555' ?
+                                        this.handleTyreClaims(values, errors, touched, setFieldTouched, setFieldValue) : null
                                     }
                                 </Row>
                                 )) : null}
