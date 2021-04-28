@@ -606,6 +606,13 @@ class MotorCoverages extends Component {
                             }
                             trailer_array.push(tempVal)
                         }
+                        if(subValue.interestId == '900000005') {
+                            var tempVal={
+                                chassisNo :  subValue.fieldValueMap.TrailerChassisNumber_BT ,
+                                regNo :  subValue.fieldValueMap.TrailerRegNo_BT
+                            }
+                            trailer_array.push(tempVal)
+                        }
                     })
                 }) 
 
@@ -1011,15 +1018,15 @@ class MotorCoverages extends Component {
         let newInnitialArray = {}
         let fuel_type = vehicleDetails && vehicleDetails.varientmodel && vehicleDetails.varientmodel.fueltype  ? vehicleDetails.varientmodel.fueltype.id : ""
 
-        let trailer_flag= add_more_coverage.indexOf("700001865") > 0 ? '1' : '0' 
+        let trailer_flag= add_more_coverage.indexOf("700001865") > 0 || add_more_coverage.indexOf("900000005") > 0 ? '1' : '0' 
         let tyre_cover_flag = add_more_coverage.indexOf("900009555") > 0 ? '1' : '0' 
         let pa_coolie_flag= add_more_coverage.indexOf("900001147") > 0 ? '1' : '0'
-        let electric_flag= add_more_coverage.indexOf("700001865") > 0  || add_more_coverage.indexOf("700000342") > 0 ? '1' : '0'
-        let nonElectric_flag= add_more_coverage.indexOf("700001862") > 0 || add_more_coverage.indexOf("700000341") > 0 ? '1' : '0'  
+        let electric_flag= add_more_coverage.indexOf("700001865") > 0  || add_more_coverage.indexOf("700000342") > 0 || add_more_coverage.indexOf("900000002") > 0  ? '1' : '0'
+        let nonElectric_flag= add_more_coverage.indexOf("700001862") > 0 || add_more_coverage.indexOf("700000341") > 0 || add_more_coverage.indexOf("900000001") > 0  ? '1' : '0'  
         let hospital_cash_OD_flag= add_more_coverage_request_array.B00020 && add_more_coverage_request_array.B00020.value ? '1' : '0'
         let hospital_cash_PD_flag= add_more_coverage_request_array.B00022 && add_more_coverage_request_array.B00022.value ? '1' : '0'
-        let LL_PD_flag= add_more_coverage.indexOf("700000351") > 0 || add_more_coverage.indexOf("900000687") > 0 ? '1' : '0' 
-        let LL_Emp_flag= add_more_coverage.indexOf("900000688") > 0 ? '1' : '0'
+        let LL_PD_flag= add_more_coverage.indexOf("700000351") > 0 || add_more_coverage.indexOf("900000687") > 0 || add_more_coverage.indexOf("900000743") > 0 ? '1' : '0' 
+        let LL_Emp_flag= add_more_coverage.indexOf("900000688") > 0 || add_more_coverage.indexOf("900000742") > 0 ? '1' : '0'
         let LL_Coolie_flag= add_more_coverage_request_array.B00069 && add_more_coverage_request_array.B00069.value ? '1' : '0'
         let enhance_PA_OD_flag= add_more_coverage_request_array.B00018 && add_more_coverage_request_array.B00018.value ? '1' : '0'
         let ATC_flag= add_more_coverage_request_array.ATC && add_more_coverage_request_array.ATC.value ? '1' : '0'
@@ -1044,7 +1051,7 @@ class MotorCoverages extends Component {
                 // B00005 : vehicleDetails && vehicleDetails.varientmodel && (vehicleDetails.varientmodel.fueltype.id == 8 || vehicleDetails.varientmodel.fueltype.id == 9) ? "B00005" : "",
                 B00006 : vehicleDetails && vehicleDetails.varientmodel && (vehicleDetails.varientmodel.fueltype.id == 3 || vehicleDetails.varientmodel.fueltype.id == 4) ? "B00006" : "",
                 B00010 : vehicleDetails && vehicleDetails.varientmodel && (vehicleDetails.varientmodel.fueltype.id == 3 || vehicleDetails.varientmodel.fueltype.id == 4) ? "B00010" : "",               
-                PA_cover_flag: add_more_coverage.indexOf("700000452") > 0 || add_more_coverage.indexOf("700000353") > 0 || add_more_coverage.indexOf("900000695") > 0 ? '1' : '0',
+                PA_cover_flag: add_more_coverage.indexOf("700000452") > 0 || add_more_coverage.indexOf("700000353") > 0 || add_more_coverage.indexOf("900000695") > 0 || add_more_coverage.indexOf("900000750") > 0 ? '1' : '0',
                 PA_flag: add_more_coverage.indexOf("700000453") > 0 || add_more_coverage.indexOf("700000354") > 0 || add_more_coverage.indexOf("700000941") > 0 ? '1' : '0',
                 trailer_flag: '0',
                 pa_coolie_flag: '0',
@@ -1078,7 +1085,7 @@ class MotorCoverages extends Component {
                     vahanVerify: vahanVerify,
                     newRegistrationNo: localStorage.getItem('registration_number') == "NEW" ? localStorage.getItem('registration_number') : "", 
                     PA_flag: add_more_coverage.indexOf("700000453") > 0 || add_more_coverage.indexOf("700000354") > 0 || add_more_coverage.indexOf("700000941") > 0 ? '1' : '0',
-                    PA_cover_flag: add_more_coverage.indexOf("700000452") > 0 || add_more_coverage.indexOf("700000353") > 0 || add_more_coverage.indexOf("900000695") > 0 ? '1' : '0',
+                    PA_cover_flag: add_more_coverage.indexOf("700000452") > 0 || add_more_coverage.indexOf("700000353") > 0 || add_more_coverage.indexOf("900000695") > 0 || add_more_coverage.indexOf("900000750") > 0 ? '1' : '0',
                     trailer_flag: '0',
                     pa_coolie_flag: '0',
                     electric_flag: '0',
@@ -1150,31 +1157,42 @@ class MotorCoverages extends Component {
                     if(subValue.interestId == '700000351') {
                         newInnitialArray['B00013_value'] = subValue.fieldValueMap.NoofPaidDrivers_BT
                     }
-                    if(subValue.interestId == '900000687') {
+                    if(subValue.interestId == '900000687' || subValue.interestId == '900000743' ) {
                         newInnitialArray['B00013_value'] = subValue.fieldValueMap.NoOfPersons
                     }
-                    if(subValue.interestId == '900000688') {
+                    if(subValue.interestId == '900000688' || subValue.interestId == '900000742') {
                         newInnitialArray['B00012_value'] = subValue.fieldValueMap.NoOfPersons
                     }
-                    if(subValue.interestId == '700001865') {
+                    if(subValue.interestId == '700001865' || subValue.interestId == '900000005') {
                         newInnitialArray['B00007_description'] = subValue.calTotoalSumInsured
                     }
+
                     if(subValue.interestId == '700001862') {
                         newInnitialArray['B00004_value'] = subValue.calTotoalSumInsured
                         newInnitialArray['B00004_description'] = subValue.fieldValueMap.AccessoryDescripton1_BT
                     }
+                    if(subValue.interestId == '700000342') {
+                        newInnitialArray['B00004_value'] = subValue.calTotoalSumInsured
+                        newInnitialArray['B00004_description'] = subValue.fieldValueMap.AccessoryDescripton3_BT
+                    }
+                    if( subValue.interestId == '900000002') {
+                        newInnitialArray['B00004_value'] = subValue.calTotoalSumInsured
+                        newInnitialArray['B00004_description'] = subValue.fieldValueMap.AccessoryDescripton2_BT
+                    }
+                    
                     if(subValue.interestId == '700001861' ) {
                         newInnitialArray['B00003_value'] = subValue.calTotoalSumInsured
                         newInnitialArray['B00003_description'] = subValue.fieldValueMap.AccessoryDescripton1_BT
                     }
+                    if( subValue.interestId == '900000001') {
+                        newInnitialArray['B00003_value'] = subValue.calTotoalSumInsured
+                        newInnitialArray['B00003_description'] = subValue.fieldValueMap.AccessoryDescripton2_BT
+                    }
                     if(subValue.interestId == '700000341' ) {
                         newInnitialArray['B00003_value'] = subValue.calTotoalSumInsured
                         newInnitialArray['B00003_description'] = subValue.fieldValueMap.AccessoryDescripton3_BT
-                    }
-                    if(subValue.interestId == '700000342' ) {
-                        newInnitialArray['B00004_value'] = subValue.calTotoalSumInsured
-                        newInnitialArray['B00004_description'] = subValue.fieldValueMap.AccessoryDescripton3_BT
-                    }
+                    }        
+
                     if(subValue.interestId == '900001147') {
                         newInnitialArray['B00073_value'] = subValue.fieldValueMap.SumInsured_BT
                         newInnitialArray['B00073_description'] = subValue.fieldValueMap.No_of_Cleaner_conductor_coolie
@@ -1190,7 +1208,7 @@ class MotorCoverages extends Component {
                 })     
             } 
             else if(value.hasOwnProperty("policyCtAcceSOABOList")) {
-                if(value.policyCtAcceSOABOList.interestId == '700000452' || value.policyCtAcceSOABOList.interestId == '700000353') {
+                if(value.policyCtAcceSOABOList.interestId == '700000452' || value.policyCtAcceSOABOList.interestId == '700000353' || value.policyCtAcceSOABOList.interestId == '900000750') {
                     newInnitialArray['PA_Cover_OD'] =  value.policyCtAcceSOABOList.calTotoalSumInsured
                 }
             }
@@ -1629,7 +1647,7 @@ class MotorCoverages extends Component {
                                             <span className="error-message"></span>
                                         </label>
                                     </Col>
-                                    {values.PA_cover_flag == '1' && (values[coverage.ebao_code] == '700000353' || values[coverage.ebao_code] == '900000695' || values[coverage.ebao_code] == '700000452') ?
+                                    {values.PA_cover_flag == '1' && (values[coverage.ebao_code] == '700000353' || values[coverage.ebao_code] == '900000695' || values[coverage.ebao_code] == '700000452' || values[coverage.ebao_code] == '900000750') ?
                                         <Col sm={12} md={11} lg={3} key={qIndex+"b"}>
                                             <FormGroup>
                                                 <div className="formSection">
@@ -1664,7 +1682,7 @@ class MotorCoverages extends Component {
                                     {values.trailer_flag == '0' ?
                                         values.B00007_value = "" : null }
                                         
-                                     {values.trailer_flag == '1' && values[coverage.ebao_code] == '700001865' ?
+                                     {values.trailer_flag == '1' && (values[coverage.ebao_code] == '700001865' || values[coverage.ebao_code] == '900000005') ?
                                      <Fragment>
                                         <Col sm={12} md={11} lg={2} key={qIndex+"b"}>
                                             <FormGroup>
@@ -1778,7 +1796,7 @@ class MotorCoverages extends Component {
                                             </FormGroup>
                                         </Col> </Fragment> : null
                                     }
-                                    {values.nonElectric_flag == '1' && (values[coverage.ebao_code] == '700001862' || values[coverage.ebao_code] == '700000341') ?
+                                    {values.nonElectric_flag == '1' && (values[coverage.ebao_code] == '700001861' || values[coverage.ebao_code] == '700000341' || values[coverage.ebao_code] == '900000001') ?
                                      <Fragment>
                                         <Col sm={12} md={11} lg={2} key={qIndex+"b"}>
                                             <FormGroup>
@@ -1831,7 +1849,7 @@ class MotorCoverages extends Component {
                                             </FormGroup>
                                         </Col> </Fragment> : null
                                     }
-                                    {values.electric_flag == '1' && (values[coverage.ebao_code] == '700001861' || values[coverage.ebao_code] == '700000342') ?
+                                    {values.electric_flag == '1' && (values[coverage.ebao_code] == '700001862' || values[coverage.ebao_code] == '700000342' || values[coverage.ebao_code] == '900000002') ?
                                         <Fragment>
                                         <Col sm={12} md={11} lg={2} key={qIndex+"b"}>
                                             <FormGroup>
@@ -1977,7 +1995,7 @@ class MotorCoverages extends Component {
                                         </Col>
                                         </Fragment> : null
                                     }
-                                    {values.LL_PD_flag == '1' && (values[coverage.ebao_code] == '700000351' || values[coverage.ebao_code] == '900000687') ?
+                                    {values.LL_PD_flag == '1' && (values[coverage.ebao_code] == '700000351' || values[coverage.ebao_code] == '900000687' || values[coverage.ebao_code] == '900000743') ?
                                         <Fragment>
                                         <Col sm={12} md={11} lg={4} key={qIndex+"c"}>
                                             <FormGroup>
@@ -2010,7 +2028,7 @@ class MotorCoverages extends Component {
                                         </Fragment> : null
                                     }
 
-                                    {values.LL_Emp_flag == '1' && values[coverage.ebao_code] == '900000688' ?
+                                    {values.LL_Emp_flag == '1' && (values[coverage.ebao_code] == '900000688' || values[coverage.ebao_code] == '900000742') ?
                                         <Fragment>
                                         <Col sm={12} md={11} lg={4} key={qIndex+"b"}>
                                             <FormGroup>
@@ -2217,7 +2235,7 @@ class MotorCoverages extends Component {
                                         </Fragment> : null
                                     }
 
-                                    {values.trailer_flag == '1' && values[coverage.ebao_code] == '700001865' && values.B00007_value != "" ?
+                                    {values.trailer_flag == '1' && (values[coverage.ebao_code] == '700001865' || values[coverage.ebao_code] == '900000005') && values.B00007_value != "" ?
                                       this.handleClaims(values, errors, touched, setFieldTouched, setFieldValue) : null
                                     }
                                     {values.tyre_cover_flag == '1' && values[coverage.ebao_code] == '900009555' ?
