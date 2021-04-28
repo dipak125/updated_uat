@@ -31,11 +31,11 @@ const ageObj = new PersonAge();
 const minDate = moment(moment().subtract(20, 'years').calendar()).add(1, 'day').calendar();
 const maxDate = moment(moment().subtract(1, 'years').calendar()).add(0, 'day').calendar();
 const maxDatePYP = moment(moment().subtract(1, 'years').calendar()).add(30, 'day').calendar();
-// const startRegnDate = moment().subtract(20, 'years').calendar();
+const maxDatePYPST = moment(moment().subtract(1, 'month').calendar()).add(1, 'day').calendar();
+const startRegnDate = moment().subtract(20, 'years').calendar();
+const minRegnDate = startRegnDate;
+const minRegnDateNew = moment(moment().subtract(1, 'months').calendar()).add(1, 'day').calendar();
 // const minRegnDate = moment(startRegnDate).startOf('year').format('YYYY-MM-DD hh:mm');
-const minRegnDate = moment().subtract(20, 'years').calendar();
-// const minRegnDateNew = moment(moment().subtract(1, 'months').calendar()).add(1, 'day').calendar();
-const minRegnDateNew = moment().subtract(1, 'months').calendar();
 const maxDateForValidtion = moment(moment().subtract(1, 'years').calendar()).add(31, 'day').calendar();
 
 const initialValue = {
@@ -54,7 +54,9 @@ const initialValue = {
     averagemonthlyusages_id: "",
     permittypes_id: "",
     valid_previous_policy: "",
-    claim_array: []
+    claim_array: [],
+    newPolDuration: "",
+    prevPolDuration: ""
 }
 
 const vehicleRegistrationValidation = Yup.object().shape({
@@ -75,14 +77,14 @@ const vehicleRegistrationValidation = Yup.object().shape({
         function (value) {
             if (value && this.parent.policy_type_id == '1') {
                 // return checkGreaterStartEndTimes(value, new Date()) && checkGreaterStartEndTimes(minRegnDateNew, value);
-                return checkGreaterStartEndTimes(value, new Date()) && Math.floor(moment(minRegnDateNew).diff(value, 'days', true)<=0);       
+                return checkGreaterStartEndTimes(value, new Date()) && Math.floor(moment(minRegnDateNew).diff(value, 'days', true)<0);       
             }
             return true;
         }
     )
     .test(
         "checkGreaterTimes",
-        "RegistrationLessPrevious",
+        "RegistrationDateLessStartDate",
         function (value) {
             if (value) {
                 return checkGreaterStartEndTimes(value, this.parent.previous_start_date);
@@ -90,7 +92,8 @@ const vehicleRegistrationValidation = Yup.object().shape({
             return true;
         }
     ),
-    // location_id:Yup.string().matches(/^[A-Za-z0-9 ]+$/,'No special Character allowed').required('Registration city is required'),
+
+    newPolDuration: Yup.string().required("Policy duration required"), 
 
     location_id: Yup.string()
     .required(function() {
@@ -260,8 +263,7 @@ const vehicleRegistrationValidation = Yup.object().shape({
             return "PleaseEPCB"
         },
         function (value) {
-            if (this.parent.previous_is_claim == '0' && this.parent.previous_policy_name == '1' && (!value || value == '1') &&
-            Math.floor(moment().diff(this.parent.previous_end_date, 'days', true)) <= 90) {   
+            if (this.parent.previous_is_claim == '0' && this.parent.valid_previous_policy == '1' && Math.floor(moment().diff(this.parent.previous_end_date, 'days', true)) <= 90 && this.parent.previous_policy_name == '1' && (!value || value == '1')) {   
                 return false;    
             }
             return true;
@@ -273,8 +275,7 @@ const vehicleRegistrationValidation = Yup.object().shape({
             return "PleaseEPCB"
         },
         function (value) {
-            if (this.parent.previous_is_claim == '1' && !value && this.parent.no_of_claim == '2' &&
-            Math.floor(moment().diff(this.parent.previous_end_date, 'days', true)) <= 90) {   
+            if (this.parent.previous_is_claim == '1' && !value && this.parent.no_of_claim == '2') {   
                 return false;    
             }
             return true;
@@ -296,6 +297,13 @@ const vehicleRegistrationValidation = Yup.object().shape({
             return true;
         }
     ),
+
+    prevPolDuration: Yup.string().when(['previous_policy_name','valid_previous_policy'], {
+        is: (previous_policy_name,valid_previous_policy) => (previous_policy_name=='3') && (valid_previous_policy == '1'), 
+        then: Yup.string().required("Previous policy duration required"),
+        otherwise: Yup.string()
+    }), 
+    
     no_of_claim:Yup.string().when(['previous_is_claim'], {
         is: previous_is_claim => previous_is_claim == '1',       
         then: Yup.string().required('PleasePNOC'),
@@ -323,27 +331,27 @@ const vehicleRegistrationValidation = Yup.object().shape({
     claim_array: Yup.array().of(
         Yup.object().shape({
             claim_year : Yup.string(function() {
-                return "Please enter claim year"
+                return "PleaseEnterClaimYear"
             }).required(function() {
-                return "Please enter claim year"
+                return "PleaseEnterClaimYear"
             }).matches(/^[0-9]*$/, function() {
-                return "Invalid Year"
+                return "InvalidYear"
             }),
 
             claim_amount : Yup.string(function() {
-                return "Please enter claim amount"
+                return "PleaseEnterClaiAmmount"
             }).required(function() {
-                return "Please enter claim amount"
+                return "PleaseEnterClaiAmmount"
             }).matches(/^[0-9]*$/, function() {
-                return "Invalid Amout"
+                return "InvalidAmout"
             }),
 
             type_of_claim : Yup.string(function() {
-                return "Please enter type of claim"
+                return "PleaseEnterTypeClaim"
             }).required(function() {
-                return "Please enter type of claim"
+                return "PleaseEnterTypeClaim"
             }).matches(/^[a-zA-Z\s]*$/, function() {
-                return "Invalid Value"
+                return "InvalidValue"
             })
 
         })
@@ -519,11 +527,13 @@ class VehicleDetailsMISCD extends Component {
             return false
         }
 
+        if(Math.floor(moment().diff(values.previous_end_date, 'days', true)) > 90) {
+            values.previous_claim_bonus = 1
+        }
 
         const formData = new FormData(); 
         let encryption = new Encryption();
         let post_data = {}
-        if(values.policy_type_id == '2') {
             post_data = {
                 'policy_holder_id':localStorage.getItem('policyHolder_id'),
                 'menumaster_id':menumaster_id,
@@ -548,30 +558,9 @@ class VehicleDetailsMISCD extends Component {
                 'page_name': `VehicleDetails/${productId}`,
                 'claim_array': JSON.stringify(values.claim_array),
                 'no_of_claim': values.no_of_claim,
-                'page_name': `VehicleDetails_MISCD/${productId}`,
+                'newPolDuration': values.newPolDuration,
+                'prevPolDuration': values.prevPolDuration
             } 
-        }
-        else if(values.policy_type_id == '1')  {
-            post_data = {
-                'policy_holder_id':localStorage.getItem('policyHolder_id'),
-                'menumaster_id':menumaster_id,
-                'registration_date':moment(values.registration_date).format("YYYY-MM-DD"),
-                'location_id':values.location_id,    
-                'previous_is_claim':'0', 
-                'previous_claim_bonus': 1,
-                'vehicleAge': vehicleAge ,
-                'policy_type': policy_type,
-                'prev_policy_flag': 0,
-                // 'averagemonthlyusage_id': values.averagemonthlyusages_id,
-                // 'goodscarriedtype_id': values.goodscarriedtypes_id,
-                // 'permittype_id': values.permittypes_id,
-                'valid_previous_policy': 0,
-                'page_name': `VehicleDetails/${productId}`,
-                'claim_array': JSON.stringify(values.claim_array),
-                'no_of_claim': values.no_of_claim,
-                'page_name': `VehicleDetails_MISCD/${productId}`,
-            } 
-        }
 
         if(motorInsurance && motorInsurance.policytype_id == '1' && motorInsurance && motorInsurance.registration_no == "") {
             localStorage.setItem('registration_number', "NEW");
@@ -768,7 +757,7 @@ class VehicleDetailsMISCD extends Component {
                             </Field>
 
                             {errors.claim_array && errors.claim_array[i] && errors.claim_array[i].claim_year ? (
-                            <span className="errorMsg">{errors.claim_array[i].claim_year}</span>
+                            <span className="errorMsg">{phrases[errors.claim_array[i].claim_year]}</span>
                             ) : null}       
                         </div>
                     </FormGroup>
@@ -787,7 +776,7 @@ class VehicleDetailsMISCD extends Component {
 
                             />
                            {errors.claim_array && errors.claim_array[i] && errors.claim_array[i].claim_amount ? (
-                            <span className="errorMsg">{errors.claim_array[i].claim_amount}</span>
+                            <span className="errorMsg">{phrases[errors.claim_array[i].claim_amount]}</span>
                             ) : null}        
                         </div>
                     </FormGroup>
@@ -833,16 +822,9 @@ class VehicleDetailsMISCD extends Component {
         const {productId} = this.props.match.params  
         const {insurerList, showClaim, previous_is_claim, motorInsurance, previousPolicy,CustomerID,suggestions,
               vehicleDetails, RTO_location, averagemonthlyusages,goodscarriedtypes,permittypes, location_reset_flag} = this.state
-              
-        var defaultDate = new Date()
-        var date = previousPolicy && previousPolicy.start_date ? new Date(previousPolicy.start_date) : ""
 
-        var day = previousPolicy && previousPolicy.start_date ? date.getDate() : defaultDate.getDate()
-        var month = previousPolicy && previousPolicy.start_date ? date.getMonth() : defaultDate.getMonth()      
-        var year =  previousPolicy && previousPolicy.start_date ? date.getFullYear() : defaultDate.getFullYear()-1
-
-        var pypDateToOpen = new Date(year,month,day)
-
+        let phrases = localStorage.getItem("phrases") ? JSON.parse(localStorage.getItem("phrases")) : null
+        let previous_end_date = previousPolicy && previousPolicy.end_date ? new Date(previousPolicy.end_date) : ""
         let newInitialValues = Object.assign(initialValue, {
             registration_date: motorInsurance && motorInsurance.registration_date ? new Date(motorInsurance.registration_date) : "",
             location_id:  motorInsurance && motorInsurance.location_id && location_reset_flag == 0 ? motorInsurance.location_id : "",
@@ -863,7 +845,6 @@ class VehicleDetailsMISCD extends Component {
             
             claim_array:  this.initClaimDetailsList()
         });
-        let phrases = localStorage.getItem("phrases") ? JSON.parse(localStorage.getItem("phrases")) : null
         
 
         const inputCustomerID = {
@@ -928,8 +909,8 @@ class VehicleDetailsMISCD extends Component {
                                                         <FormGroup>
                                                             <DatePicker
                                                                 name="registration_date"
-                                                                minDate={values.policy_type_id == '1' ? new Date(minRegnDateNew) : new Date(minRegnDate)}
-                                                                maxDate={values.policy_type_id == '1' ? new Date() : new Date(maxDate)}
+                                                                minDate={new Date(minRegnDate)}
+                                                                maxDate={new Date(maxDate)}
                                                                 dateFormat="dd MMM yyyy"
                                                                 placeholderText={phrases['RegDate']}
                                                                 peekPreviousMonth
@@ -951,6 +932,42 @@ class VehicleDetailsMISCD extends Component {
                                                             {errors.registration_date && touched.registration_date ? (
                                                                 <span className="errorMsg">{phrases[errors.registration_date]}</span>
                                                             ) : null}
+                                                        </FormGroup>
+                                                    </Col>
+                                                </Row>
+                                                <Row>
+                                                    <Col sm={12} md={6} lg={6}>
+                                                        <FormGroup>
+                                                            <div className="fs-18">
+                                                            Select duration for new policy
+                                                            </div>
+                                                        </FormGroup>
+                                                    </Col>
+                                                   
+                                                    <Col sm={12} md={11} lg={4}>
+                                                        <FormGroup>
+                                                            <div className="formSection">
+                                                                <Field
+                                                                    name='newPolDuration'
+                                                                    component="select"
+                                                                    autoComplete="off"
+                                                                    className="formGrp inputfs12"
+                                                                    value = {values.newPolDuration}
+                                                                    // value={ageObj.whatIsCurrentMonth(values.registration_date) < 7 ? 6 : values.previous_policy_name}
+                                                                >
+                                                                    <option value="">Select Duration</option>
+                                                                    <option value= '1'> One Month</option>
+                                                                    <option value= '3'> Three Month</option>
+                                                                    <option value= '6'> Six Month</option>
+                                                                    {/* {goodscarriedtypes.map((subVehicle, qIndex) => ( 
+                                                                        <option value= {subVehicle.id}>{subVehicle.goodscarriedtype}</option>
+                                                                    ))} */}
+                                                        
+                                                                </Field>
+                                                                {errors.newPolDuration && touched.newPolDuration ? (
+                                                                    <span className="errorMsg">{errors.newPolDuration}</span>
+                                                                ) : null}
+                                                            </div>
                                                         </FormGroup>
                                                     </Col>
                                                 </Row>
@@ -1155,11 +1172,10 @@ class VehicleDetailsMISCD extends Component {
 
                                                             <DatePicker
                                                                 name="previous_start_date"
-                                                                minDate={new Date(minDate)}
-                                                                maxDate={new Date(maxDatePYP)}
+                                                                minDate={new Date(minDate)} 
+                                                                maxDate={values.previous_policy_name == '3' ? new Date(maxDatePYPST) : new Date(maxDatePYP)}
                                                                 dateFormat="dd MMM yyyy"
                                                                 placeholderText={phrases['PPSD']}
-                                                                openToDate={new Date(pypDateToOpen)}
                                                                 peekPreviousMonth
                                                                 autoComplete="off"
                                                                 peekPreviousYear
@@ -1170,9 +1186,18 @@ class VehicleDetailsMISCD extends Component {
                                                                 selected={values.previous_start_date}
                                                                 onChange={(val) => {
                                                                     var date = new Date(val)
-                                                                    date = date.setFullYear(date.getFullYear() + 1);
-                                                                    var date2 = new Date(date)
-                                                                    date2 = date2.setDate(date2.getDate() - 1);
+                                                                    var date2 = new Date(val)
+                                                                    if(values.previous_policy_name == '3') {
+                                                                        if(values.prevPolDuration) {
+                                                                            date2 = moment(val).add(values.prevPolDuration,'month').format('YYYY-MM-DD') 
+                                                                        }                   
+                                                                    }
+                                                                    else if(values.previous_policy_name == '1' || values.previous_policy_name == '2'){
+                                                                        date = date.setFullYear(date.getFullYear() + 1);
+                                                                        var date2 = new Date(date)
+                                                                        date2 = date2.setDate(date2.getDate() - 1);
+                                                                    }
+                                                                    
 
                                                                     setFieldTouched('previous_start_date')
                                                                     setFieldValue("previous_end_date", new Date(date2));
@@ -1195,10 +1220,10 @@ class VehicleDetailsMISCD extends Component {
                                                                 dropdownMode="select"
                                                                 className="datePckr inputfs12"
                                                                 selected={values.previous_end_date}
-                                                                onChange={(val) => {
-                                                                    setFieldTouched('previous_end_date');
-                                                                    setFieldValue('previous_end_date', val);
-                                                                }}
+                                                                // onChange={(val) => {
+                                                                //     setFieldTouched('previous_end_date');
+                                                                //     setFieldValue('previous_end_date', val);
+                                                                // }}
                                                             />
                                                             {errors.previous_end_date && touched.previous_end_date ? (
                                                                 <span className="errorMsg">{phrases[errors.previous_end_date]}</span>
@@ -1214,11 +1239,32 @@ class VehicleDetailsMISCD extends Component {
                                                                     autoComplete="off"
                                                                     className="formGrp inputfs12"
                                                                     value = {values.previous_policy_name}
+                                                                    onChange = {(e)=> {
+                                                                        if(e.target.value == '3' ) {
+                                                                            if(values.prevPolDuration && values.previous_start_date) {
+                                                                                let date1 = ""
+                                                                                date1 = moment(values.previous_start_date).add(values.prevPolDuration,'month').format('YYYY-MM-DD') 
+                                                                                setFieldValue("previous_end_date", new Date(date1)); 
+                                                                            }
+                                                                            else setFieldValue("previous_end_date", "");
+                                                                                               
+                                                                        }
+                                                                        else if( values.previous_start_date){
+                                                                            var date = new Date(values.previous_start_date)
+                                                                            date = date.setFullYear(date.getFullYear() + 1);
+                                                                            var date2 = new Date(date)
+                                                                            date2 = date2.setDate(date2.getDate() - 1);
+                                                                            setFieldValue("previous_policy_name", e.target.value);
+                                                                            setFieldValue("previous_end_date", new Date(date2));
+                                                                        }
+                                                                        setFieldValue("previous_policy_name", e.target.value);
+                                                                    }}
                                                                     // value={ageObj.whatIsCurrentMonth(values.registration_date) < 7 ? 6 : values.previous_policy_name}
                                                                 >
                                                                 <option value="">{phrases['SPT']}</option>
                                                                 <option value="1">{phrases['Package']}</option>
                                                                 <option value="2">{phrases['LiabilityOnly']}</option> 
+                                                                <option value="3">Short Term</option>
                                                         
                                                                 </Field>
                                                                 {errors.previous_policy_name && touched.previous_policy_name ? (
@@ -1271,7 +1317,7 @@ class VehicleDetailsMISCD extends Component {
                                                     </Col>
                                                 </Row>
                                                 <Row>
-                                                <Col sm={12} md={5} lg={5}>
+                                                <Col sm={12} md={5} lg={6}>
                                                         <FormGroup>
                                                             <div className="insurerName">
                                                                 <Field
@@ -1290,8 +1336,42 @@ class VehicleDetailsMISCD extends Component {
                                                             </div>
                                                         </FormGroup>
                                                     </Col>
+                                                    { values.previous_policy_name == '3' ?
+                                                    <Col sm={12} md={5} lg={5}>
+                                                        <FormGroup>
+                                                            <div className="formSection">
+                                                                <Field
+                                                                    name='prevPolDuration'
+                                                                    component="select"
+                                                                    autoComplete="off"
+                                                                    className="formGrp inputfs12"
+                                                                    value = {values.prevPolDuration}
+                                                                    onChange = {(e)=> {        
+                                                                        let date2 = new Date()
+                                                                        date2 = moment(values.previous_start_date).add(e.target.value,'month').format('YYYY-MM-DD')                              
+                                                                        setFieldValue("prevPolDuration", e.target.value);
+                                                                        setFieldValue("previous_end_date", new Date(date2));                                  
+                                                                    }}
+                                                                    // value={ageObj.whatIsCurrentMonth(values.registration_date) < 7 ? 6 : values.previous_policy_name}
+                                                                >
+                                                                    <option value="">Select Duration</option>
+                                                                    <option value= '1'> One Month</option>
+                                                                    <option value= '3'> Three Month</option>
+                                                                    <option value= '6'> Six Month</option>
+                                                                    {/* {goodscarriedtypes.map((subVehicle, qIndex) => ( 
+                                                                        <option value= {subVehicle.id}>{subVehicle.goodscarriedtype}</option>
+                                                                    ))} */}
+                                                        
+                                                                </Field>
+                                                                {errors.prevPolDuration && touched.prevPolDuration ? (
+                                                                    <span className="errorMsg">{errors.prevPolDuration}</span>
+                                                                ) : null}
+                                                            </div>
+                                                        </FormGroup>
+                                                    </Col> : null
+                                                    }
                                                 </Row>
-                                                { values.previous_policy_name == '1' && Math.floor(moment().diff(values.previous_end_date, 'days', true)) <= 90 ?
+                                                { (values.previous_policy_name == '1' || values.previous_policy_name == '3') && Math.floor(moment().diff(values.previous_end_date, 'days', true)) <= 90 ?
                                                     <Fragment>
                                                     <Row>
                                                         <Col sm={12}>

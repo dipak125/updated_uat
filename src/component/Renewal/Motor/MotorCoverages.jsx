@@ -548,8 +548,8 @@ class MotorCoverages extends Component {
                 policyCoverage.map((coverage,Index) => {
                     add_more_coverage.push(coverage.cover_type_id)
                     coverage.renewalsubcoverage && coverage.renewalsubcoverage.length > 0 && coverage.renewalsubcoverage.map((benefit, bIndex) => (
-                        // benefit.interest_premium && parseInt(benefit.interest_premium) > 0 ? add_more_coverage.push(benefit.interest_id) : null
-                        add_more_coverage.push(benefit.interest_id)
+                        benefit.interest_premium && parseInt(benefit.interest_premium) > 0 ? add_more_coverage.push(benefit.interest_id) : null
+                        // add_more_coverage.push(benefit.interest_id)
                         ))
                 })
 
@@ -1045,7 +1045,7 @@ class MotorCoverages extends Component {
                 B00006 : vehicleDetails && vehicleDetails.varientmodel && (vehicleDetails.varientmodel.fueltype.id == 3 || vehicleDetails.varientmodel.fueltype.id == 4) ? "B00006" : "",
                 B00010 : vehicleDetails && vehicleDetails.varientmodel && (vehicleDetails.varientmodel.fueltype.id == 3 || vehicleDetails.varientmodel.fueltype.id == 4) ? "B00010" : "",               
                 PA_cover_flag: add_more_coverage.indexOf("700000452") > 0 || add_more_coverage.indexOf("700000353") > 0 || add_more_coverage.indexOf("900000695") > 0 ? '1' : '0',
-                PA_flag: add_more_coverage.indexOf("700000453") > 0 || add_more_coverage.indexOf("700000354") > 0 ? '1' : '0',
+                PA_flag: add_more_coverage.indexOf("700000453") > 0 || add_more_coverage.indexOf("700000354") > 0 || add_more_coverage.indexOf("700000941") > 0 ? '1' : '0',
                 trailer_flag: '0',
                 pa_coolie_flag: '0',
                 electric_flag: '0',
@@ -1077,7 +1077,7 @@ class MotorCoverages extends Component {
                     engine_no: motorInsurance.engine_no ? motorInsurance.engine_no : (engine_no ? engine_no : ""),
                     vahanVerify: vahanVerify,
                     newRegistrationNo: localStorage.getItem('registration_number') == "NEW" ? localStorage.getItem('registration_number') : "", 
-                    PA_flag: add_more_coverage.indexOf("700000453") > 0 || add_more_coverage.indexOf("700000354") > 0 ? '1' : '0',
+                    PA_flag: add_more_coverage.indexOf("700000453") > 0 || add_more_coverage.indexOf("700000354") > 0 || add_more_coverage.indexOf("700000941") > 0 ? '1' : '0',
                     PA_cover_flag: add_more_coverage.indexOf("700000452") > 0 || add_more_coverage.indexOf("700000353") > 0 || add_more_coverage.indexOf("900000695") > 0 ? '1' : '0',
                     trailer_flag: '0',
                     pa_coolie_flag: '0',
@@ -1182,7 +1182,7 @@ class MotorCoverages extends Component {
                     if(subValue.interestId == '900000695' || subValue.interestId == '700000353' || subValue.interestId == '700000452' ) {
                         newInnitialArray['PA_Cover_OD'] = subValue.totoalSumInsured
                     }
-                    if(subValue.interestId == '700000453' || subValue.interestId == '700000354' ) {
+                    if(subValue.interestId == '700000453' || subValue.interestId == '700000354' || subValue.interestId == '700000941' ) { 
                         newInnitialArray['PA_Cover'] = subValue.fieldValueMap.SumInsured_BT
                     }
 
@@ -1244,6 +1244,23 @@ class MotorCoverages extends Component {
             </div> : null
         )) : null  
 
+        const premiumBreakup = policyCoverage && policyCoverage.length > 0 ?
+        policyCoverage.map((coverage, qIndex) => (
+            coverage.renewalsubcoverage && coverage.renewalsubcoverage.length > 0 ? coverage.renewalsubcoverage.map((benefit, bIndex) => (
+                    (parseInt(benefit.interest_premium) != 0 ) ?
+                    <tr>
+                        <td>{benefit.interest_name}:</td>
+                        <td>₹ {Math.round(benefit.interest_premium)}</td>
+                    </tr> : null                 
+            )) : 
+                (parseInt(coverage.annual_premium) != 0 ) ?
+                <tr>
+                    <td>{coverage.cover_name}:</td>
+                    <td>₹ {Math.round(coverage.annual_premium)}</td>
+                </tr> : null   
+        )) : null
+
+
         const ncbStr = (ncbDiscount && ncbDiscount!=0 && ncbCount==1) ? <Row><Col sm={12} md={6}>
         <FormGroup>{phrases["NCBDiscount"]}</FormGroup>
         </Col>
@@ -1266,20 +1283,6 @@ class MotorCoverages extends Component {
 
         productCount=1
         ncbCount=1
-        // console.log('ncbDiscount_breakup', ncbDiscount);
-         const premiumBreakup = policyCoverage && policyCoverage.length > 0 ?
-            policyCoverage.map((coverage, qIndex) => (
-                coverage.PolicyBenefitList && coverage.PolicyBenefitList.map((benefit, bIndex) => (
-                        (benefit.ProductElementCode != 'B00007') ?
-                        <tr>
-                            <td>{Coverage[benefit.ProductElementCode]}:</td>
-                            <td>₹ {Math.round(benefit.AnnualPremium)}</td>
-                        </tr> : (benefit.ProductElementCode == 'B00007' && productCount==1) ? <tr label={productCount+=1}>
-                        <td >{Coverage[benefit.ProductElementCode]}:</td>
-                        <td>₹ {Math.round(TRAILOR_OD_PREMIUM)}</td>
-                    </tr> : null                         
-                ))
-            )) : null
         
         const ncbBreakup = (ncbDiscount && ncbDiscount!=0 && ncbCount==1) ? <tr label={ncbCount+=1}>
         <td >{phrases["NCBDiscount"]}:</td>
@@ -2094,7 +2097,7 @@ class MotorCoverages extends Component {
                                         </Col>
                                         </Fragment> : null
                                     }
-                                     {values.PA_flag == '1' && (values[coverage.ebao_code] == '700000453' || values[coverage.ebao_code] == '700000354') ?
+                                     {values.PA_flag == '1' && (values[coverage.ebao_code] == '700000453' || values[coverage.ebao_code] == '700000354' || values[coverage.ebao_code] == '700000941' ) ?
                                         <Col sm={12} md={11} lg={3} key={qIndex+"b"}>
                                             <FormGroup>
                                                 <div className="formSection">
@@ -2282,11 +2285,7 @@ class MotorCoverages extends Component {
                                     </Col>
                                 </Row>
                                 
-                                <div className="d-flex justify-content-left resmb">
-                                    <Button className={`backBtn`} type="button"  onClick= {this.vehicleDetails.bind(this,productId)}>
-                                        {phrases['Back']}
-                                    </Button> 
-
+                                <div className="d-flex justify-content-left resmb">   
                                         {/* { serverResponse && serverResponse != "" ? (serverResponse.message ? 
                                         <Button className={`proceedBtn`} type="submit"  >
                                             {phrases['Recalculate']}
@@ -2337,7 +2336,7 @@ class MotorCoverages extends Component {
                             <thead>
                                 <tr>
                                     <th>{phrases['Premium']}:</th>
-                                    <th>₹ {fulQuoteResp.DuePremium}</th>
+                                    <th>₹ {Math.round(request_data.payable_premium)}</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -2347,11 +2346,11 @@ class MotorCoverages extends Component {
                             
                                 <tr>
                                     <td>{phrases["GrossPremium"]}:</td>
-                                    <td>₹ {Math.round(fulQuoteResp.BeforeVatPremium)}</td>
+                                    <td>₹ {Math.round(request_data.gross_premium)}</td>
                                 </tr>
                                 <tr>
                                     <td>{phrases["GST"]}:</td>
-                                    <td>₹ {Math.round(fulQuoteResp.TGST)}</td>
+                                    <td>₹ {Math.round(request_data.service_tax)}</td>
                                 </tr>
                             </tbody>
                         </table>
