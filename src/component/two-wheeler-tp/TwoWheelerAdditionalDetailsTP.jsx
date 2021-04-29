@@ -118,9 +118,9 @@ const ownerValidation = Yup.object().shape({
         otherwise: Yup.string()
     }), */
 	
-	pancard: Yup.string().when(['is_eia_account2','net_premium'], {
+    pancard: Yup.string().when(['is_eia_account2','net_premium'], {
         is: (is_eia_account2,net_premium) => (is_eia_account2=='1') || (net_premium >= 100000), 
-        then: Yup.string().required().test(
+        then: Yup.string().required("EnterPan").test(
             "1LakhChecking",
 			function(){return "EnterPan"; },
             function (value) {
@@ -1272,6 +1272,30 @@ class TwoWheelerAdditionalDetails extends Component {
                                             </div>
                                         </FormGroup>
                                     </Col>
+                                    {motorInsurance && motorInsurance.policy_for == '2' ?
+                                        (showEIA2 || is_eia_account2 == '1' ?
+                                        <Col sm={12} md={4} lg={4}>
+                                            <FormGroup>
+                                                <div className="insurerName">
+                                                <Field
+                                                    name='pancard'
+                                                    type="text"
+                                                    placeholder={phrases['PAN']}
+                                                    autoComplete="off"
+                                                    onFocus={e => this.changePlaceHoldClassAdd(e)}
+                                                    onBlur={e => this.changePlaceHoldClassRemove(e)}
+                                                    value = {values.pancard.toUpperCase()} 
+                                                    onChange= {(e)=> 
+                                                        setFieldValue('pancard', e.target.value.toUpperCase())
+                                                        }                                                                           
+                                                />
+                                                {errors.pancard && touched.pancard ? (
+                                                <span className="errorMsg">{phrases[errors.pancard]}</span>
+                                                ) : null} 
+                                                </div>
+                                            </FormGroup>
+                                        </Col> : null )
+                                    : null }
                                     {motorInsurance && motorInsurance.policy_for == '1' ?
                                     <Col sm={12} md={4} lg={4}>
                                         <FormGroup>
@@ -1289,7 +1313,7 @@ class TwoWheelerAdditionalDetails extends Component {
                                                     }                                                                           
                                             />
                                             {errors.pancard && touched.pancard ? (
-                                            <span className="errorMsg">{errors.pancard}</span>
+                                            <span className="errorMsg">{phrases[errors.pancard]}</span>
                                             ) : null} 
                                             </div>
                                         </FormGroup>

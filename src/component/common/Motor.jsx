@@ -56,6 +56,12 @@ class Motor extends Component {
         else if(productId == '16') {
             this.props.history.push(`/two_wheeler_Select-brandOD/${productId}`)
         }
+        else if(productId == '17') {
+            this.props.history.push(`/Registration_GCVST/${productId}`)
+        }
+        else if(productId == '18') {
+            this.props.history.push(`/Registration_MISCDST/${productId}`)
+        }
 
     }   
 

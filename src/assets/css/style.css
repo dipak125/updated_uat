@@ -155,7 +155,7 @@ ul.navPan li a span{ margin-bottom:8px; display: block; }
 
 /*-------------- Select Brand Section--------------*/
 
-.brand { margin: 25px auto; padding: 25px 25px 25px 45px;  max-width: 1066px; background: url(../images/brand-bg1.svg) no-repeat center center; box-sizing: border-box; border-radius: 25px; min-height: 620px; background-size: cover; background-attachment: fixed; transition: 0.3s;}
+.brand { margin: 25px auto; padding: 25px 25px 25px 25px;  max-width: 1066px; background: url(../images/brand-bg1.svg) no-repeat center center; box-sizing: border-box; border-radius: 25px; min-height: 620px; background-size: cover; background-attachment: fixed; transition: 0.3s;}
 .topcar {margin-top: 120px !important;}
 .brandhead h4 {font-size: 15px; color: #1482AB;}
 .brandhead p {font-size: 18px; color: #231F20;}
@@ -578,7 +578,7 @@ Note: Beware of modifying this element as it can break the animations - you shou
 /*---------Insurance close-------*/
 
 /*---- Error Page Start------*/
-.error404 {box-sizing: border-box; text-align: center; margin: 18% auto 0;}
+.error404 {box-sizing: border-box; text-align: center; margin:25% auto 18% auto;}
 .error404 h3 {color:#1482AB; font-size: 50px; font-weight: 900; line-height: 55px;}
 .error404 h4 {font-size: 40px; line-height: 45px; font-weight: 500;}
 /*---- Error Page close------*/
@@ -765,8 +765,7 @@ a.navbar-brand.logoActive span.logo-text.text-center img {
     box-shadow: 1px 0 20px rgb(0 0 0 / 8%);
     transition: .2s ease-in;
 	left:0;
-	/*background: url(/static/media/sidenav-bg.8ed71014.svg) no-repeat left 0;*/
-	background: url(../images/sidenav-bg.svg) no-repeat left 0;
+	background: url(/static/media/sidenav-bg.8ed71014.svg) no-repeat left 0;
 	background-size:cover;
 }
 .ps-container {
@@ -901,17 +900,28 @@ li.logoutbtn {
 .policytab table th,.policytab table td{ padding:7px 10px !important;}
 
 .policytab .react-bs-table .react-bs-container-body .table>tbody>tr>td {
+	overflow-wrap: break-word; 
+  word-wrap: break-word;
+  -ms-word-break: break-all;
+  word-break: break-all;
+  word-break: break-word;
+}
+
+.policytab .pagination {
+    justify-content: flex-end;
+}
+.breakin .dropdown-toggle::after { 
+    margin-left: 14px;
+}
+.breakin .react-bs-table .react-bs-container-body .table>tbody>tr>td {
 	overflow-wrap: break-word;
   word-wrap: break-word;
   -ms-word-break: break-all;
   word-break: break-all;
   word-break: break-word;
 }
-.policytab .pagination {
-    justify-content: flex-end;
-}
-.breakin .dropdown-toggle::after {
-    margin-left: 14px;
+.breakin table th, .breakin table td {
+    padding: 7px 10px !important;
 }
 
 @media (min-width: 768px){
@@ -1042,7 +1052,12 @@ li.logoutbtn {
 .displayshow ul.navbar-nav{ flex-direction: row; justify-content: center;}
 .customInnerTable.policytab .react-bs-table.react-bs-table-bordered th{ padding:7px; font-size: 13px;}
 .policytab .react-bs-table .react-bs-container-body .table>tbody>tr>td{font-size: 13px;}
-
+.customModalfamlyForm .dropinput.m-b-45 .col-md-15 label.customCheckBox.formGrp.formGrp {
+    height: auto;
+    line-height: 24px;
+}
+.customModalfamlyForm .dropinput.m-b-45 .col-md-15{ padding-left:15px; padding-right:15px;}
+.rghtsideTrigr .Collapsible__trigger { background-position: right top;}
 }
 
 @media (max-width: 680px) {
@@ -1054,7 +1069,7 @@ li.logoutbtn {
 
 @media (max-width: 575.98px) { 
    .tablecontent {overflow: scroll;}
-      
+      .formSection label{ margin-bottom:15px; margin-top:15px;}
 }
 
 /* Absolute Center Spinner for Loader */
@@ -1310,7 +1325,9 @@ img.avatar {  border-radius: inherit;}
 .border-cardbody-dash .col-sm-12{
   padding: 0!important;
 }
-
+.modal-content .customModalfamlyForm .col-md-15 label.customCheckBox.formGrp.formGrp {
+    height: auto;
+}
 
 
 
@@ -1454,6 +1471,8 @@ ul.navPan { height:100%;}
 .dataTableCustom table td, .dataTableCustom table th{
     font-size: 13px !important;
 }
+.modal-header.custmModlHead{ padding-bottom:15px;}
+
 
 @media (max-width: 576px){
 
@@ -1493,6 +1512,12 @@ ul.navPan { height:100%;}
     margin-bottom: 0 !important;
 }
 }
+@media (max-width: 479px){
+.cntrbtn button.btnPrimary {
+    margin-bottom: 5px;
+}
+}
+
 
 @media (max-width: 460px){
 .align-self-center.userNameImg {
@@ -1513,4 +1538,20 @@ li.nav-item.dropdown select.listSelect {
 }
 .displayshow{ padding:0 !important; top:58px;}
 
+}
+@media (max-width: 375px){
+	.rghtsideTrigr .Collapsible__trigger{ background-position:right top;}
+}
+@media (max-width: 350px){
+	
+ .infobox.helpolicy span.Collapsible__trigger {
+    font-size: 12px !important;
+}
+.helpolicy .boxpd {
+    padding-left: 12px;
+    padding-right: 12px;
+}
+.customModal table th,.customModal table td {
+    padding: 7px;
+}
 }

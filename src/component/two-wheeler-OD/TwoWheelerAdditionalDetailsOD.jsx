@@ -43,7 +43,7 @@ const initialValue = {
     phone: "",
     email: "",
     address: "",
-    is_eia_account: "0",
+    is_eia_account: "",
 	is_eia_account2: "",
     eia_no: "",
     stateName: "",
@@ -132,27 +132,10 @@ const ownerValidation = Yup.object().shape({
         otherwise: Yup.string()
     }), */
 	
-	 /*
-	pancard: Yup.string().when(['policy_for','is_eia_account2','net_premium'], {
-        is: (policy_for,is_eia_account2,net_premium) => (policy_for == '1' && is_eia_account2=='1') || (policy_for == '1' && net_premium >= 100000), 
-        then: Yup.string().required().test(
-            "1LakhChecking",
-			function(){return "EnterPan"; },
-            function (value) {
-                if (!value) {
-                    return this.parent.net_premium <= 100000
-                }
-                 return true;
-				 
-        }).matches(/^[A-Z]{3}[CPHFATBLJG]{1}[A-Z]{1}[0-9]{4}[A-Z]{1}$/, function() {
-            return "ValidPan"
-        }),
-        otherwise: Yup.string()
-    }),  */
 	
-	pancard: Yup.string().when(['is_eia_account2','net_premium'], {
+    pancard: Yup.string().when(['is_eia_account2','net_premium'], {
         is: (is_eia_account2,net_premium) => (is_eia_account2=='1') || (net_premium >= 100000), 
-        then: Yup.string().required().test(
+        then: Yup.string().required("EnterPan").test(
             "1LakhChecking",
 			function(){return "EnterPan"; },
             function (value) {
@@ -165,7 +148,7 @@ const ownerValidation = Yup.object().shape({
             return "ValidPan"
         }),
         otherwise: Yup.string()
-    }),
+    }), 
     
 
     pincode_id:Yup.string().required('LocationRequired'),
@@ -517,7 +500,9 @@ class TwoWheelerAdditionalDetailsOD extends Component {
         if(value == 1){
             this.setState({
                 showEIA:true,
-                is_eia_account:1
+                is_eia_account:1,
+				showEIA2:false,
+				is_eia_account2:0
             })
         }
         else{
@@ -593,7 +578,7 @@ class TwoWheelerAdditionalDetailsOD extends Component {
             'phone': values['phone'],
             'email': values['email'],
             'is_eia_account': values['is_eia_account'],
-			
+			'is_eia_account2': values['is_eia_account2'],
             'eia_no': values['eia_no'],
             'address': values['address'],          
             'gstn_no': values['gstn_no'],
@@ -665,6 +650,8 @@ class TwoWheelerAdditionalDetailsOD extends Component {
                  let is_eia_account=  policyHolder && (policyHolder.is_eia_account == 0 || policyHolder.is_eia_account == 1) ? policyHolder.is_eia_account : ""
 				 
 				 let is_eia_account2=  policyHolder && (policyHolder.create_eia_account == 0 || policyHolder.create_eia_account == 1) ? policyHolder.create_eia_account : ""
+				 
+				 let tpaInsurance = policyHolder.T_Insurance_Repository_id ? policyHolder.T_Insurance_Repository_id : ""			 
 				 
                  let bankDetails = decryptResp.data.policyHolder && decryptResp.data.policyHolder.bankdetail ? decryptResp.data.policyHolder.bankdetail[0] : {};
                  let addressDetails = JSON.parse(decryptResp.data.policyHolder.pincode_response)
@@ -814,7 +801,7 @@ class TwoWheelerAdditionalDetailsOD extends Component {
    
 
     render() {
-        const {showEIA, showEIA2, showLoan, is_eia_account,is_eia_account2, is_loan_account, nomineeDetails, motorInsurance,appointeeFlag, is_appointee,titleList,tpaInsurance,
+        const {showLoan, showEIA, showEIA2, is_eia_account,is_eia_account2, is_loan_account, nomineeDetails, motorInsurance,appointeeFlag, is_appointee,titleList, tpaInsurance,
             bankDetails,policyHolder, stateName, pinDataArr, quoteId, addressDetails, relation,step_completed,vehicleDetails} = this.state
         const {productId} = this.props.match.params 
         let phrases = localStorage.getItem("phrases") ? JSON.parse(localStorage.getItem("phrases")) : null
@@ -838,7 +825,7 @@ class TwoWheelerAdditionalDetailsOD extends Component {
             phone: policyHolder && policyHolder.mobile ? policyHolder.mobile : "",
             email:  policyHolder && policyHolder.email_id ? policyHolder.email_id : "",
             address: policyHolder && policyHolder.address ? policyHolder.address : "",
-            // is_eia_account:  is_eia_account,
+            is_eia_account:  is_eia_account,
 			is_eia_account2:  is_eia_account2,
             eia_no: policyHolder && policyHolder.eia_no ? policyHolder.eia_no : "",
             policy_for : motorInsurance ? motorInsurance.policy_for : "",
@@ -865,16 +852,13 @@ class TwoWheelerAdditionalDetailsOD extends Component {
 				<div className="page-wrapper">
                 <div className="container-fluid">
                 <div className="row">
-				
-				
-                    <aside className="left-sidebar">
- <div className="scroll-sidebar ps-container ps-theme-default ps-active-y">
-<SideNav />
- </div>
-</aside>
 
-					
-					
+                    <aside className="left-sidebar">
+                    <div className="scroll-sidebar ps-container ps-theme-default ps-active-y">
+                    <SideNav />
+                    </div>
+                    </aside>
+			
                 <div className="col-sm-12 col-md-12 col-lg-12 col-xl-12 infobox twoadiDetail">
                 <h4 className="text-center mt-3 mb-3">{phrases['SBIGICL']}</h4>
                 { step_completed >= '3' && vehicleDetails.vehicletype_id == productId ?
@@ -885,8 +869,7 @@ class TwoWheelerAdditionalDetailsOD extends Component {
                         validationSchema={ownerValidation}
                         >
                         {({ values, errors, setFieldValue, setFieldTouched, isValid, isSubmitting, touched }) => {
-                             let value = values.nominee_first_name;
-                             console.log("errors", errors)
+                             console.log("values-------- ", values)
                         return (
                         <Form>
                         <Row>
@@ -1005,7 +988,7 @@ class TwoWheelerAdditionalDetailsOD extends Component {
                                                 ))}
                                             </Field>     
                                             {errors.salutation_id && touched.salutation_id ? (
-                                            <span className="errorMsg">{errors.salutation_id}</span>
+                                            <span className="errorMsg">{phrases[errors.salutation_id]}</span>
                                             ) : null}              
                                             </div>
                                         </FormGroup>
@@ -1141,7 +1124,7 @@ class TwoWheelerAdditionalDetailsOD extends Component {
                                                 value = {values.email}                                                                            
                                             />
                                             {errors.email && touched.email ? (
-                                            <span className="errorMsg">{errors.email == "email must be a valid email" ? errors.email : phrases[errors.email]}</span>
+                                            <span className="errorMsg">{phrases[errors.email]}</span>
                                             ) : null}  
                                             </div>
                                         </FormGroup>
@@ -1296,6 +1279,30 @@ class TwoWheelerAdditionalDetailsOD extends Component {
                                             </div>
                                         </FormGroup>
                                     </Col>
+                                    {motorInsurance && motorInsurance.policy_for == '2' ?
+                                        (showEIA2 || is_eia_account2 == '1' ?
+                                        <Col sm={12} md={4} lg={4}>
+                                            <FormGroup>
+                                                <div className="insurerName">
+                                                <Field
+                                                    name='pancard'
+                                                    type="text"
+                                                    placeholder={phrases['PAN']}
+                                                    autoComplete="off"
+                                                    onFocus={e => this.changePlaceHoldClassAdd(e)}
+                                                    onBlur={e => this.changePlaceHoldClassRemove(e)}
+                                                    value = {values.pancard.toUpperCase()} 
+                                                    onChange= {(e)=> 
+                                                        setFieldValue('pancard', e.target.value.toUpperCase())
+                                                        }                                                                           
+                                                />
+                                                {errors.pancard && touched.pancard ? (
+                                                <span className="errorMsg">{phrases[errors.pancard]}</span>
+                                                ) : null} 
+                                                </div>
+                                            </FormGroup>
+                                        </Col> : null )
+                                    : null }
                                     {motorInsurance && motorInsurance.policy_for == '1' ?
                                     <Col sm={12} md={4} lg={4}>
                                         <FormGroup>
@@ -1313,7 +1320,7 @@ class TwoWheelerAdditionalDetailsOD extends Component {
                                                     }                                                                           
                                             />
                                             {errors.pancard && touched.pancard ? (
-                                            <span className="errorMsg">{errors.pancard}</span>
+                                            <span className="errorMsg">{phrases[errors.pancard]}</span>
                                             ) : null} 
                                             </div>
                                         </FormGroup>
@@ -1346,7 +1353,7 @@ class TwoWheelerAdditionalDetailsOD extends Component {
                                                 ))}
                                             </Field>     
                                             {errors.nominee_salutation && touched.nominee_salutation ? (
-                                            <span className="errorMsg">{errors.nominee_salutation}</span>
+                                            <span className="errorMsg">{phrases[errors.nominee_salutation]}</span>
                                             ) : null}              
                                             </div>
                                         </FormGroup>
@@ -1619,7 +1626,6 @@ class TwoWheelerAdditionalDetailsOD extends Component {
 														{errors.is_eia_account2 && touched.is_eia_account2 ? (
                                                         <span className="errorMsg">{phrases[errors.is_eia_account2]}</span>
                                                     ) : null}
-														
                                                         
                                                     </label>
                                                 </div>
@@ -1664,87 +1670,11 @@ class TwoWheelerAdditionalDetailsOD extends Component {
 								</Row> 
 									: ''}
 								
-								
-								
-								
 
                                 <div className="d-flex justify-content-left carloan">
                                     <h4> </h4>
                                 </div>
 
-                                {/* <Row>
-                                    <Col sm={12} md={4} lg={4}>
-                                        <FormGroup>
-                                            <div className="insurerName">
-                                                <h4 className="fs-16">Do you have EIA account</h4>
-                                            </div>
-                                        </FormGroup>
-                                    </Col>
-                                    <Col sm={12} md={4} lg={4}>
-                                        <FormGroup>
-                                            <div className="d-inline-flex m-b-35">
-                                                <div className="p-r-25">
-                                                    <label className="customRadio3">
-                                                    <Field
-                                                        type="radio"
-                                                        name='is_eia_account'                                            
-                                                        value='1'
-                                                        key='1'  
-                                                        onChange={(e) => {
-                                                            setFieldValue(`is_eia_account`, e.target.value);
-                                                            this.showEIAText(1);
-                                                        }}
-                                                        checked={values.is_eia_account == '1' ? true : false}
-                                                    />
-                                                        <span className="checkmark " /><span className="fs-14"> Yes</span>
-                                                    </label>
-                                                </div>
-
-                                                <div className="">
-                                                    <label className="customRadio3">
-                                                        <Field
-                                                        type="radio"
-                                                        name='is_eia_account'                                            
-                                                        value='0'
-                                                        key='1'  
-                                                        onChange={(e) => {
-                                                            setFieldValue(`is_eia_account`, e.target.value);
-                                                            this.showEIAText(0);
-                                                        }}
-                                                        checked={values.is_eia_account == '0' ? true : false}
-                                                    />
-                                                        <span className="checkmark" />
-                                                        <span className="fs-14">No</span>
-                                                        {errors.is_eia_account && touched.is_eia_account ? (
-                                                        <span className="errorMsg">{errors.is_eia_account}</span>
-                                                    ) : null}
-                                                    </label>
-                                                </div>
-                                            </div>
-                                        </FormGroup>
-                                    </Col>
-                                    
-                                    {showEIA || is_eia_account == '1' ?
-                                    <Col sm={12} md={4} lg={4}>
-                                        <FormGroup>
-                                        <div className="insurerName">   
-                                            <Field
-                                                name="eia_no"
-                                                type="text"
-                                                placeholder="EIA Number"
-                                                autoComplete="off"
-                                                value = {values.eia_no}
-                                                maxLength="13"
-                                                onFocus={e => this.changePlaceHoldClassAdd(e)}
-                                                onBlur={e => this.changePlaceHoldClassRemove(e)}
-                                            />
-                                            {errors.eia_no && touched.eia_no ? (
-                                            <span className="errorMsg">{errors.eia_no}</span>
-                                            ) : null}                                             
-                                            </div>
-                                        </FormGroup>
-                                    </Col> : ''}
-                                </Row>  */}
 
                                 <div className="d-flex justify-content-left carloan">
                                     <h4> </h4>

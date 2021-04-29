@@ -481,7 +481,7 @@ class Dashboard extends Component {
                                               </FormGroup>
                                             </Col>
                                             {/* {values.report_range != "" ? ( */}
-                                              <Col sm={6} md={5} lg={6}>
+                                              <Col sm={6} md={5} lg={7} className="cm-dash">
                                                 <FormGroup className="dashboard-date">
                                                   {values.report_range !=
                                                   "4" ? (

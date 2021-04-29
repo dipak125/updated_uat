@@ -102,30 +102,9 @@ const ownerValidation = Yup.object().shape({
         otherwise: Yup.date().nullable()
     }),
 
-/*
-    pancard: Yup.string().when(['policy_for'], {
-        is: policy_for => policy_for == '1', 
-        then: Yup.string().required().test(
-            "1LakhChecking",
-            function() {
-                if ((document.querySelector('input[name="is_eia_account2"]:checked')) && (document.querySelector('input[name="is_eia_account2"]:checked').value == 1 )) { 
-                    return "EnterPan";
-                }
-            },
-            function (value) {
-                if (!value) {
-                    return this.parent.net_premium <= 100000
-                }
-                 return true;
-        }).matches(/^[A-Z]{3}[CPHFATBLJG]{1}[A-Z]{1}[0-9]{4}[A-Z]{1}$/, function() {
-            return "ValidPan"
-        }),
-        otherwise: Yup.string()
-    }), */
-	
-	pancard: Yup.string().when(['is_eia_account2','net_premium'], {
+    pancard: Yup.string().when(['is_eia_account2','net_premium'], {
         is: (is_eia_account2,net_premium) => (is_eia_account2=='1') || (net_premium >= 100000), 
-        then: Yup.string().required().test(
+        then: Yup.string().required("EnterPan").test(
             "1LakhChecking",
 			function(){return "EnterPan"; },
             function (value) {
@@ -138,7 +117,7 @@ const ownerValidation = Yup.object().shape({
             return "ValidPan"
         }),
         otherwise: Yup.string()
-    }),
+    }), 
 
     pincode_id:Yup.string().required('LocationRequired'),
 
@@ -844,15 +823,12 @@ class TwoWheelerAdditionalDetails extends Component {
 				 <div className="page-wrapper">
                 <div className="container-fluid">
                 <div className="row">
-				
                     <aside className="left-sidebar">
- <div className="scroll-sidebar ps-container ps-theme-default ps-active-y">
-<SideNav />
- </div>
-</aside>
+                    <div className="scroll-sidebar ps-container ps-theme-default ps-active-y">
+                    <SideNav />
+                    </div>
+                    </aside>
 
-					
-					
                 <div className="col-sm-12 col-md-12 col-lg-12 col-xl-12 infobox twoAditional">
                 <h4 className="text-center mt-3 mb-3">{phrases['SBIGICL']}</h4>
                 { step_completed >= '4' && vehicleDetails.vehicletype_id == '4' ?
@@ -864,8 +840,8 @@ class TwoWheelerAdditionalDetails extends Component {
                         >
                         {({ values, errors, setFieldValue, setFieldTouched, isValid, isSubmitting, touched }) => {
                              let value = values.nominee_first_name;
-                             console.log("errors---------- ", errors)
-                             console.log("values----------- ", values)
+                            //  console.log("errors---------- ", errors)
+                            //  console.log("values----------- ", values)
                         return (
                         <Form>
                         <Row>
@@ -1275,6 +1251,30 @@ class TwoWheelerAdditionalDetails extends Component {
                                             </div>
                                         </FormGroup>
                                     </Col>
+                                    {motorInsurance && motorInsurance.policy_for == '2' ?
+                                        (showEIA2 || is_eia_account2 == '1' ?
+                                        <Col sm={12} md={4} lg={4}>
+                                            <FormGroup>
+                                                <div className="insurerName">
+                                                <Field
+                                                    name='pancard'
+                                                    type="text"
+                                                    placeholder={phrases['PAN']}
+                                                    autoComplete="off"
+                                                    onFocus={e => this.changePlaceHoldClassAdd(e)}
+                                                    onBlur={e => this.changePlaceHoldClassRemove(e)}
+                                                    value = {values.pancard.toUpperCase()} 
+                                                    onChange= {(e)=> 
+                                                        setFieldValue('pancard', e.target.value.toUpperCase())
+                                                        }                                                                           
+                                                />
+                                                {errors.pancard && touched.pancard ? (
+                                                <span className="errorMsg">{phrases[errors.pancard]}</span>
+                                                ) : null} 
+                                                </div>
+                                            </FormGroup>
+                                        </Col> : null )
+                                    : null }
                                     {motorInsurance && motorInsurance.policy_for == '1' ?
                                     <Col sm={12} md={4} lg={4}>
                                         <FormGroup>
@@ -1292,7 +1292,7 @@ class TwoWheelerAdditionalDetails extends Component {
                                                     }                                                                           
                                             />
                                             {errors.pancard && touched.pancard ? (
-                                            <span className="errorMsg">{errors.pancard}</span>
+                                            <span className="errorMsg">{phrases[errors.pancard]}</span>
                                             ) : null} 
                                             </div>
                                         </FormGroup>

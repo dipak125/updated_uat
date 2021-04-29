@@ -345,7 +345,7 @@ regnoFormat = (e, setFieldTouched, setFieldValue) => {
         const {motorInsurance, subVehicleList} = this.state
         const newInitialValues = Object.assign(initialValues,{
             regNumber: motorInsurance && motorInsurance.registration_no ? motorInsurance.registration_no : "",
-            policy_type: motorInsurance && motorInsurance.policytype_id ? motorInsurance.policytype_id : "",
+            policy_type: "2",
             policy_for: motorInsurance && motorInsurance.policy_for ? motorInsurance.policy_for : "",
             subclass_id : motorInsurance && motorInsurance.subclass_id ? motorInsurance.subclass_id : "",
             check_registration : sessionStorage.getItem("check_registration") ? sessionStorage.getItem("check_registration") : "2"
@@ -437,26 +437,7 @@ regnoFormat = (e, setFieldTouched, setFieldValue) => {
                                                 <div className="brandhead"> 
                                                     <p>{phrases['TellAboutPolicy']}</p>
 
-                                                    <div className="d-inline-flex m-b-15">
-                                                        <div className="p-r-25">
-                                                            <label className="customRadio3">
-                                                                <Field
-                                                                    type="radio"
-                                                                    name='policy_type'
-                                                                    value='1'
-                                                                    key='1'
-                                                                    checked = {values.policy_type == '1' ? true : false}
-                                                                    onChange = {() =>{
-                                                                        setFieldTouched('policy_type')
-                                                                        setFieldValue('policy_type', '1');
-                                                                        this.handleChange(values,setFieldTouched, setFieldValue)
-                                                                    }  
-                                                                    }
-                                                                />
-                                                                <span className="checkmark " /><span className="fs-14"> {phrases['NewPolicy']}</span>
-                                                            </label>
-                                                        </div>
-                                                        
+                                                    <div className="d-inline-flex m-b-15">                                                       
                                                         <div className="p-r-25">
                                                             <label className="customRadio3">
                                                                 <Field
