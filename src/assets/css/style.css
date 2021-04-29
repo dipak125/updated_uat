@@ -765,7 +765,8 @@ a.navbar-brand.logoActive span.logo-text.text-center img {
     box-shadow: 1px 0 20px rgb(0 0 0 / 8%);
     transition: .2s ease-in;
 	left:0;
-	background: url(/static/media/sidenav-bg.8ed71014.svg) no-repeat left 0;
+	/*background: url(/static/media/sidenav-bg.8ed71014.svg) no-repeat left 0;*/
+	background:url(../images/sidenav-bg.svg) no-repeat left 0;
 	background-size:cover;
 }
 .ps-container {
