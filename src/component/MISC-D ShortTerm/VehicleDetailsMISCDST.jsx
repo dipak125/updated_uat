@@ -56,7 +56,9 @@ const initialValue = {
     valid_previous_policy: "",
     claim_array: [],
     newPolDuration: "",
-    prevPolDuration: ""
+    prevPolDuration: "",
+    new_start_date: "",
+    new_end_date: ""
 }
 
 const vehicleRegistrationValidation = Yup.object().shape({
@@ -102,6 +104,50 @@ const vehicleRegistrationValidation = Yup.object().shape({
     .matches(/^([0-9]*)$/, function() {
         return "NoCharacterAllowed"
     }),
+
+    new_start_date:Yup.date()
+    .required("PleaseESD")
+    .test(
+        "checkGreaterTimes",
+        "StartDateLessEnd",
+        function (value) {
+            if (value && this.parent.policy_type_id == '2' ) {
+                return checkGreaterStartEndTimes(value, this.parent.new_end_date);
+            }
+            return true;
+        }
+    ).test(
+      "checkStartDate",
+      "PleaseESD",
+      function (value) {       
+          if ( this.parent.new_end_date != undefined && value == undefined && this.parent.policy_type_id == '2') {
+              return false;
+          }
+          return true;
+      }
+    ),
+    
+    new_end_date:Yup.date()
+    .required("PleaseEED")
+    .test( 
+        "checkGreaterTimes",
+        "EndDateGreaterStart",
+        function (value) {
+            if (value && this.parent.policy_type_id == '2'  ) {
+                return checkGreaterTimes(value, this.parent.new_start_date);
+            }
+            return true;
+        }
+        ).test(
+        "checkEndDate",
+        "PleaseEED",
+        function (value) {     
+            if ( this.parent.new_start_date != undefined && value == undefined && this.parent.policy_type_id == '2' ) {
+                return false;
+            }
+            return true;
+        }
+    ),
 
     previous_start_date:Yup.date()
     .notRequired('Previous Start date is required')
@@ -679,15 +725,6 @@ class VehicleDetailsMISCD extends Component {
             })
     }
 
-    handleChange =(value) => {
-        let endDate = moment(value).add(1, 'years').format("YYYY-MM-DD")
-        this.setState({
-            EndDate: endDate,
-            endDateFlag: true,
-            serverResponse: [],
-            error: []
-        }) 
-    }
 
     handleNoOfClaims = (values, value) => {
 
@@ -891,7 +928,7 @@ class VehicleDetailsMISCD extends Component {
                             onSubmit={this.handleSubmit} 
                             validationSchema={vehicleRegistrationValidation}>
                             {({ values, errors, setFieldValue, setFieldTouched, isValid, isSubmitting, touched }) => {
-
+console.log("values---------------- ", values)
                                 return (
                                     <Form enableReinitialize = {true}>
                                         <Row>
@@ -935,43 +972,7 @@ class VehicleDetailsMISCD extends Component {
                                                         </FormGroup>
                                                     </Col>
                                                 </Row>
-                                                <Row>
-                                                    <Col sm={12} md={6} lg={6}>
-                                                        <FormGroup>
-                                                            <div className="fs-18">
-                                                            Select duration for new policy
-                                                            </div>
-                                                        </FormGroup>
-                                                    </Col>
-                                                   
-                                                    <Col sm={12} md={11} lg={4}>
-                                                        <FormGroup>
-                                                            <div className="formSection">
-                                                                <Field
-                                                                    name='newPolDuration'
-                                                                    component="select"
-                                                                    autoComplete="off"
-                                                                    className="formGrp inputfs12"
-                                                                    value = {values.newPolDuration}
-                                                                    // value={ageObj.whatIsCurrentMonth(values.registration_date) < 7 ? 6 : values.previous_policy_name}
-                                                                >
-                                                                    <option value="">Select Duration</option>
-                                                                    <option value= '1'> One Month</option>
-                                                                    <option value= '3'> Three Month</option>
-                                                                    <option value= '6'> Six Month</option>
-                                                                    {/* {goodscarriedtypes.map((subVehicle, qIndex) => ( 
-                                                                        <option value= {subVehicle.id}>{subVehicle.goodscarriedtype}</option>
-                                                                    ))} */}
-                                                        
-                                                                </Field>
-                                                                {errors.newPolDuration && touched.newPolDuration ? (
-                                                                    <span className="errorMsg">{errors.newPolDuration}</span>
-                                                                ) : null}
-                                                            </div>
-                                                        </FormGroup>
-                                                    </Col>
-                                                </Row>
-
+                                                
                                                 <Row>
                                                     <Col sm={12} md={4} lg={4}>
                                                         <FormGroup>
@@ -1003,80 +1004,7 @@ class VehicleDetailsMISCD extends Component {
                                                         </FormGroup>
                                                     </Col>
                                                 </Row>
-{/*                                                 
-                                                <Row>
-                                                    <Col sm={12} md={11} lg={4}>
-                                                        <FormGroup>
-                                                            <div className="formSection">
-                                                                <Field
-                                                                    name='goodscarriedtypes_id'
-                                                                    component="select"
-                                                                    autoComplete="off"
-                                                                    className="formGrp inputfs12"
-                                                                    value = {values.goodscarriedtypes_id}
-                                                                    // value={ageObj.whatIsCurrentMonth(values.registration_date) < 7 ? 6 : values.previous_policy_name}
-                                                                >
-                                                                    <option value="">Select Type of goods carried</option>
-                                                                    {goodscarriedtypes.map((subVehicle, qIndex) => ( 
-                                                                        <option value= {subVehicle.id}>{subVehicle.goodscarriedtype}</option>
-                                                                    ))}
-                                                        
-                                                                </Field>
-                                                                {errors.goodscarriedtypes_id && touched.goodscarriedtypes_id ? (
-                                                                    <span className="errorMsg">{errors.goodscarriedtypes_id}</span>
-                                                                ) : null}
-                                                            </div>
-                                                        </FormGroup>
-                                                    </Col>
 
-                                                    <Col sm={12} md={11} lg={4}>
-                                                        <FormGroup>
-                                                            <div className="formSection">
-                                                                <Field
-                                                                    name='averagemonthlyusages_id'
-                                                                    component="select"
-                                                                    autoComplete="off"
-                                                                    className="formGrp inputfs12"
-                                                                    value = {values.averagemonthlyusages_id}
-                                                                    // value={ageObj.whatIsCurrentMonth(values.registration_date) < 7 ? 6 : values.previous_policy_name}
-                                                                >
-                                                                    <option value="">Average Monthly use of Vehicle</option>
-                                                                    {averagemonthlyusages.map((monthlyusages, qIndex) => ( 
-                                                                        <option value= {monthlyusages.id}>{monthlyusages.usage_description}</option>
-                                                                    ))}
-                                                        
-                                                                </Field>
-                                                                {errors.averagemonthlyusages_id && touched.averagemonthlyusages_id ? (
-                                                                    <span className="errorMsg">{errors.averagemonthlyusages_id}</span>
-                                                                ) : null}
-                                                            </div>
-                                                        </FormGroup>
-                                                    </Col>
-                                                    <Col sm={12} md={11} lg={3}>
-                                                        <FormGroup>
-                                                            <div className="formSection">
-                                                                <Field
-                                                                    name='permittypes_id'
-                                                                    component="select"
-                                                                    autoComplete="off"
-                                                                    className="formGrp inputfs12"
-                                                                    value = {values.permittypes_id}
-                                                                    // value={ageObj.whatIsCurrentMonth(values.registration_date) < 7 ? 6 : values.previous_policy_name}
-                                                                >
-                                                                    <option value="">Select Type of permit</option>
-                                                                    {permittypes.map((permittype, qIndex) => ( 
-                                                                        <option value= {permittype.id}>{permittype.permittype}</option>
-                                                                    ))}
-                                                        
-                                                                </Field>
-                                                                {errors.permittypes_id && touched.permittypes_id ? (
-                                                                    <span className="errorMsg">{errors.permittypes_id}</span>
-                                                                ) : null}
-                                                            </div>
-                                                        </FormGroup>
-                                                    </Col>
-                                                </Row>
-                                                 */}
                                                 <Row>
                                                     <Col sm={12}>
                                                         <FormGroup>
@@ -1167,9 +1095,101 @@ class VehicleDetailsMISCD extends Component {
                                                 </Row>
 
                                                 <Row>
-                                                    <Col sm={12} md={11} lg={4}>
+                                                <Col sm={12} md={11} lg={3}>
                                                         <FormGroup>
-
+                                                            <div className="formSection">
+                                                                <Field
+                                                                    name='previous_policy_name'
+                                                                    component="select"
+                                                                    autoComplete="off"
+                                                                    className="formGrp inputfs12"
+                                                                    value = {values.previous_policy_name}
+                                                                    onChange = {(e)=> {
+                                                                        if(e.target.value == '3' ) {
+                                                                            if(values.prevPolDuration && values.previous_start_date) {
+                                                                                let date1 = ""
+                                                                                var tempDate = ""
+                                                                                date1 = moment(moment(values.previous_start_date).add(values.prevPolDuration,'month')).subtract(1, 'day').format('YYYY-MM-DD')
+                                                                                tempDate = moment(values.previous_start_date).add(values.prevPolDuration,'month').format('YYYY-MM-DD')
+                                                                                setFieldValue("previous_end_date", new Date(date1)); 
+                                                                                setFieldValue("new_start_date", new Date(tempDate)); 
+                                                                            }
+                                                                            else setFieldValue("previous_end_date", "");
+                                                                                               
+                                                                        }
+                                                                        else if( values.previous_start_date){
+                                                                            var date = new Date(values.previous_start_date)
+                                                                            var tempDate = ""
+                                                                            date = date.setFullYear(date.getFullYear() + 1);
+                                                                            var date2 = new Date(date)
+                                                                            date2 = date2.setDate(date2.getDate() - 1);
+                                                                            tempDate = moment(date2).add(1,'day').format('YYYY-MM-DD')
+                                                                            setFieldValue("previous_policy_name", e.target.value);
+                                                                            setFieldValue("previous_end_date", new Date(date2));
+                                                                            setFieldValue("new_start_date", new Date(tempDate)); 
+                                                                        }
+                                                                        setFieldValue("previous_policy_name", e.target.value);
+                                                                    }}
+                                                                    // value={ageObj.whatIsCurrentMonth(values.registration_date) < 7 ? 6 : values.previous_policy_name}
+                                                                >
+                                                                <option value="">{phrases['SPT']}</option>
+                                                                <option value="1">{phrases['Package']}</option>
+                                                                <option value="2">{phrases['LiabilityOnly']}</option> 
+                                                                <option value="3">{phrases['shortTerm']}</option>
+                                                        
+                                                                </Field>
+                                                                {errors.previous_policy_name && touched.previous_policy_name ? (
+                                                                    <span className="errorMsg">{phrases[errors.previous_policy_name]}</span>
+                                                                ) : null}
+                                                            </div>
+                                                        </FormGroup>
+                                                    </Col>
+                                                    { values.previous_policy_name == '3' ?
+                                                    <Col sm={12} md={5} lg={3}>
+                                                        <FormGroup>
+                                                            <div className="formSection">
+                                                                <Field
+                                                                    name='prevPolDuration'
+                                                                    component="select"
+                                                                    autoComplete="off"
+                                                                    className="formGrp inputfs12"
+                                                                    value = {values.prevPolDuration}
+                                                                    onChange = {(e)=> {        
+                                                                        let date2 = new Date()
+                                                                        var tempDate = ""
+                                                                        var tempEndDate = ""
+                                                                        date2 = moment(moment(values.previous_start_date).add(e.target.value,'month')).subtract(1, 'day').format('YYYY-MM-DD')
+                                                                        tempDate = moment(values.previous_start_date).add(e.target.value,'month').format('YYYY-MM-DD')  
+                                                                        if(values.newPolDuration) {
+                                                                            tempEndDate = moment(moment(tempDate).add(values.newPolDuration,'month')).subtract(1, 'day').format('YYYY-MM-DD') 
+                                                                            setFieldValue("new_end_date", new Date(tempEndDate)); 
+                                                                        }
+                                                                        setFieldValue("prevPolDuration", e.target.value);
+                                                                        setFieldValue("previous_end_date", new Date(date2));      
+                                                                        setFieldValue("new_start_date", new Date(tempDate));                             
+                                                                    }}
+                                                                    // value={ageObj.whatIsCurrentMonth(values.registration_date) < 7 ? 6 : values.previous_policy_name}
+                                                                >
+                                                                    <option value="">Select Duration</option>
+                                                                    <option value= '1'> One Month</option>
+                                                                    <option value= '2'> Two Month</option>
+                                                                    <option value= '3'> Three Month</option>
+                                                                    <option value= '4'> Four Month</option>
+                                                                    <option value= '5'> Five Month</option>
+                                                                    <option value= '6'> Six Month</option>
+                                                                    <option value= '7'> Seven Month</option>
+                                                                    <option value= '8'> Eight Month</option>
+                                                                   
+                                                                </Field>
+                                                                {errors.prevPolDuration && touched.prevPolDuration ? (
+                                                                    <span className="errorMsg">{errors.prevPolDuration}</span>
+                                                                ) : null}
+                                                            </div>
+                                                        </FormGroup>
+                                                    </Col> : null
+                                                    }
+                                                    <Col sm={12} md={11} lg={values.previous_policy_name == '3'? 3 : 4}>
+                                                        <FormGroup>
                                                             <DatePicker
                                                                 name="previous_start_date"
                                                                 minDate={new Date(minDate)} 
@@ -1187,20 +1207,28 @@ class VehicleDetailsMISCD extends Component {
                                                                 onChange={(val) => {
                                                                     var date = new Date(val)
                                                                     var date2 = new Date(val)
+                                                                    var tempDate = new Date(val)
+                                                                    var tempEndDate = ""
                                                                     if(values.previous_policy_name == '3') {
                                                                         if(values.prevPolDuration) {
-                                                                            date2 = moment(val).add(values.prevPolDuration,'month').format('YYYY-MM-DD') 
+                                                                            date2 = moment(moment(val).add(values.prevPolDuration,'month')).subtract(1, 'day').format('YYYY-MM-DD')
+                                                                            tempDate = moment(val).add(values.prevPolDuration,'month').format('YYYY-MM-DD')                           
                                                                         }                   
                                                                     }
                                                                     else if(values.previous_policy_name == '1' || values.previous_policy_name == '2'){
                                                                         date = date.setFullYear(date.getFullYear() + 1);
                                                                         var date2 = new Date(date)
                                                                         date2 = date2.setDate(date2.getDate() - 1);
-                                                                    }
-                                                                    
-
+                                                                        tempDate = moment(date2).add(1,'day').format('YYYY-MM-DD')  
+                                                                    }          
+                                                                    if(values.newPolDuration) {
+                                                                        tempEndDate = moment(moment(tempDate).add(values.newPolDuration,'month')).subtract(1, 'day').format('YYYY-MM-DD') 
+                                                                        setFieldValue("new_end_date", new Date(tempEndDate)); 
+                                                                    }                
+console.log("tempDate------------------ ", tempDate)
                                                                     setFieldTouched('previous_start_date')
                                                                     setFieldValue("previous_end_date", new Date(date2));
+                                                                    setFieldValue("new_start_date", new Date(tempDate));       
                                                                     setFieldValue('previous_start_date', val);
                                                                 }}
                                                             />
@@ -1210,7 +1238,7 @@ class VehicleDetailsMISCD extends Component {
                                                         </FormGroup>
                                                     </Col>
 
-                                                    <Col sm={12} md={11} lg={4}>
+                                                    <Col sm={12} md={11} lg={values.previous_policy_name == '3'? 3 : 4}>
                                                         <FormGroup>
                                                             <DatePicker
                                                                 name="previous_end_date"
@@ -1230,49 +1258,7 @@ class VehicleDetailsMISCD extends Component {
                                                             ) : null}
                                                         </FormGroup>
                                                     </Col>
-                                                    <Col sm={12} md={11} lg={3}>
-                                                        <FormGroup>
-                                                            <div className="formSection">
-                                                                <Field
-                                                                    name='previous_policy_name'
-                                                                    component="select"
-                                                                    autoComplete="off"
-                                                                    className="formGrp inputfs12"
-                                                                    value = {values.previous_policy_name}
-                                                                    onChange = {(e)=> {
-                                                                        if(e.target.value == '3' ) {
-                                                                            if(values.prevPolDuration && values.previous_start_date) {
-                                                                                let date1 = ""
-                                                                                date1 = moment(values.previous_start_date).add(values.prevPolDuration,'month').format('YYYY-MM-DD') 
-                                                                                setFieldValue("previous_end_date", new Date(date1)); 
-                                                                            }
-                                                                            else setFieldValue("previous_end_date", "");
-                                                                                               
-                                                                        }
-                                                                        else if( values.previous_start_date){
-                                                                            var date = new Date(values.previous_start_date)
-                                                                            date = date.setFullYear(date.getFullYear() + 1);
-                                                                            var date2 = new Date(date)
-                                                                            date2 = date2.setDate(date2.getDate() - 1);
-                                                                            setFieldValue("previous_policy_name", e.target.value);
-                                                                            setFieldValue("previous_end_date", new Date(date2));
-                                                                        }
-                                                                        setFieldValue("previous_policy_name", e.target.value);
-                                                                    }}
-                                                                    // value={ageObj.whatIsCurrentMonth(values.registration_date) < 7 ? 6 : values.previous_policy_name}
-                                                                >
-                                                                <option value="">{phrases['SPT']}</option>
-                                                                <option value="1">{phrases['Package']}</option>
-                                                                <option value="2">{phrases['LiabilityOnly']}</option> 
-                                                                <option value="3">Short Term</option>
-                                                        
-                                                                </Field>
-                                                                {errors.previous_policy_name && touched.previous_policy_name ? (
-                                                                    <span className="errorMsg">{phrases[errors.previous_policy_name]}</span>
-                                                                ) : null}
-                                                            </div>
-                                                        </FormGroup>
-                                                    </Col>
+                                                    
                                                 </Row>
 
                                                 <Row>
@@ -1335,42 +1321,9 @@ class VehicleDetailsMISCD extends Component {
                                                                 ) : null}
                                                             </div>
                                                         </FormGroup>
-                                                    </Col>
-                                                    { values.previous_policy_name == '3' ?
-                                                    <Col sm={12} md={5} lg={5}>
-                                                        <FormGroup>
-                                                            <div className="formSection">
-                                                                <Field
-                                                                    name='prevPolDuration'
-                                                                    component="select"
-                                                                    autoComplete="off"
-                                                                    className="formGrp inputfs12"
-                                                                    value = {values.prevPolDuration}
-                                                                    onChange = {(e)=> {        
-                                                                        let date2 = new Date()
-                                                                        date2 = moment(values.previous_start_date).add(e.target.value,'month').format('YYYY-MM-DD')                              
-                                                                        setFieldValue("prevPolDuration", e.target.value);
-                                                                        setFieldValue("previous_end_date", new Date(date2));                                  
-                                                                    }}
-                                                                    // value={ageObj.whatIsCurrentMonth(values.registration_date) < 7 ? 6 : values.previous_policy_name}
-                                                                >
-                                                                    <option value="">Select Duration</option>
-                                                                    <option value= '1'> One Month</option>
-                                                                    <option value= '3'> Three Month</option>
-                                                                    <option value= '6'> Six Month</option>
-                                                                    {/* {goodscarriedtypes.map((subVehicle, qIndex) => ( 
-                                                                        <option value= {subVehicle.id}>{subVehicle.goodscarriedtype}</option>
-                                                                    ))} */}
-                                                        
-                                                                </Field>
-                                                                {errors.prevPolDuration && touched.prevPolDuration ? (
-                                                                    <span className="errorMsg">{errors.prevPolDuration}</span>
-                                                                ) : null}
-                                                            </div>
-                                                        </FormGroup>
-                                                    </Col> : null
-                                                    }
+                                                    </Col>                                         
                                                 </Row>
+ 
                                                 { (values.previous_policy_name == '1' || values.previous_policy_name == '3') && Math.floor(moment().diff(values.previous_end_date, 'days', true)) <= 90 ?
                                                     <Fragment>
                                                     <Row>
@@ -1522,6 +1475,120 @@ class VehicleDetailsMISCD extends Component {
                                                 
                                             </Fragment> 
                                              : null } 
+
+                                             <Fragment>
+                                                <Row>
+                                                    <Col sm={12}>
+                                                        <FormGroup>
+                                                            <div className="carloan">
+                                                                <h4> </h4>
+                                                            </div>
+                                                        </FormGroup>
+                                                    </Col>
+                                                </Row>
+                                                <Row>
+                                                    <Col sm={12}>
+                                                        <FormGroup>
+                                                            <div className="carloan">
+                                                                <h4> {phrases['NPD']}</h4>
+                                                            </div>
+                                                        </FormGroup>
+                                                    </Col>
+                                                </Row>
+
+                                                <Row>
+                                                    <Col sm={12} md={11} lg={3}>
+                                                        <FormGroup>
+                                                        <div className="formSection">
+                                                                <Field
+                                                                    name='newPolDuration'
+                                                                    component="select"
+                                                                    autoComplete="off"
+                                                                    className="formGrp inputfs12"
+                                                                    value = {values.newPolDuration}
+                                                                    onChange = {(e)=> {        
+                                                                        let date2 = new Date()
+                                                                        if(values.new_start_date) {
+                                                                            date2 = moment(moment(values.new_start_date).add(e.target.value,'month')).subtract(1, 'day').format('YYYY-MM-DD')           
+                                                                            setFieldValue("new_end_date", new Date(date2)); 
+                                                                        }                      
+                                                                        setFieldValue("newPolDuration", e.target.value);                                          
+                                                                    }}
+                                                                >
+                                                                    <option value="">Select Duration</option>
+                                                                    <option value= '1'> One Month</option>
+                                                                    <option value= '2'> Two Month</option>
+                                                                    <option value= '3'> Three Month</option>
+                                                                    <option value= '4'> Four Month</option>
+                                                                    <option value= '5'> Five Month</option>
+                                                                    <option value= '6'> Six Month</option>
+                                                                    <option value= '7'> Seven Month</option>
+                                                                    <option value= '8'> Eight Month</option>
+                                                        
+                                                                </Field>
+                                                                {errors.newPolDuration && touched.newPolDuration ? (
+                                                                    <span className="errorMsg">{errors.newPolDuration}</span>
+                                                                ) : null}
+                                                            </div>
+                                                        </FormGroup>
+                                                    </Col>
+                                                    <Col sm={12} md={11} lg={4}>
+                                                        <FormGroup>
+                                                            <DatePicker
+                                                                name="new_start_date"
+                                                                minDate={new Date(minDate)} 
+                                                                maxDate={ new Date()}
+                                                                dateFormat="dd MMM yyyy"
+                                                                placeholderText={phrases['PPSD']}
+                                                                peekPreviousMonth
+                                                                autoComplete="off"
+                                                                peekPreviousYear
+                                                                showMonthDropdown
+                                                                showYearDropdown
+                                                                dropdownMode="select"
+                                                                className="datePckr inputfs12"
+                                                                selected={values.new_start_date}
+                                                                // onChange={(val) => {
+                                                                //     var date = new Date(val)
+                                                                //     var date2 = new Date(val)
+                                                                //     if(values.newPolDuration && values.previous_end_date) {
+                                                                //         date2 = moment(moment(val).add(values.newPolDuration,'month')).subtract(1, 'day').format('YYYY-MM-DD') 
+                                                                //     }                   
+
+                                                                //     setFieldTouched('new_start_date')
+                                                                //     setFieldValue("new_end_date", new Date(date2));
+                                                                //     setFieldValue('new_start_date', val);
+                                                                // }}
+                                                            />
+                                                            {errors.new_start_date && touched.new_start_date ? (
+                                                                <span className="errorMsg">{phrases[errors.new_start_date]}</span>
+                                                            ) : null}
+                                                        </FormGroup>
+                                                    </Col>
+
+                                                    <Col sm={12} md={11} lg={4}>
+                                                        <FormGroup>
+                                                            <DatePicker
+                                                                name="new_end_date"
+                                                                dateFormat="dd MMM yyyy"
+                                                                placeholderText={phrases['PPED']}
+                                                                disabled = {true}
+                                                                dropdownMode="select"
+                                                                className="datePckr inputfs12"
+                                                                selected={values.new_end_date}
+                                                                // onChange={(val) => {
+                                                                //     setFieldTouched('new_end_date');
+                                                                //     setFieldValue('new_end_date', val);
+                                                                // }}
+                                                            />
+                                                            {errors.new_end_date && touched.new_end_date ? (
+                                                                <span className="errorMsg">{phrases[errors.new_end_date]}</span>
+                                                            ) : null}
+                                                        </FormGroup>
+                                                    </Col>                                                
+                                                </Row>
+
+                                             </Fragment>
 
                                                 <div className="d-flex justify-content-left resmb">
                                                 <Button className={`backBtn`} type="button"  disabled={isSubmitting ? true : false} onClick= {this.selectBrand.bind(this,productId)}>

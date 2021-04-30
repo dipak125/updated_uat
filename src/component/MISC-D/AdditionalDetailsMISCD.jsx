@@ -130,7 +130,7 @@ const ownerValidation = Yup.object().shape({
 
     pancard: Yup.string().when(['is_eia_account2','net_premium'], {
         is: (is_eia_account2,net_premium) => (is_eia_account2=='1') || (net_premium >= 100000), 
-        then: Yup.string().required().test(
+        then: Yup.string().required("EnterPan").test(
             "1LakhChecking",
 			function(){return "EnterPan"; },
             function (value) {
@@ -143,7 +143,7 @@ const ownerValidation = Yup.object().shape({
             return "ValidPan"
         }),
         otherwise: Yup.string()
-    }), 
+    }),
     
     pincode_id:Yup.string().required('LocationRequired'),
 
@@ -1269,7 +1269,7 @@ class AdditionalDetailsMISCD extends Component {
                                                     }                                                                           
                                             />
                                             {errors.pancard && touched.pancard ? (
-                                            <span className="errorMsg">{errors.pancard}</span>
+                                            <span className="errorMsg">{phrases[errors.pancard]}</span>
                                             ) : null} 
                                             </div>
                                         </FormGroup>
@@ -1294,7 +1294,7 @@ class AdditionalDetailsMISCD extends Component {
                                                     }                                                                           
                                             />
                                             {errors.pancard && touched.pancard ? (
-                                            <span className="errorMsg">{errors.pancard}</span>
+                                            <span className="errorMsg">{phrases[errors.pancard]}</span>
                                             ) : null} 
                                             </div>
                                         </FormGroup>

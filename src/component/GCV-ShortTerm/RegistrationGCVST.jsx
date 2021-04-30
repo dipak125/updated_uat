@@ -328,7 +328,7 @@ regnoFormat = (e, setFieldTouched, setFieldValue) => {
         const {motorInsurance, subVehicleList} = this.state
         const newInitialValues = Object.assign(initialValues,{
             regNumber: motorInsurance && motorInsurance.registration_no ? motorInsurance.registration_no : "",
-            policy_type: motorInsurance && motorInsurance.policytype_id ? motorInsurance.policytype_id : "",
+            policy_type:'2',
             policy_for: motorInsurance && motorInsurance.policy_for ? motorInsurance.policy_for : "",
             subclass_id : motorInsurance && motorInsurance.subclass_id ? motorInsurance.subclass_id : "",
         })
@@ -340,21 +340,13 @@ regnoFormat = (e, setFieldTouched, setFieldValue) => {
 				<div className="page-wrapper">
                     <div className="container-fluid">
                         <div className="row">
-						
-						
+								
                            <aside className="left-sidebar">
 		 				 <div className="scroll-sidebar ps-container ps-theme-default ps-active-y">
 						 <SideNav />
 						</div>
 						</aside>
-								
-					 {/*<div className="col-sm-12 col-md-12 col-lg-2 col-xl-2 pd-l-0">        
-						<SideNav />
-             		 </div>*/}
-							
-							
-							
-							
+						
                             <div className="col-sm-12 col-md-12 col-lg-12 col-xl-12 infobox regcv2">
                                 <h4 className="text-center mt-3 mb-3">{phrases['SBIGICL']}</h4>
                                 <section className="brand">
@@ -419,7 +411,7 @@ regnoFormat = (e, setFieldTouched, setFieldValue) => {
                                                     <p>{phrases['TellAboutPolicy']}</p>
 
                                                     <div className="d-inline-flex m-b-15">
-                                                        <div className="p-r-25">
+                                                        {/* <div className="p-r-25">
                                                             <label className="customRadio3">
                                                                 <Field
                                                                     type="radio"
@@ -436,7 +428,7 @@ regnoFormat = (e, setFieldTouched, setFieldValue) => {
                                                                 />
                                                                 <span className="checkmark " /><span className="fs-14"> {phrases['NewPolicy']}</span>
                                                             </label>
-                                                        </div>
+                                                        </div> */}
                                                         
                                                         <div className="p-r-25">
                                                             <label className="customRadio3">

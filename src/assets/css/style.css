@@ -1059,6 +1059,11 @@ li.logoutbtn {
 }
 .customModalfamlyForm .dropinput.m-b-45 .col-md-15{ padding-left:15px; padding-right:15px;}
 .rghtsideTrigr .Collapsible__trigger { background-position: right top;}
+.twowheelBrand label.customCheckBox.formGrp.formGrp {
+    width: 90%;
+    margin: 15px auto;
+	line-height: 27px;
+}
 }
 
 @media (max-width: 680px) {
@@ -1524,12 +1529,18 @@ ul.navPan { height:100%;}
 .align-self-center.userNameImg {
     font-size: 9px;
 }
+.align-self-center.userNameImg p {
+    font-size: 10px;
+}
+.align-self-center img.notiBell {
+    max-width: 84%;
+}
 .displayshow ul.navbar-nav {   
-    justify-content: space-around;
+    justify-content: space-between;
 }
 li.nav-item.dropdown select.listSelect {
     width: 70px !important;
-	left: 0 !important;
+	left: 7px !important;
 }
 .d-flex.topUserBtn .align-self-center {
     width: 50%;

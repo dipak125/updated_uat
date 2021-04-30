@@ -328,7 +328,7 @@ issuePolicy = () => {
     })
     .catch(err => {
       this.setState({
-        accessToken: []
+        accessToken: [],  retry: 1
       });
       this.props.loadingStop();
     });

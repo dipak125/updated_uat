@@ -138,9 +138,9 @@
     margin-left: 15px;
     margin-top: 5px;
 }
-	.twoSLtp button.btn.btn-primary {
+	.twoSLtp button.btn.btn-primary, .twowheelOd button.btn.btn-primary{
     margin-left: 15px;
-    margin-top: 5px;
+    margin-top: 10px;
 }
   .brand{ min-height: inherit; background-image: inherit; background: #f6faff;}
   .tablecontent td { font-size: 14px;  padding: 15px;}
@@ -196,6 +196,12 @@
     max-width: 100%;
 }
 .dashboardBrand .card{ margin-bottom:10px;}
+.Collapsible__contentInner {
+    padding-top: 10px;
+}
+.Collapsible__contentInner strong {
+    font-size: 12px;
+}
 }
 
 @media (max-width: 479px) {
@@ -209,6 +215,15 @@
 .collaps_area span.Collapsible__trigger {
     font-size:14px;
 }
+.rghtsideTrigr .Collapsible__trigger.is-open, .rghtsideTrigr .Collapsible__trigger {
+    font-size: 14px;
+}
+.prehealthex .d-inline-flex.m-b-35 .p-r-25 {
+    padding-right: 10px;
+}
+.healthnominee2 span.errorMsg {
+    padding-top: 15px;
+}
 }
 
 @media (max-width: 360px){
@@ -216,6 +231,12 @@
     padding: 8px 7px;
     font-size: 10px;
 }
+.rghtsideTrigr .Collapsible__trigger.is-open, .rghtsideTrigr .Collapsible__trigger {
+    font-weight: 600;
+    font-size: 11px !important;
+}
+.othercomOd span.Collapsible__trigger, .twoComprehens span.Collapsible__trigger, .twocomp2 span.Collapsible__trigger, .ocGcv span.Collapsible__trigger, .otherCom span.Collapsible__trigger, .healthplicyDetail span.Collapsible__trigger, .argDetail span.Collapsible__trigger, .helpolicy span.Collapsible__trigger{ font-size:11px !important;}
+
 }
 
 @media (max-width: 350px) {
