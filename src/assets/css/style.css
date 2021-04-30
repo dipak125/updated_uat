@@ -463,7 +463,8 @@ Note: Beware of modifying this element as it can break the animations - you shou
 .btnPrimary {background-color: #65106b; color: #fff; width: 140px; height: 47px; padding: 0 10px; text-align: center; vertical-align: middle; font-size: 16px; border: 1px solid #65106b; -webkit-box-shadow: -1px 6px 12px -7px rgba(0, 0, 0, 0.24); -moz-box-shadow: -1px 6px 12px -7px rgba(0, 0, 0, 0.24); box-shadow: -1px 6px 12px -7px rgba(0, 0, 0, 0.24); border-radius: 47px;}
 .cntrbtn {text-align: center; margin: 0 auto;}
 
-.modal-content .customModalfamlyForm {min-width: 638px !important; border-radius: 15px; color: #7d7d7d; font-size: 15px; padding: 20px 50px; background-color: #f6faff !important;}
+.modal-content .customModalfamlyForm {/*min-width: 638px !important;*/ border-radius: 15px; color: #7d7d7d; font-size: 15px; padding: 20px 50px; background-color: #f6faff !important;}
+.customModal1 .modal-dialog { max-width:638px;}
 .customModalfamlyForm .modal-header { display: -ms-flexbox; display: flex; -ms-flex-align: start; align-items: flex-start; -ms-flex-pack: justify; justify-content: space-between; padding: 1rem 1rem; border-bottom: 1px solid #dee2e6; border-top-left-radius: .3rem; border-top-right-radius: .3rem;}
 /* .customModalfamlyForm .modal .close {padding: 1rem 1rem; margin: -1rem -1rem -1rem auto; font-weight: 300; position: absolute; right: 0; top: 0; margin: 10px; font-size: 34px; height: auto; padding: 0 10px; color: #999;} */
 .customModalfamlyForm h4 {font-size: 20px; color: #231f20; font-weight: 500;}
@@ -1478,7 +1479,9 @@ ul.navPan { height:100%;}
     font-size: 13px !important;
 }
 .modal-header.custmModlHead{ padding-bottom:15px;}
-
+.modal-content .customModalfamlyForm .col-md-15 label.customCheckBox.formGrp.formGrp label.formGrp.error {
+    display: block;
+}
 
 @media (max-width: 576px){
 

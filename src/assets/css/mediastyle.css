@@ -85,8 +85,8 @@
   .login-box-body, .register-box-body{ padding: 0!important;}
   .brand { padding: 25px;}
   .modal-content{ min-width: 300px;}
-  .modal-content .customModalfamlyForm {  min-width: 638px !important; padding: 20px; }
-  .customModal1 .modal-dialog{ margin: 0;}
+  .modal-content .customModalfamlyForm {  /*min-width: 638px !important;*/ padding: 20px; }
+ /* .customModal1 .modal-dialog{ margin: 0;}*/
   .modal-content{ left: 50%; transform: translateX(-50%);}
   .W-80 {width: 100% !important;}
   .brand-table {overflow: scroll;}
