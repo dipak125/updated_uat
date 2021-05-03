@@ -159,6 +159,7 @@ handleSubmit=(values)=>{
                 'policy_type_id':values.policy_type,
                 'policy_for': values.policy_for,
                 'subclass_id' : values.subclass_id,
+                'is_short_term' : 1,
                 'fastlaneLog_id': this.state.fastLaneData && this.state.fastLaneData.fastlaneLog_id ? this.state.fastLaneData.fastlaneLog_id : fastlanelog && fastlanelog.id ? fastlanelog.id : "",
 
             } 
@@ -177,6 +178,7 @@ handleSubmit=(values)=>{
                 'policy_type_id':values.policy_type,
                 'policy_for': values.policy_for,
                 'subclass_id' : values.subclass_id,
+                'is_short_term' : 1,
                 'fastlaneLog_id': this.state.fastLaneData && this.state.fastLaneData.fastlaneLog_id ? this.state.fastLaneData.fastlaneLog_id : fastlanelog && fastlanelog.id ? fastlanelog.id : ""
             } 
         }
@@ -224,6 +226,7 @@ handleSubmit=(values)=>{
                 'policy_type_id':values.policy_type,
                 'policy_for': values.policy_for,
                 'subclass_id': values.subclass_id,
+                'is_short_term' : 1,
                 'fastlaneLog_id': this.state.fastLaneData && this.state.fastLaneData.fastlaneLog_id ? this.state.fastLaneData.fastlaneLog_id : fastlanelog && fastlanelog.id ? fastlanelog.id : ""
             } 
         }
@@ -240,6 +243,7 @@ handleSubmit=(values)=>{
                 'policy_type_id':values.policy_type,
                 'policy_for': values.policy_for,
                 'subclass_id': values.subclass_id,
+                'is_short_term' : 1,
                 'fastlaneLog_id': this.state.fastLaneData && this.state.fastLaneData.fastlaneLog_id ? this.state.fastLaneData.fastlaneLog_id : fastlanelog && fastlanelog.id ? fastlanelog.id : ""
             } 
         }

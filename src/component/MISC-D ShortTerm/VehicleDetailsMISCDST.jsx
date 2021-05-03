@@ -55,10 +55,11 @@ const initialValue = {
     permittypes_id: "",
     valid_previous_policy: "",
     claim_array: [],
-    newPolDuration: "",
-    prevPolDuration: "",
-    new_start_date: "",
-    new_end_date: ""
+    new_policy_duration : "",
+    duration: "",
+    new_policy_start_date: "",
+    new_policy_end_date: "",
+    duration: ""
 }
 
 const vehicleRegistrationValidation = Yup.object().shape({
@@ -95,7 +96,7 @@ const vehicleRegistrationValidation = Yup.object().shape({
         }
     ),
 
-    newPolDuration: Yup.string().required("Policy duration required"), 
+    new_policy_duration : Yup.string().required("Policy duration required"), 
 
     location_id: Yup.string()
     .required(function() {
@@ -105,14 +106,14 @@ const vehicleRegistrationValidation = Yup.object().shape({
         return "NoCharacterAllowed"
     }),
 
-    new_start_date:Yup.date()
+    new_policy_start_date:Yup.date()
     .required("PleaseESD")
     .test(
         "checkGreaterTimes",
         "StartDateLessEnd",
         function (value) {
             if (value && this.parent.policy_type_id == '2' ) {
-                return checkGreaterStartEndTimes(value, this.parent.new_end_date);
+                return checkGreaterStartEndTimes(value, this.parent.new_policy_end_date);
             }
             return true;
         }
@@ -120,21 +121,21 @@ const vehicleRegistrationValidation = Yup.object().shape({
       "checkStartDate",
       "PleaseESD",
       function (value) {       
-          if ( this.parent.new_end_date != undefined && value == undefined && this.parent.policy_type_id == '2') {
+          if ( this.parent.new_policy_end_date != undefined && value == undefined && this.parent.policy_type_id == '2') {
               return false;
           }
           return true;
       }
     ),
     
-    new_end_date:Yup.date()
+    new_policy_end_date:Yup.date()
     .required("PleaseEED")
     .test( 
         "checkGreaterTimes",
         "EndDateGreaterStart",
         function (value) {
             if (value && this.parent.policy_type_id == '2'  ) {
-                return checkGreaterTimes(value, this.parent.new_start_date);
+                return checkGreaterTimes(value, this.parent.new_policy_start_date);
             }
             return true;
         }
@@ -142,7 +143,7 @@ const vehicleRegistrationValidation = Yup.object().shape({
         "checkEndDate",
         "PleaseEED",
         function (value) {     
-            if ( this.parent.new_start_date != undefined && value == undefined && this.parent.policy_type_id == '2' ) {
+            if ( this.parent.new_policy_start_date != undefined && value == undefined && this.parent.policy_type_id == '2' ) {
                 return false;
             }
             return true;
@@ -344,7 +345,7 @@ const vehicleRegistrationValidation = Yup.object().shape({
         }
     ),
 
-    prevPolDuration: Yup.string().when(['previous_policy_name','valid_previous_policy'], {
+    duration: Yup.string().when(['previous_policy_name','valid_previous_policy'], {
         is: (previous_policy_name,valid_previous_policy) => (previous_policy_name=='3') && (valid_previous_policy == '1'), 
         then: Yup.string().required("Previous policy duration required"),
         otherwise: Yup.string()
@@ -427,7 +428,8 @@ class VehicleDetailsMISCD extends Component {
         permittypes: [],
         location_reset_flag: 0,
         changeFlag: 0,
-        no_of_claim: []
+        no_of_claim: [],
+        shortTermNewPolicy: {}
 
     };
 
@@ -597,15 +599,15 @@ class VehicleDetailsMISCD extends Component {
                 'vehicleAge': vehicleAge,
                 'policy_type': policy_type,
                 'prev_policy_flag': 1,
-                // 'averagemonthlyusage_id': values.averagemonthlyusages_id,
-                // 'goodscarriedtype_id': values.goodscarriedtypes_id,
-                // 'permittype_id': values.permittypes_id,
                 'valid_previous_policy': values.valid_previous_policy,
-                'page_name': `VehicleDetails/${productId}`,
+                'page_name': `VehicleDetails_MISCDST/${productId}`,
                 'claim_array': JSON.stringify(values.claim_array),
                 'no_of_claim': values.no_of_claim,
-                'newPolDuration': values.newPolDuration,
-                'prevPolDuration': values.prevPolDuration
+                'new_policy_duration': values.new_policy_duration ,
+                'duration': values.duration,
+                'new_policy_start_date' : values.new_policy_start_date,
+                'new_policy_end_date' : values.new_policy_end_date,
+                'is_new_policy' : 1
             } 
 
         if(motorInsurance && motorInsurance.policytype_id == '1' && motorInsurance && motorInsurance.registration_no == "") {
@@ -689,8 +691,10 @@ class VehicleDetailsMISCD extends Component {
                  let no_of_claim = previousPolicy && previousPolicy.previouspoliciesclaims ? previousPolicy.previouspoliciesclaims.length : ""
                  let RTO_location = motorInsurance && motorInsurance.rtolocation && motorInsurance.rtolocation.RTO_LOCATION ? motorInsurance.rtolocation.RTO_LOCATION : ""
                  let previous_is_claim= previousPolicy && (previousPolicy.is_claim == 0 || previousPolicy.is_claim == 1) ? previousPolicy.is_claim : ""
-                this.setState({
-                    motorInsurance, previousPolicy, vehicleDetails,RTO_location, previous_is_claim, no_of_claim
+                 let shortTermNewPolicy = decryptResp.data.policyHolder.shorttermnewpolicy ? decryptResp.data.policyHolder.shorttermnewpolicy : {}
+                 
+                 this.setState({
+                    motorInsurance, previousPolicy, vehicleDetails,RTO_location, previous_is_claim, no_of_claim,shortTermNewPolicy
                 })
                 this.props.loadingStop();
             })
@@ -857,7 +861,7 @@ class VehicleDetailsMISCD extends Component {
 
     render() {
         const {productId} = this.props.match.params  
-        const {insurerList, showClaim, previous_is_claim, motorInsurance, previousPolicy,CustomerID,suggestions,
+        const {insurerList, showClaim, previous_is_claim, motorInsurance, previousPolicy,CustomerID,suggestions,shortTermNewPolicy,
               vehicleDetails, RTO_location, averagemonthlyusages,goodscarriedtypes,permittypes, location_reset_flag} = this.state
 
         let phrases = localStorage.getItem("phrases") ? JSON.parse(localStorage.getItem("phrases")) : null
@@ -874,12 +878,13 @@ class VehicleDetailsMISCD extends Component {
             previous_is_claim: previous_is_claim,
             previous_claim_bonus: previousPolicy && (previousPolicy.claim_bonus || previousPolicy.claim_bonus == 0) ? previousPolicy.claim_bonus.toString() : "1",
             no_of_claim: previousPolicy && previousPolicy.previouspoliciesclaims ? previousPolicy.previouspoliciesclaims.length : "",
-            // goodscarriedtypes_id: motorInsurance && motorInsurance.goodscarriedtype_id ? motorInsurance.goodscarriedtype_id : "",
-            // averagemonthlyusages_id: motorInsurance && motorInsurance.averagemonthlyusage_id ? motorInsurance.averagemonthlyusage_id : "",
-            // permittypes_id: motorInsurance && motorInsurance.permittype_id ? motorInsurance.permittype_id : "",
             policy_type_id: motorInsurance && motorInsurance.policytype_id ? motorInsurance.policytype_id : "",
             valid_previous_policy: motorInsurance && (motorInsurance.valid_previous_policy == 0 || motorInsurance.valid_previous_policy == 1) ? motorInsurance.valid_previous_policy : "",           
-            
+            duration: previousPolicy && previousPolicy.duration ? previousPolicy.duration : "",
+            new_policy_duration: shortTermNewPolicy && shortTermNewPolicy.duration ? shortTermNewPolicy.duration : "",
+            new_policy_start_date: shortTermNewPolicy && shortTermNewPolicy.start_date ? new Date(shortTermNewPolicy.start_date) : "",
+            new_policy_end_date: shortTermNewPolicy && shortTermNewPolicy.end_date ? new Date(shortTermNewPolicy.end_date) : "",
+
             claim_array:  this.initClaimDetailsList()
         });
         
@@ -928,7 +933,7 @@ class VehicleDetailsMISCD extends Component {
                             onSubmit={this.handleSubmit} 
                             validationSchema={vehicleRegistrationValidation}>
                             {({ values, errors, setFieldValue, setFieldTouched, isValid, isSubmitting, touched }) => {
-console.log("values---------------- ", values)
+// console.log("values---------------- ", values)
                                 return (
                                     <Form enableReinitialize = {true}>
                                         <Row>
@@ -1106,13 +1111,13 @@ console.log("values---------------- ", values)
                                                                     value = {values.previous_policy_name}
                                                                     onChange = {(e)=> {
                                                                         if(e.target.value == '3' ) {
-                                                                            if(values.prevPolDuration && values.previous_start_date) {
+                                                                            if(values.duration && values.previous_start_date) {
                                                                                 let date1 = ""
                                                                                 var tempDate = ""
-                                                                                date1 = moment(moment(values.previous_start_date).add(values.prevPolDuration,'month')).subtract(1, 'day').format('YYYY-MM-DD')
-                                                                                tempDate = moment(values.previous_start_date).add(values.prevPolDuration,'month').format('YYYY-MM-DD')
+                                                                                date1 = moment(moment(values.previous_start_date).add(values.duration,'month')).subtract(1, 'day').format('YYYY-MM-DD')
+                                                                                tempDate = moment(values.previous_start_date).add(values.duration,'month').format('YYYY-MM-DD')
                                                                                 setFieldValue("previous_end_date", new Date(date1)); 
-                                                                                setFieldValue("new_start_date", new Date(tempDate)); 
+                                                                                setFieldValue("new_policy_start_date", new Date(tempDate)); 
                                                                             }
                                                                             else setFieldValue("previous_end_date", "");
                                                                                                
@@ -1126,7 +1131,7 @@ console.log("values---------------- ", values)
                                                                             tempDate = moment(date2).add(1,'day').format('YYYY-MM-DD')
                                                                             setFieldValue("previous_policy_name", e.target.value);
                                                                             setFieldValue("previous_end_date", new Date(date2));
-                                                                            setFieldValue("new_start_date", new Date(tempDate)); 
+                                                                            setFieldValue("new_policy_start_date", new Date(tempDate)); 
                                                                         }
                                                                         setFieldValue("previous_policy_name", e.target.value);
                                                                     }}
@@ -1149,24 +1154,26 @@ console.log("values---------------- ", values)
                                                         <FormGroup>
                                                             <div className="formSection">
                                                                 <Field
-                                                                    name='prevPolDuration'
+                                                                    name='duration'
                                                                     component="select"
                                                                     autoComplete="off"
                                                                     className="formGrp inputfs12"
-                                                                    value = {values.prevPolDuration}
+                                                                    value = {values.duration}
                                                                     onChange = {(e)=> {        
                                                                         let date2 = new Date()
                                                                         var tempDate = ""
                                                                         var tempEndDate = ""
-                                                                        date2 = moment(moment(values.previous_start_date).add(e.target.value,'month')).subtract(1, 'day').format('YYYY-MM-DD')
-                                                                        tempDate = moment(values.previous_start_date).add(e.target.value,'month').format('YYYY-MM-DD')  
-                                                                        if(values.newPolDuration) {
-                                                                            tempEndDate = moment(moment(tempDate).add(values.newPolDuration,'month')).subtract(1, 'day').format('YYYY-MM-DD') 
-                                                                            setFieldValue("new_end_date", new Date(tempEndDate)); 
-                                                                        }
-                                                                        setFieldValue("prevPolDuration", e.target.value);
-                                                                        setFieldValue("previous_end_date", new Date(date2));      
-                                                                        setFieldValue("new_start_date", new Date(tempDate));                             
+                                                                        if(values.previous_start_date) {
+                                                                            date2 = moment(moment(values.previous_start_date).add(e.target.value,'month')).subtract(1, 'day').format('YYYY-MM-DD')
+                                                                            tempDate = moment(values.previous_start_date).add(e.target.value,'month').format('YYYY-MM-DD')  
+                                                                            if(values.new_policy_duration ) {
+                                                                                tempEndDate = moment(moment(tempDate).add(values.new_policy_duration ,'month')).subtract(1, 'day').format('YYYY-MM-DD') 
+                                                                                setFieldValue("new_policy_end_date", new Date(tempEndDate)); 
+                                                                            }
+                                                                            setFieldValue("previous_end_date", new Date(date2));      
+                                                                            setFieldValue("new_policy_start_date", new Date(tempDate));  
+                                                                        } 
+                                                                        setFieldValue("duration", e.target.value);                                                                                    
                                                                     }}
                                                                     // value={ageObj.whatIsCurrentMonth(values.registration_date) < 7 ? 6 : values.previous_policy_name}
                                                                 >
@@ -1181,8 +1188,8 @@ console.log("values---------------- ", values)
                                                                     <option value= '8'> Eight Month</option>
                                                                    
                                                                 </Field>
-                                                                {errors.prevPolDuration && touched.prevPolDuration ? (
-                                                                    <span className="errorMsg">{errors.prevPolDuration}</span>
+                                                                {errors.duration && touched.duration ? (
+                                                                    <span className="errorMsg">{errors.duration}</span>
                                                                 ) : null}
                                                             </div>
                                                         </FormGroup>
@@ -1210,9 +1217,9 @@ console.log("values---------------- ", values)
                                                                     var tempDate = new Date(val)
                                                                     var tempEndDate = ""
                                                                     if(values.previous_policy_name == '3') {
-                                                                        if(values.prevPolDuration) {
-                                                                            date2 = moment(moment(val).add(values.prevPolDuration,'month')).subtract(1, 'day').format('YYYY-MM-DD')
-                                                                            tempDate = moment(val).add(values.prevPolDuration,'month').format('YYYY-MM-DD')                           
+                                                                        if(values.duration) {
+                                                                            date2 = moment(moment(val).add(values.duration,'month')).subtract(1, 'day').format('YYYY-MM-DD')
+                                                                            tempDate = moment(val).add(values.duration,'month').format('YYYY-MM-DD')                           
                                                                         }                   
                                                                     }
                                                                     else if(values.previous_policy_name == '1' || values.previous_policy_name == '2'){
@@ -1221,14 +1228,13 @@ console.log("values---------------- ", values)
                                                                         date2 = date2.setDate(date2.getDate() - 1);
                                                                         tempDate = moment(date2).add(1,'day').format('YYYY-MM-DD')  
                                                                     }          
-                                                                    if(values.newPolDuration) {
-                                                                        tempEndDate = moment(moment(tempDate).add(values.newPolDuration,'month')).subtract(1, 'day').format('YYYY-MM-DD') 
-                                                                        setFieldValue("new_end_date", new Date(tempEndDate)); 
+                                                                    if(values.new_policy_duration ) {
+                                                                        tempEndDate = moment(moment(tempDate).add(values.new_policy_duration ,'month')).subtract(1, 'day').format('YYYY-MM-DD') 
+                                                                        setFieldValue("new_policy_end_date", new Date(tempEndDate)); 
                                                                     }                
-console.log("tempDate------------------ ", tempDate)
                                                                     setFieldTouched('previous_start_date')
                                                                     setFieldValue("previous_end_date", new Date(date2));
-                                                                    setFieldValue("new_start_date", new Date(tempDate));       
+                                                                    setFieldValue("new_policy_start_date", new Date(tempDate));       
                                                                     setFieldValue('previous_start_date', val);
                                                                 }}
                                                             />
@@ -1501,18 +1507,18 @@ console.log("tempDate------------------ ", tempDate)
                                                         <FormGroup>
                                                         <div className="formSection">
                                                                 <Field
-                                                                    name='newPolDuration'
+                                                                    name='new_policy_duration'
                                                                     component="select"
                                                                     autoComplete="off"
                                                                     className="formGrp inputfs12"
-                                                                    value = {values.newPolDuration}
+                                                                    value = {values.new_policy_duration }
                                                                     onChange = {(e)=> {        
                                                                         let date2 = new Date()
-                                                                        if(values.new_start_date) {
-                                                                            date2 = moment(moment(values.new_start_date).add(e.target.value,'month')).subtract(1, 'day').format('YYYY-MM-DD')           
-                                                                            setFieldValue("new_end_date", new Date(date2)); 
+                                                                        if(values.new_policy_start_date) {
+                                                                            date2 = moment(moment(values.new_policy_start_date).add(e.target.value,'month')).subtract(1, 'day').format('YYYY-MM-DD')           
+                                                                            setFieldValue("new_policy_end_date", new Date(date2)); 
                                                                         }                      
-                                                                        setFieldValue("newPolDuration", e.target.value);                                          
+                                                                        setFieldValue("new_policy_duration", e.target.value);                                          
                                                                     }}
                                                                 >
                                                                     <option value="">Select Duration</option>
@@ -1526,8 +1532,8 @@ console.log("tempDate------------------ ", tempDate)
                                                                     <option value= '8'> Eight Month</option>
                                                         
                                                                 </Field>
-                                                                {errors.newPolDuration && touched.newPolDuration ? (
-                                                                    <span className="errorMsg">{errors.newPolDuration}</span>
+                                                                {errors.new_policy_duration  && touched.new_policy_duration  ? (
+                                                                    <span className="errorMsg">{errors.new_policy_duration }</span>
                                                                 ) : null}
                                                             </div>
                                                         </FormGroup>
@@ -1535,7 +1541,7 @@ console.log("tempDate------------------ ", tempDate)
                                                     <Col sm={12} md={11} lg={4}>
                                                         <FormGroup>
                                                             <DatePicker
-                                                                name="new_start_date"
+                                                                name="new_policy_start_date"
                                                                 minDate={new Date(minDate)} 
                                                                 maxDate={ new Date()}
                                                                 dateFormat="dd MMM yyyy"
@@ -1547,21 +1553,21 @@ console.log("tempDate------------------ ", tempDate)
                                                                 showYearDropdown
                                                                 dropdownMode="select"
                                                                 className="datePckr inputfs12"
-                                                                selected={values.new_start_date}
+                                                                selected={values.new_policy_start_date}
                                                                 // onChange={(val) => {
                                                                 //     var date = new Date(val)
                                                                 //     var date2 = new Date(val)
-                                                                //     if(values.newPolDuration && values.previous_end_date) {
-                                                                //         date2 = moment(moment(val).add(values.newPolDuration,'month')).subtract(1, 'day').format('YYYY-MM-DD') 
+                                                                //     if(values.new_policy_duration  && values.previous_end_date) {
+                                                                //         date2 = moment(moment(val).add(values.new_policy_duration ,'month')).subtract(1, 'day').format('YYYY-MM-DD') 
                                                                 //     }                   
 
-                                                                //     setFieldTouched('new_start_date')
-                                                                //     setFieldValue("new_end_date", new Date(date2));
-                                                                //     setFieldValue('new_start_date', val);
+                                                                //     setFieldTouched('new_policy_start_date')
+                                                                //     setFieldValue("new_policy_end_date", new Date(date2));
+                                                                //     setFieldValue('new_policy_start_date', val);
                                                                 // }}
                                                             />
-                                                            {errors.new_start_date && touched.new_start_date ? (
-                                                                <span className="errorMsg">{phrases[errors.new_start_date]}</span>
+                                                            {errors.new_policy_start_date && touched.new_policy_start_date ? (
+                                                                <span className="errorMsg">{phrases[errors.new_policy_start_date]}</span>
                                                             ) : null}
                                                         </FormGroup>
                                                     </Col>
@@ -1569,20 +1575,20 @@ console.log("tempDate------------------ ", tempDate)
                                                     <Col sm={12} md={11} lg={4}>
                                                         <FormGroup>
                                                             <DatePicker
-                                                                name="new_end_date"
+                                                                name="new_policy_end_date"
                                                                 dateFormat="dd MMM yyyy"
                                                                 placeholderText={phrases['PPED']}
                                                                 disabled = {true}
                                                                 dropdownMode="select"
                                                                 className="datePckr inputfs12"
-                                                                selected={values.new_end_date}
+                                                                selected={values.new_policy_end_date}
                                                                 // onChange={(val) => {
-                                                                //     setFieldTouched('new_end_date');
-                                                                //     setFieldValue('new_end_date', val);
+                                                                //     setFieldTouched('new_policy_end_date');
+                                                                //     setFieldValue('new_policy_end_date', val);
                                                                 // }}
                                                             />
-                                                            {errors.new_end_date && touched.new_end_date ? (
-                                                                <span className="errorMsg">{phrases[errors.new_end_date]}</span>
+                                                            {errors.new_policy_end_date && touched.new_policy_end_date ? (
+                                                                <span className="errorMsg">{phrases[errors.new_policy_end_date]}</span>
                                                             ) : null}
                                                         </FormGroup>
                                                     </Col>                                                

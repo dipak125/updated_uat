@@ -314,7 +314,7 @@ class SelectBrandMISCD extends Component {
             'brand_id': values.selectedBrandId,
             'brand_model_id': values.selectedModelId,
             'model_varient_id': values.selectedVarientId,
-            'page_name': `SelectBrand_MISCD/${productId}`
+            'page_name': `SelectBrand_MISCDST/${productId}`
         }
         formData.append('enc_data', encryption.encrypt(JSON.stringify(post_data)))
         console.log("Post Date---------- ", post_data) 

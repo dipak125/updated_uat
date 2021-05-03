@@ -181,8 +181,9 @@ handleSubmit=(values)=>{
                 'policy_type_id':values.policy_type,
                 'policy_for': values.policy_for,
                 'subclass_id' : values.subclass_id,
+                'is_short_term' : 1,
                 'fastlaneLog_id': this.state.fastLaneData && this.state.fastLaneData.fastlaneLog_id ? this.state.fastLaneData.fastlaneLog_id : fastlanelog && fastlanelog.id ? fastlanelog.id : "",
-                'page_name': `Registration_MISCD/${productId}`
+                'page_name': `Registration_MISCDST/${productId}`
             } 
         }
         else {
@@ -199,8 +200,9 @@ handleSubmit=(values)=>{
                 'policy_type_id':values.policy_type,
                 'policy_for': values.policy_for,
                 'subclass_id' : values.subclass_id,
+                'is_short_term' : 1,
                 'fastlaneLog_id': this.state.fastLaneData && this.state.fastLaneData.fastlaneLog_id ? this.state.fastLaneData.fastlaneLog_id : fastlanelog && fastlanelog.id ? fastlanelog.id : "",
-                'page_name': `Registration_MISCD/${productId}`
+                'page_name': `Registration_MISCDST/${productId}`
             } 
         }
 
@@ -243,10 +245,11 @@ handleSubmit=(values)=>{
                 'agent_name':sessionStorage.getItem('agent_name') ? sessionStorage.getItem('agent_name') : "",
                 'product_id':sessionStorage.getItem('product_id') ? sessionStorage.getItem('product_id') : "",
                 'bcmaster_id': "5",
-                'page_name': `Registration_MISCD/${productId}`,
+                'page_name': `Registration_MISCDST/${productId}`,
                 'policy_type_id':values.policy_type,
                 'policy_for': values.policy_for,
                 'subclass_id': values.subclass_id,
+                'is_short_term' : 1,
                 'fastlaneLog_id': this.state.fastLaneData && this.state.fastLaneData.fastlaneLog_id ? this.state.fastLaneData.fastlaneLog_id : fastlanelog && fastlanelog.id ? fastlanelog.id : ""
             } 
         }
@@ -259,10 +262,11 @@ handleSubmit=(values)=>{
                 'bcmaster_id': bc_data ? bc_data.agent_id : "",
                 'bc_token': bc_data ? bc_data.token : "",
                 'bc_agent_id': bc_data ? bc_data.user_info.data.user.username : "",
-                'page_name': `Registration_MISCD/${productId}`,
+                'page_name': `Registration_MISCDST/${productId}`,
                 'policy_type_id':values.policy_type,
                 'policy_for': values.policy_for,
                 'subclass_id': values.subclass_id,
+                'is_short_term' : 1,
                 'fastlaneLog_id': this.state.fastLaneData && this.state.fastLaneData.fastlaneLog_id ? this.state.fastLaneData.fastlaneLog_id : fastlanelog && fastlanelog.id ? fastlanelog.id : ""
             } 
         }
@@ -352,8 +356,6 @@ regnoFormat = (e, setFieldTouched, setFieldValue) => {
             // check_registration : this.props.data && this.props.data.check_registration ? this.props.data.check_registration : ""
         })
         let phrases = localStorage.getItem("phrases") ? JSON.parse(localStorage.getItem("phrases")) : null
-
-        console.log("newInitialValues-------------------- ", newInitialValues)
 
         return (
             <>

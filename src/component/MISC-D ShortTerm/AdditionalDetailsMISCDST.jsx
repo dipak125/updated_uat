@@ -542,7 +542,7 @@ class AdditionalDetailsMISCD extends Component {
             'gstn_no': values['gstn_no'],
             'salutation_id': values['salutation_id'],
             'nominee_title_id': values['nominee_salutation'],
-            'page_name': `AdditionalDetails_MISCD/${productId}`,
+            'page_name': `AdditionalDetails_MISCDST/${productId}`,
 			'create_eia_account': create_eia_account,
 			'tpaInsurance': values['tpaInsurance'],
         }

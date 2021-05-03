@@ -968,7 +968,7 @@ class OtherComprehensiveMISCD extends Component {
                 'body_idv_value' : bodySliderVal ? bodySliderVal : defaultBodySliderValue,
                 'fuel_type' : values.fuel_type,
                 'trailer_array' : values.trailer_array,
-                'page_name': `OtherComprehensive_MISCD/${productId}`,
+                'page_name': `OtherComprehensive_MISCDST/${productId}`,
             }
             if(values.B00004_value){
                 other_idv = other_idv + parseInt(values.B00004_value)
