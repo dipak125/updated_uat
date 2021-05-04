@@ -218,7 +218,7 @@ const ComprehensiveValidation = Yup.object().shape({
     ).test(
         "currentMonthChecking",
         function() {
-            return "Since previous policy is a liability policy, issuance of a package policy will be subjet to successful inspection of your vehicle. Our Customer care executive will call you to assit on same, shortly"
+            return "PreviousPolicyLiabilityPolicy"
         },
         function (value) {
             if (value == '2' ) {   

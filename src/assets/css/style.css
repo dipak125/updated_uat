@@ -1317,7 +1317,7 @@ img.avatar {  border-radius: inherit;}
   padding: 2px 15px;
 }
 .chartjs-render-monitor{
-  height: 300px!important;
+  height:260px!important;
 }
 .border-cardbody-dash {
   border: 1px solid #00B5EF;
@@ -1570,3 +1570,8 @@ li.nav-item.dropdown select.listSelect {
     padding: 7px;
 }
 }
+
+/* --- Dashboard Graph Height Setting */
+.canvas-container {
+    height:  60vh;
+  }

@@ -439,7 +439,7 @@ class Premium extends Component {
                                                                                                     <FormGroup>{phrases['RegNo']}:</FormGroup>
                                                                                                 </Col>
                                                                                                 <Col sm={12} md={6}>
-                                                                                                    <FormGroup>{motorInsurance && motorInsurance.registration_no}</FormGroup>
+                     <FormGroup>{motorInsurance && motorInsurance.registration_no}</FormGroup>
                                                                                                 </Col>
                                                                                             </Row>
 
@@ -448,12 +448,12 @@ class Premium extends Component {
                                                                                                     <FormGroup>{phrases['TwoWheelBrand']}:</FormGroup>
                                                                                                 </Col>
                                                                                                 <Col sm={12} md={6}>
-                                                                                                    <FormGroup>{vehicleDetails && vehicleDetails.vehiclebrand && vehicleDetails.vehiclebrand.name ? vehicleDetails.vehiclebrand.name : ""}</FormGroup>
+                <FormGroup>{vehicleDetails && vehicleDetails.vehiclebrand && vehicleDetails.vehiclebrand.name ? vehicleDetails.vehiclebrand.name : ""}</FormGroup>
                                                                                                 </Col>
                                                                                             </Row>
                                                                                             <Row>
                                                                                                 <Col sm={12} md={6}>
-                                                                                                    <FormGroup>{phrases['TwoWheelModel']}</FormGroup>
+                                                                                                    <FormGroup>{phrases['TwoWheelModel']}:</FormGroup>
                                                                                                 </Col>
                                                                                                 <Col sm={12} md={6}>
                                                                                                     <FormGroup>{vehicleDetails && vehicleDetails.vehiclemodel && vehicleDetails.vehiclemodel.description ? vehicleDetails.vehiclemodel.description+" "+vehicleDetails.varientmodel.varient : ""}</FormGroup>
@@ -461,7 +461,7 @@ class Premium extends Component {
                                                                                             </Row>
                                                                                             <Row>
                                                                                                 <Col sm={12} md={6}>
-                                                                                                    <FormGroup>{phrases['Variant']}</FormGroup>
+                                                                                                    <FormGroup>{phrases['Variant']}:</FormGroup>
                                                                                                 </Col>
                                                                                                 <Col sm={12} md={6}>
                                                                                                     <FormGroup>{vehicleDetails && vehicleDetails.varientmodel && vehicleDetails.varientmodel.varient ? vehicleDetails.varientmodel.varient : ""}</FormGroup>
@@ -469,7 +469,7 @@ class Premium extends Component {
                                                                                             </Row>
                                                                                             <Row>
                                                                                                 <Col sm={12} md={6}>
-                                                                                                    <FormGroup>{phrases['ChasisNumber']}</FormGroup>
+                                                                                                    <FormGroup>{phrases['ChasisNumber']}:</FormGroup>
                                                                                                 </Col>
                                                                                                 <Col sm={12} md={6}>
                                                                                                     <FormGroup>{motorInsurance && motorInsurance.chasis_no  ? motorInsurance.chasis_no : ""}</FormGroup>
@@ -477,15 +477,15 @@ class Premium extends Component {
                                                                                             </Row>
                                                                                             <Row>
                                                                                                 <Col sm={12} md={6}>
-                                                                                                    <FormGroup>{phrases['EngineNumber']}</FormGroup>
+                                                                                                    <FormGroup>{phrases['EngineNumber']}:</FormGroup>
                                                                                                 </Col>
                                                                                                 <Col sm={12} md={6}>
-                                                                                                <FormGroup>{motorInsurance && motorInsurance.engine_no  ? motorInsurance.engine_no : ""}</FormGroup>
+             <FormGroup>{motorInsurance && motorInsurance.engine_no  ? motorInsurance.engine_no : ""}</FormGroup>
                                                                                                 </Col>
                                                                                             </Row>
                                                                                             <Row>
                                                                                                 <Col sm={12} md={6}>
-                                                                                                    <FormGroup>{phrases['Fuel']}</FormGroup>
+           <FormGroup>{phrases['Fuel']}:</FormGroup>
                                                                                                 </Col>
                                                                                                 <Col sm={12} md={6}>
                                                                                                     <FormGroup>{vehicleDetails && vehicleDetails.varientmodel && vehicleDetails.varientmodel.fuel_type ? fuel[parseInt(vehicleDetails.varientmodel.fuel_type)] : null}</FormGroup>
@@ -494,7 +494,7 @@ class Premium extends Component {
 
                                                                                             <Row>
                                                                                                 <Col sm={12} md={6}>
-                                                                                                    <FormGroup>{phrases['Seating']}</FormGroup>
+                                                                                                    <FormGroup>{phrases['Seating']}:</FormGroup>
                                                                                                 </Col>
                                                                                                 <Col sm={12} md={6}>
                                                                                                     <FormGroup>{vehicleDetails && vehicleDetails.varientmodel && vehicleDetails.varientmodel.seating ? vehicleDetails.varientmodel.seating : null}</FormGroup>
@@ -503,7 +503,7 @@ class Premium extends Component {
 
                                                                                             <Row>
                                                                                                 <Col sm={12} md={6}>
-                                                                                                    <FormGroup>{phrases['IDVofVehicle']}</FormGroup>
+                                                                                                    <FormGroup>{phrases['IDVofVehicle']}:</FormGroup>
                                                                                                 </Col>
                                                                                                 <Col sm={12} md={6}>
                                                                                                     <FormGroup>{motorInsurance && motorInsurance.idv_value ? motorInsurance.idv_value : null}</FormGroup>
@@ -582,7 +582,7 @@ class Premium extends Component {
                                                                                             {motorInsurance.policy_for == '1' ?
                                                                                                 <Row>
                                                                                                     <Col sm={12} md={6}>
-                                                                                                        <FormGroup>{phrases['Gender']}</FormGroup>
+                                                                                                        <FormGroup>{phrases['Gender']}:</FormGroup>
                                                                                                     </Col>
                                                                                                     <Col sm={12} md={6}>
                                                                                                         <FormGroup>{memberdetails.gender == "m" ? "Male" : "Female"}</FormGroup>
@@ -603,8 +603,8 @@ class Premium extends Component {
                                                                                         <p></p>
                                                                                     </Row>
                                                                                 </div>
-                                                                            : (<p></p>)}
-                                                                         {motorInsurance.policy_for == '1' && motorInsurance.pa_flag == '1' ?          
+  : (<p></p>)}
+                          {motorInsurance.policy_for == '1' && motorInsurance.pa_flag == '1' ?          
                                                                             <div>
                                                                             <strong>{phrases['NomineeDetails']} :</strong>
                                                                                 <br/>
@@ -642,7 +642,7 @@ class Premium extends Component {
 
                                                                                         <Row>
                                                                                             <Col sm={12} md={6}>
-                                                                                                <FormGroup>{phrases['Gender']}</FormGroup>
+                              <FormGroup>{phrases['Gender']}:</FormGroup>
                                                                                             </Col>
                                                                                             <Col sm={12} md={6}>
                                                                                                 <FormGroup>{nomineedetails && nomineedetails.gender == "m" ? "Male" : "Female"}</FormGroup>

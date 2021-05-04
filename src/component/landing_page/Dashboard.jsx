@@ -1,5 +1,8 @@
 import React, { Component, Fragment } from "react";
 import { Bar, Line, Pie } from "react-chartjs-2";
+// import CanvasJS from 'canvasjs'
+// var CanvasJS = CanvasJSReact.CanvasJS;
+// var CanvasJSChart = CanvasJSReact.CanvasJSChart;
 // import { HiRefresh } from "react-icons/hi";
 import {
   Row,
@@ -46,6 +49,7 @@ const initialValues = {
 };
 
 const option = {
+  maintainAspectRatio: false,
   title: {
     display: true,
     // text: 'Line chart'
@@ -175,6 +179,7 @@ class Dashboard extends Component {
               total_premium_count,
             ],
             backgroundColor: "#833471",
+            fill: false,
           },
         ],
       };
@@ -186,6 +191,7 @@ class Dashboard extends Component {
             label: `NOP: ${total_policy_count}`,
             data: [motor_policy_count, health_policy_count, total_policy_count],
             backgroundColor: "#833471",
+            fill: false,
           },
         ],
       };
@@ -340,29 +346,17 @@ class Dashboard extends Component {
         <BaseComponent>
         {phrases ? 
 		
-		
-		
-		
-		
-		
-		<div className="page-wrapper">
-          <div className="container-fluid">
-            <div className="row">
-			
-			
-			<aside className="left-sidebar">
-		  <div className="scroll-sidebar ps-container ps-theme-default ps-active-y">
-		 <SideNav />
-		 </div>
-		</aside>
-			
-			
-			
-              {/*<div className="col-sm-12 col-md-12 col-lg-2 col-xl-2 pd-l-0">               
-				<SideNav />
-              </div>*/}
-			  
-              <div className="col-sm-12 col-md-12 col-lg-12 col-xl-12 infobox">
+          <div className="page-wrapper">
+                <div className="container-fluid">
+                  <div className="row">
+                     
+            <aside className="left-sidebar">
+            <div className="scroll-sidebar ps-container ps-theme-default ps-active-y">
+          <SideNav />
+          </div>
+          </aside>
+
+              <div className="col-sm-12 col-md-12 col-lg-12 col-xl-12 infobox dashboard">
                 <h4 className="text-center mt-3 mb-3">
                 {phrases['SBIGICL']}
                 </h4>
@@ -480,8 +474,7 @@ class Dashboard extends Component {
                                                 </div>
                                               </FormGroup>
                                             </Col>
-                                            {/* {values.report_range != "" ? ( */}
-                                              <Col sm={6} md={5} lg={7} className="cm-dash">
+                                              <Col sm={6} md={5} lg={7}>
                                                 <FormGroup className="dashboard-date">
                                                   {values.report_range !=
                                                   "4" ? (
@@ -544,15 +537,14 @@ class Dashboard extends Component {
                                                   )}
                                                 </FormGroup>
                                               </Col>
-                                            {/* ) : null} */}
                                           </Row>
                                         </Card.Title>
-                                        <Card.Text>
+                                        <Card.Text className="canvas-container">                              
                                           <Bar
                                             data={this.state.chartData}
                                             options={option}
                                           />
-                                        </Card.Text>
+                                        </Card.Text>           
                                       </Card.Body>
                                     </Card>
                                   </Col>

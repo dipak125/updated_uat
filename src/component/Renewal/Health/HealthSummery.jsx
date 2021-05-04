@@ -37,6 +37,60 @@ const Coverage = {
   "IPA106": "Education Benefit",
 }
 
+const arogyaSanjeevaniCoverage = () => {
+  return(
+    <div className="justify-content-left align-items-center list m-b-30">
+      <p>Your Health Insurance covers you for following :</p>
+      <ul>
+          <li>Your hospital room rent,boarding expenses and doctor fees</li>
+          <li>Nursing expenses.Operation theatre and ICU charges</li>
+          <li>Medicines that you consume during the hospital stay</li>
+          <li>Road Ambulance Charges</li>
+          <li>Pre and Post hospitalization expenses up to 30 and 60 days respectively</li>
+      </ul>
+    </div>
+  )
+}
+
+const arogyaTopupCoverage = () => {
+  return(
+    <div className="justify-content-left align-items-center list m-b-30">
+      <p>Your Health Insurance covers you for following :</p>
+      <ul>
+          <li>Your hospital room rent,boarding expenses and doctor fees</li>
+          <li>Nursing expenses.Operation theatre and ICU charges</li>
+          <li>Medicines that you consume during the hospital stay</li>
+          <li>Road Ambulance Charges</li>
+          <li>Day Care expenses for 142 daycare procedures</li>
+          <li>Pre and Post hospitalization expenses up to 60 and 90 days respectively</li>
+      </ul>
+    </div>
+  )
+}
+
+const ksbCoverage = () => {
+  return(
+    <div className="justify-content-left align-items-center list m-b-30">
+      <p>Your Health Insurance covers you for following :</p>
+      <ul><b>Base</b>
+          <li>24 Doctor consultation calls in a year</li>
+          <li>1 lakh PA Cover to Primary Insured </li>
+      </ul>
+      <ul><b>Medium</b>
+          <li>36 Doctor Consultation calls in a year</li>
+          <li>Hospital Daily Cash Benefit of Rs 250/day up to 30 Days </li>
+          <li>3 Lakhs PA Cover to Primary Insured  </li>
+      </ul>
+      <ul><b>Top</b>
+          <li>60 Doctor Consultation calls in a year</li>
+          <li>Hospital Daily Cash Benefit of Rs 250/day up to 60 Days </li>
+          <li>5 Lakhs PA Cover to Primary Insured</li>
+      </ul>
+    </div>
+  )
+}
+
+
 class HealthSummery extends Component {
   state = {
     occupationList: [],
@@ -167,12 +221,12 @@ class HealthSummery extends Component {
 
   payment = () => {
     const { policyHolder_refNo } = this.state;
-    window.location = `${process.env.REACT_APP_PAYMENT_URL}/ConnectPG/payment.php?refrence_no=${policyHolder_refNo}`
+    window.location = `${process.env.REACT_APP_PAYMENT_URL}/ConnectPG/payment_renewal.php?refrence_no=${policyHolder_refNo}`
   }
 
   Razor_payment = () => {
       const { policyHolder_refNo } = this.state;
-      window.location = `${process.env.REACT_APP_PAYMENT_URL}/razorpay/pay.php?refrence_no=${policyHolder_refNo}`
+      window.location = `${process.env.REACT_APP_PAYMENT_URL}/razorpay/renewal_pay.php?refrence_no=${policyHolder_refNo}`
   }
 
   paypoint_payment = () => {
@@ -186,32 +240,21 @@ class HealthSummery extends Component {
     const { fulQuoteResp, error, show, policyHolder, nomineeDetails, paymentStatus, policyCoverage, relationArr, 
       request_data, bcMaster, menumaster, vehicleDetails } = this.state;
 
-    const policyCoverageList =  policyCoverage && policyCoverage.length > 0 ?
-      policyCoverage.map((coverage, qIndex) => (
-          coverage.renewalsubcoverage && coverage.renewalsubcoverage.length > 0 ? coverage.renewalsubcoverage.map((benefit, bIndex) => (
-              parseInt(benefit.interest_premium) != 0 ?
-              <div>
-                  <Row>
-                      <Col sm={12} md={6}>
-                          <FormGroup>{benefit.interest_name}</FormGroup>
-                      </Col>
-                      <Col sm={12} md={6}>
-                          <FormGroup>₹ {Math.round(benefit.interest_premium)}</FormGroup>
-                      </Col>
-                  </Row>
-              </div> : null
-      )) : 
-      <div>
-          <Row>
-              <Col sm={12} md={6}>
-              <FormGroup>{coverage.cover_name}</FormGroup>
-              </Col>
-              <Col sm={12} md={6}>
-              <FormGroup>₹ {Math.round(coverage.annual_premium)}  </FormGroup>                      
-              </Col>
-          </Row> 
-      </div>
-  )) : null 
+    const policyCoverageList =  policyCoverage && policyCoverage.length > 0 ?(
+      <div><p>Your Health Insurance covers you for following :</p>
+        <ul>
+      {
+        policyCoverage.map((coverage, qIndex) => (
+            coverage.renewalsubcoverage && coverage.renewalsubcoverage.length > 0 ? coverage.renewalsubcoverage.map((benefit, bIndex) => (
+                // parseInt(benefit.interest_premium) != 0 ?
+                    <li>{benefit.interest_name}</li>                   
+                // : null
+        )) : 
+            <li>{coverage.cover_name}</li>
+        )) 
+      }
+      </ul></div>
+    ): null 
 
       const memberDetails =
       vehicleDetails && vehicleDetails.vehicletype && vehicleDetails.vehicletype.is_helth == 1 &&
@@ -455,14 +498,17 @@ class HealthSummery extends Component {
                                                   </div>
                                                 </Collapsible>
                                               </div>
-                                        
+                                              {vehicleDetails && vehicleDetails.vehicletype_id == '5' ? 
                                               <div className="rghtsideTrigr">
                                                   <Collapsible trigger="Default Covered Coverages & Benefit" open= {true}>
                                                       <div className="listrghtsideTrigr">
-                                                          {policyCoverageList}
+                                                          {/* {policyCoverageList} */}
+                                                          { vehicleDetails && vehicleDetails.vehicletype_id == '12' ? arogyaTopupCoverage() : 
+                                                          vehicleDetails && vehicleDetails.vehicletype_id == '10' ?  ksbCoverage() : 
+                                                          vehicleDetails && vehicleDetails.vehicletype_id == '5' ?  arogyaSanjeevaniCoverage() : policyCoverageList }
                                                       </div>
                                                   </Collapsible>
-                                              </div>
+                                              </div> : null }
                                               
                                               <div className="rghtsideTrigr">
                                                 <Collapsible trigger="Premium Summary" open={true}>
@@ -610,7 +656,7 @@ class HealthSummery extends Component {
                                                   &nbsp;&nbsp;&nbsp;&nbsp;
                                                   </div> : null }
 
-                                              {fulQuoteResp.QuotationNo && values.gateway != "" ? 
+                                              {request_data.quote_id && values.gateway != "" ? 
                                                 <Button type="submit"
                                                   className="proceedBtn"
                                                 >
