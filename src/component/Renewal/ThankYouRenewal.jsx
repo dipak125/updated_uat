@@ -284,18 +284,18 @@ getAgentReceipt = () => {
   }
   else {
     this.props.loadingStop();
-    swal({
-      title: "Alert",
-      text: "Maximum Retry attempt limit is crossed. Now refund process would be initiated",
-      icon: "warning",
-      // buttons: true,
-      dangerMode: true,
-    })
-    .then((willRefund) => {
-      if (willRefund) {
-      // this.handleRefund()
-      }
-    })
+    // swal({
+    //   title: "Alert",
+    //   text: "Maximum Retry attempt limit is crossed. Now refund process would be initiated",
+    //   icon: "warning",
+    //   // buttons: true,
+    //   dangerMode: true,
+    // })
+    // .then((willRefund) => {
+    //   if (willRefund) {
+    // this.handleRefund()
+    //   }
+    // })
   }
 }
 
@@ -334,18 +334,18 @@ issuePolicy = () => {
     });
 }
 
-handleRefund = (values) => {
-  const {policyHolder} = this.state
+// handleRefund = (values) => {
+//   const {policyHolder} = this.state
   
-  if(policyHolder && policyHolder.bcmaster && policyHolder.bcmaster.paymentgateway && policyHolder.bcmaster.paymentgateway.slug) {
-      if(policyHolder.bcmaster.paymentgateway.slug == "csc_wallet") {
-          this.CSCRefund()
-      }
-      if(policyHolder.bcmaster.paymentgateway.slug == "razorpay") {
-          this.RazorpayRefund()
-      }     
-  }
-}
+//   if(policyHolder && policyHolder.bcmaster && policyHolder.bcmaster.paymentgateway && policyHolder.bcmaster.paymentgateway.slug) {
+//       if(policyHolder.bcmaster.paymentgateway.slug == "csc_wallet") {
+//           this.CSCRefund()
+//       }
+//       if(policyHolder.bcmaster.paymentgateway.slug == "razorpay") {
+//           this.RazorpayRefund()
+//       }     
+//   }
+// }
 
 CSCRefund = () => {
   const { refNumber } = this.state;

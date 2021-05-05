@@ -5,11 +5,23 @@ import { authLogout } from "../../../store/actions/auth";
 import { connect } from "react-redux";
 import Encryption from "../../../shared/payload-encryption";
 import { withRouter } from "react-router-dom";
+import {logoToggle } from "../../../store/actions/toggle";
 
 class SideNav extends Component {
   state = {
     BC_check : "0"
   }
+
+
+  toggle = () => {
+    if(window.innerWidth < 768) {
+      var data = this.props.logo_toggle
+      if(data == true) {
+          this.props.logoToggle(false);
+      }
+      else this.props.logoToggle(true);
+    }
+}
   
   handleLogout = () => {
     const formData = new FormData();
@@ -75,7 +87,7 @@ class SideNav extends Component {
         <nav className="flex-fill leftNav">
           <ul className="navPan">
             <li>
-              <Link to="/Dashboard" activeClassName="active">
+              <Link to="/Dashboard" activeClassName="active" onClick = {this.toggle.bind(this)}>
                 <span className="leftIcon01">
                   <img
                     src={require("../../../assets/images/leftIcon02Hover.svg")}
@@ -86,7 +98,7 @@ class SideNav extends Component {
               </Link>
             </li>
             <li>
-              <Link to="/PolicySearch" activeClassName="active">
+              <Link to="/PolicySearch" activeClassName="active" onClick = {this.toggle.bind(this)}>
                 <span className="leftIcon01">
                   <img
                     src={require("../../../assets/images/document.png")}
@@ -97,13 +109,13 @@ class SideNav extends Component {
               </Link>
             </li>
             <li>
-			<Link to="/QuoteHistory" activeClassName="active">
+			<Link to="/QuoteHistory" activeClassName="active" onClick = {this.toggle.bind(this)}>
 			<span className="leftIcon01"><img src={require('../../../assets/images/document.png')} alt="" /></span>
 			 <span className="hidemenu">{childPhrase['QuoteHistory']}</span>
 			 </Link>
             </li>
             <li>
-              <Link to="/Products" activeClassName="active">
+              <Link to="/Products" activeClassName="active" onClick = {this.toggle.bind(this)}>
                 <span className="leftIcon01">
                   <img
                     src={require("../../../assets/images/leftIcon02Hover.svg")}
@@ -114,7 +126,7 @@ class SideNav extends Component {
               </Link>
             </li>
             <li>
-              <Link to="/Documents" activeClassName="active">
+              <Link to="/Documents" activeClassName="active" onClick = {this.toggle.bind(this)}>
                 <span className="leftIcon01">
                   <img
                     src={require("../../../assets/images/document.png")}
@@ -126,7 +138,7 @@ class SideNav extends Component {
             </li>
 
             <li>
-              <Link to="/ClaimIntimation" activeClassName="active">
+              <Link to="/ClaimIntimation" activeClassName="active" onClick = {this.toggle.bind(this)}>
                 <span className="leftIcon01">
                   <img
                     src={require("../../../assets/images/support.png")}
@@ -137,7 +149,7 @@ class SideNav extends Component {
               </Link>
               </li>
               <li>
-              <Link to="/Renewal" activeClassName="active">
+              <Link to="/Renewal" activeClassName="active" onClick = {this.toggle.bind(this)}>
                 <span className="leftIcon01">
                   <img
                     src={require("../../../assets/images/support.png")}
@@ -149,7 +161,7 @@ class SideNav extends Component {
             </li>
 
             <li>
-              <Link to="/Services" activeClassName="active">
+              <Link to="/Services" activeClassName="active" onClick = {this.toggle.bind(this)}>
                 <span className="leftIcon01">
                   <img
                     src={require("../../../assets/images/support.png")}
@@ -161,14 +173,14 @@ class SideNav extends Component {
             </li>
            { BC_check.is_permission == true ?
               <li>
-                <Link to="/Supports" activeClassName="active">
+                <Link to="/Supports" activeClassName="active" onClick = {this.toggle.bind(this)}>
                 <span className="leftIcon01"><img src={require('../../../assets/images/support.png')} alt="" /></span>
                 <span className="hidemenu">{childPhrase['Support']}</span>
                 </Link>
               </li> 
             : [] } 
             <li>
-              <Link to="/Break_in" activeClassName="active">
+              <Link to="/Break_in" activeClassName="active" onClick = {this.toggle.bind(this)}>
                 <span className="leftIcon01">
                   <img
                     src={require("../../../assets/images/leftIcon01.svg")}
@@ -192,12 +204,7 @@ class SideNav extends Component {
             </a>
           </button>
 					</li>	
-						
-						
-						
-          </ul>
-
-          
+          </ul>        
         </nav> : null }
       </>
     );
@@ -207,12 +214,14 @@ class SideNav extends Component {
 const mapDispatchToProps = (dispatch) => {
   return {
     logout: () => dispatch(authLogout()),
+    logoToggle: (data) => dispatch(logoToggle(data)),
   };
 };
 
 const mapStateToProps = (state) => {
   return {
     loading: state.loader.loading,
+    logo_toggle: state.toggle.logo_toggle
   };
 };
 

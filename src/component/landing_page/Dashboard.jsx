@@ -77,10 +77,10 @@ class Dashboard extends Component {
   };
 
   handleSubmit = (values) => {
-    console.log("start_date------ ", values.start_date);
-    console.log("end_date------ ", values.end_date);
-    console.log("bcmaster_id------ ", values.bcmaster_id);
-    console.log("bc_agent_id------ ", values.bc_agent_id);
+    // console.log("start_date------ ", values.start_date);
+    // console.log("end_date------ ", values.end_date);
+    // console.log("bcmaster_id------ ", values.bcmaster_id);
+    // console.log("bc_agent_id------ ", values.bc_agent_id);
     const formData = new FormData();
     let encryption = new Encryption();
 
@@ -356,7 +356,7 @@ class Dashboard extends Component {
           </div>
           </aside>
 
-              <div className="col-sm-12 col-md-12 col-lg-12 col-xl-12 infobox dashboard">
+              <div className="col-sm-12 col-md-12 col-lg-12 col-xl-12 infobox">
                 <h4 className="text-center mt-3 mb-3">
                 {phrases['SBIGICL']}
                 </h4>
@@ -377,7 +377,7 @@ class Dashboard extends Component {
                       isSubmitting,
                       touched,
                     }) => {
-                      console.log("values-dashboard-------------> ", values);
+                      // console.log("values-dashboard-------------> ", values);
                       return (
                         <Form>
                           <Container fluid>
@@ -474,7 +474,7 @@ class Dashboard extends Component {
                                                 </div>
                                               </FormGroup>
                                             </Col>
-                                              <Col sm={6} md={5} lg={7}>
+                                              <Col sm={6} md={5} lg={6}>
                                                 <FormGroup className="dashboard-date">
                                                   {values.report_range !=
                                                   "4" ? (
@@ -567,8 +567,8 @@ class Dashboard extends Component {
                                          <thead>
                                             <tr>
                                               <th>{phrases['Product']}</th>
-                                              <th>{phrases['GWP']}</th>
                                               <th>{phrases['NOP']}</th>
+                                              <th>{phrases['GWP']}</th>
                                             </tr>
                                           </thead>
                                           <tbody>

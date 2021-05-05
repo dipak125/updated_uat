@@ -135,6 +135,25 @@ class Premium extends Component {
                 this.props.loadingStop();
             })
     }
+	
+	fetchRequestData = () => {
+        const { productId } = this.props.match.params
+        let policyHolder_id = this.state.policyHolder_refNo ? this.state.policyHolder_refNo : '0'
+        let encryption = new Encryption();
+    
+        axios.get(`four-wh-tp/details/${policyHolder_id}`)
+            .then(res => {
+                let decryptResp = JSON.parse(encryption.decrypt(res.data))
+                let request_data = decryptResp.data.policyHolder ? decryptResp.data.policyHolder.request_data : {}
+                this.setState({
+                    request_data
+                })
+            })
+            .catch(err => {
+                // handle error
+                this.props.loadingStop();
+            })
+    }
 
     getAccessToken = (motorInsurance) => {
         axios
@@ -179,6 +198,7 @@ class Premium extends Component {
                         PolicyArray: res.data.PolicyObject.PolicyLobList,
                         error: [],
                     });
+					this.fetchRequestData()
                 } else {
                     this.setState({
                         fulQuoteResp: [],

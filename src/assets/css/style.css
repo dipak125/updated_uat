@@ -1002,7 +1002,11 @@ li.logoutbtn {
     /* .leftNav {display: none;} */
 
  }
- 
+ @media (max-width: 1199px){
+ .dashboard .formSection .inputfs12, .dashboard .react-datepicker__input-container .inputfs12 {
+    height: auto;
+}
+ }
 
 /******************** Medium devices (tablets, less than 992px)********************/
 @media (max-width: 991.98px) { 
@@ -1317,7 +1321,11 @@ img.avatar {  border-radius: inherit;}
   padding: 2px 15px;
 }
 .chartjs-render-monitor{
-  height:260px!important;
+  height:240px!important;
+}
+.dashboard .card-header-custom.card-header h6 {
+    display: flex;
+    align-items: center;
 }
 .border-cardbody-dash {
   border: 1px solid #00B5EF;
@@ -1512,7 +1520,14 @@ ul.navPan { height:100%;}
     padding-right: 15px !important;
 }
 .chartjs-render-monitor {
-    height: 150px!important;
+    height: 200px !important;
+}
+.dashboard .card-header-custom.card-header h6 strong {
+    text-align: left;
+	    margin-right: 8px;
+}
+.dashboard .card-header-custom.card-header h6 {
+    justify-content: space-between;
 }
 .scrollable.card-body {
     padding: 5px;
@@ -1553,9 +1568,25 @@ li.nav-item.dropdown select.listSelect {
 }
 .displayshow{ padding:0 !important; top:58px;}
 
+.customModal .modal-content {
+    min-width: 95%;
+    max-width: 95%;
 }
+
+}
+@media (max-width: 385px){
+	.customModal table th,.customModal table td {
+    padding: 7px;
+	font-size: 12px;
+}
+.customModal .modal-body {
+    padding: 20px 10px;
+}
+}
+
 @media (max-width: 375px){
 	.rghtsideTrigr .Collapsible__trigger{ background-position:right top;}
+	.customCheckBox{ font-size:13px;}
 }
 @media (max-width: 350px){
 	
@@ -1566,9 +1597,7 @@ li.nav-item.dropdown select.listSelect {
     padding-left: 12px;
     padding-right: 12px;
 }
-.customModal table th,.customModal table td {
-    padding: 7px;
-}
+
 }
 
 /* --- Dashboard Graph Height Setting */

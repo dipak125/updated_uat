@@ -26,6 +26,16 @@ const genderArr = {
   f: "Female",
 };
 
+const static_relation_model = {
+  2: 'Spouse',
+  3: 'Son',
+  4: 'Daughter',
+  5: 'Father',
+  6: 'Mother',
+  7: 'Father In Law',
+  8: 'Mother In Law'
+};
+
 
 const Coverage = {
 
@@ -237,7 +247,7 @@ class HealthSummery extends Component {
 
   render() {
     const { productId } = this.props.match.params;
-    const { fulQuoteResp, error, show, policyHolder, nomineeDetails, paymentStatus, policyCoverage, relationArr, 
+    const { fulQuoteResp, error, show, policyHolder, nomineeDetails, paymentStatus, policyCoverage, 
       request_data, bcMaster, menumaster, vehicleDetails } = this.state;
 
     const policyCoverageList =  policyCoverage && policyCoverage.length > 0 ?(
@@ -258,8 +268,8 @@ class HealthSummery extends Component {
 
       const memberDetails =
       vehicleDetails && vehicleDetails.vehicletype && vehicleDetails.vehicletype.is_helth == 1 &&
-      fulQuoteResp.PolicyCustomerList && fulQuoteResp.PolicyCustomerList.length > 0 
-        ? fulQuoteResp.PolicyCustomerList.map((member, qIndex) => {
+      request_data && request_data.family_members.length > 0 
+        ? request_data.family_members.map((member, qIndex) => {
             return (
               <div>
               <Row>
@@ -269,7 +279,7 @@ class HealthSummery extends Component {
                       <FormGroup>Name:</FormGroup>
                     </Col>
                     <Col sm={12} md={6}>
-                      <FormGroup>{member.FirstName+" "+member.LastName ? member.LastName : ""}</FormGroup>
+                      <FormGroup>{member.first_name +" "+(member.last_name ? member.last_name : "")}</FormGroup>
                     </Col>
                   </Row>
 
@@ -278,7 +288,7 @@ class HealthSummery extends Component {
                       <FormGroup>Date Of Birth:</FormGroup>
                     </Col>
                     <Col sm={12} md={6}>
-                      <FormGroup>{moment(member.DateOfBirth).format("DD-MM-YYYY")}</FormGroup>
+                      <FormGroup>{moment(member.dob).format("DD-MM-YYYY")}</FormGroup>
                     </Col>
                   </Row>
 
@@ -287,7 +297,7 @@ class HealthSummery extends Component {
                       <FormGroup>Gender</FormGroup>
                     </Col>
                     <Col sm={12} md={6}>
-                      <FormGroup>{genderArr[member.GenderCode]}</FormGroup>
+                      <FormGroup>{genderArr[member.gender]}</FormGroup>
                     </Col>
                   </Row>
                 </Col>
@@ -363,9 +373,12 @@ class HealthSummery extends Component {
                           <FormGroup>Relation With Proposer:</FormGroup>
                       </Col>
                       <Col sm={12} md={6}>
-                          <FormGroup>{ vehicleDetails && vehicleDetails.vehicletype && vehicleDetails.vehicletype.is_helth == 3 && nomineeDetails && nomineeDetails.relation ? nomineeDetails.relation.ipa_relation_name  : 
-                          (vehicleDetails && vehicleDetails.vehicletype && vehicleDetails.vehicletype.is_helth == 2 && nomineeDetails && nomineeDetails.relation ? nomineeDetails.relation.gsb_appointee_relation  :
-                            vehicleDetails && vehicleDetails.vehicletype && vehicleDetails.vehicletype.is_helth == 1 && nomineeDetails && nomineeDetails.relation ? nomineeDetails.relation.ksb_label : null)}</FormGroup> 
+                          <FormGroup>
+                             { vehicleDetails && vehicleDetails.vehicletype_id == '12' || vehicleDetails && vehicleDetails.vehicletype_id == '5' ? static_relation_model[nomineeDetails.relation_with] : 
+                                (vehicleDetails && vehicleDetails.vehicletype_id == 13 && nomineeDetails && nomineeDetails.relation ? nomineeDetails.relation.ipa_relation_name  : 
+                                (vehicleDetails && vehicleDetails.vehicletype_id == 14 && nomineeDetails && nomineeDetails.relation ? nomineeDetails.relation.gsb_appointee_relation  :
+                                  vehicleDetails && vehicleDetails.vehicletype_id == 10 && nomineeDetails && nomineeDetails.relation ? nomineeDetails.relation.ksb_label : null) ) }
+                          </FormGroup> 
                       </Col>
                   </Row>
   
@@ -394,7 +407,7 @@ class HealthSummery extends Component {
                           <FormGroup>Relation With Nominee:</FormGroup>
                       </Col>
                       <Col sm={12} md={6}>
-                      <FormGroup>{nomineeDetails ? relationArr[nomineeDetails.appointee_relation_with] : []}</FormGroup>
+                      <FormGroup>{nomineeDetails ? static_relation_model[nomineeDetails.appointee_relation_with] : []}</FormGroup>
                       </Col>
                   </Row>
               </Col>
