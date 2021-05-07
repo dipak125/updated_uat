@@ -9,6 +9,8 @@ import { PrivateRoute } from "../../shared/private-route";
 import Loader from "react-loader-spinner";
 
 import LogIn from "../common/login/LogIn";
+import Intermediary_LogIn from "../common/intermediary_login/Intermediary_LogIn"; 
+import Reset_Password from "../common/intermediary_login/Reset_Password";
 
 import Registration from '../motor/Registration';
 import VehicleDetails from '../motor/VehicleDetails';
@@ -523,6 +525,13 @@ const VedvagGateway = Loadable({
     loading: () => loadingContent
 });
 
+//  ************ Sahipay Payment Gateway ******************
+
+const SahipayGateway = Loadable({
+    loader: () => import(/*webpackChunkName: "Products" */"../common/Sahipay_gateway.jsx"),
+    loading: () => loadingContent
+});
+
 
 //  ************ Renewal ******************
 
@@ -573,6 +582,8 @@ class Routes extends Component {
                 <HashRouter>
                     <Switch>
                         <Route exact path="/login" component={LogIn} />                
+                        <Route exact path="/Intermediary_LogIn" component={Intermediary_LogIn} /> 
+                        <Route exact path="/Reset_Password" component={Reset_Password} /> 
                         <Route exact path="/logout" component={Logout} /> 
                         <PrivateRoute exact path="/Error" component={Error} />
 
@@ -729,7 +740,10 @@ class Routes extends Component {
                         <PrivateRoute exact path="/PolicyDetails_GSB/:productId" component={PolicyDetails_GSB} />
 
                         {/************ Vedvag Payment Gateway ******************/}
-                        <PrivateRoute exact path="/Vedvag_gateway/:productId" component={VedvagGateway} />
+                        <PrivateRoute exact path="/Vedvag_gateway/:productId" component={VedvagGateway} />  
+
+                        {/************ Sahipay Payment Gateway ******************/}
+                        <PrivateRoute exact path="/Sahipay_gateway/:productId" component={SahipayGateway} />
 
 
                         <PrivateRoute exact path="/UnderMaintenance" component={UnderMaintenance} />

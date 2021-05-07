@@ -243,9 +243,8 @@ class IPA_Premium extends Component {
   };
 
   handleSubmit = (values) => {
-    // this.setState({ show: true, refNo: values.refNo, whatsapp: values.whatsapp });
     const policyHolder = this.state.policyHolderDetails
-    console.log("hello------------")
+
     if(policyHolder && policyHolder.bcmaster && policyHolder.bcmaster.paymentgateway && policyHolder.bcmaster.paymentgateway.slug && values.gateway == 1) {
         if(policyHolder.bcmaster.paymentgateway.slug == "csc_wallet") {
             this.payment()
@@ -260,6 +259,9 @@ class IPA_Premium extends Component {
     else if (policyHolder && policyHolder.bcmaster && policyHolder.bcmaster.paymentgateway && policyHolder.bcmaster.paymentgateway.slug && values.gateway == 2) {
         this.props.history.push(`/Vedvag_gateway/${this.props.match.params.productId}?access_id=${this.state.policyHolder_refNo}`);
     }
+    else if (policyHolder && policyHolder.bcmaster && policyHolder.bcmaster.paymentgateway && policyHolder.bcmaster.paymentgateway.slug && values.gateway == 3) {	
+      this.props.history.push(`/Sahipay_gateway/${this.props.match.params.productId}?access_id=${this.state.policyHolder_refNo}`);	
+  }
 }
 
   payment = () => {
@@ -283,8 +285,6 @@ class IPA_Premium extends Component {
     const { productId } = this.props.match.params;
     const { fulQuoteResp, error, show, policyHolderDetails, nomineeDetails, paymentStatus, policyCoverage, relationArr, 
       ipaInfo, bcMaster, menumaster, vehicleDetails } = this.state;
-
-    console.log("policyHolderDetails ", policyHolderDetails)
 
     const policyCoverageList =  policyCoverage && policyCoverage.length > 0 ?
     policyCoverage.map((coverage, qIndex) => (
@@ -448,15 +448,15 @@ class IPA_Premium extends Component {
     return (
       <>
         <BaseComponent>
-		<div className="page-wrapper">
+		    <div className="page-wrapper">
           <div className="container-fluid">
             <div className="row">
 			
-<aside className="left-sidebar">
- <div className="scroll-sidebar ps-container ps-theme-default ps-active-y">
-<SideNav />
- </div>
-</aside>			  
+            <aside className="left-sidebar">
+            <div className="scroll-sidebar ps-container ps-theme-default ps-active-y">
+            <SideNav />
+            </div>
+            </aside>			  
               <div className="col-sm-12 col-md-12 col-lg-12 col-xl-12 infobox premium3">
                 <h4 className="text-center mt-3 mb-3">
                 SBI General Insurance Company Limited
@@ -660,6 +660,29 @@ class IPA_Premium extends Component {
                                                               </span>
                                                           </label>
                                                           </div> : null }
+
+                                                          {policyHolderDetails.bcmaster && policyHolderDetails.bcmaster.id === 6 ?	
+                                                          <div>	
+                                                          <label className="customRadio3">	
+                                                          <Field	
+                                                              type="radio"	
+                                                              name='gateway'                                            	
+                                                              value='3'	
+                                                              key='1'  	
+                                                              onChange={(e) => {	
+                                                                  setFieldValue(`gateway`, e.target.value);	
+                                                              }}	
+                                                              checked={values.gateway == '3' ? true : false}	
+                                                          />	
+                                                              <span className="checkmark " /><span className="fs-14"> 	
+                                                              
+                                                                  { policyHolderDetails.bcmaster && policyHolderDetails.bcmaster.id === 6 ? <img src={require('../../assets/images/sahipay.png')} alt="" /> :	
+                                                                  null	
+                                                                  }	
+                                                              </span>	
+                                                          </label>	
+                                                          </div> : null }	
+
                                                     </div>
                                                   </FormGroup>
                                               </Col>

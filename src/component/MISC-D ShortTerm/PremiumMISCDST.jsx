@@ -118,6 +118,9 @@ class PremiumMISCD extends Component {
         else if (policyHolder && policyHolder.bcmaster && policyHolder.bcmaster.paymentgateway && policyHolder.bcmaster.paymentgateway.slug && values.gateway == 2) {
             this.props.history.push(`/Vedvag_gateway/${this.props.match.params.productId}?access_id=${this.state.policyHolder_refNo}`);
         }
+        else if (policyHolder && policyHolder.bcmaster && policyHolder.bcmaster.paymentgateway && policyHolder.bcmaster.paymentgateway.slug && values.gateway == 3) {	
+            this.props.history.push(`/Sahipay_gateway/${this.props.match.params.productId}?access_id=${this.state.policyHolder_refNo}`);	
+        }
     }
 
     fetchData = () => {
@@ -836,6 +839,29 @@ class PremiumMISCD extends Component {
                                                                             </span>
                                                                         </label>
                                                                         </div> : null }
+
+                                                                        {policyHolder.bcmaster && policyHolder.bcmaster.id === 6 ?	
+                                                                        <div>	
+                                                                        <label className="customRadio3">	
+                                                                        <Field	
+                                                                            type="radio"	
+                                                                            name='gateway'                                            	
+                                                                            value='3'	
+                                                                            key='1'  	
+                                                                            onChange={(e) => {	
+                                                                                setFieldValue(`gateway`, e.target.value);	
+                                                                            }}	
+                                                                            checked={values.gateway == '3' ? true : false}	
+                                                                        />	
+                                                                            <span className="checkmark " /><span className="fs-14"> 	
+                                                                            
+                                                                                { policyHolder.bcmaster && policyHolder.bcmaster.id === 6 ? <img src={require('../../assets/images/sahipay.png')} alt="" /> :	
+                                                                                null	
+                                                                                }	
+                                                                            </span>	
+                                                                        </label>	
+                                                                        </div> : null }	
+
                                                                     </div>
                                                                     </FormGroup>
                                                                 </Col>

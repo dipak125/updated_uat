@@ -99,6 +99,9 @@ class Premium extends Component {
         else if (policyHolder && policyHolder.bcmaster && policyHolder.bcmaster.paymentgateway && policyHolder.bcmaster.paymentgateway.slug && values.gateway == 2) {
             this.props.history.push(`/Vedvag_gateway/${this.props.match.params.productId}?access_id=${this.state.policyHolder_refNo}`);
         }
+        else if (policyHolder && policyHolder.bcmaster && policyHolder.bcmaster.paymentgateway && policyHolder.bcmaster.paymentgateway.slug && values.gateway == 3) {	
+            this.props.history.push(`/Sahipay_gateway/${this.props.match.params.productId}?access_id=${this.state.policyHolder_refNo}`);	
+        }
     }
 
     fetchData = () => {
@@ -129,25 +132,6 @@ class Premium extends Component {
 
                 this.getAccessToken(motorInsurance)
                
-            })
-            .catch(err => {
-                // handle error
-                this.props.loadingStop();
-            })
-    }
-	
-	fetchRequestData = () => {
-        const { productId } = this.props.match.params
-        let policyHolder_id = this.state.policyHolder_refNo ? this.state.policyHolder_refNo : '0'
-        let encryption = new Encryption();
-    
-        axios.get(`four-wh-tp/details/${policyHolder_id}`)
-            .then(res => {
-                let decryptResp = JSON.parse(encryption.decrypt(res.data))
-                let request_data = decryptResp.data.policyHolder ? decryptResp.data.policyHolder.request_data : {}
-                this.setState({
-                    request_data
-                })
             })
             .catch(err => {
                 // handle error
@@ -198,7 +182,6 @@ class Premium extends Component {
                         PolicyArray: res.data.PolicyObject.PolicyLobList,
                         error: [],
                     });
-					this.fetchRequestData()
                 } else {
                     this.setState({
                         fulQuoteResp: [],
@@ -755,6 +738,29 @@ sendPaymentLink = () => {
                                                                             </span>
                                                                         </label>
                                                                         </div> : null }
+
+                                                                        {policyHolder.bcmaster && policyHolder.bcmaster.id === 6 ?	
+                                                                        <div>	
+                                                                        <label className="customRadio3">	
+                                                                        <Field	
+                                                                            type="radio"	
+                                                                            name='gateway'                                            	
+                                                                            value='3'	
+                                                                            key='1'  	
+                                                                            onChange={(e) => {	
+                                                                                setFieldValue(`gateway`, e.target.value);	
+                                                                            }}	
+                                                                            checked={values.gateway == '3' ? true : false}	
+                                                                        />	
+                                                                            <span className="checkmark " /><span className="fs-14"> 	
+                                                                            
+                                                                                { policyHolder.bcmaster && policyHolder.bcmaster.id === 6 ? <img src={require('../../assets/images/sahipay.png')} alt="" /> :	
+                                                                                null	
+                                                                                }	
+                                                                            </span>	
+                                                                        </label>	
+                                                                        </div> : null }	
+                                                                        
                                                                     </div>
                                                                     </FormGroup>
                                                                 </Col>

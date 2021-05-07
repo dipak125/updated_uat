@@ -95,6 +95,9 @@ class PremiumGCV extends Component {
         else if (policyHolder && policyHolder.bcmaster && policyHolder.bcmaster.paymentgateway && policyHolder.bcmaster.paymentgateway.slug && values.gateway == 2) {	
             this.props.history.push(`/Vedvag_gateway/${this.props.match.params.productId}?access_id=${this.state.policyHolder_refNo}`);	
         }	
+        else if (policyHolder && policyHolder.bcmaster && policyHolder.bcmaster.paymentgateway && policyHolder.bcmaster.paymentgateway.slug && values.gateway == 3) {	
+            this.props.history.push(`/Sahipay_gateway/${this.props.match.params.productId}?access_id=${this.state.policyHolder_refNo}`);	
+        }
     }	
     fetchData = () => {	
         const { productId } = this.props.match.params	
@@ -299,6 +302,7 @@ class PremiumGCV extends Component {
         const { refNumber } = this.state;	
         window.location = `${process.env.REACT_APP_PAYMENT_URL}/ppinl/pay.php?refrence_no=${refNumber}`	
     }	
+
     fetchRelationships=()=>{	
         this.props.loadingStart();	
         axios.get('relations')	
@@ -339,6 +343,7 @@ class PremiumGCV extends Component {
         // this.fetchData()	
         this.fetchRelationships()	
     }	
+
     render() {	
         const { policyHolder, show, fulQuoteResp, motorInsurance, error, error1, refNumber, paymentStatus, bcMaster,	
              relation, memberdetails,nomineedetails, vehicleDetails, breakin_flag, step_completed, request_data,menumaster, } = this.state	
@@ -379,14 +384,7 @@ class PremiumGCV extends Component {
 						 <SideNav />
 						</div>
 						</aside>
-								
-					 {/*<div className="col-sm-12 col-md-12 col-lg-2 col-xl-2 pd-l-0">        
-						<SideNav />
-             		 </div>*/}
-							
-							
-							
-							
+											
                             { step_completed >= '4' && vehicleDetails.vehicletype_id == '8' ?	
                             <div className="col-sm-12 col-md-12 col-lg-12 col-xl-12 infobox premiumCgv">	
                                 <h4 className="text-center mt-3 mb-3">{phrases['SBIGICL']}</h4>	
@@ -786,6 +784,7 @@ class PremiumGCV extends Component {
                                                                             </span>	
                                                                         </label>	
                                                                         </div>	
+
                                                                         {policyHolder.bcmaster && policyHolder.bcmaster.id === 2 ?	
                                                                         <div>	
                                                                         <label className="customRadio3">	
@@ -802,6 +801,28 @@ class PremiumGCV extends Component {
                                                                             <span className="checkmark " /><span className="fs-14"> 	
                                                                         	
                                                                                 { policyHolder.bcmaster && policyHolder.bcmaster.id === 2 ? <img src={require('../../assets/images/vedavaag.png')} alt="" /> :	
+                                                                                null	
+                                                                                }	
+                                                                            </span>	
+                                                                        </label>	
+                                                                        </div> : null }	
+
+                                                                        {policyHolder.bcmaster && policyHolder.bcmaster.id === 6 ?	
+                                                                        <div>	
+                                                                        <label className="customRadio3">	
+                                                                        <Field	
+                                                                            type="radio"	
+                                                                            name='gateway'                                            	
+                                                                            value='3'	
+                                                                            key='1'  	
+                                                                            onChange={(e) => {	
+                                                                                setFieldValue(`gateway`, e.target.value);	
+                                                                            }}	
+                                                                            checked={values.gateway == '3' ? true : false}	
+                                                                        />	
+                                                                            <span className="checkmark " /><span className="fs-14"> 	
+                                                                        	
+                                                                                { policyHolder.bcmaster && policyHolder.bcmaster.id === 6 ? <img src={require('../../assets/images/sahipay.png')} alt="" /> :	
                                                                                 null	
                                                                                 }	
                                                                             </span>	

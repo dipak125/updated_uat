@@ -56,7 +56,6 @@ const initialValue = {
     valid_previous_policy: "",
     claim_array: [],
     new_policy_duration : "",
-    duration: "",
     new_policy_start_date: "",
     new_policy_end_date: "",
     duration: ""
@@ -96,7 +95,11 @@ const vehicleRegistrationValidation = Yup.object().shape({
         }
     ),
 
-    new_policy_duration : Yup.string().required("Policy duration required"), 
+    new_policy_duration: Yup.string().when(['valid_previous_policy'], {
+        is: valid_previous_policy => valid_previous_policy == '1', 
+        then: Yup.string().required("Policy duration required"),
+        otherwise: Yup.string()
+    }), 
 
     location_id: Yup.string()
     .required(function() {
@@ -106,50 +109,56 @@ const vehicleRegistrationValidation = Yup.object().shape({
         return "NoCharacterAllowed"
     }),
 
-    new_policy_start_date:Yup.date()
-    .required("PleaseESD")
-    .test(
-        "checkGreaterTimes",
-        "StartDateLessEnd",
-        function (value) {
-            if (value && this.parent.policy_type_id == '2' ) {
-                return checkGreaterStartEndTimes(value, this.parent.new_policy_end_date);
+    new_policy_start_date: Yup.date().when(['valid_previous_policy'], {
+        is: valid_previous_policy => valid_previous_policy == '1', 
+        then: Yup.date().required("PleaseESD")
+            .test(
+                "checkGreaterTimes",
+                "StartDateLessEnd",
+                function (value) {
+                    if (value && this.parent.policy_type_id == '2' ) {
+                        return checkGreaterStartEndTimes(value, this.parent.new_policy_end_date);
+                    }
+                    return true;
+                }
+            ).test(
+            "checkStartDate",
+            "PleaseESD",
+            function (value) {       
+                if ( this.parent.new_policy_end_date != undefined && value == undefined && this.parent.policy_type_id == '2') {
+                    return false;
+                }
+                return true;
             }
-            return true;
-        }
-    ).test(
-      "checkStartDate",
-      "PleaseESD",
-      function (value) {       
-          if ( this.parent.new_policy_end_date != undefined && value == undefined && this.parent.policy_type_id == '2') {
-              return false;
-          }
-          return true;
-      }
-    ),
-    
-    new_policy_end_date:Yup.date()
-    .required("PleaseEED")
-    .test( 
-        "checkGreaterTimes",
-        "EndDateGreaterStart",
-        function (value) {
-            if (value && this.parent.policy_type_id == '2'  ) {
-                return checkGreaterTimes(value, this.parent.new_policy_start_date);
-            }
-            return true;
-        }
-        ).test(
-        "checkEndDate",
-        "PleaseEED",
-        function (value) {     
-            if ( this.parent.new_policy_start_date != undefined && value == undefined && this.parent.policy_type_id == '2' ) {
-                return false;
-            }
-            return true;
-        }
-    ),
+            ),
+        otherwise: Yup.date()
+    }), 
 
+    new_policy_end_date: Yup.date().when(['valid_previous_policy'], {
+        is: valid_previous_policy => valid_previous_policy == '1', 
+        then: Yup.date().required("PleaseEED")
+            .test( 
+                "checkGreaterTimes",
+                "EndDateGreaterStart",
+                function (value) {
+                    if (value && this.parent.policy_type_id == '2'  ) {
+                        return checkGreaterTimes(value, this.parent.new_policy_start_date);
+                    }
+                    return true;
+                }
+                ).test(
+                "checkEndDate",
+                "PleaseEED",
+                function (value) {     
+                    if ( this.parent.new_policy_start_date != undefined && value == undefined && this.parent.policy_type_id == '2' ) {
+                        return false;
+                    }
+                    return true;
+                }
+            ),
+        otherwise: Yup.date()
+    }), 
+    
     previous_start_date:Yup.date()
     .notRequired('Previous Start date is required')
     .test(
@@ -429,7 +438,7 @@ class VehicleDetailsMISCD extends Component {
         location_reset_flag: 0,
         changeFlag: 0,
         no_of_claim: [],
-        shortTermNewPolicy: {}
+        request_data: {}
 
     };
 
@@ -552,7 +561,7 @@ class VehicleDetailsMISCD extends Component {
     handleSubmit = (values, actions) => {
         const {productId} = this.props.match.params 
         const {motorInsurance, changeFlag} = this.state
-        let policy_type = 1
+        let policy_type = 2
         let vehicleAge = Math.floor(moment().diff(values.registration_date, 'months', true))
 
         if(changeFlag == 1) {
@@ -691,10 +700,10 @@ class VehicleDetailsMISCD extends Component {
                  let no_of_claim = previousPolicy && previousPolicy.previouspoliciesclaims ? previousPolicy.previouspoliciesclaims.length : ""
                  let RTO_location = motorInsurance && motorInsurance.rtolocation && motorInsurance.rtolocation.RTO_LOCATION ? motorInsurance.rtolocation.RTO_LOCATION : ""
                  let previous_is_claim= previousPolicy && (previousPolicy.is_claim == 0 || previousPolicy.is_claim == 1) ? previousPolicy.is_claim : ""
-                 let shortTermNewPolicy = decryptResp.data.policyHolder.shorttermnewpolicy ? decryptResp.data.policyHolder.shorttermnewpolicy : {}
+                 let request_data = decryptResp.data.policyHolder.request_data ? decryptResp.data.policyHolder.request_data : {}
                  
                  this.setState({
-                    motorInsurance, previousPolicy, vehicleDetails,RTO_location, previous_is_claim, no_of_claim,shortTermNewPolicy
+                    motorInsurance, previousPolicy, vehicleDetails,RTO_location, previous_is_claim, no_of_claim,request_data
                 })
                 this.props.loadingStop();
             })
@@ -861,7 +870,7 @@ class VehicleDetailsMISCD extends Component {
 
     render() {
         const {productId} = this.props.match.params  
-        const {insurerList, showClaim, previous_is_claim, motorInsurance, previousPolicy,CustomerID,suggestions,shortTermNewPolicy,
+        const {insurerList, showClaim, previous_is_claim, motorInsurance, previousPolicy,CustomerID,suggestions,request_data,
               vehicleDetails, RTO_location, averagemonthlyusages,goodscarriedtypes,permittypes, location_reset_flag} = this.state
 
         let phrases = localStorage.getItem("phrases") ? JSON.parse(localStorage.getItem("phrases")) : null
@@ -881,9 +890,9 @@ class VehicleDetailsMISCD extends Component {
             policy_type_id: motorInsurance && motorInsurance.policytype_id ? motorInsurance.policytype_id : "",
             valid_previous_policy: motorInsurance && (motorInsurance.valid_previous_policy == 0 || motorInsurance.valid_previous_policy == 1) ? motorInsurance.valid_previous_policy : "",           
             duration: previousPolicy && previousPolicy.duration ? previousPolicy.duration : "",
-            new_policy_duration: shortTermNewPolicy && shortTermNewPolicy.duration ? shortTermNewPolicy.duration : "",
-            new_policy_start_date: shortTermNewPolicy && shortTermNewPolicy.start_date ? new Date(shortTermNewPolicy.start_date) : "",
-            new_policy_end_date: shortTermNewPolicy && shortTermNewPolicy.end_date ? new Date(shortTermNewPolicy.end_date) : "",
+            new_policy_duration: request_data && request_data.duration ? request_data.duration : "",
+            new_policy_start_date: request_data && request_data.start_date ? new Date(request_data.start_date) : "",
+            new_policy_end_date: request_data && request_data.end_date ? new Date(request_data.end_date) : "",
 
             claim_array:  this.initClaimDetailsList()
         });
@@ -903,21 +912,13 @@ class VehicleDetailsMISCD extends Component {
 				<div className="page-wrapper">
                 <div className="container-fluid">
                 <div className="row">
-				
-				
-				
-						<aside className="left-sidebar">
-		 				 <div className="scroll-sidebar ps-container ps-theme-default ps-active-y">
-						 <SideNav />
-						</div>
-						</aside>
-								
-					 {/* <div className="col-sm-12 col-md-12 col-lg-2 col-xl-2 pd-l-0">           
-						<SideNav />
-             		 </div>*/}
-                  
-					
-					
+
+                <aside className="left-sidebar">
+                    <div className="scroll-sidebar ps-container ps-theme-default ps-active-y">
+                    <SideNav />
+                </div>
+                </aside>
+			
                 <div className="col-sm-12 col-md-12 col-lg-12 col-xl-12 infobox sbbrand2">
                 <h4 className="text-center mt-3 mb-3">{phrases['SBIGICL']}</h4>
                 <section className="brand m-b-25">
@@ -933,6 +934,7 @@ class VehicleDetailsMISCD extends Component {
                             onSubmit={this.handleSubmit} 
                             validationSchema={vehicleRegistrationValidation}>
                             {({ values, errors, setFieldValue, setFieldTouched, isValid, isSubmitting, touched }) => {
+// console.log("errors---------------- ", errors)
 // console.log("values---------------- ", values)
                                 return (
                                     <Form enableReinitialize = {true}>
@@ -1166,6 +1168,9 @@ class VehicleDetailsMISCD extends Component {
                                                                         if(values.previous_start_date) {
                                                                             date2 = moment(moment(values.previous_start_date).add(e.target.value,'month')).subtract(1, 'day').format('YYYY-MM-DD')
                                                                             tempDate = moment(values.previous_start_date).add(e.target.value,'month').format('YYYY-MM-DD')  
+                                                                            if(checkGreaterStartEndTimes(tempDate, new Date()) ){
+                                                                                tempDate = moment().add(1,'day').format('YYYY-MM-DD')  
+                                                                            } 
                                                                             if(values.new_policy_duration ) {
                                                                                 tempEndDate = moment(moment(tempDate).add(values.new_policy_duration ,'month')).subtract(1, 'day').format('YYYY-MM-DD') 
                                                                                 setFieldValue("new_policy_end_date", new Date(tempEndDate)); 
@@ -1219,7 +1224,10 @@ class VehicleDetailsMISCD extends Component {
                                                                     if(values.previous_policy_name == '3') {
                                                                         if(values.duration) {
                                                                             date2 = moment(moment(val).add(values.duration,'month')).subtract(1, 'day').format('YYYY-MM-DD')
-                                                                            tempDate = moment(val).add(values.duration,'month').format('YYYY-MM-DD')                           
+                                                                            tempDate = moment(val).add(values.duration,'month').format('YYYY-MM-DD')  
+                                                                            if(checkGreaterStartEndTimes(tempDate, new Date()) ){
+                                                                                tempDate = moment().add(1,'day').format('YYYY-MM-DD')  
+                                                                            }                          
                                                                         }                   
                                                                     }
                                                                     else if(values.previous_policy_name == '1' || values.previous_policy_name == '2'){
@@ -1227,6 +1235,9 @@ class VehicleDetailsMISCD extends Component {
                                                                         var date2 = new Date(date)
                                                                         date2 = date2.setDate(date2.getDate() - 1);
                                                                         tempDate = moment(date2).add(1,'day').format('YYYY-MM-DD')  
+                                                                        if(checkGreaterStartEndTimes(tempDate, new Date()) ){
+                                                                            tempDate = moment().add(1,'day').format('YYYY-MM-DD')  
+                                                                        } 
                                                                     }          
                                                                     if(values.new_policy_duration ) {
                                                                         tempEndDate = moment(moment(tempDate).add(values.new_policy_duration ,'month')).subtract(1, 'day').format('YYYY-MM-DD') 
@@ -1482,6 +1493,7 @@ class VehicleDetailsMISCD extends Component {
                                             </Fragment> 
                                              : null } 
 
+                                            {values.policy_type_id == '2' && values.valid_previous_policy == '1' ?
                                              <Fragment>
                                                 <Row>
                                                     <Col sm={12}>
@@ -1551,6 +1563,7 @@ class VehicleDetailsMISCD extends Component {
                                                                 peekPreviousYear
                                                                 showMonthDropdown
                                                                 showYearDropdown
+                                                                disabled = {true}
                                                                 dropdownMode="select"
                                                                 className="datePckr inputfs12"
                                                                 selected={values.new_policy_start_date}
@@ -1593,8 +1606,8 @@ class VehicleDetailsMISCD extends Component {
                                                         </FormGroup>
                                                     </Col>                                                
                                                 </Row>
-
-                                             </Fragment>
+                                             </Fragment> 
+                                             : null }
 
                                                 <div className="d-flex justify-content-left resmb">
                                                 <Button className={`backBtn`} type="button"  disabled={isSubmitting ? true : false} onClick= {this.selectBrand.bind(this,productId)}>

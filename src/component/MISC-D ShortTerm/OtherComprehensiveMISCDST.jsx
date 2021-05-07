@@ -828,7 +828,7 @@ class OtherComprehensiveMISCD extends Component {
 
         let encryption = new Encryption();
         formData.append('enc_data',encryption.encrypt(JSON.stringify(post_data)))
-        axios.post('fullQuoteMISCD',formData)
+        axios.post('fullQuoteMISCDShortTerm',formData)
             .then(res => {
 
                 if (res.data.data.PolicyObject && res.data.data.UnderwritingResult && res.data.data.UnderwritingResult.Status == "Success") {

@@ -103,6 +103,9 @@ class TwoWheelerPolicyPremiumDetailsOD extends Component {
         else if (policyHolder && policyHolder.bcmaster && policyHolder.bcmaster.paymentgateway && policyHolder.bcmaster.paymentgateway.slug && values.gateway == 2) {
             this.props.history.push(`/Vedvag_gateway/${this.props.match.params.productId}?access_id=${this.state.policyHolder_refNo}`);
         }
+        else if (policyHolder && policyHolder.bcmaster && policyHolder.bcmaster.paymentgateway && policyHolder.bcmaster.paymentgateway.slug && values.gateway == 3) {	
+            this.props.history.push(`/Sahipay_gateway/${this.props.match.params.productId}?access_id=${this.state.policyHolder_refNo}`);	
+        }
     }
 
     fetchData = () => {
@@ -304,500 +307,517 @@ class TwoWheelerPolicyPremiumDetailsOD extends Component {
         return (
             <>
                 <BaseComponent>
-				<div className="page-wrapper">
-                    <div className="container-fluid">
-                        <div className="row">
-			
-                           <aside className="left-sidebar">
-                            <div className="scroll-sidebar ps-container ps-theme-default ps-active-y">
+                <div className="container-fluid">
+                    <div className="row">
+                        <div className="col-sm-12 col-md-12 col-lg-2 col-xl-2 pd-l-0">
                             <SideNav />
-                            </div>
-                            </aside>
-											
-                            { step_completed >= '4' && vehicleDetails.vehicletype_id == productId ?
-                            <div className="col-sm-12 col-md-12 col-lg-12 col-xl-12 infobox twopremiumOd">
-                                <h4 className="text-center mt-3 mb-3">{phrases['SBIGICL']}</h4>
-                                <Formik initialValues={initialValue} onSubmit={this.handleSubmit}
-                                validationSchema={validatePremium}
-                                >
-                                    {({ values, errors, setFieldValue, setFieldTouched, isValid, isSubmitting, touched }) => {
+                        </div>					
+                        { step_completed >= '4' && vehicleDetails.vehicletype_id == productId ?
+                            <div className="col-sm-12 col-md-12 col-lg-10 col-xl-10 infobox">
+                            <h4 className="text-center mt-3 mb-3">{phrases['SBIGICL']}</h4>
+                            <Formik initialValues={initialValue} onSubmit={this.handleSubmit}
+                            validationSchema={validatePremium}
+                            >
+                                {({ values, errors, setFieldValue, setFieldTouched, isValid, isSubmitting, touched }) => {
 
-                                        return (
-                                            <Form>
-                                                <section className="brand m-t-11 m-b-25">
-                                                    <div className="d-flex justify-content-left">
-                                                        <div className="brandhead m-b-10">
-                                                            <h4>{phrases['PremiumDetails']} </h4>
+                                    return (
+                                        <Form>
+                                            <section className="brand m-t-11 m-b-25">
+                                                <div className="d-flex justify-content-left">
+                                                    <div className="brandhead m-b-10">
+                                                        <h4>{phrases['PremiumDetails']} </h4>
+                                                    </div>
+                                                </div>
+                                                <div className="brandhead m-b-30">
+                                                    <h5>{errMsg}</h5>
+                                                    <h5>{paymentErrMsg}</h5>
+                                                    <h4>
+                                                    {phrases['PolRefNumber']} {fulQuoteResp.QuotationNo ? fulQuoteResp.QuotationNo : ''}
+                                                    </h4>
+                                                </div>
+
+                                                <Row>
+                                                    <Col sm={12} md={12} lg={9}>
+                                                        <div className="rghtsideTrigr">
+                                                            <Collapsible trigger={phrases['PolicyDetails']}>
+                                                                <div className="listrghtsideTrigr">
+                                                                    <Row>                                                                       
+                                                                        <Col sm={12} md={6}>
+                                                                            <div className="motopremium">
+                                                                                Policy Start date:
+                                                                            </div>
+                                                                        </Col>
+                                                                        <Col sm={12} md={6}>
+                                                                            <div className="premamount">
+                                                                                {request_data && request_data.start_date ? moment(request_data.start_date).format('DD-MM-yyy') : null}
+                                                                            </div>
+                                                                        </Col>
+
+                                                                        <Col sm={12} md={6}>
+                                                                            <div className="motopremium">
+                                                                                Policy End Date:
+                                                                            </div>
+                                                                        </Col>
+                                                                        <Col sm={12} md={3}>
+                                                                            <div className="premamount">
+                                                                            {request_data && request_data.end_date ? moment(request_data.end_date).format('DD-MM-yyy') : null}
+                                                                            </div>
+                                                                        </Col>
+                                                                        <Col sm={12} md={6}>
+                                                                            <div className="motopremium">
+                                                                                Product Name:
+                                                                            </div>
+                                                                        </Col>
+                                                                        <Col sm={12} md={6}>
+                                                                            <div className="premamount">
+                                                                            {vehicleDetails && vehicleDetails.vehicletype ? vehicleDetails.vehicletype.description : null}
+                                                                            </div>
+                                                                        </Col>
+                                                                    </Row>
+                                                                </div>
+
+                                                            </Collapsible>
                                                         </div>
-                                                    </div>
-                                                    <div className="brandhead m-b-30">
-                                                        <h5>{errMsg}</h5>
-                                                        <h5>{paymentErrMsg}</h5>
-                                                        <h4>
-                                                        {phrases['PolRefNumber']} {fulQuoteResp.QuotationNo ? fulQuoteResp.QuotationNo : ''}
-                                                        </h4>
-                                                    </div>
 
-                                                    <Row>
-                                                        <Col sm={12} md={12} lg={9}>
-                                                            <div className="rghtsideTrigr">
-                                                                <Collapsible trigger={phrases['PolicyDetails']}>
-                                                                    <div className="listrghtsideTrigr">
-                                                                        <Row>                                                                       
-                                                                            <Col sm={12} md={6}>
-                                                                                <div className="motopremium">
-                                                                                    Policy Start date:
-                                                                                </div>
-                                                                            </Col>
-                                                                            <Col sm={12} md={6}>
-                                                                                <div className="premamount">
-                                                                                    {request_data && request_data.start_date ? moment(request_data.start_date).format('DD-MM-yyy') : null}
-                                                                                </div>
-                                                                            </Col>
+                                                        <div className="rghtsideTrigr">
+                                                            <Collapsible trigger={phrases['RMPolicy']} open = {true}>
+                                                                <div className="listrghtsideTrigr">
+                                                                    <Row>
+                                                                        <Col sm={12} md={6}>
+                                                                            <div className="motopremium">
+                                                                            {phrases['Premium']}:
+                                                                            </div>
+                                                                        </Col>
 
-                                                                            <Col sm={12} md={6}>
-                                                                                <div className="motopremium">
-                                                                                    Policy End Date:
-                                                                                </div>
-                                                                            </Col>
-                                                                            <Col sm={12} md={3}>
-                                                                                <div className="premamount">
-                                                                                {request_data && request_data.end_date ? moment(request_data.end_date).format('DD-MM-yyy') : null}
-                                                                                </div>
-                                                                            </Col>
-                                                                            <Col sm={12} md={6}>
-                                                                                <div className="motopremium">
-                                                                                    Product Name:
-                                                                                </div>
-                                                                            </Col>
-                                                                            <Col sm={12} md={6}>
-                                                                                <div className="premamount">
-                                                                                {vehicleDetails && vehicleDetails.vehicletype ? vehicleDetails.vehicletype.description : null}
-                                                                                </div>
-                                                                            </Col>
-                                                                        </Row>
-                                                                    </div>
 
-                                                                </Collapsible>
-                                                            </div>
+                                                                        <Col sm={12} md={6}>
+                                                                            <div className="premamount">
+                                                                                ₹ {fulQuoteResp.DuePremium}
+                                                                            </div>
+                                                                        </Col>
 
-                                                            <div className="rghtsideTrigr">
-                                                                <Collapsible trigger={phrases['RMPolicy']} open = {true}>
-                                                                    <div className="listrghtsideTrigr">
+                                                                        <Col sm={12} md={6}>
+                                                                            <div className="motopremium">
+                                                                            {phrases['GrossPremium']}:
+                                                                            </div>
+                                                                        </Col>
+
+
+                                                                        <Col sm={12} md={6}>
+                                                                            <div className="premamount">
+                                                                                ₹ {Math.round(fulQuoteResp.BeforeVatPremium)}
+                                                                            </div>
+                                                                        </Col>
+
+                                                                        <Col sm={12} md={6}>
+                                                                            <div className="motopremium">
+                                                                            {phrases['GST']}:
+                                                                            </div>
+                                                                        </Col>
+                                                                        <Col sm={12} md={6}>
+                                                                            <div className="premamount">
+                                                                                ₹ {Math.round(fulQuoteResp.TGST)}
+                                                                            </div>
+                                                                        </Col>
+                                                                    </Row>
+                                                                </div>
+
+                                                            </Collapsible>
+                                                        </div>
+
+                                                        <div className="rghtsideTrigr m-b-30">
+                                                            <Collapsible trigger={phrases['VehicleDetails']} >
+                                                                <div className="listrghtsideTrigr">
+                                                                    {memberdetails ?
+
+                                                                            <div>
+                                                                                <Row>
+                                                                                    <Col sm={12} md={12}>
+                                                                                        <Row>
+                                                                                            <Col sm={12} md={6}>
+                                                                                                <FormGroup>{phrases['RegNo']}:</FormGroup>
+                                                                                            </Col>
+                                                                                            <Col sm={12} md={6}>
+                                                                                                <FormGroup>{motorInsurance && motorInsurance.registration_no}</FormGroup>
+                                                                                            </Col>
+                                                                                        </Row>
+
+                                                                                        <Row>
+                                                                                            <Col sm={12} md={6}>
+                                                                                                <FormGroup>{phrases['TwoWheelBrand']}:</FormGroup>
+                                                                                            </Col>
+                                                                                            <Col sm={12} md={6}>
+                                                                                                <FormGroup>{vehicleDetails && vehicleDetails.vehiclebrand && vehicleDetails.vehiclebrand.name ? vehicleDetails.vehiclebrand.name : ""}</FormGroup>
+                                                                                            </Col>
+                                                                                        </Row>
+                                                                                        <Row>
+                                                                                            <Col sm={12} md={6}>
+                                                                                                <FormGroup>{phrases['TwoWheelModel']}</FormGroup>
+                                                                                            </Col>
+                                                                                            <Col sm={12} md={6}>
+                                                                                                <FormGroup>{vehicleDetails && vehicleDetails.vehiclemodel && vehicleDetails.vehiclemodel.description ? vehicleDetails.vehiclemodel.description+" "+vehicleDetails.varientmodel.varient : ""}</FormGroup>
+                                                                                            </Col>
+                                                                                        </Row>
+                                                                                        <Row>
+                                                                                            <Col sm={12} md={6}>
+                                                                                                <FormGroup>{phrases['Variant']}</FormGroup>
+                                                                                            </Col>
+                                                                                            <Col sm={12} md={6}>
+                                                                                                <FormGroup>{vehicleDetails && vehicleDetails.varientmodel && vehicleDetails.varientmodel.varient ? vehicleDetails.varientmodel.varient : ""}</FormGroup>
+                                                                                            </Col>
+                                                                                        </Row>
+                                                                                        <Row>
+                                                                                            <Col sm={12} md={6}>
+                                                                                                <FormGroup>{phrases['ChasisNumber']}</FormGroup>
+                                                                                            </Col>
+                                                                                            <Col sm={12} md={6}>
+                                                                                                <FormGroup>{motorInsurance && motorInsurance.chasis_no  ? motorInsurance.chasis_no : ""}</FormGroup>
+                                                                                            </Col>
+                                                                                        </Row>
+                                                                                        <Row>
+                                                                                            <Col sm={12} md={6}>
+                                                                                                <FormGroup>{phrases['EngineNumber']}</FormGroup>
+                                                                                            </Col>
+                                                                                            <Col sm={12} md={6}>
+                                                                                            <FormGroup>{motorInsurance && motorInsurance.engine_no  ? motorInsurance.engine_no : ""}</FormGroup>
+                                                                                            </Col>
+                                                                                        </Row>
+                                                                                        <Row>
+                                                                                            <Col sm={12} md={6}>
+                                                                                                <FormGroup>{phrases['Fuel']}</FormGroup>
+                                                                                            </Col>
+                                                                                            <Col sm={12} md={6}>
+                                                                                                <FormGroup>{vehicleDetails && vehicleDetails.varientmodel && vehicleDetails.varientmodel.fuel_type ? fuel[parseInt(vehicleDetails.varientmodel.fuel_type)] : null}</FormGroup>
+                                                                                            </Col>
+                                                                                        </Row>
+
+                                                                                        <Row>
+                                                                                            <Col sm={12} md={6}>
+                                                                                                <FormGroup>{phrases['Seating']}</FormGroup>
+                                                                                            </Col>
+                                                                                            <Col sm={12} md={6}>
+                                                                                                <FormGroup>{vehicleDetails && vehicleDetails.varientmodel && vehicleDetails.varientmodel.seating ? vehicleDetails.varientmodel.seating : null}</FormGroup>
+                                                                                            </Col>
+                                                                                        </Row>
+
+                                                                                        <Row>
+                                                                                            <Col sm={12} md={6}>
+                                                                                                <FormGroup>{phrases['IDVofVehicle']}</FormGroup>
+                                                                                            </Col>
+                                                                                            <Col sm={12} md={6}>
+                                                                                                <FormGroup>{motorInsurance && motorInsurance.idv_value ? motorInsurance.idv_value : null}</FormGroup>
+                                                                                            </Col>
+                                                                                        </Row>
+
+                                                                                    </Col>
+                                                                                </Row>
+                                                                                <Row>
+                                                                                    <p></p>
+                                                                                </Row>
+                                                                            </div>
+                                                                        : (<p></p>)}
+                                                                                
+                                                                    <div>
                                                                         <Row>
-                                                                            <Col sm={12} md={6}>
-                                                                                <div className="motopremium">
-                                                                                {phrases['Premium']}:
-                                                                                </div>
-                                                                            </Col>
-
-
-                                                                            <Col sm={12} md={6}>
-                                                                                <div className="premamount">
-                                                                                    ₹ {fulQuoteResp.DuePremium}
-                                                                                </div>
-                                                                            </Col>
-
-                                                                            <Col sm={12} md={6}>
-                                                                                <div className="motopremium">
-                                                                                {phrases['GrossPremium']}:
-                                                                                </div>
-                                                                            </Col>
-
-
-                                                                            <Col sm={12} md={6}>
-                                                                                <div className="premamount">
-                                                                                    ₹ {Math.round(fulQuoteResp.BeforeVatPremium)}
-                                                                                </div>
-                                                                            </Col>
-
-                                                                            <Col sm={12} md={6}>
-                                                                                <div className="motopremium">
-                                                                                {phrases['GST']}:
-                                                                                </div>
-                                                                            </Col>
-                                                                            <Col sm={12} md={6}>
-                                                                                <div className="premamount">
-                                                                                    ₹ {Math.round(fulQuoteResp.TGST)}
-                                                                                </div>
-                                                                            </Col>
+                                                                            <p></p>
                                                                         </Row>
                                                                     </div>
+                                                                </div>
 
-                                                                </Collapsible>
-                                                            </div>
+                                                            </Collapsible>
+                                                        </div>
 
-                                                            <div className="rghtsideTrigr m-b-30">
-                                                                <Collapsible trigger={phrases['VehicleDetails']} >
-                                                                    <div className="listrghtsideTrigr">
-                                                                        {memberdetails ?
+                                                        <div className="rghtsideTrigr m-b-30">
+                                                            <Collapsible trigger={phrases['MemberDetails']} >
+                                                                <div className="listrghtsideTrigr">
+                                                                    {memberdetails ?
 
-                                                                                <div>
+                                                                            <div>
+                                                                                <strong>{phrases['OwnerDetails']}:</strong>
+                                                                                <br/>
+                                                                                <Row>
+                                                                                    <Col sm={12} md={12}>
+                                                                                        <Row>
+                                                                                            <Col sm={12} md={6}>
+                                                                                            {motorInsurance.policy_for == '1' ?  <FormGroup>{phrases['Name']}:</FormGroup> : <FormGroup>{phrases['CompanyName']}:</FormGroup> }
+                                                                                            </Col>
+                                                                                            <Col sm={12} md={6}>
+                                                                                                <FormGroup>{memberdetails.first_name }</FormGroup>
+                                                                                            </Col>
+                                                                                        </Row>
+                                                                                        {motorInsurance.policy_for == '1' ?     
+                                                                                            <Row>
+                                                                                                <Col sm={12} md={6}>
+                                                                                                    <FormGroup>{phrases['DateOfBirth']}:</FormGroup>
+                                                                                                </Col>
+                                                                                                <Col sm={12} md={6}>
+                                                                                                    <FormGroup>{memberdetails.dob}</FormGroup>
+                                                                                                </Col>
+                                                                                            </Row> : 
+                                                                                                <Row>	
+                                                                                                <Col sm={12} md={6}>	
+                                                                                                    <FormGroup>{phrases['IncorporationDate']}:</FormGroup>	
+                                                                                                </Col>	
+                                                                                                <Col sm={12} md={6}>	
+                                                                                                    <FormGroup>{ memberdetails ? moment(memberdetails.date_of_incorporation).format("DD-MM-YYYY") : null}</FormGroup>	
+                                                                                                </Col>	
+                                                                                            </Row>}
+                                                                                        <Row>
+                                                                                            <Col sm={12} md={6}>
+                                                                                                <FormGroup>{phrases['MobileNo']}:</FormGroup>
+                                                                                            </Col>
+                                                                                            <Col sm={12} md={6}>
+                                                                                                <FormGroup>{memberdetails.mobile}</FormGroup>
+                                                                                            </Col>
+                                                                                        </Row>
+                                                                                        <Row>
+                                                                                            <Col sm={12} md={6}>
+                                                                                                <FormGroup>{phrases['EmailId']}:</FormGroup>
+                                                                                            </Col>
+                                                                                            <Col sm={12} md={6}>
+                                                                                                <FormGroup>{memberdetails.email_id}</FormGroup>
+                                                                                            </Col>
+                                                                                        </Row>
+                                                                                        {motorInsurance.policy_for == '1' ?
+                                                                                            <Row>
+                                                                                                <Col sm={12} md={6}>
+                                                                                                    <FormGroup>{phrases['Gender']}</FormGroup>
+                                                                                                </Col>
+                                                                                                <Col sm={12} md={6}>
+                                                                                                    <FormGroup>{memberdetails.gender == "m" ? "Male" : "Female"}</FormGroup>
+                                                                                                </Col>
+                                                                                            </Row> :
+                                                                                            <Row>
+                                                                                                <Col sm={12} md={6}>
+                                                                                                    <FormGroup>{phrases['GSTIN']}:</FormGroup>
+                                                                                                </Col>
+                                                                                                <Col sm={12} md={6}>
+                                                                                                    <FormGroup>{memberdetails.gstn_no}</FormGroup>
+                                                                                                </Col>
+                                                                                            </Row> }
+
+                                                                                    </Col>
+                                                                                </Row>
+                                                                                <Row>
+                                                                                    <p></p>
+                                                                                </Row>
+                                                                            </div>
+                                                                        : (<p></p>)}
+                                                                        {motorInsurance.policy_for == '1' && motorInsurance.pa_flag == '1' ?          
+                                                                        <div>
+                                                                        <strong>{phrases['NomineeDetails']} :</strong>
+                                                                            <br/>
+                                                                            <Row>
+                                                                                <Col sm={12} md={12}>
                                                                                     <Row>
-                                                                                        <Col sm={12} md={12}>
-                                                                                            <Row>
-                                                                                                <Col sm={12} md={6}>
-                                                                                                    <FormGroup>{phrases['RegNo']}:</FormGroup>
-                                                                                                </Col>
-                                                                                                <Col sm={12} md={6}>
-                                                                                                    <FormGroup>{motorInsurance && motorInsurance.registration_no}</FormGroup>
-                                                                                                </Col>
-                                                                                            </Row>
-
-                                                                                            <Row>
-                                                                                                <Col sm={12} md={6}>
-                                                                                                    <FormGroup>{phrases['TwoWheelBrand']}:</FormGroup>
-                                                                                                </Col>
-                                                                                                <Col sm={12} md={6}>
-                                                                                                    <FormGroup>{vehicleDetails && vehicleDetails.vehiclebrand && vehicleDetails.vehiclebrand.name ? vehicleDetails.vehiclebrand.name : ""}</FormGroup>
-                                                                                                </Col>
-                                                                                            </Row>
-                                                                                            <Row>
-                                                                                                <Col sm={12} md={6}>
-                                                                                                    <FormGroup>{phrases['TwoWheelModel']}</FormGroup>
-                                                                                                </Col>
-                                                                                                <Col sm={12} md={6}>
-                                                                                                    <FormGroup>{vehicleDetails && vehicleDetails.vehiclemodel && vehicleDetails.vehiclemodel.description ? vehicleDetails.vehiclemodel.description+" "+vehicleDetails.varientmodel.varient : ""}</FormGroup>
-                                                                                                </Col>
-                                                                                            </Row>
-                                                                                            <Row>
-                                                                                                <Col sm={12} md={6}>
-                                                                                                    <FormGroup>{phrases['Variant']}</FormGroup>
-                                                                                                </Col>
-                                                                                                <Col sm={12} md={6}>
-                                                                                                    <FormGroup>{vehicleDetails && vehicleDetails.varientmodel && vehicleDetails.varientmodel.varient ? vehicleDetails.varientmodel.varient : ""}</FormGroup>
-                                                                                                </Col>
-                                                                                            </Row>
-                                                                                            <Row>
-                                                                                                <Col sm={12} md={6}>
-                                                                                                    <FormGroup>{phrases['ChasisNumber']}</FormGroup>
-                                                                                                </Col>
-                                                                                                <Col sm={12} md={6}>
-                                                                                                    <FormGroup>{motorInsurance && motorInsurance.chasis_no  ? motorInsurance.chasis_no : ""}</FormGroup>
-                                                                                                </Col>
-                                                                                            </Row>
-                                                                                            <Row>
-                                                                                                <Col sm={12} md={6}>
-                                                                                                    <FormGroup>{phrases['EngineNumber']}</FormGroup>
-                                                                                                </Col>
-                                                                                                <Col sm={12} md={6}>
-                                                                                                <FormGroup>{motorInsurance && motorInsurance.engine_no  ? motorInsurance.engine_no : ""}</FormGroup>
-                                                                                                </Col>
-                                                                                            </Row>
-                                                                                            <Row>
-                                                                                                <Col sm={12} md={6}>
-                                                                                                    <FormGroup>{phrases['Fuel']}</FormGroup>
-                                                                                                </Col>
-                                                                                                <Col sm={12} md={6}>
-                                                                                                    <FormGroup>{vehicleDetails && vehicleDetails.varientmodel && vehicleDetails.varientmodel.fuel_type ? fuel[parseInt(vehicleDetails.varientmodel.fuel_type)] : null}</FormGroup>
-                                                                                                </Col>
-                                                                                            </Row>
-
-                                                                                            <Row>
-                                                                                                <Col sm={12} md={6}>
-                                                                                                    <FormGroup>{phrases['Seating']}</FormGroup>
-                                                                                                </Col>
-                                                                                                <Col sm={12} md={6}>
-                                                                                                    <FormGroup>{vehicleDetails && vehicleDetails.varientmodel && vehicleDetails.varientmodel.seating ? vehicleDetails.varientmodel.seating : null}</FormGroup>
-                                                                                                </Col>
-                                                                                            </Row>
-
-                                                                                            <Row>
-                                                                                                <Col sm={12} md={6}>
-                                                                                                    <FormGroup>{phrases['IDVofVehicle']}</FormGroup>
-                                                                                                </Col>
-                                                                                                <Col sm={12} md={6}>
-                                                                                                    <FormGroup>{motorInsurance && motorInsurance.idv_value ? motorInsurance.idv_value : null}</FormGroup>
-                                                                                                </Col>
-                                                                                            </Row>
-
+                                                                                        <Col sm={12} md={6}>
+                                                                                            <FormGroup>{phrases['Name']}:</FormGroup>
+                                                                                        </Col>
+                                                                                        <Col sm={12} md={6}>
+                                                                                            <FormGroup>{nomineedetails ? nomineedetails.first_name : null}</FormGroup>
                                                                                         </Col>
                                                                                     </Row>
+
                                                                                     <Row>
-                                                                                        <p></p>
+                                                                                        <Col sm={12} md={6}>
+                                                                                            <FormGroup>{phrases['DateOfBirth']}:</FormGroup>
+                                                                                        </Col>
+                                                                                        <Col sm={12} md={6}>
+                                                                                            <FormGroup>{nomineedetails ? nomineedetails.dob : null}</FormGroup>
+                                                                                        </Col>
                                                                                     </Row>
-                                                                                </div>
-                                                                            : (<p></p>)}
-                                                                                   
-                                                                        <div>
+
+                                                                                    <Row>
+                                                                                        <Col sm={12} md={6}>
+                                                                                            <FormGroup>{phrases['ProposerRelation']}:</FormGroup>
+                                                                                        </Col>
+                                                                                        <Col sm={12} md={6}>
+                                                                                        {nomineedetails && relation.map((relations, qIndex) => 
+                                                                                        relations.id == nomineedetails.relation_with ?
+                                                                                            <FormGroup>{relations.name}</FormGroup> : null
+                                                                                        )}
+                                                                                        </Col>
+                                                                                    </Row>
+
+                                                                                    <Row>
+                                                                                        <Col sm={12} md={6}>
+                                                                                            <FormGroup>{phrases['Gender']}</FormGroup>
+                                                                                        </Col>
+                                                                                        <Col sm={12} md={6}>
+                                                                                            <FormGroup>{nomineedetails && nomineedetails.gender == "m" ? "Male" : "Female"}</FormGroup>
+                                                                                        </Col>
+                                                                                    </Row>
+                                                                                </Col>
+                                                                            </Row>
                                                                             <Row>
                                                                                 <p></p>
                                                                             </Row>
-                                                                        </div>
-                                                                    </div>
+                                                                        </div> : null }
 
-                                                                </Collapsible>
-                                                            </div>
-
-                                                            <div className="rghtsideTrigr m-b-30">
-                                                                <Collapsible trigger={phrases['MemberDetails']} >
-                                                                    <div className="listrghtsideTrigr">
-                                                                        {memberdetails ?
-
-                                                                                <div>
-                                                                                    <strong>{phrases['OwnerDetails']}:</strong>
-                                                                                    <br/>
+                                                                        {motorInsurance.policy_for == '1' && nomineedetails && nomineedetails.is_appointee == '1' && motorInsurance.pa_flag == '1' ?      
+                                                                        <div>
+                                                                        <strong>{phrases['AppoDetails']} :</strong>
+                                                                            <br/>
+                                                                            <Row>
+                                                                                <Col sm={12} md={12}>
                                                                                     <Row>
-                                                                                        <Col sm={12} md={12}>
-                                                                                            <Row>
-                                                                                                <Col sm={12} md={6}>
-                                                                                                {motorInsurance.policy_for == '1' ?  <FormGroup>{phrases['Name']}:</FormGroup> : <FormGroup>{phrases['CompanyName']}:</FormGroup> }
-                                                                                                </Col>
-                                                                                                <Col sm={12} md={6}>
-                                                                                                    <FormGroup>{memberdetails.first_name }</FormGroup>
-                                                                                                </Col>
-                                                                                            </Row>
-                                                                                            {motorInsurance.policy_for == '1' ?     
-                                                                                                <Row>
-                                                                                                    <Col sm={12} md={6}>
-                                                                                                        <FormGroup>{phrases['DateOfBirth']}:</FormGroup>
-                                                                                                    </Col>
-                                                                                                    <Col sm={12} md={6}>
-                                                                                                        <FormGroup>{memberdetails.dob}</FormGroup>
-                                                                                                    </Col>
-                                                                                                </Row> : 
-                                                                                                 <Row>	
-                                                                                                    <Col sm={12} md={6}>	
-                                                                                                        <FormGroup>{phrases['IncorporationDate']}:</FormGroup>	
-                                                                                                    </Col>	
-                                                                                                    <Col sm={12} md={6}>	
-                                                                                                        <FormGroup>{ memberdetails ? moment(memberdetails.date_of_incorporation).format("DD-MM-YYYY") : null}</FormGroup>	
-                                                                                                    </Col>	
-                                                                                                </Row>}
-                                                                                            <Row>
-                                                                                                <Col sm={12} md={6}>
-                                                                                                    <FormGroup>{phrases['MobileNo']}:</FormGroup>
-                                                                                                </Col>
-                                                                                                <Col sm={12} md={6}>
-                                                                                                    <FormGroup>{memberdetails.mobile}</FormGroup>
-                                                                                                </Col>
-                                                                                            </Row>
-                                                                                            <Row>
-                                                                                                <Col sm={12} md={6}>
-                                                                                                    <FormGroup>{phrases['EmailId']}:</FormGroup>
-                                                                                                </Col>
-                                                                                                <Col sm={12} md={6}>
-                                                                                                    <FormGroup>{memberdetails.email_id}</FormGroup>
-                                                                                                </Col>
-                                                                                            </Row>
-                                                                                            {motorInsurance.policy_for == '1' ?
-                                                                                                <Row>
-                                                                                                    <Col sm={12} md={6}>
-                                                                                                        <FormGroup>{phrases['Gender']}</FormGroup>
-                                                                                                    </Col>
-                                                                                                    <Col sm={12} md={6}>
-                                                                                                        <FormGroup>{memberdetails.gender == "m" ? "Male" : "Female"}</FormGroup>
-                                                                                                    </Col>
-                                                                                                </Row> :
-                                                                                                <Row>
-                                                                                                    <Col sm={12} md={6}>
-                                                                                                        <FormGroup>{phrases['GSTIN']}:</FormGroup>
-                                                                                                    </Col>
-                                                                                                    <Col sm={12} md={6}>
-                                                                                                        <FormGroup>{memberdetails.gstn_no}</FormGroup>
-                                                                                                    </Col>
-                                                                                                </Row> }
-
+                                                                                        <Col sm={12} md={6}>
+                                                                                            <FormGroup>{phrases['Name']}:</FormGroup>
+                                                                                        </Col>
+                                                                                        <Col sm={12} md={6}>
+                                                                                            <FormGroup>{nomineedetails && nomineedetails.appointee_name ? nomineedetails.appointee_name : null}</FormGroup>
                                                                                         </Col>
                                                                                     </Row>
+
                                                                                     <Row>
-                                                                                        <p></p>
+                                                                                        <Col sm={12} md={6}>
+                                                                                            <FormGroup>{phrases['RelationNominee']}:</FormGroup>
+                                                                                        </Col>
+                                                                                        <Col sm={12} md={6}>
+                                                                                        {nomineedetails && nomineedetails.appointee_relation_with && relation.map((relations, qIndex) => 
+                                                                                        relations.id == nomineedetails.appointee_relation_with ?
+                                                                                            <FormGroup>{relations.name}</FormGroup> : null
+                                                                                        )}
+                                                                                        </Col>
                                                                                     </Row>
-                                                                                </div>
-                                                                            : (<p></p>)}
-                                                                         {motorInsurance.policy_for == '1' && motorInsurance.pa_flag == '1' ?          
-                                                                            <div>
-                                                                            <strong>{phrases['NomineeDetails']} :</strong>
-                                                                                <br/>
-                                                                                <Row>
-                                                                                    <Col sm={12} md={12}>
-                                                                                        <Row>
-                                                                                            <Col sm={12} md={6}>
-                                                                                                <FormGroup>{phrases['Name']}:</FormGroup>
-                                                                                            </Col>
-                                                                                            <Col sm={12} md={6}>
-                                                                                                <FormGroup>{nomineedetails ? nomineedetails.first_name : null}</FormGroup>
-                                                                                            </Col>
-                                                                                        </Row>
-
-                                                                                        <Row>
-                                                                                            <Col sm={12} md={6}>
-                                                                                                <FormGroup>{phrases['DateOfBirth']}:</FormGroup>
-                                                                                            </Col>
-                                                                                            <Col sm={12} md={6}>
-                                                                                                <FormGroup>{nomineedetails ? nomineedetails.dob : null}</FormGroup>
-                                                                                            </Col>
-                                                                                        </Row>
-
-                                                                                        <Row>
-                                                                                            <Col sm={12} md={6}>
-                                                                                                <FormGroup>{phrases['ProposerRelation']}:</FormGroup>
-                                                                                            </Col>
-                                                                                            <Col sm={12} md={6}>
-                                                                                            {nomineedetails && relation.map((relations, qIndex) => 
-                                                                                            relations.id == nomineedetails.relation_with ?
-                                                                                                <FormGroup>{relations.name}</FormGroup> : null
-                                                                                            )}
-                                                                                            </Col>
-                                                                                        </Row>
-
-                                                                                        <Row>
-                                                                                            <Col sm={12} md={6}>
-                                                                                                <FormGroup>{phrases['Gender']}</FormGroup>
-                                                                                            </Col>
-                                                                                            <Col sm={12} md={6}>
-                                                                                                <FormGroup>{nomineedetails && nomineedetails.gender == "m" ? "Male" : "Female"}</FormGroup>
-                                                                                            </Col>
-                                                                                        </Row>
-                                                                                    </Col>
-                                                                                </Row>
-                                                                                <Row>
-                                                                                    <p></p>
-                                                                                </Row>
-                                                                            </div> : null }
-
-                                                                            {motorInsurance.policy_for == '1' && nomineedetails && nomineedetails.is_appointee == '1' && motorInsurance.pa_flag == '1' ?      
-                                                                            <div>
-                                                                            <strong>{phrases['AppoDetails']} :</strong>
-                                                                                <br/>
-                                                                                <Row>
-                                                                                    <Col sm={12} md={12}>
-                                                                                        <Row>
-                                                                                            <Col sm={12} md={6}>
-                                                                                                <FormGroup>{phrases['Name']}:</FormGroup>
-                                                                                            </Col>
-                                                                                            <Col sm={12} md={6}>
-                                                                                                <FormGroup>{nomineedetails && nomineedetails.appointee_name ? nomineedetails.appointee_name : null}</FormGroup>
-                                                                                            </Col>
-                                                                                        </Row>
-
-                                                                                        <Row>
-                                                                                            <Col sm={12} md={6}>
-                                                                                                <FormGroup>{phrases['RelationNominee']}:</FormGroup>
-                                                                                            </Col>
-                                                                                            <Col sm={12} md={6}>
-                                                                                            {nomineedetails && nomineedetails.appointee_relation_with && relation.map((relations, qIndex) => 
-                                                                                            relations.id == nomineedetails.appointee_relation_with ?
-                                                                                                <FormGroup>{relations.name}</FormGroup> : null
-                                                                                            )}
-                                                                                            </Col>
-                                                                                        </Row>
-                                                                                    </Col>
-                                                                                </Row>
-                                                                                <Row>
-                                                                                    <p></p>
-                                                                                </Row>
-                                                                            </div> : null }
-                                                                    </div>
-
-                                                                </Collapsible>
-                                                            </div>
-                                                         
-                                                            <Row>
-                                                            <Col sm={12} md={6}>
-                                                            </Col>
-                                                                <Col sm={12} md={6}>
-                                                                    <FormGroup>
-                                                                     <div className="paymntgatway">
-                                                                     {phrases['SelectPayGateway']}
-                                                                        <div>
-                                                                        {/* <img src={require('../../assets/images/green-check.svg')} alt="" className="m-r-10" /> */}
-                                                                        <label className="customRadio3">
-                                                                        <Field
-                                                                            type="radio"
-                                                                            name='gateway'                                            
-                                                                            value='1'
-                                                                            key='1'  
-                                                                            onChange={(e) => {
-                                                                                setFieldValue(`gateway`, e.target.value);
-                                                                            }}
-                                                                            checked={values.gateway == '1' ? true : false}
-                                                                        />
-                                                                            <span className="checkmark " /><span className="fs-14"> 
-                                                                        
-                                                                                { policyHolder && policyHolder.bcmaster && policyHolder.bcmaster.paymentgateway && policyHolder.bcmaster.paymentgateway.logo ? <img src={require('../../assets/images/'+ policyHolder.bcmaster.paymentgateway.logo)} alt="" /> :
-                                                                                null
-                                                                                }
-                                                                            </span>
-                                                                        </label>
-                                                                        </div>
-
-                                                                        {policyHolder.bcmaster && policyHolder.bcmaster.id === 2 ?
-                                                                        <div>
-                                                                        <label className="customRadio3">
-                                                                        <Field
-                                                                            type="radio"
-                                                                            name='gateway'                                            
-                                                                            value='2'
-                                                                            key='1'  
-                                                                            onChange={(e) => {
-                                                                                setFieldValue(`gateway`, e.target.value);
-                                                                            }}
-                                                                            checked={values.gateway == '2' ? true : false}
-                                                                        />
-                                                                            <span className="checkmark " /><span className="fs-14"> 
-                                                                        
-                                                                                { policyHolder.bcmaster && policyHolder.bcmaster.id === 2 ? <img src={require('../../assets/images/vedavaag.png')} alt="" /> :
-                                                                                null
-                                                                                }
-                                                                            </span>
-                                                                        </label>
+                                                                                </Col>
+                                                                            </Row>
+                                                                            <Row>
+                                                                                <p></p>
+                                                                            </Row>
                                                                         </div> : null }
+                                                                </div>
+
+                                                            </Collapsible>
+                                                        </div>
+                                                        
+                                                        <Row>
+                                                        <Col sm={12} md={6}>
+                                                        </Col>
+                                                            <Col sm={12} md={6}>
+                                                                <FormGroup>
+                                                                    <div className="paymntgatway">
+                                                                    {phrases['SelectPayGateway']}
+                                                                    <div>
+                                                                    {/* <img src={require('../../assets/images/green-check.svg')} alt="" className="m-r-10" /> */}
+                                                                    <label className="customRadio3">
+                                                                    <Field
+                                                                        type="radio"
+                                                                        name='gateway'                                            
+                                                                        value='1'
+                                                                        key='1'  
+                                                                        onChange={(e) => {
+                                                                            setFieldValue(`gateway`, e.target.value);
+                                                                        }}
+                                                                        checked={values.gateway == '1' ? true : false}
+                                                                    />
+                                                                        <span className="checkmark " /><span className="fs-14"> 
+                                                                    
+                                                                            { policyHolder && policyHolder.bcmaster && policyHolder.bcmaster.paymentgateway && policyHolder.bcmaster.paymentgateway.logo ? <img src={require('../../assets/images/'+ policyHolder.bcmaster.paymentgateway.logo)} alt="" /> :
+                                                                            null
+                                                                            }
+                                                                        </span>
+                                                                    </label>
                                                                     </div>
-                                                                    </FormGroup>
-                                                                </Col>
-                                                            </Row>
 
-                                                            <div className="d-flex justify-content-left resmb">
-                                                                <Button className="backBtn" type="button" onClick={this.additionalDetails.bind(this, productId)}>{phrases['Back']}</Button>
-                                                                
-                                                                {bcMaster && bcMaster.eligible_for_payment_link == 1 ?
-                                                                <div>
-                                                                <Button type="button" className="proceedBtn" onClick = {this.sendPaymentLink.bind(this)}>  {phrases['PaymentLink']}  </Button>
-                                                                &nbsp;&nbsp;&nbsp;&nbsp;
-                                                                </div> : null }
+                                                                    {policyHolder.bcmaster && policyHolder.bcmaster.id === 2 ?
+                                                                    <div>
+                                                                    <label className="customRadio3">
+                                                                    <Field
+                                                                        type="radio"
+                                                                        name='gateway'                                            
+                                                                        value='2'
+                                                                        key='1'  
+                                                                        onChange={(e) => {
+                                                                            setFieldValue(`gateway`, e.target.value);
+                                                                        }}
+                                                                        checked={values.gateway == '2' ? true : false}
+                                                                    />
+                                                                        <span className="checkmark " /><span className="fs-14"> 
+                                                                    
+                                                                            { policyHolder.bcmaster && policyHolder.bcmaster.id === 2 ? <img src={require('../../assets/images/vedavaag.png')} alt="" /> :
+                                                                            null
+                                                                            }
+                                                                        </span>
+                                                                    </label>
+                                                                    </div> : null }
 
-                                                                {fulQuoteResp.QuotationNo && values.gateway != "" ?
-                                                                    <Button type="submit"
-                                                                        className="proceedBtn"
-                                                                    >
-                                                                        {phrases['MakePayment']}
-                                                                </Button> 
-                                                            : null}
-                                                            </div>
-                                                        </Col>
+                                                                    {policyHolder.bcmaster && policyHolder.bcmaster.id === 6 ?	
+                                                                    <div>	
+                                                                    <label className="customRadio3">	
+                                                                    <Field	
+                                                                        type="radio"	
+                                                                        name='gateway'                                            	
+                                                                        value='3'	
+                                                                        key='1'  	
+                                                                        onChange={(e) => {	
+                                                                            setFieldValue(`gateway`, e.target.value);	
+                                                                        }}	
+                                                                        checked={values.gateway == '3' ? true : false}	
+                                                                    />	
+                                                                        <span className="checkmark " /><span className="fs-14"> 	
+                                                                        
+                                                                            { policyHolder.bcmaster && policyHolder.bcmaster.id === 6 ? <img src={require('../../assets/images/sahipay.png')} alt="" /> :	
+                                                                            null	
+                                                                            }	
+                                                                        </span>	
+                                                                    </label>	
+                                                                    </div> : null }	
+                                                                    
+                                                                </div>
+                                                                </FormGroup>
+                                                            </Col>
+                                                        </Row>
+
+                                                        <div className="d-flex justify-content-left resmb">
+                                                            <Button className="backBtn" type="button" onClick={this.additionalDetails.bind(this, productId)}>{phrases['Back']}</Button>
+                                                            
+                                                            {bcMaster && bcMaster.eligible_for_payment_link == 1 ?
+                                                            <div>
+                                                            <Button type="button" className="proceedBtn" onClick = {this.sendPaymentLink.bind(this)}>  {phrases['PaymentLink']}  </Button>
+                                                            &nbsp;&nbsp;&nbsp;&nbsp;
+                                                            </div> : null }
+
+                                                            {fulQuoteResp.QuotationNo && values.gateway != "" ?
+                                                                <Button type="submit"
+                                                                    className="proceedBtn"
+                                                                >
+                                                                    {phrases['MakePayment']}
+                                                            </Button> 
+                                                        : null}
+                                                        </div>
+                                                    </Col>
 
 
-                                                        <Col sm={12} md={3} lg={3}>
-                                                            <div className="motrcar"><img src={require('../../assets/images/two-wheeler-addl.svg')} alt="" /></div>
-                                                        </Col>
-                                                    </Row>
-                                                </section>
-                                            </Form>
-                                        );
-                                    }}
-                                </Formik>
-                                {/* <Modal className="" bsSize="md"
-                                    show={show}
-                                    onHide={this.handleClose}>
-                                    <div className="otpmodal">
-                                        <Modal.Body>
-                                            <Otp
-                                                quoteNo={fulQuoteResp.QuotationNo}
-                                                duePremium={fulQuoteResp.DuePremium}
-                                                refNumber={refNumber}
-                                                whatsapp={whatsapp}
-                                                reloadPage={(e) => this.payment(e)}
-                                            />
-                                        </Modal.Body>
-                                    </div>
-                                </Modal> */}
+                                                    <Col sm={12} md={3} lg={3}>
+                                                        <div className="motrcar"><img src={require('../../assets/images/two-wheeler-addl.svg')} alt="" /></div>
+                                                    </Col>
+                                                </Row>
+                                            </section>
+                                        </Form>
+                                    );
+                                }}
+                            </Formik>
+                            {/* <Modal className="" bsSize="md"
+                                show={show}
+                                onHide={this.handleClose}>
+                                <div className="otpmodal">
+                                    <Modal.Body>
+                                        <Otp
+                                            quoteNo={fulQuoteResp.QuotationNo}
+                                            duePremium={fulQuoteResp.DuePremium}
+                                            refNumber={refNumber}
+                                            whatsapp={whatsapp}
+                                            reloadPage={(e) => this.payment(e)}
+                                        />
+                                    </Modal.Body>
+                                </div>
+                            </Modal> */}
 
-                            </div> : step_completed == "" ? "Forbidden" : null }
-                            <Footer />
-                        </div>
+                        </div> : step_completed == "" ? "Forbidden" : null }
+                        <Footer />
                     </div>
-					 </div>
+                </div>
                 </BaseComponent>
             </>
         );
