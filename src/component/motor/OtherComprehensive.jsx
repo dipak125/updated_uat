@@ -1124,7 +1124,7 @@ class OtherComprehensive extends Component {
                         <Row>
                             <Col sm={12} md={9} lg={9}>
                                 <div className="rghtsideTrigr W-90 m-b-30">
-                                    <Collapsible trigger={phrases['DefaultCovered']} >
+                                    <Collapsible trigger={phrases['DefaultCovered']} open= {true}>
                                         <div className="listrghtsideTrigr">
                                             {policyCoverageList}
                                         </div>

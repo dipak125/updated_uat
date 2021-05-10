@@ -102,98 +102,92 @@ class Reset_Password extends Component {
 
         return (
             <BaseComponent>
-                <div className="page-wrapper">  
-                    <div className="container-fluid">
-                        <div className="row">
-                            <div className="d-flex justify-content-center brand lginpg">
-                                <div className="login-box-body">
-                                    <Formik
-                                        initialValues={initialValues}
-                                        validationSchema={loginvalidation}
-                                        onSubmit={this.handleSubmit}
-                                    >
-                                        {({ values, errors, isValid, touched, isSubmitting,setFieldValue, setFieldTouched, }) => {
-                                            return (
-                                                <Form>
-                                                    <h3 className="login-box-msg">Reset Password</h3>
-                                                    <br />
-                                                    {this.state.errMsg ? (
-                                                        <Row className="show-grid">
-                                                            <Col md={12}>
-                                                                <div className="errorMsg loginError">{this.state.errMsg}</div>
-                                                            </Col>
-                                                        </Row>
-                                                    ) : null}
+                <div className="d-flex justify-content-center brand lginpg reset-paswd">  
+                    <div className="login-box-body">
+                        <Formik
+                            initialValues={initialValues}
+                            validationSchema={loginvalidation}
+                            onSubmit={this.handleSubmit}
+                        >
+                            {({ values, errors, isValid, touched, isSubmitting,setFieldValue, setFieldTouched, }) => {
+                                return (
+                                    <Form>
+                                        <h3 className="login-box-msg">Reset Password</h3>
+                                        <br />
+                                        {this.state.errMsg ? (
+                                            <Row className="show-grid">
+                                                <Col md={12}>
+                                                    <div className="errorMsg loginError">{this.state.errMsg}</div>
+                                                </Col>
+                                            </Row>
+                                        ) : null}
 
-                                                    <div className="row formSection">
-                                                        <label className="col-md-4">Password :</label>
-                                                        <div className="col-md-4">
+                                        <div className="row formSection">
+                                            <label className="col-md-4">Password :</label>
+                                            <div className="col-md-4">
 
-                                                            <Field
-                                                                name="password"
-                                                                type="text"
-                                                                placeholder=""
-                                                                autoComplete="off"
-                                                                onFocus={e => this.changePlaceHoldClassAdd(e)}
-                                                                onBlur={e => this.changePlaceHoldClassRemove(e)}
-                                                                value={values.password}
+                                                <Field
+                                                    name="password"
+                                                    type="text"
+                                                    placeholder=""
+                                                    autoComplete="off"
+                                                    onFocus={e => this.changePlaceHoldClassAdd(e)}
+                                                    onBlur={e => this.changePlaceHoldClassRemove(e)}
+                                                    value={values.password}
 
-                                                            />
-                                                            {errors.password && touched.password ? (
-                                                                <span className="errorMsg">{errors.password}</span>
-                                                            ) : null}
-                                                        </div>
-                                                    </div>
-                                                    <div className="row formSection">
-                                                        <label className="col-md-4">Confirm Password :</label>
-                                                        <div className="col-md-4">
+                                                />
+                                                {errors.password && touched.password ? (
+                                                    <span className="errorMsg">{errors.password}</span>
+                                                ) : null}
+                                            </div>
+                                        </div>
+                                        <div className="row formSection">
+                                            <label className="col-md-4">Confirm Password :</label>
+                                            <div className="col-md-4">
 
-                                                            <Field
-                                                                name="confirmPassword"
-                                                                type="text"
-                                                                placeholder=""
-                                                                autoComplete="off"
-                                                                onFocus={e => this.changePlaceHoldClassAdd(e)}
-                                                                onBlur={e => this.changePlaceHoldClassRemove(e)}
-                                                                value={values.confirmPassword}
+                                                <Field
+                                                    name="confirmPassword"
+                                                    type="text"
+                                                    placeholder=""
+                                                    autoComplete="off"
+                                                    onFocus={e => this.changePlaceHoldClassAdd(e)}
+                                                    onBlur={e => this.changePlaceHoldClassRemove(e)}
+                                                    value={values.confirmPassword}
 
-                                                            />
-                                                            {errors.confirmPassword && touched.confirmPassword ? (
-                                                                <span className="errorMsg">{errors.confirmPassword}</span>
-                                                            ) : null}
-                                                        </div>
-                                                    </div>
-                                                    <div className="row formSection">
-                                                        <label className="col-md-4">OTP :</label>
-                                                        <div className="col-md-4">
+                                                />
+                                                {errors.confirmPassword && touched.confirmPassword ? (
+                                                    <span className="errorMsg">{errors.confirmPassword}</span>
+                                                ) : null}
+                                            </div>
+                                        </div>
+                                        <div className="row formSection">
+                                            <label className="col-md-4">OTP :</label>
+                                            <div className="col-md-4">
 
-                                                            <Field
-                                                                name="OTP"
-                                                                type="text"
-                                                                placeholder=""
-                                                                autoComplete="off"
-                                                                onFocus={e => this.changePlaceHoldClassAdd(e)}
-                                                                onBlur={e => this.changePlaceHoldClassRemove(e)}
-                                                                value={values.OTP}
+                                                <Field
+                                                    name="OTP"
+                                                    type="text"
+                                                    placeholder=""
+                                                    autoComplete="off"
+                                                    onFocus={e => this.changePlaceHoldClassAdd(e)}
+                                                    onBlur={e => this.changePlaceHoldClassRemove(e)}
+                                                    value={values.OTP}
 
-                                                            />
-                                                            {errors.OTP && touched.OTP ? (
-                                                                <span className="errorMsg">{errors.OTP}</span>
-                                                            ) : null}
-                                                        </div>
-                                                    </div>
-                                                    <div className="cntrbtn">
-                                                        <Button className={`btnPrimary`} type="submit" >
-                                                            Submit
-                                                        </Button>
-                                                    </div>
-                                                </Form>
-                                            );
-                                        }}
-                                    </Formik> 
-                                </div>
-                            </div>
-                        </div>
+                                                />
+                                                {errors.OTP && touched.OTP ? (
+                                                    <span className="errorMsg">{errors.OTP}</span>
+                                                ) : null}
+                                            </div>
+                                        </div>
+                                        <div className="cntrbtn">
+                                            <Button className={`btnPrimary`} type="submit" >
+                                                Submit
+                                            </Button>
+                                        </div>
+                                    </Form>
+                                );
+                            }}
+                        </Formik> 
                     </div>
                 </div>
             </BaseComponent>

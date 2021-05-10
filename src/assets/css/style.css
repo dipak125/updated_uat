@@ -926,6 +926,10 @@ li.logoutbtn {
     padding: 7px 10px !important;
 }
 
+.reset-paswd{ display:block !important;}
+
+
+
 @media (min-width: 768px){
 	
 	.mini-sidebar .left-sidebar span.valuetxt {
@@ -1069,6 +1073,11 @@ li.logoutbtn {
     margin: 15px auto;
 	line-height: 27px;
 }
+
+.reset-paswd label.col-md-4 {
+    margin-bottom: 0;
+    margin-top: 15px;
+}
 }
 
 @media (max-width: 680px) {
@@ -1081,6 +1090,10 @@ li.logoutbtn {
 @media (max-width: 575.98px) { 
    .tablecontent {overflow: scroll;}
       .formSection label{ margin-bottom:15px; margin-top:15px;}
+	  
+	  .dashboardBrand .card .scrollable.card-body {
+    overflow-x: auto;
+}
 }
 
 /* Absolute Center Spinner for Loader */
@@ -1344,6 +1357,12 @@ img.avatar {  border-radius: inherit;}
     height: auto;
 }
 
+.otherComprehens .col-lg-5 label.customCheckBox.formGrp.formGrp {
+    height: auto;
+}
+.customModal {
+    padding-left: 0 !important;
+}
 
 
 @media (min-width: 992px){
@@ -1351,6 +1370,10 @@ img.avatar {  border-radius: inherit;}
       flex: 0 0 49%;
       max-width: 49%;
   }
+  .twoOCdetail .regisBox, .fwhTp .regisBox, .otherCom .regisBox, .othercomOd .regisBox,.twoComprehens .regisBox,
+  .twocomp2 .regisBox, .ocGcv .regisBox, .otherGcvt .regisBox, .otherComprehens .regisBox{
+    margin-right: 10px;
+}
 }
 
 @media (min-width: 1300px){
@@ -1494,7 +1517,10 @@ ul.navPan { height:100%;}
 @media (max-width: 576px){
 
   /*.infobox { padding-left: 97px !important;}*/
-
+  .customModal table.table.table-bordered th:last-child,
+.customModal table.table.table-bordered td:last-child{
+	display:flex;
+}
 }
 
 @media (max-width: 480px){
