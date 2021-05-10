@@ -1520,6 +1520,9 @@ ul.navPan { height:100%;}
   .customModal table.table.table-bordered th:last-child,
 .customModal table.table.table-bordered td:last-child{
 	display:flex;
+	display: -ms-flexbox;
+	min-width: 100px;
+    justify-content: center;
 }
 }
 
