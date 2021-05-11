@@ -206,14 +206,9 @@ class renewal extends Component {
                                                             <div className="row formSection"> &nbsp; </div>
 
                                                             <div >
-                                                                <Button className={`backBtn`} type="button"  disabled={isSubmitting ? true : false} onClick= {this.back.bind(this)}>
-                                                                    {isSubmitting ? phrases['Wait'] : phrases['Back']}
-                                                                </Button> &nbsp;&nbsp;
                                                                 <Button className={`btnPrimary`} type="submit" >
-                                                                    {phrases['Go']}
+                                                                    {phrases.hasOwnProperty('Renew') ? phrases['Renew'] : null}
                                                                 </Button>
-
-
                                                             </div>
                                                         </Form>
                                                     );

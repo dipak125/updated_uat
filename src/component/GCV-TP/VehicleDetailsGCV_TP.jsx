@@ -58,7 +58,7 @@ const vehicleRegistrationValidation = Yup.object().shape({
     registration_date: Yup.string().required('RegistrationRequired')
     .test(
         "checkMaxDateRollover",
-        "Registration date must be one year old",
+        "RegistrationDateOld",
         function (value) {
             if (value && this.parent.policy_type_id == '2') {
                 return checkGreaterStartEndTimes(value, maxDateForValidtion);
@@ -68,7 +68,7 @@ const vehicleRegistrationValidation = Yup.object().shape({
     )
     .test(
         "checkMinDate_MaxDate_NewPolicy",
-        "Registration date cannot be older than one month",
+        "RegistrationDateOneMonth",
         function (value) {
             if (value && this.parent.policy_type_id == '1') {
                 // return checkGreaterStartEndTimes(value, new Date()) && checkGreaterStartEndTimes(minRegnDateNew, value);
@@ -79,7 +79,7 @@ const vehicleRegistrationValidation = Yup.object().shape({
     )
     .test(
         "checkGreaterTimes",
-        "Registration date must be less than Previous policy start date",
+        "RegistrationLessPrevious",
         function (value) {
             if (value) {
                 return checkGreaterStartEndTimes(value, this.parent.previous_start_date);
@@ -113,7 +113,9 @@ const vehicleRegistrationValidation = Yup.object().shape({
         }
     ).test(
         "checkGreaterTimes",
-        "Start date must be less than end date",
+        function() {
+            return "StartDateLessEnd"
+        },
         function (value) {
             if (value && this.parent.policy_type_id == '2'  && this.parent.valid_previous_policy == '1'  && this.parent.valid_previous_policy == '1') {
                 return checkGreaterStartEndTimes(value, this.parent.previous_end_date);
@@ -122,7 +124,9 @@ const vehicleRegistrationValidation = Yup.object().shape({
         }
     ).test(
       "checkStartDate",
-      "Enter Start Date",
+      function() {
+        return "PleaseESD"
+        },
       function (value) {       
           if ( this.parent.previous_end_date != undefined && value == undefined && this.parent.policy_type_id == '2'  && this.parent.valid_previous_policy == '1') {
               return false;
@@ -146,7 +150,9 @@ const vehicleRegistrationValidation = Yup.object().shape({
         }
     ).test( 
         "checkGreaterTimes",
-        "End date must be greater than start date",
+        function() {
+            return "EndDateGreaterStart"
+        },
         function (value) {
             if (value && this.parent.policy_type_id == '2'  && this.parent.valid_previous_policy == '1') {
                 return checkGreaterTimes(value, this.parent.previous_start_date);
@@ -155,7 +161,9 @@ const vehicleRegistrationValidation = Yup.object().shape({
         }
         ).test(
         "checkEndDate",
-        "Enter End Date",
+        function() {
+            return "PleaseEED"
+        },
         function (value) {     
             if ( this.parent.previous_start_date != undefined && value == undefined && this.parent.policy_type_id == '2'  && this.parent.valid_previous_policy == '1') {
                 return false;
@@ -667,18 +675,12 @@ class VehicleDetailsGCV extends Component {
                 <div className="row">
 				
 				
-                   <aside className="left-sidebar">
-		 				 <div className="scroll-sidebar ps-container ps-theme-default ps-active-y">
-						 <SideNav />
-						</div>
-						</aside>
-								
-					 {/*<div className="col-sm-12 col-md-12 col-lg-2 col-xl-2 pd-l-0">        
-						<SideNav />
-             		 </div>*/}
-					
-					
-					
+                    <aside className="left-sidebar">
+                        <div className="scroll-sidebar ps-container ps-theme-default ps-active-y">
+                        <SideNav />
+                    </div>
+                    </aside>
+		
                 <div className="col-sm-12 col-md-12 col-lg-12 col-xl-12 infobox vehiGcvd">
                 <h4 className="text-center mt-3 mb-3">{phrases['SBIGICL']}</h4>
                 <section className="brand m-b-25">
