@@ -69,11 +69,14 @@ class ErrorPage extends Component {
         return (
             <>
              <BaseComponent>
+             <div className="page-wrapper">
                 <div className="container-fluid">
                   <div className="row">
-                    <div className="col-sm-12 col-md-12 col-lg-2 col-xl-2 pd-l-0">
+                    <aside className="left-sidebar">
+                    <div className="scroll-sidebar ps-container ps-theme-default ps-active-y">
                       <SideNav />
                     </div>
+                    </aside>
                     <div className="col-sm-12 col-md-12 col-lg-10 col-xl-10">
                       <section className="thankuBox">
                         <div className="text-center custtxt">
@@ -88,6 +91,7 @@ class ErrorPage extends Component {
                       <Footer />
                     </div>
                   </div>
+                </div>
                 </div>
               </BaseComponent>
             </>

@@ -561,7 +561,7 @@ class VehicleDetailsMISCD extends Component {
     handleSubmit = (values, actions) => {
         const {productId} = this.props.match.params 
         const {motorInsurance, changeFlag} = this.state
-        let policy_type = 2
+        let policy_type = 1
         let vehicleAge = Math.floor(moment().diff(values.registration_date, 'months', true))
 
         if(changeFlag == 1) {

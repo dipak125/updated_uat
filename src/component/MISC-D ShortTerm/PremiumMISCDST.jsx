@@ -212,10 +212,10 @@ class PremiumMISCD extends Component {
             'body_idv_value' : motorInsurance && motorInsurance.body_idv_value ? motorInsurance.body_idv_value : '0',
             'trailer_array' : trailer_array,
         }
-
+console.log("post_Data MISDST_Summery--------- ", post_data)
         formData.append('enc_data',encryption.encrypt(JSON.stringify(post_data)))
         
-        axios.post('fullQuoteMISCD', formData)
+        axios.post('fullQuoteMISCDShortTerm', formData)
             .then(res => {
                 if (res.data.data.PolicyObject) {
                     this.setState({
@@ -397,7 +397,7 @@ class PremiumMISCD extends Component {
 						<SideNav />
              		 </div>*/}
 							
-                            { step_completed >= '4' && vehicleDetails.vehicletype_id == '11' ?
+                            { step_completed >= '4' && vehicleDetails.vehicletype_id == '18' ?
                             <div className="col-sm-12 col-md-12 col-lg-12 col-xl-12 infobox premiumMisd">
                                 <h4 className="text-center mt-3 mb-3">{phrases['SBIGICL']}</h4>
                                 <Formik initialValues={initialValue} onSubmit={this.handleSubmit}

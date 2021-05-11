@@ -200,7 +200,7 @@ class PremiumGCV extends Component {
         }	
         formData.append('enc_data',encryption.encrypt(JSON.stringify(post_data)))	
         console.log("post_data--fullQuotePMGCV- ", post_data)	
-        axios.post('fullQuotePMGCV', formData)	
+        axios.post('fullQuotePMGCVShortTerm', formData)	
             .then(res => {	
                 if (res.data.PolicyObject) {	
                     this.setState({	

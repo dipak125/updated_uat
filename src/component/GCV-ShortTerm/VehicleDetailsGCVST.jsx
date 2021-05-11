@@ -569,7 +569,7 @@ class VehicleDetailsGCV extends Component {
 
         const {productId} = this.props.match.params 
         const {motorInsurance, changeFlag} = this.state
-        let policy_type = 2
+        let policy_type = 1
         // let vehicleAge = ageObj.whatIsMyVehicleAge(values.registration_date)
         let vehicleAge = Math.floor(moment().diff(values.registration_date, 'months', true))
         // let ageDiff = Math.floor(moment().diff(values.registration_date, 'days', true));
