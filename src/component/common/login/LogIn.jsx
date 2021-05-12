@@ -244,7 +244,6 @@ class LogIn extends Component {
                 this.props.onFormSubmit(values,
                     () => {
                         this.props.loadingStop();
-                        console.log("this.callFetchPhrase()-------- ", this.callFetchPhrase())
                         if(this.callFetchPhrase()){
                             setTimeout(
                                 function() {
@@ -258,8 +257,8 @@ class LogIn extends Component {
                     },
                     (err) => {
                         this.props.loadingStop();
-                        if (err.data.message) {
-                            this.setState({ errMsg: err.data.message });
+                        if (err.data) {    
+                            this.setState({ errMsg: err.data.error });
                         } else {
                             // console.log(err.data);
                         }

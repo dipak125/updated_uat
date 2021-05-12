@@ -119,6 +119,9 @@ class Vedvag_gateway extends Component {
         else if(productId == 14) {
             this.props.history.push(`/PolicyDetails_GSB/${productId}`);
         }
+        else if(productId == 12) {
+            this.props.history.push(`/arogya_PolicyDetails/${productId}`);
+        }
          
 
     }

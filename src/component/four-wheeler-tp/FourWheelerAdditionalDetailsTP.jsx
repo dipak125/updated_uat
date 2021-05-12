@@ -847,7 +847,7 @@ class TwoWheelerAdditionalDetails extends Component {
                         return (
                         <Form>
                         <Row>
-                            <Col sm={12} md={12} lg={11}>
+                            <Col sm={12} md={12} lg={9}>
                                 <div className="d-flex justify-content-left brandhead">
                                 {quoteNumber}
                                 </div>

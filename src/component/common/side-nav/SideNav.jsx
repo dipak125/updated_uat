@@ -9,7 +9,7 @@ import {logoToggle } from "../../../store/actions/toggle";
 
 class SideNav extends Component {
   state = {
-    BC_check : "0"
+    userMenu : []
   }
 
 
@@ -63,13 +63,13 @@ class SideNav extends Component {
       ? JSON.parse(sessionStorage.getItem("users"))
       : "";
     if (user_data) {
-      user_data = JSON.parse(encryption.decrypt(user_data.permission));
-      let BC_check =  user_data ? user_data : null
-      // console.log('user_data------>',BC_check)
+      user_data = JSON.parse(encryption.decrypt(user_data.userMenu));
+      let userMenu =  user_data ? user_data : null
+      // console.log('user_data------>',userMenu)
       this.setState ({
-        BC_check
+        userMenu
       })
-      console.log('this.----->',BC_check)
+      console.log('userMenu.----->',userMenu)
     }
   }
 
@@ -78,7 +78,7 @@ class SideNav extends Component {
   }
 
   render() {
-    const { BC_check } = this.state
+    const { userMenu } = this.state
     let childPhrase = localStorage.getItem("phrases") ? JSON.parse(localStorage.getItem("phrases")) : null
 
     return (
@@ -86,111 +86,21 @@ class SideNav extends Component {
       {childPhrase ?
         <nav className="flex-fill leftNav">
           <ul className="navPan">
-            <li>
-              <Link to="/Dashboard" activeClassName="active" onClick = {this.toggle.bind(this)}>
+            {userMenu && userMenu.length && userMenu.map((values,index) => (
+              <li key={index}>
+              <Link to={values.router_link} activeClassName="active" onClick = {this.toggle.bind(this)}>
                 <span className="leftIcon01">
                   <img
-                    src={require("../../../assets/images/leftIcon02Hover.svg")}
+                    // src={require(`../../../assets/images${values.icon}`)}
                     alt=""
                   />
                 </span>
-                <span className="hidemenu">{childPhrase['Dashboard']}</span>
+                <span className="hidemenu">{childPhrase[values.phases]}</span>
               </Link>
             </li>
-            <li>
-              <Link to="/PolicySearch" activeClassName="active" onClick = {this.toggle.bind(this)}>
-                <span className="leftIcon01">
-                  <img
-                    src={require("../../../assets/images/document.png")}
-                    alt=""
-                  />
-                </span>
-                <span className="hidemenu">{childPhrase['PolicySearch']}</span>
-              </Link>
-            </li>
-            <li>
-			<Link to="/QuoteHistory" activeClassName="active" onClick = {this.toggle.bind(this)}>
-			<span className="leftIcon01"><img src={require('../../../assets/images/document.png')} alt="" /></span>
-			 <span className="hidemenu">{childPhrase['QuoteHistory']}</span>
-			 </Link>
-            </li>
-            <li>
-              <Link to="/Products" activeClassName="active" onClick = {this.toggle.bind(this)}>
-                <span className="leftIcon01">
-                  <img
-                    src={require("../../../assets/images/leftIcon02Hover.svg")}
-                    alt=""
-                  />
-                </span>
-                <span className="hidemenu">{childPhrase['Products']}</span>
-              </Link>
-            </li>
-            <li>
-              <Link to="/Documents" activeClassName="active" onClick = {this.toggle.bind(this)}>
-                <span className="leftIcon01">
-                  <img
-                    src={require("../../../assets/images/document.png")}
-                    alt=""
-                  />
-                </span>
-                <span className="hidemenu">{childPhrase['Documents']}</span>
-              </Link>
-            </li>
+            ))        
+          }
 
-            <li>
-              <Link to="/ClaimIntimation" activeClassName="active" onClick = {this.toggle.bind(this)}>
-                <span className="leftIcon01">
-                  <img
-                    src={require("../../../assets/images/support.png")}
-                    alt=""
-                  />
-                </span>
-                <span className="hidemenu">{childPhrase['ClaimModule']}</span>
-              </Link>
-              </li>
-              <li>
-              <Link to="/Renewal" activeClassName="active" onClick = {this.toggle.bind(this)}>
-                <span className="leftIcon01">
-                  <img
-                    src={require("../../../assets/images/support.png")}
-                    alt=""
-                  />
-                </span>
-                <span className="hidemenu">Renewal</span>
-              </Link>
-            </li>
-
-            <li>
-              <Link to="/Services" activeClassName="active" onClick = {this.toggle.bind(this)}>
-                <span className="leftIcon01">
-                  <img
-                    src={require("../../../assets/images/support.png")}
-                    alt=""
-                  />
-                </span>
-                <span className="hidemenu">{childPhrase['Services']}</span>
-              </Link>
-            </li>
-           { BC_check.is_permission == true ?
-              <li>
-                <Link to="/Supports" activeClassName="active" onClick = {this.toggle.bind(this)}>
-                <span className="leftIcon01"><img src={require('../../../assets/images/support.png')} alt="" /></span>
-                <span className="hidemenu">{childPhrase['Support']}</span>
-                </Link>
-              </li> 
-            : [] } 
-            <li>
-              <Link to="/Break_in" activeClassName="active" onClick = {this.toggle.bind(this)}>
-                <span className="leftIcon01">
-                  <img
-                    src={require("../../../assets/images/leftIcon01.svg")}
-                    alt=""
-                  />
-                </span>
-                <span className="hidemenu">{childPhrase['BreakIn']}</span>
-              </Link>
-            </li>						
-						
 					<li class="logoutbtn">
 					 <button className="btn-lg" onClick={this.handleLogout}>
             <a activeClassName="active">

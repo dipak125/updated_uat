@@ -103,9 +103,6 @@ class PremiumOD extends Component {
         else if (policyHolder && policyHolder.bcmaster && policyHolder.bcmaster.paymentgateway && policyHolder.bcmaster.paymentgateway.slug && values.gateway == 2) {
             this.props.history.push(`/Vedvag_gateway/${this.props.match.params.productId}?access_id=${this.state.policyHolder_refNo}`);
         }
-        else if (policyHolder && policyHolder.bcmaster && policyHolder.bcmaster.paymentgateway && policyHolder.bcmaster.paymentgateway.slug && values.gateway == 3) {	
-            this.props.history.push(`/Sahipay_gateway/${this.props.match.params.productId}?access_id=${this.state.policyHolder_refNo}`);	
-        }
     }
 
     fetchData = () => {
@@ -353,12 +350,21 @@ sendPaymentLink = () => {
         return (
             <>
                 <BaseComponent>
+				 <div className="page-wrapper">
                     <div className="container-fluid">
                         <div className="row">
-                            <div className="col-sm-12 col-md-12 col-lg-2 col-xl-2 pd-l-0">
-                                <SideNav />
-                            </div>
-                            <div className="col-sm-12 col-md-12 col-lg-10 col-xl-10 infobox">
+						
+						
+                           <aside className="left-sidebar">
+ <div className="scroll-sidebar ps-container ps-theme-default ps-active-y">
+<SideNav />
+ </div>
+</aside>
+							
+							
+							
+
+                            <div className="col-sm-12 col-md-12 col-lg-12 col-xl-12 infobox odpremium">
                                 <h4 className="text-center mt-3 mb-3">{phrases['SBIGICL']}</h4>
                                 <Formik initialValues={initialValue} onSubmit={this.handleSubmit}
                                 validationSchema={validatePremium}
@@ -557,7 +563,7 @@ sendPaymentLink = () => {
                                                                                     </Row>
                                                                                 </div>
                                                                             : (<p></p>)}
-                                                                                
+                                                                                   
                                                                         <div>
                                                                             <Row>
                                                                                 <p></p>
@@ -576,7 +582,7 @@ sendPaymentLink = () => {
                                                                                 <div>
                                                                                     <strong>{phrases['OwnerDetails']} :</strong>
                                                                                     <br/>
-                                                                                    <Row>
+                                                                                       <Row>
                                                                                         <Col sm={12} md={12}>
                                                                                             <Row>
                                                                                                 <Col sm={12} md={6}>
@@ -628,7 +634,7 @@ sendPaymentLink = () => {
                                                                                     </Row>
                                                                                 </div>
                                                                             : (<p></p>)}
-                                                                                
+                                                                                   
                                                                         <div>
                                                                         {motorInsurance && motorInsurance.pa_flag == '1' ? 
                                                                         <div>
@@ -718,14 +724,14 @@ sendPaymentLink = () => {
 
                                                                 </Collapsible>
                                                             </div>
-                                                        
+                                                          
                                                             <Row>
                                                             <Col sm={12} md={6}>
                                                             </Col>
                                                                 <Col sm={12} md={6}>
                                                                     <FormGroup>
-                                                                    <div className="paymntgatway">
-                                                                    {phrases['SelectPayGateway']}
+                                                                     <div className="paymntgatway">
+                                                                     {phrases['SelectPayGateway']}
                                                                         <div>
                                                                         {/* <img src={require('../../assets/images/green-check.svg')} alt="" className="m-r-10" /> */}
                                                                         <label className="customRadio3">
@@ -769,29 +775,6 @@ sendPaymentLink = () => {
                                                                             </span>
                                                                         </label>
                                                                         </div> : null }
-
-                                                                        {policyHolder.bcmaster && policyHolder.bcmaster.id === 6 ?	
-                                                                        <div>	
-                                                                        <label className="customRadio3">	
-                                                                        <Field	
-                                                                            type="radio"	
-                                                                            name='gateway'                                            	
-                                                                            value='3'	
-                                                                            key='1'  	
-                                                                            onChange={(e) => {	
-                                                                                setFieldValue(`gateway`, e.target.value);	
-                                                                            }}	
-                                                                            checked={values.gateway == '3' ? true : false}	
-                                                                        />	
-                                                                            <span className="checkmark " /><span className="fs-14"> 	
-                                                                            
-                                                                                { policyHolder.bcmaster && policyHolder.bcmaster.id === 6 ? <img src={require('../../assets/images/sahipay.png')} alt="" /> :	
-                                                                                null	
-                                                                                }	
-                                                                            </span>	
-                                                                        </label>	
-                                                                        </div> : null }	
-
                                                                     </div>
                                                                     </FormGroup>
                                                                 </Col>
@@ -847,6 +830,7 @@ sendPaymentLink = () => {
                             <Footer />
                         </div>
                     </div>
+					  </div>
                 </BaseComponent>
             </>
         );

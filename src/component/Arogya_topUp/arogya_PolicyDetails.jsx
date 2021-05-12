@@ -89,7 +89,11 @@ class arogya_PolicyDetails extends Component {
     refNumber: "",
     paymentStatus: [],
     nomineedetails: [],
-    request_data: []
+    request_data: [],
+    serverResponse: false,
+    policyHolder_refNo: queryString.parse(this.props.location.search).access_id ? 
+                        queryString.parse(this.props.location.search).access_id : 
+                        localStorage.getItem("policyHolder_refNo")
   };
 
   handleClose = () => {
@@ -169,27 +173,31 @@ class arogya_PolicyDetails extends Component {
     axios
       .post(`/arogya-topup/fullQuoteServiceArogyaTopup`, formData)
       .then((res) => {
-        // let decryptResp = JSON.parse(encryption.decrypt(res.data))
-        let decryptResp = res.data
-        
-        if (decryptResp.PolicyObject) {
+        if (res.data.PolicyObject && res.data.UnderwritingResult && res.data.UnderwritingResult.Status == "Success") {
           this.setState({
-            fulQuoteResp: decryptResp.PolicyObject,
-            // address: address.address1,
+            fulQuoteResp: res.data.PolicyObject,
+            serverResponse: true,
             error: [],
           });
-        } else {
+        } else if (res.data.PolicyObject && res.data.UnderwritingResult && res.data.UnderwritingResult.Status == "Fail") {
+          this.setState({
+            fulQuoteResp: res.data.PolicyObject,
+            error: {"message": 1},
+            serverResponse: false,
+          });
+        }
+        else {
           this.setState({
             fulQuoteResp: [],
-            address: [],
-            error: decryptResp.ValidateResult ? decryptResp.ValidateResult : [] ,
+            error: res.data,
+            serverResponse: false,
           });
         }
         this.props.loadingStop();
       })
       .catch((err) => {
         this.setState({
-          serverResponse: [],
+          serverResponse: false,
         });
         this.props.loadingStop();
       });
@@ -197,7 +205,7 @@ class arogya_PolicyDetails extends Component {
 
   handleSubmit = (values) => {
     const {policyHolderDetails} = this.state
-    if(policyHolderDetails && policyHolderDetails.bcmaster && policyHolderDetails.bcmaster.paymentgateway && policyHolderDetails.bcmaster.paymentgateway.slug) {
+    if(policyHolderDetails && policyHolderDetails.bcmaster && policyHolderDetails.bcmaster.paymentgateway && policyHolderDetails.bcmaster.paymentgateway.slug  && values.gateway == 1) {
       if(policyHolderDetails.bcmaster.paymentgateway.slug == "csc_wallet") {
           this.payment()
       }
@@ -257,7 +265,7 @@ paypoint_payment = () => {
 
   render() {
     const { productId } = this.props.match.params;
-    const { fulQuoteResp, addressArray, error, show, policyHolderDetails, nomineedetails, paymentStatus,bcMaster, menumaster, request_data } = this.state;
+    const { fulQuoteResp, addressArray, error, serverResponse, policyHolderDetails, nomineedetails, paymentStatus,bcMaster, menumaster, request_data } = this.state;
 
     const AddressDetails = addressArray ? (
         <div>
@@ -674,7 +682,7 @@ paypoint_payment = () => {
                                               
                                             </Collapsible>
                                           </div>
-
+                                          {serverResponse ?
                                           <Row>
                                               <Col sm={12} md={6}>
                                               </Col>
@@ -711,7 +719,7 @@ paypoint_payment = () => {
                                                               type="radio"
                                                               name='gateway'                                            
                                                               value='2'
-                                                              key='1'  
+                                                              key='2'  
                                                               onChange={(e) => {
                                                                   setFieldValue(`gateway`, e.target.value);
                                                               }}
@@ -733,7 +741,7 @@ paypoint_payment = () => {
                                                               type="radio"	
                                                               name='gateway'                                            	
                                                               value='3'	
-                                                              key='1'  	
+                                                              key='3'  	
                                                               onChange={(e) => {	
                                                                   setFieldValue(`gateway`, e.target.value);	
                                                               }}	
@@ -751,7 +759,7 @@ paypoint_payment = () => {
                                                     </div>
                                                   </FormGroup>
                                               </Col>
-                                          </Row>
+                                          </Row> : null }
                                           <Row>&nbsp;</Row>
 
                                           <Row>
@@ -768,14 +776,12 @@ paypoint_payment = () => {
                                             &nbsp;&nbsp;&nbsp;&nbsp;
                                             </div> : null }
 
-                                          {fulQuoteResp.QuotationNo && values.gateway != "" ? 
-                                            <button
+                                          {fulQuoteResp.QuotationNo && values.gateway != "" && serverResponse ? 
+                                           <Button type="submit"
                                               className="proceedBtn"
-                                              type="button"
-                                              onClick= {this.handleSubmit }
                                             >
                                               Make Payment
-                                            </button> : null
+                                            </Button> : null
                                           } 
                                           </div>
                                           </Row>

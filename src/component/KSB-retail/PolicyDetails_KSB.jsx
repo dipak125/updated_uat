@@ -63,6 +63,7 @@ class PolicyDetails extends Component {
     show: false,
     refNumber: "",
     paymentStatus: [],
+    serverResponse: false,
     policyHolder_refNo: queryString.parse(this.props.location.search).access_id ? 
                         queryString.parse(this.props.location.search).access_id : 
                         localStorage.getItem("policyHolder_refNo")
@@ -142,22 +143,31 @@ class PolicyDetails extends Component {
     axios
       .post(`/fullQuoteServiceKSBRetail`, formData)
       .then((res) => {
-        if (res.data.PolicyObject) {
+        if (res.data.PolicyObject && res.data.UnderwritingResult && res.data.UnderwritingResult.Status == "Success") {
           this.setState({
             fulQuoteResp: res.data.PolicyObject,
+            serverResponse: true,
             error: [],
           });
-        } else {
+        } else if (res.data.PolicyObject && res.data.UnderwritingResult && res.data.UnderwritingResult.Status == "Fail") {
+          this.setState({
+            fulQuoteResp: res.data.PolicyObject,
+            error: {"message": 1},
+            serverResponse: false,
+          });
+        }
+        else {
           this.setState({
             fulQuoteResp: [],
             error: res.data,
+            serverResponse: false,
           });
         }
         this.props.loadingStop();
       })
       .catch((err) => {
         this.setState({
-          serverResponse: [],
+          serverResponse: false,
         });
         this.props.loadingStop();
       });
@@ -224,7 +234,7 @@ class PolicyDetails extends Component {
 
   render() {
     const { productId } = this.props.match.params;
-    const { fulQuoteResp, error, show, policyHolderDetails, refNumber, paymentStatus, nomineeDetails, bcMaster,
+    const { fulQuoteResp, error,  serverResponse, policyHolderDetails, refNumber, paymentStatus, nomineeDetails, bcMaster,
        menumaster, request_data, vehicleDetails } = this.state;
 
     console.log("policyHolderDetails ", policyHolderDetails)
@@ -542,7 +552,7 @@ class PolicyDetails extends Component {
                                               </div>
                                             </Collapsible>
                                           </div>
-
+                                          {serverResponse ?
                                           <Row>
                                               <Col sm={12} md={6}>
                                               </Col>
@@ -619,7 +629,7 @@ class PolicyDetails extends Component {
                                                     </div>
                                                   </FormGroup>
                                               </Col>
-                                          </Row>
+                                          </Row> : null }
 
                                           <div className="d-flex justify-content-left resmb">
                                             <Button
@@ -635,7 +645,7 @@ class PolicyDetails extends Component {
                                               &nbsp;&nbsp;&nbsp;&nbsp;
                                               </div> : null }
 
-                                          {fulQuoteResp.QuotationNo && values.gateway != "" ? 
+                                          {fulQuoteResp.QuotationNo && values.gateway != "" && serverResponse ? 
                                             <Button type="submit"
                                               className="proceedBtn"
                                             >

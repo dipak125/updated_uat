@@ -63,6 +63,7 @@ class PolicyDetails extends Component {
     show: false,
     refNumber: "",
     paymentStatus: [],
+    serverResponse: false,
     policyHolder_refNo: queryString.parse(this.props.location.search).access_id ? 
                         queryString.parse(this.props.location.search).access_id : 
                         localStorage.getItem("policyHolder_refNo")
@@ -197,27 +198,34 @@ class PolicyDetails extends Component {
     }
     formData.append('enc_data',encryption.encrypt(JSON.stringify(post_data)))    
 
-
-
     axios
       .post(`/fullQuoteServiceArogyaSeries`, formData)
       .then((res) => {
-        if (res.data.PolicyObject) {
+        if (res.data.PolicyObject && res.data.UnderwritingResult && res.data.UnderwritingResult.Status == "Success") {
           this.setState({
             fulQuoteResp: res.data.PolicyObject,
+            serverResponse: true,
             error: [],
           });
-        } else {
+        } else if (res.data.PolicyObject && res.data.UnderwritingResult && res.data.UnderwritingResult.Status == "Fail") {
+          this.setState({
+            fulQuoteResp: res.data.PolicyObject,
+            error: {"message": 1},
+            serverResponse: false,
+          });
+        }
+        else {
           this.setState({
             fulQuoteResp: [],
             error: res.data,
+            serverResponse: false,
           });
         }
         this.props.loadingStop();
       })
       .catch((err) => {
         this.setState({
-          serverResponse: [],
+          serverResponse: false,
         });
         this.props.loadingStop();
       });
@@ -290,7 +298,7 @@ paypoint_payment = () => {
 
   render() {
     const { productId } = this.props.match.params;
-    const { fulQuoteResp, error, show, policyHolderDetails, refNumber, paymentStatus, bcMaster, menumaster, request_data } = this.state;
+    const { fulQuoteResp, error, serverResponse, policyHolderDetails, refNumber, paymentStatus, bcMaster, menumaster, request_data } = this.state;
 
     console.log("policyHolderDetails ", policyHolderDetails)
     const items =
@@ -525,7 +533,7 @@ paypoint_payment = () => {
                                               </div>
                                             </Collapsible>
                                           </div>
-
+                                          {serverResponse ?
                                           <Row>
                                               <Col sm={12} md={6}>
                                               </Col>
@@ -602,7 +610,7 @@ paypoint_payment = () => {
                                                     </div>
                                                   </FormGroup>
                                               </Col>
-                                          </Row>
+                                          </Row> : null }
                                           <Row>&nbsp;</Row>
                                           <div className="d-flex justify-content-left resmb">
                                             <Button
@@ -618,7 +626,7 @@ paypoint_payment = () => {
                                               &nbsp;&nbsp;&nbsp;&nbsp;
                                               </div> : null }
 
-                                          {fulQuoteResp.QuotationNo && values.gateway != "" ? 
+                                          {fulQuoteResp.QuotationNo && values.gateway != "" &&  serverResponse ? 
                                             <Button type="submit"
                                               className="proceedBtn"
                                             >

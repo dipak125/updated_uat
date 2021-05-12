@@ -94,7 +94,7 @@ export const authProcess = (data, onSuccess, onFailure) => {
         }
         let encryption = new Encryption();
         formData.append('enc_data',encryption.encrypt(JSON.stringify(post_data_obj)))
-console.log("login post_data_obj--------", post_data_obj)
+        console.log("login post_data_obj--------", post_data_obj)
         axios
             .post('/login', formData)
             .then(response => {
@@ -110,7 +110,8 @@ console.log("login post_data_obj--------", post_data_obj)
                 }
                 sessionStorage.setItem('auth_token', response.data.token_type+" "+response.data.token);
                 // localStorage.setItem('users', JSON.stringify({ user: response.data.user, permission: response.data.permission, lastAction: Date.now() }));
-                sessionStorage.setItem('users', JSON.stringify({ user: encryption.encrypt(JSON.stringify(response.data.user_data)), permission: encryption.encrypt(JSON.stringify(response.data.helpTicket)), lastAction: Date.now() }));
+                sessionStorage.setItem('users', JSON.stringify({ user: encryption.encrypt(JSON.stringify(response.data.user_data)), permission: encryption.encrypt(JSON.stringify(response.data.helpTicket)), 
+                    userMenu: encryption.encrypt(JSON.stringify(response.data.visibleMenus)), lastAction: Date.now() }));
                 localStorage.setItem('loginData', JSON.stringify( loginData ));
                 // var cscData = JSON.parse(response.data.user_data.info);
                 // localStorage.setItem('csc_id', cscData["csc_id"]);
