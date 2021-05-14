@@ -7,6 +7,8 @@ import Encryption from "../../../shared/payload-encryption";
 import { withRouter } from "react-router-dom";
 import {logoToggle } from "../../../store/actions/toggle";
 
+const images = require.context('../../../assets/images', true);
+
 class SideNav extends Component {
   state = {
     userMenu : []
@@ -69,7 +71,6 @@ class SideNav extends Component {
       this.setState ({
         userMenu
       })
-      console.log('userMenu.----->',userMenu)
     }
   }
 
@@ -80,6 +81,7 @@ class SideNav extends Component {
   render() {
     const { userMenu } = this.state
     let childPhrase = localStorage.getItem("phrases") ? JSON.parse(localStorage.getItem("phrases")) : null
+    let url_prefix = "../../../assets/images"
 
     return (
       <>
@@ -91,9 +93,12 @@ class SideNav extends Component {
               <Link to={values.router_link} activeClassName="active" onClick = {this.toggle.bind(this)}>
                 <span className="leftIcon01">
                   <img
-                    // src={require(`../../../assets/images${values.icon}`)}
+                    src= {images(`./${values.icon}.png`)}
+                    // src={require(`${url_prefix}`)}
+                    // src={require('../../../assets/images/leftIcon02Hover.svg')}
                     alt=""
                   />
+                  {/* <img src={`${url_prefix}` + `${values.icon}`} /> */}
                 </span>
                 <span className="hidemenu">{childPhrase[values.phases]}</span>
               </Link>

@@ -34,23 +34,23 @@ const insert = (arr, index, newItem) => [
 const ComprehensiveValidation = Yup.object().shape({
     // is_carloan: Yup.number().required('Please select one option')
 
-    registration_no: Yup.string().when("newRegistrationNo", {
-        is: "NEW",       
-        then: Yup.string(),
-        otherwise: Yup.string()
-            .test(
-                "last4digitcheck",
-                function() {
-                    return "InvalidRegNumber"
-                },
-                function (value) {
-                    if (value && (value != "" || value != undefined)) {             
-                        return validRegistrationNumber(value);
-                    }   
-                    return true;
-                }
-            ),
-    }),
+    // registration_no: Yup.string().when("newRegistrationNo", {
+    //     is: "NEW",       
+    //     then: Yup.string(),
+    //     otherwise: Yup.string()
+    //         .test(
+    //             "last4digitcheck",
+    //             function() {
+    //                 return "InvalidRegNumber"
+    //             },
+    //             function (value) {
+    //                 if (value && (value != "" || value != undefined)) {             
+    //                     return validRegistrationNumber(value);
+    //                 }   
+    //                 return true;
+    //             }
+    //         ),
+    // }),
 
     puc: Yup.string().required("Please verify pollution certificate to proceed"),
 

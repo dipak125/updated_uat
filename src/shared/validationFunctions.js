@@ -220,6 +220,17 @@ export const validRegistrationNumber = (value) => {
      return true;
 }
 
+export const registrationNumberLastBlock = (value) => {
+    var str = /^[0-9]*$/;
+        if(value && value.match(str)) {    
+            if (value == 0) {
+                return false;
+            }         
+            else return true;  
+        }
+        else return false;
+}
+
 export const validRegistrationNumberOD = (value) => {
     var str = /^[A-Z]{2}(?:[A-Z])?(?:[0-9]{1,2})?(?:[ABCDEFGHJKLMNPQRSTUVWXYZ])?(?:[ABCDEFGHJKLMNPQRSTUVWXYZ]{2})?[0-9]{4}$/;
     
