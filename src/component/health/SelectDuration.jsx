@@ -130,16 +130,16 @@ class SelectDuration extends Component {
        // formData.append('policy_holder_id', localStorage.getItem('policyHolder_id'));
         let policy_holder_id = localStorage.getItem('policyHolder_id') ? localStorage.getItem('policyHolder_id') : 0
 
-       /* formData.append('start_date', serverResponse.EffectiveDate);
-        formData.append('end_date', serverResponse.ExpiryDate);
-        formData.append('gross_premium', serverResponse.GrossPremium);
-        formData.append('service_tax', serverResponse.TGST);
-        formData.append('swatch_bharat_cess', '0');
-        formData.append('krishi_kalayan_cess', '0');
-        formData.append('net_premium', serverResponse.DuePremium);
-        formData.append('sum_insured', values.insureValue);
-        */
+        let user_data = sessionStorage.getItem("users") ? JSON.parse(sessionStorage.getItem("users")) : "";
+        if (user_data) {
+            user_data = JSON.parse(encryption.decrypt(user_data.user));
 
+            if((serverResponse.DuePremium > 5000000) && user_data.user_type == "POSP"  ) {
+                swal("Quote cannot proceed with IDV greater than 5000000")
+                this.props.loadingStop();
+                return false
+            }
+        }
 
         const post_data = {
             'policy_holder_id':policy_holder_id,
@@ -154,7 +154,6 @@ class SelectDuration extends Component {
             'page_name': `SelectDuration/${productId}`
         }
         formData.append('enc_data',encryption.encrypt(JSON.stringify(post_data)))
-
 
         this.props.loadingStart();
         axios
@@ -215,7 +214,7 @@ class SelectDuration extends Component {
           });
       }
 
-      quote = (value) => {
+    quote = (value) => {
       const {accessToken} = this.state
       if(accessToken)
       {   
@@ -251,19 +250,15 @@ class SelectDuration extends Component {
             default:
                 si = '5';
         }
-        // console.log('sum_insured', si);
+
         let polStartDate = moment(value.polStartDate).format("YYYY-MM-DD");
         let polEndDate = moment(value.polEndDate).format("YYYY-MM-DD");
+        
         let insureValue = value.insureValue ? value.insureValue : si;
         const formData = new FormData(); 
         this.props.loadingStart();
-      /*formData.append('id', localStorage.getItem('policyHolder_id'));
-        formData.append('policyStartDate', polStartDate);
-      formData.append('policyEndDate', polEndDate);
-      formData.append('insureValue', insureValue);
-      formData.append('access_token', accessToken);*/
+       
       console.log('insureValue', insureValue);
-
 
       const post_data = {
         'id':localStorage.getItem('policyHolder_id'),
@@ -272,7 +267,7 @@ class SelectDuration extends Component {
         'insureValue':insureValue,
         'access_token':accessToken
     }
-    let encryption = new Encryption();
+        let encryption = new Encryption();
         formData.append('enc_data',encryption.encrypt(JSON.stringify(post_data)))
         axios
           .post(`/quickQuoteService`, formData)
@@ -320,8 +315,6 @@ class SelectDuration extends Component {
     }
 
 
-
-
     componentDidMount() {
         this.getPolicyHolderDetails();
         // this.getAccessToken();
@@ -362,16 +355,13 @@ class SelectDuration extends Component {
 				<div className="page-wrapper">
                     <div className="container-fluid">
                         <div className="row">
-						
-						
+										
                             <aside className="left-sidebar">
- <div className="scroll-sidebar ps-container ps-theme-default ps-active-y">
-<SideNav />
- </div>
-</aside>
-							
-							
-							
+                            <div className="scroll-sidebar ps-container ps-theme-default ps-active-y">
+                            <SideNav />
+                            </div>
+                            </aside>
+                                                                                   
                             <div className="col-sm-12 col-md-12 col-lg-12 col-xl-12 infobox arg2">
                                 <h4 className="text-center mt-3 mb-3">Arogya Sanjeevani Policy</h4>
                                 <section className="brand">

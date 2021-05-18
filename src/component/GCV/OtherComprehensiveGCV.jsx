@@ -762,7 +762,6 @@ class OtherComprehensiveGCV extends Component {
     };
 
 
-
     fullQuote = (access_token, values) => {
         const { PolicyArray, sliderVal, add_more_coverage, motorInsurance, bodySliderVal ,vehicleDetails, geographical_extension, chasis_price, userIdvStatus,bodyIdvStatus} = this.state
         // let cng_kit_flag = 0;
@@ -771,23 +770,14 @@ class OtherComprehensiveGCV extends Component {
         //     cng_kit_flag = values.cng_kit
         //     cngKit_Cost = values.cngKit_Cost
         // }
-        let defaultSliderValue = PolicyArray.length > 0 ? Math.round(PolicyArray[0].PolicyRiskList[0].IDV_User) : 0
+        let defaultSliderValue = PolicyArray.length > 0 ? Math.round(PolicyArray[0].PolicyRiskList[0].IDV_Suggested) : 0
         let defaultBodySliderValue =  0
         let coverage_data = {}
         const formData = new FormData();
 
-        let csc_data = localStorage.getItem('users') ? localStorage.getItem('users') : "";
-        let csc_user_type = "";
         let total_idv=0
         let other_idv=0
 
-        if(csc_data && sessionStorage.getItem('csc_id')) {
-            let encryption = new Encryption();
-            csc_data = JSON.parse(csc_data)        
-            csc_data = csc_data.user
-            csc_data = JSON.parse(encryption.decrypt(csc_data));           
-            csc_user_type = csc_data.type
-        }
         if(add_more_coverage) {
             coverage_data = {
                 'B00018' : {'value': values.B00018_value },
@@ -811,8 +801,7 @@ class OtherComprehensiveGCV extends Component {
             }
             if(values.B00003_value){
                 other_idv = other_idv + parseInt(values.B00003_value)
-            }
-            
+            }          
         }
 
         const post_data = {
@@ -836,11 +825,15 @@ class OtherComprehensiveGCV extends Component {
         total_idv = parseInt(other_idv) + parseInt(post_data.idv_value)+parseInt(post_data.body_idv_value)
         console.log('fullQuote_post_data', post_data)
 
+        let user_data = sessionStorage.getItem("users") ? JSON.parse(sessionStorage.getItem("users")) : "";
+        if (user_data) {
+            user_data = JSON.parse(encryption.decrypt(user_data.user));
 
-        if(( total_idv> 5000000) && csc_user_type == "POSP" ) {
-            swal("Quote cannot proceed with total IDV (including IDV, Body IDV, Electrical and Non-Electrical IDV) greater than 5000000")
-            this.props.loadingStop();
-            return false
+            if((total_idv> 5000000) && user_data.user_type == "POSP"  ) {
+                swal("Quote cannot proceed with IDV greater than 5000000")
+                this.props.loadingStop();
+                return false
+            }
         }
 
         let encryption = new Encryption();
@@ -877,7 +870,7 @@ class OtherComprehensiveGCV extends Component {
                         ncbDiscount,
                         userIdvStatus:1,
                         bodyIdvStatus:1,
-                        sliderVal: res.data.PolicyObject.PolicyLobList ? Math.round(res.data.PolicyObject.PolicyLobList[0].PolicyRiskList[0].IDV_User) : 0,
+                        sliderVal: res.data.PolicyObject.PolicyLobList ? Math.round(res.data.PolicyObject.PolicyLobList[0].PolicyRiskList[0].IDV_Suggested) : 0,
                         serverResponse: res.data.PolicyObject,
                         policyCoverage: res.data.PolicyObject.PolicyLobList ? res.data.PolicyObject.PolicyLobList[0].PolicyRiskList[0].PolicyCoverageList : [],
                     });
@@ -915,28 +908,9 @@ class OtherComprehensiveGCV extends Component {
     handleSubmit = (values) => {
         const { productId } = this.props.match.params
         const { motorInsurance, PolicyArray, sliderVal, add_more_coverage, bodySliderVal, geographical_extension } = this.state
-        let defaultSliderValue = PolicyArray.length > 0 ? Math.round(PolicyArray[0].PolicyRiskList[0].IDV_User) : 0
+        let defaultSliderValue = PolicyArray.length > 0 ? Math.round(PolicyArray[0].PolicyRiskList[0].IDV_Suggested) : 0
         let defaultBodySliderValue =  0
         let coverage_data = {}
-
-        let csc_data = localStorage.getItem('users') ? localStorage.getItem('users') : "";
-        let csc_user_type = "";
-        let bc_data = sessionStorage.getItem('bcLoginData') ? sessionStorage.getItem('bcLoginData') : "";
-
-        if(csc_data && sessionStorage.getItem('csc_id')) {
-            let encryption = new Encryption();
-            csc_data = JSON.parse(csc_data)        
-            csc_data = csc_data.user
-            csc_data = JSON.parse(encryption.decrypt(csc_data));           
-            csc_user_type = csc_data.type
-        }
-        else {
-            if(bc_data) {
-                let encryption = new Encryption();
-                bc_data = JSON.parse(encryption.decrypt(bc_data));
-            }
-            // console.log("bc_data------ ", bc_data)
-        }
 
         if(add_more_coverage) {
             coverage_data = {
@@ -1011,12 +985,18 @@ class OtherComprehensiveGCV extends Component {
             }
             total_idv=parseInt(post_data.idv_value)+parseInt(post_data.body_idv_value)
         }
-        // console.log("--total_idv------ ", total_idv)
-        if(((total_idv > 5000000) && csc_user_type == "POSP" ) || ((total_idv > 5000000) && bc_data && bc_data.master_data.vendor_name == "PayPoint" ) ) {
-            swal("Quote cannot proceed with total IDV (including IDV, Body IDV, Electrical and Non-Electrical IDV) greater than 5000000")
-            this.props.loadingStop();
-            return false
+        
+        let user_data = sessionStorage.getItem("users") ? JSON.parse(sessionStorage.getItem("users")) : "";
+        if (user_data) {
+            user_data = JSON.parse(encryption.decrypt(user_data.user));
+
+            if((total_idv> 5000000) && user_data.user_type == "POSP"  ) {
+                swal("Quote cannot proceed with IDV greater than 5000000")
+                this.props.loadingStop();
+                return false
+            }
         }
+
         console.log("--post Data-- ", post_data)
         formData.append('enc_data', encryption.encrypt(JSON.stringify(post_data)))
         this.props.loadingStart();
@@ -1366,7 +1346,7 @@ class OtherComprehensiveGCV extends Component {
         const {add_more_coverage, is_CNG_account, vahanDetails,error, policyCoverage, vahanVerify, selectFlag, fulQuoteResp, PolicyArray, fuelList, depreciationPercentage, vehicleDetails, geographical_extension,
             moreCoverage, sliderVal, bodySliderVal, motorInsurance, serverResponse, engine_no, chasis_no, initialValue, add_more_coverage_request_array,ncbDiscount} = this.state
         const {productId} = this.props.match.params 
-        //let defaultSliderValue = PolicyArray.length > 0 ? Math.round(PolicyArray[0].PolicyRiskList[0].IDV_User) : 0
+        //let defaultSliderValue = PolicyArray.length > 0 ? Math.round(PolicyArray[0].PolicyRiskList[0].IDV_Suggested) : 0
         let defaultSliderValue = sliderVal
         let min_IDV_suggested = PolicyArray.length > 0 ? PolicyArray[0].PolicyRiskList[0].MinIDV_Suggested : 0
         let max_IDV_suggested = PolicyArray.length > 0 ? PolicyArray[0].PolicyRiskList[0].MaxIDV_Suggested : 0
@@ -1851,7 +1831,7 @@ console.log("values------------> ", values)
                                 </Col>
                                 {console.log("minIDV------------- ", minIDV)}
                                 {console.log("maxIDV------------- ", maxIDV)}
-                                {console.log("IDV_User------------- ", defaultSliderValue)}
+                                {console.log("IDV_Suggested------------- ", defaultSliderValue)}
                                 {defaultSliderValue ? 
 
                                 <Col sm={12} md={12} lg={6}>

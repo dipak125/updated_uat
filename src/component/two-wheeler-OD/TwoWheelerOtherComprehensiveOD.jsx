@@ -474,17 +474,7 @@ class TwoWheelerOtherComprehensiveOD extends Component {
         // }
         let defaultSliderValue = PolicyArray.length > 0 ? Math.floor(PolicyArray[0].PolicyRiskList[0].IDV_User) : 0
         const formData = new FormData();
-
-        let csc_data = sessionStorage.getItem('users') ? sessionStorage.getItem('users') : "";
-        let csc_user_type = "";
-
-        if(csc_data && sessionStorage.getItem('csc_id')) {
-            let encryption = new Encryption();
-            csc_data = JSON.parse(csc_data)        
-            csc_data = csc_data.user
-            csc_data = JSON.parse(encryption.decrypt(csc_data));           
-            csc_user_type = csc_data.type
-        }
+        let encryption = new Encryption();
 
         if(add_more_coverage ) {
             coverage_data = {
@@ -516,24 +506,18 @@ class TwoWheelerOtherComprehensiveOD extends Component {
         console.log('fullQuote_post_data', post_data)
         total_idv = parseInt(other_idv) + parseInt(post_data.idv_value)
 
-        if(( total_idv> 5000000) && csc_user_type == "POSP" ) {
-            swal("Quote cannot proceed with total IDV (including IDV, Body IDV, Electrical and Non-Electrical IDV) greater than 5000000")
-            this.props.loadingStop();
-            return false
-        }
-        let encryption = new Encryption();
-        formData.append('enc_data',encryption.encrypt(JSON.stringify(post_data)))
+        let user_data = sessionStorage.getItem("users") ? JSON.parse(sessionStorage.getItem("users")) : "";
+        if (user_data) {
+            user_data = JSON.parse(encryption.decrypt(user_data.user));
 
-        // formData.append('reference_no',localStorage.getItem('policyHolder_refNo'))
-        // formData.append('access_token',access_token)
-        // formData.append('idv_value',sliderVal ? sliderVal : defaultSliderValue.toString())
-        // formData.append('policy_type',motorInsurance ? motorInsurance.policy_type : "")
-        // formData.append('add_more_coverage',JSON.stringify(add_more_coverage))
-        // formData.append('policytype_id',motorInsurance ? motorInsurance.policytype_id : "")
-        // formData.append('PA_Cover',values.PA_flag ? values.PA_Cover : "0")
-        // formData.append('policy_for',motorInsurance ? motorInsurance.policy_for : "")
-        // formData.append('tyre_rim_array',values.tyre_rim_array ? JSON.stringify(values.tyre_rim_array) : "")
-        // formData.append('coverage_data', JSON.stringify(coverage_data))
+            if((total_idv> 5000000) && user_data.user_type == "POSP"  ) {
+                swal("Quote cannot proceed with IDV greater than 5000000")
+                this.props.loadingStop();
+                return false
+            }
+        }
+
+        formData.append('enc_data',encryption.encrypt(JSON.stringify(post_data)))
 
         axios.post('two-wh-stal/fullQuoteStlM2W', formData)
             .then(res => {
@@ -558,7 +542,6 @@ class TwoWheelerOtherComprehensiveOD extends Component {
                         policyCoverage = ncbDiscount != '0' ?  insert(policyCoverage, 2, totOD) : ""
                     }
                     
-
                     this.setState({
                         fulQuoteResp: res.data.PolicyObject,
                         PolicyArray: res.data.PolicyObject.PolicyLobList,
@@ -568,11 +551,6 @@ class TwoWheelerOtherComprehensiveOD extends Component {
                         // policyCoverage: res.data.PolicyObject.PolicyLobList ? res.data.PolicyObject.PolicyLobList[0].PolicyRiskList[0].PolicyCoverageList : [],
                         // ncbDiscount: res.data.PolicyObject.PolicyLobList ? res.data.PolicyObject.PolicyLobList[0].PolicyRiskList[0].NCBDiscountAmt : 0,
                     });
-                    if(( res.data.PolicyObject.SumInsured > 5000000) && csc_user_type == "POSP" ) {
-                        swal("Quote cannot proceed with IDV greater than 5000000")
-                        this.props.loadingStop();
-                        return false
-                    }
                 } 
                 else if (res.data.PolicyObject && res.data.UnderwritingResult && res.data.UnderwritingResult.Status == "Fail") {
                     this.setState({
@@ -581,11 +559,6 @@ class TwoWheelerOtherComprehensiveOD extends Component {
                         serverResponse: [],
                         policyCoverage: res.data.PolicyObject.PolicyLobList ? res.data.PolicyObject.PolicyLobList[0].PolicyRiskList[0].PolicyCoverageList : [],
                     });
-                    if(( res.data.PolicyObject.SumInsured > 5000000) && csc_user_type == "POSP" ) {
-                        swal("Quote cannot proceed with IDV greater than 5000000")
-                        this.props.loadingStop();
-                        return false
-                    }
                 }
                 else {
                     this.setState({
@@ -609,25 +582,7 @@ class TwoWheelerOtherComprehensiveOD extends Component {
         const { motorInsurance, PolicyArray, sliderVal, add_more_coverage } = this.state
         let defaultSliderValue = PolicyArray.length > 0 ? Math.round(PolicyArray[0].PolicyRiskList[0].IDV_User) : 0
         let coverage_data = {}
-
-        let csc_data = sessionStorage.getItem('users') ? sessionStorage.getItem('users') : "";
-        let csc_user_type = "";
-        let bc_data = sessionStorage.getItem('bcLoginData') ? sessionStorage.getItem('bcLoginData') : "";
         let phrases = localStorage.getItem("phrases") ? JSON.parse(localStorage.getItem("phrases")) : []
-
-        if(csc_data && sessionStorage.getItem('csc_id')) {
-            let encryption = new Encryption();
-            csc_data = JSON.parse(csc_data)        
-            csc_data = csc_data.user
-            csc_data = JSON.parse(encryption.decrypt(csc_data));           
-            csc_user_type = csc_data.type
-        }
-        else {
-            if(bc_data) {
-                let encryption = new Encryption();
-                bc_data = JSON.parse(encryption.decrypt(bc_data));
-            }
-        }
 
         if(add_more_coverage) {
             coverage_data = {
@@ -670,11 +625,18 @@ class TwoWheelerOtherComprehensiveOD extends Component {
 
 
         console.log('post_data', post_data)
-        if(((total_idv > 5000000) && csc_user_type == "POSP" ) || ((total_idv > 5000000) && bc_data && bc_data.master_data.vendor_name == "PayPoint" ) ) {
-            swal("Quote cannot proceed with total IDV (including IDV, Body IDV, Electrical and Non-Electrical IDV) greater than 5000000")
-            this.props.loadingStop();
-            return false
+
+        let user_data = sessionStorage.getItem("users") ? JSON.parse(sessionStorage.getItem("users")) : "";
+        if (user_data) {
+            user_data = JSON.parse(encryption.decrypt(user_data.user));
+
+            if((total_idv> 5000000) && user_data.user_type == "POSP"  ) {
+                swal("Quote cannot proceed with IDV greater than 5000000")
+                this.props.loadingStop();
+                return false
+            }
         }
+
         formData.append('enc_data', encryption.encrypt(JSON.stringify(post_data)))
         this.props.loadingStart();
         axios.post('two-wh-stal/insured-value', formData).then(res => {

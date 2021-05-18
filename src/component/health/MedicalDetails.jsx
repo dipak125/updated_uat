@@ -96,10 +96,7 @@ class MedicalDetails extends Component {
         //resource.id} : false
             })           
         );
-            console.log("SSSSSSSSSSS=======>",newShowImage)
       
-      // formData.append('question_id', question_id[0]);
-      // formData.append('answer', value);
        selected_answer.push(value);
        selected_answer = [...new Set(selected_answer)];
        selected_question = this.state.selected_question;
@@ -125,7 +122,6 @@ class MedicalDetails extends Component {
                     arr_data.push(resource.id)
                 }                
             );  
-            //formData.append('policy_holder_id', localStorage.getItem('policyHolder_id'));
 
             let policy_holder_id = localStorage.getItem('policyHolder_id') ? localStorage.getItem('policyHolder_id') : 0
             let encryption = new Encryption();
@@ -170,12 +166,6 @@ class MedicalDetails extends Component {
            }
            
        }
-       console.log("Form Data=======>",formData)
-      console.log("Form Data=======>",formData)
-       
-       
-
-
           
     }
 

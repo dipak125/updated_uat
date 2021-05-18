@@ -137,51 +137,39 @@ class arogya_SelectDuration extends Component {
 
     handleSubmit = (values) => {
         let defaultSliderValue = 0
-        // let defaultSumSliderValue = 0
-        // let defaultdeductibleSliderValue = 0
-        // let defaulttenureSliderValue = 0
         const { productId } = this.props.match.params
         const { serverResponse, SliderVal, policyHolderDetails } = this.state
         const formData = new FormData();    
         let encryption = new Encryption();
 
-        // formData.append('policy_holder_id', localStorage.getItem('policyHolder_id'));
         let policy_holder_id = localStorage.getItem('policyHolder_id') ? localStorage.getItem('policyHolder_id') : 0
         let SumInsuredsliderVal = values.slider_sum_insured ? values.slider_sum_insured : 0
         let deductibleSliderVal = values.slider_deductible ? values.slider_deductible : 0
         let tenureSliderVal = values.slider_tenure ? values.slider_tenure : 0
 
-        let csc_user_type = "";
         let total_idv=0
         let coverTypeId = policyHolderDetails && policyHolderDetails.request_data && policyHolderDetails.request_data.cover_type_id
         let no_of_members = policyHolderDetails && policyHolderDetails.request_data && policyHolderDetails.request_data.family_members && policyHolderDetails.request_data.family_members.length
-        let csc_data = localStorage.getItem('users') ? localStorage.getItem('users') : "";
-        if(csc_data && sessionStorage.getItem('csc_id')) {
-            let encryption = new Encryption();
-            csc_data = JSON.parse(csc_data)        
-            csc_data = csc_data.user
-            csc_data = JSON.parse(encryption.decrypt(csc_data));           
-            csc_user_type = csc_data.type
-        }
+
     
         if (coverTypeId == '3' || coverTypeId == '1') {
             total_idv = serverResponse && serverResponse.SumInsured
         }
-        else if(coverTypeId == '2'){
-              
+        else if(coverTypeId == '2'){          
             total_idv = serverResponse && serverResponse.SumInsured
             total_idv = total_idv/no_of_members
         }
 
-        csc_user_type = sessionStorage.getItem('type') ? sessionStorage.getItem('type') : csc_data.type
+        let user_data = sessionStorage.getItem("users") ? JSON.parse(sessionStorage.getItem("users")) : "";
+        if (user_data) {
+            user_data = JSON.parse(encryption.decrypt(user_data.user));
 
-
-        if(( total_idv> 500000) && csc_user_type == "POSP" ) {
-            swal("Quote cannot proceed with IDV greater than 500000 for each menber")
-            this.props.loadingStop();
-            return false
+            if((total_idv> 5000000) && user_data.user_type == "POSP"  ) {
+                swal("Quote cannot proceed with IDV greater than 5000000")
+                this.props.loadingStop();
+                return false
+            }
         }
-
 
         const post_data = {
             'page_name': 'arogya_SelectDuration/12',

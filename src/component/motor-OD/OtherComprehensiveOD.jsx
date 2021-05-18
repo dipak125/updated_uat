@@ -644,23 +644,6 @@ class OtherComprehensiveOD extends Component {
         let total_idv=0
         let other_idv=0
 
-        let csc_data = sessionStorage.getItem('users') ? sessionStorage.getItem('users') : "";
-        let csc_user_type = "";
-        let bc_data = sessionStorage.getItem('bcLoginData') ? sessionStorage.getItem('bcLoginData') : "";
-
-        if(csc_data && sessionStorage.getItem('csc_id')) {
-            let encryption = new Encryption();
-            csc_data = JSON.parse(csc_data)        
-            csc_data = csc_data.user
-            csc_data = JSON.parse(encryption.decrypt(csc_data));           
-            csc_user_type = csc_data.type
-        }
-        else {
-            if(bc_data) {
-                let encryption = new Encryption();
-                bc_data = JSON.parse(encryption.decrypt(bc_data));
-            }
-        }
 
         if(add_more_coverage) {
             coverage_data = {
@@ -719,10 +702,15 @@ class OtherComprehensiveOD extends Component {
         console.log('post_data',post_data)
         total_idv = parseInt(other_idv) + parseInt(post_data.idv_value)
 
-        if(((total_idv> 5000000) && csc_user_type == "POSP" ) || (total_idv> 5000000 && bc_data && bc_data.master_data.vendor_name == "PayPoint" )) {
-            swal("Quote cannot proceed with IDV greater than 5000000")
-            this.props.loadingStop();
-            return false
+        let user_data = sessionStorage.getItem("users") ? JSON.parse(sessionStorage.getItem("users")) : "";
+        if (user_data) {
+            user_data = JSON.parse(encryption.decrypt(user_data.user));
+
+            if((total_idv> 5000000) && user_data.user_type == "POSP"  ) {
+                swal("Quote cannot proceed with IDV greater than 5000000")
+                this.props.loadingStop();
+                return false
+            }
         }
 
         formData.append('enc_data', encryption.encrypt(JSON.stringify(post_data)))
