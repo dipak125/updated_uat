@@ -897,7 +897,6 @@ class OtherComprehensiveOD extends Component {
         if(Number.isInteger(min_IDV_suggested) == false ) {
             minIDV = PolicyArray.length > 0 ? Math.floor(PolicyArray[0].PolicyRiskList[0].MinIDV_Suggested) : null           
             minIDV = minIDV + 1;
-            // maxIDV = maxIDV - 1;
         }
 
         let covList = motorInsurance && motorInsurance.add_more_coverage ? motorInsurance.add_more_coverage.split(",") : ""
@@ -1029,26 +1028,6 @@ class OtherComprehensiveOD extends Component {
                         <td>₹ {Math.round(coverage.BeforeVatPremium)}  </td>                      
                     </tr> 
             )) : null
-
-        // const premiumBreakup = policyCoverage && policyCoverage.length > 0 ?
-        //     policyCoverage.map((coverage, qIndex) => {
-        //         return(
-        //             <Fragment>
-        //                 {coverage.ProductElementCode == "C101066" ? 
-        //                     coverage.PolicyBenefitList.map((coverage1, qIndex) => {
-        //                         return(
-        //                                 <tr>
-        //                                     <td>{Coverage[coverage1.ProductElementCode]}</td>
-        //                                     <td>₹ {Math.round(coverage1.BeforeVatPremium)}  </td>                      
-
-        //                                 </tr>)}) :
-        //                     <tr>
-        //                         <td>{Coverage[coverage.ProductElementCode]}:</td>
-        //                         <td>₹ {Math.round(coverage.BeforeVatPremium)}</td>
-        //                     </tr>}
-        //             </Fragment>
-        //         )   
-        //     }) : null
         
 
         const errMsg =
@@ -1069,671 +1048,673 @@ class OtherComprehensiveOD extends Component {
                 <BaseComponent>
                 {phrases ? 
 				
-				 <div className="page-wrapper">
+                <div className="page-wrapper">
                 <div className="container-fluid">
-                <div className="row">
-				
-                   <aside className="left-sidebar">
-                    <div className="scroll-sidebar ps-container ps-theme-default ps-active-y">
-                    <SideNav />
-                    </div>
-                    </aside>
-	
-                <div className="col-sm-12 col-md-12 col-lg-12 col-xl-12 infobox othercomOd">
-                <h4 className="text-center mt-3 mb-3">{phrases['SBIGICL']}</h4>
-                <section className="brand colpd m-b-25">
-                    <div className="d-flex justify-content-left">
-                        <div className="brandhead m-b-10">
-                            <h4 className="m-b-30">{phrases['CoversM4WOD']}</h4>
-                            <h5>{errMsg}</h5>
-                        </div>
-                    </div>
-                    <Formik initialValues={newInitialValues} 
-                    onSubmit={ serverResponse && serverResponse != "" ? (serverResponse.message ? this.fullQuote : this.handleSubmit ) : this.fullQuote} 
-                    validationSchema={ComprehensiveValidation}>
-                    {({ values, errors, setFieldValue, setFieldTouched, isValid, isSubmitting, touched }) => {
-
-                    return (
-                        <Form>
-                        <Row>
-                            <Col sm={12} md={9} lg={9}>
-                                <div className="rghtsideTrigr W-90 m-b-30">
-                                    <Collapsible trigger={phrases['DefaultCovered']} open = {true}>
-                                        <div className="listrghtsideTrigr">
-                                            {policyCoverageList}
-                                        </div>
-                                    </Collapsible>
-                                </div>
-
-                            <Row>
-                            <Col sm={12} md={12} lg={4}>
-                            <Row>
-                            <Col sm={12} md={5} lg={6}>
-                                <FormGroup>
-                                    <div className="insurerName">
-                                    {phrases['RegNo']}
-                                    </div>
-                                </FormGroup>
-                            </Col>
-                                
-                                <Col sm={12} md={5} lg={6}>
-                                    <FormGroup>
-                                        <div className="insurerName">
-                                        {values.newRegistrationNo != "NEW" ?
-                                            <Field
-                                                name="registration_no"
-                                                type="text"
-                                                placeholder=""
-                                                autoComplete="off"
-                                                onFocus={e => this.changePlaceHoldClassAdd(e)}
-                                                onBlur={e => this.changePlaceHoldClassRemove(e)}
-                                                value= {values.registration_no}   
-                                                maxLength={this.state.length}
-                                                disabled = {true}
-                                                onInput={e=>{
-                                                    this.regnoFormat(e, setFieldTouched, setFieldValue)
-                                                }}        
-    
-                                            /> : 
-                                            <Field
-                                                    type="text"
-                                                    name='registration_no' 
-                                                    autoComplete="off"
-                                                    className="premiumslid"   
-                                                    value= {values.newRegistrationNo}    
-                                                    disabled = {true}                                                 
-                                                />}
-
-                                            {errors.registration_no ? (
-                                                <span className="errorMsg">{phrases[errors.registration_no]}</span>
-                                            ) : null}
-                                        </div>
-                                    </FormGroup>
-                                </Col>
-                                </Row>
-                                </Col>
-
-                                <Col sm={12} md={12} lg={5}>
-                                    <Row>
-                                        <Col sm={12} md={5} lg={6}>
-                                            <FormGroup>
-                                                <div className="insurerName">
-                                                {phrases['ChassisNo']}
-                                                </div>
-                                            </FormGroup>
-                                        </Col>
-                                    
-                                        <Col sm={12} md={5} lg={6}>
-                                            <FormGroup>
-                                                <div className="insurerName">
-                                                        <Field
-                                                            type="text"
-                                                            name='chasis_no_last_part' 
-                                                            autoComplete="off"
-                                                            className="premiumslid"       
-                                                            value= {values.chasis_no_last_part}
-                                                            maxLength="5"       
-                                                            onChange = {(e) => {
-                                                                setFieldValue('vahanVerify', false)
-
-                                                                setFieldTouched('chasis_no_last_part')
-                                                                setFieldValue('chasis_no_last_part', e.target.value)                       
-                                                            }}                           
-                                                            
-                                                        />
-                                                        {errors.chasis_no_last_part && touched.chasis_no_last_part ? (
-                                                        <span className="errorMsg">{phrases[errors.chasis_no_last_part]}</span>
-                                                    ) : null}
-                                                </div>
-                                            </FormGroup>
-                                        </Col>
-                                    </Row>
-                                    </Col>
-
-                                    <Col sm={12} md={2} lg={2}>
-                                        <FormGroup>
+                    <div className="row">
+                    
+                        <aside className="left-sidebar">
+                                <div className="scroll-sidebar ps-container ps-theme-default ps-active-y">
+                                <SideNav />
+                            </div>
+                        </aside>
                                         
-                                            <Button className="btn btn-primary vrifyBtn" onClick= {!errors.chasis_no_last_part ? this.getVahanDetails.bind(this,values, setFieldTouched, setFieldValue, errors) : null}>{phrases['Verify']}</Button>
-                                            {errors.vahanVerify ? (
-                                                    <span className="errorMsg">{phrases[errors.vahanVerify]}</span>
-                                                ) : null}
-                                        </FormGroup>
-                                    </Col>
-                            </Row>
-                            {values.vahanVerify && !errors.chasis_no_last_part ?
-                            <Row>
-                                <Col sm={12} md={6} lg={5}>
-                                    <FormGroup>
-                                        <div className="insurerName">
-                                            <Field
-                                                name="engine_no"
-                                                type="text"
-                                                placeholder={phrases["EngineNumber"]}
-                                                autoComplete="off"
-                                                onFocus={e => this.changePlaceHoldClassAdd(e)}
-                                                onBlur={e => this.changePlaceHoldClassRemove(e)}
-                                                value= {values.engine_no.toUpperCase()}
-                                                maxLength="17"
-                                                onChange = {(e) => {
-                                                    setFieldTouched('engine_no')
-                                                    setFieldValue('engine_no', e.target.value)                       
-                                                }}  
-                                            />
-                                            {errors.engine_no && touched.engine_no ? (
-                                                <span className="errorMsg">{phrases[errors.engine_no]}</span>
-                                            ) : null}
-                                        </div>
-                                    </FormGroup>
-                                </Col>
-                                <Col sm={12} md={6} lg={5}>
-                                    <FormGroup>
-                                        <div className="insurerName">
-                                            <Field
-                                                name="chasis_no"
-                                                type="text"
-                                                placeholder={phrases["ChasisNumber"]}
-                                                autoComplete="off"
-                                                onFocus={e => this.changePlaceHoldClassAdd(e)}
-                                                onBlur={e => this.changePlaceHoldClassRemove(e)}
-                                                value= {values.chasis_no.toUpperCase()}
-                                                maxLength="17"
-                                                onChange = {(e) => {
-                                                    setFieldTouched('chasis_no')
-                                                    setFieldValue('chasis_no', e.target.value)                       
-                                                }} 
-                                            />
-                                            {errors.chasis_no && touched.chasis_no ? (
-                                                <span className="errorMsg">{phrases[errors.chasis_no]}</span>
-                                            ) : null}
-                                        </div>
-                                    </FormGroup>
-                                </Col>
-                            </Row>
-                            : null}
+                        <div className="col-sm-12 col-md-12 col-lg-12 col-xl-12 infobox otherCom">
+                            <h4 className="text-center mt-3 mb-3">{phrases['SBIGICL']}</h4>
+                            <section className="brand colpd m-b-25">
+                                <div className="d-flex justify-content-left">
+                                    <div className="brandhead m-b-10">
+                                        <h4 className="m-b-30">{phrases['CoversM4WOD']}</h4>
+                                        <h5>{errMsg}</h5>
+                                    </div>
+                                </div>
+                                <Formik initialValues={newInitialValues} 
+                                onSubmit={ serverResponse && serverResponse != "" ? (serverResponse.message ? this.fullQuote : this.handleSubmit ) : this.fullQuote} 
+                                validationSchema={ComprehensiveValidation}>
+                                {({ values, errors, setFieldValue, setFieldTouched, isValid, isSubmitting, touched }) => {
 
-                            <Row>
-                                <Col sm={12} md={6} lg={4}>
-                                    <FormGroup>
-                                        <div className="insurerName">
-                                            <span className="fs-16">{phrases['IDValue']}</span>
-                                        </div>
-                                    </FormGroup>
-                                </Col>
-                                <Col sm={12} md={6} lg={2}>
-                                    <FormGroup>
-                                        <div className="insurerName">
-                                        <Field
-                                            name="IDV"
-                                            type="text"
-                                            placeholder=""
-                                            autoComplete="off"
-                                            className="premiumslid"
-                                            onFocus={e => this.changePlaceHoldClassAdd(e)}
-                                            onBlur={e => this.changePlaceHoldClassRemove(e)}
-                                            value={sliderValue ? sliderValue : defaultSliderValue}  
-                                        />
-                                        {errors.IDV && touched.IDV ? (
-                                            <span className="errorMsg">{errors.IDV}</span>
-                                        ) : null}
-                                        </div>
-                                    </FormGroup>
-                                </Col>
-                                {defaultSliderValue ? 
-
-                                <Col sm={12} md={12} lg={6}>
-                                    <FormGroup>
-                                    <input type="range" className="W-90" 
-                                    name= 'slider'
-                                    defaultValue= {defaultSliderValue}
-                                    min= {minIDV}
-                                    max= {maxIDV}
-                                    step= '1'
-                                    value={values.slider}
-                                    onChange= {(e) =>{
-                                    setFieldTouched("slider");
-                                    setFieldValue("slider",e.target.value);
-                                    this.sliderValue(e.target.value)
-                                }}
-                                    />
-                                        {/* <img src={require('../../assets/images/slide.svg')} alt="" className="W-90" /> */}
-                                    </FormGroup>
-                                </Col>
-                                : null}
-                            </Row>
-
-                                                            
-
-                            {/* <Row>
-                                <Col sm={12} md={5} lg={5}>
-                                    <FormGroup>
-                                        <div className="insurerName">
-                                            <span className="fs-16"> Have you fitted external CNG Kit</span>
-                                        </div>
-                                    </FormGroup>
-                                </Col>
-                                <Col sm={12} md={3} lg={3}>
-                                    <FormGroup>
-                                        <div className="d-inline-flex m-b-35">
-                                            <div className="p-r-25">
-                                                <label className="customRadio3">
-                                                <Field
-                                                    type="radio"
-                                                    name='cng_kit'                                            
-                                                    value='1'
-                                                    key='1'  
-                                                    onChange={(e) => {
-                                                        setFieldValue(`cng_kit`, e.target.value);
-                                                        this.showCNGText(1);
-                                                    }}
-                                                    checked={values.cng_kit == '1' ? true : false}
-                                                />
-                                                    <span className="checkmark " /><span className="fs-14"> Yes</span>
-                                                </label>
-                                            </div>
-
-                                            <div className="">
-                                                <label className="customRadio3">
-                                                <Field
-                                                    type="radio"
-                                                    name='cng_kit'                                            
-                                                    value='0'
-                                                    key='1'  
-                                                    onChange={(e) => {
-                                                        setFieldValue(`cng_kit`, e.target.value);
-                                                        this.showCNGText(0);
-                                                    }}
-                                                    checked={values.cng_kit == '0' ? true : false}
-                                                />
-                                                    <span className="checkmark" />
-                                                    <span className="fs-14">No</span>      
-                                                </label>
-                                                {errors.cng_kit && touched.cng_kit ? (
-                                                <span className="errorMsg">{errors.cng_kit}</span>
-                                                ) : null}
-                                            </div>
-                                        </div>
-                                    </FormGroup>
-                                </Col>
-                                {showCNG || is_CNG_account == 1 ?
-                                <Col sm={12} md={12} lg={4}>
-                                    <FormGroup>
-                                    <div className="insurerName">   
-                                        <Field
-                                            name="cngKit_Cost"
-                                            type="text"
-                                            placeholder="Cost of Kit"
-                                            autoComplete="off"
-                                            className="W-80"
-                                            value = {values.cngKit_Cost}
-                                            onFocus={e => this.changePlaceHoldClassAdd(e)}
-                                            onBlur={e => this.changePlaceHoldClassRemove(e)}
-                                            onChange={e => {
-                                                setFieldTouched('cngKit_Cost');
-                                                setFieldValue('cngKit_Cost', e.target.value);
-                                                this.handleChange()
-
-                                            }}
-                                        />
-                                        {errors.cngKit_Cost && touched.cngKit_Cost ? (
-                                        <span className="errorMsg">{errors.cngKit_Cost}</span>
-                                        ) : null}                                             
-                                        </div>
-                                    </FormGroup>
-                                </Col> : ''}
-                            </Row>
-                                */}
-
-                            <Row>
-                                <Col sm={12} md={12} lg={12}>
-                                    <FormGroup>
-                                        <span className="fs-18"> {phrases['AddMoreCoverage']}.</span>
-                                    </FormGroup>
-                                </Col>
-                            </Row>
-  
-
-                                {moreCoverage && moreCoverage.length > 0 ? moreCoverage.map((coverage, qIndex) => (
-                                <Row key={qIndex}>   
-                                    <Col sm={12} md={11} lg={5} key={qIndex+"a"} >
-                                        <label className="customCheckBox formGrp formGrp">{coverage.name}
-                                           
-                                            <Field
-                                                type="checkbox"
-                                                // name={`moreCov_${qIndex}`}
-                                                name={coverage.code}
-                                                value={coverage.code}
-                                                className="user-self"
-                                                // checked={values.roadsideAssistance ? true : false}
-                                                onClick={(e) =>{
-                                                    if( e.target.checked == false && values[coverage.code] == 'B00015') {
-                                                        swal(phrases.SwalIRDAI,
-                                                            {button: phrases.OK})
-                                                    }
-                                                    this.onRowSelect(e.target.value, e.target.checked, setFieldTouched, setFieldValue)         
-                                                }
-                                                }
-                                                checked = {values[coverage.code] == coverage.code ? true : false}
-                                            />
-                                            <span className="checkmark mL-0"></span>
-                                            <span className="error-message"></span>
-                                        </label>
-                                    </Col>
-                                    {values.PA_flag == '1' && values[coverage.code] == 'B00016' ?
-                                        <Col sm={12} md={11} lg={3} key={qIndex+"b"}>
-                                            <FormGroup>
-                                                <div className="formSection">
-                                                    <Field
-                                                        name='PA_Cover'
-                                                        component="select"
-                                                        autoComplete="off"
-                                                        className="formGrp inputfs12"
-                                                        value = {values.PA_Cover}
-                                                        onChange={(e) => {
-                                                            setFieldTouched('PA_Cover')
-                                                            setFieldValue('PA_Cover', e.target.value);
-                                                            this.handleChange()
-                                                        }}
-                                                    >
-                                                        <option value="">{phrases['SSI']}</option>
-                                                        <option value="50000">50000</option>
-                                                        <option value="100000">100000</option>  
-                                            
-                                                    </Field>
-                                                    {errors.PA_Cover ? (
-                                                        <span className="errorMsg">{phrases[errors.PA_Cover]}</span>
-                                                    ) : null}
-                                                </div>
-                                            </FormGroup>
-                                        </Col> : null
-                                    }
-                                    {values.nonElectric_flag == '1' && values[coverage.code] == 'B00003' ?
-                                     <Fragment>
-                                        <Col sm={12} md={11} lg={3} key={qIndex+"b"}>
-                                            <FormGroup>
-                                                <div className="formSection">
-                                                    <Field
-                                                        name="B00003_value"
-                                                        type="text"
-                                                        placeholder={phrases['ValueOfAccessory']}
-                                                        autoComplete="off"
-                                                        maxLength="8"
-                                                        onFocus={e => this.changePlaceHoldClassAdd(e)}
-                                                        onBlur={e => this.changePlaceHoldClassRemove(e)}
-                                                        onChange={(e) => {
-                                                            setFieldTouched('B00003_value')
-                                                            setFieldValue('B00003_value', e.target.value);
-                                                            this.handleChange()
-                                                        }}
-                                                    >                                     
-                                                    </Field>
-                                                    {errors.B00003_value ? (
-                                                        <span className="errorMsg">{phrases[errors.B00003_value]}</span>
-                                                    ) : null}
-                                                </div>
-                                            </FormGroup>
-                                        </Col>
-                                        <Col sm={12} md={11} lg={3} key={qIndex+"c"}>
-                                            <FormGroup>
-                                                <div className="formSection">
-                                                    <Field
-                                                        name="B00003_description"
-                                                        type="text"
-                                                        placeholder={phrases['AccessoryDescription']}
-                                                        autoComplete="off"
-                                                        // maxLength="28"
-                                                        onFocus={e => this.changePlaceHoldClassAdd(e)}
-                                                        onBlur={e => this.changePlaceHoldClassRemove(e)}
-                                                        onChange={(e) => {
-                                                            setFieldTouched('B00003_description')
-                                                            setFieldValue('B00003_description', e.target.value);
-                                                            this.handleChange()
-                                                        }}
-                                                    >                                     
-                                                    </Field>
-                                                    {errors.B00003_description ? (
-                                                        <span className="errorMsg">{phrases[errors.B00003_description]}</span>
-                                                    ) : null}
-                                                </div>
-                                            </FormGroup>
-                                        </Col> </Fragment> : null
-                                    }
-                                    {values.electric_flag == '1' && values[coverage.code] == 'B00004' ?
-                                        <Fragment>
-                                        <Col sm={12} md={11} lg={3} key={qIndex+"b"}>
-                                            <FormGroup>
-                                                <div className="formSection">
-                                                    <Field
-                                                        name="B00004_value"
-                                                        type="text"
-                                                        placeholder={phrases['ValueOfAccessory']}
-                                                        autoComplete="off"
-                                                        maxLength="8"
-                                                        onFocus={e => this.changePlaceHoldClassAdd(e)}
-                                                        onBlur={e => this.changePlaceHoldClassRemove(e)}
-                                                        onChange={(e) => {
-                                                            setFieldTouched('B00004_value')
-                                                            setFieldValue('B00004_value', e.target.value);
-                                                            this.handleChange()
-                                                        }}
-                                                    >                                     
-                                                    </Field>
-                                                    {errors.B00004_value ? (
-                                                        <span className="errorMsg">{phrases[errors.B00004_value]}</span>
-                                                    ) : null}
-                                                </div>
-                                            </FormGroup>
-                                        </Col>
-                                        <Col sm={12} md={11} lg={3} key={qIndex+"c"}>
-                                            <FormGroup>
-                                                <div className="formSection">
-                                                    <Field
-                                                        name="B00004_description"
-                                                        type="text"
-                                                        placeholder={phrases['AccessoryDescription']}
-                                                        autoComplete="off"
-                                                        // maxLength="28"
-                                                        onFocus={e => this.changePlaceHoldClassAdd(e)}
-                                                        onBlur={e => this.changePlaceHoldClassRemove(e)}
-                                                        onChange={(e) => {
-                                                            setFieldTouched('B00004_description')
-                                                            setFieldValue('B00004_description', e.target.value);
-                                                            this.handleChange()
-                                                        }}
-                                                    >                                     
-                                                    </Field>
-                                                    {errors.B00004_description ? (
-                                                        <span className="errorMsg">{phrases[errors.B00004_description]}</span>
-                                                    ) : null}
-                                                </div>
-                                            </FormGroup>
-                                        </Col> </Fragment> : null
-                                    }
-                                    {values.Geographical_flag == '1' && values[coverage.code] == 'geographical_extension' ?
-                                        <Fragment>
-                                        <Col sm={12} md={11} lg={3} key={qIndex+"c"}>
-                                        {coverage.covarage_value != null && JSON.parse(coverage.covarage_value).value.length > 0 && JSON.parse(coverage.covarage_value).value.map((insurer, qIndex) => (
-                                            insurer.status == '1' ?
-                                            <label className="customCheckBox formGrp formGrp">{insurer.name}                                         
-                                                <Field
-                                                    type="checkbox"
-                                                    // name={`moreCov_${qIndex}`}
-                                                    name={insurer.id}
-                                                    value={insurer.id}
-                                                    className="user-self"
-                                                    checked = {values[insurer.id] == insurer.id ? true : false}
-                                                    onClick={(e) =>{
-                                                        this.onGeoAreaSelect(e.target.value, values, e.target.checked, setFieldTouched, setFieldValue)         
-                                                    }}
-                                                />
-                                                <span className="checkmark mL-0"></span>
-                                                <span className="error-message"></span>
-                                            </label> : null))}
-                                            {errors.geographical_extension_length ? (
-                                                    <span className="errorMsg">{errors.geographical_extension_length}</span>
-                                            ) : null} 
-                                        </Col>
-                                        </Fragment> : null
-                                    }
-                                    {values.CNG_OD_flag == '1' && values[coverage.code] == 'B00005' ?
-                                        <Fragment>
-                                        <Col sm={12} md={11} lg={3} key={qIndex+"b"}>
-                                            <FormGroup>
-                                                <div className="formSection">
-                                                    <Field
-                                                        name="B00005_value"
-                                                        type="text"
-                                                        placeholder="IDV"
-                                                        autoComplete="off"
-                                                        maxLength="7"
-                                                        onFocus={e => this.changePlaceHoldClassAdd(e)}
-                                                        onBlur={e => this.changePlaceHoldClassRemove(e)}
-                                                        onChange={(e) => {
-                                                            setFieldTouched('B00005_value')
-                                                            setFieldValue('B00005_value', e.target.value);
-                                                            this.handleChange()
-                                                        }}
-                                                        >                                     
-                                                    </Field>
-                                                    {errors.B00005_value ? (
-                                                        <span className="errorMsg">{errors.B00005_value}</span>
-                                                    ) : null}
-                                                </div>
-                                            </FormGroup>
-                                        </Col>
-                                        </Fragment> : null
-                                    }
-                                     {values.LL_PD_flag == '1' && values[coverage.code] == 'B00013' ?
-                                        <Fragment>
-                                        <Col sm={12} md={11} lg={3} key={qIndex+"c"}>
-                                            <FormGroup>
-                                                <div className="formSection">
-                                                    <Field
-                                                        name='B00013_value'
-                                                        component="select"
-                                                        autoComplete="off"
-                                                        className="formGrp inputfs12"
-                                                        value = {values.B00013_value}
-                                                        onChange={(e) => {
-                                                            setFieldTouched('B00013_value')
-                                                            setFieldValue('B00013_value', e.target.value);
-                                                            this.handleChange()
-                                                        }}
-                                                    >
-                                                        <option value="">{phrases['NoOfDrivers']}</option>
-                                                        {coverage.covarage_value != null && JSON.parse(coverage.covarage_value).value.length > 0 && JSON.parse(coverage.covarage_value).value.map((insurer, qIndex) => (
-                                                            <option value= {insurer}>{insurer}</option>
-                                                        ))} 
-                                            
-                                                    </Field>
-                                                    {errors.B00013_value ? (
-                                                        <span className="errorMsg">{phrases[errors.B00013_value]}</span>
-                                                    ) : null}
-                                                </div>
-                                            </FormGroup>
-                                        </Col>
-                                        </Fragment> : null
-                                    }
-                                </Row>
-                                )) : null}
-
-                                <Row>
-                                    <Col sm={12}>
-                                        <FormGroup>
-                                            <div className="carloan">
-                                                <h4> </h4>
-                                            </div>
-                                            <div className="col-md-15">
-                                                <div className="brandhead"> 
-                                                    {phrases['EffectivePUC']}
-                                                    <div className="carloan">
-                                                        <h4> </h4>
+                                return (
+                                    <Form>
+                                    <Row>
+                                        <Col sm={12} md={9} lg={9}>
+                                            <div className="rghtsideTrigr W-90 m-b-30">
+                                                <Collapsible trigger={phrases['DefaultCovered']} open = {true}>
+                                                    <div className="listrghtsideTrigr">
+                                                        {policyCoverageList}
                                                     </div>
-                                                        <div className="d-inline-flex m-b-15">
-                                                            <div className="p-r-25">
-                                                                <label className="customRadio3">
-                                                                    <Field
-                                                                        type="radio"
-                                                                        name='puc'
-                                                                        value='1'
-                                                                        key='1'
-                                                                        checked = {values.puc == '1' ? true : false}
-                                                                        onChange = {() =>{
-                                                                            setFieldTouched('puc')
-                                                                            setFieldValue('puc', '1');
-                                                                        }  
-                                                                        }
-                                                                    />
-                                                                    <span className="checkmark " /><span className="fs-14"> {phrases['Yes']}</span>
-                                                                </label>
+                                                </Collapsible>
+                                            </div>
+
+                                        <Row>
+                                        <Col sm={12} md={12} lg={4}>
+                                        <Row>
+                                        <Col sm={12} md={5} lg={6}>
+                                            <FormGroup>
+                                                <div className="insurerName">
+                                                {phrases['RegNo']}
+                                                </div>
+                                            </FormGroup>
+                                        </Col>
+                                            
+                                            <Col sm={12} md={5} lg={6}>
+                                                <FormGroup>
+                                                    <div className="insurerName">
+                                                    {values.newRegistrationNo != "NEW" ?
+                                                        <Field
+                                                            name="registration_no"
+                                                            type="text"
+                                                            placeholder=""
+                                                            autoComplete="off"
+                                                            onFocus={e => this.changePlaceHoldClassAdd(e)}
+                                                            onBlur={e => this.changePlaceHoldClassRemove(e)}
+                                                            value= {values.registration_no}   
+                                                            maxLength={this.state.length}
+                                                            disabled = {true}
+                                                            onInput={e=>{
+                                                                this.regnoFormat(e, setFieldTouched, setFieldValue)
+                                                            }}        
+                
+                                                        /> : 
+                                                        <Field
+                                                                type="text"
+                                                                name='registration_no' 
+                                                                autoComplete="off"
+                                                                className="premiumslid"   
+                                                                value= {values.newRegistrationNo}    
+                                                                disabled = {true}                                                 
+                                                            />}
+
+                                                        {errors.registration_no ? (
+                                                            <span className="errorMsg">{phrases[errors.registration_no]}</span>
+                                                        ) : null}
+                                                    </div>
+                                                </FormGroup>
+                                            </Col>
+                                            </Row>
+                                            </Col>
+
+                                            <Col sm={12} md={12} lg={5}>
+                                                <Row>
+                                                    <Col sm={12} md={5} lg={6}>
+                                                        <FormGroup>
+                                                            <div className="insurerName">
+                                                            {phrases['ChassisNo']}
                                                             </div>
-                                                            <div className="p-r-25">
-                                                                <label className="customRadio3">
+                                                        </FormGroup>
+                                                    </Col>
+                                                
+                                                    <Col sm={12} md={5} lg={6}>
+                                                        <FormGroup>
+                                                            <div className="insurerName">
                                                                     <Field
-                                                                        type="radio"
-                                                                        name='puc'
-                                                                        value='2'
-                                                                        key='1'
-                                                                        checked = {values.puc == '2' ? true : false}
-                                                                        onChange = {() =>{
-                                                                            setFieldTouched('puc')
-                                                                            setFieldValue('puc', '2');
-                                                                        }  
-                                                                        }
+                                                                        type="text"
+                                                                        name='chasis_no_last_part' 
+                                                                        autoComplete="off"
+                                                                        className="premiumslid"       
+                                                                        value= {values.chasis_no_last_part}
+                                                                        maxLength="5"       
+                                                                        onChange = {(e) => {
+                                                                            setFieldValue('vahanVerify', false)
+
+                                                                            setFieldTouched('chasis_no_last_part')
+                                                                            setFieldValue('chasis_no_last_part', e.target.value)                       
+                                                                        }}                           
+                                                                        
                                                                     />
-                                                                    <span className="checkmark " /><span className="fs-14"> {phrases['No']}</span>
-                                                                </label>
-                                                                {errors.puc && touched.puc ? (
-                                                                    <span className="errorMsg">{errors.puc}</span>
+                                                                    {errors.chasis_no_last_part && touched.chasis_no_last_part ? (
+                                                                    <span className="errorMsg">{phrases[errors.chasis_no_last_part]}</span>
                                                                 ) : null}
                                                             </div>
+                                                        </FormGroup>
+                                                    </Col>
+                                                </Row>
+                                                </Col>
+
+                                                <Col sm={12} md={2} lg={2}>
+                                                    <FormGroup>
+                                                    
+                                                        <Button className="btn btn-primary vrifyBtn" onClick= {!errors.chasis_no_last_part ? this.getVahanDetails.bind(this,values, setFieldTouched, setFieldValue, errors) : null}>{phrases['Verify']}</Button>
+                                                        {errors.vahanVerify ? (
+                                                                <span className="errorMsg">{phrases[errors.vahanVerify]}</span>
+                                                            ) : null}
+                                                    </FormGroup>
+                                                </Col>
+                                        </Row>
+                                        {values.vahanVerify && !errors.chasis_no_last_part ?
+                                        <Row>
+                                            <Col sm={12} md={6} lg={5}>
+                                                <FormGroup>
+                                                    <div className="insurerName">
+                                                        <Field
+                                                            name="engine_no"
+                                                            type="text"
+                                                            placeholder={phrases["EngineNumber"]}
+                                                            autoComplete="off"
+                                                            onFocus={e => this.changePlaceHoldClassAdd(e)}
+                                                            onBlur={e => this.changePlaceHoldClassRemove(e)}
+                                                            value= {values.engine_no.toUpperCase()}
+                                                            maxLength="17"
+                                                            onChange = {(e) => {
+                                                                setFieldTouched('engine_no')
+                                                                setFieldValue('engine_no', e.target.value)                       
+                                                            }}  
+                                                        />
+                                                        {errors.engine_no && touched.engine_no ? (
+                                                            <span className="errorMsg">{phrases[errors.engine_no]}</span>
+                                                        ) : null}
+                                                    </div>
+                                                </FormGroup>
+                                            </Col>
+                                            <Col sm={12} md={6} lg={5}>
+                                                <FormGroup>
+                                                    <div className="insurerName">
+                                                        <Field
+                                                            name="chasis_no"
+                                                            type="text"
+                                                            placeholder={phrases["ChasisNumber"]}
+                                                            autoComplete="off"
+                                                            onFocus={e => this.changePlaceHoldClassAdd(e)}
+                                                            onBlur={e => this.changePlaceHoldClassRemove(e)}
+                                                            value= {values.chasis_no.toUpperCase()}
+                                                            maxLength="17"
+                                                            onChange = {(e) => {
+                                                                setFieldTouched('chasis_no')
+                                                                setFieldValue('chasis_no', e.target.value)                       
+                                                            }} 
+                                                        />
+                                                        {errors.chasis_no && touched.chasis_no ? (
+                                                            <span className="errorMsg">{phrases[errors.chasis_no]}</span>
+                                                        ) : null}
+                                                    </div>
+                                                </FormGroup>
+                                            </Col>
+                                        </Row>
+                                        : null}
+
+                                        <Row>
+                                            <Col sm={12} md={6} lg={4}>
+                                                <FormGroup>
+                                                    <div className="insurerName">
+                                                        <span className="fs-16">{phrases['IDValue']}</span>
+                                                    </div>
+                                                </FormGroup>
+                                            </Col>
+                                            <Col sm={12} md={6} lg={2}>
+                                                <FormGroup>
+                                                    <div className="insurerName">
+                                                    <Field
+                                                        name="IDV"
+                                                        type="text"
+                                                        placeholder=""
+                                                        autoComplete="off"
+                                                        className="premiumslid"
+                                                        onFocus={e => this.changePlaceHoldClassAdd(e)}
+                                                        onBlur={e => this.changePlaceHoldClassRemove(e)}
+                                                        value={sliderValue ? sliderValue : defaultSliderValue}  
+                                                    />
+                                                    {errors.IDV && touched.IDV ? (
+                                                        <span className="errorMsg">{errors.IDV}</span>
+                                                    ) : null}
+                                                    </div>
+                                                </FormGroup>
+                                            </Col>
+                                            {defaultSliderValue ? 
+
+                                            <Col sm={12} md={12} lg={6}>
+                                                <FormGroup>
+                                                <input type="range" className="W-90" 
+                                                name= 'slider'
+                                                defaultValue= {defaultSliderValue}
+                                                min= {minIDV}
+                                                max= {maxIDV}
+                                                step= '1'
+                                                value={values.slider}
+                                                onChange= {(e) =>{
+                                                setFieldTouched("slider");
+                                                setFieldValue("slider",e.target.value);
+                                                this.sliderValue(e.target.value)
+                                            }}
+                                                />
+                                                    {/* <img src={require('../../assets/images/slide.svg')} alt="" className="W-90" /> */}
+                                                </FormGroup>
+                                            </Col>
+                                            : null}
+                                        </Row>
+
+                                                                        
+
+                                        {/* <Row>
+                                            <Col sm={12} md={5} lg={5}>
+                                                <FormGroup>
+                                                    <div className="insurerName">
+                                                        <span className="fs-16"> Have you fitted external CNG Kit</span>
+                                                    </div>
+                                                </FormGroup>
+                                            </Col>
+                                            <Col sm={12} md={3} lg={3}>
+                                                <FormGroup>
+                                                    <div className="d-inline-flex m-b-35">
+                                                        <div className="p-r-25">
+                                                            <label className="customRadio3">
+                                                            <Field
+                                                                type="radio"
+                                                                name='cng_kit'                                            
+                                                                value='1'
+                                                                key='1'  
+                                                                onChange={(e) => {
+                                                                    setFieldValue(`cng_kit`, e.target.value);
+                                                                    this.showCNGText(1);
+                                                                }}
+                                                                checked={values.cng_kit == '1' ? true : false}
+                                                            />
+                                                                <span className="checkmark " /><span className="fs-14"> Yes</span>
+                                                            </label>
+                                                        </div>
+
+                                                        <div className="">
+                                                            <label className="customRadio3">
+                                                            <Field
+                                                                type="radio"
+                                                                name='cng_kit'                                            
+                                                                value='0'
+                                                                key='1'  
+                                                                onChange={(e) => {
+                                                                    setFieldValue(`cng_kit`, e.target.value);
+                                                                    this.showCNGText(0);
+                                                                }}
+                                                                checked={values.cng_kit == '0' ? true : false}
+                                                            />
+                                                                <span className="checkmark" />
+                                                                <span className="fs-14">No</span>      
+                                                            </label>
+                                                            {errors.cng_kit && touched.cng_kit ? (
+                                                            <span className="errorMsg">{errors.cng_kit}</span>
+                                                            ) : null}
+                                                        </div>
+                                                    </div>
+                                                </FormGroup>
+                                            </Col>
+                                            {showCNG || is_CNG_account == 1 ?
+                                            <Col sm={12} md={12} lg={4}>
+                                                <FormGroup>
+                                                <div className="insurerName">   
+                                                    <Field
+                                                        name="cngKit_Cost"
+                                                        type="text"
+                                                        placeholder="Cost of Kit"
+                                                        autoComplete="off"
+                                                        className="W-80"
+                                                        value = {values.cngKit_Cost}
+                                                        onFocus={e => this.changePlaceHoldClassAdd(e)}
+                                                        onBlur={e => this.changePlaceHoldClassRemove(e)}
+                                                        onChange={e => {
+                                                            setFieldTouched('cngKit_Cost');
+                                                            setFieldValue('cngKit_Cost', e.target.value);
+                                                            this.handleChange()
+
+                                                        }}
+                                                    />
+                                                    {errors.cngKit_Cost && touched.cngKit_Cost ? (
+                                                    <span className="errorMsg">{errors.cngKit_Cost}</span>
+                                                    ) : null}                                             
+                                                    </div>
+                                                </FormGroup>
+                                            </Col> : ''}
+                                        </Row>
+                                            */}
+
+                                        <Row>
+                                            <Col sm={12} md={12} lg={12}>
+                                                <FormGroup>
+                                                    <span className="fs-18"> {phrases['AddMoreCoverage']}.</span>
+                                                </FormGroup>
+                                            </Col>
+                                        </Row>
+            
+
+                                            {moreCoverage && moreCoverage.length > 0 ? moreCoverage.map((coverage, qIndex) => (
+                                            <Row key={qIndex}>   
+                                                <Col sm={12} md={11} lg={5} key={qIndex+"a"} >
+                                                    <label className="customCheckBox formGrp formGrp">{coverage.name}
+                                                    
+                                                        <Field
+                                                            type="checkbox"
+                                                            // name={`moreCov_${qIndex}`}
+                                                            name={coverage.code}
+                                                            value={coverage.code}
+                                                            className="user-self"
+                                                            // checked={values.roadsideAssistance ? true : false}
+                                                            onClick={(e) =>{
+                                                                if( e.target.checked == false && values[coverage.code] == 'B00015') {
+                                                                    swal(phrases.SwalIRDAI,
+                                                                        {button: phrases.OK})
+                                                                }
+                                                                this.onRowSelect(e.target.value, e.target.checked, setFieldTouched, setFieldValue)         
+                                                            }
+                                                            }
+                                                            checked = {values[coverage.code] == coverage.code ? true : false}
+                                                        />
+                                                        <span className="checkmark mL-0"></span>
+                                                        <span className="error-message"></span>
+                                                    </label>
+                                                </Col>
+                                                {values.PA_flag == '1' && values[coverage.code] == 'B00016' ?
+                                                    <Col sm={12} md={11} lg={3} key={qIndex+"b"}>
+                                                        <FormGroup>
+                                                            <div className="formSection">
+                                                                <Field
+                                                                    name='PA_Cover'
+                                                                    component="select"
+                                                                    autoComplete="off"
+                                                                    className="formGrp inputfs12"
+                                                                    value = {values.PA_Cover}
+                                                                    onChange={(e) => {
+                                                                        setFieldTouched('PA_Cover')
+                                                                        setFieldValue('PA_Cover', e.target.value);
+                                                                        this.handleChange()
+                                                                    }}
+                                                                >
+                                                                    <option value="">{phrases['SSI']}</option>
+                                                                    <option value="50000">50000</option>
+                                                                    <option value="100000">100000</option>  
+                                                        
+                                                                </Field>
+                                                                {errors.PA_Cover ? (
+                                                                    <span className="errorMsg">{phrases[errors.PA_Cover]}</span>
+                                                                ) : null}
+                                                            </div>
+                                                        </FormGroup>
+                                                    </Col> : null
+                                                }
+                                                {values.nonElectric_flag == '1' && values[coverage.code] == 'B00003' ?
+                                                <Fragment>
+                                                    <Col sm={12} md={11} lg={3} key={qIndex+"b"}>
+                                                        <FormGroup>
+                                                            <div className="formSection">
+                                                                <Field
+                                                                    name="B00003_value"
+                                                                    type="text"
+                                                                    placeholder={phrases['ValueOfAccessory']}
+                                                                    autoComplete="off"
+                                                                    maxLength="8"
+                                                                    onFocus={e => this.changePlaceHoldClassAdd(e)}
+                                                                    onBlur={e => this.changePlaceHoldClassRemove(e)}
+                                                                    onChange={(e) => {
+                                                                        setFieldTouched('B00003_value')
+                                                                        setFieldValue('B00003_value', e.target.value);
+                                                                        this.handleChange()
+                                                                    }}
+                                                                >                                     
+                                                                </Field>
+                                                                {errors.B00003_value ? (
+                                                                    <span className="errorMsg">{phrases[errors.B00003_value]}</span>
+                                                                ) : null}
+                                                            </div>
+                                                        </FormGroup>
+                                                    </Col>
+                                                    <Col sm={12} md={11} lg={3} key={qIndex+"c"}>
+                                                        <FormGroup>
+                                                            <div className="formSection">
+                                                                <Field
+                                                                    name="B00003_description"
+                                                                    type="text"
+                                                                    placeholder={phrases['AccessoryDescription']}
+                                                                    autoComplete="off"
+                                                                    // maxLength="28"
+                                                                    onFocus={e => this.changePlaceHoldClassAdd(e)}
+                                                                    onBlur={e => this.changePlaceHoldClassRemove(e)}
+                                                                    onChange={(e) => {
+                                                                        setFieldTouched('B00003_description')
+                                                                        setFieldValue('B00003_description', e.target.value);
+                                                                        this.handleChange()
+                                                                    }}
+                                                                >                                     
+                                                                </Field>
+                                                                {errors.B00003_description ? (
+                                                                    <span className="errorMsg">{phrases[errors.B00003_description]}</span>
+                                                                ) : null}
+                                                            </div>
+                                                        </FormGroup>
+                                                    </Col> </Fragment> : null
+                                                }
+                                                {values.electric_flag == '1' && values[coverage.code] == 'B00004' ?
+                                                    <Fragment>
+                                                    <Col sm={12} md={11} lg={3} key={qIndex+"b"}>
+                                                        <FormGroup>
+                                                            <div className="formSection">
+                                                                <Field
+                                                                    name="B00004_value"
+                                                                    type="text"
+                                                                    placeholder={phrases['ValueOfAccessory']}
+                                                                    autoComplete="off"
+                                                                    maxLength="8"
+                                                                    onFocus={e => this.changePlaceHoldClassAdd(e)}
+                                                                    onBlur={e => this.changePlaceHoldClassRemove(e)}
+                                                                    onChange={(e) => {
+                                                                        setFieldTouched('B00004_value')
+                                                                        setFieldValue('B00004_value', e.target.value);
+                                                                        this.handleChange()
+                                                                    }}
+                                                                >                                     
+                                                                </Field>
+                                                                {errors.B00004_value ? (
+                                                                    <span className="errorMsg">{phrases[errors.B00004_value]}</span>
+                                                                ) : null}
+                                                            </div>
+                                                        </FormGroup>
+                                                    </Col>
+                                                    <Col sm={12} md={11} lg={3} key={qIndex+"c"}>
+                                                        <FormGroup>
+                                                            <div className="formSection">
+                                                                <Field
+                                                                    name="B00004_description"
+                                                                    type="text"
+                                                                    placeholder={phrases['AccessoryDescription']}
+                                                                    autoComplete="off"
+                                                                    // maxLength="28"
+                                                                    onFocus={e => this.changePlaceHoldClassAdd(e)}
+                                                                    onBlur={e => this.changePlaceHoldClassRemove(e)}
+                                                                    onChange={(e) => {
+                                                                        setFieldTouched('B00004_description')
+                                                                        setFieldValue('B00004_description', e.target.value);
+                                                                        this.handleChange()
+                                                                    }}
+                                                                >                                     
+                                                                </Field>
+                                                                {errors.B00004_description ? (
+                                                                    <span className="errorMsg">{phrases[errors.B00004_description]}</span>
+                                                                ) : null}
+                                                            </div>
+                                                        </FormGroup>
+                                                    </Col> </Fragment> : null
+                                                }
+                                                {values.Geographical_flag == '1' && values[coverage.code] == 'geographical_extension' ?
+                                                    <Fragment>
+                                                    <Col sm={12} md={11} lg={3} key={qIndex+"c"}>
+                                                    {coverage.covarage_value != null && JSON.parse(coverage.covarage_value).value.length > 0 && JSON.parse(coverage.covarage_value).value.map((insurer, qIndex) => (
+                                                        insurer.status == '1' ?
+                                                        <label className="customCheckBox formGrp formGrp">{insurer.name}                                         
+                                                            <Field
+                                                                type="checkbox"
+                                                                // name={`moreCov_${qIndex}`}
+                                                                name={insurer.id}
+                                                                value={insurer.id}
+                                                                className="user-self"
+                                                                checked = {values[insurer.id] == insurer.id ? true : false}
+                                                                onClick={(e) =>{
+                                                                    this.onGeoAreaSelect(e.target.value, values, e.target.checked, setFieldTouched, setFieldValue)         
+                                                                }}
+                                                            />
+                                                            <span className="checkmark mL-0"></span>
+                                                            <span className="error-message"></span>
+                                                        </label> : null))}
+                                                        {errors.geographical_extension_length ? (
+                                                                <span className="errorMsg">{errors.geographical_extension_length}</span>
+                                                        ) : null} 
+                                                    </Col>
+                                                    </Fragment> : null
+                                                }
+                                                {values.CNG_OD_flag == '1' && values[coverage.code] == 'B00005' ?
+                                                    <Fragment>
+                                                    <Col sm={12} md={11} lg={3} key={qIndex+"b"}>
+                                                        <FormGroup>
+                                                            <div className="formSection">
+                                                                <Field
+                                                                    name="B00005_value"
+                                                                    type="text"
+                                                                    placeholder="IDV"
+                                                                    autoComplete="off"
+                                                                    maxLength="7"
+                                                                    onFocus={e => this.changePlaceHoldClassAdd(e)}
+                                                                    onBlur={e => this.changePlaceHoldClassRemove(e)}
+                                                                    onChange={(e) => {
+                                                                        setFieldTouched('B00005_value')
+                                                                        setFieldValue('B00005_value', e.target.value);
+                                                                        this.handleChange()
+                                                                    }}
+                                                                    >                                     
+                                                                </Field>
+                                                                {errors.B00005_value ? (
+                                                                    <span className="errorMsg">{errors.B00005_value}</span>
+                                                                ) : null}
+                                                            </div>
+                                                        </FormGroup>
+                                                    </Col>
+                                                    </Fragment> : null
+                                                }
+                                                {values.LL_PD_flag == '1' && values[coverage.code] == 'B00013' ?
+                                                    <Fragment>
+                                                    <Col sm={12} md={11} lg={3} key={qIndex+"c"}>
+                                                        <FormGroup>
+                                                            <div className="formSection">
+                                                                <Field
+                                                                    name='B00013_value'
+                                                                    component="select"
+                                                                    autoComplete="off"
+                                                                    className="formGrp inputfs12"
+                                                                    value = {values.B00013_value}
+                                                                    onChange={(e) => {
+                                                                        setFieldTouched('B00013_value')
+                                                                        setFieldValue('B00013_value', e.target.value);
+                                                                        this.handleChange()
+                                                                    }}
+                                                                >
+                                                                    <option value="">{phrases['NoOfDrivers']}</option>
+                                                                    {coverage.covarage_value != null && JSON.parse(coverage.covarage_value).value.length > 0 && JSON.parse(coverage.covarage_value).value.map((insurer, qIndex) => (
+                                                                        <option value= {insurer}>{insurer}</option>
+                                                                    ))} 
+                                                        
+                                                                </Field>
+                                                                {errors.B00013_value ? (
+                                                                    <span className="errorMsg">{phrases[errors.B00013_value]}</span>
+                                                                ) : null}
+                                                            </div>
+                                                        </FormGroup>
+                                                    </Col>
+                                                    </Fragment> : null
+                                                }
+                                            </Row>
+                                            )) : null}
+
+                                            <Row>
+                                                <Col sm={12}>
+                                                    <FormGroup>
+                                                        <div className="carloan">
+                                                            <h4> </h4>
+                                                        </div>
+                                                        <div className="col-md-15">
+                                                            <div className="brandhead"> 
+                                                                {phrases['EffectivePUC']}
+                                                                <div className="carloan">
+                                                                    <h4> </h4>
+                                                                </div>
+                                                                    <div className="d-inline-flex m-b-15">
+                                                                        <div className="p-r-25">
+                                                                            <label className="customRadio3">
+                                                                                <Field
+                                                                                    type="radio"
+                                                                                    name='puc'
+                                                                                    value='1'
+                                                                                    key='1'
+                                                                                    checked = {values.puc == '1' ? true : false}
+                                                                                    onChange = {() =>{
+                                                                                        setFieldTouched('puc')
+                                                                                        setFieldValue('puc', '1');
+                                                                                    }  
+                                                                                    }
+                                                                                />
+                                                                                <span className="checkmark " /><span className="fs-14"> {phrases['Yes']}</span>
+                                                                            </label>
+                                                                        </div>
+                                                                        <div className="p-r-25">
+                                                                            <label className="customRadio3">
+                                                                                <Field
+                                                                                    type="radio"
+                                                                                    name='puc'
+                                                                                    value='2'
+                                                                                    key='1'
+                                                                                    checked = {values.puc == '2' ? true : false}
+                                                                                    onChange = {() =>{
+                                                                                        setFieldTouched('puc')
+                                                                                        setFieldValue('puc', '2');
+                                                                                    }  
+                                                                                    }
+                                                                                />
+                                                                                <span className="checkmark " /><span className="fs-14"> {phrases['No']}</span>
+                                                                            </label>
+                                                                            {errors.puc && touched.puc ? (
+                                                                                <span className="errorMsg">{errors.puc}</span>
+                                                                            ) : null}
+                                                                        </div>
+                                                                    </div>
+                                                            </div>
+                                                        </div> 
+                                                        
+                                                    </FormGroup>
+                                                </Col>
+                                            </Row>
+                                            
+                                            <div className="d-flex justify-content-left resmb">
+                                                <Button className={`backBtn`} type="button"  onClick= {this.vehicleDetails.bind(this,productId)}>
+                                                    {phrases['Back']}
+                                                </Button> 
+
+                                                    { serverResponse && serverResponse != "" ? (serverResponse.message ? 
+                                                    <Button className={`proceedBtn`} type="submit"  >
+                                                        {phrases['Recalculate']}
+                                                    </Button> : (values.puc == '1' ?  <Button className={`proceedBtn`} type="submit"  >
+                                                        {phrases['Continue']}
+                                                    </Button>  : null)) : <Button className={`proceedBtn`} type="submit"  >
+                                                        {phrases['Recalculate']}
+                                                    </Button>}
+
+                                                </div>
+                                            </Col>
+
+                                            <Col sm={12} md={3}>
+                                                <div className="justify-content-left regisBox">
+                                                    <h3 className="premamnt"> {phrases['TPAmount']}</h3>
+                                                    <div className="rupee"> ₹ {fulQuoteResp.DuePremium}</div>
+                                                    <div className="text-center">
+                                                        <Button className={`brkbtn`} type="button" onClick= {this.handleShow}>
+                                                        {phrases['Breakup']}
+                                                        </Button> 
                                                         </div>
                                                 </div>
-                                            </div> 
-                                            
-                                        </FormGroup>
-                                    </Col>
-                                </Row>
-                                
-                                <div className="d-flex justify-content-left resmb">
-                                    <Button className={`backBtn`} type="button"  onClick= {this.vehicleDetails.bind(this,productId)}>
-                                        {phrases['Back']}
-                                    </Button> 
-
-                                        { serverResponse && serverResponse != "" ? (serverResponse.message ? 
-                                        <Button className={`proceedBtn`} type="submit"  >
-                                            {phrases['Recalculate']}
-                                        </Button> : (values.puc == '1' ?  <Button className={`proceedBtn`} type="submit"  >
-                                            {phrases['Continue']}
-                                        </Button>  : null)) : <Button className={`proceedBtn`} type="submit"  >
-                                            {phrases['Recalculate']}
-                                        </Button>}
-
-                                    </div>
-                                </Col>
-
-                                <Col sm={12} md={3}>
-                                    <div className="justify-content-left regisBox">
-                                        <h3 className="premamnt"> {phrases['TPAmount']}</h3>
-                                        <div className="rupee"> ₹ {fulQuoteResp.DuePremium}</div>
-                                        <div className="text-center">
-                                            <Button className={`brkbtn`} type="button" onClick= {this.handleShow}>
-                                            {phrases['Breakup']}
-                                            </Button> 
-                                            </div>
-                                    </div>
-                                </Col>
-                        </Row>
-                        </Form>
-                        );
-                        }}
-                        </Formik>
-                </section>
-                <Footer />
+                                            </Col>
+                                    </Row>
+                                    </Form>
+                                    );
+                                    }}
+                                    </Formik>
+                            </section>
+                            <Footer />
+                        </div>
+                    </div>
                 </div>
-                </div>
-				 </div>
                 </div> : null }
                 </BaseComponent>
+
+
                 <Modal className="customModal" bsSize="md"
                     show={this.state.show}
                     onHide={this.handleClose}>

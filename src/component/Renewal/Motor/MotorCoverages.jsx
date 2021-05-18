@@ -548,7 +548,7 @@ class MotorCoverages extends Component {
                 policyCoverage.map((coverage,Index) => {
                     add_more_coverage.push(coverage.cover_type_id)
                     coverage.renewalsubcoverage && coverage.renewalsubcoverage.length > 0 && coverage.renewalsubcoverage.map((benefit, bIndex) => (
-                        benefit.interest_premium && parseInt(benefit.interest_premium) > 0 ? add_more_coverage.push(benefit.interest_id) : null
+                        benefit.interest_premium && parseInt(benefit.interest_premium) != 0 ? add_more_coverage.push(benefit.interest_id) : null
                         // add_more_coverage.push(benefit.interest_id)
                         ))
                 })
@@ -989,9 +989,7 @@ class MotorCoverages extends Component {
         const {add_more_coverage, additional_coverage, request_data,error, policyCoverage, vahanVerify, selectFlag, fulQuoteResp, PolicyArray, fuelList, depreciationPercentage, vehicleDetails, geographical_extension,
             moreCoverage, sliderVal, bodySliderVal, motorInsurance, serverResponse, engine_no, chasis_no, initialValue, add_more_coverage_request_array,ncbDiscount} = this.state
         const {productId} = this.props.match.params 
-        console.log("add_more_coverage_request_array-------------------------- ", add_more_coverage_request_array)
-        // console.log("additional_coverage-------------------------- ", additional_coverage)
-        //let defaultSliderValue = PolicyArray.length > 0 ? Math.round(PolicyArray[0].PolicyRiskList[0].IDV_Suggested) : 0
+        // console.log("add_more_coverage-------------------------- ", add_more_coverage)
         let vehicletype_id = vehicleDetails ? vehicleDetails.vehicletype_id : ""
         let defaultSliderValue = sliderVal
         let min_IDV_suggested = PolicyArray.length > 0 ? PolicyArray[0].PolicyRiskList[0].MinIDV_Suggested : 0

@@ -15,7 +15,7 @@ import "react-datepicker/dist/react-datepicker-cssmodules.min.css";
 import moment from "moment";
 import Collapsible from "react-collapsible";
 import queryString from 'query-string';
-
+import { paymentGateways} from '../../shared/reUseFunctions';	
 
 const initialValue = {
   gateway : ""
@@ -52,6 +52,7 @@ class IPA_Premium extends Component {
     policyCoverage: [],
     paymentStatus: [],
     relationArr: {},
+    paymentgateway: [],
     policyHolder_refNo: queryString.parse(this.props.location.search).access_id ? 
                         queryString.parse(this.props.location.search).access_id : 
                         localStorage.getItem("policyHolder_refNo"),
@@ -137,9 +138,10 @@ class IPA_Premium extends Component {
         let ipaInfo = decryptResp.data && decryptResp.data.policyHolder && decryptResp.data.policyHolder.ipainfo ? decryptResp.data.policyHolder.ipainfo : null;
         let policyHolderDetails = decryptResp.data.policyHolder ? decryptResp.data.policyHolder : [];
         let vehicleDetails = decryptResp.data.policyHolder ? decryptResp.data.policyHolder.vehiclebrandmodel : {};
+        let paymentgateway = decryptResp.data.policyHolder && decryptResp.data.policyHolder.bcmaster && decryptResp.data.policyHolder.bcmaster.bcpayment
         console.log("---ipaInfo--->>", ipaInfo);
         this.setState({
-          ipaInfo, policyHolderDetails, bcMaster,menumaster,vehicleDetails,
+          ipaInfo, policyHolderDetails, bcMaster,menumaster,vehicleDetails,paymentgateway,
           nomineeDetails: policyHolderDetails.request_data && policyHolderDetails.request_data.nominee && policyHolderDetails.request_data.nominee[0],
         });
         this.quote() 
@@ -242,49 +244,17 @@ class IPA_Premium extends Component {
       });
   };
 
-  handleSubmit = (values) => {
-    const policyHolder = this.state.policyHolderDetails
-
-    if(policyHolder && policyHolder.bcmaster && policyHolder.bcmaster.paymentgateway && policyHolder.bcmaster.paymentgateway.slug && values.gateway == 1) {
-        if(policyHolder.bcmaster.paymentgateway.slug == "csc_wallet") {
-            this.payment()
-        }
-        if(policyHolder.bcmaster.paymentgateway.slug == "razorpay") {
-            this.Razor_payment()
-        }
-        if(policyHolder.bcmaster.paymentgateway.slug == "PPINL") {
-            this.paypoint_payment()
-        }
-    }
-    else if (policyHolder && policyHolder.bcmaster && policyHolder.bcmaster.paymentgateway && policyHolder.bcmaster.paymentgateway.slug && values.gateway == 2) {
-        this.props.history.push(`/Vedvag_gateway/${this.props.match.params.productId}?access_id=${this.state.policyHolder_refNo}`);
-    }
-    else if (policyHolder && policyHolder.bcmaster && policyHolder.bcmaster.paymentgateway && policyHolder.bcmaster.paymentgateway.slug && values.gateway == 3) {	
-      this.props.history.push(`/Sahipay_gateway/${this.props.match.params.productId}?access_id=${this.state.policyHolder_refNo}`);	
-  }
+  handleSubmit = (values) => {    
+    const { refNumber , policyHolderDetails} = this.state
+    const { productId } = this.props.match.params
+    paymentGateways(values, policyHolderDetails, refNumber, productId)
 }
-
-  payment = () => {
-    const { policyHolder_refNo } = this.state;
-    let csc_type = sessionStorage.getItem('type')
-    window.location = `${process.env.REACT_APP_PAYMENT_URL}/ConnectPG/payment.php?refrence_no=${policyHolder_refNo}&type=${csc_type}`
-  }
-
-  Razor_payment = () => {
-      const { policyHolder_refNo } = this.state;
-      window.location = `${process.env.REACT_APP_PAYMENT_URL}/razorpay/pay.php?refrence_no=${policyHolder_refNo}`
-  }
-
-  paypoint_payment = () => {
-      const { policyHolder_refNo } = this.state;
-      window.location = `${process.env.REACT_APP_PAYMENT_URL}/ppinl/pay.php?refrence_no=${policyHolder_refNo}`
-  }
 
 
   render() {
     const { productId } = this.props.match.params;
     const { fulQuoteResp, error, show, policyHolderDetails, nomineeDetails, paymentStatus, policyCoverage, relationArr, 
-      ipaInfo, bcMaster, menumaster, vehicleDetails } = this.state;
+      ipaInfo, bcMaster, paymentgateway, vehicleDetails } = this.state;
 
     const policyCoverageList =  policyCoverage && policyCoverage.length > 0 ?
     policyCoverage.map((coverage, qIndex) => (
@@ -377,14 +347,6 @@ class IPA_Premium extends Component {
                       </Col>
                   </Row>
   
-                  {/* <Row>
-                      <Col sm={12} md={6}>
-                          <FormGroup>Gender</FormGroup>
-                      </Col>
-                      <Col sm={12} md={6}>
-                          <FormGroup>{nomineeDetails && nomineeDetails.gender == "m" ? "Male" : "Female"}</FormGroup>
-                      </Col>
-                  </Row> */}
               </Col>
           </Row>
           <Row>
@@ -617,71 +579,31 @@ class IPA_Premium extends Component {
                                                     <FormGroup>
                                                     <div className="paymntgatway">
                                                           Select Payment Gateway
-                                                          <div>
-                                                          {/* <img src={require('../../assets/images/green-check.svg')} alt="" className="m-r-10" /> */}
-                                                          <label className="customRadio3">
-                                                          <Field
-                                                              type="radio"
-                                                              name='gateway'                                            
-                                                              value='1'
-                                                              key='1'  
-                                                              onChange={(e) => {
-                                                                  setFieldValue(`gateway`, e.target.value);
-                                                              }}
-                                                              checked={values.gateway == '1' ? true : false}
-                                                          />
-                                                              <span className="checkmark " /><span className="fs-14"> 
-                                                          
-                                                                  { policyHolderDetails && policyHolderDetails.bcmaster && policyHolderDetails.bcmaster.paymentgateway && policyHolderDetails.bcmaster.paymentgateway.logo ? <img src={require('../../assets/images/'+ policyHolderDetails.bcmaster.paymentgateway.logo)} alt="" /> :
-                                                                  null
-                                                                  }
-                                                              </span>
-                                                          </label>
-                                                          </div>
-
-                                                          {policyHolderDetails.bcmaster && policyHolderDetails.bcmaster.id === 2 ?
-                                                          <div>
-                                                          <label className="customRadio3">
-                                                          <Field
-                                                              type="radio"
-                                                              name='gateway'                                            
-                                                              value='2'
-                                                              key='1'  
-                                                              onChange={(e) => {
-                                                                  setFieldValue(`gateway`, e.target.value);
-                                                              }}
-                                                              checked={values.gateway == '2' ? true : false}
-                                                          />
-                                                              <span className="checkmark " /><span className="fs-14"> 
-                                                          
-                                                                  { policyHolderDetails.bcmaster && policyHolderDetails.bcmaster.id === 2 ? <img src={require('../../assets/images/vedavaag.png')} alt="" /> :
-                                                                  null
-                                                                  }
-                                                              </span>
-                                                          </label>
-                                                          </div> : null }
-
-                                                          {policyHolderDetails.bcmaster && policyHolderDetails.bcmaster.id === 6 ?	
-                                                          <div>	
-                                                          <label className="customRadio3">	
-                                                          <Field	
-                                                              type="radio"	
-                                                              name='gateway'                                            	
-                                                              value='3'	
-                                                              key='1'  	
-                                                              onChange={(e) => {	
-                                                                  setFieldValue(`gateway`, e.target.value);	
-                                                              }}	
-                                                              checked={values.gateway == '3' ? true : false}	
-                                                          />	
-                                                              <span className="checkmark " /><span className="fs-14"> 	
-                                                              
-                                                                  { policyHolderDetails.bcmaster && policyHolderDetails.bcmaster.id === 6 ? <img src={require('../../assets/images/sahipay.png')} alt="" /> :	
-                                                                  null	
-                                                                  }	
-                                                              </span>	
-                                                          </label>	
-                                                          </div> : null }	
+                                                         
+                                                          { paymentgateway && paymentgateway.length > 0 ? paymentgateway.map((gateways,index) =>
+                                                              gateways.hasOwnProperty('paymentgateway') && gateways.paymentgateway ? 
+                                                              <div>
+                                                                  <label className="customRadio3">
+                                                                  <Field
+                                                                      type="radio"
+                                                                      name='gateway'                                            
+                                                                      value={index+1}
+                                                                      key= {index} 
+                                                                      onChange={(e) => {
+                                                                          setFieldValue(`gateway`, e.target.value);
+                                                                          setFieldValue(`slug`, gateways.paymentgateway.slug);
+                                                                      }}
+                                                                      checked={values.gateway == `${index+1}` ? true : false}
+                                                                  />
+                                                                      <span className="checkmark " /><span className="fs-14"> 
+                                                                  
+                                                                          { gateways.paymentgateway.logo ? <img src={require('../../assets/images/'+ gateways.paymentgateway.logo)} alt="" /> :
+                                                                          null
+                                                                          }
+                                                                      </span>
+                                                                  </label>
+                                                              </div> : null
+                                                            ) : null}
 
                                                     </div>
                                                   </FormGroup>

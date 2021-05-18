@@ -113,6 +113,9 @@ export const authProcess = (data, onSuccess, onFailure) => {
                 sessionStorage.setItem('users', JSON.stringify({ user: encryption.encrypt(JSON.stringify(response.data.user_data)), permission: encryption.encrypt(JSON.stringify(response.data.helpTicket)), 
                     userMenu: encryption.encrypt(JSON.stringify(response.data.visibleMenus)), lastAction: Date.now() }));
                 localStorage.setItem('loginData', JSON.stringify( loginData ));
+				
+				
+				sessionStorage.setItem('user_data', JSON.stringify( response.data.user_data ));
                 // var cscData = JSON.parse(response.data.user_data.info);
                 // localStorage.setItem('csc_id', cscData["csc_id"]);
                 // localStorage.setItem('agent_name', cscData["fullname"]);

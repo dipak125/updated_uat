@@ -28,7 +28,6 @@ export const registrationNoFormat = (e, numLength) => {
 
 }
 
-
 export const prevEndDate = (value) => {
     var day =  value.getDate() - 1
     var month = value.getMonth()
@@ -56,4 +55,37 @@ export const fourwheelerODEndDate = (value) => {
         return endDate
     }
     
+}
+
+export const paymentGateways = (values,policyHolder,refNumber, productId) => {
+    if (values.gateway == 2) {
+        console.log("Vedvag_gateway")
+        window.location.href = `#/Vedvag_gateway/${productId}?access_id=${refNumber}`
+    }
+    else if(values.slug && values.gateway == 1) {
+        if(values.slug == "csc_wallet") {
+            payment(refNumber)
+        }
+        if(values.slug == "razorpay") {
+            Razor_payment(refNumber)
+        }
+        if(values.slug == "PPINL") {
+            paypoint_payment(refNumber)
+        }
+        if(values.slug == "sahi_wallet") {
+            window.location.href = `#/Sahipay_gateway/${productId}?access_id=${refNumber}` 
+        }
+    }
+}
+
+function payment(refNumber) {
+    window.location = `${process.env.REACT_APP_PAYMENT_URL}/ConnectPG/payment_motor.php?refrence_no=${refNumber}`
+}
+
+function Razor_payment(refNumber) {
+    window.location = `${process.env.REACT_APP_PAYMENT_URL}/razorpay/pay.php?refrence_no=${refNumber}`
+}
+
+function paypoint_payment(refNumber) {
+    window.location = `${process.env.REACT_APP_PAYMENT_URL}/ppinl/pay.php?refrence_no=${refNumber}`
 }

@@ -389,15 +389,12 @@ class SelectBrandOD extends Component {
                     <div className="container-fluid">
                         <div className="row">
 						
-						
                             <aside className="left-sidebar">
-							 	 <div className="scroll-sidebar ps-container ps-theme-default ps-active-y">
-							 		<SideNav />
-								 </div>
-								</aside>
-							
-							
-							
+                            <div className="scroll-sidebar ps-container ps-theme-default ps-active-y">
+                            <SideNav />
+                            </div>
+                            </aside>
+        
                             <div className="col-sm-12 col-md-12 col-lg-12 col-xl-12 infobox">
                                 <h4 className="text-center mt-3 mb-3">{phrases['SBIGICL']}</h4>
                                 {this.props.data && this.props.data.brandEdit && this.props.data.brandEdit == '1' || pageLoad == '1' ?
@@ -481,8 +478,8 @@ class SelectBrandOD extends Component {
                                 </Formik> : null }
                             </div>
 
-                        </div>
-						 </div>
+                        </div>	
+                    </div>				 
                     </div> : null}
                 </BaseComponent>
 

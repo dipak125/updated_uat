@@ -84,8 +84,9 @@ class renewal extends Component {
             let encryption = new Encryption();
             csc_data = JSON.parse(csc_data)        
             csc_data = csc_data.user
-            csc_data = JSON.parse(encryption.decrypt(csc_data));          
-            user_id = csc_data.csc_digital_seva_id 
+            csc_data = JSON.parse(encryption.decrypt(csc_data));    
+            console.log("cscData----------- ", csc_data)      
+            user_id = csc_data.master_user_id 
             user_type = 'csc'  
         }
 

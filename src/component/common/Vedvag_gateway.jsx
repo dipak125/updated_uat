@@ -122,6 +122,12 @@ class Vedvag_gateway extends Component {
         else if(productId == 12) {
             this.props.history.push(`/arogya_PolicyDetails/${productId}`);
         }
+        else if(productId == 17) {
+            this.props.history.push(`/Premium_GCVST/${productId}`);
+        }
+        else if(productId == 18) {
+            this.props.history.push(`/Premium_MISCDST/${productId}`);
+        }
          
 
     }

@@ -1047,17 +1047,17 @@ class TwoWheelerOtherComprehensiveOD extends Component {
             
             <>
                 <BaseComponent>
-				<div className="page-wrapper">
+                <div className="page-wrapper">
                     <div className="container-fluid">
                         <div className="row">
-						
-                          <aside className="left-sidebar">
+											
+                            <aside className="left-sidebar">
                             <div className="scroll-sidebar ps-container ps-theme-default ps-active-y">
                             <SideNav />
                             </div>
                             </aside>
-	
-                            <div className="col-sm-12 col-md-12 col-lg-12 col-xl-12 infobox twocomp2">
+		
+                            <div className="col-sm-12 col-md-12 col-lg-12 col-xl-12 infobox twoOCdetail">
                                 <h4 className="text-center mt-3 mb-3">{phrases['SBIGICL']}</h4>
                                 { step_completed >= '2' && vehicleDetails.vehicletype_id == productId ?
                                 <section className="brand colpd m-b-25">
@@ -1730,8 +1730,8 @@ class TwoWheelerOtherComprehensiveOD extends Component {
                                                                 {phrases['Back']}
                                                                 </Button>
                                                                 {serverResponse && serverResponse != "" ? (serverResponse.message ?
-                                                                     <Button className={`proceedBtn`} type="submit"  >
-                                                                     {phrases['Recalculate']}
+                                                                    <Button className={`proceedBtn`} type="submit"  >
+                                                                    {phrases['Recalculate']}
                                                                     </Button> : (values.puc == '1' ?  <Button className={`proceedBtn`} type="submit"  >
                                                                         {phrases['Continue']}
                                                                     </Button>  : null)) : <Button className={`proceedBtn`} type="submit"  >
@@ -1760,8 +1760,8 @@ class TwoWheelerOtherComprehensiveOD extends Component {
                                 <Footer />
                             </div>
                         </div>
+                    </div> 
                     </div>
-					  </div>
                 </BaseComponent>
         
                 <Modal className="customModal" bsSize="md"

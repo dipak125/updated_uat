@@ -17,6 +17,7 @@ class HeaderTop extends Component {
         logo: sessionStorage.getItem('logo') && sessionStorage.getItem('logo') != "undefined" ? sessionStorage.getItem('logo') : "",
         bc_data: {},
         csc_data: {},
+		user_data: {},
         phrases: [],
         toggle1: true
     }
@@ -73,6 +74,7 @@ class HeaderTop extends Component {
     componentDidMount() {
         let bc_data = sessionStorage.getItem('bcLoginData') ? sessionStorage.getItem('bcLoginData') : "";
         let csc_data = sessionStorage.getItem('users') ? sessionStorage.getItem('users') : "";
+		let user_data = sessionStorage.getItem('user_data') ? JSON.parse(sessionStorage.getItem('user_data')) : "";
 
         if(bc_data) {
             let encryption = new Encryption();
@@ -86,13 +88,14 @@ class HeaderTop extends Component {
             csc_data = JSON.parse(csc_data) 
             csc_data = csc_data.user
             csc_data = JSON.parse(encryption.decrypt(csc_data));  
-            this.setState({csc_data})
+            this.setState({csc_data, user_data})
         }
     }
 
       
     render() {
-        const { logo, bc_data, csc_data } = this.state
+        const { logo, bc_data, csc_data, user_data } = this.state
+		console.log('user_data', user_data)
 
         let phrases = localStorage.getItem("phrases") ? JSON.parse(localStorage.getItem("phrases")) : null
         
@@ -162,16 +165,11 @@ class HeaderTop extends Component {
                                     {sessionStorage.getItem("auth_token") && bc_data.user_info && phrases ?
                                         <div className="align-self-center userNameImg">
                                             {phrases['Welcome']} {bc_data.user_info.data.user.name}
-                                            <p><a href={process.env.REACT_APP_PAYMENT_URL+'/core/public/pdf_files/RM-name-SBIG.xlsx'}>
-                                                    <Blink color='blue' text= {phrases['DownloadRMList']} fontSize='14'>
-                                                    {phrases['DownloadRMList']}
-                                                    </Blink> 
-                                            </a></p>
                                         </div>
                                             :  
                                             sessionStorage.getItem("auth_token") && csc_data && phrases ?
                                             <div className="align-self-center userNameImg">
-                                                {phrases['Welcome']} {csc_data.name}
+                                                {phrases['Welcome']} {user_data.user_name}
                                                 <p><a href={process.env.REACT_APP_PAYMENT_URL+'/core/public/pdf_files/RM-name-SBIG.xlsx'}>
                                                     <Blink color='blue' text= {phrases['DownloadRMList']} fontSize='14'>
                                                     {phrases['DownloadRMList']}

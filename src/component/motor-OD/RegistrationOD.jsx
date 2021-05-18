@@ -265,34 +265,6 @@ class RegistrationOD extends Component {
     regnoFormat = (e, setFieldTouched, setFieldValue) => {
 
         let regno = e.target.value
-        // let formatVal = ""
-        // let regnoLength = regno.length
-        // var letter = /^[a-zA-Z]+$/;
-        // var number = /^[0-9]+$/;
-        // let subString = regno.substring(regnoLength-1, regnoLength)
-        // let preSubString = regno.substring(regnoLength-2, regnoLength-1)
-
-        // if(subString.match(letter) && preSubString.match(letter) && regnoLength == 3) {        
-        //     formatVal = formatVal = regno.substring(0, regnoLength-1) + " " +subString
-        // }
-        // else if(subString.match(letter) && preSubString.match(letter)) {
-        //     formatVal = regno
-        // }
-        // else if(subString.match(number) && preSubString.match(number) && regnoLength == 6) {
-        //     formatVal = formatVal = regno.substring(0, regnoLength-1) + " " +subString
-        // } 
-        // else if(subString.match(number) && preSubString.match(number) && regnoLength == 11 && regno.substring(3, 4).match(letter) && regno.substring(5, 7).match(number) ) {
-        //     formatVal = formatVal = regno.substring(0, 7) + " " +regno.substring(7, 11)
-        // } 
-        // else if(subString.match(number) && preSubString.match(letter)) {        
-        //     formatVal = regno.substring(0, regnoLength-1) + " " +subString      
-        // } 
-        // else if(subString.match(letter) && preSubString.match(number)) {
-        //     formatVal = regno.substring(0, regnoLength-1) + " " +subString   
-        // } 
-
-        // else formatVal = regno.toUpperCase()
-
         e.target.value = regno.toUpperCase()
 
     }
@@ -310,74 +282,71 @@ class RegistrationOD extends Component {
             <>
                 <BaseComponent>
                     {phrases ?
-					<div className="page-wrapper">
-					
-                        <div className="container-fluid">
-                            <div className="row">
-							
-							<aside className="left-sidebar">
-							 	 <div className="scroll-sidebar ps-container ps-theme-default ps-active-y">
-							 		<SideNav />
-								 </div>
-								</aside>
-										
-														
-								
-                                <div className="col-sm-12 col-md-12 col-lg-12 col-xl-12 infobox">
-                                    <h4 className="text-center mt-3 mb-3">{phrases['SBIGICL']}</h4>
-                                    <section className="brand">
-                                        <div className="boxpd">
-                                            <h4 className="m-b-30">{phrases['AboutVehicle']}</h4>
-                                            <Formik initialValues={newInitialValues}
-                                                onSubmit={this.fetchFastlane}
-                                                validationSchema={vehicleRegistrationValidation}>
-                                                {({ values, errors, setFieldValue, setFieldTouched, isValid, isSubmitting, touched }) => {
-                                                    // console.log('values',values)
+					<div className="page-wrapper">		
+                    <div className="container-fluid">
+                        <div className="row">
+                        
+                            <aside className="left-sidebar">
+                              <div className="scroll-sidebar ps-container ps-theme-default ps-active-y">
+                             <SideNav />
+                             </div>
+                            </aside>
+                            
+                            <div className="col-sm-12 col-md-12 col-lg-12 col-xl-12 infobox registerbr">
+                                <h4 className="text-center mt-3 mb-3">{phrases['SBIGICL']}</h4>
+                                <section className="brand">
+                                    <div className="boxpd">
+                                        <h4 className="m-b-30">{phrases['AboutVehicle']}</h4>
+                                        <Formik initialValues={newInitialValues}
+                                            onSubmit={this.fetchFastlane}
+                                            validationSchema={vehicleRegistrationValidation}>
+                                            {({ values, errors, setFieldValue, setFieldTouched, isValid, isSubmitting, touched }) => {
+                                                // console.log('values',values)
 
-                                                    return (
-                                                        <Form>
-                                                            <div className="row formSection">
-                                                                <label className="col-md-4">{phrases['RegName']} :</label>
-                                                                <div className="col-md-4">
+                                                return (
+                                                    <Form>
+                                                        <div className="row formSection">
+                                                            <label className="col-md-4">{phrases['RegName']} :</label>
+                                                            <div className="col-md-4">
 
-                                                                    <Field
-                                                                        name="regNumber"
-                                                                        type="text"
-                                                                        placeholder={phrases['RegNum']}
-                                                                        autoComplete="off"
-                                                                        onFocus={e => this.changePlaceHoldClassAdd(e)}
-                                                                        onBlur={e => this.changePlaceHoldClassRemove(e)}
-                                                                        value={values.regNumber}
-                                                                        maxLength={this.state.length}
-                                                                        onInput={e => {
-                                                                            this.regnoFormat(e, setFieldTouched, setFieldValue)
-                                                                        }}
+                                                                <Field
+                                                                    name="regNumber"
+                                                                    type="text"
+                                                                    placeholder={phrases['RegNum']}
+                                                                    autoComplete="off"
+                                                                    onFocus={e => this.changePlaceHoldClassAdd(e)}
+                                                                    onBlur={e => this.changePlaceHoldClassRemove(e)}
+                                                                    value={values.regNumber}
+                                                                    maxLength={this.state.length}
+                                                                    onInput={e => {
+                                                                        this.regnoFormat(e, setFieldTouched, setFieldValue)
+                                                                    }}
 
-                                                                    />
-                                                                    {errors.regNumber && touched.regNumber ? (
-                                                                        <span className="errorMsg">{phrases[errors.regNumber]}</span>
-                                                                    ) : null}
-                                                                </div>
-                                                            </div> 
-                                                            <div className="cntrbtn">
-                                                                <Button className={`btnPrimary`} type="submit" >
-                                                                    {phrases['Go']}
-                                                                </Button>
-
-
+                                                                />
+                                                                {errors.regNumber && touched.regNumber ? (
+                                                                    <span className="errorMsg">{phrases[errors.regNumber]}</span>
+                                                                ) : null}
                                                             </div>
-                                                        </Form>
-                                                    );
-                                                }}
-                                            </Formik>
-                                        </div>
+                                                        </div> 
+                                                        <div className="cntrbtn">
+                                                            <Button className={`btnPrimary`} type="submit" >
+                                                                {phrases['Go']}
+                                                            </Button>
 
-                                    </section>
-                                    <Footer />
-                                </div>
+
+                                                        </div>
+                                                    </Form>
+                                                );
+                                            }}
+                                        </Formik>
+                                    </div>
+
+                                </section>
+                                <Footer />
                             </div>
-							    </div>
-                        </div> : null}
+                        </div>
+                    </div>	    
+                    </div> : null}
                 </BaseComponent>
             </>
         );
