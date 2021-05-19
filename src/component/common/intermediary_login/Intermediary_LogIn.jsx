@@ -74,7 +74,7 @@ class Intermediary_LogIn extends Component {
 
     componentDidMount() {
         localStorage.clear()
-        sessionStorage.removeItem('logo') 
+        sessionStorage.removeItem('logo')
         let bodyClass = [];
         bodyClass.length && document.body.classList.remove(...bodyClass);
         document.body.classList.add("loginBody");
@@ -91,7 +91,7 @@ class Intermediary_LogIn extends Component {
                 });
             }
         }
-        
+
         if(queryString.parse(this.props.location.search).authentication_token) {
             sessionStorage.removeItem('csc_id');
             sessionStorage.removeItem('agent_name');
@@ -109,12 +109,12 @@ class Intermediary_LogIn extends Component {
             let bcLoginData = {}
             bcLoginData.agent_id = ""
             bcLoginData.bc_agent_id = ""
-            this.callLogin(bcLoginData);          
+            this.callLogin(bcLoginData);
         }
         else{
             // this.fetchCustDetail()
         }
-        
+
     }
 
     // fetchCustDetail=()=>{
@@ -123,7 +123,7 @@ class Intermediary_LogIn extends Component {
     //     axiosBCintegration.get('all-customer')
     //     .then(res=>{
     //         if(res.data.error == false) {
-    //             let respArray = res.data.data ? res.data.data : []                        
+    //             let respArray = res.data.data ? res.data.data : []
     //             this.setState({
     //                 respArray
     //             });
@@ -132,7 +132,7 @@ class Intermediary_LogIn extends Component {
     //             this.setState({
     //                 respArray: []
     //             });
-    //         }           
+    //         }
     //         this.props.loadingStop();
     //     }).
     //     catch(err=>{
@@ -141,7 +141,7 @@ class Intermediary_LogIn extends Component {
     //             respArray: []
     //         });
     //     })
-    
+
     // }
 
     componentWillReceiveProps(nextProps) {
@@ -156,7 +156,7 @@ class Intermediary_LogIn extends Component {
         } else {
             this.setState({ rememberMe: 0 });
         }
-    } 
+    }
 
     fetchTokenDetails= (token) => {
 
@@ -168,9 +168,9 @@ class Intermediary_LogIn extends Component {
 
         axiosBCintegration.post('token-info', formData)
         .then(res=>{
-            
+
             if(res.data.error == false) {
-                let bcData = res.data.data ? res.data.data : [] 
+                let bcData = res.data.data ? res.data.data : []
                 bcLoginData.agent_id = bcData ? bcData.token_data.bcmaster_id : ""
                 bcLoginData.token = token
                 bcLoginData.bc_agent_id = bcData ? bcData.token_data.bc_agent_id : ""
@@ -180,7 +180,7 @@ class Intermediary_LogIn extends Component {
                 }
 
                 sessionStorage.setItem('bcLoginData', encryption.encrypt(JSON.stringify(bcLoginData)));
-                sessionStorage.setItem('logo', bcData.master_data.logo) 
+                sessionStorage.setItem('logo', bcData.master_data.logo)
                 this.setState({broker_id: bcLoginData.agent_id})
                 this.callLogin(bcLoginData)
             }
@@ -188,7 +188,7 @@ class Intermediary_LogIn extends Component {
                 sessionStorage.removeItem('bcLoginData');
                 swal(res.data.msg)
             }
-            
+
             this.props.loadingStop();
         }).
         catch(err=>{
@@ -207,7 +207,7 @@ class Intermediary_LogIn extends Component {
 
 
     handle_AutoSubmit = (value, actions) => {
-        // console.log('values', value); 
+        // console.log('values', value);
         return new Promise(resolve => {
             setTimeout(() => {
                 let values = {}
@@ -228,7 +228,7 @@ class Intermediary_LogIn extends Component {
                                 .bind(this),
                                 300
                             );
-                        }              
+                        }
                     },
                     (err) => {
                         this.props.loadingStop();
@@ -275,7 +275,7 @@ class Intermediary_LogIn extends Component {
                             {({ values, errors, isValid, touched, isSubmitting,setFieldValue, setFieldTouched, }) => {
                                 return (
                                     <Form>
-                                        <h3 className="login-box-msg">Intermediate Login</h3>
+                                         {/* <h3 className="login-box-msg">Intermediate Login</h3> */}
                                         <br />
                                         {this.state.errMsg ? (
                                             <Row className="show-grid">
@@ -432,5 +432,3 @@ const mapDispatchToProps = dispatch => {
 }
 
 export default connect(mapStateToProps, mapDispatchToProps)(Intermediary_LogIn);
-
-

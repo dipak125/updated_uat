@@ -15,6 +15,7 @@ import "react-datepicker/dist/react-datepicker-cssmodules.min.css";
 import moment from "moment";
 import Collapsible from "react-collapsible";
 import queryString from 'query-string';
+import { paymentGateways} from '../../../shared/reUseFunctions';	
 
 
 const initialValue = {
@@ -116,6 +117,7 @@ class HealthSummery extends Component {
     paymentStatus: [],
     relationArr: {},
     request_data: [],
+    paymentgateway: [],
     policyHolder_refNo: queryString.parse(this.props.location.search).access_id ? 
                         queryString.parse(this.props.location.search).access_id : 
                         localStorage.getItem("policyHolder_refNo"),
@@ -137,25 +139,6 @@ class HealthSummery extends Component {
     this.fetchData();
   }
   
-
-  // fetchRelationships=()=>{	
-  //   this.props.loadingStart();	
-  //   axios.get('relations')	
-  //   .then(res=>{	
-  //       let relation = res.data.data ? res.data.data : []                        	
-  //       this.setState({	
-  //           relation	
-  //       });	
-  //       this.fetchData()
-  //   }).	
-  //   catch(err=>{	
-  //       this.props.loadingStop();	
-  //       this.setState({	
-  //           relation: []	
-  //       });	
-  //   })	
-  
-  // }
   
   sendPaymentLink = () => {
     let encryption = new Encryption();
@@ -193,9 +176,10 @@ class HealthSummery extends Component {
             let bcMaster = decryptResp.data.policyHolder ? decryptResp.data.policyHolder.bcmaster : {};	
             let menumaster = decryptResp.data.policyHolder ? decryptResp.data.policyHolder.menumaster : {};
             let policyCoverage = decryptResp.data.policyHolder && decryptResp.data.policyHolder.renewalinfo && decryptResp.data.policyHolder.renewalinfo.renewalcoverage ? decryptResp.data.policyHolder.renewalinfo.renewalcoverage : []	
-              
+            let paymentgateway = decryptResp.data.policyHolder && decryptResp.data.policyHolder.bcmaster && decryptResp.data.policyHolder.bcmaster.paymentgateway
+
             this.setState({	
-                policyHolder,vehicleDetails,request_data,menumaster,step_completed, bcMaster,	policyCoverage,
+                policyHolder,vehicleDetails,request_data,menumaster,step_completed, bcMaster,	policyCoverage,paymentgateway,
                 paymentStatus: decryptResp.data.policyHolder.payment ? decryptResp.data.policyHolder.payment[0] : [],	
                 nomineeDetails: request_data && request_data.nominee ? request_data.nominee[0]:[]	
             })	
@@ -208,47 +192,17 @@ class HealthSummery extends Component {
 }	
 
 
-
-  handleSubmit = (values) => {
-    // this.setState({ show: true, refNo: values.refNo, whatsapp: values.whatsapp });
-    const policyHolder = this.state.policyHolder
-
-    if(policyHolder && policyHolder.bcmaster && policyHolder.bcmaster.paymentgateway && policyHolder.bcmaster.paymentgateway.slug && values.gateway == 1) {
-        if(policyHolder.bcmaster.paymentgateway.slug == "csc_wallet") {
-            this.payment()
-        }
-        if(policyHolder.bcmaster.paymentgateway.slug == "razorpay") {
-            this.Razor_payment()
-        }
-        if(policyHolder.bcmaster.paymentgateway.slug == "PPINL") {
-            this.paypoint_payment()
-        }
-    }
-    else if (policyHolder && policyHolder.bcmaster && policyHolder.bcmaster.paymentgateway && policyHolder.bcmaster.paymentgateway.slug && values.gateway == 2) {
-        this.props.history.push(`/Vedvag_gateway/${this.props.match.params.productId}?access_id=${this.state.policyHolder_refNo}`);
-    }
+handleSubmit = (values) => {    
+  const { refNumber , policyHolder} = this.state
+  const { productId } = this.props.match.params
+  paymentGateways(values, policyHolder, refNumber, productId)
 }
-
-  payment = () => {
-    const { policyHolder_refNo } = this.state;
-    window.location = `${process.env.REACT_APP_PAYMENT_URL}/ConnectPG/payment_renewal.php?refrence_no=${policyHolder_refNo}`
-  }
-
-  Razor_payment = () => {
-      const { policyHolder_refNo } = this.state;
-      window.location = `${process.env.REACT_APP_PAYMENT_URL}/razorpay/renewal_pay.php?refrence_no=${policyHolder_refNo}`
-  }
-
-  paypoint_payment = () => {
-      const { policyHolder_refNo } = this.state;
-      window.location = `${process.env.REACT_APP_PAYMENT_URL}/ppinl/pay.php?refrence_no=${policyHolder_refNo}`
-  }
 
 
   render() {
     const { productId } = this.props.match.params;
     const { fulQuoteResp, error, show, policyHolder, nomineeDetails, paymentStatus, policyCoverage, 
-      request_data, bcMaster, menumaster, vehicleDetails } = this.state;
+      request_data, bcMaster, menumaster, vehicleDetails, paymentgateway } = this.state;
 
     const policyCoverageList =  policyCoverage && policyCoverage.length > 0 ?(
       <div><p>Your Health Insurance covers you for following :</p>
@@ -613,49 +567,34 @@ class HealthSummery extends Component {
                                                         <FormGroup>
                                                         <div className="paymntgatway">
                                                               Select Payment Gateway
-                                                              <div>
-                                                              {/* <img src={require('../../assets/images/green-check.svg')} alt="" className="m-r-10" /> */}
-                                                              <label className="customRadio3">
-                                                              <Field
-                                                                  type="radio"
-                                                                  name='gateway'                                            
-                                                                  value='1'
-                                                                  key='1'  
-                                                                  onChange={(e) => {
-                                                                      setFieldValue(`gateway`, e.target.value);
-                                                                  }}
-                                                                  checked={values.gateway == '1' ? true : false}
-                                                              />
-                                                                  <span className="checkmark " /><span className="fs-14"> 
                                                               
-                                                                      { policyHolder && policyHolder.bcmaster && policyHolder.bcmaster.paymentgateway && policyHolder.bcmaster.paymentgateway.logo ? <img src={require('../../../assets/images/'+ policyHolder.bcmaster.paymentgateway.logo)} alt="" /> :
-                                                                      null
-                                                                      }
-                                                                  </span>
-                                                              </label>
-                                                              </div>
+                                                              { paymentgateway && paymentgateway.length > 0 ? paymentgateway.map((gateways,index) =>
+                                                                // gateways.hasOwnProperty('paymentgateway') && gateways.paymentgateway ? 
+                                                                  <div>
+                                                                      <label className="customRadio3">
+                                                                      <Field
+                                                                          type="radio"
+                                                                          name='gateway'                                            
+                                                                          value={index+1}
+                                                                          key= {index} 
+                                                                          onChange={(e) => {
+                                                                              setFieldValue(`gateway`, e.target.value);
+                                                                              setFieldValue(`slug`, gateways.slug);
+                                                                          }}
+                                                                          checked={values.gateway == `${index+1}` ? true : false}
+                                                                      />
+                                                                          <span className="checkmark " /><span className="fs-14"> 
+                                                                      
+                                                                              { gateways.logo ? <img src={require('../../../assets/images/'+ gateways.logo)} alt="" /> :
+                                                                              null
+                                                                              }
+                                                                          </span>
+                                                                      </label>
+                                                                  </div> 
+                                                                // : null
+                                                                ) : null}	
 
-                                                              {policyHolder.bcmaster && policyHolder.bcmaster.id === 2 ?
-                                                              <div>
-                                                              <label className="customRadio3">
-                                                              <Field
-                                                                  type="radio"
-                                                                  name='gateway'                                            
-                                                                  value='2'
-                                                                  key='1'  
-                                                                  onChange={(e) => {
-                                                                      setFieldValue(`gateway`, e.target.value);
-                                                                  }}
-                                                                  checked={values.gateway == '2' ? true : false}
-                                                              />
-                                                                  <span className="checkmark " /><span className="fs-14"> 
-                                                              
-                                                                      { policyHolder.bcmaster && policyHolder.bcmaster.id === 2 ? <img src={require('../../../assets/images/vedavaag.png')} alt="" /> :
-                                                                      null
-                                                                      }
-                                                                  </span>
-                                                              </label>
-                                                              </div> : null }
+
                                                         </div>
                                                       </FormGroup>
                                                   </Col>

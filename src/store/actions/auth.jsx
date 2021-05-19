@@ -109,8 +109,8 @@ export const authProcess = (data, onSuccess, onFailure) => {
                     loginData = {email: '', pass: '', rememberMe: ''};
                 }
                 sessionStorage.setItem('auth_token', response.data.token_type+" "+response.data.token);
-                // localStorage.setItem('users', JSON.stringify({ user: response.data.user, permission: response.data.permission, lastAction: Date.now() }));
-                sessionStorage.setItem('users', JSON.stringify({ user: encryption.encrypt(JSON.stringify(response.data.user_data)), permission: encryption.encrypt(JSON.stringify(response.data.helpTicket)), 
+                sessionStorage.setItem('users', JSON.stringify({ user: encryption.encrypt(JSON.stringify(Object.assign(response.data.user_data,{login_type: response.data.login_type, role_id: response.data.role_id }))), 
+                    permission: encryption.encrypt(JSON.stringify(response.data.helpTicket)), 
                     userMenu: encryption.encrypt(JSON.stringify(response.data.visibleMenus)), lastAction: Date.now() }));
                 localStorage.setItem('loginData', JSON.stringify( loginData ));
 				
@@ -174,7 +174,9 @@ export const intermediate_authProcess = (data, onSuccess, onFailure) => {
                     loginData = {email: '', pass: '', rememberMe: ''};
                 }
                 sessionStorage.setItem('auth_token', response.data.token_type+" "+response.data.token);
-                sessionStorage.setItem('users', JSON.stringify({ user: encryption.encrypt(JSON.stringify(response.data.user_data)), permission: encryption.encrypt(JSON.stringify(response.data.helpTicket)), 
+
+                sessionStorage.setItem('users', JSON.stringify({ user: encryption.encrypt(JSON.stringify(Object.assign(response.data.user_data,{login_type: response.data.login_type, role_id: response.data.role_id }))), 
+                    permission: encryption.encrypt(JSON.stringify(response.data.helpTicket)), 
                     userMenu: encryption.encrypt(JSON.stringify(response.data.visibleMenus)), lastAction: Date.now() }));
                 localStorage.setItem('loginData', JSON.stringify( loginData ));
 				sessionStorage.setItem('user_data', JSON.stringify( response.data.user_data ));

@@ -16,7 +16,7 @@ import queryString from 'query-string';
 import fuel from '../../common/FuelTypes';	
 import swal from 'sweetalert';	
 import moment from "moment";	
-import {registrationNoFormat} from '../../../shared/reUseFunctions';	
+import {registrationNoFormat, paymentGateways} from '../../../shared/reUseFunctions';	
 const initialValue = {	
     gateway : ""	
 }	
@@ -53,6 +53,7 @@ class MotorSummery extends Component {
             request_data: [],	
             breakin_flag: 0,	
             policyCoverage: [],
+            paymentgateway: [],
             policyHolder_refNo: queryString.parse(this.props.location.search).access_id ? 	
                                 queryString.parse(this.props.location.search).access_id : 	
                                 localStorage.getItem("policyHolder_refNo")	
@@ -77,25 +78,13 @@ class MotorSummery extends Component {
     additionalDetails = (productId) => {	
         this.props.history.push(`/AdditionalDetails_GCV/${productId}`);	
     }	
-    handleSubmit = (values) => {	
-        // this.setState({ show: true, refNo: values.refNo, whatsapp: values.whatsapp });	
-        const {policyHolder} = this.state	
-        	
-        if(policyHolder && policyHolder.bcmaster && policyHolder.bcmaster.paymentgateway && policyHolder.bcmaster.paymentgateway.slug && values.gateway == 1) {	
-            if(policyHolder.bcmaster.paymentgateway.slug == "csc_wallet") {	
-                this.payment()	
-            }	
-            if(policyHolder.bcmaster.paymentgateway.slug == "razorpay") {	
-                this.Razor_payment()	
-            }	
-            if(policyHolder.bcmaster.paymentgateway.slug == "PPINL") {	
-                this.paypoint_payment()	
-            }	
-        }	
-        else if (policyHolder && policyHolder.bcmaster && policyHolder.bcmaster.paymentgateway && policyHolder.bcmaster.paymentgateway.slug && values.gateway == 2) {	
-            this.props.history.push(`/Vedvag_gateway/${this.props.match.params.productId}?access_id=${this.state.policyHolder_refNo}`);	
-        }	
-    }	
+
+    handleSubmit = (values) => {    
+        const { refNumber , policyHolder} = this.state
+        const { productId } = this.props.match.params
+        paymentGateways(values, policyHolder, refNumber, productId)
+    }
+
     fetchData = () => {	
         const { productId } = this.props.match.params	
         let policyHolder_id = this.state.policyHolder_refNo ? this.state.policyHolder_refNo : '0'	
@@ -116,9 +105,10 @@ class MotorSummery extends Component {
                 let menumaster = decryptResp.data.policyHolder ? decryptResp.data.policyHolder.menumaster : {};
                 let policyCoverage = decryptResp.data.policyHolder && decryptResp.data.policyHolder.renewalinfo && decryptResp.data.policyHolder.renewalinfo.renewalcoverage ? decryptResp.data.policyHolder.renewalinfo.renewalcoverage : []
                 let dateDiff = 0	
+                let paymentgateway = decryptResp.data.policyHolder && decryptResp.data.policyHolder.bcmaster && decryptResp.data.policyHolder.bcmaster.paymentgateway
                 	
                 this.setState({	
-                    motorInsurance,policyHolder,vehicleDetails,previousPolicy,request_data,menumaster,step_completed, bcMaster,	policyCoverage,
+                    motorInsurance,policyHolder,vehicleDetails,previousPolicy,request_data,menumaster,step_completed, bcMaster,	policyCoverage,paymentgateway,
                     paymentStatus: decryptResp.data.policyHolder.payment ? decryptResp.data.policyHolder.payment[0] : [],	
                     memberdetails : decryptResp.data.policyHolder ? decryptResp.data.policyHolder : [],	
                     nomineedetails: decryptResp.data.policyHolder ? decryptResp.data.policyHolder.request_data.nominee[0]:[]	
@@ -163,19 +153,6 @@ class MotorSummery extends Component {
     }	
 	
 
-    payment = () => {	
-        const { policyHolder_refNo } = this.state;	
-        window.location = `${process.env.REACT_APP_PAYMENT_URL}/ConnectPG/payment_renewal.php?refrence_no=${policyHolder_refNo}`	
-    }	
-    Razor_payment = () => {	
-        const { policyHolder_refNo } = this.state;	
-        window.location = `${process.env.REACT_APP_PAYMENT_URL}/razorpay/renewal_pay.php?refrence_no=${policyHolder_refNo}`	
-    }	
-    paypoint_payment = () => {	
-        const { policyHolder_refNo } = this.state;	
-        window.location = `${process.env.REACT_APP_PAYMENT_URL}/ppinl/pay.php?refrence_no=${policyHolder_refNo}`	
-    }
-
     fetchRelationships=()=>{	
         this.props.loadingStart();	
         axios.get('relations')	
@@ -218,7 +195,7 @@ class MotorSummery extends Component {
         this.fetchRelationships()	
     }	
     render() {	
-        const { policyHolder, show, fulQuoteResp, motorInsurance, error, error1, paymentStatus, bcMaster,policyCoverage,	
+        const { policyHolder, show, paymentgateway, motorInsurance, error, error1, paymentStatus, bcMaster,policyCoverage,	
              relation, memberdetails,nomineedetails, vehicleDetails, breakin_flag, step_completed, request_data,menumaster, } = this.state	
         const { productId } = this.props.match.params	
         let phrases = localStorage.getItem("phrases") ? JSON.parse(localStorage.getItem("phrases")) : null	
@@ -466,6 +443,8 @@ class MotorSummery extends Component {
                                                                                                     <FormGroup>{vehicleDetails && vehicleDetails.varientmodel && vehicleDetails.varientmodel.seating ? vehicleDetails.varientmodel.seating : null}</FormGroup>	
                                                                                                 </Col>	
                                                                                             </Row>	
+
+                                                                                            {vehicleDetails && vehicleDetails.vehicletype && (vehicleDetails.vehicletype.id != 4 || vehicleDetails.vehicletype.id != 3 || vehicleDetails.vehicletype.id != 16 ) ?
                                                                                             <Row>	
                                                                                                 <Col sm={12} md={6}>	
                                                                                                     <FormGroup>{phrases['BodyStyle']}</FormGroup>	
@@ -473,7 +452,8 @@ class MotorSummery extends Component {
                                                                                                 <Col sm={12} md={6}>	
                                                                                                     <FormGroup>{vehicleDetails && vehicleDetails.varientmodel && vehicleDetails.varientmodel.body_style ? vehicleDetails.varientmodel.body_style : null}</FormGroup>	
                                                                                                 </Col>	
-                                                                                            </Row>	
+                                                                                            </Row>	: null }
+                                                                                            {vehicleDetails && vehicleDetails.vehicletype && (vehicleDetails.vehicletype.id != 4 || vehicleDetails.vehicletype.id != 3 || vehicleDetails.vehicletype.id != 16 ) ?
                                                                                             <Row>	
                                                                                                 <Col sm={12} md={6}>	
                                                                                                     <FormGroup>{phrases['GrossVehicleWeight']}</FormGroup>	
@@ -481,13 +461,14 @@ class MotorSummery extends Component {
                                                                                                 <Col sm={12} md={6}>	
                                                                                                     <FormGroup>{vehicleDetails && vehicleDetails.varientmodel && vehicleDetails.varientmodel.gross_vechicle_weight ? vehicleDetails.varientmodel.gross_vechicle_weight : null}</FormGroup>	
                                                                                                 </Col>	
-                                                                                            </Row>	
+                                                                                            </Row>	: null }
+
                                                                                             <Row>
                                                                                                 <Col sm={12} md={6}>
                                                                                                     <FormGroup>{phrases['IDVofVehicle']}</FormGroup>
                                                                                                 </Col>
                                                                                                 <Col sm={12} md={6}>
-                                                                                                    <FormGroup>{motorInsurance && motorInsurance.idv_value ? motorInsurance.idv_value : null}</FormGroup>
+                                                                                                    <FormGroup>{request_data && request_data.sum_insured ? parseInt(request_data.sum_insured) : null}</FormGroup>
                                                                                                 </Col>
                                                                                             </Row>
                                                                                         </Col>	
@@ -669,48 +650,33 @@ class MotorSummery extends Component {
                                                                 <Col sm={12} md={6}>	
                                                                     <FormGroup>	
                                                                      <div className="paymntgatway">	
-                                                                     {phrases['SelectPayGateway']}	
-                                                                        <div>	
-                                                                        <label className="customRadio3">	
-                                                                        <Field	
-                                                                            type="radio"	
-                                                                            name='gateway'                                            	
-                                                                            value='1'	
-                                                                            key='1'  	
-                                                                            onChange={(e) => {	
-                                                                                setFieldValue(`gateway`, e.target.value);	
-                                                                            }}	
-                                                                            checked={values.gateway == '1' ? true : false}	
-                                                                        />	
-                                                                            <span className="checkmark " /><span className="fs-14"> 	
-                                                                        	
-                                                                                { policyHolder && policyHolder.bcmaster && policyHolder.bcmaster.paymentgateway && policyHolder.bcmaster.paymentgateway.logo ? <img src={require('../../../assets/images/'+ policyHolder.bcmaster.paymentgateway.logo)} alt="" /> :	
-                                                                                null	
-                                                                                }	
-                                                                            </span>	
-                                                                        </label>	
-                                                                        </div>	
-                                                                        {policyHolder.bcmaster && policyHolder.bcmaster.id === 2 ?	
-                                                                        <div>	
-                                                                        <label className="customRadio3">	
-                                                                        <Field	
-                                                                            type="radio"	
-                                                                            name='gateway'                                            	
-                                                                            value='2'	
-                                                                            key='1'  	
-                                                                            onChange={(e) => {	
-                                                                                setFieldValue(`gateway`, e.target.value);	
-                                                                            }}	
-                                                                            checked={values.gateway == '2' ? true : false}	
-                                                                        />	
-                                                                            <span className="checkmark " /><span className="fs-14"> 	
-                                                                        	
-                                                                                { policyHolder.bcmaster && policyHolder.bcmaster.id === 2 ? <img src={require('../../../assets/images/vedavaag.png')} alt="" /> :	
-                                                                                null	
-                                                                                }	
-                                                                            </span>	
-                                                                        </label>	
-                                                                        </div> : null }	
+
+                                                                     { paymentgateway && paymentgateway.length > 0 ? paymentgateway.map((gateways,index) =>
+                                                                        // gateways.hasOwnProperty('paymentgateway') && gateways.paymentgateway ? 
+                                                                        <div>
+                                                                            <label className="customRadio3">
+                                                                            <Field
+                                                                                type="radio"
+                                                                                name='gateway'                                            
+                                                                                value={index+1}
+                                                                                key= {index} 
+                                                                                onChange={(e) => {
+                                                                                    setFieldValue(`gateway`, e.target.value);
+                                                                                    setFieldValue(`slug`, gateways.slug);
+                                                                                }}
+                                                                                checked={values.gateway == `${index+1}` ? true : false}
+                                                                            />
+                                                                                <span className="checkmark " /><span className="fs-14"> 
+                                                                            
+                                                                                    { gateways.logo ? <img src={require('../../../assets/images/'+ gateways.logo)} alt="" /> :
+                                                                                    null
+                                                                                    }
+                                                                                </span>
+                                                                            </label>
+                                                                        </div> 
+                                                                        // : null
+                                                                        ) : null}	
+                                                                        
                                                                     </div>	
                                                                     </FormGroup>	
                                                                 </Col>	

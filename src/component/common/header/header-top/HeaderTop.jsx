@@ -15,8 +15,7 @@ class HeaderTop extends Component {
 
     state = {
         logo: sessionStorage.getItem('logo') && sessionStorage.getItem('logo') != "undefined" ? sessionStorage.getItem('logo') : "",
-        bc_data: {},
-        csc_data: {},
+        bc_d: {},
 		user_data: {},
         phrases: [],
         toggle1: true
@@ -72,29 +71,19 @@ class HeaderTop extends Component {
       }
 
     componentDidMount() {
-        let bc_data = sessionStorage.getItem('bcLoginData') ? sessionStorage.getItem('bcLoginData') : "";
-        let csc_data = sessionStorage.getItem('users') ? sessionStorage.getItem('users') : "";
-		let user_data = sessionStorage.getItem('user_data') ? JSON.parse(sessionStorage.getItem('user_data')) : "";
+		let user_data = sessionStorage.getItem('users') ? JSON.parse(sessionStorage.getItem('users')) : "";
 
-        if(bc_data) {
+        if(user_data) {
             let encryption = new Encryption();
-            bc_data = JSON.parse(encryption.decrypt(bc_data));
-            this.setState({bc_data})
-        }
-        else if(csc_data && sessionStorage.getItem('csc_id')) {
-            let encryption = new Encryption();
-            // csc_data = JSON.parse(csc_data)          
-            // csc_data = csc_data.user
-            csc_data = JSON.parse(csc_data) 
-            csc_data = csc_data.user
-            csc_data = JSON.parse(encryption.decrypt(csc_data));  
-            this.setState({csc_data, user_data})
+            user_data = user_data.user
+            user_data = JSON.parse(encryption.decrypt(user_data));  
+            this.setState({user_data})
         }
     }
 
       
     render() {
-        const { logo, bc_data, csc_data, user_data } = this.state
+        const { logo, user_data } = this.state
 		console.log('user_data', user_data)
 
         let phrases = localStorage.getItem("phrases") ? JSON.parse(localStorage.getItem("phrases")) : null
@@ -162,12 +151,8 @@ class HeaderTop extends Component {
                                 <Dropdown alignRight>
                                 <Dropdown.Toggle variant="" id="dropdown-basic">
                                     <div className="d-flex topUserBtn">
-                                    {sessionStorage.getItem("auth_token") && bc_data.user_info && phrases ?
-                                        <div className="align-self-center userNameImg">
-                                            {phrases['Welcome']} {bc_data.user_info.data.user.name}
-                                        </div>
-                                            :  
-                                            sessionStorage.getItem("auth_token") && csc_data && phrases ?
+                                    {sessionStorage.getItem("auth_token")  && phrases ?
+                                         user_data && sessionStorage.getItem('csc_id')?
                                             <div className="align-self-center userNameImg">
                                                 {phrases['Welcome']} {user_data.user_name}
                                                 <p><a href={process.env.REACT_APP_PAYMENT_URL+'/core/public/pdf_files/RM-name-SBIG.xlsx'}>
@@ -175,8 +160,11 @@ class HeaderTop extends Component {
                                                     {phrases['DownloadRMList']}
                                                     </Blink> 
                                                 </a></p>
+                                            </div> : 
+                                            <div className="align-self-center userNameImg">
+                                                {phrases['Welcome']} {user_data.user_name}
                                             </div>
-                                            : null }
+                                        : null }
                                         <div className="align-self-center">
                                         {this.props.flag == "logout" ? null :  
                                         logo ? 

@@ -535,6 +535,7 @@ class OtherComprehensive extends Component {
         let defaultSliderValue = PolicyArray.length > 0 ? Math.round(PolicyArray[0].PolicyRiskList[0].IDV_Suggested) : 0
         let coverage_data = {}
         const formData = new FormData();
+        let encryption = new Encryption();
 
         let total_idv=0
         let other_idv=0
@@ -581,7 +582,6 @@ class OtherComprehensive extends Component {
             }
         }
 
-        let encryption = new Encryption();
         formData.append('enc_data',encryption.encrypt(JSON.stringify(post_data)))
         axios.post('fullQuotePMCAR',formData)
             .then(res => {
