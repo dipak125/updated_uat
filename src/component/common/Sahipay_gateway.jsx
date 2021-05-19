@@ -112,6 +112,9 @@ class Sahipay_gateway extends Component {
         else if(productId == 5) {
             this.props.history.push(`/PolicyDetails/${productId}`);
         }
+		else if(productId == 12) {
+            this.props.history.push(`/arogya_PolicyDetails/${productId}`);
+        }
         else if(productId == 13) {
             this.props.history.push(`/AccidentAdditionalPremium/${productId}`);
         }

@@ -204,7 +204,9 @@ export const validServiceHourRange = (value) => {
 
 
 export const validRegistrationNumber = (value) => {
-    var str = /^[A-Z]{2}(?:[A-Z])?(?:[0-9]{1,2})?(?:[ABCDEFGHJKLMNPQRSTUVWXYZ])?(?:[ABCDEFGHJKLMNPQRSTUVWXYZ]{2})?[0-9]{4}$/;
+    //var str = /^[A-Z]{2}(?:[A-Z])?(?:[0-9]{1,2})?(?:[ABCDEFGHJKLMNPQRSTUVWXYZ])?(?:[ABCDEFGHJKLMNPQRSTUVWXYZ]{2})?[0-9]{4}$/;
+	
+	var str = /(([A-Za-z]){2,3}(|-)(?:[0-9]){1,2}(|-)(?:[A-Za-z]){2}(|-)([0-9]){1,4})|(([A-Za-z]){2,3}(|-)([0-9]){1,4})/;
     
     if ( value && value != "NEW" && (value != '' || value != undefined) ) {  
         if(value.match(str)) {    

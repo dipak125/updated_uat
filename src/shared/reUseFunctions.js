@@ -58,23 +58,40 @@ export const fourwheelerODEndDate = (value) => {
 }
 
 export const paymentGateways = (values,policyHolder,refNumber, productId) => {
-    if (values.gateway == 2) {
+    // if (values.gateway == 2) {
+        // console.log("Vedvag_gateway")
+        // window.location.href = `#/Vedvag_gateway/${productId}?access_id=${refNumber}`
+    // }
+    // else if(values.slug && values.gateway == 1) {
+        // if(values.slug == "csc_wallet") {
+            // payment(refNumber)
+        // }
+        // if(values.slug == "razorpay") {
+            // Razor_payment(refNumber)
+        // }
+        // if(values.slug == "PPINL") {
+            // paypoint_payment(refNumber)
+        // }
+        // if(values.slug == "sahi_wallet") {
+            // window.location.href = `#/Sahipay_gateway/${productId}?access_id=${refNumber}` 
+        // }
+    // }
+	
+	if (values.slug == 'vedavaag_wallet') {
         console.log("Vedvag_gateway")
         window.location.href = `#/Vedvag_gateway/${productId}?access_id=${refNumber}`
     }
-    else if(values.slug && values.gateway == 1) {
-        if(values.slug == "csc_wallet") {
-            payment(refNumber)
-        }
-        if(values.slug == "razorpay") {
-            Razor_payment(refNumber)
-        }
-        if(values.slug == "PPINL") {
-            paypoint_payment(refNumber)
-        }
-        if(values.slug == "sahi_wallet") {
-            window.location.href = `#/Sahipay_gateway/${productId}?access_id=${refNumber}` 
-        }
+	if(values.slug == "csc_wallet") {
+		payment(refNumber)
+	}
+	if(values.slug == "razorpay") {
+		Razor_payment(refNumber)
+	}
+	if(values.slug == "PPINL") {
+		paypoint_payment(refNumber)
+	}
+	if(values.slug == "sahi_wallet") {
+		window.location.href = `#/Sahipay_gateway/${productId}?access_id=${refNumber}` 
     }
 }
 

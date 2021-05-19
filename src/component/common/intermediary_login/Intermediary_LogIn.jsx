@@ -156,42 +156,7 @@ class Intermediary_LogIn extends Component {
         } else {
             this.setState({ rememberMe: 0 });
         }
-    }
-
-    handleSubmit = (values, actions) => {
-        // sessionStorage.removeItem('logo') 
-        sessionStorage.removeItem('bcLoginData')
-        const formData = new FormData();
-        this.props.loadingStart();
-        formData.append('username',values.userId)
-        formData.append('password',values.password)
-        formData.append('bcmaster_id',values.broker_id)
-
-        axiosBCintegration.post('bc-login', formData)
-        .then(res=>{
-            
-            if(res.data.error == false) {
-                let bcLoginData = res.data.data ? res.data.data : []                      
-                this.fetchTokenDetails(bcLoginData.token)
-                actions.setSubmitting(false)
-            }
-            else {
-                sessionStorage.removeItem('bcLoginData');
-                actions.setSubmitting(false)
-                this.props.loadingStop();
-            }
-            
-            
-        }).
-        catch(err=>{
-            this.props.loadingStop();
-            actions.setSubmitting(false)
-            sessionStorage.removeItem('bcLoginData');
-        })
-
-
-    }
-    
+    } 
 
     fetchTokenDetails= (token) => {
 
@@ -252,11 +217,6 @@ class Intermediary_LogIn extends Component {
                 values.password= value.password;
                 values.bc_id= sessionStorage.getItem('csc_id')
                 values.user_type= sessionStorage.getItem('type')
-                // values.agent_id=  bcLoginData.agent_id ? bcLoginData.agent_id : ""
-                // values.bc_agent_id= bcLoginData.bc_agent_id ? bcLoginData.bc_agent_id : ""
-                
-                // this.setState({ errMsg: '' });
-                // console.log("values-- ", values)
                 this.props.onFormSubmit(values,
                     () => {
                         this.props.loadingStop();
@@ -272,8 +232,8 @@ class Intermediary_LogIn extends Component {
                     },
                     (err) => {
                         this.props.loadingStop();
-                        if (err.data.message) {
-                            this.setState({ errMsg: err.data.message });
+                        if (err.data.error) {
+                            this.setState({ errMsg: err.data.error });
                         } else {
                             // console.log(err.data);
                         }
@@ -295,9 +255,7 @@ class Intermediary_LogIn extends Component {
 
 
     render() {
-        //console.log('state', this.state);
         const { email, pass, rememberMe, broker_id,showModal } = this.state;
-
         const newInitialValues = Object.assign(initialValues, {
             userId: email ? email : '',
             password: pass ? pass : '',
@@ -305,12 +263,10 @@ class Intermediary_LogIn extends Component {
 
         });
 
-        // console.log("queryString.parse(this.props.location.search)---", )
         return (
             <BaseComponent>
                 <div className="d-flex justify-content-center brand lginpg">
                     <div className="login-box-body">
-                    {queryString.parse(this.props.location.search).csc_id || queryString.parse(this.props.location.search).authentication_token ? null :
                         <Formik
                             initialValues={newInitialValues}
                             validationSchema={loginvalidation}
@@ -363,28 +319,6 @@ class Intermediary_LogIn extends Component {
                                                 </div>
                                             </Col>
                                         </Row>
-
-                                        {/* <Row className="show-grid">
-                                            <Col sm={12} md={12} lg={12}>
-                                                <div className="formSection">
-                                                    <Field
-                                                        name="broker_id"
-                                                        component="select"
-                                                        autoComplete="off"
-                                                        value={values.broker_id}
-                                                        className="formGrp"
-                                                    >
-                                                    <option value="">Select Broker Company</option>
-                                                    { respArray.map((relations, qIndex) => 
-                                                        <option value={relations.id}>{relations.vendor_name}</option>                                        
-                                                    )}
-                                                    </Field>     
-                                                    {errors.broker_id && touched.broker_id ? (
-                                                        <span className="errorMsg">{errors.broker_id}</span>
-                                                    ) : null}
-                                                </div>
-                                            </Col>
-                                        </Row> */}
                                         <Row>
                                            <Col>&nbsp;</Col>
                                         </Row>
@@ -420,7 +354,7 @@ class Intermediary_LogIn extends Component {
                                     </Form>
                                 );
                             }}
-                        </Formik> }
+                        </Formik>
 
                     </div>
 

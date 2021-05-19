@@ -221,6 +221,18 @@ class ThankYouPage extends Component {
   fetchData = () => {
     const { productId } = this.props.match.params
     let encryption = new Encryption();
+	
+	
+	axios.get(`ceiaCall/${this.state.refNumber}`)
+        .then(res => {
+        })
+        .catch(err => {
+            
+        })
+	
+	
+	
+	
 
     axios.get(`policy-holder-additional-details/${this.state.refNumber}`)
         .then(res => {

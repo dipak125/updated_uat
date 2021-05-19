@@ -171,7 +171,8 @@ class arogya_PolicyDetails extends Component {
     'tenure_year': policyDetails ? parseInt(policyDetails.tenure_year) : null,
     }
     formData.append('enc_data',encryption.encrypt(JSON.stringify(post_data)))    
-    console.log('post_data-----', post_data);
+    console.log('policyHolderDetails.arogyatopupsuminsured', policyHolderDetails)
+	console.log('post_data-----', post_data);
 
     axios
       .post(`/arogya-topup/fullQuoteServiceArogyaTopup`, formData)
@@ -209,6 +210,7 @@ class arogya_PolicyDetails extends Component {
   handleSubmit = (values) => {    
     const { refNumber , policyHolderDetails} = this.state
     const { productId } = this.props.match.params
+	console.log('handleSubmit_values', values)
     paymentGateways(values, policyHolderDetails, refNumber, productId)
 }
   
