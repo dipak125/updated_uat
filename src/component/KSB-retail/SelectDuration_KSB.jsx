@@ -139,6 +139,16 @@ class SelectDuration extends Component {
         let encryption = new Encryption();
         let policy_holder_id = localStorage.getItem('policyHolder_id') ? localStorage.getItem('policyHolder_id') : 0
 
+        let user_data = sessionStorage.getItem("users") ? JSON.parse(sessionStorage.getItem("users")) : "";
+        if (user_data) {
+            user_data = JSON.parse(encryption.decrypt(user_data.user));
+            if((serverResponse.SumInsured > 500000) && user_data.user_type == "POSP"  ) {
+                swal("Quote cannot proceed with IDV greater than 500000")
+                this.props.loadingStop();
+                return false
+            }
+        }
+
         const post_data = {
             'policy_holder_id':policy_holder_id,
             'start_date':serverResponse.EffectiveDate,
@@ -392,14 +402,12 @@ class SelectDuration extends Component {
                     <div className="container-fluid">
                         <div className="row">
 						
-						
-                          <aside className="left-sidebar">
- <div className="scroll-sidebar ps-container ps-theme-default ps-active-y">
-<SideNav />
- </div>
-</aside>
-							
-							
+                            <aside className="left-sidebar">
+                                <div className="scroll-sidebar ps-container ps-theme-default ps-active-y">
+                                <SideNav />
+                                </div>
+                            </aside>
+								
                             <div className="col-sm-12 col-md-12 col-lg-12 col-xl-12 infobox heathDuration">
                                 <h4 className="text-center mt-3 mb-3">KSB Retail Policy</h4>
                                 <section className="brand">

@@ -293,8 +293,8 @@ class TwoWheelerOtherComprehensive extends Component {
         if (user_data) {
             user_data = JSON.parse(encryption.decrypt(user_data.user));
 
-            if((post_data.idv_value> 5000000) && user_data.user_type == "POSP"  ) {
-                swal("Quote cannot proceed with IDV greater than 5000000")
+            if((post_data.idv_value> 500000) && user_data.user_type == "POSP"  ) {
+                swal("Quote cannot proceed with IDV greater than 500000")
                 this.props.loadingStop();
                 return false
             }
@@ -410,8 +410,8 @@ class TwoWheelerOtherComprehensive extends Component {
         if (user_data) {
             user_data = JSON.parse(encryption.decrypt(user_data.user));
 
-            if((post_data.idv_value> 5000000) && user_data.user_type == "POSP"  ) {
-                swal("Quote cannot proceed with IDV greater than 5000000")
+            if((post_data.idv_value> 500000) && user_data.user_type == "POSP"  ) {
+                swal("Quote cannot proceed with IDV greater than 500000")
                 this.props.loadingStop();
                 return false
             }
