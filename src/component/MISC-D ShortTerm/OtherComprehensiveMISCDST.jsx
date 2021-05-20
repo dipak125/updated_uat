@@ -761,7 +761,7 @@ class OtherComprehensiveMISCD extends Component {
         //     cng_kit_flag = values.cng_kit
         //     cngKit_Cost = values.cngKit_Cost
         // }
-        let defaultSliderValue = PolicyArray.length > 0 ? Math.round(PolicyArray[0].PolicyRiskList[0].IDV_Suggested) : 0
+        let defaultSliderValue = PolicyArray.length > 0 ? Math.round(PolicyArray[0].PolicyRiskList[0].IDV_User) : 0
         let defaultBodySliderValue = 0
         let coverage_data = {}
         const formData = new FormData();
@@ -839,7 +839,7 @@ class OtherComprehensiveMISCD extends Component {
                         validation_error: [],
                         userIdvStatus: 1,
                         bodyIdvStatus: 1,
-                        sliderVal: res.data.data.PolicyObject.PolicyLobList ? Math.round(res.data.data.PolicyObject.PolicyLobList[0].PolicyRiskList[0].IDV_Suggested) : 0,
+                        sliderVal: res.data.data.PolicyObject.PolicyLobList ? Math.round(res.data.data.PolicyObject.PolicyLobList[0].PolicyRiskList[0].IDV_User) : 0,
                         ncbDiscount,
                         serverResponse: res.data.data.PolicyObject,
                         policyCoverage: res.data.data.PolicyObject.PolicyLobList ? res.data.data.PolicyObject.PolicyLobList[0].PolicyRiskList[0].PolicyCoverageList : [],
@@ -899,7 +899,7 @@ class OtherComprehensiveMISCD extends Component {
     handleSubmit = (values) => {
         const { productId } = this.props.match.params
         const { motorInsurance, PolicyArray, sliderVal, add_more_coverage, bodySliderVal } = this.state
-        let defaultSliderValue = PolicyArray.length > 0 ? Math.round(PolicyArray[0].PolicyRiskList[0].IDV_Suggested) : 0
+        let defaultSliderValue = PolicyArray.length > 0 ? Math.round(PolicyArray[0].PolicyRiskList[0].IDV_User) : 0
         let defaultBodySliderValue = 0
         let coverage_data = {}
 
@@ -1284,7 +1284,7 @@ class OtherComprehensiveMISCD extends Component {
         const { showCNG, is_CNG_account, vahanDetails, error, policyCoverage, vahanVerify, selectFlag, fulQuoteResp, PolicyArray, fuelList, depreciationPercentage, vehicleDetails, validation_error,
             moreCoverage, sliderVal, bodySliderVal, motorInsurance, serverResponse, engine_no, chasis_no, initialValue, add_more_coverage_request_array, ncbDiscount } = this.state
         const { productId } = this.props.match.params
-        //let defaultSliderValue = PolicyArray.length > 0 ? Math.round(PolicyArray[0].PolicyRiskList[0].IDV_Suggested) : 0
+        //let defaultSliderValue = PolicyArray.length > 0 ? Math.round(PolicyArray[0].PolicyRiskList[0].IDV_User) : 0
         let defaultSliderValue = sliderVal
         let min_IDV_suggested = PolicyArray.length > 0 ? PolicyArray[0].PolicyRiskList[0].MinIDV_Suggested : 0
         let max_IDV_suggested = PolicyArray.length > 0 ? PolicyArray[0].PolicyRiskList[0].MaxIDV_Suggested : 0
