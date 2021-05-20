@@ -15,6 +15,7 @@ import moment from "moment";
 import Collapsible from 'react-collapsible';
 import { Formik, Field, Form, FieldArray } from "formik";
 import DatePicker from "react-datepicker";
+import { array } from 'prop-types';
 
 const actionFormatter = (refObj) => (cell, row, enumObject) => {
     return (
@@ -93,16 +94,19 @@ class PolicySearch extends Component {
         
         }
 
-        let bc_data = sessionStorage.getItem('bcLoginData') ? sessionStorage.getItem('bcLoginData') : "";
-        if(bc_data) {
-            bc_data = JSON.parse(encryption.decrypt(bc_data));
+        let user_data = sessionStorage.getItem('users') ? JSON.parse(sessionStorage.getItem('users')) : "";
+
+        if(user_data) {
+            let encryption = new Encryption();
+            user_data = user_data.user
+            user_data = JSON.parse(encryption.decrypt(user_data));  
         }
 
-        formData.append('bcmaster_id', sessionStorage.getItem('csc_id') ? "5" : bc_data ? bc_data.agent_id : "" ) 
+        formData.append('bcmaster_id', user_data.bc_master_id )
         formData.append('page_no', page_no)   
-        formData.append('policy_status', 'complete')
-        formData.append('bc_agent_id', sessionStorage.getItem('csc_id') ? sessionStorage.getItem('csc_id') : bc_data ? bc_data.user_info.data.user.username : "") 
-
+        formData.append('bc_agent_id', user_data.master_user_id )
+        formData.append('login_type', user_data.login_type )
+        
         this.props.loadingStart();
         axios.post('bc/policy-customer',formData)
         .then(res=>{
@@ -145,20 +149,19 @@ class PolicySearch extends Component {
         
         }
 
-        let bc_data = sessionStorage.getItem('bcLoginData') ? sessionStorage.getItem('bcLoginData') : "";
-        if(bc_data) {
-            bc_data = JSON.parse(encryption.decrypt(bc_data));
+        let user_data = sessionStorage.getItem('users') ? JSON.parse(sessionStorage.getItem('users')) : "";
+
+        if(user_data) {
+            let encryption = new Encryption();
+            user_data = user_data.user
+            user_data = JSON.parse(encryption.decrypt(user_data));  
         }
 
-        // formData.append('bcmaster_id', bc_data ? bc_data.agent_id : "")  
-        // formData.append('page_no', 1)   
-        // formData.append('policy_status', 'complete')
-        // formData.append('bc_agent_id', bc_data ? bc_data.user_info.data.user.username : "",) 
-
-        formData.append('bcmaster_id', sessionStorage.getItem('csc_id') ? "5" : bc_data ? bc_data.agent_id : "" ) 
+        formData.append('bcmaster_id', user_data.bc_master_id ) 
         formData.append('page_no', 1)   
         formData.append('policy_status', 'complete')
-        formData.append('bc_agent_id', sessionStorage.getItem('csc_id') ? sessionStorage.getItem('csc_id') : bc_data ? bc_data.user_info.data.user.username : "") 
+        formData.append('bc_agent_id', user_data.master_user_id )
+        formData.append('login_type', user_data.login_type )
 
         this.props.loadingStart();
         axios.post('bc/policy-customer',formData)
@@ -211,19 +214,55 @@ class PolicySearch extends Component {
         );
       }
 
+
     getAllProducts = () => {
-    this.props.loadingStart();
-    axios.get('all-product')
-        .then(res => {
-        this.setState({
-            products: res.data.data ? res.data.data : [],
-        });
-        // this.fetchDashboard();
-        this.props.loadingStop();
-        })
-        .catch(err => {
-        this.props.loadingStop();
-        });
+        let encryption = new Encryption();
+        const formData = new FormData(); 
+        let user_data = sessionStorage.getItem("users") ? JSON.parse(sessionStorage.getItem("users")): "";
+        let user_id = ""
+        
+        if (user_data) {
+            user_id = JSON.parse(encryption.decrypt(user_data.user));
+          }
+
+        formData.append('user_id',user_id.master_user_id)
+        formData.append('role_id',user_id.role_id)
+        formData.append('login_type',user_id.login_type)
+        formData.append('bc_id',user_id.bc_master_id)
+
+        this.props.loadingStart();
+
+        axios.post(`visible/products`, formData)
+          .then(res => {
+            if(res.data.error == false) {      
+                this.props.loadingStop(); 
+                var all_products = []
+                var temp_products = []
+                var products = []
+                all_products = res.data.data
+                
+                for (const [key, value] of Object.entries(all_products)) {
+                    temp_products.push(value)             
+                  }
+                
+                temp_products.map((value,index) => {
+                    value.map((sub_value, sub_index) =>
+                    products.push(sub_value)
+                    )
+                })
+                
+                this.setState({
+                    products
+                });
+            }
+            else {
+                this.props.loadingStop();
+            }
+          })
+          .catch(err => {
+            this.setState({ products: [] })
+            this.props.loadingStop();
+          });
     }
 
     handleClose = (val,setFieldValue,setFieldTouched) => {
@@ -284,21 +323,14 @@ class PolicySearch extends Component {
         return (
             <BaseComponent>
 			
-			<div className="page-wrapper">
-			
+			<div className="page-wrapper">			
                 <div className="container-fluid">
-                    <div className="row">
-					
-					
-					<aside className="left-sidebar">
-		  <div className="scroll-sidebar ps-container ps-theme-default ps-active-y">
-		 <SideNav />
-		 </div>
-		</aside>
-					
-					 {/*<div className="col-sm-12 col-md-12 col-lg-2 col-xl-2 pd-l-0">               
-						<SideNav />
-             		 </div>*/}
+                    <div className="row">	
+                        <aside className="left-sidebar">
+                            <div className="scroll-sidebar ps-container ps-theme-default ps-active-y">
+                            <SideNav />
+                            </div>
+                        </aside>
 						
                         <div className="col-sm-12 col-md-12 col-lg-12 col-xl-12 infobox">
                         <h4 className="text-center mt-3 mb-3">{phrases['SBIGICL']}</h4>
@@ -666,11 +698,6 @@ class PolicySearch extends Component {
                                     <TableHeaderColumn width='100px'  dataField="first_name" >{phrases['ProposerName']}</TableHeaderColumn>
                                     <TableHeaderColumn width='100px'  dataField="mobile"  >{phrases['MobileNumber']}</TableHeaderColumn>
                                     <TableHeaderColumn width='100px'  dataField="email_id"  >{phrases['EmailId']}</TableHeaderColumn>
-{/* 
-                                    <TableHeaderColumn width='100px' tdStyle={{ whiteSpace: 'normal', width: '120px'}} dataField="request_data" dataFormat={quoteFormatter} >Quote Number</TableHeaderColumn>
-                                    <TableHeaderColumn width='100px' tdStyle={{ whiteSpace: 'normal', width: '120px'}} dataField="request_data" dataFormat={premiumFormatter} >Net Premium</TableHeaderColumn> */}
-                                    
-
                                     <TableHeaderColumn width='100px'  dataField="reference_no" isKey dataAlign="center" dataFormat={ actionFormatter(this) }>{phrases['Download']}</TableHeaderColumn>
 
                                 </BootstrapTable>

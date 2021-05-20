@@ -61,8 +61,8 @@ class PremiumMISCD extends Component {
             previousPolicy: [],
             request_data: [],
             breakin_flag: 0,
-            policyHolder_refNo: queryString.parse(this.props.location.search).access_id ? 
-                                queryString.parse(this.props.location.search).access_id : 
+            policyHolder_refNo: queryString.parse(this.props.location.search).access_id ?
+                                queryString.parse(this.props.location.search).access_id :
                                 localStorage.getItem("policyHolder_refNo")
         };
     }
@@ -79,7 +79,7 @@ class PremiumMISCD extends Component {
         else {
             this.setState({ show: false, paymentButton: false, smsButton: true});
         }
-        
+
     }
 
     changePlaceHoldClassAdd(e) {
@@ -100,7 +100,7 @@ class PremiumMISCD extends Component {
         this.setState({ show: true});
     }
 
-    handleSubmit = (values) => {    
+    handleSubmit = (values) => {
         const { refNumber , policyHolder} = this.state
         const { productId } = this.props.match.params
         paymentGateways(values, policyHolder, refNumber, productId)
@@ -110,7 +110,7 @@ class PremiumMISCD extends Component {
         const { productId } = this.props.match.params
         let policyHolder_id = this.state.policyHolder_refNo ? this.state.policyHolder_refNo : '0'
         let encryption = new Encryption();
-    
+
         axios.get(`miscd/policy-holder/details/${policyHolder_id}`)
             .then(res => {
                 let decryptResp = JSON.parse(encryption.decrypt(res.data))
@@ -132,9 +132,9 @@ class PremiumMISCD extends Component {
                     paymentStatus: decryptResp.data.policyHolder.payment ? decryptResp.data.policyHolder.payment[0] : [],
                     memberdetails : decryptResp.data.policyHolder ? decryptResp.data.policyHolder : [],
                     nomineedetails: decryptResp.data.policyHolder && decryptResp.data.policyHolder.request_data.nominee ? decryptResp.data.policyHolder.request_data.nominee[0]:[]
-                    
+
                 })
-                this.fullQuote(motorInsurance)       
+                this.fullQuote(motorInsurance)
             })
             .catch(err => {
                 // handle error
@@ -160,8 +160,8 @@ class PremiumMISCD extends Component {
         if(bc_data) {
             bc_data = JSON.parse(encryption.decrypt(bc_data));
         }
-        formData.append('bcmaster_id', sessionStorage.getItem('csc_id') ? "5" : bc_data ? bc_data.agent_id : "" ) 
-        formData.append('ref_no', policyHolder_id) 
+        formData.append('bcmaster_id', sessionStorage.getItem('csc_id') ? "5" : bc_data ? bc_data.agent_id : "" )
+        formData.append('ref_no', policyHolder_id)
         formData.append('registrationNo', val)
 
         this.props.loadingStart();
@@ -172,34 +172,36 @@ class PremiumMISCD extends Component {
         }).
         catch(err=>{
             this.props.loadingStop();
-        })  
+        })
     }
 
 
     fullQuote = ( motorInsurance) => {
         const formData = new FormData();
         let encryption = new Encryption();
-        
+
         const {previousPolicy, request_data, policyHolder} = this.state
 
         let trailer_array = motorInsurance.trailers ? motorInsurance.trailers : null
         trailer_array = trailer_array ? JSON.parse(trailer_array) : []
-        
+
         const post_data = {
             'ref_no':this.state.policyHolder_refNo ? this.state.policyHolder_refNo : '0',
-            'idv_value': motorInsurance.idv_value,
+            'idv_value': this.state.request_data.IDV_Suggested ? this.state.request_data.IDV_Suggested : '0',
             'policy_type':  motorInsurance.policy_type,
             'add_more_coverage': motorInsurance.add_more_coverage,
             // 'cng_kit': motorInsurance.cng_kit,
             // 'cngKit_Cost': Math.floor(motorInsurance.cngkit_cost),
             'PA_Cover': motorInsurance && motorInsurance.pa_cover ? motorInsurance.pa_cover : '0',
             'coverage_data': motorInsurance && motorInsurance.add_more_coverage_request_json != null ? motorInsurance.add_more_coverage_request_json : "",
-            'body_idv_value' : motorInsurance && motorInsurance.body_idv_value ? motorInsurance.body_idv_value : '0',
+            'body_idv_value' : this.state.request_data.VehicleBodyPrice ? this.state.request_data.VehicleBodyPrice : '0',
+      			'userIdvStatus' : 1,
+            'bodyIdvStatus' : 1,
             'trailer_array' : trailer_array,
         }
 console.log("post_Data MISDST_Summery--------- ", post_data)
         formData.append('enc_data',encryption.encrypt(JSON.stringify(post_data)))
-        
+
         axios.post('fullQuoteMISCDShortTerm', formData)
             .then(res => {
                 if (res.data.data.PolicyObject) {
@@ -223,7 +225,7 @@ console.log("post_Data MISDST_Summery--------- ", post_data)
 
                 if(previousPolicy && policyHolder.break_in_status != "Vehicle Recommended and Reports Uploaded"){
                     let dateDiff = Math.floor(moment().diff(previousPolicy.end_date, 'days', true));
-                    if(dateDiff > 0 || previousPolicy.name == "2") {                     
+                    if(dateDiff > 0 || previousPolicy.name == "2") {
                             const formData1 = new FormData();
                             let policyHolder_id = this.state.policyHolder_refNo ? this.state.policyHolder_refNo : '0'
                             formData1.append('policy_ref_no',policyHolder_id)
@@ -234,7 +236,7 @@ console.log("post_Data MISDST_Summery--------- ", post_data)
                                 let break_in_status = res.data.data.break_in_status
                                 if( break_in_checking == true){
                                     this.setState({breakin_flag: 1})
-                                    if( break_in_inspection_no == "" && (break_in_status == null || break_in_status == "0")) {        
+                                    if( break_in_inspection_no == "" && (break_in_status == null || break_in_status == "0")) {
                                         swal({
                                             title: "Breakin",
                                             text: `Your Quotation number is ${request_data.quote_id}. Your vehicle needs inspection. Do you want to raise inspection.`,
@@ -249,7 +251,7 @@ console.log("post_Data MISDST_Summery--------- ", post_data)
                                             else {
                                                 this.props.loadingStop();
                                             }
-                                        })                                                           
+                                        })
                                     }
                                     else {
                                         swal({
@@ -281,7 +283,7 @@ console.log("post_Data MISDST_Summery--------- ", post_data)
         this.props.loadingStart();
         axios.get('relations')
         .then(res=>{
-            let relation = res.data.data ? res.data.data : []                        
+            let relation = res.data.data ? res.data.data : []
             this.setState({
                 relation
             });
@@ -292,7 +294,7 @@ console.log("post_Data MISDST_Summery--------- ", post_data)
             this.setState({
                 relation: []
             });
-        })   
+        })
     }
 
     sendPaymentLink = () => {
@@ -300,7 +302,7 @@ console.log("post_Data MISDST_Summery--------- ", post_data)
         const formData = new FormData();
         let policyHolder_refNo = localStorage.getItem("policyHolder_refNo") ? localStorage.getItem("policyHolder_refNo") : 0;
         formData.append('reference_no', policyHolder_refNo)
-    
+
         this.props.loadingStart();
         axios
           .post("send-payment-link", formData)
@@ -312,7 +314,7 @@ console.log("post_Data MISDST_Summery--------- ", post_data)
             this.props.loadingStop();
           });
       };
-    
+
 
 
     componentDidMount() {
@@ -354,7 +356,7 @@ console.log("post_Data MISDST_Summery--------- ", post_data)
         return (
             <>
                 <BaseComponent>
-				
+
 				<div className="page-wrapper">
                     <div className="container-fluid">
                         <div className="row">
@@ -363,8 +365,8 @@ console.log("post_Data MISDST_Summery--------- ", post_data)
 			 <SideNav />
 			</div>
 			</aside>
-								
-				
+
+
                             { step_completed >= '4' && vehicleDetails.vehicletype_id == '18' ?
                             <div className="col-sm-12 col-md-12 col-lg-12 col-xl-12 infobox premiumMisd">
                                 <h4 className="text-center mt-3 mb-3">{phrases['SBIGICL']}</h4>
@@ -570,7 +572,7 @@ console.log("post_Data MISDST_Summery--------- ", post_data)
                                                                                                     <FormGroup>{phrases['IDVofVehicle']}</FormGroup>
                                                                                                 </Col>
                                                                                                 <Col sm={12} md={6}>
-                                                                                                    <FormGroup>{motorInsurance && motorInsurance.idv_value ? motorInsurance.idv_value : null}</FormGroup>
+                                                                                                    <FormGroup>{this.state.request_data.IDV_Suggested ? parseInt(this.state.request_data.IDV_Suggested) : null}</FormGroup>
                                                                                                 </Col>
                                                                                             </Row>
 
@@ -581,7 +583,7 @@ console.log("post_Data MISDST_Summery--------- ", post_data)
                                                                                     </Row>
                                                                                 </div>
                                                                             : (<p></p>)}
-                                                                                   
+
                                                                         <div>
                                                                             <Row>
                                                                                 <p></p>
@@ -610,7 +612,7 @@ console.log("post_Data MISDST_Summery--------- ", post_data)
                                                                                                     <FormGroup>{memberdetails.first_name }</FormGroup>
                                                                                                 </Col>
                                                                                             </Row>
-                                                                                            {motorInsurance.policy_for == '1' ?     
+                                                                                            {motorInsurance.policy_for == '1' ?
                                                                                                 <Row>
                                                                                                     <Col sm={12} md={6}>
                                                                                                         <FormGroup>{phrases['DateOfBirth']}:</FormGroup>
@@ -618,14 +620,14 @@ console.log("post_Data MISDST_Summery--------- ", post_data)
                                                                                                     <Col sm={12} md={6}>
                                                                                                         <FormGroup>{ memberdetails ? moment(memberdetails.dob).format("DD-MM-YYYY") : null}</FormGroup>
                                                                                                     </Col>
-                                                                                                </Row> : 
-                                                                                                 <Row>	
-                                                                                                    <Col sm={12} md={6}>	
-                                                                                                        <FormGroup>{phrases['IncorporationDate']}:</FormGroup>	
-                                                                                                    </Col>	
-                                                                                                    <Col sm={12} md={6}>	
-                                                                                                        <FormGroup>{ memberdetails ? moment(memberdetails.date_of_incorporation).format("DD-MM-YYYY") : null}</FormGroup>	
-                                                                                                    </Col>	
+                                                                                                </Row> :
+                                                                                                 <Row>
+                                                                                                    <Col sm={12} md={6}>
+                                                                                                        <FormGroup>{phrases['IncorporationDate']}:</FormGroup>
+                                                                                                    </Col>
+                                                                                                    <Col sm={12} md={6}>
+                                                                                                        <FormGroup>{ memberdetails ? moment(memberdetails.date_of_incorporation).format("DD-MM-YYYY") : null}</FormGroup>
+                                                                                                    </Col>
                                                                                                 </Row>}
                                                                                             <Row>
                                                                                                 <Col sm={12} md={6}>
@@ -668,7 +670,7 @@ console.log("post_Data MISDST_Summery--------- ", post_data)
                                                                                     </Row>
                                                                                 </div>
                                                                             : (<p></p>)}
-                                                                        {motorInsurance.policy_for == '1' && motorInsurance.pa_flag == '1' ?             
+                                                                        {motorInsurance.policy_for == '1' && motorInsurance.pa_flag == '1' ?
                                                                         <div>
                                                                         <strong>{phrases['NomineeDetails']} :</strong>
                                                                             <br/>
@@ -697,7 +699,7 @@ console.log("post_Data MISDST_Summery--------- ", post_data)
                                                                                             <FormGroup>{phrases['ProposerRelation']}:</FormGroup>
                                                                                         </Col>
                                                                                         <Col sm={12} md={6}>
-                                                                                        {nomineedetails && relation.map((relations, qIndex) => 
+                                                                                        {nomineedetails && relation.map((relations, qIndex) =>
                                                                                         relations.id == nomineedetails.relation_with ?
                                                                                             <FormGroup key={qIndex}>{relations.name}</FormGroup> : null
                                                                                         )}
@@ -719,7 +721,7 @@ console.log("post_Data MISDST_Summery--------- ", post_data)
                                                                             </Row>
                                                                         </div> : null}
 
-                                                                        {motorInsurance.policy_for == '1' && nomineedetails && nomineedetails.is_appointee == '1' && motorInsurance.pa_flag == '1' ?      
+                                                                        {motorInsurance.policy_for == '1' && nomineedetails && nomineedetails.is_appointee == '1' && motorInsurance.pa_flag == '1' ?
                                                                             <div>
                                                                             <strong>{phrases['AppoDetails']} :</strong>
                                                                                 <br/>
@@ -739,7 +741,7 @@ console.log("post_Data MISDST_Summery--------- ", post_data)
                                                                                                 <FormGroup>{phrases['RelationNominee']}:</FormGroup>
                                                                                             </Col>
                                                                                             <Col sm={12} md={6}>
-                                                                                            {nomineedetails && nomineedetails.appointee_relation_with && relation.map((relations, qIndex) => 
+                                                                                            {nomineedetails && nomineedetails.appointee_relation_with && relation.map((relations, qIndex) =>
                                                                                             relations.id == nomineedetails.appointee_relation_with ?
                                                                                                 <FormGroup key={qIndex}>{relations.name}</FormGroup> : null
                                                                                             )}
@@ -755,33 +757,33 @@ console.log("post_Data MISDST_Summery--------- ", post_data)
 
                                                                 </Collapsible>
                                                             </div>
-                                                          {fulQuoteResp.QuotationNo && breakin_flag == 0  ? 
+                                                          {fulQuoteResp.QuotationNo && breakin_flag == 0  ?
                                                             <Row>
                                                             <Col sm={12} md={6}>
                                                             </Col>
                                                                 <Col sm={12} md={6}>
                                                                     <FormGroup>
-                                                                    
+
                                                                      <div className="paymntgatway">
                                                                      {phrases['SelectPayGateway']}
-                                                                     
+
                                                                      { paymentgateway && paymentgateway.length > 0 ? paymentgateway.map((gateways,index) =>
-                                                                        gateways.hasOwnProperty('paymentgateway') && gateways.paymentgateway ? 
+                                                                        gateways.hasOwnProperty('paymentgateway') && gateways.paymentgateway ?
                                                                         <div>
                                                                             <label className="customRadio3">
                                                                             <Field
                                                                                 type="radio"
-                                                                                name='gateway'                                            
+                                                                                name='gateway'
                                                                                 value={index+1}
-                                                                                key= {index} 
+                                                                                key= {index}
                                                                                 onChange={(e) => {
                                                                                     setFieldValue(`gateway`, e.target.value);
                                                                                     setFieldValue(`slug`, gateways.paymentgateway.slug);
                                                                                 }}
                                                                                 checked={values.gateway == `${index+1}` ? true : false}
                                                                             />
-                                                                                <span className="checkmark " /><span className="fs-14"> 
-                                                                            
+                                                                                <span className="checkmark " /><span className="fs-14">
+
                                                                                     { gateways.paymentgateway.logo ? <img src={require('../../assets/images/'+ gateways.paymentgateway.logo)} alt="" /> :
                                                                                     null
                                                                                     }
@@ -803,7 +805,7 @@ console.log("post_Data MISDST_Summery--------- ", post_data)
                                                                     <Button type="button" className="proceedBtn" onClick = {this.sendPaymentLink.bind(this)}>  {phrases['PaymentLink']}  </Button>
                                                                     &nbsp;&nbsp;&nbsp;&nbsp;
                                                                     </div> : null }
-                                                                
+
                                                                 {smsButton === true && breakin_flag == 0 ?
                                                                 <Button className="backBtn" type="button" onClick={this.handleModal.bind(this)}>{phrases['SendSMS']}</Button>
                                                                 : null}
@@ -813,7 +815,7 @@ console.log("post_Data MISDST_Summery--------- ", post_data)
                                                                         className="proceedBtn"
                                                                     >
                                                                         Make Payment
-                                                                </Button> 
+                                                                </Button>
                                                             : null}
                                                             </div>
                                                         </Col>

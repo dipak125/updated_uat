@@ -82,7 +82,7 @@ export const paymentGateways = (values,policyHolder,refNumber, productId) => {
         window.location.href = `#/Vedvag_gateway/${productId}?access_id=${refNumber}`
     }
 	if(values.slug == "csc_wallet") {
-		payment(refNumber)
+		payment(refNumber, productId)
 	}
 	if(values.slug == "razorpay") {
 		Razor_payment(refNumber)
@@ -95,8 +95,13 @@ export const paymentGateways = (values,policyHolder,refNumber, productId) => {
     }
 }
 
-function payment(refNumber) {
-    window.location = `${process.env.REACT_APP_PAYMENT_URL}/ConnectPG/payment_motor.php?refrence_no=${refNumber}`
+function payment(refNumber, productId) {
+	const motor_productIds = [2,3,4,6,7,8,11,15,16,17,18];
+	if(motor_productIds.includes(productId)){
+		window.location = `${process.env.REACT_APP_PAYMENT_URL}/ConnectPG/payment_motor.php?refrence_no=${refNumber}`
+	}else{
+		window.location = `${process.env.REACT_APP_PAYMENT_URL}/ConnectPG/payment.php?refrence_no=${refNumber}`
+	} 
 }
 
 function Razor_payment(refNumber) {

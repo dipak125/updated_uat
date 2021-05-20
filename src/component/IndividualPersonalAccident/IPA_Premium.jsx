@@ -245,9 +245,10 @@ class IPA_Premium extends Component {
   };
 
   handleSubmit = (values) => {    
-    const { refNumber , policyHolderDetails} = this.state
+    const { policyHolderDetails} = this.state.policyHolderDetails
     const { productId } = this.props.match.params
-    paymentGateways(values, policyHolderDetails, refNumber, productId)
+	//console.log("state", this.state.policyHolderDetails);
+    paymentGateways(values, policyHolderDetails, this.state.policyHolderDetails.reference_no, productId)
 }
 
 
