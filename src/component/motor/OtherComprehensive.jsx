@@ -632,11 +632,27 @@ class OtherComprehensive extends Component {
                     });
                   } 
                 else if (res.data.PolicyObject && res.data.UnderwritingResult && res.data.UnderwritingResult.Status == "Fail") {
+                    var validationErrors = []
+                    for (const x in res.data.UnderwritingResult.MessageList) {
+                        validationErrors.push(res.data.UnderwritingResult.MessageList[x].Message)
+                    }
                     this.setState({
                         fulQuoteResp: res.data.PolicyObject,
-                        error: {"message": 1},
+                        validation_error: validationErrors,
+                        error: {"message": 0},
                         serverResponse: [],
                         policyCoverage: res.data.PolicyObject.PolicyLobList ? res.data.PolicyObject.PolicyLobList[0].PolicyRiskList[0].PolicyCoverageList : [],
+                    });
+                }
+                else if (res.data.code && res.data.message && res.data.code == "validation failed" && res.data.message == "validation failed") {
+                    var validationErrors = []
+                    for (const x in res.data.data.messages) {
+                        validationErrors.push(res.data.messages[x].message)
+                    }
+                    this.setState({
+                        fulQuoteResp: [], add_more_coverage,
+                        validation_error: validationErrors,
+                        serverResponse: []
                     });
                 }
                 else {
@@ -895,7 +911,7 @@ class OtherComprehensive extends Component {
 
 
     render() {
-        const {showCNG, vahanDetails,error, policyCoverage, vahanVerify, selectFlag, fulQuoteResp, PolicyArray, geographical_extension,ncbDiscount,
+        const {showCNG, vahanDetails,error, policyCoverage, vahanVerify, selectFlag, fulQuoteResp, PolicyArray, geographical_extension,ncbDiscount,validation_error,
             moreCoverage, sliderVal, motorInsurance, serverResponse, engine_no, chasis_no, initialValue, add_more_coverage, add_more_coverage_request_array} = this.state
         const {productId} = this.props.match.params 
         let defaultSliderValue = PolicyArray.length > 0 ? Math.round(PolicyArray[0].PolicyRiskList[0].IDV_Suggested) : 0
@@ -1069,6 +1085,20 @@ class OtherComprehensive extends Component {
                 </span>
             ) : null;
 
+        const validationErrors =
+            validation_error ? (
+                validation_error.map((errors, qIndex) => (
+                    <span className="errorMsg" key={qIndex}>
+                        <li>
+                            <strong>
+                                {errors}
+                            </strong>
+                        </li>
+                    </span>
+                ))
+            ) : null;
+
+
         return (
             <>
                 <BaseComponent>
@@ -1090,6 +1120,7 @@ class OtherComprehensive extends Component {
                             <div className="brandhead m-b-10">
                                 <h4 className="m-b-30">{phrases['CoversYourCar']}</h4>
                                 <h5>{errMsg}</h5>
+                                <h5>{validationErrors}</h5>
                             </div>
                         </div>
                         <Formik initialValues={newInitialValues} 

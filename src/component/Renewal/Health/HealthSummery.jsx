@@ -193,9 +193,9 @@ class HealthSummery extends Component {
 
 
 handleSubmit = (values) => {    
-  const { refNumber , policyHolder} = this.state
+  const { policyHolder_refNo , policyHolder} = this.state
   const { productId } = this.props.match.params
-  paymentGateways(values, policyHolder, refNumber, productId)
+  paymentGateways(values, policyHolder, policyHolder_refNo, productId)
 }
 
 

@@ -128,6 +128,34 @@ const PolicyDetails = Loadable({
     loading: () => loadingContent
 });
 
+
+// ========== AROGYA SANJEEVANI MICRO =============================================
+
+const Health_Micro = Loadable({
+    loader: () => import(/*webpackChunkName: "Products" */"../Micro Products/Arogya-Sanjeevani-Micro/InformationYourself_Micro.jsx"),
+    loading: () => loadingContent
+});
+const MedicalDetails_Micro = Loadable({
+    loader: () => import(/*webpackChunkName: "Products" */"../Micro Products/Arogya-Sanjeevani-Micro/MedicalDetails_Micro.jsx"),
+    loading: () => loadingContent
+});
+const SelectDuration_Micro = Loadable({
+    loader: () => import(/*webpackChunkName: "Products" */"../Micro Products/Arogya-Sanjeevani-Micro/SelectDuration_Micro.jsx"),
+    loading: () => loadingContent
+});
+const Address_Micro = Loadable({
+    loader: () => import(/*webpackChunkName: "Products" */"../Micro Products/Arogya-Sanjeevani-Micro/Address_Micro.jsx"),
+    loading: () => loadingContent
+});
+const NomineeDetails_Micro = Loadable({
+    loader: () => import(/*webpackChunkName: "Products" */"../Micro Products/Arogya-Sanjeevani-Micro/NomineeDetails_Micro.jsx"),
+    loading: () => loadingContent
+});
+const PolicyDetails_Micro = Loadable({
+    loader: () => import(/*webpackChunkName: "Products" */"../Micro Products/Arogya-Sanjeevani-Micro/PolicyDetails_Micro.jsx"),
+    loading: () => loadingContent
+});
+
 // =======================================================
 
 const ThankYou = Loadable({
@@ -429,6 +457,34 @@ const PolicyDetails_KSB = Loadable({
     loading: () => loadingContent
 });
 
+// ======================KSB Retail Micro =============================================
+
+const Health_KSB_Micro = Loadable({
+    loader: () => import(/*webpackChunkName: "Products" */"../Micro Products/KSB-retail-Micro/InformationYourself_KSB_Micro.jsx"),
+    loading: () => loadingContent
+});
+const PreExistingDisease_KSB_Micro = Loadable({
+    loader: () => import(/*webpackChunkName: "Products" */"../Micro Products/KSB-retail-Micro/PreExistingDisease_KSB_Micro.jsx"),
+    loading: () => loadingContent
+});
+const SelectDuration_KSB_Micro = Loadable({
+    loader: () => import(/*webpackChunkName: "Products" */"../Micro Products/KSB-retail-Micro/SelectDuration_KSB_Micro.jsx"),
+    loading: () => loadingContent
+});
+const Address_KSB_Micro = Loadable({
+    loader: () => import(/*webpackChunkName: "Products" */"../Micro Products/KSB-retail-Micro/Address_KSB_Micro.jsx"),
+    loading: () => loadingContent
+});
+const NomineeDetails_KSB_Micro = Loadable({
+    loader: () => import(/*webpackChunkName: "Products" */"../Micro Products/KSB-retail-Micro/NomineeDetails_KSB_Micro.jsx"),
+    loading: () => loadingContent
+});
+const PolicyDetails_KSB_Micro = Loadable({
+    loader: () => import(/*webpackChunkName: "Products" */"../Micro Products/KSB-retail-Micro/PolicyDetails_KSB_Micro.jsx"),
+    loading: () => loadingContent
+});
+
+
 // =================== INDIVIDUAL PERSONAL ACCIDENT  =============================== //
 
 const AccidentSelectPlan = Loadable({
@@ -445,6 +501,25 @@ const AccidentAdditionalDetails = Loadable({
 });
 const IPA_Premium = Loadable({
     loader: () => import(/*webpackChunkName: "Products" */"../IndividualPersonalAccident/IPA_Premium"),
+    loading: () => loadingContent
+});
+
+// =================== INDIVIDUAL PERSONAL ACCIDENT  Micro =============================== //
+
+const AccidentSelectPlan_Micro = Loadable({
+    loader: () => import(/*webpackChunkName: "Products" */"../Micro Products/IndividualPersonalAccident-Micro/IPA_SelectPlan_Micro"),
+    loading: () => loadingContent
+});
+const AccidentAddDetails_Micro = Loadable({
+    loader: () => import(/*webpackChunkName: "Products" */"../Micro Products/IndividualPersonalAccident-Micro/IPA_AddDetails_Micro"),
+    loading: () => loadingContent
+});
+const AccidentAdditionalDetails_Micro = Loadable({
+    loader: () => import(/*webpackChunkName: "Products" */"../Micro Products/IndividualPersonalAccident-Micro/IPA_CommunicationalDetails_Micro"),
+    loading: () => loadingContent
+});
+const IPA_Premium_Micro = Loadable({
+    loader: () => import(/*webpackChunkName: "Products" */"../Micro Products/IndividualPersonalAccident-Micro/IPA_Premium_Micro"),
     loading: () => loadingContent
 });
 
@@ -598,8 +673,18 @@ class Routes extends Component {
                         {/* <PrivateRoute exact path="/PolicySummery/:productId" component={PolicySummery} />                  */}
                         <PrivateRoute exact path="/ThankYou/:policyId" component={ThankYou} />
                         <PrivateRoute exact path="/ThankYouCCM" component={ThankYouCCM} />
-                    
+
+                        {/* ============================ Arogya Sanjeevani Micro================================ */}
                         
+                        <PrivateRoute exact path="/Health_Micro/:productId" component={Health_Micro} />
+                        <PrivateRoute exact path="/MedicalDetails_Micro/:productId" component={MedicalDetails_Micro} />
+                        <PrivateRoute exact path="/SelectDuration_Micro/:productId" component={SelectDuration_Micro} />
+                        <PrivateRoute exact path="/Address_Micro/:productId" component={Address_Micro} />    
+                        <PrivateRoute exact path="/NomineeDetails_Micro/:productId" component={NomineeDetails_Micro} /> 
+                        <PrivateRoute exact path="/PolicyDetails_Micro/:productId" component={PolicyDetails_Micro} />
+
+                        {/* ======================================== M4W Comprehensive ===================================================== */}
+                     
                         <PrivateRoute exact path="/Registration/:productId" component={Registration} />                    
                         <PrivateRoute exact path="/Select-brand/:productId" component={SelectBrand} />
                         <PrivateRoute exact path="/VehicleDetails/:productId" component={VehicleDetails} />
@@ -616,6 +701,12 @@ class Routes extends Component {
                         <PrivateRoute exact path="/AccidentAddDetails/:productId" component={AccidentAddDetails} /> 
                         <PrivateRoute exact path="/AccidentAdditionalDetails/:productId" component={AccidentAdditionalDetails} /> 
                         <PrivateRoute exact path="/AccidentAdditionalPremium/:productId" component={IPA_Premium} /> 
+
+                        {/* ******************* Individual Personal Accident Micro ************* */}              
+                        <PrivateRoute exact path="/AccidentSelectPlan_Micro/:productId" component={AccidentSelectPlan_Micro} /> 
+                        <PrivateRoute exact path="/AccidentAddDetails_Micro/:productId" component={AccidentAddDetails_Micro} /> 
+                        <PrivateRoute exact path="/AccidentAdditionalDetails_Micro/:productId" component={AccidentAdditionalDetails_Micro} /> 
+                        <PrivateRoute exact path="/AccidentAdditionalPremium_Micro/:productId" component={IPA_Premium_Micro} /> 
 
                         {/* ********************* AROGYA TOPUP ***************** */}
                         
@@ -733,6 +824,14 @@ class Routes extends Component {
                         <PrivateRoute exact path="/Address_KSB/:productId" component={Address_KSB} />    
                         <PrivateRoute exact path="/NomineeDetails_KSB/:productId" component={NomineeDetails_KSB} /> 
                         <PrivateRoute exact path="/PolicyDetails_KSB/:productId" component={PolicyDetails_KSB} />
+
+                        {/************ KSB-Retail Micro ******************/}
+                        <PrivateRoute exact path="/Health_KSB_Micro/:productId" component={Health_KSB_Micro} />
+                        <PrivateRoute exact path="/PreExistingDisease_KSB_Micro/:productId" component={PreExistingDisease_KSB_Micro} />
+                        <PrivateRoute exact path="/SelectDuration_KSB_Micro/:productId" component={SelectDuration_KSB_Micro} />
+                        <PrivateRoute exact path="/Address_KSB_Micro/:productId" component={Address_KSB_Micro} />    
+                        <PrivateRoute exact path="/NomineeDetails_KSB_Micro/:productId" component={NomineeDetails_KSB_Micro} /> 
+                        <PrivateRoute exact path="/PolicyDetails_KSB_Micro/:productId" component={PolicyDetails_KSB_Micro} />
                         
                         {/************ GSB ******************/}
                         <PrivateRoute exact path="/SelectPlan_GSB/:productId" component={SelectPlan_GSB} />

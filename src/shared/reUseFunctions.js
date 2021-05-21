@@ -58,40 +58,40 @@ export const fourwheelerODEndDate = (value) => {
 }
 
 export const paymentGateways = (values,policyHolder,refNumber, productId) => {
-    // if (values.gateway == 2) {
-        // console.log("Vedvag_gateway")
-        // window.location.href = `#/Vedvag_gateway/${productId}?access_id=${refNumber}`
-    // }
-    // else if(values.slug && values.gateway == 1) {
-        // if(values.slug == "csc_wallet") {
-            // payment(refNumber)
-        // }
-        // if(values.slug == "razorpay") {
-            // Razor_payment(refNumber)
-        // }
-        // if(values.slug == "PPINL") {
-            // paypoint_payment(refNumber)
-        // }
-        // if(values.slug == "sahi_wallet") {
-            // window.location.href = `#/Sahipay_gateway/${productId}?access_id=${refNumber}` 
-        // }
-    // }
-	
-	if (values.slug == 'vedavaag_wallet') {
-        console.log("Vedvag_gateway")
-        window.location.href = `#/Vedvag_gateway/${productId}?access_id=${refNumber}`
+
+	if(policyHolder.hasOwnProperty("renewalinfo")) {
+        if (values.slug == 'vedavaag_wallet') {
+            console.log("Vedvag_gateway")
+            window.location.href = `#/Vedvag_gateway/${productId}?access_id=${refNumber}`
+        }
+        if(values.slug == "csc_wallet") {
+            payment_renewal(refNumber, productId)
+        }
+        if(values.slug == "razorpay") {
+            Razor_payment_renewal(refNumber)
+        }
+        if(values.slug == "sahi_wallet") {
+            window.location.href = `#/Sahipay_gateway/${productId}?access_id=${refNumber}` 
+        }
+        
     }
-	if(values.slug == "csc_wallet") {
-		payment(refNumber, productId)
-	}
-	if(values.slug == "razorpay") {
-		Razor_payment(refNumber)
-	}
-	if(values.slug == "PPINL") {
-		paypoint_payment(refNumber)
-	}
-	if(values.slug == "sahi_wallet") {
-		window.location.href = `#/Sahipay_gateway/${productId}?access_id=${refNumber}` 
+    else {
+        if (values.slug == 'vedavaag_wallet') {
+            console.log("Vedvag_gateway")
+            window.location.href = `#/Vedvag_gateway/${productId}?access_id=${refNumber}`
+        }
+        if(values.slug == "csc_wallet") {
+            payment(refNumber, productId)
+        }
+        if(values.slug == "razorpay") {
+            Razor_payment(refNumber)
+        }
+        if(values.slug == "PPINL") {
+            paypoint_payment(refNumber)
+        }
+        if(values.slug == "sahi_wallet") {
+            window.location.href = `#/Sahipay_gateway/${productId}?access_id=${refNumber}` 
+        }
     }
 }
 
@@ -110,4 +110,14 @@ function Razor_payment(refNumber) {
 
 function paypoint_payment(refNumber) {
     window.location = `${process.env.REACT_APP_PAYMENT_URL}/ppinl/pay.php?refrence_no=${refNumber}`
+}
+
+// -------------------------- Renewal Gateway -----------------------------------------------
+function payment_renewal(refNumber, productId) {
+
+    window.location = `${process.env.REACT_APP_PAYMENT_URL}/ConnectPG/payment_renewal.php?refrence_no=${refNumber}`
+}
+
+function Razor_payment_renewal(refNumber) {
+    window.location = `${process.env.REACT_APP_PAYMENT_URL}/razorpay/renewal_pay.php?refrence_no=${refNumber}`
 }
