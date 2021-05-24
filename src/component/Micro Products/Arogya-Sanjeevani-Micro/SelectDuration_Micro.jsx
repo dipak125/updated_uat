@@ -102,7 +102,8 @@ class SelectDuration_Micro extends Component {
         insureValue: "" ,
         error: [],
         endDateFlag: false,
-        serverResponse: []
+        serverResponse: [],
+        familyMembers: []
       };
 
 
@@ -123,22 +124,22 @@ class SelectDuration_Micro extends Component {
 
     handleSubmit = (values) => {
         const {productId} = this.props.match.params
-        const {serverResponse} = this.state
+        const {serverResponse, familyMembers} = this.state
         const formData = new FormData(); 
         let encryption = new Encryption();
 
        // formData.append('policy_holder_id', localStorage.getItem('policyHolder_id'));
         let policy_holder_id = localStorage.getItem('policyHolder_id') ? localStorage.getItem('policyHolder_id') : 0
 
-        let user_data = sessionStorage.getItem("users") ? JSON.parse(sessionStorage.getItem("users")) : "";
-        if (user_data) {
-            user_data = JSON.parse(encryption.decrypt(user_data.user));
-
-            if((serverResponse.SumInsured > 500000) && user_data.user_type == "POSP"  ) {
-                swal("Quote cannot proceed with IDV greater than 500000")
-                this.props.loadingStop();
-                return false
-            }
+        if((serverResponse.HighestFamilySI > 250000) && familyMembers.length > "1"  ) {
+            swal("Quote cannot proceed with IDV greater than 250000")
+            this.props.loadingStop();
+            return false
+        }
+        else if((serverResponse.HighestFamilySI > 100000) && familyMembers.length == "1"  ) {
+            swal("Quote cannot proceed with IDV greater than 100000")
+            this.props.loadingStop();
+            return false
         }
 
         const post_data = {
@@ -201,8 +202,10 @@ class SelectDuration_Micro extends Component {
         axios
           .get(`/policy-holder/${localStorage.getItem('policyHolder_id')}`)
           .then(res => { 
+            var familyMembers = res.data.data.policyHolder.request_data && res.data.data.policyHolder.request_data.family_members
             this.setState({
-                policyHolderDetails: res.data.data.policyHolder
+                policyHolderDetails: res.data.data.policyHolder,
+                familyMembers
             }) 
             this.getAccessToken()
           })

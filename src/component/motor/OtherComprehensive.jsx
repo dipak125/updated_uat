@@ -569,7 +569,7 @@ class OtherComprehensive extends Component {
             // 'cngKit_Cost': cngKit_Cost
         }
         console.log('fullQuote_post_data', post_data)
-        total_idv = parseInt(other_idv) + parseInt(post_data.idv_value)+parseInt(post_data.body_idv_value)
+        total_idv = parseInt(other_idv) + parseInt(post_data.idv_value)
 
         let user_data = sessionStorage.getItem("users") ? JSON.parse(sessionStorage.getItem("users")) : "";
         if (user_data) {
@@ -738,10 +738,10 @@ class OtherComprehensive extends Component {
             }
         }
         console.log('post_data',post_data)
-        total_idv = parseInt(other_idv) + parseInt(post_data.idv_value)+parseInt(post_data.body_idv_value)
+        total_idv = parseInt(other_idv) + parseInt(post_data.idv_value)
 
         let user_data = sessionStorage.getItem("users") ? JSON.parse(sessionStorage.getItem("users")) : "";
-        if (user_data) {
+        if (user_data.user && total_idv) {
             user_data = JSON.parse(encryption.decrypt(user_data.user));
 
             if((total_idv> 5000000) && user_data.user_type == "POSP"  ) {
@@ -749,22 +749,23 @@ class OtherComprehensive extends Component {
                 this.props.loadingStop();
                 return false
             }
-        }
-
-        formData.append('enc_data', encryption.encrypt(JSON.stringify(post_data)))
-        this.props.loadingStart();
-        axios.post('update-insured-value', formData).then(res => {
-            this.props.loadingStop();
-            
-            if (res.data.error == false) {
-                this.props.history.push(`/Additional_details/${productId}`);
+            else {
+                formData.append('enc_data', encryption.encrypt(JSON.stringify(post_data)))
+                this.props.loadingStart();
+                axios.post('update-insured-value', formData).then(res => {
+                    this.props.loadingStop();
+                    
+                    if (res.data.error == false) {
+                        this.props.history.push(`/Additional_details/${productId}`);
+                    }
+        
+                })
+                .catch(err => {
+                    // handle error
+                    this.props.loadingStop();
+                })
             }
-
-        })
-            .catch(err => {
-                // handle error
-                this.props.loadingStop();
-            })
+        }   
     }
 
     onRowSelect = (values, isSelect, setFieldTouched, setFieldValue) => {
@@ -833,11 +834,13 @@ class OtherComprehensive extends Component {
             if(values == "B00003") {
                 setFieldTouched("nonElectric_flag");
                 setFieldValue("nonElectric_flag", '0');
+                setFieldValue("B00003_value", 0);
                 
             }
             if(values == "B00004") {
                 setFieldTouched("electric_flag");
-                setFieldValue("electric_flag", '0');
+                setFieldValue("electric_flag", '0'); 
+                setFieldValue("B00004_value", 0);
             }      
             if(values == "geographical_extension") {
                 setFieldTouched("Geographical_flag");

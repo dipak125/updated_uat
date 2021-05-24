@@ -1046,6 +1046,7 @@ class InformationYourself_KSB_Micro extends Component {
     post_data['page_name'] = `Health_KSB/${productId}`
     post_data['primaryInsured'] = this.state.primaryInsured
     post_data['ksbplan_id'] = values.ksbplan_id
+    post_data['product_id'] = this.props.match.params.productId
     
     
     let arr_date=[]
@@ -1081,7 +1082,7 @@ class InformationYourself_KSB_Micro extends Component {
     if(sessionStorage.getItem('csc_id')) {
         post_data['csc_id'] = sessionStorage.getItem('csc_id') ? sessionStorage.getItem('csc_id') : ""
         post_data['agent_name'] = sessionStorage.getItem('agent_name') ? sessionStorage.getItem('agent_name') : ""
-        post_data['product_id'] = sessionStorage.getItem('product_id') ? sessionStorage.getItem('product_id') : ""
+        // post_data['product_id'] = sessionStorage.getItem('product_id') ? sessionStorage.getItem('product_id') : ""
         post_data['bcmaster_id'] = "5"
     }
     else {

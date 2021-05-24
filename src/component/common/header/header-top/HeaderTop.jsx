@@ -84,7 +84,7 @@ class HeaderTop extends Component {
       
     render() {
         const { logo, user_data } = this.state
-		console.log('user_data', user_data)
+		// console.log('user_data', user_data)
 
         let phrases = localStorage.getItem("phrases") ? JSON.parse(localStorage.getItem("phrases")) : null
         

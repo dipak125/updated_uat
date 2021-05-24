@@ -141,7 +141,7 @@ class Sahipay_gateway extends Component {
                 this.policyInception(res.data.data.transaction_no, this.state.quote_id)
             }
             else {
-                swal("Payment failed")
+                swal(res.data.msg)
                 this.props.loadingStop();
             }
 

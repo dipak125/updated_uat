@@ -26,7 +26,8 @@ class Products extends Component {
         health_list: [],
         misc_list: [],
         personalAccident_list: [],
-        fire_list: []
+        fire_list: [],
+        defaultTab: ""
     };
 
     componentDidMount() {
@@ -61,12 +62,31 @@ class Products extends Component {
         axios.post(`visible/products`, formData)
           .then(res => {
             if(res.data.error == false) {        
+                var defaultTab = ''
+                var motor_list = res.data.data.Motor
+                var health_list = res.data.data.Health
+                var misc_list = res.data.data.MiscellaneousLOB
+                var personalAccident_list = res.data.data.PersonalAccident
+                var fire_list = res.data.data.FireInsurance
+
+                if(motor_list && motor_list.length > 0) {
+                    defaultTab = 'first'
+                }
+                else if(health_list && health_list.length > 0) {
+                    defaultTab = 'second'
+                }
+                else if(fire_list && fire_list.length > 0) {
+                    defaultTab = 'third'
+                }
+                else if(personalAccident_list && personalAccident_list.length > 0) {
+                    defaultTab = 'fourth'
+                }
+                else if(misc_list && misc_list.length > 0) {
+                    defaultTab = 'fifth'
+                }
+                
                 this.setState({
-                    motor_list: res.data.data.Motor,
-                    health_list: res.data.data.Health,
-                    misc_list: res.data.data.MiscellaneousLOB,
-                    personalAccident_list: res.data.data.PersonalAccident,
-                    fire_list: res.data.data.FireInsurance
+                    motor_list, health_list, misc_list, personalAccident_list, fire_list,defaultTab
                 });
     
                 localStorage.removeItem('policyHolder_id');
@@ -101,9 +121,9 @@ class Products extends Component {
     }
 
     render() {
-        const { product_id, motor_list, health_list, misc_list, personalAccident_list, fire_list } = this.state
+        const { product_id, motor_list, health_list, misc_list, personalAccident_list, fire_list, defaultTab } = this.state
         let phrases = localStorage.getItem("phrases") ? JSON.parse(localStorage.getItem("phrases")) : null
-        console.log('product_id', product_id)
+        console.log('product_id', defaultTab)
         return (
             <>
                 <BaseComponent>
@@ -120,10 +140,10 @@ class Products extends Component {
 							 		<SideNav />
 								 </div>
 								</aside>
-									
+									{defaultTab ?
                                     <div className="col-sm-12 col-md-12 col-lg-12 col-xl-12 infobox">
                                         <div className="messageDeskSec">
-                                            <Tab.Container id="left-tabs-example" defaultActiveKey="first">
+                                            <Tab.Container id="left-tabs-example" defaultActiveKey={defaultTab}>
                                                 <Row>
                                                     <Col sm={12}>
                                                         <Nav variant="pills" className="flex-column">
@@ -181,6 +201,7 @@ class Products extends Component {
 
                                     </div>
 
+                                :null}
                                 </div>
                             </div>
                         </div>
