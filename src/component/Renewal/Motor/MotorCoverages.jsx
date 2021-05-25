@@ -55,17 +55,6 @@ const ComprehensiveValidation = Yup.object().shape({
 
     puc: Yup.string().required("Please verify pollution certificate to proceed"),
 
-    chasis_no_last_part:Yup.string().required('RequiredField')
-    .matches(/^([0-9]*)$/, function() {
-        return "Invalid number"
-    })
-    .min(5, function() {
-        return "ChasisLastDigit"
-    })
-    .max(5, function() {
-        return "ChasisLastDigit"
-    }),
-
     engine_no:Yup.string().required('EngineRequired')
     .matches(/^[a-zA-Z0-9]*$/, function() {
         return "InvalidEngineNumber"
@@ -619,14 +608,20 @@ class MotorCoverages extends Component {
                 add_more_coverage_request_array && add_more_coverage_request_array.length>0 && add_more_coverage_request_array.map((value,index) => {   
                     // console.log("subValue-------------- ", subValue)
                     if(value.coverTypeId == '900009555') {
-                        var newTyreMfgYr = new Date(vehicleRegDate)
-                        var tempVal={
-                            tyreSerialNo : "",
-                            tyreMfgYr : newTyreMfgYr.getFullYear(),
-                            vehicleRegDate: vehicleRegDate,
-                            policy_for: this.state.policy_for
-                        }
-                        tyre_rim_array.push(tempVal)
+                        var dynamicObjectList = value.dynamicObjectList
+                        dynamicObjectList.map((subValue,subIndex) => {
+                            if(subValue.bizTableName == "Tyre_Rim_PM_Obj") {
+                                subValue.dynamicAttributeVOList.length > 0 && subValue.dynamicAttributeVOList.map((miniSubValue,miniSubIndex) => {
+                                    var tempVal={
+                                        tyreSerialNo : miniSubValue.valueMap && miniSubValue.valueMap.Tyre_Serial_no_PM,
+                                        tyreMfgYr : miniSubValue.valueMap && miniSubValue.valueMap.Tyre_MFG_Year_PM,
+                                        vehicleRegDate: vehicleRegDate,
+                                        policy_for: this.state.policy_for
+                                    }
+                                    tyre_rim_array.push(tempVal)
+                                })
+                            }   
+                        })  
                     }
                 }) 
                 
@@ -861,6 +856,7 @@ class MotorCoverages extends Component {
                 )
             }   
         }
+        return innicialClaimList
     }
             
 
@@ -989,7 +985,6 @@ class MotorCoverages extends Component {
         const {add_more_coverage, additional_coverage, request_data,error, policyCoverage, vahanVerify, selectFlag, fulQuoteResp, PolicyArray, fuelList, depreciationPercentage, vehicleDetails, geographical_extension,
             moreCoverage, sliderVal, bodySliderVal, motorInsurance, serverResponse, engine_no, chasis_no, initialValue, add_more_coverage_request_array,ncbDiscount} = this.state
         const {productId} = this.props.match.params 
-        // console.log("add_more_coverage-------------------------- ", add_more_coverage)
         let vehicletype_id = vehicleDetails ? vehicleDetails.vehicletype_id : ""
         let defaultSliderValue = sliderVal
         let min_IDV_suggested = PolicyArray.length > 0 ? PolicyArray[0].PolicyRiskList[0].MinIDV_Suggested : 0
@@ -1355,7 +1350,7 @@ class MotorCoverages extends Component {
                     // validationSchema={ComprehensiveValidation}
                     >
                     {({ values, errors, setFieldValue, setFieldTouched, isValid, isSubmitting, touched }) => {
-// console.log("benefit.values------------------ ", values)
+
                     return (
                         <Form>
                         <Row>
@@ -1373,13 +1368,13 @@ class MotorCoverages extends Component {
                             <Row>
                                 <Col sm={12} md={12} lg={5}>
                                 <Row>
-                                <Col sm={12} md={5} lg={5}>
-                                    <FormGroup>
-                                        <div className="insurerName">
-                                        {phrases['RegNo']}
-                                        </div>
-                                    </FormGroup>
-                                </Col>
+                                    <Col sm={12} md={5} lg={5}>
+                                        <FormGroup>
+                                            <div className="insurerName">
+                                            {phrases['RegNo']}
+                                            </div>
+                                        </FormGroup>
+                                    </Col>
                                     
                                     <Col sm={12} md={5} lg={6}>
                                         <FormGroup>
@@ -1405,54 +1400,9 @@ class MotorCoverages extends Component {
                                         </FormGroup>
                                     </Col>
                                     </Row>
-                                    </Col>
-
-                                    <Col sm={12} md={12} lg={5}>
-                                        <Row>
-                                            <Col sm={12} md={5} lg={6}>
-                                                <FormGroup>
-                                                    <div className="insurerName">
-                                                    {phrases['ChassisNo']}
-                                                    </div>
-                                                </FormGroup>
-                                            </Col>
-                                        
-                                            <Col sm={12} md={5} lg={5}>
-                                                <FormGroup>
-                                                    <div className="insurerName">
-                                                            <Field
-                                                                type="text"
-                                                                name='chasis_no_last_part' 
-                                                                autoComplete="off"
-                                                                className="premiumslid"       
-                                                                value= {values.chasis_no_last_part}
-                                                                maxLength="5"       
-                                                                disabled = {true}
-                                                                onChange = {(e) => {
-                                                                    setFieldValue('vahanVerify', false)
-
-                                                                    setFieldTouched('chasis_no_last_part')
-                                                                    setFieldValue('chasis_no_last_part', e.target.value)                       
-                                                                }}                           
-                                                                
-                                                            />
-                                                            {errors.chasis_no_last_part && touched.chasis_no_last_part ? (
-                                                            <span className="errorMsg">{phrases[errors.chasis_no_last_part]}</span>
-                                                        ) : null}
-                                                    </div>
-                                                </FormGroup>
-                                            </Col>
-                                            {/* <Col sm={12} md={5} lg={2}>
-                                                <Button className="btn btn-primary vrifyBtn" onClick= {!errors.chasis_no_last_part ? this.getVahanDetails.bind(this,values, setFieldTouched, setFieldValue, errors) : null}>{phrases['Verify']}</Button>
-                                                {errors.vahanVerify ? (
-                                                        <span className="errorMsg">{phrases[errors.vahanVerify]}</span>
-                                                    ) : null}       
-                                            </Col> */}
-                                        </Row>
-                                        
-                                    </Col>   
+                                </Col>  
                             </Row>
-                            {/* {values.vahanVerify && !errors.chasis_no_last_part ? */}
+
                             <Row>
                                 <Col sm={12} md={6} lg={5}>
                                     <FormGroup>

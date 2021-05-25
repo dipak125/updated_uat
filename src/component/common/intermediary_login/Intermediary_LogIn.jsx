@@ -19,6 +19,7 @@ import Encryption from '../../../shared/payload-encryption';
 import queryString from 'query-string';
 import swal from 'sweetalert';
 import axios from "../../../shared/axios";
+import axiosExternal from "../../../shared/axiosExternal";
 
 const initialValues = {
     userId: "",
@@ -31,14 +32,25 @@ const passResetInitialValues = {
 }
 
 const loginvalidation = Yup.object().shape({
-    userId: Yup.string().required("Please enter email id"),
+    userId: Yup.string().email("User Id must be a valid email").required('Please enter email id').min(8, function() {
+        return "Minimum 8 characters"
+    })
+    .max(75, function() {
+        return "Maximum 75 characters"
+    }).matches(/^[a-zA-Z0-9]+([._\-]?[a-zA-Z0-9]+)*@\w+([-]?\w+)*(\.\w{2,3})+$/,'Invalid email id'),
+
     password: Yup.string().required("Please enter password"),
     broker_id: Yup.string().required("Please select broker"),
 });
 
 const passResetValidation = Yup.object().shape({
-    email: Yup.string().required("Please enter email id"),
-});
+    email: Yup.string().email("Email Id must be a valid email").required('Please enter email id').min(8, function() {
+        return "Minimum 8 characters"
+        })
+        .max(75, function() {
+            return "Maximum 75 characters"
+        }).matches(/^[a-zA-Z0-9]+([._\-]?[a-zA-Z0-9]+)*@\w+([-]?\w+)*(\.\w{2,3})+$/,'Invalid email id'),
+    });
 
 
 
@@ -50,7 +62,8 @@ class Intermediary_LogIn extends Component {
         errMsg: null,
         respArray: [],
         broker_id: "",
-        showModal: false
+        showModal: false,
+        message: null
     }
 
     fetchPhrases = () => {
@@ -78,127 +91,34 @@ class Intermediary_LogIn extends Component {
         let bodyClass = [];
         bodyClass.length && document.body.classList.remove(...bodyClass);
         document.body.classList.add("loginBody");
-        let encryption = new Encryption();
-
-        if (localStorage.getItem('loginData') && localStorage.getItem('loginData') !== "") {
-            // check remember me option
-            const loginData = JSON.parse(encryption.decrypt(localStorage.getItem('loginData')));
-            if (loginData) {
-                this.setState({
-                    email: loginData.email,
-                    pass: loginData.pass,
-                    rememberMe: loginData.rememberMe ? 1 : 0
-                });
-            }
-        }
-
-        if(queryString.parse(this.props.location.search).authentication_token) {
-            sessionStorage.removeItem('csc_id');
-            sessionStorage.removeItem('agent_name');
-            sessionStorage.removeItem('product_id');
-            this.fetchTokenDetails(queryString.parse(this.props.location.search).authentication_token )
-        }
-        else if(queryString.parse(this.props.location.search).csc_id) {
-            sessionStorage.removeItem('bcLoginData');
-            sessionStorage.setItem('logo', "CSC.svg");
-            let encryption = new Encryption();
-            let csc_id = encryption.decrypt(queryString.parse(this.props.location.search).csc_id);
-            let csc_type = queryString.parse(this.props.location.search).type
-            sessionStorage.setItem('csc_id', csc_id);
-            sessionStorage.setItem('type', csc_type);
-            let bcLoginData = {}
-            bcLoginData.agent_id = ""
-            bcLoginData.bc_agent_id = ""
-            this.callLogin(bcLoginData);
-        }
-        else{
-            // this.fetchCustDetail()
-        }
 
     }
 
-    // fetchCustDetail=()=>{
-
-    //     this.props.loadingStart();
-    //     axiosBCintegration.get('all-customer')
-    //     .then(res=>{
-    //         if(res.data.error == false) {
-    //             let respArray = res.data.data ? res.data.data : []
-    //             this.setState({
-    //                 respArray
-    //             });
-    //         }
-    //         else {
-    //             this.setState({
-    //                 respArray: []
-    //             });
-    //         }
-    //         this.props.loadingStop();
-    //     }).
-    //     catch(err=>{
-    //         this.props.loadingStop();
-    //         this.setState({
-    //             respArray: []
-    //         });
-    //     })
-
-    // }
-
-    componentWillReceiveProps(nextProps) {
-        // if (nextProps.match.path === '/login' && !nextProps.loading) {
-        //     this.props.history.push('/Products');
-        // }
-    }
-
-    rememberMeHandler = (e) => {
-        if (e.target.checked === true) {
-            this.setState({ rememberMe: 1 });
-        } else {
-            this.setState({ rememberMe: 0 });
-        }
-    }
-
-    fetchTokenDetails= (token) => {
-
-        const formData = new FormData();
-        let encryption = new Encryption();
-        let bcLoginData = {}
-        this.props.loadingStart();
-        formData.append('token',token)
-
-        axiosBCintegration.post('token-info', formData)
-        .then(res=>{
-
+    handleSubmit = (values, actions) => {
+        this.props.loadingStart()
+        axiosExternal
+          .get(`/core/user/forgot-password/${values.email}`)
+          .then(res => {
             if(res.data.error == false) {
-                let bcData = res.data.data ? res.data.data : []
-                bcLoginData.agent_id = bcData ? bcData.token_data.bcmaster_id : ""
-                bcLoginData.token = token
-                bcLoginData.bc_agent_id = bcData ? bcData.token_data.bc_agent_id : ""
-                let user_info = JSON.parse(bcData.token_data.additional_info)
-                if(user_info && user_info.is_success == true ) {
-                    bcLoginData.user_info = user_info
-                }
-
-                sessionStorage.setItem('bcLoginData', encryption.encrypt(JSON.stringify(bcLoginData)));
-                sessionStorage.setItem('logo', bcData.master_data.logo)
-                this.setState({broker_id: bcLoginData.agent_id})
-                this.callLogin(bcLoginData)
+                actions.setSubmitting(false);
+                this.props.loadingStop();
+                this.setState({showModal: false, message: res.data.msg, errMsg: null})
+            }else {
+                actions.setSubmitting(false);
+                this.props.loadingStop();
+                this.setState({ errMsg: res.data.msg, message: null})
             }
-            else {
-                sessionStorage.removeItem('bcLoginData');
-                swal(res.data.msg)
-            }
-
+            
+          })
+          .catch(err => {
+            this.setState({
+                errMsg: err.data.msg,
+                message: null,
+                showModal: false
+            });
             this.props.loadingStop();
-        }).
-        catch(err=>{
-            this.props.loadingStop();
-            sessionStorage.removeItem('bcLoginData');
-        })
-    }
-
-    callLogin = async (bcLoginData) => {
-        const result = await this.handle_AutoSubmit(bcLoginData);
+            actions.setSubmitting(false);
+          });
     }
 
     callFetchPhrase = async () => {
@@ -284,6 +204,13 @@ class Intermediary_LogIn extends Component {
                                                 </Col>
                                             </Row>
                                         ) : null}
+                                         {this.state.message ? (
+                                            <Row className="show-grid">
+                                                <Col md={12}>
+                                                    <div className="successMsg">{this.state.message}</div>
+                                                </Col>
+                                            </Row>
+                                        ) : null}
 
                                         <Row className="show-grid">
                                             <Col md={12}>
@@ -322,22 +249,10 @@ class Intermediary_LogIn extends Component {
                                         <Row>
                                            <Col>&nbsp;</Col>
                                         </Row>
-                                        <Row>
-                                           <Col><Link to="#" onClick = {this.resetPassword.bind(this)} > Forgot Password </Link></Col>
-                                        </Row>
 
                                         <Row className="show-grid dropinput">
                                             <Col xs={8}>
-
-                                                <label className="customCheckBox formGrp formGrp">
-                                                 <input type="checkbox"
-                                                        checked={rememberMe ? true : false}
-                                                        value={rememberMe}
-                                                        onChange={this.rememberMeHandler}
-                                                        className="user-self"/>
-                                                    <span className="checkmark mL-0"></span>
-                                                    Remember Me
-                                                </label>
+                                            <Link to="#" onClick = {this.resetPassword.bind(this)} > Forgot Password </Link>
                                             </Col>
                                             <Col xs={4}>
                                                 <Button
@@ -366,7 +281,7 @@ class Intermediary_LogIn extends Component {
                         <Formik
                             initialValues={passResetInitialValues}
                             validationSchema={passResetValidation}
-                            // onSubmit={this.handle_AutoSubmit}
+                            onSubmit={this.handleSubmit}
                         >
                             {({ values, errors, isValid, touched, isSubmitting,setFieldValue, setFieldTouched, }) => {
                                 return (

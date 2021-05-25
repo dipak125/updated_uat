@@ -658,8 +658,8 @@ class Routes extends Component {
                     <Switch>
                         <Route exact path="/login" component={LogIn} />                
                         <Route exact path="/Intermediary_LogIn" component={Intermediary_LogIn} /> 
-                        <Route exact path="/Reset_Password" component={Reset_Password} /> 
                         <Route exact path="/logout" component={Logout} /> 
+                        <Route exact path="/Reset_Password" component={Reset_Password} /> 
                         <PrivateRoute exact path="/Error" component={Error} />
 
                         <PrivateRoute exact path="/Products" component={Products} />

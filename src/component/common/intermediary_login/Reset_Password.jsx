@@ -14,7 +14,6 @@ import * as Yup from "yup";
 import "./LogIn.css";
 import { intermediate_authProcess } from "../../../store/actions/auth";
 import BaseComponent from '../../BaseComponent';
-import axiosBCintegration from "../../../shared/axiosBCintegration"
 import Encryption from '../../../shared/payload-encryption';
 import queryString from 'query-string';
 import swal from 'sweetalert';
@@ -23,7 +22,7 @@ import axios from "../../../shared/axios";
 const initialValues = {
     confirmPassword: "",
     password: "",
-    OTP: ""
+    currentPassword: ""
 };
 
 
@@ -31,7 +30,7 @@ const initialValues = {
 const loginvalidation = Yup.object().shape({
     password: Yup.string().required("Please enter password"),
     confirmPassword: Yup.string().required("Please enter confirm password"),
-    OTP: Yup.string().required("Please enter OTP"),
+    currentPassword: Yup.string().required("Please enter current password"),
 });
 
 
@@ -44,11 +43,12 @@ class Reset_Password extends Component {
         errMsg: null,
         respArray: [],
         broker_id: "",
-        showModal: false
+        showModal: false,
+        errMsg: ""
+
     }
 
     componentDidMount() {
-        localStorage.clear()
     
     }
 
@@ -65,24 +65,36 @@ class Reset_Password extends Component {
     handleSubmit = (values, actions) => {
 
         const formData = new FormData();
+        let encryption = new Encryption();
+        let users = sessionStorage.getItem('users') ? JSON.parse(sessionStorage.getItem('users')) : "";
+        let user_data = ""
+        if(users) {
+            user_data = users.user
+            user_data = JSON.parse(encryption.decrypt(user_data));  
+        }
         if(values.confirmPassword !=values.password) {
             swal("Password and confirm password does not match")
         return false;
         }
         else {
             this.props.loadingStart();
-            formData.append('confirmPassword',values.confirmPassword)
-            formData.append('password',values.password)
-            formData.append('OTP',values.OTP)
+            formData.append('user_id',user_data.master_user_id)
+            formData.append('new_password',values.password)
+            formData.append('old_password',values.currentPassword)
     
-            axiosBCintegration.post('bc-login', formData)
+            axios.post('user/change-default-password', formData)
             .then(res=>{          
                 if(res.data.error == false) {
-                    let bcLoginData = res.data.data ? res.data.data : []                      
-                    this.fetchTokenDetails(bcLoginData.token)
+                    users.user = encryption.encrypt(JSON.stringify(res.data.data))
+                    sessionStorage.setItem("users", JSON.stringify(users))
+                    this.props.loadingStop();
+                    this.setState({errMsg: ""})
+                    swal(res.data.msg)
+                    this.props.history.push('/Dashboard')
                     actions.setSubmitting(false)
                 }
                 else {
+                    this.setState({errMsg: res.data.msg})
                     actions.setSubmitting(false)
                     this.props.loadingStop();
                 }  
@@ -95,7 +107,6 @@ class Reset_Password extends Component {
         }
     }
     
-
 
     render() {
         const { email, pass, rememberMe, broker_id,showModal } = this.state;
@@ -112,7 +123,7 @@ class Reset_Password extends Component {
                             {({ values, errors, isValid, touched, isSubmitting,setFieldValue, setFieldTouched, }) => {
                                 return (
                                     <Form>
-                                        <h3 className="login-box-msg">Reset Password</h3>
+                                       
                                         <br />
                                         {this.state.errMsg ? (
                                             <Row className="show-grid">
@@ -121,9 +132,27 @@ class Reset_Password extends Component {
                                                 </Col>
                                             </Row>
                                         ) : null}
-
                                         <div className="row formSection">
-                                            <label className="col-md-4">Password :</label>
+                                            <label className="col-md-4"><b>Current Password :</b></label>
+                                            <div className="col-md-4">
+
+                                                <Field
+                                                    name="currentPassword"
+                                                    type="text"
+                                                    placeholder=""
+                                                    autoComplete="off"
+                                                    onFocus={e => this.changePlaceHoldClassAdd(e)}
+                                                    onBlur={e => this.changePlaceHoldClassRemove(e)}
+                                                    value={values.currentPassword}
+
+                                                />
+                                                {errors.currentPassword && touched.currentPassword ? (
+                                                    <span className="errorMsg">{errors.currentPassword}</span>
+                                                ) : null}
+                                            </div>
+                                        </div>
+                                        <div className="row formSection">
+                                            <label className="col-md-4"><b>New Password :</b></label>
                                             <div className="col-md-4">
 
                                                 <Field
@@ -142,7 +171,7 @@ class Reset_Password extends Component {
                                             </div>
                                         </div>
                                         <div className="row formSection">
-                                            <label className="col-md-4">Confirm Password :</label>
+                                            <label className="col-md-4"><b>Confirm Password :</b></label>
                                             <div className="col-md-4">
 
                                                 <Field
@@ -157,25 +186,6 @@ class Reset_Password extends Component {
                                                 />
                                                 {errors.confirmPassword && touched.confirmPassword ? (
                                                     <span className="errorMsg">{errors.confirmPassword}</span>
-                                                ) : null}
-                                            </div>
-                                        </div>
-                                        <div className="row formSection">
-                                            <label className="col-md-4">OTP :</label>
-                                            <div className="col-md-4">
-
-                                                <Field
-                                                    name="OTP"
-                                                    type="text"
-                                                    placeholder=""
-                                                    autoComplete="off"
-                                                    onFocus={e => this.changePlaceHoldClassAdd(e)}
-                                                    onBlur={e => this.changePlaceHoldClassRemove(e)}
-                                                    value={values.OTP}
-
-                                                />
-                                                {errors.OTP && touched.OTP ? (
-                                                    <span className="errorMsg">{errors.OTP}</span>
                                                 ) : null}
                                             </div>
                                         </div>

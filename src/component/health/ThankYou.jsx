@@ -38,7 +38,7 @@ class ThankYouPage extends Component {
         if(res.data.error == false) {
           this.downloadDoc()
         }
-        else swal("Document not found")
+        else swal(res.data.msg)
                
       })
     

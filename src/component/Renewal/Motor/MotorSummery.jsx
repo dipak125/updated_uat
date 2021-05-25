@@ -20,6 +20,7 @@ import {registrationNoFormat, paymentGateways} from '../../../shared/reUseFuncti
 const initialValue = {	
     gateway : ""	
 }	
+const motor_productIds = [2,6,7,8,11,15,17,18];
 const menumaster_id = 7	
 const validatePremium = Yup.object().shape({	
     refNo: Yup.string().notRequired('Reference number is required')	
@@ -378,7 +379,7 @@ class MotorSummery extends Component {
                                                                         {memberdetails ?	
                                                                                 <div>	
                                                                                     <Row>	
-                                                                                        <Col sm={12} md={6}>	
+                                                                                        <Col sm={12} md={9}>	
                                                                                             <Row>	
                                                                                                 <Col sm={12} md={6}>	
                                                                                                     <FormGroup>{phrases['RegNo']}:</FormGroup>	
@@ -444,7 +445,7 @@ class MotorSummery extends Component {
                                                                                                 </Col>	
                                                                                             </Row>	
 
-                                                                                            {vehicleDetails && vehicleDetails.vehicletype && (vehicleDetails.vehicletype.id != 4 || vehicleDetails.vehicletype.id != 3 || vehicleDetails.vehicletype.id != 16 ) ?
+                                                                                            {vehicleDetails && vehicleDetails.vehicletype && motor_productIds.includes(vehicleDetails.vehicletype.id) ?
                                                                                             <Row>	
                                                                                                 <Col sm={12} md={6}>	
                                                                                                     <FormGroup>{phrases['BodyStyle']}</FormGroup>	
@@ -453,7 +454,8 @@ class MotorSummery extends Component {
                                                                                                     <FormGroup>{vehicleDetails && vehicleDetails.varientmodel && vehicleDetails.varientmodel.body_style ? vehicleDetails.varientmodel.body_style : null}</FormGroup>	
                                                                                                 </Col>	
                                                                                             </Row>	: null }
-                                                                                            {vehicleDetails && vehicleDetails.vehicletype && (vehicleDetails.vehicletype.id != 4 || vehicleDetails.vehicletype.id != 3 || vehicleDetails.vehicletype.id != 16 ) ?
+
+                                                                                            {vehicleDetails && vehicleDetails.vehicletype && motor_productIds.includes(vehicleDetails.vehicletype.id) ?
                                                                                             <Row>	
                                                                                                 <Col sm={12} md={6}>	
                                                                                                     <FormGroup>{phrases['GrossVehicleWeight']}</FormGroup>	
