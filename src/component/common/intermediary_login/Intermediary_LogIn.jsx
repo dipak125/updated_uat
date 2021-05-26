@@ -37,19 +37,21 @@ const loginvalidation = Yup.object().shape({
     })
     .max(75, function() {
         return "Maximum 75 characters"
-    }).matches(/^[a-zA-Z0-9]+([._\-]?[a-zA-Z0-9]+)*@\w+([-]?\w+)*(\.\w{2,3})+$/,'Invalid email id'),
+    }).matches(/^[a-zA-Z0-9]+([._\-]?[a-zA-Z0-9])*@\w+([-]?\w+)*(\.\w{2,3})+$/,'Invalid email id'),
 
     password: Yup.string().required("Please enter password"),
     broker_id: Yup.string().required("Please select broker"),
 });
 
 const passResetValidation = Yup.object().shape({
-    email: Yup.string().email("Email Id must be a valid email").required('Please enter email id').min(8, function() {
+    email: Yup.string().email("Email Id must be a valid email").required('Please enter email id')
+        .min(8, function() {
         return "Minimum 8 characters"
         })
         .max(75, function() {
             return "Maximum 75 characters"
-        }).matches(/^[a-zA-Z0-9]+([._\-]?[a-zA-Z0-9]+)*@\w+([-]?\w+)*(\.\w{2,3})+$/,'Invalid email id'),
+        })
+        .matches(/^[a-zA-Z0-9]+([._\-]?[a-zA-Z0-9])*@\w+([-]?\w+)*(\.\w{2,3})+$/,'Invalid email id'),
     });
 
 
