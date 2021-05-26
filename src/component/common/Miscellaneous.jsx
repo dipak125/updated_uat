@@ -15,6 +15,7 @@ class Miscellaneous extends Component {
 
 
     buy_policy = (productId) => {
+        this.props.loadingStart()
         if(productId == '14')
         this.props.history.push(`/SelectPlan_GSB/${productId}`);
     }   

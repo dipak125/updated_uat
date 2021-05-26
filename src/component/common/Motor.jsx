@@ -16,6 +16,7 @@ class Motor extends Component {
 
 
     buy_policy = (productId) => {
+        this.props.loadingStart()
         if(productId == '2'){
          this.props.history.push(`/Registration/${productId}`);      
         }

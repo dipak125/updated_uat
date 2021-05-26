@@ -139,14 +139,10 @@ class SelectDuration_KSB_Micro extends Component {
         let encryption = new Encryption();
         let policy_holder_id = localStorage.getItem('policyHolder_id') ? localStorage.getItem('policyHolder_id') : 0
 
-        let user_data = sessionStorage.getItem("users") ? JSON.parse(sessionStorage.getItem("users")) : "";
-        if (user_data) {
-            user_data = JSON.parse(encryption.decrypt(user_data.user));
-            if((serverResponse.SumInsured > 500000) && user_data.user_type == "POSP"  ) {
-                swal("Quote cannot proceed with IDV greater than 500000")
-                this.props.loadingStop();
-                return false
-            }
+        if(serverResponse.SumInsured > 100000 ) {
+            swal("Quote cannot proceed with IDV greater than 100000")
+            this.props.loadingStop();
+            return false
         }
 
         const post_data = {

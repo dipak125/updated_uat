@@ -15,6 +15,9 @@ class Health extends Component {
 
 
     buy_policy = (productId) => {
+        this.props.loadingStart()
+        localStorage.removeItem('policy_holder_ref_no')
+
         if(productId == '5')
         this.props.history.push(`/Health/${productId}`);
         if(productId == '10')
@@ -23,6 +26,8 @@ class Health extends Component {
         this.props.history.push(`/arogya_Health/${productId}`);
         if(productId == '20')
         this.props.history.push(`/Health_Micro/${productId}`);
+        if(productId == '22')
+        this.props.history.push(`/Health_KSB_Micro/${productId}`);
     }   
 
 

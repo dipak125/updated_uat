@@ -89,9 +89,13 @@ class Reset_Password extends Component {
                     sessionStorage.setItem("users", JSON.stringify(users))
                     this.props.loadingStop();
                     this.setState({errMsg: ""})
-                    swal(res.data.msg)
-                    this.props.history.push('/Dashboard')
                     actions.setSubmitting(false)
+                    swal(res.data.msg)
+                    .then((willUpdate) => {
+                        if(willUpdate) {
+                            this.props.history.push('/Dashboard')
+                        }
+                    })   
                 }
                 else {
                     this.setState({errMsg: res.data.msg})

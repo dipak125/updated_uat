@@ -110,11 +110,16 @@ class IPA_SelectPlan_Micro extends Component {
     let encryption = new Encryption();
     // const {} = this.state;
     let date_of_birth = moment(values.date_of_birth).format('yyyy-MM-DD');
+    let user_data = sessionStorage.getItem("users") ? JSON.parse(sessionStorage.getItem("users")): "";
+    let user_id = ""
+    if (user_data) {
+      user_id = JSON.parse(encryption.decrypt(user_data.user));
+    }
     this.props.loadingStart();
     let post_data = {
           'menumaster_id': '9',
-          'page_name': `Registration_SME/${productId}`,
-          'vehicle_type_id': '13',
+          'page_name': `AccidentSelectPlan_Micro/${productId}`,
+          'vehicle_type_id': productId,
           'sum_insured' : values.sumInsured ? sum_insured_array[values.sumInsured] : null,
           'proposer_title_id' : values.salutation_id,
           'proposer_first_name' : values.first_name,
@@ -124,25 +129,11 @@ class IPA_SelectPlan_Micro extends Component {
           'proposer_email' : values.email_id,
           'pincode': values.pincode,
           'pincode_id': values.pincode_id,
-          // 'proposer_gender' : 'm'
+          'bc_agent_id': user_id.master_user_id,
+          'bcmaster_id': user_id.bc_master_id,
+          'product_id': productId
       }
       let policyHolder_id = localStorage.getItem('policyHolder_id') ? localStorage.getItem('policyHolder_id') :0
-
-      if(sessionStorage.getItem('csc_id')) {
-          post_data['bcmaster_id'] = '5'
-          post_data['csc_id'] = sessionStorage.getItem('csc_id') ? sessionStorage.getItem('csc_id') : ""
-          post_data['agent_name']= sessionStorage.getItem('agent_name') ? sessionStorage.getItem('agent_name') : ""
-          post_data['product_id'] = productId
-      }else{
-          let bc_data = sessionStorage.getItem('bcLoginData') ? sessionStorage.getItem('bcLoginData') : "";
-          if(bc_data) {
-              bc_data = JSON.parse(encryption.decrypt(bc_data));
-              post_data['bcmaster_id'] = bc_data ? bc_data.agent_id : ""
-              post_data['bc_token'] = bc_data ? bc_data.token : ""
-              post_data['bc_agent_id']= bc_data ? bc_data.user_info.data.user.username : ""
-              post_data['product_id'] = productId
-          }
-      }
       console.log('Post data------>>',post_data)
 
       if(policyHolder_id > 0){

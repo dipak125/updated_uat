@@ -14,13 +14,17 @@ const initialValues = {};
 class Others extends Component {
 
 
-    buy_policy = (productId) => {
-        this.props.loadingStart();
-        if(productId == '13'){
+    buy_policy = (productId) => {     
+        this.props.loadingStart()      
         localStorage.removeItem('policy_holder_ref_no')
+
+        if(productId == '13'){    
         this.props.history.push(`/AccidentSelectPlan/${productId}`);
-        window.location.reload(false);
-    }   }
+        }   
+        if(productId == '24'){
+            this.props.history.push(`/AccidentSelectPlan_Micro/${productId}`);
+        }
+    }
 
 
     componentDidMount() {

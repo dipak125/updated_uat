@@ -125,6 +125,7 @@ class IPA_AddDetails_Micro extends Component {
       'proposer_dob': date_of_birth,
       'occupation_id': values.occupation_id,
     }
+    console.log("post_data----------- ", post_data)
     let encryption = new Encryption();
     formData.append('enc_data', encryption.encrypt(JSON.stringify(post_data)))
 
@@ -186,7 +187,7 @@ class IPA_AddDetails_Micro extends Component {
 
   handleSubmit = (values, actions) => {
     const { productId } = this.props.match.params
-    const { accidentDetails, declineStatus } = this.state
+    const { accidentDetails, declineStatus, serverResponse } = this.state
     if(declineStatus == "Decline") {
       swal('Insurance Policy cannot be offered')
       return false
@@ -217,6 +218,13 @@ class IPA_AddDetails_Micro extends Component {
     else if (values.disability == 1) {
       swal('Insurance Policy cannot be offered')
     }
+
+    if(serverResponse.SumInsured > 100000 ) {
+        swal("Quote cannot proceed with IDV greater than 100000")
+        this.props.loadingStop();
+        return false
+    }
+
     axios
       .post(`ipa/policy-details`, formData)
       .then(res => {

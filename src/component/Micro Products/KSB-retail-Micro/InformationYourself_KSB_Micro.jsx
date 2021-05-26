@@ -1032,9 +1032,10 @@ class InformationYourself_KSB_Micro extends Component {
     let menumaster_id = 6;
     let vehicle_type_id = 10;
 
-    let bc_data = sessionStorage.getItem('bcLoginData') ? sessionStorage.getItem('bcLoginData') : "";
-    if(bc_data) {
-        bc_data = JSON.parse(encryption.decrypt(bc_data));
+    let user_data = sessionStorage.getItem("users") ? JSON.parse(sessionStorage.getItem("users")): "";
+    let user_id = ""
+    if (user_data) {
+        user_id = JSON.parse(encryption.decrypt(user_data.user));
     }
 
     post_data['menumaster_id'] = menumaster_id
@@ -1047,6 +1048,8 @@ class InformationYourself_KSB_Micro extends Component {
     post_data['primaryInsured'] = this.state.primaryInsured
     post_data['ksbplan_id'] = values.ksbplan_id
     post_data['product_id'] = this.props.match.params.productId
+    post_data['bc_agent_id'] = user_id.master_user_id
+    post_data['bcmaster_id'] = user_id.bc_master_id
     
     
     let arr_date=[]
@@ -1078,22 +1081,7 @@ class InformationYourself_KSB_Micro extends Component {
     post_data['gender'] = arr_date
     post_data['confirm'] = this.state.confirm
     localStorage.setItem("confirm", this.state.confirm)
-
-    if(sessionStorage.getItem('csc_id')) {
-        post_data['csc_id'] = sessionStorage.getItem('csc_id') ? sessionStorage.getItem('csc_id') : ""
-        post_data['agent_name'] = sessionStorage.getItem('agent_name') ? sessionStorage.getItem('agent_name') : ""
-        // post_data['product_id'] = sessionStorage.getItem('product_id') ? sessionStorage.getItem('product_id') : ""
-        post_data['bcmaster_id'] = "5"
-    }
-    else {
-        post_data['bcmaster_id'] = bc_data ? bc_data.agent_id : ""
-        post_data['bc_token'] = bc_data ? bc_data.token : ""
-        post_data['bc_agent_id'] = bc_data ? bc_data.user_info.data.user.username : ""
-        post_data['agent_name'] = bc_data ? bc_data.user_info.data.user.name : ""
-
-    }
      
-
     let post_data_obj = {}
 
     console.log("postData========", post_data)
