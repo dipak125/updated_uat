@@ -139,7 +139,7 @@ class IPA_Premium extends Component {
         let policyHolderDetails = decryptResp.data.policyHolder ? decryptResp.data.policyHolder : [];
         let vehicleDetails = decryptResp.data.policyHolder ? decryptResp.data.policyHolder.vehiclebrandmodel : {};
         let paymentgateway = decryptResp.data.policyHolder && decryptResp.data.policyHolder.bcmaster && decryptResp.data.policyHolder.bcmaster.bcpayment
-        console.log("---ipaInfo--->>", ipaInfo);
+        // console.log("---policyHolderDetails--->> ", policyHolderDetails);
         this.setState({
           ipaInfo, policyHolderDetails, bcMaster,menumaster,vehicleDetails,paymentgateway,
           nomineeDetails: policyHolderDetails.request_data && policyHolderDetails.request_data.nominee && policyHolderDetails.request_data.nominee[0],
@@ -245,9 +245,8 @@ class IPA_Premium extends Component {
   };
 
   handleSubmit = (values) => {    
-    const { policyHolderDetails} = this.state.policyHolderDetails
+    const { policyHolderDetails} = this.state
     const { productId } = this.props.match.params
-	//console.log("state", this.state.policyHolderDetails);
     paymentGateways(values, policyHolderDetails, this.state.policyHolderDetails.reference_no, productId)
 }
 

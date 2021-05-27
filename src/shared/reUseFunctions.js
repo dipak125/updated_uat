@@ -1,3 +1,5 @@
+import swal from "sweetalert";
+import Encryption from '../shared/payload-encryption';
 
 export const registrationNoFormat = (e, numLength) => {
     
@@ -59,38 +61,56 @@ export const fourwheelerODEndDate = (value) => {
 
 export const paymentGateways = (values,policyHolder,refNumber, productId) => {
 
-	if(policyHolder.hasOwnProperty("renewalinfo")) {
-        if (values.slug == 'vedavaag_wallet') {
-            window.location.href = `#/Vedvag_gateway/${productId}?access_id=${refNumber}`
+    let user_data = sessionStorage.getItem("users") ? JSON.parse(sessionStorage.getItem("users")): "";
+    let user_id = ""
+    let not_access_in = []
+    var paymentFlag = true;
+    let encryption = new Encryption();
+    if (user_data) {
+        user_id = JSON.parse(encryption.decrypt(user_data.user));
+        not_access_in =  user_id.not_access_in
+        not_access_in.length > 0 && not_access_in.map((accessValue, index) => {
+            if(accessValue.name == "payment") {
+                swal(accessValue.msg)
+                paymentFlag = false
+            }
+        })
+        if(paymentFlag) {
+            if(policyHolder.hasOwnProperty("renewalinfo")) {
+                if (values.slug == 'vedavaag_wallet') {
+                    window.location.href = `#/Vedvag_gateway/${productId}?access_id=${refNumber}`
+                }
+                if(values.slug == "csc_wallet") {
+                    payment_renewal(refNumber, productId)
+                }
+                if(values.slug == "razorpay") {
+                    Razor_payment_renewal(refNumber)
+                }
+                if(values.slug == "sahi_wallet") {
+                    window.location.href = `#/Sahipay_gateway/${productId}?access_id=${refNumber}` 
+                }
+                
+            }
+            else {
+                if (values.slug == 'vedavaag_wallet') {
+                    window.location.href = `#/Vedvag_gateway/${productId}?access_id=${refNumber}`
+                }
+                if(values.slug == "csc_wallet") {
+                    payment(refNumber, productId)
+                }
+                if(values.slug == "razorpay") {
+                    Razor_payment(refNumber)
+                }
+                if(values.slug == "PPINL") {
+                    paypoint_payment(refNumber)
+                }
+                if(values.slug == "sahi_wallet") {
+                    window.location.href = `#/Sahipay_gateway/${productId}?access_id=${refNumber}` 
+                }
+            }
         }
-        if(values.slug == "csc_wallet") {
-            payment_renewal(refNumber, productId)
-        }
-        if(values.slug == "razorpay") {
-            Razor_payment_renewal(refNumber)
-        }
-        if(values.slug == "sahi_wallet") {
-            window.location.href = `#/Sahipay_gateway/${productId}?access_id=${refNumber}` 
-        }
-        
     }
-    else {
-        if (values.slug == 'vedavaag_wallet') {
-            window.location.href = `#/Vedvag_gateway/${productId}?access_id=${refNumber}`
-        }
-        if(values.slug == "csc_wallet") {
-            payment(refNumber, productId)
-        }
-        if(values.slug == "razorpay") {
-            Razor_payment(refNumber)
-        }
-        if(values.slug == "PPINL") {
-            paypoint_payment(refNumber)
-        }
-        if(values.slug == "sahi_wallet") {
-            window.location.href = `#/Sahipay_gateway/${productId}?access_id=${refNumber}` 
-        }
-    }
+    else swal("User data not found")
 }
 
 function payment(refNumber, productId) {

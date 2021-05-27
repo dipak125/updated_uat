@@ -413,10 +413,10 @@ sendPaymentLink = () => {
                                                                                     <div className="motopremium">
                                                                                         Policy Start date:
                                                                                     </div>
-                                                                                </Col>
+                                                                                </Col> 
                                                                                 <Col sm={12} md={6}>
                                                                                 <div className="premamount">
-                                                                                    {request_data && request_data.start_date ? moment(request_data.start_date).format('DD-MM-yyy') : null}
+                                                                                    {fulQuoteResp && fulQuoteResp.EffectiveDate ? moment(fulQuoteResp.EffectiveDate).format('DD-MM-yyy') : null}
                                                                                 </div>
                                                                                 </Col>
 
@@ -427,7 +427,7 @@ sendPaymentLink = () => {
                                                                                 </Col>
                                                                                 <Col sm={12} md={6}>
                                                                                     <div className="premamount">
-                                                                                    {request_data && request_data.end_date ? moment(request_data.end_date).format('DD-MM-yyy') : null}
+                                                                                    {fulQuoteResp && fulQuoteResp.ExpiryDate ? moment(fulQuoteResp.ExpiryDate).format('DD-MM-yyy') : null}
                                                                                     </div>
                                                                                 </Col>
                                                                                 <Col sm={12} md={6}>

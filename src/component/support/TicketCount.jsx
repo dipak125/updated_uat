@@ -99,14 +99,30 @@ class TicketCount extends Component {
         const formData = new FormData();
         let encryption = new Encryption();
         page_no = page_no ? page_no : '1'
+        let user_type = ""
+        let master_id = ""
+        let user_id = ""
 
-        let bc_data = sessionStorage.getItem('bcLoginData') ? sessionStorage.getItem('bcLoginData') : "";
-        if(bc_data) {
-            bc_data = JSON.parse(encryption.decrypt(bc_data));
+        let user_data = sessionStorage.getItem("users") ? JSON.parse(sessionStorage.getItem("users")): "";
+        if (user_data) {
+            user_data = JSON.parse(encryption.decrypt(user_data.user));
         }
-        let user_type = sessionStorage.getItem('csc_id') ? 'csc' : 'bc'
-        let master_id = sessionStorage.getItem('csc_id') ? '5' : bc_data ? bc_data.agent_id : ""
-        let user_id = sessionStorage.getItem('csc_id') ? sessionStorage.getItem('csc_id') : bc_data ? bc_data.user_info.data.user.username : ""
+
+        if(user_data.login_type == '4') {
+            let bc_data = sessionStorage.getItem('bcLoginData') ? sessionStorage.getItem('bcLoginData') : "";
+            if(bc_data) {
+                bc_data = JSON.parse(encryption.decrypt(bc_data));
+            }
+             user_type = sessionStorage.getItem('csc_id') ? 'csc' : 'bc'
+             master_id = sessionStorage.getItem('csc_id') ? '5' : bc_data ? bc_data.agent_id : "0"
+             user_id = sessionStorage.getItem('csc_id') ? sessionStorage.getItem('csc_id') : bc_data ? bc_data.user_info.data.user.username : ""
+        }
+        else {
+             user_type = user_data.user_type
+             master_id = user_data.bc_master_id
+             user_id = user_data.master_user_id
+        }
+        
 
         formData.append('user_type', user_type); 
         formData.append('master_id', master_id);

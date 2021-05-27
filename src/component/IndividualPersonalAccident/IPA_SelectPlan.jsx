@@ -301,6 +301,16 @@ class AccidentSelectPlan extends Component {
     }
   };
 
+  bcInfo = () =>  {
+    let bc_data = sessionStorage.getItem('bcLoginData') ? sessionStorage.getItem('bcLoginData') : "";
+    let encryption = new Encryption();
+    if(bc_data) {   
+      bc_data = JSON.parse(encryption.decrypt(bc_data));
+      // post_data['bcmaster_id'] = bc_data ? bc_data.agent_id : ""
+    }
+    return bc_data;
+  }
+  
 
   render() {
     const {titleList, accidentDetails, serverResponse, validation_error, error, pinDataArr, pincodeRESP} = this.state;
@@ -336,22 +346,21 @@ class AccidentSelectPlan extends Component {
               </span>
           ))        
     ): null;
-
+      
+console.log("bcInfo.agent_id------------ ", this.bcInfo().agent_id)
     return (
       <>
         <BaseComponent>
-		<div className="page-wrapper">
+		    <div className="page-wrapper">
           <div className="container-fluid">
             <div className="row">
-			
-			
+
              <aside className="left-sidebar">
- <div className="scroll-sidebar ps-container ps-theme-default ps-active-y">
-<SideNav />
- </div>
-</aside>
-			  
-			  
+            <div className="scroll-sidebar ps-container ps-theme-default ps-active-y">
+            <SideNav />
+            </div>
+            </aside>
+
               <div className="col-sm-12 col-md-12 col-lg-12 col-xl-12 infobox induvidualplan">
                 <h4 className="text-center mt-3 mb-3">
                   SBI General Insurance Company Limited
@@ -397,8 +406,8 @@ class AccidentSelectPlan extends Component {
                                         <option value="">
                                           Select sum insured
                                         </option>
-                                        <option value="1">100 000</option>
-                                        <option value="2">200 000</option>
+                                        {this.bcInfo().agent_id != '3' ? <option value="1">100 000</option> : null }
+                                        {this.bcInfo().agent_id != '3' ? <option value="2">200 000</option> : null }
                                         <option value="3">300 000</option>
                                         <option value="4">400 000</option>
                                         <option value="5">500 000</option>
