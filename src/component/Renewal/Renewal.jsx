@@ -88,6 +88,7 @@ class renewal extends Component {
             console.log("cscData----------- ", csc_data)      
             user_id = csc_data.master_user_id 
             user_type = 'csc'  
+            sessionStorage.getItem('type') ? formData.append('csc_user_type', sessionStorage.getItem('type')) : formData.append('csc_user_type', csc_data.user_type)
         }
 
         post_data = {
@@ -96,7 +97,9 @@ class renewal extends Component {
         // formData.append('enc_data', encryption.encrypt(JSON.stringify(post_data)))
         formData.append('policy_number', values.policy_number)
         formData.append('user_id', user_id)
-        formData.append('user_type', user_type)
+        formData.append('user_type', user_type) 
+       
+        
 
         this.props.loadingStart();
         axios
