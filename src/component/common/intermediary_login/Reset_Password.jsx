@@ -110,6 +110,41 @@ class Reset_Password extends Component {
             })
         }
     }
+
+    skipPassword = () => {
+
+        const formData = new FormData();
+        let encryption = new Encryption();
+        let users = sessionStorage.getItem('users') ? JSON.parse(sessionStorage.getItem('users')) : "";
+        let user_data = ""
+        if(users) {
+            user_data = users.user
+            user_data = JSON.parse(encryption.decrypt(user_data));  
+        
+            this.props.loadingStart();
+            formData.append('user_id',user_data.master_user_id)
+            formData.append('manually_password_changed',0)
+    
+            axios.post('user/change-default-password', formData)
+            .then(res=>{          
+                if(res.data.error == false) {
+                    users.user = encryption.encrypt(JSON.stringify(res.data.data))
+                    sessionStorage.setItem("users", JSON.stringify(users))
+                    this.props.loadingStop();
+                    this.setState({errMsg: ""})
+                    this.props.history.push('/Dashboard')  
+                }
+                else {
+                    this.setState({errMsg: res.data.msg})
+                    this.props.loadingStop();
+                }  
+            }).
+            catch(err=>{
+                this.props.loadingStop();
+            })
+        }
+        else {swal("user id not found")}
+    }
     
 
     render() {
@@ -196,6 +231,10 @@ class Reset_Password extends Component {
                                         <div className="cntrbtn">
                                             <Button className={`btnPrimary`} type="submit" >
                                                 Submit
+                                            </Button>
+                                            &nbsp;&nbsp;
+                                            <Button className={`btnPrimary`} type="button" onClick = {this.skipPassword.bind(this)}>
+                                                Skip
                                             </Button>
                                         </div>
                                     </Form>
