@@ -77,32 +77,42 @@ class Dashboard extends Component {
   };
 
   handleSubmit = (values) => {
-    // console.log("start_date------ ", values.start_date);
-    // console.log("end_date------ ", values.end_date);
-    // console.log("bcmaster_id------ ", values.bcmaster_id);
-    // console.log("bc_agent_id------ ", values.bc_agent_id);
     const formData = new FormData();
     let encryption = new Encryption();
 
-    if(sessionStorage.getItem('csc_id')) {
-        formData.append('bcmaster_id', '5');
-        formData.append('user_id',sessionStorage.getItem('csc_id') ? sessionStorage.getItem('csc_id') : "");
-        formData.append('agent_name',sessionStorage.getItem('agent_name') ? sessionStorage.getItem('agent_name') : "");
-        // formData.append('product_id',pr);
-            formData.append('page_name', `Dashboard`);
-    }else{
-        let bc_data = sessionStorage.getItem('bcLoginData') ? sessionStorage.getItem('bcLoginData') : "";
-        if(bc_data) {
-            bc_data = JSON.parse(encryption.decrypt(bc_data));
+    let user_data = sessionStorage.getItem("users") ? JSON.parse(sessionStorage.getItem("users")): "";
+    let user_id = ""
+    if (user_data) {
+      user_id = JSON.parse(encryption.decrypt(user_data.user));
 
-            formData.append('bcmaster_id', bc_data ? bc_data.agent_id : "");
-            formData.append('bc_token', bc_data ? bc_data.token : "");
-            formData.append('user_id', bc_data ? bc_data.user_info.data.user.username : "");
-            // formData.append('product_id',productId);
-            formData.append('page_name', `Dashboard`);
+      if(user_id.login_type == '4') {
+        if(sessionStorage.getItem('csc_id')) {
+          formData.append('bcmaster_id', '5');
+          formData.append('user_id',sessionStorage.getItem('csc_id') ? sessionStorage.getItem('csc_id') : "");
+          formData.append('agent_name',sessionStorage.getItem('agent_name') ? sessionStorage.getItem('agent_name') : "");
+          formData.append('page_name', `Dashboard`);
         }
-
+        else{
+            let bc_data = sessionStorage.getItem('bcLoginData') ? sessionStorage.getItem('bcLoginData') : "";
+            if(bc_data) {
+                bc_data = JSON.parse(encryption.decrypt(bc_data));
+                formData.append('bcmaster_id', bc_data ? bc_data.agent_id : "");
+                formData.append('bc_token', bc_data ? bc_data.token : "");
+                formData.append('user_id', bc_data ? bc_data.user_info.data.user.username : "");
+                formData.append('page_name', `Dashboard`);
+            }
+        }
+      }
+      else {
+        formData.append('bcmaster_id', user_id ? user_id.bc_master_id: "");
+        formData.append('user_id', user_id ? user_id.master_user_id : "");
+        formData.append('login_type', user_id ? user_id.login_type : "");
+        formData.append('role_id', user_id ? user_id.role_id : "");
+        formData.append('page_name', `Dashboard`);
+      }
+     
     }
+    
     formData.append(
       "start_date",
       moment(values.start_date).format("YYYY-MM-DD")

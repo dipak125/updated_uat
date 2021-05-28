@@ -76,9 +76,6 @@ class Registration extends Component {
     }
 
 
-
-
-
     componentDidMount() {
         this.fetchData();
 
