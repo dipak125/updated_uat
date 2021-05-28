@@ -246,8 +246,9 @@ class LogIn extends Component {
                         this.props.loadingStop();
                         if(this.callFetchPhrase()){
                             setTimeout(
-                                function() {
+                                function() {                              
                                     this.props.history.push('/Dashboard')
+                                    window.location.reload(true);             
                                 }
                                 .bind(this),
                                 300

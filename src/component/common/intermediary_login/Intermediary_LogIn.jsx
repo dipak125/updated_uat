@@ -146,6 +146,7 @@ class Intermediary_LogIn extends Component {
                             setTimeout(
                                 function() {
                                     this.props.history.push('/Dashboard')
+                                    window.location.reload(true);   
                                 }
                                 .bind(this),
                                 300
