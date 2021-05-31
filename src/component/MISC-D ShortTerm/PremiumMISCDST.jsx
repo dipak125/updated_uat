@@ -61,8 +61,9 @@ class PremiumMISCD extends Component {
             previousPolicy: [],
             request_data: [],
             breakin_flag: 0,
-            policyHolder_refNo: queryString.parse(this.props.location.search).access_id ?
-                                queryString.parse(this.props.location.search).access_id :
+	    paymentgateway: [],
+            policyHolder_refNo: queryString.parse(this.props.location.search).access_id ? 
+                                queryString.parse(this.props.location.search).access_id : 
                                 localStorage.getItem("policyHolder_refNo")
         };
     }

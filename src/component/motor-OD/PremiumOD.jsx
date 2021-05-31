@@ -334,7 +334,7 @@ sendPaymentLink = () => {
 						</div>
 						</aside>
 								
-                            <div className="col-sm-12 col-md-12 col-lg-12 col-xl-12 infobox premiumPage1">
+                            <div className="col-sm-12 col-md-12 col-lg-12 col-xl-12 infobox odpremium">
                                 <h4 className="text-center mt-3 mb-3">{phrases['SBIGICL']}</h4>
                                 <Formik initialValues={initialValue} onSubmit={this.handleSubmit}
                                 validationSchema={validatePremium}

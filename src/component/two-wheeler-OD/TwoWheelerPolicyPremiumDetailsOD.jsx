@@ -290,7 +290,7 @@ class TwoWheelerPolicyPremiumDetailsOD extends Component {
                             </aside>
 
                             { step_completed >= '4' && vehicleDetails.vehicletype_id == productId ?
-                            <div className="col-sm-12 col-md-12 col-lg-12 col-xl-12 infobox twoPoldetail">
+                            <div className="col-sm-12 col-md-12 col-lg-12 col-xl-12 infobox twopremiumOd">
                                 <h4 className="text-center mt-3 mb-3">{phrases['SBIGICL']}</h4>
                                 <Formik initialValues={initialValue} onSubmit={this.handleSubmit}
                                 validationSchema={validatePremium}

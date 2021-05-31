@@ -122,13 +122,26 @@ class QuoteSearch extends Component {
         if(bc_data) {
             bc_data = JSON.parse(encryption.decrypt(bc_data));
         }
+        
+        let user_data = sessionStorage.getItem("users") ? JSON.parse(sessionStorage.getItem("users")): "";
+        let user_id = ""
+        if (user_data) {
+            user_id = JSON.parse(encryption.decrypt(user_data.user));
+        }
 
         formData.append('start_date', moment().format("YYYY-MM-DD"))   
         formData.append('end_date', moment().format("YYYY-MM-DD"))   
-        formData.append('bcmaster_id', sessionStorage.getItem('csc_id') ? "5" : bc_data ? bc_data.agent_id : "" ) 
+        formData.append('bcmaster_id', user_id.bc_master_id ) 
         formData.append('page_no', page_no)   
         formData.append('policy_status', 'pending')
-        formData.append('bc_agent_id', sessionStorage.getItem('csc_id') ? sessionStorage.getItem('csc_id') : bc_data ? bc_data.user_info.data.user.username : "") 
+        if(user_id.login_type == '4') {
+            formData.append('bc_agent_id', sessionStorage.getItem('csc_id') ? sessionStorage.getItem('csc_id') : bc_data ? bc_data.user_info.data.user.username : "")
+        }
+        else {
+            formData.append('bc_agent_id', user_id.master_user_id)
+            formData.append('login_type', user_id.login_type)
+        }
+         
 
         this.props.loadingStart();
         axios.post('bc/policy-customer',formData)

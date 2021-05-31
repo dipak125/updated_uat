@@ -236,8 +236,8 @@ class PremiumGCV extends Component {
                             let policyHolder_id = this.state.policyHolder_refNo ? this.state.policyHolder_refNo : '0'
                             formData1.append('policy_ref_no',policyHolder_id)
                             axios.post('breakin/checking', formData1)
-                            .then(res => {
-                                let break_in_checking = res.data.data.break_in_checking
+                            .then(res => {	
+                                let break_in_checking = res.data.data.break_in_checking	
                                 let break_in_inspection_no = res.data.data.break_in_inspection_no
                                 let break_in_status = res.data.data.break_in_status
                                 if( break_in_checking == true && break_in_inspection_no == "" && (break_in_status == null || break_in_status == "0")) {

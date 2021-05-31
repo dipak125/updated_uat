@@ -56,6 +56,7 @@ class Premium extends Component {
             policyHolder: [],
             vehicleDetails: [],
             step_completed: "0",
+	    paymentgateway: [],
             policyHolder_refNo: queryString.parse(this.props.location.search).access_id ? 
                                 queryString.parse(this.props.location.search).access_id : 
                                 localStorage.getItem("policyHolder_refNo")
