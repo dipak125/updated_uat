@@ -12,18 +12,17 @@ import swal from 'sweetalert';
 import Encryption from '../../shared/payload-encryption';
 import { Formik, Form, Field, ErrorMessage } from 'formik';
 import { setData } from "../../store/actions/data";
-import { validRegistrationNumber, registrationNumberLastBlock } from "../../shared/validationFunctions";
-// let phrases = localStorage.getItem("phrases") ? JSON.parse(localStorage.getItem("phrases")) : null
+import { registrationNumberFirstBlock, registrationNumberSecondBlock, registrationNumberThirdBlock, registrationNumberLastBlock } from "../../shared/validationFunctions";
 
 // const { t, i18n } = useTranslation();
 // const href = "#";
 
 const initialValues = {
     regNumber: '',
-    blockA: '',
-    blockB: '',
-    blockC: '',
-    blockD: '',
+    reg_number_part_one: '',
+    reg_number_part_two: '',
+    reg_number_part_three: '',
+    reg_number_part_four: '',
     check_registration: 2
 }
 
@@ -31,37 +30,49 @@ const vehicleRegistrationValidation = Yup.object().shape({
 
     check_registration: Yup.string().notRequired(),
 
-    blockA: Yup.string().when(['check_registration'], {
+    reg_number_part_one: Yup.string().when(['check_registration'], {
         is: check_registration => check_registration == '2', 
         then: Yup.string().required('RegistrationNumber')
-            .max(2, function() {
+        .test(
+            "firstDigitcheck",
+            function () {
                 return "InvalidRegistrationNumber"
-            })        
-            .matches(/^[a-zA-Z]*$/, function() {
-                return "InvalidRegistrationNumber"}),
+            },
+            function (value) {         
+                return registrationNumberFirstBlock(value);
+            }
+        ),
         otherwise: Yup.string().nullable()
     }),
-    blockB: Yup.string().when(['check_registration'], {
+    reg_number_part_two: Yup.string().when(['check_registration'], {
         is: check_registration => check_registration == '2', 
         then: Yup.string()
-            .max(3, function() {
+        .test(
+            "secondDigitcheck",
+            function () {
                 return "InvalidRegistrationNumber"
-            })        
-            .matches(/^[a-zA-Z0-9]*$/, function() {
-                return "InvalidRegistrationNumber"}),
+            },
+            function (value) {         
+                return registrationNumberSecondBlock(value);
+            }
+        ),
         otherwise: Yup.string().nullable()
     }),
-    blockC: Yup.string().when(['check_registration'], {
+    reg_number_part_three: Yup.string().when(['check_registration'], {
         is: check_registration => check_registration == '2', 
         then: Yup.string()
-            .max(3, function() {
+        .test(
+            "thirdDigitcheck",
+            function () {
                 return "InvalidRegistrationNumber"
-            })        
-            .matches(/^[a-zA-Z0-9]*$/, function() {
-                return "InvalidRegistrationNumber"}),
+            },
+            function (value) {         
+                return registrationNumberThirdBlock(value);
+            }
+        ),
         otherwise: Yup.string().nullable()
     }),
-    blockD: Yup.string().when(['check_registration'], {
+    reg_number_part_four: Yup.string().when(['check_registration'], {
         is: check_registration => check_registration == '2', 
         then: Yup.string().required('RegistrationNumber')
             .test(
@@ -155,7 +166,7 @@ class Registration extends Component {
 
     fetchFastlane = (values) => {
         const formData = new FormData();
-        var regNumber = values.blockA+values.blockB+values.blockC+values.blockD
+        var regNumber = values.reg_number_part_one+values.reg_number_part_two+values.reg_number_part_three+values.reg_number_part_four
         if (values.check_registration == '2') {
             formData.append('registration_no', regNumber)
             formData.append('menumaster_id', '1')
@@ -193,11 +204,27 @@ class Registration extends Component {
         const formData = new FormData();
         let encryption = new Encryption();
         let post_data = {}
+        var registration_part_numbers  = {}
         var regNumber = ""
         if(values.check_registration == '2') {
-            regNumber = values.blockA+'-'+values.blockB+'-'+values.blockC+'-'+values.blockD
+            registration_part_numbers  = {
+                reg_number_part_one: values.reg_number_part_one,
+                reg_number_part_two: values.reg_number_part_two,
+                reg_number_part_three: values.reg_number_part_three,
+                reg_number_part_four: values.reg_number_part_four
+            } 
+            regNumber = values.reg_number_part_one+values.reg_number_part_two+values.reg_number_part_three+values.reg_number_part_four
         }
-        else regNumber = "NEW"
+        else {
+            registration_part_numbers  = {
+                reg_number_part_one: "",
+                reg_number_part_two: "",
+                reg_number_part_three: "",
+                reg_number_part_four: ""
+    
+            } 
+            regNumber = "NEW"
+        }
         
         let policyHolder_id = localStorage.getItem('policyHolder_id') ? localStorage.getItem('policyHolder_id') : 0
 
@@ -210,7 +237,8 @@ class Registration extends Component {
             if (sessionStorage.getItem('csc_id')) {
                 post_data = {
                     'policy_holder_id': policyHolder_id,
-                    'registration_no': values.regNumber,
+                    'registration_no': regNumber,
+                    'registration_part_numbers': JSON.stringify(registration_part_numbers),
                     'check_registration': values.check_registration,
                     'menumaster_id': 1,
                     'vehicle_type_id': productId,
@@ -225,7 +253,8 @@ class Registration extends Component {
             else {
                 post_data = {
                     'policy_holder_id': policyHolder_id,
-                    'registration_no': values.regNumber,
+                    'registration_no': regNumber,
+                    'registration_part_numbers': JSON.stringify(registration_part_numbers),
                     'check_registration': values.check_registration,
                     'menumaster_id': 1,
                     'vehicle_type_id': productId,
@@ -263,8 +292,9 @@ class Registration extends Component {
         else {
             if (sessionStorage.getItem('csc_id')) {
                 post_data = {
-                    'registration_no': values.regNumber,
+                    'registration_no': regNumber,
                     'check_registration': values.check_registration,
+                    'registration_part_numbers': JSON.stringify(registration_part_numbers),
                     'menumaster_id': 1,
                     'vehicle_type_id': productId,
                     'csc_id': sessionStorage.getItem('csc_id') ? sessionStorage.getItem('csc_id') : "",
@@ -277,8 +307,9 @@ class Registration extends Component {
             }
             else {
                 post_data = {
-                    'registration_no': values.regNumber,
+                    'registration_no': regNumber,
                     'check_registration': values.check_registration,
+                    'registration_part_numbers': JSON.stringify(registration_part_numbers),
                     'menumaster_id': 1,
                     'vehicle_type_id': productId,
                     'bcmaster_id': bc_data ? bc_data.agent_id : "",
@@ -333,12 +364,13 @@ class Registration extends Component {
 
     render() {
         const { motorInsurance } = this.state
+        var tempRegNo = motorInsurance && motorInsurance.registration_part_numbers && JSON.parse(motorInsurance.registration_part_numbers)
         const newInitialValues = Object.assign(initialValues, {
-            // blockA: tempRegNo[0] ? tempRegNo[0] : "",
-            // blockB: tempRegNo[1] ? tempRegNo[1] : "",
-            // blockC: tempRegNo[2] ? tempRegNo[2] : "",
-            // blockD: tempRegNo[3] ? tempRegNo[3] : "",
-	    regNumber: motorInsurance ? motorInsurance.registration_no : '',
+            reg_number_part_one: tempRegNo && tempRegNo.reg_number_part_one,
+            reg_number_part_two: tempRegNo && tempRegNo.reg_number_part_two,
+            reg_number_part_three: tempRegNo && tempRegNo.reg_number_part_three,
+            reg_number_part_four: tempRegNo && tempRegNo.reg_number_part_four,
+	        regNumber: motorInsurance ? motorInsurance.registration_no : '',
             check_registration: motorInsurance && motorInsurance.registration_no == "NEW" ? '1' : '2'
         })
         let phrases = localStorage.getItem("phrases") ? JSON.parse(localStorage.getItem("phrases")) : null
@@ -368,7 +400,6 @@ class Registration extends Component {
                                                 onSubmit={this.fetchFastlane}
                                                 validationSchema={vehicleRegistrationValidation}>
                                                 {({ values, errors, setFieldValue, setFieldTouched, isValid, isSubmitting, touched }) => {
-                                                    // console.log('values',values)
 
                                                     return (
                                                         <Form>
@@ -377,12 +408,13 @@ class Registration extends Component {
                                                                 <div className="col-md-1">
 
                                                                     <Field
-                                                                        name="blockA"
+                                                                        name="reg_number_part_one"
                                                                         type="text"
                                                                         autoComplete="off"
                                                                         onFocus={e => this.changePlaceHoldClassAdd(e)}
                                                                         onBlur={e => this.changePlaceHoldClassRemove(e)}
-                                                                        value={values.blockA}
+                                                                        value={values.reg_number_part_one}
+                                                                        disabled= {values.check_registration == '1' ? true : false}
                                                                         maxLength="2"
                                                                         onInput={e => {
                                                                             this.regnoFormat(e, setFieldTouched, setFieldValue)
@@ -395,12 +427,13 @@ class Registration extends Component {
                                                                 <div className="col-md-1">
 
                                                                     <Field
-                                                                        name="blockB"
+                                                                        name="reg_number_part_two"
                                                                         type="text"
                                                                         autoComplete="off"
                                                                         onFocus={e => this.changePlaceHoldClassAdd(e)}
                                                                         onBlur={e => this.changePlaceHoldClassRemove(e)}
-                                                                        value={values.blockB}
+                                                                        value={values.reg_number_part_two}
+                                                                        disabled= {values.check_registration == '1' ? true : false}
                                                                         maxLength="3"
                                                                         onInput={e => {
                                                                             this.regnoFormat(e, setFieldTouched, setFieldValue)
@@ -413,12 +446,13 @@ class Registration extends Component {
                                                                 <div className="col-md-1">
 
                                                                     <Field
-                                                                        name="blockC"
+                                                                        name="reg_number_part_three"
                                                                         type="text"
                                                                         autoComplete="off"
                                                                         onFocus={e => this.changePlaceHoldClassAdd(e)}
                                                                         onBlur={e => this.changePlaceHoldClassRemove(e)}
-                                                                        value={values.blockC}
+                                                                        value={values.reg_number_part_three}
+                                                                        disabled= {values.check_registration == '1' ? true : false}
                                                                         maxLength="3"
                                                                         onInput={e => {
                                                                             this.regnoFormat(e, setFieldTouched, setFieldValue)
@@ -431,12 +465,13 @@ class Registration extends Component {
                                                                 <div className="col-md-1">
 
                                                                     <Field
-                                                                        name="blockD"
+                                                                        name="reg_number_part_four"
                                                                         type="text"
                                                                         autoComplete="off"
                                                                         onFocus={e => this.changePlaceHoldClassAdd(e)}
                                                                         onBlur={e => this.changePlaceHoldClassRemove(e)}
-                                                                        value={values.blockD}
+                                                                        value={values.reg_number_part_four}
+                                                                        disabled= {values.check_registration == '1' ? true : false}
                                                                         maxLength="4"
                                                                         onInput={e => {
                                                                             this.regnoFormat(e, setFieldTouched, setFieldValue)
@@ -446,8 +481,8 @@ class Registration extends Component {
 
                                                                     />
                                                                 </div>
-                                                                {(errors.blockA || errors.blockB || errors.blockC || errors.blockD) 
-                                                                && (touched.blockA || touched.blockB || touched.blockC || touched.blockD) ? (
+                                                                {(errors.reg_number_part_one || errors.reg_number_part_two || errors.reg_number_part_three || errors.reg_number_part_four) 
+                                                                && (touched.reg_number_part_one || touched.reg_number_part_two || touched.reg_number_part_three || touched.reg_number_part_four) ? (
                                                                         <span className="errorMsg">{phrases["InvalidRegistrationNumber"]}</span>
                                                                     ) : null}
                                                             </div>
@@ -461,18 +496,19 @@ class Registration extends Component {
                                                                         className="user-self"
                                                                         onChange={(e) => {
                                                                             if (e.target.checked === true) {
-                                                                                setFieldTouched('blockA')
-                                                                                setFieldValue('blockA', '');
-                                                                                setFieldTouched('blockB')
-                                                                                setFieldValue('blockB', '');
-                                                                                setFieldTouched('blockC')
-                                                                                setFieldValue('blockC', '');
-                                                                                setFieldTouched('blockD')
-                                                                                setFieldValue('blockD', '');
+                                                                                setFieldTouched('reg_number_part_one')
+                                                                                setFieldValue('reg_number_part_one', '');
+                                                                                setFieldTouched('reg_number_part_two')
+                                                                                setFieldValue('reg_number_part_two', '');
+                                                                                setFieldTouched('reg_number_part_three')
+                                                                                setFieldValue('reg_number_part_three', '');
+                                                                                setFieldTouched('reg_number_part_four')
+                                                                                setFieldValue('reg_number_part_four', '');
                                                                                 setFieldTouched('check_registration')
                                                                                 setFieldValue('check_registration', e.target.value);
 
                                                                             } else {
+                                                                                setFieldTouched('check_registration')
                                                                                 setFieldValue('check_registration', '2');                                                                            }
                                                                             if (this.setValueData()) {
                                                                                 this.setState({
@@ -489,7 +525,6 @@ class Registration extends Component {
                                                                     />
                                                                     <span className="checkmark mL-0"></span>
                                                                 </label>
-                                                                {/* {console.log('phrases[errors.check_registration]----',errors.check_registration)} */}
                                                                 {errors.check_registration ?
                                                                     <span className="error-message">{errors.check_registration}</span> : ""
                                                                 }

@@ -15,7 +15,7 @@ import ScrollArea from 'react-scrollbar';
 import Encryption from '../../shared/payload-encryption';
 import fuel from '../common/FuelTypes';
 import { setData } from "../../store/actions/data";
-import {  validRegistrationNumber } from "../../shared/validationFunctions";
+import { registrationNumberFirstBlock, registrationNumberSecondBlock, registrationNumberThirdBlock, registrationNumberLastBlock } from "../../shared/validationFunctions";
 
 
 
@@ -26,6 +26,10 @@ const initialValues = {
     selectedModelName: '',
     selectedVarientId: '',
     regNumber:'',
+    reg_number_part_one: '',
+    reg_number_part_two: '',
+    reg_number_part_three: '',
+    reg_number_part_four: '',
     check_registration: 2,
     policy_for: "1",
     lapse_duration: '',
@@ -37,24 +41,62 @@ const initialValues = {
 const vehicleValidation = Yup.object().shape({
     policy_type: Yup.string().required("PleasePT"),
     policy_for: Yup.string().required("PleasePIC"),
-    check_registration: Yup.string().notRequired(),  
 
-    regNumber: Yup.string().when("check_registration", {
-        is: "1",       
-        then: Yup.string(),
-        otherwise: Yup.string().required('PleaseProRegNum')
+    reg_number_part_one: Yup.string().when(['check_registration'], {
+        is: check_registration => check_registration == '2', 
+        then: Yup.string().required('RegistrationNumber')
         .test(
-            "last4digitcheck",
-            function() {
+            "firstDigitcheck",
+            function () {
                 return "InvalidRegistrationNumber"
             },
-            function (value) {
-                if (value && this.parent.check_registration == 2 && (value != "" || value != undefined) ) {             
-                    return validRegistrationNumber(value);
-                }   
-                return true;
+            function (value) {         
+                return registrationNumberFirstBlock(value);
             }
-        )
+        ),
+        otherwise: Yup.string().nullable()
+    }),
+    reg_number_part_two: Yup.string().when(['check_registration'], {
+        is: check_registration => check_registration == '2', 
+        then: Yup.string()
+        .test(
+            "secondDigitcheck",
+            function () {
+                return "InvalidRegistrationNumber"
+            },
+            function (value) {         
+                return registrationNumberSecondBlock(value);
+            }
+        ),
+        otherwise: Yup.string().nullable()
+    }),
+    reg_number_part_three: Yup.string().when(['check_registration'], {
+        is: check_registration => check_registration == '2', 
+        then: Yup.string()
+        .test(
+            "thirdDigitcheck",
+            function () {
+                return "InvalidRegistrationNumber"
+            },
+            function (value) {         
+                return registrationNumberThirdBlock(value);
+            }
+        ),
+        otherwise: Yup.string().nullable()
+    }),
+    reg_number_part_four: Yup.string().when(['check_registration'], {
+        is: check_registration => check_registration == '2', 
+        then: Yup.string().required('RegistrationNumber')
+            .test(
+                "last4digitcheck",
+                function () {
+                    return "InvalidRegistrationNumber"
+                },
+                function (value) {         
+                    return registrationNumberLastBlock(value);
+                }
+            ),
+        otherwise: Yup.string().nullable()
     }),
 
     lapse_duration: Yup.string().when("policy_type", {
@@ -323,6 +365,16 @@ class TwoWheelerSelectBrandOD extends Component {
         const { productId } = this.props.match.params
         const { selectedVarientId, selectedModelId, selectedBrandId, brandView, fastLaneData, fastlanelog } = this.state
         let post_data = {}
+        var registration_part_numbers  = {}
+	var regNumber = values.reg_number_part_one+values.reg_number_part_two+values.reg_number_part_three+values.reg_number_part_four
+	    registration_part_numbers  = {
+	        reg_number_part_one: values.reg_number_part_one,
+	        reg_number_part_two: values.reg_number_part_two,
+	        reg_number_part_three: values.reg_number_part_three,
+	        reg_number_part_four: values.reg_number_part_four
+	    } 
+	    
+
         const formData = new FormData();
         let encryption = new Encryption();
         let policyHolder_id = localStorage.getItem('policyHolder_id') ? localStorage.getItem('policyHolder_id') :0
@@ -342,7 +394,8 @@ class TwoWheelerSelectBrandOD extends Component {
                     'model_varient_id': selectedVarientId ? selectedVarientId : fastLaneData && fastLaneData.model_varient_id ? fastLaneData.model_varient_id : values.selectedVarientId ? values.selectedVarientId : "",
                     'vehicle_type_id':this.props.match.params.productId,
                     'product_id': this.props.match.params.productId,
-                    'registration_no':values.regNumber,
+                    'registration_no': regNumber,
+                    'registration_part_numbers': JSON.stringify(registration_part_numbers),
                     'policy_type_id':values.policy_type,
                     'policy_holder_id': policyHolder_id,
                     'check_registration': values.check_registration,
@@ -364,7 +417,8 @@ class TwoWheelerSelectBrandOD extends Component {
                     'model_varient_id': selectedVarientId ? selectedVarientId : fastLaneData && fastLaneData.model_varient_id ? fastLaneData.model_varient_id : values.selectedVarientId ? values.selectedVarientId : "",
                     'vehicle_type_id':this.props.match.params.productId,
                     'product_id': this.props.match.params.productId,
-                    'registration_no':values.regNumber,
+                    'registration_no': regNumber,
+                    'registration_part_numbers': JSON.stringify(registration_part_numbers),
                     'policy_type_id':values.policy_type,
                     'policy_holder_id': policyHolder_id,
                     'check_registration': values.check_registration,
@@ -418,7 +472,8 @@ class TwoWheelerSelectBrandOD extends Component {
                     'model_varient_id': brandView == '1' ? selectedVarientId : fastLaneData ? fastLaneData.model_varient_id : "",
                     'vehicle_type_id':this.props.match.params.productId,
                     'product_id': this.props.match.params.productId,
-                    'registration_no':values.regNumber,
+                    'registration_no': regNumber,
+                    'registration_part_numbers': JSON.stringify(registration_part_numbers),
                     'policy_type_id':values.policy_type,
                     'check_registration': values.check_registration,
                     'csc_id':sessionStorage.getItem('csc_id') ? sessionStorage.getItem('csc_id') : "",
@@ -439,7 +494,8 @@ class TwoWheelerSelectBrandOD extends Component {
                     'model_varient_id': brandView == '1' ? selectedVarientId : fastLaneData ? fastLaneData.model_varient_id : "",
                     'vehicle_type_id':this.props.match.params.productId,
                     'product_id': this.props.match.params.productId,
-                    'registration_no':values.regNumber,
+                    'registration_no': regNumber,
+                    'registration_part_numbers': JSON.stringify(registration_part_numbers),
                     'policy_type_id':values.policy_type,
                     'check_registration': values.check_registration,
                     'bcmaster_id': bc_data ? bc_data.agent_id : "",
@@ -507,7 +563,8 @@ class TwoWheelerSelectBrandOD extends Component {
 
     fetchFastlane = (values) => {
         const formData = new FormData();
-        formData.append('registration_no', values.regNumber)
+        var regNumber = values.reg_number_part_one+values.reg_number_part_two+values.reg_number_part_three+values.reg_number_part_four
+        formData.append('registration_no', regNumber)
         formData.append('menumaster_id', '3')
         this.props.loadingStart();
         axios.post('fastlane', formData).then(res => {
@@ -543,6 +600,7 @@ class TwoWheelerSelectBrandOD extends Component {
         const { brandList, motorInsurance, selectedBrandDetails, brandModelList, selectedBrandId,fuelType,fastLaneData, brandView,
             selectedModelId, selectedVarientId, otherBrands, vehicleDetails, error_msg, brandName, modelName } = this.state
         const { productId } = this.props.match.params
+        var tempRegNo = motorInsurance && motorInsurance.registration_part_numbers && JSON.parse(motorInsurance.registration_part_numbers)
         const newInitialValues = Object.assign(initialValues, {
             selectedBrandId: selectedBrandId ? selectedBrandId : (vehicleDetails && vehicleDetails.vehiclebrand_id ? vehicleDetails.vehiclebrand_id : ""),
             selectedModelId:  selectedModelId ? selectedModelId : (selectedBrandId ? "" : vehicleDetails && vehicleDetails.vehiclemodel_id ? vehicleDetails.vehiclemodel_id : ""),
@@ -551,9 +609,13 @@ class TwoWheelerSelectBrandOD extends Component {
             selectedVarientId: selectedVarientId ? selectedVarientId : (selectedBrandId ? "" :  vehicleDetails && vehicleDetails.varientmodel_id ? vehicleDetails.varientmodel_id : ""),
             policy_type: motorInsurance && motorInsurance.policytype_id ? motorInsurance.policytype_id : "2",
             regNumber: motorInsurance && motorInsurance.registration_no ? motorInsurance.registration_no : "",
-            check_registration: localStorage.getItem('check_registration') ? localStorage.getItem('check_registration') : "2",
+            check_registration: "2",
             lapse_duration: motorInsurance && motorInsurance.lapse_duration ? motorInsurance.lapse_duration : "",
             policy_for: motorInsurance && motorInsurance.policy_for ? motorInsurance.policy_for : "1",
+	        reg_number_part_one: tempRegNo && tempRegNo.reg_number_part_one,
+            reg_number_part_two: tempRegNo && tempRegNo.reg_number_part_two,
+            reg_number_part_three: tempRegNo && tempRegNo.reg_number_part_three,
+            reg_number_part_four: tempRegNo && tempRegNo.reg_number_part_four,
         })
         let phrases = localStorage.getItem("phrases") ? JSON.parse(localStorage.getItem("phrases")) : null
 
@@ -684,41 +746,93 @@ class TwoWheelerSelectBrandOD extends Component {
                                                     <Row className="m-b-15">
                                                         <Col sm={12}>
                                                         
-                                                            <div className="row formSection">
-                                                                <label className="col-md-6 col-lg-4">{phrases['RegName']}:</label>
-                                                                <div className="col-md-6 col-lg-4">
+                                                        <div className="row formSection">
+                                                            <label className="col-md-4">{phrases['RegName']} </label>
+                                                            <div className="col-md-1">
+
                                                                 <Field
-                                                                    name="regNumber"
+                                                                    name="reg_number_part_one"
                                                                     type="text"
-                                                                    placeholder={phrases['RegNum']}
                                                                     autoComplete="off"
                                                                     onFocus={e => this.changePlaceHoldClassAdd(e)}
                                                                     onBlur={e => this.changePlaceHoldClassRemove(e)}
-                                                                    value= {values.regNumber}    
-                                                                    maxLength={this.state.length}
-                                                                    onInput={e=>{
+                                                                    value={values.reg_number_part_one}
+                                                                    disabled= {values.check_registration == '1' ? true : false}
+                                                                    maxLength="2"
+                                                                    onInput={e => {
                                                                         this.regnoFormat(e, setFieldTouched, setFieldValue)
                                                                         setFieldTouched('check_registration')
                                                                         setFieldValue('check_registration', '2');
-                                                                    }}  
-                        
+                                                                    }}
+
                                                                 />
-                                                                    
-                                                                    {errors.regNumber && touched.regNumber ? (
-                                                                        <span className="errorMsg">{phrases[errors.regNumber]}</span>
-                                                                    ) : null}   
-                                                                        {/* {console.log("error_msg.registration_no", error_msg)} */}
-                                                                    {error_msg.registration_no ? (
-                                                                        <span className="errorMsg">Please provide registration number</span>
-                                                                    ) : null}
-                                                                </div>
-                                                                <div >
-                                                                {brandView == '0' && fastLaneData.length == '0' ?
-                                                                <Button  type="button" onClick = {this.fetchFastlane.bind(this,values)} >
-                                                                    {phrases['FetchDetails']} 
-                                                                </Button> : null }
-                                                                </div>
-                                                            </div>                                                           
+                                                            </div>
+                                                            <div className="col-md-1">
+
+                                                                <Field
+                                                                    name="reg_number_part_two"
+                                                                    type="text"
+                                                                    autoComplete="off"
+                                                                    onFocus={e => this.changePlaceHoldClassAdd(e)}
+                                                                    onBlur={e => this.changePlaceHoldClassRemove(e)}
+                                                                    value={values.reg_number_part_two}
+                                                                    disabled= {values.check_registration == '1' ? true : false}
+                                                                    maxLength="3"
+                                                                    onInput={e => {
+                                                                        this.regnoFormat(e, setFieldTouched, setFieldValue)
+                                                                        setFieldTouched('check_registration')
+                                                                        setFieldValue('check_registration', '2');
+                                                                    }}
+
+                                                                />         
+                                                            </div>
+                                                            <div className="col-md-1">
+
+                                                                <Field
+                                                                    name="reg_number_part_three"
+                                                                    type="text"
+                                                                    autoComplete="off"
+                                                                    onFocus={e => this.changePlaceHoldClassAdd(e)}
+                                                                    onBlur={e => this.changePlaceHoldClassRemove(e)}
+                                                                    value={values.reg_number_part_three}
+                                                                    disabled= {values.check_registration == '1' ? true : false}
+                                                                    maxLength="3"
+                                                                    onInput={e => {
+                                                                        this.regnoFormat(e, setFieldTouched, setFieldValue)
+                                                                        setFieldTouched('check_registration')
+                                                                        setFieldValue('check_registration', '2');
+                                                                    }}
+
+                                                                />
+                                                            </div>
+                                                            <div className="col-md-2">
+
+                                                                <Field
+                                                                    name="reg_number_part_four"
+                                                                    type="text"
+                                                                    autoComplete="off"
+                                                                    onFocus={e => this.changePlaceHoldClassAdd(e)}
+                                                                    onBlur={e => this.changePlaceHoldClassRemove(e)}
+                                                                    value={values.reg_number_part_four}
+                                                                    disabled= {values.check_registration == '1' ? true : false}
+                                                                    maxLength="4"
+                                                                    onInput={e => {
+                                                                        this.regnoFormat(e, setFieldTouched, setFieldValue)
+                                                                        setFieldTouched('check_registration')
+                                                                        setFieldValue('check_registration', '2');
+                                                                    }}
+
+                                                                />
+                                                            </div>
+                                                            {brandView == '0' && fastLaneData.length == '0' ?
+                                                                <Button  type="button"  onClick = {this.fetchFastlane.bind(this,values)} >
+                                                                    {phrases['FetchDetails']}
+                                                            </Button> : null }
+                                                            {(errors.reg_number_part_one || errors.reg_number_part_two || errors.reg_number_part_three || errors.reg_number_part_four) 
+                                                            && (touched.reg_number_part_one || touched.reg_number_part_two || touched.reg_number_part_three || touched.reg_number_part_four) ? (
+                                                                    <span className="errorMsg">{phrases["InvalidRegistrationNumber"]}</span>
+                                                                ) : null}
+                                                        </div>                                                           
                                                         </Col>
                                                     </Row>
 

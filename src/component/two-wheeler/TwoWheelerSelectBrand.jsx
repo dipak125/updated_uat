@@ -15,7 +15,7 @@ import ScrollArea from 'react-scrollbar';
 import Encryption from '../../shared/payload-encryption';
 import fuel from '../common/FuelTypes';
 import { setData } from "../../store/actions/data";
-import {  validRegistrationNumber } from "../../shared/validationFunctions";
+import { registrationNumberFirstBlock, registrationNumberSecondBlock, registrationNumberThirdBlock, registrationNumberLastBlock } from "../../shared/validationFunctions";
 
 
 
@@ -26,6 +26,10 @@ const initialValues = {
     selectedModelName: '',
     selectedVarientId: '',
     regNumber:'',
+    reg_number_part_one: '',
+    reg_number_part_two: '',
+    reg_number_part_three: '',
+    reg_number_part_four: '',
     check_registration: 2,
     policy_for: "1",
     lapse_duration: ''
@@ -36,26 +40,63 @@ const initialValues = {
 const vehicleValidation = Yup.object().shape({
     policy_type: Yup.string().required("PleasePT"),
     policy_for: Yup.string().required("PleasePIC"),
-    check_registration: Yup.string().notRequired(),  
 
-    regNumber: Yup.string().when("check_registration", {
-        is: "1",       
-        then: Yup.string(),
-        otherwise: Yup.string().required('PleaseProRegNum')
+    reg_number_part_one: Yup.string().when(['check_registration'], {
+        is: check_registration => check_registration == '2', 
+        then: Yup.string().required('RegistrationNumber')
         .test(
-            "last4digitcheck",
-            function() {
+            "firstDigitcheck",
+            function () {
                 return "InvalidRegistrationNumber"
             },
-            function (value) {
-                if (value && this.parent.check_registration == 2 && (value != "" || value != undefined) ) {             
-                    return validRegistrationNumber(value);
-                }   
-                return true;
+            function (value) {         
+                return registrationNumberFirstBlock(value);
             }
-        )
+        ),
+        otherwise: Yup.string().nullable()
     }),
-
+    reg_number_part_two: Yup.string().when(['check_registration'], {
+        is: check_registration => check_registration == '2', 
+        then: Yup.string()
+        .test(
+            "secondDigitcheck",
+            function () {
+                return "InvalidRegistrationNumber"
+            },
+            function (value) {         
+                return registrationNumberSecondBlock(value);
+            }
+        ),
+        otherwise: Yup.string().nullable()
+    }),
+    reg_number_part_three: Yup.string().when(['check_registration'], {
+        is: check_registration => check_registration == '2', 
+        then: Yup.string()
+        .test(
+            "thirdDigitcheck",
+            function () {
+                return "InvalidRegistrationNumber"
+            },
+            function (value) {         
+                return registrationNumberThirdBlock(value);
+            }
+        ),
+        otherwise: Yup.string().nullable()
+    }),
+    reg_number_part_four: Yup.string().when(['check_registration'], {
+        is: check_registration => check_registration == '2', 
+        then: Yup.string().required('RegistrationNumber')
+            .test(
+                "last4digitcheck",
+                function () {
+                    return "InvalidRegistrationNumber"
+                },
+                function (value) {         
+                    return registrationNumberLastBlock(value);
+                }
+            ),
+        otherwise: Yup.string().nullable()
+    }),
     lapse_duration: Yup.string().when("policy_type", {
         is: "3",       
         then: Yup.string().required('LapseDuration'),
@@ -320,6 +361,27 @@ class TwoWheelerSelectBrand extends Component {
         const { productId } = this.props.match.params
         const { selectedVarientId, selectedModelId, selectedBrandId, brandView, fastLaneData, fastlanelog } = this.state
         let post_data = {}
+        var registration_part_numbers  = {}
+        var regNumber = ""
+        if(values.check_registration == '2') {
+            registration_part_numbers  = {
+                reg_number_part_one: values.reg_number_part_one,
+                reg_number_part_two: values.reg_number_part_two,
+                reg_number_part_three: values.reg_number_part_three,
+                reg_number_part_four: values.reg_number_part_four
+            } 
+            regNumber = values.reg_number_part_one+values.reg_number_part_two+values.reg_number_part_three+values.reg_number_part_four
+        }
+        else {
+            registration_part_numbers  = {
+                reg_number_part_one: "",
+                reg_number_part_two: "",
+                reg_number_part_three: "",
+                reg_number_part_four: ""
+    
+            } 
+            regNumber = "NEW"
+        }
         const formData = new FormData();
         let encryption = new Encryption();
         let policyHolder_id = localStorage.getItem('policyHolder_id') ? localStorage.getItem('policyHolder_id') :0
@@ -338,7 +400,8 @@ class TwoWheelerSelectBrand extends Component {
                     'brand_model_id': selectedModelId ? selectedModelId : fastLaneData && fastLaneData.brand_model_id ? fastLaneData.brand_model_id : values.selectedModelId ? values.selectedModelId : "",
                     'model_varient_id': selectedVarientId ? selectedVarientId : fastLaneData && fastLaneData.model_varient_id ? fastLaneData.model_varient_id : values.selectedVarientId ? values.selectedVarientId : "",
                     'vehicle_type_id':4,
-                    'registration_no':values.regNumber,
+                    'registration_no': regNumber,
+                    'registration_part_numbers': JSON.stringify(registration_part_numbers),
                     'policy_type_id':values.policy_type,
                     'policy_holder_id': policyHolder_id,
                     'check_registration': values.check_registration,
@@ -359,7 +422,8 @@ class TwoWheelerSelectBrand extends Component {
                     'brand_model_id': selectedModelId ? selectedModelId : fastLaneData && fastLaneData.brand_model_id ? fastLaneData.brand_model_id : values.selectedModelId ? values.selectedModelId : "",
                     'model_varient_id': selectedVarientId ? selectedVarientId : fastLaneData && fastLaneData.model_varient_id ? fastLaneData.model_varient_id : values.selectedVarientId ? values.selectedVarientId : "",
                     'vehicle_type_id':4,
-                    'registration_no':values.regNumber,
+                    'registration_no': regNumber,
+                    'registration_part_numbers': JSON.stringify(registration_part_numbers),
                     'policy_type_id':values.policy_type,
                     'policy_holder_id': policyHolder_id,
                     'check_registration': values.check_registration,
@@ -412,7 +476,8 @@ class TwoWheelerSelectBrand extends Component {
                     'brand_model_id': brandView == '1' ? selectedModelId : fastLaneData ? fastLaneData.brand_model_id : "",
                     'model_varient_id': brandView == '1' ? selectedVarientId : fastLaneData ? fastLaneData.model_varient_id : "",
                     'vehicle_type_id':4,
-                    'registration_no':values.regNumber,
+                    'registration_no': regNumber,
+                    'registration_part_numbers': JSON.stringify(registration_part_numbers),
                     'policy_type_id':values.policy_type,
                     'check_registration': values.check_registration,
                     'csc_id':sessionStorage.getItem('csc_id') ? sessionStorage.getItem('csc_id') : "",
@@ -432,7 +497,8 @@ class TwoWheelerSelectBrand extends Component {
                     'brand_model_id': brandView == '1' ? selectedModelId : fastLaneData ? fastLaneData.brand_model_id : "",
                     'model_varient_id': brandView == '1' ? selectedVarientId : fastLaneData ? fastLaneData.model_varient_id : "",
                     'vehicle_type_id':4,
-                    'registration_no':values.regNumber,
+                    'registration_no': regNumber,
+                    'registration_part_numbers': JSON.stringify(registration_part_numbers),
                     'policy_type_id':values.policy_type,
                     'check_registration': values.check_registration,
                     'bcmaster_id': bc_data ? bc_data.agent_id : "",
@@ -500,7 +566,8 @@ class TwoWheelerSelectBrand extends Component {
 
     fetchFastlane = (values) => {
         const formData = new FormData();
-        formData.append('registration_no', values.regNumber)
+        var regNumber = values.reg_number_part_one+values.reg_number_part_two+values.reg_number_part_three+values.reg_number_part_four
+        formData.append('registration_no', regNumber)
         formData.append('menumaster_id', '3')
         this.props.loadingStart();
         axios.post('fastlane', formData).then(res => {
@@ -536,6 +603,7 @@ class TwoWheelerSelectBrand extends Component {
         const { brandList, motorInsurance, selectedBrandDetails, brandModelList, selectedBrandId,fuelType,fastLaneData, brandView,
             selectedModelId, selectedVarientId, otherBrands, vehicleDetails, error_msg, brandName, modelName } = this.state
         const { productId } = this.props.match.params
+        var tempRegNo = motorInsurance && motorInsurance.registration_part_numbers && JSON.parse(motorInsurance.registration_part_numbers)
         const newInitialValues = Object.assign(initialValues, {
             selectedBrandId: selectedBrandId ? selectedBrandId : (vehicleDetails && vehicleDetails.vehiclebrand_id ? vehicleDetails.vehiclebrand_id : ""),
             selectedModelId:  selectedModelId ? selectedModelId : (selectedBrandId ? "" : vehicleDetails && vehicleDetails.vehiclemodel_id ? vehicleDetails.vehiclemodel_id : ""),
@@ -544,9 +612,13 @@ class TwoWheelerSelectBrand extends Component {
             selectedVarientId: selectedVarientId ? selectedVarientId : (selectedBrandId ? "" :  vehicleDetails && vehicleDetails.varientmodel_id ? vehicleDetails.varientmodel_id : ""),
             policy_type: motorInsurance && motorInsurance.policytype_id ? motorInsurance.policytype_id : "",
             regNumber: motorInsurance && motorInsurance.registration_no ? motorInsurance.registration_no : "",
-            check_registration: localStorage.getItem('check_registration') ? localStorage.getItem('check_registration') : "2",
+            check_registration: motorInsurance && motorInsurance.registration_no == "NEW"? '1' : '2',
             lapse_duration: motorInsurance && motorInsurance.lapse_duration ? motorInsurance.lapse_duration : "",
             policy_for: motorInsurance && motorInsurance.policy_for ? motorInsurance.policy_for : "1",
+	        reg_number_part_one: tempRegNo && tempRegNo.reg_number_part_one,
+            reg_number_part_two: tempRegNo && tempRegNo.reg_number_part_two,
+            reg_number_part_three: tempRegNo && tempRegNo.reg_number_part_three,
+            reg_number_part_four: tempRegNo && tempRegNo.reg_number_part_four,
         })
         let phrases = localStorage.getItem("phrases") ? JSON.parse(localStorage.getItem("phrases")) : null
 
@@ -557,332 +629,347 @@ class TwoWheelerSelectBrand extends Component {
 				<div className="page-wrapper">
                     <div className="container-fluid">
                         <div className="row">
-						
-						
-                           <aside className="left-sidebar">
- <div className="scroll-sidebar ps-container ps-theme-default ps-active-y">
-<SideNav />
- </div>
-</aside>
-							
-							
-                            <div className="col-sm-12 col-md-12 col-lg-12 col-xl-12 infobox twowheelBrand">
-                                <h4 className="text-center mt-3 mb-3">{phrases['SBIGICL']}</h4>
+	
+                        <aside className="left-sidebar">
+                            <div className="scroll-sidebar ps-container ps-theme-default ps-active-y">
+                            <SideNav />
+                            </div>
+                        </aside>
+		
+                        <div className="col-sm-12 col-md-12 col-lg-12 col-xl-12 infobox twowheelBrand">
+                            <h4 className="text-center mt-3 mb-3">{phrases['SBIGICL']}</h4>
 
-                                <Formik initialValues={newInitialValues} 
-                                    onSubmit={ this.handleSubmit} 
-                                    validationSchema={vehicleValidation}
-                                    >
-                                    {({ values, errors, setFieldValue, setFieldTouched, isValid, isSubmitting, touched }) => {
-                                     
-                                        return (
-                                            <Form>
-                                                <section className="brand">
-                                                    <div className="brand-bg">
-                                                    <Row>
-                                                    <div className="col-md-9 col-sm-12">
+                            <Formik initialValues={newInitialValues} 
+                                onSubmit={ this.handleSubmit} 
+                                validationSchema={vehicleValidation}
+                                >
+                                {({ values, errors, setFieldValue, setFieldTouched, isValid, isSubmitting, touched }) => {
+                                    
+                                    return (
+                                        <Form>
+                                            <section className="brand">
+                                                <div className="brand-bg">
+                                                <Row>
+                                                <div className="col-md-9 col-sm-12">
+                                                <div className="d-flex justify-content-left">
+                                                    <div className="brandhead"> 
+                                                        <p>{phrases['TakingTwoPolicy']}</p>
+                                                            <div className="d-inline-flex m-b-15">
+                                                                <div className="p-r-25">
+                                                                    <label className="customRadio3">
+                                                                        <Field
+                                                                            type="radio"
+                                                                            name='policy_for'
+                                                                            value='1'
+                                                                            key='1'
+                                                                            checked = {values.policy_for == '1' ? true : false}
+                                                                            onChange = {() =>{
+                                                                                setFieldTouched('policy_for')
+                                                                                setFieldValue('policy_for', '1');
+                                                                                this.handleChange(values,setFieldTouched, setFieldValue)
+                                                                            }  
+                                                                            }
+                                                                        />
+                                                                        <span className="checkmark " /><span className="fs-14"> {phrases['Individual']}</span>
+                                                                    </label>
+                                                                </div>
+                                                                <div className="p-r-25">
+                                                                    <label className="customRadio3">
+                                                                        <Field
+                                                                            type="radio"
+                                                                            name='policy_for'
+                                                                            value='2'
+                                                                            key='1'
+                                                                            checked = {values.policy_for == '2' ? true : false}
+                                                                            onChange = {() =>{
+                                                                                setFieldTouched('policy_for')
+                                                                                setFieldValue('policy_for', '2');
+                                                                                this.handleChange(values,setFieldTouched, setFieldValue)
+                                                                            }  
+                                                                            }
+                                                                        />
+                                                                        <span className="checkmark " /><span className="fs-14"> {phrases['Corporate']}</span>
+                                                                    </label>
+                                                                    {errors.policy_for && touched.policy_for ? (
+                                                                        <span className="errorMsg">{phrases[errors.policy_for]}</span>
+                                                                    ) : null}
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+
                                                     <div className="d-flex justify-content-left">
                                                         <div className="brandhead"> 
-                                                            <p>{phrases['TakingTwoPolicy']}</p>
-                                                                <div className="d-inline-flex m-b-15">
-                                                                    <div className="p-r-25">
-                                                                        <label className="customRadio3">
-                                                                            <Field
-                                                                                type="radio"
-                                                                                name='policy_for'
-                                                                                value='1'
-                                                                                key='1'
-                                                                                checked = {values.policy_for == '1' ? true : false}
-                                                                                onChange = {() =>{
-                                                                                    setFieldTouched('policy_for')
-                                                                                    setFieldValue('policy_for', '1');
-                                                                                    this.handleChange(values,setFieldTouched, setFieldValue)
-                                                                                }  
-                                                                                }
-                                                                            />
-                                                                            <span className="checkmark " /><span className="fs-14"> {phrases['Individual']}</span>
-                                                                        </label>
-                                                                    </div>
-                                                                    <div className="p-r-25">
-                                                                        <label className="customRadio3">
-                                                                            <Field
-                                                                                type="radio"
-                                                                                name='policy_for'
-                                                                                value='2'
-                                                                                key='1'
-                                                                                checked = {values.policy_for == '2' ? true : false}
-                                                                                onChange = {() =>{
-                                                                                    setFieldTouched('policy_for')
-                                                                                    setFieldValue('policy_for', '2');
-                                                                                    this.handleChange(values,setFieldTouched, setFieldValue)
-                                                                                }  
-                                                                                }
-                                                                            />
-                                                                            <span className="checkmark " /><span className="fs-14"> {phrases['Corporate']}</span>
-                                                                        </label>
-                                                                        {errors.policy_for && touched.policy_for ? (
-                                                                            <span className="errorMsg">{phrases[errors.policy_for]}</span>
-                                                                        ) : null}
-                                                                    </div>
-                                                                </div>
-                                                            </div>
-                                                        </div>
+                                                            <p>{phrases['TellAboutPolicy']}</p>
 
-                                                        <div className="d-flex justify-content-left">
-                                                            <div className="brandhead"> 
-                                                                <p>{phrases['TellAboutPolicy']}</p>
-
-                                                                <div className="d-inline-flex m-b-15">
-                                                                    <div className="p-r-25">
-                                                                        <label className="customRadio3">
-                                                                            <Field
-                                                                                type="radio"
-                                                                                name='policy_type'
-                                                                                value='1'
-                                                                                key='1'
-                                                                                checked = {values.policy_type == '1' ? true : false}
-                                                                                onChange = {() =>{
-                                                                                    setFieldTouched('policy_type')
-                                                                                    setFieldValue('policy_type', '1');
-                                                                                    this.handleChange(values,setFieldTouched, setFieldValue)
-                                                                                }  
-                                                                                }
-                                                                            />
-                                                                            <span className="checkmark " /><span className="fs-14"> {phrases['NewPolicy']}</span>
-                                                                        </label>
-                                                                    </div>
-                                                                    
-                                                                    <div className="p-r-25">
-                                                                        <label className="customRadio3">
-                                                                            <Field
-                                                                                type="radio"
-                                                                                name='policy_type'
-                                                                                value='2'
-                                                                                key='1'
-                                                                                checked = {values.policy_type == '2' ? true : false}
-                                                                                onChange = {() =>{
-                                                                                    setFieldTouched('policy_type')
-                                                                                    setFieldValue('policy_type', '2');
-                                                                                    this.handleChange(values,setFieldTouched, setFieldValue)
-                                                                                }  
-                                                                                }
-                                                                            />
-                                                                            <span className="checkmark " /><span className="fs-14"> {phrases['RollOver']}</span>
-                                                                        </label>
-                                                                    </div>
-
-                                                                    <div>
-                                                                        <label className="customRadio3">
-                                                                            <Field
-                                                                                type="radio"
-                                                                                name='policy_type'
-                                                                                value='3'
-                                                                                key='1'
-                                                                                checked = {values.policy_type == '3' ? true : false}
-                                                                                onChange = {() =>{
-                                                                                    setFieldTouched('policy_type')
-                                                                                    setFieldValue('policy_type', '3');
-                                                                                    this.handleChange(values,setFieldTouched, setFieldValue)
-                                                                                }  
-                                                                                }
-                                                                            />
-                                                                            <span className="checkmark" />
-                                                                            <span className="fs-14">{phrases['LapsedPolicy']}</span>
-                                                                        </label>
-                                                                        {errors.policy_type && touched.policy_type ? (
-                                                                            <span className="errorMsg">{phrases[errors.policy_type]}</span>
-                                                                        ) : null}
-                                                                    </div>
-                                                                </div>
-                                                            </div>
-                                                        </div>
-                                                        {values.policy_type == '3' ? 
-                                                        <div className="d-flex justify-content-left">
-                                                            <div className="brandhead"> 
-                                                            <p>{phrases['LapseDuration']}</p>
-                                                                <div className="d-inline-flex m-b-15">
-                                                                    <div className="p-r-25">
-                                                                        <label className="customRadio3">
-                                                                            <Field
-                                                                                type="radio"
-                                                                                name='lapse_duration'
-                                                                                value='1'
-                                                                                key='1'
-                                                                                checked = {values.lapse_duration == '1' ? true : false}
-                                                                            />
-                                                                            <span className="checkmark " /><span className="fs-14"> {phrases['BeforeNinety']}</span>
-                                                                        </label>
-                                                                    </div>
-                                                                    <div className="p-r-25">
-                                                                        <label className="customRadio3">
-                                                                            <Field
-                                                                                type="radio"
-                                                                                name='lapse_duration'
-                                                                                value='2'
-                                                                                key='1'
-                                                                                checked = {values.lapse_duration == '2' ? true : false}
-                                                                            />
-                                                                            <span className="checkmark " /><span className="fs-14"> {phrases['OverNinety']}</span>
-                                                                        </label>
-                                                                        {errors.lapse_duration && touched.lapse_duration ? (
-                                                                            <span className="errorMsg">{phrases[errors.lapse_duration]}</span>
-                                                                        ) : null}
-                                                                    </div>
-                                                                </div>
-                                                            </div>
-                                                        </div> : null }
-
-                                                        <div className="brandhead">
-                                                        <h4 className="m-b-30">{phrases['About']}</h4></div>
-                                                        <Row className="m-b-15">
-                                                            <Col sm={12}>
-                                                            
-                                                                <div className="row formSection">
-                                                                    <label className="col-md-6 col-lg-4">{phrases['RegName']}:</label>
-                                                                    <div className="col-md-6 col-lg-4">
-                                                                    {values.regNumber != "NEW" ? 
+                                                            <div className="d-inline-flex m-b-15">
+                                                                <div className="p-r-25">
+                                                                    <label className="customRadio3">
                                                                         <Field
-                                                                            name="regNumber"
-                                                                            type="text"
-                                                                            placeholder={phrases['RegNum']}
-                                                                            autoComplete="off"
-                                                                            onFocus={e => this.changePlaceHoldClassAdd(e)}
-                                                                            onBlur={e => this.changePlaceHoldClassRemove(e)}
-                                                                            value= {values.regNumber}    
-                                                                            maxLength={this.state.length}
-                                                                            onInput={e=>{
-                                                                                this.regnoFormat(e, setFieldTouched, setFieldValue)
-                                                                                setFieldTouched('check_registration')
-                                                                                setFieldValue('check_registration', '2');
-                                                                            }}  
-                             
-                                                                        /> : 
-                                                                        <Field
-                                                                            type="text"
-                                                                            name='regNumber' 
-                                                                            autoComplete="off"
-                                                                            className="premiumslid"   
-                                                                            value= {values.regNumber}    
-                                                                            disabled = {true}                                                 
+                                                                            type="radio"
+                                                                            name='policy_type'
+                                                                            value='1'
+                                                                            key='1'
+                                                                            checked = {values.policy_type == '1' ? true : false}
+                                                                            onChange = {() =>{
+                                                                                setFieldTouched('policy_type')
+                                                                                setFieldValue('policy_type', '1');
+                                                                                this.handleChange(values,setFieldTouched, setFieldValue)
+                                                                            }  
+                                                                            }
                                                                         />
-                                                                        }
-                                                                        {errors.regNumber && touched.regNumber ? (
-                                                                            <span className="errorMsg">{phrases[errors.regNumber]}</span>
-                                                                        ) : null}   
-                                                                         {/* {console.log("error_msg.registration_no", error_msg)} */}
-                                                                        {error_msg.registration_no ? (
-                                                                            <span className="errorMsg">Please provide registration number</span>
-                                                                        ) : null}
-                                                                    </div>
-                                                                    <div >
-                                                                    {brandView == '0' && fastLaneData.length == '0' ?
-                                                                    <Button  type="button" onClick = {this.fetchFastlane.bind(this,values)} >
-                                                                        {phrases['FetchDetails']} 
-                                                                    </Button> : null }
-                                                                    </div>
-                                                                </div>                                                           
-                                                            </Col>
-                                                        </Row>
-                                                    {values.policy_type == '1' ?
-                                                        <div className="row formSection">
-                                                            <label className="customCheckBox formGrp formGrp">
-                                                            {phrases['WithoutNo']}
-                                                            <Field
-                                                                type="checkbox"
-                                                                name="check_registration"
-                                                                value="1"
-                                                                className="user-self"
-                                                                onChange={(e) => {
-                                                                    if (e.target.checked === true) {
-                                                                        setFieldTouched('regNumber')
-                                                                        setFieldValue('regNumber', 'NEW');
-                                                                        setFieldTouched('check_registration')
-                                                                        setFieldValue('check_registration', e.target.value);
-                
-                                                                    } else {
-                                                                        setFieldValue('check_registration', '2');  
-                                                                        setFieldValue('regNumber', '');                                                          
-                                                                    }
-                                                                    if(this.setValueData()){
-                                                                        this.setState({
-                                                                            check_registration:1
-                                                                        })
-                                                                    }
-                                                                    else{
-                                                                        this.setState({
-                                                                            check_registration:2
-                                                                        })
-                                                                    }
-                                                                }}
-                                                                checked={values.check_registration == '1' ? true : false}
-                                                            />
-                                                                <span className="checkmark mL-0"></span>
-                                                            </label>
-                                                            {errors.check_registration && (touched.looking_for_2 || touched.looking_for_3 || touched.looking_for_4) ? 
-                                                                    <span className="errorMsg">{errors.check_registration}</span> : ""
-                                                                }
-                                                            
-                                                        </div> : null }
-
-                                                        {brandView == '1' ?
-                                                        <div className="brandhead">
-                                                            <h4>{phrases['VechicleBrandTp']}</h4>
-                                                            {error_msg.brand_id || error_msg.brand_model_id || error_msg.model_varient_id ? 
-                                                                <span className="errorMsg">{phrases['BrandVarient']}</span> : ""
-                                                            }
-                                                        </div> : null }
-
-                                                        
-                                                            <Col sm={12} md={12} className="two-wheeler">
-                                                            {brandView == '1' ?
-                                                                <Fragment>
-                                                                    <TwoWheelerBrandTable brandList={brandList && brandList.length > 0 ? brandList : []} selectBrandFunc={this.setBrandName} otherBrandFunc={this.getOtherBrands} />
-                                                                </Fragment> : null }
-
-                                                                <div className="d-flex justify-content-left resmb">
-                                                                {brandView == '1' || (fastLaneData && fastLaneData.brand_text) ?
-                                                                    <Button className={`proceedBtn`} type="submit"  >
-                                                                        {phrases['Continue']}
-                                                                </Button> : null }
+                                                                        <span className="checkmark " /><span className="fs-14"> {phrases['NewPolicy']}</span>
+                                                                    </label>
                                                                 </div>
-                                                            </Col>
+                                                                
+                                                                <div className="p-r-25">
+                                                                    <label className="customRadio3">
+                                                                        <Field
+                                                                            type="radio"
+                                                                            name='policy_type'
+                                                                            value='2'
+                                                                            key='1'
+                                                                            checked = {values.policy_type == '2' ? true : false}
+                                                                            onChange = {() =>{
+                                                                                setFieldTouched('policy_type')
+                                                                                setFieldValue('policy_type', '2');
+                                                                                this.handleChange(values,setFieldTouched, setFieldValue)
+                                                                            }  
+                                                                            }
+                                                                        />
+                                                                        <span className="checkmark " /><span className="fs-14"> {phrases['RollOver']}</span>
+                                                                    </label>
+                                                                </div>
+
+                                                                <div>
+                                                                    <label className="customRadio3">
+                                                                        <Field
+                                                                            type="radio"
+                                                                            name='policy_type'
+                                                                            value='3'
+                                                                            key='1'
+                                                                            checked = {values.policy_type == '3' ? true : false}
+                                                                            onChange = {() =>{
+                                                                                setFieldTouched('policy_type')
+                                                                                setFieldValue('policy_type', '3');
+                                                                                this.handleChange(values,setFieldTouched, setFieldValue)
+                                                                            }  
+                                                                            }
+                                                                        />
+                                                                        <span className="checkmark" />
+                                                                        <span className="fs-14">{phrases['LapsedPolicy']}</span>
+                                                                    </label>
+                                                                    {errors.policy_type && touched.policy_type ? (
+                                                                        <span className="errorMsg">{phrases[errors.policy_type]}</span>
+                                                                    ) : null}
+                                                                </div>
                                                             </div>
-
-                                                            <div className= "col-md-3 col-sm-12">
-                                                            {brandView == '1' ?
-                                                            <Fragment>
-                                                                <div className="regisBox">
-                                                                    <div className="d-flex justify-content-between flex-lg-row flex-md-column m-b-25">
-
-                                                                        <div className="txtRegistr resmb-15">{phrases['RegNo']}.<br />
-                                                                            {motorInsurance && motorInsurance.registration_no}</div>
-
-                                                                        <div> <button type="button" className="rgistrBtn" onClick={this.registration.bind(this, productId)}>{phrases['Edit']}</button></div>
-                                                                    </div>
-
-                                                                    <div className="d-flex justify-content-between flex-lg-row flex-md-column m-b-25">
-                                                                        <div className="txtRegistr resmb-15">{phrases['TwoWheelBrand']}
-                                                                            - <strong>{brandName ? brandName : (vehicleDetails && vehicleDetails.vehiclebrand && vehicleDetails.vehiclebrand.name ? vehicleDetails.vehiclebrand.name : "")}</strong>
-                                                                        </div>
-
-                                                                        <div> <button type="button" className="rgistrBtn" onClick={this.selectVehicle.bind(this, productId)}>{phrases['Edit']}</button></div>
-                                                                    </div>
-
-                                                                    <div className="d-flex justify-content-between flex-lg-row flex-md-column m-b-25">
-                                                                        <div className="txtRegistr resmb-15">{phrases['TwoWheelModel']}
-                                                                            - <strong>{modelName ? modelName : (selectedBrandId ? "" : vehicleDetails && vehicleDetails.vehiclemodel && vehicleDetails.vehiclemodel.description ? vehicleDetails.vehiclemodel.description+" "+vehicleDetails.varientmodel.varient : "")}</strong></div>
-
-                                                                        <div> <button type="button" className="rgistrBtn" onClick={this.selectBrand.bind(this, productId)}>{phrases['Edit']}</button></div>
-                                                                    </div>
-
-                                                                    <div className="d-flex justify-content-between flex-lg-row flex-md-column m-b-25">
-                                                                        <div className="txtRegistr">{phrases['Fuel']}<br />
-                                                                        <strong>{fuel[fuelType] ? fuel[fuelType] : (vehicleDetails && vehicleDetails.varientmodel && vehicleDetails.varientmodel.fuel_type ? fuel[Math.floor(vehicleDetails.varientmodel.fuel_type)] : null)} </strong></div>
-
-                                                                    </div>
+                                                        </div>
+                                                    </div>
+                                                    {values.policy_type == '3' ? 
+                                                    <div className="d-flex justify-content-left">
+                                                        <div className="brandhead"> 
+                                                        <p>{phrases['LapseDuration']}</p>
+                                                            <div className="d-inline-flex m-b-15">
+                                                                <div className="p-r-25">
+                                                                    <label className="customRadio3">
+                                                                        <Field
+                                                                            type="radio"
+                                                                            name='lapse_duration'
+                                                                            value='1'
+                                                                            key='1'
+                                                                            checked = {values.lapse_duration == '1' ? true : false}
+                                                                        />
+                                                                        <span className="checkmark " /><span className="fs-14"> {phrases['BeforeNinety']}</span>
+                                                                    </label>
                                                                 </div>
-                                                            </Fragment> : 
+                                                                <div className="p-r-25">
+                                                                    <label className="customRadio3">
+                                                                        <Field
+                                                                            type="radio"
+                                                                            name='lapse_duration'
+                                                                            value='2'
+                                                                            key='1'
+                                                                            checked = {values.lapse_duration == '2' ? true : false}
+                                                                        />
+                                                                        <span className="checkmark " /><span className="fs-14"> {phrases['OverNinety']}</span>
+                                                                    </label>
+                                                                    {errors.lapse_duration && touched.lapse_duration ? (
+                                                                        <span className="errorMsg">{phrases[errors.lapse_duration]}</span>
+                                                                    ) : null}
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div> : null }
+
+                                                    <div className="brandhead">
+                                                    <h4 className="m-b-30">{phrases['About']}</h4></div>
+                                                    <Row className="m-b-15">
+                                                        <Col sm={12}>
+                                                        
+                                                        <div className="row formSection">
+                                                            <label className="col-md-4">{phrases['RegName']} </label>
+                                                            <div className="col-md-1">
+
+                                                                <Field
+                                                                    name="reg_number_part_one"
+                                                                    type="text"
+                                                                    autoComplete="off"
+                                                                    onFocus={e => this.changePlaceHoldClassAdd(e)}
+                                                                    onBlur={e => this.changePlaceHoldClassRemove(e)}
+                                                                    value={values.reg_number_part_one}
+                                                                    disabled= {values.check_registration == '1' ? true : false}
+                                                                    maxLength="2"
+                                                                    onInput={e => {
+                                                                        this.regnoFormat(e, setFieldTouched, setFieldValue)
+                                                                        setFieldTouched('check_registration')
+                                                                        setFieldValue('check_registration', '2');
+                                                                    }}
+
+                                                                />
+                                                            </div>
+                                                            <div className="col-md-1">
+
+                                                                <Field
+                                                                    name="reg_number_part_two"
+                                                                    type="text"
+                                                                    autoComplete="off"
+                                                                    onFocus={e => this.changePlaceHoldClassAdd(e)}
+                                                                    onBlur={e => this.changePlaceHoldClassRemove(e)}
+                                                                    value={values.reg_number_part_two}
+                                                                    disabled= {values.check_registration == '1' ? true : false}
+                                                                    maxLength="3"
+                                                                    onInput={e => {
+                                                                        this.regnoFormat(e, setFieldTouched, setFieldValue)
+                                                                        setFieldTouched('check_registration')
+                                                                        setFieldValue('check_registration', '2');
+                                                                    }}
+
+                                                                />         
+                                                            </div>
+                                                            <div className="col-md-1">
+
+                                                                <Field
+                                                                    name="reg_number_part_three"
+                                                                    type="text"
+                                                                    autoComplete="off"
+                                                                    onFocus={e => this.changePlaceHoldClassAdd(e)}
+                                                                    onBlur={e => this.changePlaceHoldClassRemove(e)}
+                                                                    value={values.reg_number_part_three}
+                                                                    disabled= {values.check_registration == '1' ? true : false}
+                                                                    maxLength="3"
+                                                                    onInput={e => {
+                                                                        this.regnoFormat(e, setFieldTouched, setFieldValue)
+                                                                        setFieldTouched('check_registration')
+                                                                        setFieldValue('check_registration', '2');
+                                                                    }}
+
+                                                                />
+                                                            </div>
+                                                            <div className="col-md-2">
+
+                                                                <Field
+                                                                    name="reg_number_part_four"
+                                                                    type="text"
+                                                                    autoComplete="off"
+                                                                    onFocus={e => this.changePlaceHoldClassAdd(e)}
+                                                                    onBlur={e => this.changePlaceHoldClassRemove(e)}
+                                                                    value={values.reg_number_part_four}
+                                                                    disabled= {values.check_registration == '1' ? true : false}
+                                                                    maxLength="4"
+                                                                    onInput={e => {
+                                                                        this.regnoFormat(e, setFieldTouched, setFieldValue)
+                                                                        setFieldTouched('check_registration')
+                                                                        setFieldValue('check_registration', '2');
+                                                                    }}
+
+                                                                />
+                                                            </div>
+                                                            {brandView == '0' && fastLaneData.length == '0' ?
+                                                                <Button  type="button"  onClick = {this.fetchFastlane.bind(this,values)} >
+                                                                    {phrases['FetchDetails']}
+                                                            </Button> : null }
+                                                            {(errors.reg_number_part_one || errors.reg_number_part_two || errors.reg_number_part_three || errors.reg_number_part_four) 
+                                                            && (touched.reg_number_part_one || touched.reg_number_part_two || touched.reg_number_part_three || touched.reg_number_part_four) ? (
+                                                                    <span className="errorMsg">{phrases["InvalidRegistrationNumber"]}</span>
+                                                                ) : null}
+                                                        </div>                                                           
+                                                        </Col>
+                                                    </Row>
+                                                {values.policy_type == '1' ?
+                                                    <div className="row formSection">
+                                                        <label className="customCheckBox formGrp formGrp">
+                                                        {phrases['WithoutNo']}
+                                                        <Field
+                                                            type="checkbox"
+                                                            name="check_registration"
+                                                            value="1"
+                                                            className="user-self"
+                                                            onChange={(e) => {
+                                                                if (e.target.checked === true) {
+                                                                    setFieldTouched('reg_number_part_one')
+                                                                    setFieldValue('reg_number_part_one', '');
+                                                                    setFieldTouched('reg_number_part_two')
+                                                                    setFieldValue('reg_number_part_two', '');
+                                                                    setFieldTouched('reg_number_part_three')
+                                                                    setFieldValue('reg_number_part_three', '');
+                                                                    setFieldTouched('reg_number_part_four')
+                                                                    setFieldValue('reg_number_part_four', '');
+                                                                    setFieldTouched('check_registration')
+                                                                    setFieldValue('check_registration', e.target.value);
+            
+                                                                } else {
+                                                                    setFieldTouched('check_registration')
+                                                                    setFieldValue('check_registration', '2');                                                          
+                                                                }
+                                                                if(this.setValueData()){
+                                                                    this.setState({
+                                                                        check_registration:1
+                                                                    })
+                                                                }
+                                                                else{
+                                                                    this.setState({
+                                                                        check_registration:2
+                                                                    })
+                                                                }
+                                                            }}
+                                                            checked={values.check_registration == '1' ? true : false}
+                                                        />
+                                                            <span className="checkmark mL-0"></span>
+                                                        </label>
+                                                        {errors.check_registration && (touched.looking_for_2 || touched.looking_for_3 || touched.looking_for_4) ? 
+                                                                <span className="errorMsg">{errors.check_registration}</span> : ""
+                                                            }
+                                                        
+                                                    </div> : null }
+
+                                                    {brandView == '1' ?
+                                                    <div className="brandhead">
+                                                        <h4>{phrases['VechicleBrandTp']}</h4>
+                                                        {error_msg.brand_id || error_msg.brand_model_id || error_msg.model_varient_id ? 
+                                                            <span className="errorMsg">{phrases['BrandVarient']}</span> : ""
+                                                        }
+                                                    </div> : null }
+
+                                                    
+                                                        <Col sm={12} md={12} className="two-wheeler">
+                                                        {brandView == '1' ?
                                                             <Fragment>
+                                                                <TwoWheelerBrandTable brandList={brandList && brandList.length > 0 ? brandList : []} selectBrandFunc={this.setBrandName} otherBrandFunc={this.getOtherBrands} />
+                                                            </Fragment> : null }
+
+                                                            <div className="d-flex justify-content-left resmb">
+                                                            {brandView == '1' || (fastLaneData && fastLaneData.brand_text) ?
+                                                                <Button className={`proceedBtn`} type="submit"  >
+                                                                    {phrases['Continue']}
+                                                            </Button> : null }
+                                                            </div>
+                                                        </Col>
+                                                        </div>
+
+                                                        <div className= "col-md-3 col-sm-12">
+                                                        {brandView == '1' ?
+                                                        <Fragment>
                                                             <div className="regisBox">
                                                                 <div className="d-flex justify-content-between flex-lg-row flex-md-column m-b-25">
 
@@ -894,37 +981,69 @@ class TwoWheelerSelectBrand extends Component {
 
                                                                 <div className="d-flex justify-content-between flex-lg-row flex-md-column m-b-25">
                                                                     <div className="txtRegistr resmb-15">{phrases['TwoWheelBrand']}
-                                                                        -  <strong>{fastLaneData && fastLaneData.brand_text ? fastLaneData.brand_text  : vehicleDetails && vehicleDetails.vehiclebrand && vehicleDetails.vehiclebrand.name ? vehicleDetails.vehiclebrand.name : ""}</strong>
+                                                                        - <strong>{brandName ? brandName : (vehicleDetails && vehicleDetails.vehiclebrand && vehicleDetails.vehiclebrand.name ? vehicleDetails.vehiclebrand.name : "")}</strong>
                                                                     </div>
 
                                                                     <div> <button type="button" className="rgistrBtn" onClick={this.selectVehicle.bind(this, productId)}>{phrases['Edit']}</button></div>
                                                                 </div>
 
                                                                 <div className="d-flex justify-content-between flex-lg-row flex-md-column m-b-25">
-                                                                    <div className="txtRegistr">{phrases['TwoWheelModel']}
-                                                                        -  <strong>{fastLaneData && fastLaneData.model_text ? fastLaneData.model_text+" "+fastLaneData.varient_text : vehicleDetails && vehicleDetails.vehiclemodel && vehicleDetails.vehiclemodel.description ? vehicleDetails.vehiclemodel.description+" "+vehicleDetails.varientmodel.varient : "" }</strong></div>
+                                                                    <div className="txtRegistr resmb-15">{phrases['TwoWheelModel']}
+                                                                        - <strong>{modelName ? modelName : (selectedBrandId ? "" : vehicleDetails && vehicleDetails.vehiclemodel && vehicleDetails.vehiclemodel.description ? vehicleDetails.vehiclemodel.description+" "+vehicleDetails.varientmodel.varient : "")}</strong></div>
 
                                                                     <div> <button type="button" className="rgistrBtn" onClick={this.selectBrand.bind(this, productId)}>{phrases['Edit']}</button></div>
                                                                 </div>
 
                                                                 <div className="d-flex justify-content-between flex-lg-row flex-md-column m-b-25">
                                                                     <div className="txtRegistr">{phrases['Fuel']}<br />
-                                                                    <strong>{fastLaneData && fastLaneData.fuel ? fastLaneData.fuel : vehicleDetails && vehicleDetails.varientmodel && vehicleDetails.varientmodel.fuel_type ? fuel[Math.floor(vehicleDetails.varientmodel.fuel_type)] : null } </strong></div>
+                                                                    <strong>{fuel[fuelType] ? fuel[fuelType] : (vehicleDetails && vehicleDetails.varientmodel && vehicleDetails.varientmodel.fuel_type ? fuel[Math.floor(vehicleDetails.varientmodel.fuel_type)] : null)} </strong></div>
 
                                                                 </div>
                                                             </div>
-                                                        </Fragment> }
-                                                        </div>
-                                                       
-                                                    </Row>
-                                                    </div>
-                                                </section>
+                                                        </Fragment> : 
+                                                        <Fragment>
+                                                        <div className="regisBox">
+                                                            <div className="d-flex justify-content-between flex-lg-row flex-md-column m-b-25">
 
-                                            </Form>
-                                        );
-                                    }}
-                                </Formik>
-                            </div>
+                                                                <div className="txtRegistr resmb-15">{phrases['RegNo']}.<br />
+                                                                    {motorInsurance && motorInsurance.registration_no}</div>
+
+                                                                <div> <button type="button" className="rgistrBtn" onClick={this.registration.bind(this, productId)}>{phrases['Edit']}</button></div>
+                                                            </div>
+
+                                                            <div className="d-flex justify-content-between flex-lg-row flex-md-column m-b-25">
+                                                                <div className="txtRegistr resmb-15">{phrases['TwoWheelBrand']}
+                                                                    -  <strong>{fastLaneData && fastLaneData.brand_text ? fastLaneData.brand_text  : vehicleDetails && vehicleDetails.vehiclebrand && vehicleDetails.vehiclebrand.name ? vehicleDetails.vehiclebrand.name : ""}</strong>
+                                                                </div>
+
+                                                                <div> <button type="button" className="rgistrBtn" onClick={this.selectVehicle.bind(this, productId)}>{phrases['Edit']}</button></div>
+                                                            </div>
+
+                                                            <div className="d-flex justify-content-between flex-lg-row flex-md-column m-b-25">
+                                                                <div className="txtRegistr">{phrases['TwoWheelModel']}
+                                                                    -  <strong>{fastLaneData && fastLaneData.model_text ? fastLaneData.model_text+" "+fastLaneData.varient_text : vehicleDetails && vehicleDetails.vehiclemodel && vehicleDetails.vehiclemodel.description ? vehicleDetails.vehiclemodel.description+" "+vehicleDetails.varientmodel.varient : "" }</strong></div>
+
+                                                                <div> <button type="button" className="rgistrBtn" onClick={this.selectBrand.bind(this, productId)}>{phrases['Edit']}</button></div>
+                                                            </div>
+
+                                                            <div className="d-flex justify-content-between flex-lg-row flex-md-column m-b-25">
+                                                                <div className="txtRegistr">{phrases['Fuel']}<br />
+                                                                <strong>{fastLaneData && fastLaneData.fuel ? fastLaneData.fuel : vehicleDetails && vehicleDetails.varientmodel && vehicleDetails.varientmodel.fuel_type ? fuel[Math.floor(vehicleDetails.varientmodel.fuel_type)] : null } </strong></div>
+
+                                                            </div>
+                                                        </div>
+                                                    </Fragment> }
+                                                    </div>
+                                                    
+                                                </Row>
+                                                </div>
+                                            </section>
+
+                                        </Form>
+                                    );
+                                }}
+                            </Formik>
+                        </div>
 
                         </div>
                     </div>
