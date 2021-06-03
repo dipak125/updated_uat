@@ -492,6 +492,7 @@ class SelectDuration_KSB_Micro extends Component {
                                                             autoComplete="off"
                                                             value={values.ksbplan_id}
                                                             className="formGrp"
+                                                            disabled = {true}
                                                             onChange={(e) => {
                                                                 setFieldValue('ksbplan_id', e.target.value);
                                                                 this.handleAmountChange(e)

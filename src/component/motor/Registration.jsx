@@ -12,7 +12,7 @@ import swal from 'sweetalert';
 import Encryption from '../../shared/payload-encryption';
 import { Formik, Form, Field, ErrorMessage } from 'formik';
 import { setData } from "../../store/actions/data";
-import { validRegistrationNumber } from "../../shared/validationFunctions";
+import { validRegistrationNumber, registrationNumberLastBlock } from "../../shared/validationFunctions";
 // let phrases = localStorage.getItem("phrases") ? JSON.parse(localStorage.getItem("phrases")) : null
 
 // const { t, i18n } = useTranslation();
@@ -20,6 +20,10 @@ import { validRegistrationNumber } from "../../shared/validationFunctions";
 
 const initialValues = {
     regNumber: '',
+    blockA: '',
+    blockB: '',
+    blockC: '',
+    blockD: '',
     check_registration: 2
 }
 
@@ -27,31 +31,76 @@ const vehicleRegistrationValidation = Yup.object().shape({
 
     check_registration: Yup.string().notRequired(),
 
-    regNumber: Yup.string()
-        .test(
-            "registrationNumberCheck",
-            function () {
-                return "RegistrationNumber"
-            },
-            function (value) {
-                // console.log('YUP', value)
-                if ((value == "" || value == undefined) && this.parent.check_registration == 2) {
-                    return false;
-                }
-                return true;
-            }
-        ).test(
-            "last4digitcheck",
-            function () {
+    blockA: Yup.string().when(['check_registration'], {
+        is: check_registration => check_registration == '2', 
+        then: Yup.string().required('RegistrationNumber')
+            .max(2, function() {
                 return "InvalidRegistrationNumber"
-            },
-            function (value) {
-                if (value && this.parent.check_registration == 2 && (value != "" || value != undefined)) {
-                    return validRegistrationNumber(value);
+            })        
+            .matches(/^[a-zA-Z]*$/, function() {
+                return "InvalidRegistrationNumber"}),
+        otherwise: Yup.string().nullable()
+    }),
+    blockB: Yup.string().when(['check_registration'], {
+        is: check_registration => check_registration == '2', 
+        then: Yup.string()
+            .max(3, function() {
+                return "InvalidRegistrationNumber"
+            })        
+            .matches(/^[a-zA-Z0-9]*$/, function() {
+                return "InvalidRegistrationNumber"}),
+        otherwise: Yup.string().nullable()
+    }),
+    blockC: Yup.string().when(['check_registration'], {
+        is: check_registration => check_registration == '2', 
+        then: Yup.string()
+            .max(3, function() {
+                return "InvalidRegistrationNumber"
+            })        
+            .matches(/^[a-zA-Z0-9]*$/, function() {
+                return "InvalidRegistrationNumber"}),
+        otherwise: Yup.string().nullable()
+    }),
+    blockD: Yup.string().when(['check_registration'], {
+        is: check_registration => check_registration == '2', 
+        then: Yup.string().required('RegistrationNumber')
+            .test(
+                "last4digitcheck",
+                function () {
+                    return "InvalidRegistrationNumber"
+                },
+                function (value) {         
+                    return registrationNumberLastBlock(value);
                 }
-                return true;
-            }
-        ),
+            ),
+        otherwise: Yup.string().nullable()
+    }),
+
+    // regNumber: Yup.string()
+    //     .test(
+    //         "registrationNumberCheck",
+    //         function () {
+    //             return "RegistrationNumber"
+    //         },
+    //         function (value) {
+    //             // console.log('YUP', value)
+    //             if ((value == "" || value == undefined) && this.parent.check_registration == 2) {
+    //                 return false;
+    //             }
+    //             return true;
+    //         }
+    //     ).test(
+    //         "last4digitcheck",
+    //         function () {
+    //             return "InvalidRegistrationNumber"
+    //         },
+    //         function (value) {
+    //             if (value && this.parent.check_registration == 2 && (value != "" || value != undefined)) {
+    //                 return validRegistrationNumber(value);
+    //             }
+    //             return true;
+    //         }
+    //     ),
 
 });
 
@@ -106,8 +155,9 @@ class Registration extends Component {
 
     fetchFastlane = (values) => {
         const formData = new FormData();
+        var regNumber = values.blockA+values.blockB+values.blockC+values.blockD
         if (values.check_registration == '2') {
-            formData.append('registration_no', values.regNumber)
+            formData.append('registration_no', regNumber)
             formData.append('menumaster_id', '1')
             this.props.loadingStart();
             axios.post('fastlane', formData).then(res => {
@@ -143,6 +193,12 @@ class Registration extends Component {
         const formData = new FormData();
         let encryption = new Encryption();
         let post_data = {}
+        var regNumber = ""
+        if(values.check_registration == '2') {
+            regNumber = values.blockA+'-'+values.blockB+'-'+values.blockC+'-'+values.blockD
+        }
+        else regNumber = "NEW"
+        
         let policyHolder_id = localStorage.getItem('policyHolder_id') ? localStorage.getItem('policyHolder_id') : 0
 
         let bc_data = sessionStorage.getItem('bcLoginData') ? sessionStorage.getItem('bcLoginData') : "";
@@ -270,34 +326,6 @@ class Registration extends Component {
     regnoFormat = (e, setFieldTouched, setFieldValue) => {
 
         let regno = e.target.value
-        // let formatVal = ""
-        // let regnoLength = regno.length
-        // var letter = /^[a-zA-Z]+$/;
-        // var number = /^[0-9]+$/;
-        // let subString = regno.substring(regnoLength-1, regnoLength)
-        // let preSubString = regno.substring(regnoLength-2, regnoLength-1)
-
-        // if(subString.match(letter) && preSubString.match(letter) && regnoLength == 3) {        
-        //     formatVal = formatVal = regno.substring(0, regnoLength-1) + " " +subString
-        // }
-        // else if(subString.match(letter) && preSubString.match(letter)) {
-        //     formatVal = regno
-        // }
-        // else if(subString.match(number) && preSubString.match(number) && regnoLength == 6) {
-        //     formatVal = formatVal = regno.substring(0, regnoLength-1) + " " +subString
-        // } 
-        // else if(subString.match(number) && preSubString.match(number) && regnoLength == 11 && regno.substring(3, 4).match(letter) && regno.substring(5, 7).match(number) ) {
-        //     formatVal = formatVal = regno.substring(0, 7) + " " +regno.substring(7, 11)
-        // } 
-        // else if(subString.match(number) && preSubString.match(letter)) {        
-        //     formatVal = regno.substring(0, regnoLength-1) + " " +subString      
-        // } 
-        // else if(subString.match(letter) && preSubString.match(number)) {
-        //     formatVal = regno.substring(0, regnoLength-1) + " " +subString   
-        // } 
-
-        // else formatVal = regno.toUpperCase()
-
         e.target.value = regno.toUpperCase()
 
     }
@@ -306,7 +334,12 @@ class Registration extends Component {
     render() {
         const { motorInsurance } = this.state
         const newInitialValues = Object.assign(initialValues, {
-            regNumber: motorInsurance ? motorInsurance.registration_no : ''
+            // blockA: tempRegNo[0] ? tempRegNo[0] : "",
+            // blockB: tempRegNo[1] ? tempRegNo[1] : "",
+            // blockC: tempRegNo[2] ? tempRegNo[2] : "",
+            // blockD: tempRegNo[3] ? tempRegNo[3] : "",
+	    regNumber: motorInsurance ? motorInsurance.registration_no : '',
+            check_registration: motorInsurance && motorInsurance.registration_no == "NEW" ? '1' : '2'
         })
         let phrases = localStorage.getItem("phrases") ? JSON.parse(localStorage.getItem("phrases")) : null
         
@@ -326,10 +359,6 @@ class Registration extends Component {
 								 </div>
 								</aside>
 								
-								 {/*<div className="col-sm-12 col-md-12 col-lg-2 col-xl-2 pd-l-0">               
-									<SideNav />
-             					 </div>*/}
-								
                                 <div className="col-sm-12 col-md-12 col-lg-12 col-xl-12 infobox registerbr">
                                     <h4 className="text-center mt-3 mb-3">{phrases['SBIGICL']}</h4>
                                     <section className="brand">
@@ -345,17 +374,16 @@ class Registration extends Component {
                                                         <Form>
                                                             <div className="row formSection">
                                                                 <label className="col-md-4">{phrases['RegName']} :</label>
-                                                                <div className="col-md-4">
+                                                                <div className="col-md-1">
 
                                                                     <Field
-                                                                        name="regNumber"
+                                                                        name="blockA"
                                                                         type="text"
-                                                                        placeholder={phrases['RegNum']}
                                                                         autoComplete="off"
                                                                         onFocus={e => this.changePlaceHoldClassAdd(e)}
                                                                         onBlur={e => this.changePlaceHoldClassRemove(e)}
-                                                                        value={values.regNumber}
-                                                                        maxLength={this.state.length}
+                                                                        value={values.blockA}
+                                                                        maxLength="2"
                                                                         onInput={e => {
                                                                             this.regnoFormat(e, setFieldTouched, setFieldValue)
                                                                             setFieldTouched('check_registration')
@@ -363,10 +391,65 @@ class Registration extends Component {
                                                                         }}
 
                                                                     />
-                                                                    {errors.regNumber && touched.regNumber ? (
-                                                                        <span className="errorMsg">{phrases[errors.regNumber]}</span>
-                                                                    ) : null}
                                                                 </div>
+                                                                <div className="col-md-1">
+
+                                                                    <Field
+                                                                        name="blockB"
+                                                                        type="text"
+                                                                        autoComplete="off"
+                                                                        onFocus={e => this.changePlaceHoldClassAdd(e)}
+                                                                        onBlur={e => this.changePlaceHoldClassRemove(e)}
+                                                                        value={values.blockB}
+                                                                        maxLength="3"
+                                                                        onInput={e => {
+                                                                            this.regnoFormat(e, setFieldTouched, setFieldValue)
+                                                                            setFieldTouched('check_registration')
+                                                                            setFieldValue('check_registration', '2');
+                                                                        }}
+
+                                                                    />         
+                                                                </div>
+                                                                <div className="col-md-1">
+
+                                                                    <Field
+                                                                        name="blockC"
+                                                                        type="text"
+                                                                        autoComplete="off"
+                                                                        onFocus={e => this.changePlaceHoldClassAdd(e)}
+                                                                        onBlur={e => this.changePlaceHoldClassRemove(e)}
+                                                                        value={values.blockC}
+                                                                        maxLength="3"
+                                                                        onInput={e => {
+                                                                            this.regnoFormat(e, setFieldTouched, setFieldValue)
+                                                                            setFieldTouched('check_registration')
+                                                                            setFieldValue('check_registration', '2');
+                                                                        }}
+
+                                                                    />
+                                                                </div>
+                                                                <div className="col-md-1">
+
+                                                                    <Field
+                                                                        name="blockD"
+                                                                        type="text"
+                                                                        autoComplete="off"
+                                                                        onFocus={e => this.changePlaceHoldClassAdd(e)}
+                                                                        onBlur={e => this.changePlaceHoldClassRemove(e)}
+                                                                        value={values.blockD}
+                                                                        maxLength="4"
+                                                                        onInput={e => {
+                                                                            this.regnoFormat(e, setFieldTouched, setFieldValue)
+                                                                            setFieldTouched('check_registration')
+                                                                            setFieldValue('check_registration', '2');
+                                                                        }}
+
+                                                                    />
+                                                                </div>
+                                                                {(errors.blockA || errors.blockB || errors.blockC || errors.blockD) 
+                                                                && (touched.blockA || touched.blockB || touched.blockC || touched.blockD) ? (
+                                                                        <span className="errorMsg">{phrases["InvalidRegistrationNumber"]}</span>
+                                                                    ) : null}
                                                             </div>
                                                             <div className="row formSection">
                                                                 <label className="customCheckBox formGrp formGrp">
@@ -378,15 +461,19 @@ class Registration extends Component {
                                                                         className="user-self"
                                                                         onChange={(e) => {
                                                                             if (e.target.checked === true) {
-                                                                                setFieldTouched('regNumber')
-                                                                                setFieldValue('regNumber', 'NEW');
+                                                                                setFieldTouched('blockA')
+                                                                                setFieldValue('blockA', '');
+                                                                                setFieldTouched('blockB')
+                                                                                setFieldValue('blockB', '');
+                                                                                setFieldTouched('blockC')
+                                                                                setFieldValue('blockC', '');
+                                                                                setFieldTouched('blockD')
+                                                                                setFieldValue('blockD', '');
                                                                                 setFieldTouched('check_registration')
                                                                                 setFieldValue('check_registration', e.target.value);
 
                                                                             } else {
-                                                                                setFieldValue('check_registration', '2');
-                                                                                setFieldValue('regNumber', '');
-                                                                            }
+                                                                                setFieldValue('check_registration', '2');                                                                            }
                                                                             if (this.setValueData()) {
                                                                                 this.setState({
                                                                                     check_registration: 1

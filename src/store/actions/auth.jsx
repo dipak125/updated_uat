@@ -159,7 +159,7 @@ export const intermediate_authProcess = (data, onSuccess, onFailure) => {
         }
         let encryption = new Encryption();
         formData.append('enc_data',encryption.encrypt(JSON.stringify(post_data_obj)))
-        console.log("login post_data_obj--------", post_data_obj)
+        // console.log("login post_data_obj--------", post_data_obj)
         axios
             .post('/login', formData)
             .then(response => {

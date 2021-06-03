@@ -367,32 +367,32 @@ const SummarySME = Loadable({
     loading: () => loadingContent
 });
 
-// ======================== SUKHSAM Fire ========================================
+// ======================== Sookshma Fire ========================================
 
 const RegistrationSukhsam = Loadable({
-    loader: () => import(/*webpackChunkName: "Products" */"../sukhsam/Registration_sukhsam.jsx"),
+    loader: () => import(/*webpackChunkName: "Products" */"../Sookshma/Registration_sukhsam.jsx"),
     loading: () => loadingContent
 });
 
 const RiskDetailsSukhsam = Loadable({
-    loader: () => import(/*webpackChunkName: "Products" */"../sukhsam/RiskDetails_sukhsam.jsx"),
+    loader: () => import(/*webpackChunkName: "Products" */"../Sookshma/RiskDetails_sukhsam.jsx"),
     loading: () => loadingContent
 });
 const OtherDetailsSukhsam = Loadable({
-    loader: () => import(/*webpackChunkName: "Products" */"../sukhsam/OtherDetails_sukhsam.jsx"),
+    loader: () => import(/*webpackChunkName: "Products" */"../Sookshma/OtherDetails_sukhsam.jsx"),
     loading: () => loadingContent
 });
 const AdditionalDetailsSukhsam = Loadable({
-    loader: () => import(/*webpackChunkName: "Products" */"../sukhsam/AdditionalDetails_sukhsam.jsx"),
+    loader: () => import(/*webpackChunkName: "Products" */"../Sookshma/AdditionalDetails_sukhsam.jsx"),
     loading: () => loadingContent
 });
 const PremiumSukhsam = Loadable({
-    loader: () => import(/*webpackChunkName: "Products" */"../sukhsam/Premium_sukhsam.jsx"),
+    loader: () => import(/*webpackChunkName: "Products" */"../Sookshma/Premium_sukhsam.jsx"),
     loading: () => loadingContent
 });
 
 const SummarySukhsam = Loadable({
-    loader: () => import(/*webpackChunkName: "Products" */"../sukhsam/Summary_sukhsam.jsx"),
+    loader: () => import(/*webpackChunkName: "Products" */"../Sookshma/Summary_sukhsam.jsx"),
     loading: () => loadingContent
 });
 
@@ -814,13 +814,13 @@ class Routes extends Component {
                         <PrivateRoute exact path="/Summary_SME/:productId" component={SummarySME} />  
                         <PrivateRoute exact path="/Premium_SME/:productId" component={PremiumSME} />   */}
 
-                         {/************ SUKHSAM - Fire ******************/}
-                         <PrivateRoute exact path="/Registration_Sukhsam/:productId" component={RegistrationSukhsam} /> 
-                        <PrivateRoute exact path="/RiskDetails_Sukhsam/:productId" component={RiskDetailsSukhsam} />
-                        <PrivateRoute exact path="/OtherDetails_Sukhsam/:productId" component={OtherDetailsSukhsam} />
-                        <PrivateRoute exact path="/AdditionalDetails_Sukhsam/:productId" component={AdditionalDetailsSukhsam} />
-                        <PrivateRoute exact path="/Summary_Sukhsam/:productId" component={SummarySukhsam} />  
-                        <PrivateRoute exact path="/Premium_Sukhsam/:productId" component={PremiumSukhsam} />  
+                         {/************ Sookshma - Fire ******************/}
+                         <PrivateRoute exact path="/Registration_Sookshma/:productId" component={RegistrationSukhsam} /> 
+                        <PrivateRoute exact path="/RiskDetails_Sookshma/:productId" component={RiskDetailsSukhsam} />
+                        <PrivateRoute exact path="/OtherDetails_Sookshma/:productId" component={OtherDetailsSukhsam} />
+                        <PrivateRoute exact path="/AdditionalDetails_Sookshma/:productId" component={AdditionalDetailsSukhsam} />
+                        <PrivateRoute exact path="/Summary_Sookshma/:productId" component={SummarySukhsam} />  
+                        <PrivateRoute exact path="/Premium_Sookshma/:productId" component={PremiumSukhsam} />  
 
                         {/************ Support ******************/}
                         <PrivateRoute exact path="/Documents" component={Documents} />

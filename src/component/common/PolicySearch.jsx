@@ -15,7 +15,7 @@ import moment from "moment";
 import Collapsible from 'react-collapsible';
 import { Formik, Field, Form, FieldArray } from "formik";
 import DatePicker from "react-datepicker";
-import { array } from 'prop-types';
+// import { array } from 'prop-types';
 
 const actionFormatter = (refObj) => (cell, row, enumObject) => {
     return (

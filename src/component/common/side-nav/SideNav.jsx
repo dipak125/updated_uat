@@ -106,7 +106,7 @@ class SideNav extends Component {
             ))        
           }
 
-					<li class="logoutbtn">
+					<li className="logoutbtn">
 					 <button className="btn-lg" onClick={this.handleLogout}>
             <a activeClassName="active">
               <span className="leftIcon01">
@@ -115,7 +115,7 @@ class SideNav extends Component {
                   alt=""
                 />
               </span>
-             <span class="valuetxt"> {childPhrase['Logout']}</span>
+             <span className="valuetxt"> {childPhrase['Logout']}</span>
             </a>
           </button>
 					</li>	

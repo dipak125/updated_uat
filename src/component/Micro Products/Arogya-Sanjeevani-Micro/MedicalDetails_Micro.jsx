@@ -112,7 +112,7 @@ class MedicalDetails_Micro extends Component {
 
        let familyMembers=document.getElementsByClassName(`familyMembers${question_id[0]}`)
        let answerStr = value;
-       console.log("AAAAA====>",familyMembers);
+    //    console.log("AAAAA====>",familyMembers);
        if(answerStr=='n'){
             let family_members = this.state.family_members
             let arr_data = []
@@ -180,26 +180,29 @@ class MedicalDetails_Micro extends Component {
         let count = 0
         let checkFamily = []
         let selectCheck = []
-        for(let i=0;i<questionClass.length;i++){
-            if(questionClass[i].checked){  
-                //console.log("Name====>",questionClass[i].name  
-               let classId = questionClass[i].name[questionClass[i].name.length-1]
-               let familyMembers=`familyMembers${classId}`
-               let familyMembersClass = document.getElementsByClassName(familyMembers);
-                if(questionClass[i].value == 'y'){
-                    selectCheck.push(questionClass[i].value)
-                }
-               for(let j=0;j<familyMembersClass.length;j++){
-                    if(familyMembersClass[j].checked){                        
-                        checkFamily.push(true)
-                    }   
-               }  
-               count++;              
-            }            
+        if(values.question_id_4 == "y") {
+            swal('Thank you for showing your interest for buying product.Due to some reasons, we are not able to issue the policy online.Please call 180 22 1111');
+         return false
         }
-
-        // console.log("CHECK FAMILY ==============>", checkFamily)
-        // console.log("CHECK FAMILY ==============>", checkFamily)
+        else {
+            for(let i=0;i<questionClass.length;i++){
+                if(questionClass[i].checked){  
+                    // console.log("Name====>", values  )
+                let classId = questionClass[i].name[questionClass[i].name.length-1]
+                let familyMembers=`familyMembers${classId}`
+                let familyMembersClass = document.getElementsByClassName(familyMembers);
+                    if(questionClass[i].value == 'y'){
+                        selectCheck.push(questionClass[i].value)
+                    }
+                for(let j=0;j<familyMembersClass.length;j++){
+                        if(familyMembersClass[j].checked){                        
+                            checkFamily.push(true)
+                        }   
+                }  
+                count++;              
+                }            
+            }
+        }
 
         let q = questionClass.length/2
 
@@ -302,7 +305,6 @@ class MedicalDetails_Micro extends Component {
     }
 
     setShowImage = (questionList) => {
-        console.log("aaaaa----Question list=====>",questionList);
        let showImage = questionList && questionList.map(resource=>({
                 //`${resource.id}`:false
                 'question_id':resource.id,
@@ -437,13 +439,7 @@ class MedicalDetails_Micro extends Component {
     }
 
     
-
-    
-
-// console.log("FORM ARRAY----------=====>",famArr)
-    
     const newInitialValues =  Object.assign(initialValues) ;
-    // console.log("SSSSSSSSSSSSSSSSSS==============>",newInitialValues);
         
         return (
             <>
@@ -474,7 +470,6 @@ class MedicalDetails_Micro extends Component {
                            //  validationSchema={validateMedicalDetails}
                             >
                             {({ values, errors, setFieldValue, setFieldTouched, isValid, isSubmitting, touched }) => {
-                               console.log("aaaaaa=====>",values)
                             return (
                             <Form>
                             <Row>
@@ -485,7 +480,7 @@ class MedicalDetails_Micro extends Component {
                             return (
                             questionList.map((question, qIndex) => ( 
                                 
-                            <div className="d-flex justify-content-left">
+                            <div className="d-flex justify-content-left" key={qIndex}>
                                 <div className="m-r-25"><img src={require(`../../../assets/images/${question.logo}`)} alt="" /></div>
                                     <div className="medinfo"><p className="W500 m-r-15">{question.title}</p>
                                         
@@ -503,7 +498,6 @@ class MedicalDetails_Micro extends Component {
                                                         setFieldValue(`question_id_${question.id}`, e.target.value);
                                                         this.handleChangeSubmit(`question_id_${question.id}`,e.target.value)
                                                         //this.setState({ showImg: !this.state.showImg })
-                                                        console.log("HURAAAAAAAA",values[`family_members_${question.id}`]);
                                                         if(qIndex == qlength -1){
                                                             this.showRestriction('y');
                                                         } 
@@ -545,7 +539,7 @@ class MedicalDetails_Micro extends Component {
 
                                     </div>
                                        {
-                                          console.log("HHHHHHHHIIIIIOOOOO==============>",values[`family_members_${question.id}`]) 
+                                        //   console.log("HHHHHHHHIIIIIOOOOO==============>",values[`family_members_${question.id}`]) 
                                        }             
                                     {(values[`question_id_${question.id}`] =='y' && values[`family_members_${question.id}`]) ||(this.state.showImage && this.state.showImage[qIndex].status == true)  ?
                                     <div class="gender">
@@ -566,8 +560,8 @@ class MedicalDetails_Micro extends Component {
                                                 this.setAnswer(e)
                                             }}
                                             />
-                                         {resource.gender == 'm' ? <label for={`family_members.${question.id}.${index}.${resource.relation_with}`}> <img src={require('../../../assets/images/self.svg')} alt=""/>{this.capitalize(resource.relation_with)}</label>:
-                                         <label for={`family_members.${question.id}.${index}.${resource.relation_with}`}><img src={require('../../../assets/images/Spouse.svg')} alt=""/>{this.capitalize(resource.relation_with)}</label>}
+                                         {resource.gender == 'm' ? <label htmlFor={`family_members.${question.id}.${index}.${resource.relation_with}`}> <img src={require('../../../assets/images/self.svg')} alt=""/>{this.capitalize(resource.relation_with)}</label>:
+                                         <label htmlFor={`family_members.${question.id}.${index}.${resource.relation_with}`}><img src={require('../../../assets/images/Spouse.svg')} alt=""/>{this.capitalize(resource.relation_with)}</label>}
                                          </>
                                          :
                                              resource.relation_with == 'spouse'   ?
@@ -584,8 +578,8 @@ class MedicalDetails_Micro extends Component {
                                             }}
                                             />
                                            {resource.gender == 'm' ? 
-                                             <label for={`family_members.${question.id}.${index}.${resource.relation_with}`}> <img src={require('../../../assets/images/self.svg')} alt=""/>{this.capitalize(resource.relation_with)}</label>
-                                             : <label for={`family_members.${question.id}.${index}.${resource.relation_with}`}><img src={require('../../../assets/images/Spouse.svg')} alt=""/>{this.capitalize(resource.relation_with)}</label>}
+                                             <label htmlFor={`family_members.${question.id}.${index}.${resource.relation_with}`}> <img src={require('../../../assets/images/self.svg')} alt=""/>{this.capitalize(resource.relation_with)}</label>
+                                             : <label htmlFor={`family_members.${question.id}.${index}.${resource.relation_with}`}><img src={require('../../../assets/images/Spouse.svg')} alt=""/>{this.capitalize(resource.relation_with)}</label>}
                                             </> :
                                             resource.relation_with == 'child1' || resource.relation_with == 'child2' ||  resource.relation_with == 'child3' ?
                                             <>
@@ -599,7 +593,7 @@ class MedicalDetails_Micro extends Component {
                                                 this.setAnswer(e)
                                             }}
                                             />
-                                             <label for={`family_members.${question.id}.${index}.${resource.relation_with}`}> 
+                                             <label htmlFor={`family_members.${question.id}.${index}.${resource.relation_with}`}> 
                                              {resource.gender == 'm' ? 
                                              <img src={require('../../../assets/images/kids-boy.svg')} alt=""/>
                                              :<img src={require('../../../assets/images/kids-girl.svg')} alt=""/>                                            
@@ -619,7 +613,7 @@ class MedicalDetails_Micro extends Component {
                                                 this.setAnswer(e)
                                             }}
                                             />
-                                             <label for={`family_members.${question.id}.${index}.${resource.relation_with}`}> <img src={require('../../../assets/images/self.svg')} alt=""/>{this.capitalize(resource.relation_with)}</label>
+                                             <label htmlFor={`family_members.${question.id}.${index}.${resource.relation_with}`}> <img src={require('../../../assets/images/self.svg')} alt=""/>{this.capitalize(resource.relation_with)}</label>
                                             </>:
                                             resource.relation_with == 'mother' || resource.relation_with == 'motherInLaw'?
                                             <>
@@ -634,7 +628,7 @@ class MedicalDetails_Micro extends Component {
                                                 this.setAnswer(e)
                                             }}
                                             />
-                                             <label for={`family_members.${question.id}.${index}.${resource.relation_with}`}> <img src={require('../../../assets/images/Spouse.svg')} alt=""/>{this.capitalize(resource.relation_with)}</label>
+                                             <label htmlFor={`family_members.${question.id}.${index}.${resource.relation_with}`}> <img src={require('../../../assets/images/Spouse.svg')} alt=""/>{this.capitalize(resource.relation_with)}</label>
                                             </>:
                                             null                                                                                                                          
                                          

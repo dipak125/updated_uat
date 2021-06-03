@@ -113,14 +113,23 @@ class Vedvag_gateway extends Component {
         else if(productId == 5) {
             this.props.history.push(`/PolicyDetails/${productId}`);
         }
+        else if(productId == 10) {
+            this.props.history.push(`/PolicyDetails_KSB/${productId}`);
+        }
+        else if(productId == 12) {
+            this.props.history.push(`/arogya_PolicyDetails/${productId}`);
+        }
         else if(productId == 13) {
             this.props.history.push(`/AccidentAdditionalPremium/${productId}`);
         }
         else if(productId == 14) {
             this.props.history.push(`/PolicyDetails_GSB/${productId}`);
         }
-        else if(productId == 12) {
-            this.props.history.push(`/arogya_PolicyDetails/${productId}`);
+        else if(productId == 15) {
+            this.props.history.push(`/PremiumOD/${productId}`);
+        }    
+        else if(productId == 16) {
+            this.props.history.push(`/two_wheeler_policy_premium_detailsOD/${productId}`);
         }
         else if(productId == 17) {
             this.props.history.push(`/Premium_GCVST/${productId}`);
@@ -203,7 +212,7 @@ class Vedvag_gateway extends Component {
         const { productId } = this.props.match.params
         let policyHolder_id = this.state.policyHolder_refNo ? this.state.policyHolder_refNo : '0'
         let encryption = new Encryption();
-    
+        this.props.loadingStart();
         axios.get(`policy-holder-additional-details/${policyHolder_id}`)
             .then(res => {
                 let decryptResp = JSON.parse(encryption.decrypt(res.data))

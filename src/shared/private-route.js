@@ -20,7 +20,6 @@ export const PrivateRoute = ({ component: Component, ...rest }) => {
             let encryption = new Encryption();
             user_data = user_data.user
             user_data = JSON.parse(encryption.decrypt(user_data));  
-            console.log("user_data--------BBBB--------- ", user_data)
         }
         return(
             <Route {...rest} render={props => (     
