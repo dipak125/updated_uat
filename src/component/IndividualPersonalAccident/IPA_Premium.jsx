@@ -513,7 +513,7 @@ class IPA_Premium extends Component {
                                                   <Col sm={12} md={6} lg={3}>
                                                     <FormGroup>
                                                       <strong>Rs:</strong>{" "}
-                                                      {Math.round(fulQuoteResp.GrossPremium)}
+                                                      {Math.round(fulQuoteResp.BeforeVatPremium)}
                                                     </FormGroup>
                                                   </Col>
                                                   <Col sm={12} md={6} lg={3}>

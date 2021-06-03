@@ -222,6 +222,37 @@ export const validRegistrationNumber = (value) => {
      return true;
 }
 
+export const registrationNumberFirstBlock = (value) => {
+    var str = /^[a-zA-Z]*$/;
+        if(value && value.match(str) && value.length == 2) {    
+            if (value == 0) {
+                return false;
+            }         
+            else return true;  
+        }
+        else return false;
+}
+export const registrationNumberSecondBlock = (value) => {
+    var str = /^[a-zA-Z0-9]*$/;
+        if(value && value.match(str) && value.length <= 3) {    
+            if (value == 0) {
+                return false;
+            }         
+            else return true;  
+        }
+        else return false;
+}
+export const registrationNumberThirdBlock = (value) => {
+    var str = /^[a-zA-Z0-9]*$/;
+        if(value && value.match(str) && value.length <= 3) {    
+            if (value == 0) {
+                return false;
+            }         
+            else return true;  
+        }
+        else return false;
+}
+
 export const registrationNumberLastBlock = (value) => {
     var str = /^[0-9]*$/;
         if(value && value.match(str)) {    
