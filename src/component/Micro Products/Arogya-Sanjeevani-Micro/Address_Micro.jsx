@@ -1151,7 +1151,7 @@ class Address_Micro extends Component {
                                                     </Col>
                                                 </Row>
 
-                                                <div className="d-flex flex-column flex-sm-column flex-md-column flex-lg-row justify-content-left m-b-40">
+                                            <div className="d-flex flex-column flex-sm-column flex-md-column flex-lg-row justify-content-left m-b-40">
                                                 
                                             <div className="proposr prsres m-r-60"><p>Do you have an eIA number? 
                                             <OverlayTrigger overlay={<Tooltip id="tooltip-disabled">The e-Insurance account or Electronic Insurance Account offers policyholders online space to hold all their insurance policies electronically under one e-insurance account number. This allows the policyholder to access all their policies with a few clicks and no risk of losing the physical insurance policy</Tooltip>}>
@@ -1199,8 +1199,6 @@ class Address_Micro extends Component {
                                                     </label>
                                                 </div>
                                             </div>
-                                            
-                                        
                                         </div>
 
                                        {showEIA || is_eia_account == 1 ?                         
@@ -1212,85 +1210,78 @@ class Address_Micro extends Component {
                                             </OverlayTrigger></p>
                             
                               
-                                                </div>
+                                            </div>
                                             <div className="d-inline-flex">
                                             <FormGroup>
-                                                            <div className="insurerName">
-                                                                <Field
-                                                                    name="eia_account_no"
-                                                                    type="text"
-                                                                    placeholder="EIA NUMBER"
-                                                                    autoComplete="off"
-                                                                    value = {values.eia_account_no}
-                                                                    onFocus={e => this.changePlaceHoldClassAdd(e)}
-                                                                    onBlur={e => this.changePlaceHoldClassRemove(e)}
-                                                                />
-                                                                  {errors.eia_account_no && touched.eia_account_no ? (
-                                                        <span className="errorMsg">{errors.eia_account_no}</span>
-                                                    ) : null}                                             
-                                                            </div>
-                                                        </FormGroup>
+                                                <div className="insurerName">
+                                                    <Field
+                                                        name="eia_account_no"
+                                                        type="text"
+                                                        placeholder="EIA NUMBER"
+                                                        autoComplete="off"
+                                                        value = {values.eia_account_no}
+                                                        onFocus={e => this.changePlaceHoldClassAdd(e)}
+                                                        onBlur={e => this.changePlaceHoldClassRemove(e)}
+                                                    />
+                                                        {errors.eia_account_no && touched.eia_account_no ? (
+                                            <span className="errorMsg">{errors.eia_account_no}</span>
+                                        ) : null}                                             
+                                                </div>
+                                            </FormGroup>
                                             </div>
                                             
                                         
                                         </div>:''}
-										
-										
-										
+											
 										
 							{showEIA==false && is_eia_account == '0' ?
-								<Row>
-                                    <Col sm={12} md={4} lg={4}>
-                                        <FormGroup>
-                                            <div className="insurerName">
-                                                <h4 className="fs-16">{phrases['wish_to_create_EIA_Account']}</h4>
-                                            </div>
-                                        </FormGroup>
-                                    </Col>
-                                    <Col sm={12} md={4} lg={4}>
-                                        <FormGroup>
-                                            <div className="d-inline-flex m-b-35">
-                                                <div className="p-r-25">
-                                                    <label className="customRadio3">
-                                                    <Field
-                                                        type="radio"
-                                                        name='is_eia_account2'                                            
-                                                        value='1'
-                                                        key='1'  
-                                                        onChange={(e) => {
-                                                            setFieldValue(`is_eia_account2`, e.target.value);
-                                                            this.showEIAText2(1);
-                                                        }}
-                                                        checked={values.is_eia_account2 == '1' ? true : false}
-                                                    />
-                                                        <span className="checkmark " /><span className="fs-14"> {phrases['Yes']}</span>
-                                                    </label>
-                                                </div>
+								<div className="d-flex flex-column flex-sm-column flex-md-column flex-lg-row justify-content-left m-b-40">
+                                                
+                                <div className="proposr prsres m-r-60"><p>{phrases['wish_to_create_EIA_Account']}
+                                <OverlayTrigger overlay={<Tooltip id="tooltip-disabled">The e-Insurance account or Electronic Insurance Account offers policyholders online space to hold all their insurance policies electronically under one e-insurance account number. This allows the policyholder to access all their policies with a few clicks and no risk of losing the physical insurance policy</Tooltip>}>
+                                <a href="#" className="infoIcon"><img src={require('../../../assets/images/i.svg')} alt="" /></a>
+                                </OverlayTrigger></p>
+                                </div>
+                                <div className="d-inline-flex">
+                                    <div className="p-r-25">
+                                        <label className="customRadio3">
+                                        <Field
+                                            type="radio"
+                                            name='is_eia_account2'   
+                                            value='1'
+                                            key='1'  
+                                            onChange={(e) => {
+                                                setFieldValue('is_eia_account2', e.target.value);
+                                                this.showEIAText2(1);
+                                            }}
+                                            checked={values.is_eia_account2 == '1' ? true : false}
+                                        />
+                                            <span className="checkmark " /><span className="fs-14"> Yes</span>
+                                        </label>
+                                    </div>
 
-                                                <div className="">
-                                                    <label className="customRadio3">
-                                                        <Field
-                                                        type="radio"
-                                                        name='is_eia_account2'                                            
-                                                        value='0'
-                                                        key='1'  
-                                                        onChange={(e) => {
-                                                            setFieldValue(`is_eia_account2`, e.target.value);
-                                                            this.showEIAText2(0);
-                                                        }}
-                                                        checked={values.is_eia_account2 == '0' ? true : false}
-                                                    />
-                                                        <span className="checkmark" />
-                                                        <span className="fs-14">{phrases['No']}</span>
-                                                        {errors.is_eia_account2 && touched.is_eia_account2 ? (
-                                                        <span className="errorMsg">{phrases[errors.is_eia_account2]}</span>
-														) : null}
-                                                    </label>
-                                                </div>
-                                            </div>
-                                        </FormGroup>
-                                    </Col>							
-								</Row> 
+                                    <div className="">
+                                        <label className="customRadio3">
+                                        <Field
+                                            type="radio"
+                                            name='is_eia_account2'                                               
+                                            value='0'
+                                            key='0'  
+                                            onChange={(e) => {
+                                                setFieldValue('is_eia_account2', e.target.value);
+                                                this.showEIAText2(0);
+                                            }}
+                                            checked={values.is_eia_account2 == '0' ? true : false}
+                                        />
+                                            <span className="checkmark" />
+                                            <span className="fs-14">No</span>
+                                            {errors.name=='is_eia_account2' && touched.name=='is_eia_account2' ? (
+                                            <span className="errorMsg">{errors.name='is_eia_account2' }</span>
+                                        ) : null}
+                                        </label>
+                                    </div>
+                                </div>
+                            </div>
 							: ''}
 
 									

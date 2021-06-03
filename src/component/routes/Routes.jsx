@@ -367,6 +367,35 @@ const SummarySME = Loadable({
     loading: () => loadingContent
 });
 
+// ======================== Sookshma Fire ========================================
+
+const RegistrationSukhsam = Loadable({
+    loader: () => import(/*webpackChunkName: "Products" */"../Sookshma/Registration_sukhsam.jsx"),
+    loading: () => loadingContent
+});
+
+const RiskDetailsSukhsam = Loadable({
+    loader: () => import(/*webpackChunkName: "Products" */"../Sookshma/RiskDetails_sukhsam.jsx"),
+    loading: () => loadingContent
+});
+const OtherDetailsSukhsam = Loadable({
+    loader: () => import(/*webpackChunkName: "Products" */"../Sookshma/OtherDetails_sukhsam.jsx"),
+    loading: () => loadingContent
+});
+const AdditionalDetailsSukhsam = Loadable({
+    loader: () => import(/*webpackChunkName: "Products" */"../Sookshma/AdditionalDetails_sukhsam.jsx"),
+    loading: () => loadingContent
+});
+const PremiumSukhsam = Loadable({
+    loader: () => import(/*webpackChunkName: "Products" */"../Sookshma/Premium_sukhsam.jsx"),
+    loading: () => loadingContent
+});
+
+const SummarySukhsam = Loadable({
+    loader: () => import(/*webpackChunkName: "Products" */"../Sookshma/Summary_sukhsam.jsx"),
+    loading: () => loadingContent
+});
+
 //  =================================== Landing Page ==================================
 
 const Dashboard = Loadable({
@@ -778,12 +807,20 @@ class Routes extends Component {
                         <PrivateRoute exact path="/Premium_GCV_TP/:productId" component={PremiumGCVTP} />
 
                         {/************ SME - Fire ******************/}
-                        <PrivateRoute exact path="/Registration_SME/:productId" component={RegistrationSME} />
+                        {/* <PrivateRoute exact path="/Registration_SME/:productId" component={RegistrationSME} />
                         <PrivateRoute exact path="/RiskDetails/:productId" component={RiskDetails} />
                         <PrivateRoute exact path="/OtherDetails/:productId" component={OtherDetails} />
                         <PrivateRoute exact path="/AdditionalDetails_SME/:productId" component={AdditionalDetailsSME} />
                         <PrivateRoute exact path="/Summary_SME/:productId" component={SummarySME} />  
-                        <PrivateRoute exact path="/Premium_SME/:productId" component={PremiumSME} />  
+                        <PrivateRoute exact path="/Premium_SME/:productId" component={PremiumSME} />   */}
+
+                         {/************ Sookshma - Fire ******************/}
+                         <PrivateRoute exact path="/Registration_Sookshma/:productId" component={RegistrationSukhsam} /> 
+                        <PrivateRoute exact path="/RiskDetails_Sookshma/:productId" component={RiskDetailsSukhsam} />
+                        <PrivateRoute exact path="/OtherDetails_Sookshma/:productId" component={OtherDetailsSukhsam} />
+                        <PrivateRoute exact path="/AdditionalDetails_Sookshma/:productId" component={AdditionalDetailsSukhsam} />
+                        <PrivateRoute exact path="/Summary_Sookshma/:productId" component={SummarySukhsam} />  
+                        <PrivateRoute exact path="/Premium_Sookshma/:productId" component={PremiumSukhsam} />  
 
                         {/************ Support ******************/}
                         <PrivateRoute exact path="/Documents" component={Documents} />

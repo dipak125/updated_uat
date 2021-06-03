@@ -1635,7 +1635,6 @@ setStateForPreviousData=(family_members)=>{
                                                 </div>
 
                                                 <div className="col-md-4 formSection">
-                                                    <label className="formGrp">
                                                     <Field
                                                         name="child1Gender"
                                                         component="select"
@@ -1647,11 +1646,13 @@ setStateForPreviousData=(family_members)=>{
                                                         <option value="m">Male</option>
                                                         <option value="f">Female</option>
                                                     </Field>    
-                                                    </label>
+                                                    
+                                                    <label className="formGrp error">
                                                     {
-                                                            errors.child1Gender && touched.child1Gender ?                 
-                                                            <span className="error-message">{errors.child1Gender}</span>:''
+                                                        errors.child1Gender && touched.child1Gender ?                 
+                                                        <span className="error-message">{errors.child1Gender}</span>:''
                                                     }
+                                                    </label>
                                                 </div>
                                             </div>
 
@@ -1724,7 +1725,6 @@ setStateForPreviousData=(family_members)=>{
                                                 </div>
 
                                                 <div className="col-md-4 formSection">
-                                                    <label className="formGrp">
                                                     <Field
                                                         name="child2Gender"
                                                         component="select"
@@ -1736,11 +1736,13 @@ setStateForPreviousData=(family_members)=>{
                                                         <option value="m">Male</option>
                                                         <option value="f">Female</option>
                                                     </Field>    
-                                                    </label>
+
+                                                    <label className="formGrp error">
                                                     {
-                                                            errors.child2Gender && touched.child2Gender ?                 
-                                                            <span className="error-message">{errors.child2Gender}</span>:''
+                                                        errors.child2Gender && touched.child2Gender ?                 
+                                                        <span className="error-message">{errors.child2Gender}</span>:''
                                                     }
+                                                    </label>
                                                 </div>
                                             </div>  
 
@@ -1811,8 +1813,7 @@ setStateForPreviousData=(family_members)=>{
                                                     </FormGroup>
                                                 </div>
 
-                                                <div className="col-md-4 formSection">
-                                                    <label className="formGrp">
+                                                <div className="col-md-4 formSection">  
                                                     <Field
                                                         name="child3Gender"
                                                         component="select"
@@ -1824,11 +1825,13 @@ setStateForPreviousData=(family_members)=>{
                                                         <option value="m">Male</option>
                                                         <option value="f">Female</option>
                                                     </Field>    
-                                                    </label>
+                                                    
+                                                    <label className="formGrp error">
                                                     {
-                                                            errors.child3Gender && touched.child3Gender ?                 
-                                                            <span className="error-message">{errors.child3Gender}</span>:''
+                                                        errors.child3Gender && touched.child3Gender ?                 
+                                                        <span className="error-message">{errors.child3Gender}</span>:''
                                                     }
+                                                    </label>
                                                 </div>
                                             </div> 
 
@@ -2139,10 +2142,13 @@ setStateForPreviousData=(family_members)=>{
                                                         checked={values.confirm == '1' ? true : false}
                                                     />
                                                         <span className="checkmark mL-0"></span>
+                                                        <label className="formGrp error">
+                                                            {errors.confirm && (touched.looking_for_2 || touched.looking_for_3 || touched.looking_for_4) ? 
+                                                                <span className="error-message">{errors.confirm}</span> : ""
+                                                            }
+                                                        </label>
                                                     </label>
-                                                    {errors.confirm && (touched.looking_for_2 || touched.looking_for_3 || touched.looking_for_4) ? 
-                                                            <span className="error-message">{errors.confirm}</span> : ""
-                                                        }
+                                                   
                                                 </div>
                                             </div> 
                                             : null }

@@ -44,7 +44,8 @@ const initialValues = {
     insureList: "",
     primaryInsured: "self",
     varient_type_id: "3",
-    productTypes: "3"
+    productTypes: "3",
+    ksbplan_id: '1'
 
 }
 
@@ -1136,6 +1137,7 @@ class InformationYourself_KSB_Micro extends Component {
             }
         })
         .catch(err => {
+            console.log("err.data---------- ", err.data)
         if(err && err.data){
             swal('Family Member fields are required...');
         }
@@ -1415,7 +1417,7 @@ setStateForPreviousData=(family_members)=>{
             primaryInsured: ksbinfo && ksbinfo.primary_insured ? ksbinfo.primary_insured : "self",
             // productTypes: productTypes,
             confirm: localStorage.getItem("confirm") ? localStorage.getItem("confirm") : "",
-            ksbplan_id: ksbinfo && ksbinfo.ksbplan_id ? ksbinfo.ksbplan_id : "",
+            ksbplan_id: ksbinfo && ksbinfo.ksbplan_id ? ksbinfo.ksbplan_id : "1",
             // ksbbusniessplan_id: ksbinfo ? ksbinfo.ksbbusniessplan_id : "",
             // insurrepostry_id: ksbinfo ? ksbinfo.insurrepostry_id : "",
         });
@@ -1429,12 +1431,11 @@ setStateForPreviousData=(family_members)=>{
                         <div className="row">
 						
                            <aside className="left-sidebar">
- <div className="scroll-sidebar ps-container ps-theme-default ps-active-y">
-<SideNav />
- </div>
-</aside>
-							
-							
+                            <div className="scroll-sidebar ps-container ps-theme-default ps-active-y">
+                            <SideNav />
+                            </div>
+                            </aside>
+   	
                             <div className="col-sm-12 col-md-12 col-lg-12 col-xl-12 infobox healthkas">
                                 <h4 className="text-center mt-3 mb-3">SBI General Insurance Company Limited</h4>
                                 <section className="brand">
@@ -1527,6 +1528,7 @@ setStateForPreviousData=(family_members)=>{
                                                 autoComplete="off"
                                                 value={values.ksbplan_id}
                                                 className="formGrp"
+                                                disabled={true}
                                                 onChange={(e) => {
                                                     setFieldValue('ksbplan_id', e.target.value);
                                                 }}

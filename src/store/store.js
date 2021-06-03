@@ -7,6 +7,7 @@ import Loader from "./reducers/loader";
 import ProcessData from "./reducers/data";
 import Sme from "./reducers/sme_fire";
 import Toggle from "./reducers/toggle";
+import Sukhsam from "./reducers/sukhsam";
 
 // const composeEnhancers = window.__REDUX_DEVTOOLS_EXTENSION_COMPOSE__ || compose;
 const composeEnhancers = compose;
@@ -17,7 +18,8 @@ const rootReducer = combineReducers(
         loader: Loader,
         processData: ProcessData,
         sme_fire:Sme,
-        toggle:Toggle
+        toggle:Toggle,
+        sukhsam:Sukhsam,
     }
 )
 
