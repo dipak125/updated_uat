@@ -1218,17 +1218,24 @@ console.log("values------------ ", values)
                                                                             else setFieldValue("previous_end_date", "");
                                                                                                
                                                                         }
-                                                                        else if( values.previous_start_date){
-                                                                            var date = new Date(values.previous_start_date)
-                                                                            var tempDate = ""
-                                                                            date = date.setFullYear(date.getFullYear() + 1);
-                                                                            var date2 = new Date(date)
-                                                                            date2 = date2.setDate(date2.getDate() - 1);
-                                                                            tempDate = moment(date2).add(1,'day').format('YYYY-MM-DD')
-                                                                            setFieldValue("previous_policy_name", e.target.value);
-                                                                            setFieldValue("previous_end_date", new Date(date2));
-                                                                            setFieldValue("new_policy_start_date", new Date(tempDate)); 
+                                                                        else {
+                                                                            setFieldValue("previous_start_date", "");   
+                                                                            setFieldValue("previous_end_date", "");                 
+                                                                            setFieldValue("new_policy_start_date", ""); 
+                                                                            setFieldValue("new_policy_end_date", ""); 
                                                                         }
+                                                                        // else if( values.previous_start_date && e.target.value != '3'){
+                                                                        //     var date = new Date(values.previous_start_date)
+                                                                        //     var tempDate = ""
+                                                                        //     date = date.setFullYear(date.getFullYear() + 1);
+                                                                        //     var date2 = new Date(date)
+                                                                        //     date2 = date2.setDate(date2.getDate() - 1);
+                                                                        //     tempDate = moment(date2).add(1,'day').format('YYYY-MM-DD')
+                                                                        //     setFieldValue("previous_policy_name", e.target.value);
+                                                                        //     setFieldValue("previous_start_date", "");                
+                                                                        //     setFieldValue("previous_end_date", new Date(date2));
+                                                                        //     setFieldValue("new_policy_start_date", new Date(tempDate)); 
+                                                                        // }
                                                                         setFieldValue("previous_policy_name", e.target.value);
                                                                     }}
                                                                     // value={ageObj.whatIsCurrentMonth(values.registration_date) < 7 ? 6 : values.previous_policy_name}

@@ -18,6 +18,7 @@ import queryString from 'query-string';
 import swal from 'sweetalert';
 import axios from "../../../shared/axios";
 
+
 const initialValues = {
     userId: "",
     password: "",
@@ -253,15 +254,17 @@ class LogIn extends Component {
                                 .bind(this),
                                 300
                             );
-                            // this.props.history.push('/Dashboard');
                         }                     
                     },
                     (err) => {
                         this.props.loadingStop();
                         if (err.data) {    
                             this.setState({ errMsg: err.data.error });
+                            if(err.status == '401'){
+                                this.props.history.push(`/Logout?errMsg=${err.data.error}`);
+                            }                    
                         } else {
-                            // console.log(err.data);
+                            // this.props.history.push('/Logout');
                         }
                     }
                 );
@@ -273,7 +276,7 @@ class LogIn extends Component {
 
     render() {
         //console.log('state', this.state);
-        const { email, pass, rememberMe, broker_id } = this.state;
+        const { email, pass, rememberMe, broker_id, errMsg } = this.state;
 
         const newInitialValues = Object.assign(initialValues, {
             userId: email ? email : '',
@@ -296,10 +299,10 @@ class LogIn extends Component {
                             {({ values, errors, isValid, touched, isSubmitting,setFieldValue, setFieldTouched, }) => {
                                 return (
                                     <Form>
-                                        {this.state.errMsg ? (
+                                        {errMsg ? (
                                             <Row className="show-grid">
                                                 <Col md={12}>
-                                                    <div className="errorMsg">{this.state.errMsg}</div>
+                                                    <div className="errorMsg">{errMsg}</div>
                                                 </Col>
                                             </Row>
                                         ) : null}

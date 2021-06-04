@@ -413,7 +413,7 @@ regnoFormat = (e, setFieldTouched, setFieldValue) => {
                                                                 <span className="checkmark " /><span className="fs-14"> {phrases['Individual']}</span>
                                                             </label>
                                                         </div>
-                                                        <div className="p-r-25">
+                                                        {/* <div className="p-r-25">
                                                             <label className="customRadio3">
                                                                 <Field
                                                                     type="radio"
@@ -433,7 +433,7 @@ regnoFormat = (e, setFieldTouched, setFieldValue) => {
                                                             {errors.policy_for && touched.policy_for ? (
                                                                 <span className="errorMsg">{phrases[errors.policy_for]}</span>
                                                             ) : null}
-                                                        </div>
+                                                        </div> */}
                                                     </div>
                                                 </div>
                                             </div>

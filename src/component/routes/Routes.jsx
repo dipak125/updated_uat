@@ -634,7 +634,14 @@ const VedvagGateway = Loadable({
 const SahipayGateway = Loadable({
     loader: () => import(/*webpackChunkName: "Products" */"../common/Sahipay_gateway.jsx"),
     loading: () => loadingContent
-});
+}); 
+
+//  ************ Transcrop Payment Gateway ******************
+
+const TranscropGateway = Loadable({
+    loader: () => import(/*webpackChunkName: "Products" */"../common/Transcrop_gateway.jsx"),
+    loading: () => loadingContent
+}); 
 
 
 //  ************ Renewal ******************
@@ -880,6 +887,9 @@ class Routes extends Component {
 
                         {/************ Sahipay Payment Gateway ******************/}
                         <PrivateRoute exact path="/Sahipay_gateway/:productId" component={SahipayGateway} />
+                        
+                        {/************ Trabscrop Payment Gateway ******************/}
+                        <PrivateRoute exact path="/Transcrop_gateway/:productId" component={TranscropGateway} />
 
 
                         <PrivateRoute exact path="/UnderMaintenance" component={UnderMaintenance} />

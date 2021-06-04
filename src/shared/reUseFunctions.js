@@ -89,6 +89,9 @@ export const paymentGateways = (values,policyHolder,refNumber, productId) => {
                 if(values.slug == "sahi_wallet") {
                     window.location.href = `#/Sahipay_gateway/${productId}?access_id=${refNumber}` 
                 }
+                if(values.slug == "transcrop_wallet") {
+                    window.location.href = `#/Transcrop_gateway/${productId}?access_id=${refNumber}` 
+                }
                 
             }
             else {
@@ -106,6 +109,9 @@ export const paymentGateways = (values,policyHolder,refNumber, productId) => {
                 }
                 if(values.slug == "sahi_wallet") {
                     window.location.href = `#/Sahipay_gateway/${productId}?access_id=${refNumber}` 
+                }
+                if(values.slug == "transcrop_wallet") {
+                    window.location.href = `#/Transcrop_gateway/${productId}?access_id=${refNumber}` 
                 }
             }
         }

@@ -1,8 +1,10 @@
 import React, { Component } from 'react';
 import HeaderTop from '../common/header/header-top/HeaderTop';
+import queryString from 'query-string';
 
 class Logout extends Component {
     render() {
+        const errMsg = queryString.parse(this.props.location.search).errMsg
         return (
             <>
                  <HeaderTop flag = "logout" />
@@ -11,7 +13,7 @@ class Logout extends Component {
                             <div className="col-sm-12 col-md-12 col-lg-12 col-xl-12 pd-l-0">
                                 <div className="error404">
                                     <h3>Sorry!</h3>
-                                    <h4>You have been logged out</h4>
+                                    <h4>{errMsg ? errMsg : 'You have been logged out'}</h4>
                                     {/* <p>Sorry, but the page you are looking for is not found. Please, make sure you have typed the currect URL.</p> */}
                                     <p>Please login to continue.</p>
                                 </div>

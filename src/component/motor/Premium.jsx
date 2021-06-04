@@ -752,6 +752,7 @@ sendPaymentLink = () => {
                                                                      { paymentgateway && paymentgateway.length > 0 ? paymentgateway.map((gateways,index) =>
                                                                         gateways.hasOwnProperty('paymentgateway') && gateways.paymentgateway ? 
                                                                         <div>
+                                                                            {console.log("gateways--------------- ", gateways)}
                                                                             <label className="customRadio3">
                                                                             <Field
                                                                                 type="radio"
@@ -766,9 +767,9 @@ sendPaymentLink = () => {
                                                                             />
                                                                                 <span className="checkmark " /><span className="fs-14"> 
                                                                             
-                                                                                    { gateways.paymentgateway.logo ? <img src={require('../../assets/images/'+ gateways.paymentgateway.logo)} alt="" /> :
+                                                                                    {/* { gateways.paymentgateway.logo ? <img src={require('../../assets/images/'+ gateways.paymentgateway.logo)} alt="" /> :
                                                                                     null
-                                                                                    }
+                                                                                    } */}
                                                                                 </span>
                                                                             </label>
                                                                         </div> : null
