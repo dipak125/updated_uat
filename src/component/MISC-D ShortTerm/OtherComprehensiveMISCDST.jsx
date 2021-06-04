@@ -1593,7 +1593,7 @@ class OtherComprehensiveMISCD extends Component {
                                                                     <Collapsible trigger={phrases['DefaultCovered']} open={true}>
                                                                         <div className="listrghtsideTrigr">
                                                                             {policyCoverageList}
-                                                                            {/* {ncbStr} */}
+                                                                            {ncbStr}
                                                                             {policyCoveragIMT}
                                                                         </div>
                                                                     </Collapsible>
@@ -2604,7 +2604,7 @@ class OtherComprehensiveMISCD extends Component {
                             </thead>
                             <tbody>
                                 {premiumBreakup}
-                                {/* {ncbBreakup} */}
+                                {ncbBreakup}
                                 {premiumBreakupIMT}
 
                                 <tr>

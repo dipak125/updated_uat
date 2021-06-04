@@ -142,7 +142,9 @@ const ownerValidation = Yup.object().shape({
         }).matches(/^[A-Z]{3}[CPHFATBLJG]{1}[A-Z]{1}[0-9]{4}[A-Z]{1}$/, function() {
             return "ValidPan"
         }),
-        otherwise: Yup.string()
+        otherwise: Yup.string().matches(/^[A-Z]{3}[CPHFATBLJG]{1}[A-Z]{1}[0-9]{4}[A-Z]{1}$/, function() {
+            return "ValidPan"
+        })
     }), 
     
     pincode_id:Yup.string().required('LocationRequired'),
@@ -371,7 +373,7 @@ const ownerValidation = Yup.object().shape({
             return true;
         }
     ).matches(/^[A-Za-z][A-Za-z\s]*$/, function() {
-        return "Invalid Bank Name"
+        return "EnterValidBank"
     }),
     bank_branch: Yup.string().notRequired()
     .test(
@@ -386,7 +388,7 @@ const ownerValidation = Yup.object().shape({
             return true;
         }
     ).matches(/^[A-Za-z][A-Za-z\s]*$/, function() {
-        return "Invalid Bank Branch"
+        return "EnterValidBankBranch"
     }),
 	
 	is_eia_account2: Yup.string().when(['is_eia_account'], {

@@ -315,7 +315,7 @@ const vehicleRegistrationValidation = Yup.object().shape({
             return "PleaseEPCB"
         },
         function (value) {
-            if (this.parent.previous_is_claim == '0' && this.parent.valid_previous_policy == '1' && Math.floor(moment().diff(this.parent.previous_end_date, 'days', true)) <= 90 && this.parent.previous_policy_name == '1' && (!value || value == '1')) {   
+            if (this.parent.previous_is_claim == '0' && this.parent.valid_previous_policy == '1' && Math.floor(moment().diff(this.parent.previous_end_date, 'days', true)) <= 90 && (this.parent.previous_policy_name == '1' || this.parent.previous_policy_name == '3') && (!value || value == '1')) {   
                 return false;    
             }
             return true;
@@ -819,7 +819,7 @@ class VehicleDetailsGCV extends Component {
                             >
                                 <option value="">{phrases['SelectYear']}</option>
                                 <option value= {pol_start_date}>{pol_start_date}</option>
-                                <option value= {pol_end_date}>{pol_end_date}</option>
+                                {pol_start_date != pol_end_date ? <option value= {pol_end_date}>{pol_end_date}</option> : null}
                             </Field>
 
                             {errors.claim_array && errors.claim_array[i] && errors.claim_array[i].claim_year ? (
@@ -932,15 +932,11 @@ class VehicleDetailsGCV extends Component {
                 <div className="row">
 				
 				<aside className="left-sidebar">
-		 				 <div className="scroll-sidebar ps-container ps-theme-default ps-active-y">
-						 <SideNav />
-						</div>
-						</aside>
-								
-					 {/*<div className="col-sm-12 col-md-12 col-lg-2 col-xl-2 pd-l-0">        
-						<SideNav />
-             		 </div>*/}
-					
+                    <div className="scroll-sidebar ps-container ps-theme-default ps-active-y">
+                    <SideNav />
+                    </div>
+                </aside>
+
 					
                 <div className="col-sm-12 col-md-12 col-lg-12 col-xl-12 infobox vehiGcv">
                 <h4 className="text-center mt-3 mb-3">{phrases['SBIGICL']}</h4>
@@ -957,7 +953,7 @@ class VehicleDetailsGCV extends Component {
                             onSubmit={this.handleSubmit} 
                             validationSchema={vehicleRegistrationValidation}>
                             {({ values, errors, setFieldValue, setFieldTouched, isValid, isSubmitting, touched }) => {
-console.log("values------------ ", values)
+// console.log("values------------ ", values)
 // console.log("errors------------ ", errors)
                                 return (
                                     <Form enableReinitialize = {true}>

@@ -20,7 +20,8 @@ const initialValues = {
     reg_number_part_two: '',
     reg_number_part_three: '',
     reg_number_part_four: '',
-    check_registration: 2
+    check_registration: 2,
+    policy_for: '1'
 }
 
 const vehicleRegistrationValidation = Yup.object().shape({
@@ -375,7 +376,7 @@ regnoFormat = (e, setFieldTouched, setFieldValue) => {
             reg_number_part_four: tempRegNo && tempRegNo.reg_number_part_four,
             regNumber: motorInsurance && motorInsurance.registration_no ? motorInsurance.registration_no : "",
             policy_type: "2",
-            policy_for: motorInsurance && motorInsurance.policy_for ? motorInsurance.policy_for : "",
+            policy_for: '1',
             subclass_id : motorInsurance && motorInsurance.subclass_id ? motorInsurance.subclass_id : "",
 	        check_registration: motorInsurance && motorInsurance.registration_no == "NEW"? '1' : '2',
         })
@@ -431,7 +432,7 @@ regnoFormat = (e, setFieldTouched, setFieldValue) => {
                                                                 <span className="checkmark " /><span className="fs-14"> {phrases['Individual']}</span>
                                                             </label>
                                                         </div>
-                                                        <div className="p-r-25">
+                                                        {/* <div className="p-r-25">
                                                             <label className="customRadio3">
                                                                 <Field
                                                                     type="radio"
@@ -451,7 +452,7 @@ regnoFormat = (e, setFieldTouched, setFieldValue) => {
                                                             {errors.policy_for && touched.policy_for ? (
                                                                 <span className="errorMsg">{phrases[errors.policy_for]}</span>
                                                             ) : null}
-                                                        </div>
+                                                        </div> */}
                                                     </div>
                                                 </div>
                                             </div>

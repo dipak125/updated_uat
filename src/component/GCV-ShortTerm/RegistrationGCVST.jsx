@@ -20,7 +20,8 @@ const initialValues = {
     reg_number_part_two: '',
     reg_number_part_three: '',
     reg_number_part_four: '',
-    check_registration: 2
+    check_registration: 2,
+    policy_for: '1'
 }
 
 const vehicleRegistrationValidation = Yup.object().shape({
@@ -360,7 +361,7 @@ regnoFormat = (e, setFieldTouched, setFieldValue) => {
             reg_number_part_four: tempRegNo && tempRegNo.reg_number_part_four,
             regNumber: motorInsurance && motorInsurance.registration_no ? motorInsurance.registration_no : "",
             policy_type:'2',
-            policy_for: motorInsurance && motorInsurance.policy_for ? motorInsurance.policy_for : "",
+            policy_for: '1',
             subclass_id : motorInsurance && motorInsurance.subclass_id ? motorInsurance.subclass_id : "",
         })
         let phrases = localStorage.getItem("phrases") ? JSON.parse(localStorage.getItem("phrases")) : null

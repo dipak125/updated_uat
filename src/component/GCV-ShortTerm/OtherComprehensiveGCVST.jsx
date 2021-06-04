@@ -1657,7 +1657,7 @@ class OtherComprehensiveGCV extends Component {
                                                                     <Collapsible trigger={phrases['DefaultCovered']} open={true}>
                                                                         <div className="listrghtsideTrigr">
                                                                             {policyCoverageList}
-                                                                            {/* {ncbStr} */}
+                                                                            {ncbStr}
                                                                             {policyCoveragIMT}
                                                                         </div>
                                                                     </Collapsible>

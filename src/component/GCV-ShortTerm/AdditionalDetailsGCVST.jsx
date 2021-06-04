@@ -140,7 +140,9 @@ const ownerValidation = Yup.object().shape({
         }).matches(/^[A-Z]{3}[CPHFATBLJG]{1}[A-Z]{1}[0-9]{4}[A-Z]{1}$/, function() {
             return "ValidPan"
         }),
-        otherwise: Yup.string()
+        otherwise: Yup.string().matches(/^[A-Z]{3}[CPHFATBLJG]{1}[A-Z]{1}[0-9]{4}[A-Z]{1}$/, function() {
+            return "ValidPan"
+        })
     }), 
     
     pincode_id:Yup.string().required('LocationRequired'),
@@ -369,7 +371,7 @@ const ownerValidation = Yup.object().shape({
             return true;
         }
     ).matches(/^[A-Za-z][A-Za-z\s]*$/, function() {
-        return "Invalid Bank Name"
+        return "EnterValidBank"
     }),
     bank_branch: Yup.string().notRequired()
     .test(
@@ -384,7 +386,7 @@ const ownerValidation = Yup.object().shape({
             return true;
         }
     ).matches(/^[A-Za-z][A-Za-z\s]*$/, function() {
-        return "Invalid Bank Branch"
+        return "EnterValidBankBranch"
     }),
 	
 	is_eia_account2: Yup.string().when(['is_eia_account'], {
@@ -794,9 +796,7 @@ class AdditionalDetailsGCV extends Component {
             pa_flag: motorInsurance && motorInsurance.pa_flag ? motorInsurance.pa_flag : "",
             net_premium: request_data && request_data.net_premium ? request_data.net_premium : "0",
             salutation_id: policyHolder && policyHolder.salutation_id ? policyHolder.salutation_id : "",         
-            nominee_salutation: nomineeDetails && nomineeDetails.gender ? nomineeDetails.title_id : "",
-			
-						
+            nominee_salutation: nomineeDetails && nomineeDetails.gender ? nomineeDetails.title_id : "",			
 			tpaInsurance: policyHolder && policyHolder.T_Insurance_Repository_id ? policyHolder.T_Insurance_Repository_id : "",
         });
 
