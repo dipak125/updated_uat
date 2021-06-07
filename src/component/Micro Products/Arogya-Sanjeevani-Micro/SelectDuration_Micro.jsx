@@ -28,7 +28,7 @@ import Encryption from '../../../shared/payload-encryption';
 const initialValues = {
 polStartDate: "",
 polEndDate: "",
-insureValue: "5"    
+insureValue: ""    
 }
 
 const today = moment().add(30, 'days');;
@@ -132,12 +132,12 @@ class SelectDuration_Micro extends Component {
         let policy_holder_id = localStorage.getItem('policyHolder_id') ? localStorage.getItem('policyHolder_id') : 0
 
         if((serverResponse.HighestFamilySI > 250000) && familyMembers.length > "1"  ) {
-            swal("Quote cannot proceed with IDV greater than 250000")
+            swal("Quote cannot proceed with SI greater than 250000")
             this.props.loadingStop();
             return false
         }
         else if((serverResponse.HighestFamilySI > 100000) && familyMembers.length == "1"  ) {
-            swal("Quote cannot proceed with IDV greater than 100000")
+            swal("Quote cannot proceed with SI greater than 100000”")
             this.props.loadingStop();
             return false
         }
@@ -218,7 +218,7 @@ class SelectDuration_Micro extends Component {
       }
 
     quote = (value) => {
-      const {accessToken} = this.state
+      const {accessToken, familyMembers} = this.state
       if(accessToken)
       {   
         let si = '';
@@ -251,7 +251,7 @@ class SelectDuration_Micro extends Component {
                 si = '9';
                 break;
             default:
-                si = '5';
+                si = familyMembers.length > "1" ? '3' : '1';
         }
 
         let polStartDate = moment(value.polStartDate).format("YYYY-MM-DD");
@@ -271,6 +271,7 @@ class SelectDuration_Micro extends Component {
         'access_token':accessToken
     }
         let encryption = new Encryption();
+        console.log("post_data fullQuote--------- ", post_data)
         formData.append('enc_data',encryption.encrypt(JSON.stringify(post_data)))
         axios
           .post(`/quickQuoteService`, formData)
@@ -325,7 +326,7 @@ class SelectDuration_Micro extends Component {
 
     render() {
         const {productId} = this.props.match.params
-        const {policyHolderDetails, serverResponse, error, EndDate, endDateFlag} = this.state
+        const {policyHolderDetails, serverResponse, error, EndDate, endDateFlag,familyMembers} = this.state
         const request_data = policyHolderDetails ? policyHolderDetails.request_data:null;
         let start_date = request_data && request_data.start_date ? new Date(request_data.start_date): '';
 
@@ -339,7 +340,7 @@ class SelectDuration_Micro extends Component {
             polStartDate: start_date ? start_date : new Date,
             polEndDate: end_date  ? end_date : new Date(moment().add(1, 'years').format("YYYY-MM-DD")),
             // insureValue: policyHolderDetails && policyHolderDetails.request_data && policyHolderDetails.request_data.sum_insured ? Math.floor(policyHolderDetails.request_data.sum_insured) : initialValues.insureValue
-            insureValue: policyHolderDetails && policyHolderDetails.request_data && policyHolderDetails.request_data.sum_insured ? sum_assured[policyHolderDetails.request_data.sum_insured] : initialValues.insureValue
+            insureValue: policyHolderDetails && policyHolderDetails.request_data && policyHolderDetails.request_data.sum_insured ? sum_assured[policyHolderDetails.request_data.sum_insured] : (familyMembers.length > "1" ? '3' : '1')
         })
 
         // const errMsg =  error && error.messages && error.messages.length > 0 ? error.messages.map((msg, qIndex)=>{  
@@ -462,11 +463,6 @@ class SelectDuration_Micro extends Component {
                                                                     <option value="2" >150 000</option>
                                                                     <option value="3" >200 000</option>
                                                                     <option value="4" >250 000</option>
-                                                                    <option value="5" >300 000</option>
-                                                                    <option value="6" >350 000</option>
-                                                                    <option value="7" >400 000</option>
-                                                                    <option value="8" >450 000</option>
-                                                                    <option value="9" >500 000</option>
                                                                 </Field>    
                                                                 {errors.insureValue && touched.insureValue ? (
                                                                 <span className="errorMsg">{errors.insureValue}</span>

@@ -2642,7 +2642,7 @@ class OtherComprehensiveGCV extends Component {
                             </thead>
                             <tbody>
                                 {premiumBreakup}
-                                {/* {ncbBreakup} */}
+                                {ncbBreakup}
                                 {premiumBreakupIMT}
 
                                 <tr>

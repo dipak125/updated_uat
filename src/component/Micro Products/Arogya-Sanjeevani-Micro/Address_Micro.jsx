@@ -68,13 +68,13 @@ const validateAddress =  Yup.object().shape({
     address2: Yup.string()
         .required(function() {
             return "Enter building name / number"
-        }).matches(/^([0-9A-Za-z\s]*)$/, function() {
+        }).matches(/^[a-zA-z0-9]+([\s][a-zA-Z0-9]+)*$/, function() {
             return "Invalid building name / number"
         }),
     address3: Yup.string()
         .required(function() {
             return "Enter street name"
-        }).matches(/^([A-Za-z\s]*)$/, function() {
+        }).matches(/^[a-zA-z]+([\s][a-zA-Z]+)*$/, function() {
             return "Invalid street name"
         }),
     email:Yup.string().email().required('Email is required').min(8, function() {
@@ -178,16 +178,11 @@ const validateAddress =  Yup.object().shape({
     ),
     eia_account_no:Yup.string().when(['eIA'], {
         is: eIA => eIA == 1,
-        then: Yup.string().required('Please select the EIA account number')
-        .min(13, function() {
-            return "EIA number should be minimum 13 digits"
-        })
-        .max(13, function() {
-            return "EIA number should be maximum 13 digits"
-        }).matches(/^[1245]{1}[0-9]{12}$/, function() {
-            return "Invalid number"
+        then: Yup.string().required('Please enter EIA account number')
+        .matches(/^[1245]{1}[0-9]{12}$/, function() {
+            return "Enter valid EIA number"
         }),
-        othewise: Yup.string()
+        otherwise: Yup.string()
     }),
     proposerName: Yup.string(function() {
         return "Please enter proposer name"

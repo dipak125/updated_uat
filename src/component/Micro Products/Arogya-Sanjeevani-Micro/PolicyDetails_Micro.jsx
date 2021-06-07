@@ -95,6 +95,7 @@ class PolicyDetails_Micro extends Component {
       .then((res) => {
         let bcMaster = res.data.data.policyHolder ? res.data.data.policyHolder.bcmaster : {};
         let menumaster = res.data.data.policyHolder ? res.data.data.policyHolder.menumaster : {};
+        let vehicleDetails = res.data.data.policyHolder ? res.data.data.policyHolder.vehiclebrandmodel : {};
         let request_data = res.data.data.policyHolder && res.data.data.policyHolder.request_data ? res.data.data.policyHolder.request_data : {};
         let paymentgateway = res.data.data.policyHolder && res.data.data.policyHolder.bcmaster && res.data.data.policyHolder.bcmaster.bcpayment
 
@@ -103,7 +104,8 @@ class PolicyDetails_Micro extends Component {
           familyMember: res.data.data.policyHolder.request_data.family_members,
           refNumber: res.data.data.policyHolder.reference_no,
           paymentStatus: res.data.data.policyHolder.payment ? res.data.data.policyHolder.payment[0] : [],
-          bcMaster,  menumaster, request_data,paymentgateway
+          nomineeDetails: res.data.data.policyHolder ? res.data.data.policyHolder.request_data.nominee[0]:[],
+          bcMaster,  menumaster, request_data,paymentgateway, vehicleDetails
 
         });
         this.getAccessToken(
@@ -156,13 +158,15 @@ class PolicyDetails_Micro extends Component {
         let bcMaster = res.data.data.policyHolder ? res.data.data.policyHolder.bcmaster : {};
         let request_data = res.data.data.policyHolder && res.data.data.policyHolder.request_data ? res.data.data.policyHolder.request_data : {};
         let menumaster = res.data.data.policyHolder ? res.data.data.policyHolder.menumaster : {};
+        let vehicleDetails = res.data.data.policyHolder ? res.data.data.policyHolder.vehiclebrandmodel : {};
         let paymentgateway = res.data.data.policyHolder && res.data.data.policyHolder.bcmaster && res.data.data.policyHolder.bcmaster.bcpayment
         this.setState({
           policyHolderDetails: res.data.data.policyHolder ? res.data.data.policyHolder : [],
           familyMember: res.data.data.policyHolder.request_data.family_members,
           refNumber: res.data.data.policyHolder.reference_no,
           paymentStatus: res.data.data.policyHolder.payment ? res.data.data.policyHolder.payment[0] : [],
-          bcMaster,request_data,menumaster,paymentgateway
+          nomineeDetails: res.data.data.policyHolder ? res.data.data.policyHolder.request_data.nominee[0]:[],
+          bcMaster,request_data,menumaster,paymentgateway, vehicleDetails
         });
         this.getAccessToken(
           res.data.data.policyHolder,
@@ -190,10 +194,7 @@ class PolicyDetails_Micro extends Component {
     const formData = new FormData();
     let encryption = new Encryption();
 
-    //formData.append("id", id);
-    //formData.append("insureValue", insureValue);
-    //formData.append("access_token", access_token);
-   const post_data = {
+    const post_data = {
       "id":id,
       "insureValue":insureValue,
       "access_token":access_token
@@ -201,7 +202,7 @@ class PolicyDetails_Micro extends Component {
     formData.append('enc_data',encryption.encrypt(JSON.stringify(post_data)))    
 
     axios
-      .post(`/fullQuoteServiceArogyaSeries`, formData)
+      .post(`/fullQuoteServiceArogyaSeriesMicro`, formData)
       .then((res) => {
         if (res.data.PolicyObject && res.data.UnderwritingResult && res.data.UnderwritingResult.Status == "Success") {
           this.setState({
@@ -270,7 +271,7 @@ class PolicyDetails_Micro extends Component {
   render() {
     const { productId } = this.props.match.params;
     const { fulQuoteResp, error, serverResponse, policyHolderDetails, refNumber, paymentStatus, bcMaster, 
-      paymentgateway, menumaster, request_data } = this.state;
+      paymentgateway, nomineeDetails, request_data , vehicleDetails} = this.state;
 
     const items =
       fulQuoteResp &&
@@ -295,7 +296,7 @@ class PolicyDetails_Micro extends Component {
                       <FormGroup>Date Of Birth:</FormGroup>
                     </Col>
                     <Col sm={12} md={6}>
-                      <FormGroup>{member.DateOfBirth}</FormGroup>
+                      <FormGroup>{member.DateOfBirth ?  moment(member.DateOfBirth).format("DD-MM-YYYY") : null}</FormGroup>
                     </Col>
                   </Row>
 
@@ -328,6 +329,83 @@ class PolicyDetails_Micro extends Component {
             );
           })
         : null;
+
+        const nomineeData = 
+        <div>
+          <Row>
+              <Col sm={12} md={12}>
+                  <Row>
+                      <Col sm={12} md={6}>
+                          <FormGroup>Name:</FormGroup>
+                      </Col>
+                      <Col sm={12} md={6}>
+                          <FormGroup>{nomineeDetails ? nomineeDetails.first_name+" "+nomineeDetails.last_name : null}</FormGroup>
+                      </Col>
+                  </Row>
+  
+                  <Row>
+                      <Col sm={12} md={6}>
+                          <FormGroup>Date Of Birth:</FormGroup>
+                      </Col>
+                      <Col sm={12} md={6}>
+                          <FormGroup>{ nomineeDetails ? moment(nomineeDetails.dob).format("DD-MM-YYYY") : null}</FormGroup>
+                      </Col>
+                  </Row>
+  
+                  <Row>
+                      <Col sm={12} md={6}>
+                          <FormGroup>Relation With Proposer:</FormGroup>
+                      </Col>
+                      <Col sm={12} md={6}>
+                          <FormGroup>{nomineeDetails ? relationArr[nomineeDetails.relation_with] : []}</FormGroup> 
+                      </Col>
+                  </Row>
+  
+                  <Row>
+                      <Col sm={12} md={6}>
+                          <FormGroup>Gender</FormGroup>
+                      </Col>
+                      <Col sm={12} md={6}>
+                          <FormGroup>{nomineeDetails && nomineeDetails.gender == "m" ? "Male" : "Female"}</FormGroup>
+                      </Col>
+                  </Row>
+              </Col>
+          </Row>
+          <Row>
+              <p></p>
+          </Row>
+        </div>
+  
+  
+      const apointeeData = 
+      <div>
+        <Row>
+            <Col sm={12} md={12}>
+                <Row>
+                    <Col sm={12} md={6}>
+                        <FormGroup>Name:</FormGroup>
+                    </Col>
+                    <Col sm={12} md={6}>
+                        <FormGroup>{nomineeDetails && nomineeDetails.appointee_name ? nomineeDetails.appointee_name : null}</FormGroup>
+                    </Col>
+                </Row>
+  
+                <Row>
+                    <Col sm={12} md={6}>
+                        <FormGroup>Relation With Nominee:</FormGroup>
+                    </Col>
+                    <Col sm={12} md={6}>
+                    <FormGroup>{nomineeDetails ? relationArr[nomineeDetails.appointee_relation_with] : []}</FormGroup>
+                    </Col>
+                </Row>
+            </Col>
+        </Row>
+        <Row>
+            <p></p>
+        </Row>
+      </div>
+  
+  
 
     const errMsg =
       error && error.message ? (
@@ -417,7 +495,7 @@ class PolicyDetails_Micro extends Component {
                                                   </Col>
                                                  <Col sm={12} md={6} lg={3}>
                                                     <FormGroup>
-                                                      {menumaster && menumaster.name ? menumaster.name : null}
+                                                    {vehicleDetails && vehicleDetails.vehicletype ? vehicleDetails.vehicletype.description : null}
                                                     </FormGroup>
                                                   </Col>
                                                 </Row>
@@ -425,7 +503,7 @@ class PolicyDetails_Micro extends Component {
                                             </Collapsible>
                                           </div>
                                           <div className="rghtsideTrigr">
-                                            <Collapsible trigger="Arogya Sanjeevani Policy, SBI General Insurance Company Limited">
+                                            <Collapsible trigger="Arogya Sanjeevani Policy, SBI General Insurance Company Limited" open= {true}>
                                               <div className="listrghtsideTrigr">
                                                 <Row>
                                                   <Col sm={12} md={6} lg={3}>
@@ -451,7 +529,7 @@ class PolicyDetails_Micro extends Component {
                                                   <Col sm={12} md={6} lg={3}>
                                                     <FormGroup>
                                                       <strong>Rs:</strong>{" "}
-                                                      {Math.round(fulQuoteResp.GrossPremium+fulQuoteResp.AlcoholLoadingAmount+fulQuoteResp.SmokerLoadingAmount+fulQuoteResp.TobaccoLoadingAmount)}
+                                                      {fulQuoteResp.GrossPremium ? Math.round(fulQuoteResp.GrossPremium+fulQuoteResp.AlcoholLoadingAmount+fulQuoteResp.SmokerLoadingAmount+fulQuoteResp.TobaccoLoadingAmount) : ""}
                                                     </FormGroup>
                                                   </Col>
                                                   <Col sm={12} md={6} lg={3}>
@@ -471,6 +549,10 @@ class PolicyDetails_Micro extends Component {
                                           <div className="rghtsideTrigr">
                                             <Collapsible trigger=" Member Details">
                                               <div className="listrghtsideTrigr">{items}</div>
+                                              <strong>Nominee Details :</strong>
+                                              <div className="listrghtsideTrigr">{nomineeData}</div>
+                                              {nomineeDetails && nomineeDetails.is_appointee == '1' ? <strong>Appointee Details :</strong> : null }
+                                              {nomineeDetails && nomineeDetails.is_appointee == '1' ? <div className="listrghtsideTrigr">{apointeeData}</div> : null }
                                             </Collapsible>
                                           </div>
 

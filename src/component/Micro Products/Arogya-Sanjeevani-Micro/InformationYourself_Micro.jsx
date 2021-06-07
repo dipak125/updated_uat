@@ -1406,7 +1406,7 @@ setStateForPreviousData=(family_members)=>{
                                  validationSchema={validateFamilyMembers}
                                 >
                                 {({ values, errors, setFieldValue, setFieldTouched, isValid, isValidating ,isSubmitting, touched }) => {
-
+console.log("values---------------- ", values)
                                 return (
                                 <Form>
                                     <div className="customModalfamlyForm">
@@ -1414,13 +1414,7 @@ setStateForPreviousData=(family_members)=>{
                                             <h4 className="modal-title">Add Family Members to be Insured</h4>
                                         </div>
                                         <Modal.Body>
-                                           {/* <Field type="hidden" className="form-control" className="check_input" name="check_input" value = {validateCheck}
-                                            validate={checkInputdata} 
-                                            /> 
-                                            {
-                                                errors.check_input && touched.check_input ?                 
-                                                <span className="error-message">{errors.check_input}</span>:''
-                                            }*/}
+    
                                             <div className="row dropinput">
                                                 <div className="col-md-4">
                                                     <label className="customCheckBox formGrp formGrp">Self
@@ -1835,8 +1829,7 @@ setStateForPreviousData=(family_members)=>{
                                                 </div>
                                             </div> 
 
-
-
+                                            {values.looking_for_7 || values.looking_for_8 ? null : 
                                             <div className="row dropinput">
                                                 <div className="col-md-4">
                                                     <label className="customCheckBox formGrp formGrp">Father
@@ -1845,6 +1838,8 @@ setStateForPreviousData=(family_members)=>{
                                                         name="looking_for_5"
                                                         value="father"
                                                         className="user-self"
+                                                        disabled = {values.looking_for_7 || values.looking_for_8 ? true : false}
+                                                        hidden = {values.looking_for_7 || values.looking_for_8 ? true : false}
                                                         onChange={(e) => {
                                                             if (e.target.checked === true) {
                                                                 setFieldValue('looking_for_5', e.target.value);
@@ -1887,6 +1882,8 @@ setStateForPreviousData=(family_members)=>{
                                                             minDate={new Date(minDobAdult)}
                                                             className="datePckr"
                                                             dropdownMode="select"
+                                                            disabled = {values.looking_for_7 || values.looking_for_8 ? true : false}
+                                                            hidden = {values.looking_for_7 || values.looking_for_8 ? true : false}
                                                             onChange={(value,e) => {
                                                                 if (e && typeof e.preventDefault === 'function') {
                                                                     e.preventDefault();
@@ -1905,8 +1902,9 @@ setStateForPreviousData=(family_members)=>{
                                                         
                                                     </FormGroup>
                                                 </div>
-                                            </div>
+                                            </div> }
 
+                                            {values.looking_for_7 || values.looking_for_8 ? null : 
                                             <div className="row dropinput">
                                                 <div className="col-md-4">
                                                     <label className="customCheckBox formGrp formGrp">Mother
@@ -1915,6 +1913,7 @@ setStateForPreviousData=(family_members)=>{
                                                         name="looking_for_6"
                                                         value="mother"
                                                         className="user-self"
+                                                        disabled = {values.looking_for_7 || values.looking_for_8 ? true : false}
                                                         onChange={(e) => {
                                                             if (e.target.checked === true) {
                                                                 setFieldValue('looking_for_6', e.target.value);
@@ -1957,6 +1956,7 @@ setStateForPreviousData=(family_members)=>{
                                                             minDate={new Date(minDobAdult)}
                                                             className="datePckr"
                                                             dropdownMode="select"
+                                                            disabled = {values.looking_for_7 || values.looking_for_8 ? true : false}
                                                             onChange={(value,e) => {
                                                                 if (e && typeof e.preventDefault === 'function') {
                                                                     e.preventDefault();
@@ -1974,8 +1974,9 @@ setStateForPreviousData=(family_members)=>{
                                                         </label>
                                                     </FormGroup>
                                                 </div>
-                                            </div>
+                                            </div> }
 
+                                            {values.looking_for_5 || values.looking_for_6 ? null : 
                                             <div className="row dropinput">
                                                 <div className="col-md-4">
                                                     <label className="customCheckBox formGrp formGrp">Father in law
@@ -1984,6 +1985,7 @@ setStateForPreviousData=(family_members)=>{
                                                         name="looking_for_7"
                                                         value="fatherInLaw"
                                                         className="user-self"
+                                                        disabled = {values.looking_for_5 || values.looking_for_6 ? true : false}
                                                         onChange={(e) => {
                                                             if (e.target.checked === true) {
                                                                 setFieldValue('looking_for_7', e.target.value);
@@ -2025,6 +2027,7 @@ setStateForPreviousData=(family_members)=>{
                                                             minDate={new Date(minDobAdult)}
                                                             className="datePckr"
                                                             dropdownMode="select"
+                                                            disabled = {values.looking_for_5 || values.looking_for_6 ? true : false}
                                                             onChange={(value,e) => {
                                                                 if (e && typeof e.preventDefault === 'function') {
                                                                     e.preventDefault();
@@ -2042,9 +2045,10 @@ setStateForPreviousData=(family_members)=>{
                                                         </label>
                                                     </FormGroup>
                                                 </div>
-                                            </div>
+                                            </div>}
 
-                                            <div className="row dropinput m-b-45">
+                                            {values.looking_for_5 || values.looking_for_6 ? null : 
+                                            <div className="row dropinput m-b-45" >
                                                 <div className="col-md-4">
                                                     <label className="customCheckBox formGrp formGrp">Mother in law
                                                     <Field
@@ -2052,6 +2056,7 @@ setStateForPreviousData=(family_members)=>{
                                                         name="looking_for_8"
                                                         value="motherInLaw"
                                                         className="user-self"
+                                                        disabled = {values.looking_for_5 || values.looking_for_6 ? true : false}
                                                         onChange={(e) => {
                                                             if (e.target.checked === true) {
                                                                 setFieldValue('looking_for_8', e.target.value);
@@ -2077,8 +2082,8 @@ setStateForPreviousData=(family_members)=>{
                                                         <span className="checkmark mL-0"></span>
                                                         <span className="error-message"></span>
                                                     </label>
-                                                </div>
-
+                                                </div> 
+                                                
                                                 <div className="col-md-4">
                                                     <FormGroup >
                                                         <DatePicker
@@ -2093,6 +2098,8 @@ setStateForPreviousData=(family_members)=>{
                                                             minDate={new Date(minDobAdult)}
                                                             className="datePckr"
                                                             dropdownMode="select"
+                                                            disabled = {values.looking_for_5 || values.looking_for_6 ? true : false}
+                                                            hidden = {values.looking_for_5 || values.looking_for_6 ? true : false}
                                                             onChange={(value,e) => {
                                                                 if (e && typeof e.preventDefault === 'function') {
                                                                     e.preventDefault();
@@ -2110,7 +2117,7 @@ setStateForPreviousData=(family_members)=>{
                                                         </label>
                                                     </FormGroup>
                                                 </div>              
-                                            </div>
+                                            </div> }
                             {values.looking_for_2 || values.looking_for_3 || values.looking_for_4 ?
                                             <div className="row dropinput m-b-45">
                                                 <div className="col-md-15">
