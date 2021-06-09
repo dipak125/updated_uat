@@ -64,7 +64,7 @@ class Registration_sukhsam extends Component {
         let policyHolder_id = localStorage.getItem("policyHolder_refNo") ? localStorage.getItem("policyHolder_refNo"):0;
         let encryption = new Encryption();
         this.props.loadingStart();
-        axios.get(`sme/details/${policyHolder_id}`)
+        axios.get(`sookshama/details/${policyHolder_id}`)
             .then(res=>{
                 // let decryptResp = JSON.parse(encryption.decrypt(res.data))
                 // console.log("decrypt", decryptResp)
@@ -89,7 +89,7 @@ class Registration_sukhsam extends Component {
         if(this.props.policy_holder_ref_no == null && policy_holder_ref_no != ''){
             
             this.props.loadingStart();
-            axios.get(`sme/details/${policy_holder_ref_no}`)
+            axios.get(`sookshama/details/${policy_holder_ref_no}`)
             .then(res=>{              
                 let decryptResp = JSON.parse(encryption.decrypt(res.data));
 
@@ -113,7 +113,7 @@ class Registration_sukhsam extends Component {
 
                 if(decryptResp.data.policyHolder.step_no == 1 || decryptResp.data.policyHolder.step_no > 1){
 
-                    let risk_arr = JSON.parse(decryptResp.data.policyHolder.smeinfo.risk_address);
+                    let risk_arr = JSON.parse(decryptResp.data.policyHolder.sookshamainfo.risk_address);
 
                     this.props.setRiskData(
                         {
@@ -122,12 +122,12 @@ class Registration_sukhsam extends Component {
                             street_name:risk_arr.street_name,
                             plot_no:risk_arr.plot_no,
                             house_flat_no:risk_arr.house_flat_no,
-                            pincode:decryptResp.data.policyHolder.smeinfo.pincode,
-                            pincode_id:decryptResp.data.policyHolder.smeinfo.pincode_id,
+                            pincode:decryptResp.data.policyHolder.sookshamainfo.pincode,
+                            pincode_id:decryptResp.data.policyHolder.sookshamainfo.pincode_id,
 
-                            buildings_sum_insured:decryptResp.data.policyHolder.smeinfo.buildings_sum_insured,
-                            content_sum_insured:decryptResp.data.policyHolder.smeinfo.content_sum_insured,
-                            stock_sum_insured:decryptResp.data.policyHolder.smeinfo.stock_sum_insured
+                            buildings_sum_insured:decryptResp.data.policyHolder.sookshamainfo.buildings_sum_insured,
+                            content_sum_insured:decryptResp.data.policyHolder.sookshamainfo.content_sum_insured,
+                            stock_sum_insured:decryptResp.data.policyHolder.sookshamainfo.stock_sum_insured
                         }
                     );
                 }
@@ -193,8 +193,8 @@ class Registration_sukhsam extends Component {
         const formData = new FormData();
         let encryption = new Encryption();
         let post_data = {
-            'menumaster_id': '5',
-            'page_name': `Registration_SME/${productId}`,
+            'menumaster_id': '11',
+            'page_name': `Registration_Sookshma/${productId}`,
             'vehicle_type_id': productId
         }
 
@@ -226,7 +226,7 @@ class Registration_sukhsam extends Component {
             post_data['policy_holder_id'] = this.props.policy_holder_id
             formData.append('enc_data',encryption.encrypt(JSON.stringify(post_data)))
 
-            axios.post('sme/update-policy-info',
+            axios.post('sookshama/update-policy-info',
             formData
             ).then(res=>{
                 let decryptResp = JSON.parse(encryption.decrypt(res.data));
@@ -253,7 +253,7 @@ class Registration_sukhsam extends Component {
             })
         }else{
             formData.append('enc_data',encryption.encrypt(JSON.stringify(post_data)))
-            axios.post('sme/policy-info',
+            axios.post('sookshama/policy-info',
             formData
             ).then(res=>{     
                 let decryptResp = JSON.parse(encryption.decrypt(res.data));   
@@ -271,7 +271,7 @@ class Registration_sukhsam extends Component {
                         completed_step:decryptResp.data.completedStep,
                         menumaster_id:decryptResp.data.menumaster_id,
                     });
-                    this.props.history.push(`/RiskDetails_Sukhsam/${productId}`);
+                    this.props.history.push(`/RiskDetails_Sookshma/${productId}`);
                 }
                 else {
                     swal("Thank you for showing your interest for buying product.Due to some reasons, we are not able to issue the policy online.Please call 1800 22 1111");

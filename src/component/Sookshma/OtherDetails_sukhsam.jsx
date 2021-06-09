@@ -145,7 +145,7 @@ class OtherDetails_sukhsam extends Component {
         }
         console.log("Post Data------------- ", post_data)
         formData.append('enc_data',encryption.encrypt(JSON.stringify(post_data)))
-        axios.post('sme/previous-policy-details',
+        axios.post('sookshama/previous-policy-details',
         formData
         ).then(res=>{       
  
@@ -164,7 +164,7 @@ class OtherDetails_sukhsam extends Component {
             
             let formDataNew = new FormData(); 
             let post_data_new = {
-                'policy_ref_no': this.props.policy_holder_ref_no,
+                'id': this.props.policy_holder_id,
                 'menumaster_id': this.props.menumaster_id,
                 'page_name': `OtherDetails/${productId}`,
     
@@ -172,39 +172,13 @@ class OtherDetails_sukhsam extends Component {
             formDataNew.append('enc_data',encryption.encrypt(JSON.stringify(post_data_new)))
             
             this.props.loadingStart();
-            axios.post('/sme/calculate-premium/phase-one',
+            axios.post('/fullQuoteServiceSMEP01',
             formDataNew
             ).then(res=>{
                 let decryptResp = JSON.parse(encryption.decrypt(res.data));
                 console.log("decryptResp-------->",decryptResp)
-                   if( decryptResp.error === false) {
-                       this.props.loadingStart();
-                       axios.post('/sme/calculate-premium/phase-two',
-                    formDataNew
-                    ).then(res2=>{
-                        const {productId} = this.props.match.params;
-                        let decryptResp2 = JSON.parse(encryption.decrypt(res2.data));
-                        console.log("decryptResp Phase 2-------->",decryptResp2)
-
-                        if( decryptResp2.error === false) {
-                            this.props.history.push(`/Summary_Sukhsam/${productId}`);
-                        } else {
-                            this.props.loadingStop();
-                            swal("Thank you for showing your interest for buying product.Due to some reasons, we are not able to issue the policy online.Please call 1800 22 1111")
-                            actions.setSubmitting(false)
-                        }
-                    }).
-                    catch(err=>
-                        {this.props.loadingStop();
-                        swal("Thank you for showing your interest for buying product.Due to some reasons, we are not able to issue the policy online.Please call 1800 22 1111")
-                        actions.setSubmitting(false)
-                        
-                    });
-                }
-                else { this.props.loadingStop()
-                    swal("Thank you for showing your interest for buying product.Due to some reasons, we are not able to issue the policy online.Please call 1800 22 1111")
-                    actions.setSubmitting(false)
-                }
+                
+                
                 }).
             catch(err=>{
                 this.props.loadingStop();
@@ -259,7 +233,7 @@ class OtherDetails_sukhsam extends Component {
         if(this.props.policy_holder_ref_no == null && policy_holder_ref_no != ''){
             
             this.props.loadingStart();
-            axios.get(`sme/details/${policy_holder_ref_no}`)
+            axios.get(`sookshama/details/${policy_holder_ref_no}`)
             .then(res=>{
                 let decryptResp = JSON.parse(encryption.decrypt(res.data));
                 console.log("decryptResp -------->",decryptResp)

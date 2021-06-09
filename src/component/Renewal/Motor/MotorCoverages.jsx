@@ -531,7 +531,7 @@ class MotorCoverages extends Component {
                 let motorInsurance = decryptResp.data.policyHolder ? decryptResp.data.policyHolder.motorinsurance : {}
                 let vehicleRegDate = motorInsurance &&  motorInsurance.registration_date != null ? motorInsurance.registration_date : ''
                 let request_data = decryptResp.data.policyHolder ? decryptResp.data.policyHolder.request_data : {};
-                let sliderVal = request_data && request_data.sum_insured ? parseInt(request_data.sum_insured) : ""
+                let sliderVal = request_data && request_data.IDV_Suggested ? parseInt(request_data.IDV_Suggested) : ""
                 let vehicleDetails = decryptResp.data.policyHolder ? decryptResp.data.policyHolder.vehiclebrandmodel : {};
                 let policyCoverage = decryptResp.data.policyHolder && decryptResp.data.policyHolder.renewalinfo && decryptResp.data.policyHolder.renewalinfo.renewalcoverage ? decryptResp.data.policyHolder.renewalinfo.renewalcoverage : []
                 policyCoverage.map((coverage,Index) => {
@@ -1456,7 +1456,7 @@ class MotorCoverages extends Component {
                                 </Col>
                             </Row>
                             {/* : null} */}
-
+                            {defaultSliderValue ?
                             <Row>
                                 <Col sm={12} md={5} lg={4}>
                                     <FormGroup>
@@ -1506,7 +1506,7 @@ class MotorCoverages extends Component {
                                     </FormGroup>
                                 </Col>
                                 : null}
-                            </Row>
+                            </Row> : null }
                             {vehicletype_id == "11" || vehicletype_id == "8" ?
                                 <Row>
                                     <Col sm={12} md={5} lg={4}>

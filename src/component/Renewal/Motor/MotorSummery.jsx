@@ -20,6 +20,18 @@ import {registrationNoFormat, paymentGateways} from '../../../shared/reUseFuncti
 const initialValue = {	
     gateway : ""	
 }	
+const vehicleModel = {
+    1: 'Model',
+    3: 'TwoWheelModel',
+    4: 'GCVModel',
+    7: 'MISCDModel'
+}
+const vehicleBrand = {
+    1: 'Brand',
+    3: 'TwoWheelBrand',
+    4: 'GcvBrand',
+    7: 'MISCDBrand'
+}
 const motor_productIds = [2,6,7,8,11,15,17,18];
 const menumaster_id = 7	
 const validatePremium = Yup.object().shape({	
@@ -103,7 +115,7 @@ class MotorSummery extends Component {
                 let request_data = decryptResp.data.policyHolder ? decryptResp.data.policyHolder.request_data : {}	
                 let step_completed = decryptResp.data.policyHolder ? decryptResp.data.policyHolder.step_no : "";	
                 let bcMaster = decryptResp.data.policyHolder ? decryptResp.data.policyHolder.bcmaster : {};	
-                let menumaster = decryptResp.data.policyHolder ? decryptResp.data.policyHolder.menumaster : {};
+                let menumaster = decryptResp.data.policyHolder && decryptResp.data.policyHolder.vehiclebrandmodel && decryptResp.data.policyHolder.vehiclebrandmodel.vehiclemodel ? decryptResp.data.policyHolder.vehiclebrandmodel.vehiclemodel.menumaster_id : {};
                 let policyCoverage = decryptResp.data.policyHolder && decryptResp.data.policyHolder.renewalinfo && decryptResp.data.policyHolder.renewalinfo.renewalcoverage ? decryptResp.data.policyHolder.renewalinfo.renewalcoverage : []
                 let dateDiff = 0	
                 let paymentgateway = decryptResp.data.policyHolder && decryptResp.data.policyHolder.bcmaster && decryptResp.data.policyHolder.bcmaster.paymentgateway
@@ -112,7 +124,7 @@ class MotorSummery extends Component {
                     motorInsurance,policyHolder,vehicleDetails,previousPolicy,request_data,menumaster,step_completed, bcMaster,	policyCoverage,paymentgateway,
                     paymentStatus: decryptResp.data.policyHolder.payment ? decryptResp.data.policyHolder.payment[0] : [],	
                     memberdetails : decryptResp.data.policyHolder ? decryptResp.data.policyHolder : [],	
-                    nomineedetails: decryptResp.data.policyHolder ? decryptResp.data.policyHolder.request_data.nominee[0]:[]	
+                    nomineedetails: decryptResp.data.policyHolder && decryptResp.data.policyHolder.request_data.nominee ? decryptResp.data.policyHolder.request_data.nominee[0]:[]	
                     	
                 })	
                 this.props.loadingStop();
@@ -199,6 +211,7 @@ class MotorSummery extends Component {
         const { policyHolder, show, paymentgateway, motorInsurance, error, error1, paymentStatus, bcMaster,policyCoverage,	
              relation, memberdetails,nomineedetails, vehicleDetails, breakin_flag, step_completed, request_data,menumaster, } = this.state	
         const { productId } = this.props.match.params	
+
         let phrases = localStorage.getItem("phrases") ? JSON.parse(localStorage.getItem("phrases")) : null	
         const errMsg =	
             error && error.message ? (	
@@ -390,7 +403,7 @@ class MotorSummery extends Component {
                                                                                             </Row>	
                                                                                             <Row>	
                                                                                                 <Col sm={12} md={6}>	
-                                                                                                    <FormGroup>{phrases['Brand']}:</FormGroup>	
+                                                                                                <FormGroup>{ menumaster ? phrases[vehicleBrand[menumaster]] : null}:</FormGroup>
                                                                                                 </Col>	
                                                                                                 <Col sm={12} md={6}>	
                                                                                                     <FormGroup>{vehicleDetails && vehicleDetails.vehiclebrand && vehicleDetails.vehiclebrand.name ? vehicleDetails.vehiclebrand.name : ""}</FormGroup>	
@@ -398,7 +411,7 @@ class MotorSummery extends Component {
                                                                                             </Row>	
                                                                                             <Row>	
                                                                                                 <Col sm={12} md={6}>	
-                                                                                                    <FormGroup>{phrases['Model']}</FormGroup>	
+                                                                                                    <FormGroup>{ menumaster ? phrases[vehicleModel[menumaster]] : null}</FormGroup>	
                                                                                                 </Col>	
                                                                                                 <Col sm={12} md={6}>	
                                                                                                     <FormGroup>{vehicleDetails && vehicleDetails.vehiclemodel && vehicleDetails.vehiclemodel.description ? vehicleDetails.vehiclemodel.description+" "+vehicleDetails.varientmodel.varient : ""}</FormGroup>	
@@ -464,15 +477,15 @@ class MotorSummery extends Component {
                                                                                                     <FormGroup>{vehicleDetails && vehicleDetails.varientmodel && vehicleDetails.varientmodel.gross_vechicle_weight ? vehicleDetails.varientmodel.gross_vechicle_weight : null}</FormGroup>	
                                                                                                 </Col>	
                                                                                             </Row>	: null }
-
+                                                                                            {request_data && parseInt(request_data.IDV_Suggested) == 0 ? null :
                                                                                             <Row>
                                                                                                 <Col sm={12} md={6}>
                                                                                                     <FormGroup>{phrases['IDVofVehicle']}</FormGroup>
                                                                                                 </Col>
                                                                                                 <Col sm={12} md={6}>
-                                                                                                    <FormGroup>{request_data && request_data.sum_insured ? parseInt(request_data.sum_insured) : null}</FormGroup>
+                                                                                                    <FormGroup>{request_data && request_data.IDV_Suggested ? parseInt(request_data.IDV_Suggested) : null}</FormGroup>
                                                                                                 </Col>
-                                                                                            </Row>
+                                                                                            </Row> }
                                                                                         </Col>	
                                                                                     </Row>	
                                                                                     <Row>	
@@ -564,7 +577,7 @@ class MotorSummery extends Component {
                                                                                     </Row>	
                                                                                 </div>	
                                                                             : (<p></p>)}	
-                                                                        {motorInsurance && motorInsurance.policy_for == '1' && motorInsurance.pa_flag == '1' ?             	
+                                                                        {nomineedetails ?             	
                                                                         <div>	
                                                                         <strong>{phrases['NomineeDetails']} :</strong>	
                                                                             <br/>	
@@ -611,7 +624,7 @@ class MotorSummery extends Component {
                                                                                 <p></p>	
                                                                             </Row>	
                                                                         </div> : null}	
-                                                                        {motorInsurance && motorInsurance.policy_for == '1' && nomineedetails && nomineedetails.is_appointee == '1' && motorInsurance.pa_flag == '1' ?      	
+                                                                        {nomineedetails && nomineedetails.is_appointee == '1' ?      	
                                                                             <div>	
                                                                             <strong>{phrases['AppoDetails']} :</strong>	
                                                                                 <br/>	

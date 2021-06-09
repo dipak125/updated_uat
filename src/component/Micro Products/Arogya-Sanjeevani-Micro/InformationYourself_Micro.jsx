@@ -18,7 +18,8 @@ import { Formik, Form, Field, ErrorMessage } from 'formik';
 import { changeFormat, get18YearsBeforeDate, PersonAge } from "../../../shared/dateFunctions";
 import Encryption from '../../../shared/payload-encryption';
 
-const minDobAdult = moment(moment().subtract(56, 'years').calendar()).add(1, 'day').calendar()
+// const minDobAdult = moment(moment().subtract(56, 'years').calendar()).add(1, 'day').calendar()
+const minDobAdult = moment(moment().subtract(20453, 'day').calendar()).add(1, 'day').calendar()
 const maxDobAdult = moment().subtract(18, 'years').calendar();
 
 const minDobChild = moment(moment().subtract(26, 'years').calendar()).add(1, 'day').calendar()
@@ -1018,6 +1019,11 @@ class InformationYourself_Micro extends Component {
         var display_dob = [];
         let display_gender = [];
 
+        if( (values.looking_for_5 || values.looking_for_6) && (values.looking_for_7 || values.looking_for_8) ){
+            swal("Either Parent or Parent In-laws allowed in Family Floater")
+            return false
+        }
+        else{
             display_gender[0] = this.state.gender ? this.state.gender:null
             display_gender[1] = this.state.gender ? (this.state.gender == 'm') ?'f':'m' :null
             display_gender[2] = values.child1Gender ? values.child1Gender :null
@@ -1092,6 +1098,7 @@ class InformationYourself_Micro extends Component {
         swal('Please select at least one option');
         //this.handleClose()
     }
+}
 }
 componentDidMount(){
     this.fetchData();
@@ -1406,7 +1413,7 @@ setStateForPreviousData=(family_members)=>{
                                  validationSchema={validateFamilyMembers}
                                 >
                                 {({ values, errors, setFieldValue, setFieldTouched, isValid, isValidating ,isSubmitting, touched }) => {
-console.log("values---------------- ", values)
+
                                 return (
                                 <Form>
                                     <div className="customModalfamlyForm">
@@ -1829,7 +1836,6 @@ console.log("values---------------- ", values)
                                                 </div>
                                             </div> 
 
-                                            {values.looking_for_7 || values.looking_for_8 ? null : 
                                             <div className="row dropinput">
                                                 <div className="col-md-4">
                                                     <label className="customCheckBox formGrp formGrp">Father
@@ -1838,8 +1844,6 @@ console.log("values---------------- ", values)
                                                         name="looking_for_5"
                                                         value="father"
                                                         className="user-self"
-                                                        disabled = {values.looking_for_7 || values.looking_for_8 ? true : false}
-                                                        hidden = {values.looking_for_7 || values.looking_for_8 ? true : false}
                                                         onChange={(e) => {
                                                             if (e.target.checked === true) {
                                                                 setFieldValue('looking_for_5', e.target.value);
@@ -1882,8 +1886,6 @@ console.log("values---------------- ", values)
                                                             minDate={new Date(minDobAdult)}
                                                             className="datePckr"
                                                             dropdownMode="select"
-                                                            disabled = {values.looking_for_7 || values.looking_for_8 ? true : false}
-                                                            hidden = {values.looking_for_7 || values.looking_for_8 ? true : false}
                                                             onChange={(value,e) => {
                                                                 if (e && typeof e.preventDefault === 'function') {
                                                                     e.preventDefault();
@@ -1902,9 +1904,8 @@ console.log("values---------------- ", values)
                                                         
                                                     </FormGroup>
                                                 </div>
-                                            </div> }
+                                            </div> 
 
-                                            {values.looking_for_7 || values.looking_for_8 ? null : 
                                             <div className="row dropinput">
                                                 <div className="col-md-4">
                                                     <label className="customCheckBox formGrp formGrp">Mother
@@ -1913,7 +1914,6 @@ console.log("values---------------- ", values)
                                                         name="looking_for_6"
                                                         value="mother"
                                                         className="user-self"
-                                                        disabled = {values.looking_for_7 || values.looking_for_8 ? true : false}
                                                         onChange={(e) => {
                                                             if (e.target.checked === true) {
                                                                 setFieldValue('looking_for_6', e.target.value);
@@ -1956,7 +1956,6 @@ console.log("values---------------- ", values)
                                                             minDate={new Date(minDobAdult)}
                                                             className="datePckr"
                                                             dropdownMode="select"
-                                                            disabled = {values.looking_for_7 || values.looking_for_8 ? true : false}
                                                             onChange={(value,e) => {
                                                                 if (e && typeof e.preventDefault === 'function') {
                                                                     e.preventDefault();
@@ -1974,9 +1973,8 @@ console.log("values---------------- ", values)
                                                         </label>
                                                     </FormGroup>
                                                 </div>
-                                            </div> }
+                                            </div> 
 
-                                            {values.looking_for_5 || values.looking_for_6 ? null : 
                                             <div className="row dropinput">
                                                 <div className="col-md-4">
                                                     <label className="customCheckBox formGrp formGrp">Father in law
@@ -1985,7 +1983,6 @@ console.log("values---------------- ", values)
                                                         name="looking_for_7"
                                                         value="fatherInLaw"
                                                         className="user-self"
-                                                        disabled = {values.looking_for_5 || values.looking_for_6 ? true : false}
                                                         onChange={(e) => {
                                                             if (e.target.checked === true) {
                                                                 setFieldValue('looking_for_7', e.target.value);
@@ -2027,7 +2024,6 @@ console.log("values---------------- ", values)
                                                             minDate={new Date(minDobAdult)}
                                                             className="datePckr"
                                                             dropdownMode="select"
-                                                            disabled = {values.looking_for_5 || values.looking_for_6 ? true : false}
                                                             onChange={(value,e) => {
                                                                 if (e && typeof e.preventDefault === 'function') {
                                                                     e.preventDefault();
@@ -2045,9 +2041,8 @@ console.log("values---------------- ", values)
                                                         </label>
                                                     </FormGroup>
                                                 </div>
-                                            </div>}
+                                            </div>
 
-                                            {values.looking_for_5 || values.looking_for_6 ? null : 
                                             <div className="row dropinput m-b-45" >
                                                 <div className="col-md-4">
                                                     <label className="customCheckBox formGrp formGrp">Mother in law
@@ -2056,7 +2051,6 @@ console.log("values---------------- ", values)
                                                         name="looking_for_8"
                                                         value="motherInLaw"
                                                         className="user-self"
-                                                        disabled = {values.looking_for_5 || values.looking_for_6 ? true : false}
                                                         onChange={(e) => {
                                                             if (e.target.checked === true) {
                                                                 setFieldValue('looking_for_8', e.target.value);
@@ -2098,8 +2092,6 @@ console.log("values---------------- ", values)
                                                             minDate={new Date(minDobAdult)}
                                                             className="datePckr"
                                                             dropdownMode="select"
-                                                            disabled = {values.looking_for_5 || values.looking_for_6 ? true : false}
-                                                            hidden = {values.looking_for_5 || values.looking_for_6 ? true : false}
                                                             onChange={(value,e) => {
                                                                 if (e && typeof e.preventDefault === 'function') {
                                                                     e.preventDefault();
@@ -2117,8 +2109,8 @@ console.log("values---------------- ", values)
                                                         </label>
                                                     </FormGroup>
                                                 </div>              
-                                            </div> }
-                            {values.looking_for_2 || values.looking_for_3 || values.looking_for_4 ?
+                                            </div> 
+                                            {values.looking_for_2 || values.looking_for_3 || values.looking_for_4 ?
                                             <div className="row dropinput m-b-45">
                                                 <div className="col-md-15">
                                                     <label className="customCheckBox formGrp formGrp">

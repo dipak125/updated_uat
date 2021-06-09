@@ -172,18 +172,28 @@ class RiskDetails_sukhsam extends Component {
             'policy_holder_id': this.props.policy_holder_id,
             'menumaster_id': this.props.menumaster_id,
             'page_name': `RiskDetails/${productId}`,
-            'house_building_name': values.house_building_name,
+            'shop_building_name': values.shop_building_name,
             'block_no': values.block_no,
             'house_flat_no': values.house_flat_no,
             'pincode': values.pincode,
             'pincode_id': values.pincode_id,
-            'buildings_sum_insured': values.buildings_sum_insured,
-            'content_sum_insured': values.content_sum_insured,
-            'stock_sum_insured': values.stock_sum_insured,
-
+            'buildings_si': values.buildings_si,
+            'plant_machinary_si': values.plant_machinary_si,
+            'furniture_fixture_si': values.furniture_fixture_si,
+            'stock_raw_mat' : values.stock_raw_mat,
+            'finish_goods' : values.finish_goods,
+            'stock_wip' : values.stock_wip,
         }
 
-        const Fire_sum_insured = parseInt(values.buildings_sum_insured) + parseInt(values.content_sum_insured) + parseInt(values.stock_sum_insured) ;
+        
+        const Fire_sum_insured = parseInt(values.buildings_si) + 
+        parseInt(values.plant_machinary_si) + 
+        parseInt(values.furniture_fixture_si) + 
+        parseInt(values.stock_raw_mat) + 
+        parseInt(values.finish_goods) + 
+        parseInt(values.stock_wip);
+
+        console.log('Sookshama...',post_data)
         formData.append('enc_data',encryption.encrypt(JSON.stringify(post_data)))
 
         if (Fire_sum_insured < 500000) {
@@ -196,7 +206,7 @@ class RiskDetails_sukhsam extends Component {
             return false;
         } else {
         this.props.loadingStart();
-        axios.post('sme/policy-details',
+        axios.post('sookshama/policy-details',
         formData
         ).then(res=>{     
             let decryptResp = JSON.parse(encryption.decrypt(res.data));
@@ -205,17 +215,20 @@ class RiskDetails_sukhsam extends Component {
             this.props.setRiskData(
                 {
 
-                    house_building_name:values.house_building_name,
+                    shop_building_name:values.shop_building_name,
                     block_no:values.block_no,
                     // street_name:values.street_name,
                     // plot_no:values.plot_no,
-                    // content_sum_insured:values.content_sum_insured,
+                    // plant_machinary_si:values.plant_machinary_si,
                     house_flat_no:values.house_flat_no,
                     pincode:values.pincode,
                     pincode_id:values.pincode_id,
-                    buildings_sum_insured:values.buildings_sum_insured,
-                    content_sum_insured:values.content_sum_insured,
-                    stock_sum_insured:values.stock_sum_insured
+                    buildings_si:values.buildings_si,
+                    plant_machinary_si:values.plant_machinary_si,
+                    furniture_fixture_si:values.furniture_fixture_si,
+                    stock_raw_mat:values.stock_raw_mat,
+                    finish_goods:values.finish_goods,
+                    stock_wip:values.stock_wip
                 }
             );
             const {productId} = this.props.match.params;
@@ -223,7 +236,7 @@ class RiskDetails_sukhsam extends Component {
             this.props.loadingStop()
             this.setState({ Fire_sum_insured : Fire_sum_insured })
             
-            this.props.history.push(`/OtherDetails_Sukhsam/${productId}`);
+            this.props.history.push(`/OtherDetails_Sookshma/${productId}`);
         } else {
             this.props.loadingStop();
             swal("Thank you for showing your interest for buying product.Due to some reasons, we are not able to issue the policy online.Please call 1800 22 1111");
@@ -246,7 +259,7 @@ class RiskDetails_sukhsam extends Component {
         // if(this.props.policy_holder_ref_no == null && policy_holder_ref_no != ''){
             
             this.props.loadingStart();
-            axios.get(`sme/details/${policy_holder_ref_no}`)
+            axios.get(`sookshama/details/${policy_holder_ref_no}`)
             .then(res=>{
                 let decryptResp = JSON.parse(encryption.decrypt(res.data));
 
@@ -266,21 +279,24 @@ class RiskDetails_sukhsam extends Component {
 
                 if(decryptResp.data.policyHolder.step_no == 1 || decryptResp.data.policyHolder.step_no > 1){
 
-                    let risk_arr = JSON.parse(decryptResp.data.policyHolder.smeinfo.risk_address);
+                    let risk_arr = JSON.parse(decryptResp.data.policyHolder.sookshamainfo.risk_address);
 
                     this.props.setRiskData(
                         {
-                            house_building_name:risk_arr.house_building_name,
+                            shop_building_name:risk_arr.shop_building_name,
                             block_no:risk_arr.block_no,
                             // street_name:risk_arr.street_name,
                             // plot_no:risk_arr.plot_no,
                             house_flat_no:risk_arr.house_flat_no,
-                            pincode:decryptResp.data.policyHolder.smeinfo.pincode,
-                            pincode_id:decryptResp.data.policyHolder.smeinfo.pincode_id,
+                            pincode:decryptResp.data.policyHolder.sookshamainfo.pincode,
+                            pincode_id:decryptResp.data.policyHolder.sookshamainfo.pincode_id,
 
-                            buildings_sum_insured:decryptResp.data.policyHolder.smeinfo.buildings_sum_insured,
-                            content_sum_insured:decryptResp.data.policyHolder.smeinfo.content_sum_insured,
-                            stock_sum_insured:decryptResp.data.policyHolder.smeinfo.stock_sum_insured
+                            buildings_si:decryptResp.data.policyHolder.sookshamainfo.buildings_si,
+                            plant_machinary_si:decryptResp.data.policyHolder.sookshamainfo.plant_machinary_si,
+                            furniture_fixture_si:decryptResp.data.policyHolder.sookshamainfo.furniture_fixture_si,
+                            stock_raw_mat:decryptResp.data.policyHolder.sookshamainfo.stock_raw_mat,
+                            finish_goods:decryptResp.data.policyHolder.sookshamainfo.finish_goods,
+                            stock_wip:decryptResp.data.policyHolder.sookshamainfo.stock_wip,
                         }
                     );
                 }
@@ -298,7 +314,7 @@ class RiskDetails_sukhsam extends Component {
         
                     });
 
-                    this.fetchAreadetailsBack(decryptResp.data.policyHolder.smeinfo.pincode);
+                    this.fetchAreadetailsBack(decryptResp.data.policyHolder.sookshamainfo.pincode);
                 
                 }
 
@@ -324,7 +340,7 @@ class RiskDetails_sukhsam extends Component {
 
                                 com_street_name:address.street_name,
                                 com_plot_no:address.plot_no,
-                                com_building_name:address.house_building_name,
+                                com_building_name:address.shop_building_name,
                                 com_block_no:address.block_no,
                                 com_house_flat_no:address.house_flat_no,
                                 com_pincode:decryptResp.data.policyHolder.pincode,
@@ -361,27 +377,34 @@ class RiskDetails_sukhsam extends Component {
     }
 
     render() {
+        const Fire_contents_sum_insured = parseInt(this.props.plant_machinary_si) + parseInt(this.props.furniture_fixture_si);
+        const Fire_stock_sum_insured = parseInt(this.props.stock_raw_mat) + parseInt(this.props.stock_wip) + parseInt(this.props.finish_goods);
         const {productId} = this.props.match.params  
         const {insurerList, showClaim, previous_is_claim, motorInsurance, previousPolicy,
             stateName,pinDataArr,CustomerID,suggestions, vehicleDetails, RTO_location} = this.state
 
         let newInitialValues = Object.assign(initialValue,{
-            house_building_name:this.props.house_building_name,
+            shop_building_name:this.props.shop_building_name,
             block_no:this.props.block_no,
             // street_name:this.props.street_name,
             // plot_no:this.props.plot_no,
-            // content_sum_insured:this.props.content_sum_insured,
+            // plant_machinary_si:this.props.plant_machinary_si,
             house_flat_no:this.props.house_flat_no,
             pincode:this.props.pincode,
             pincode_id:this.props.pincode_id,
-            buildings_sum_insured:this.props.buildings_sum_insured,
-            content_sum_insured:this.props.content_sum_insured,
-            stock_sum_insured:this.props.stock_sum_insured
+            buildings_si:this.props.buildings_si,
+            plant_machinary_si:this.props.plant_machinary_si,
+            furniture_fixture_si:this.props.furniture_fixture_si,
+            stock_raw_mat:this.props.stock_raw_mat,
+            stock_wip:this.props.stock_wip,
+            finish_goods:this.props.finish_goods,
+            fire_contents_sum_insured:Fire_contents_sum_insured,
+            fire_stock_sum_insured:Fire_stock_sum_insured
         });
 
         // VALIDATION :----------------------------------------///////////////////////////
         const vehicleRegistrationValidation = Yup.object().shape({
-            house_building_name: Yup.string().required("Please enter building name").matches(/^[a-zA-Z0-9][a-zA-Z0-9-/.,-\s]*$/, 
+            shop_building_name: Yup.string().required("Please enter building name").matches(/^[a-zA-Z0-9][a-zA-Z0-9-/.,-\s]*$/, 
                 function() {
                     return "Please enter valid building name"
                 }).nullable(),
@@ -398,13 +421,22 @@ class RiskDetails_sukhsam extends Component {
                 return "Please enter valid 6 digit pin code"
             }).nullable(),
             pincode_id: Yup.string().required("Please select area").nullable(),
-            buildings_sum_insured: Yup.string().required("Please enter building sum insured").max(8).matches(/^[0-9]*$/, function() {
+            buildings_si: Yup.string().required("Please enter building sum insured").max(8).matches(/^[0-9]*$/, function() {
                 return "Please enter only numbers"
             }).nullable(),
-            content_sum_insured: Yup.string().required("Please enter content sum insured").max(8).matches(/^[0-9]*$/, function() {
+            plant_machinary_si: Yup.string().required("Please enter plant and machinery sum insured").max(8).matches(/^[0-9]*$/, function() {
                 return "Please enter only numbers"
             }).nullable(),
-            stock_sum_insured: Yup.string().required("Please enter stock sum insured").max(8).matches(/^[0-9]*$/, function() {
+            furniture_fixture_si: Yup.string().required("Please enter furniture & fixture sum insured").max(8).matches(/^[0-9]*$/, function() {
+                return "Please enter only numbers"
+            }).nullable(),
+            stock_raw_mat: Yup.string().required("Please enter stock of raw material").max(8).matches(/^[0-9]*$/, function() {
+                return "Please enter only numbers"
+            }).nullable(),
+            finish_goods: Yup.string().required("Please enter stock of finished goods").max(8).matches(/^[0-9]*$/, function() {
+                return "Please enter only numbers"
+            }).nullable(),
+            stock_wip: Yup.string().required("Please enter stock of work in progress").max(8).matches(/^[0-9]*$/, function() {
                 return "Please enter only numbers"
             }).nullable(),
         })
@@ -449,16 +481,16 @@ class RiskDetails_sukhsam extends Component {
                                                         <FormGroup>
                                                             <div className="formSection">
                                                             <Field
-                                                                name='house_building_name'
+                                                                name='shop_building_name'
                                                                 type="text"
                                                                 placeholder="Shop/Building Name"
                                                                 autoComplete="off"
                                                                 onFocus={e => this.changePlaceHoldClassAdd(e)}
                                                                 onBlur={e => this.changePlaceHoldClassRemove(e)}
-                                                                value = {values.house_building_name}                                                                            
+                                                                value = {values.shop_building_name}                                                                            
                                                             />
-                                                            {errors.house_building_name && touched.house_building_name ? (
-                                                            <span className="errorMsg">{errors.house_building_name}</span>
+                                                            {errors.shop_building_name && touched.shop_building_name ? (
+                                                            <span className="errorMsg">{errors.shop_building_name}</span>
                                                             ) : null}              
                                                             </div>
                                                         </FormGroup>
@@ -643,27 +675,22 @@ class RiskDetails_sukhsam extends Component {
                                                         <FormGroup>
                                                             <div className="insurerName">
                                                             <Field
-                                                                name='buildings_sum_insured'
+                                                                name='buildings_si'
                                                                 type="text"
                                                                 placeholder="Fire-Building-Sum Insured"
                                                                 maxLength='7'
                                                                 autoComplete="off"
                                                                 onFocus={e => this.changePlaceHoldClassAdd(e)}
                                                                 onBlur={e => this.changePlaceHoldClassRemove(e)}
-                                                                value = {values.buildings_sum_insured} 
+                                                                value = {values.buildings_si} 
                                                                 onInput= {(e)=> {
-                                                                    setFieldTouched("buildings_sum_insured");
-                                                                    setFieldValue("buildings_sum_insured", e.target.value);  
+                                                                    setFieldTouched("buildings_si");
+                                                                    setFieldValue("buildings_si", e.target.value);  
                                                                 }}   
-                                                                // onClick={(e) =>{
-                                                                //      {
-                                                                //         swal("This cover is mandated by IRDAI, it is compulsory for Owner-Driver to possess a PA cover of minimum Rs 15 Lacs, except in certain conditions. By not choosing this cover, you confirm that you hold an existing PA cover or you do not possess a valid driving license.")
-                                                                //     }
-                                                                           
-                                                                // }       }                                                                 
+                                                                       
                                                             />
-                                                            {errors.buildings_sum_insured && touched.buildings_sum_insured ? (
-                                                            <span className="errorMsg">{errors.buildings_sum_insured}</span>
+                                                            {errors.buildings_si && touched.buildings_si ? (
+                                                            <span className="errorMsg">{errors.buildings_si}</span>
                                                             ) : null}  
                                                             </div>
                                                         </FormGroup>
@@ -672,7 +699,7 @@ class RiskDetails_sukhsam extends Component {
                                                     <Row>
                                                             <Col sm={6} md={6} lg={4}>
                                                         <label>
-                                                        Fire-Contents Sum Insured:
+                                                        Plant & Machinery Sum Insured:
                                                         </label>
                                                         <OverlayTrigger overlay={<Tooltip id="tooltip-disabled">{"Furniture, Fixtures, Fittings and Electrical Installations."}</Tooltip>}>
                                                             <a className="infoIcon"><img src={require('../../assets/images/i.svg')} alt="" className="premtool" /></a>
@@ -682,30 +709,31 @@ class RiskDetails_sukhsam extends Component {
                                                     <FormGroup>
                                                         <div className="insurerName">
                                                             <Field
-                                                                name="content_sum_insured"
+                                                                name="plant_machinary_si"
                                                                 type="text"
-                                                                placeholder="Fire-Contents Sum Insured"
+                                                                placeholder="Plant & Machinery Sum Insured"
                                                                 autoComplete="off"
                                                                 maxLength = '7'
                                                                 onFocus={e => this.changePlaceHoldClassAdd(e)}
                                                                 onBlur={e => this.changePlaceHoldClassRemove(e)}
-                                                                value={values.content_sum_insured}
+                                                                value={values.plant_machinary_si}
                                                                 onInput= {(e)=> {
-                                                                    setFieldTouched("content_sum_insured");
-                                                                    setFieldValue("content_sum_insured", e.target.value);  
+                                                                    setFieldTouched("plant_machinary_si");
+                                                                    setFieldValue("plant_machinary_si", e.target.value);  
                                                                 }}
                                                             />
-                                                            {errors.content_sum_insured && touched.content_sum_insured ? (
-                                                            <span className="errorMsg">{errors.content_sum_insured}</span>
+                                                            {errors.plant_machinary_si && touched.plant_machinary_si ? (
+                                                            <span className="errorMsg">{errors.plant_machinary_si}</span>
                                                             ) : null}                                                   
                                                         </div>
                                                     </FormGroup>
                                                     </Col>
                                                     </Row>
-                                                    <Row>
-                                                            <Col sm={6} md={6} lg={4}>
+                                                   
+                                                <Row>
+                                                        <Col sm={6} md={6} lg={4}>
                                                         <label>
-                                                        Fire-Stock Sum Insured:
+                                                        Furniture, Fixture & Fittings Sum Insured:
                                                         </label>
                                                         <OverlayTrigger overlay={<Tooltip id="tooltip-disabled">{"Commodity stored inside shops for sale."}</Tooltip>}>
                                                             <a className="infoIcon"><img src={require('../../assets/images/i.svg')} alt="" className="premtool" /></a>
@@ -715,27 +743,191 @@ class RiskDetails_sukhsam extends Component {
                                                         <FormGroup>
                                                             <div className="insurerName">
                                                             <Field
-                                                                name='stock_sum_insured'
+                                                                name='furniture_fixture_si'
                                                                 type="text"
-                                                                placeholder="Fire-Stock Sum Insured"
+                                                                placeholder="Furniture, Fixture & Fittings Sum Insured"
                                                                 maxLength='7'
                                                                 autoComplete="off"
                                                                 onFocus={e => this.changePlaceHoldClassAdd(e)}
                                                                 onBlur={e => this.changePlaceHoldClassRemove(e)}
-                                                                value = {values.stock_sum_insured} 
+                                                                value = {values.furniture_fixture_si} 
                                                                 onInput= {(e)=> {
-                                                                    setFieldTouched("stock_sum_insured");
-                                                                    setFieldValue("stock_sum_insured", e.target.value);  
+                                                                    setFieldTouched("furniture_fixture_si");
+                                                                    setFieldValue("furniture_fixture_si", e.target.value);  
                                                                 }}                                                                           
                                                             />
-                                                            {errors.stock_sum_insured && touched.stock_sum_insured ? (
-                                                            <span className="errorMsg">{errors.stock_sum_insured}</span>
+                                                            {errors.furniture_fixture_si && touched.furniture_fixture_si ? (
+                                                            <span className="errorMsg">{errors.furniture_fixture_si}</span>
                                                             ) : null}  
                                                             </div>
                                                         </FormGroup>
                                                     </Col>                         
                                                 </Row>
-                                                
+
+                                                <Row>
+                                                            <Col sm={6} md={6} lg={4}>
+                                                        <label>
+                                                        Fire-Contents Sum Insured:
+                                                        </label>
+                                                        <OverlayTrigger overlay={<Tooltip id="tooltip-disabled">{"Commodity stored inside shops for sale."}</Tooltip>}>
+                                                            <a className="infoIcon"><img src={require('../../assets/images/i.svg')} alt="" className="premtool" /></a>
+                                                        </OverlayTrigger>
+                                                        </Col>
+                                                    <Col sm={12} md={6} lg={4}>
+                                                        <FormGroup>
+                                                            <div className="insurerName">
+                                                            <Field
+                                                                name='fire_contents_sum_insured'
+                                                                type="text"
+                                                                placeholder="Fire-Contents Sum Insured"
+                                                                maxLength='7'
+                                                                autoComplete="off"
+                                                                disabled={true}
+                                                                onFocus={e => this.changePlaceHoldClassAdd(e)}
+                                                                onBlur={e => this.changePlaceHoldClassRemove(e)}
+                                                                value = {parseInt(values.plant_machinary_si) + 
+                                                                    parseInt(values.furniture_fixture_si)}  
+                                                                                                                                
+                                                            />
+                                                            {errors.fire_contents_sum_insured && touched.fire_contents_sum_insured ? (
+                                                            <span className="errorMsg">{errors.fire_contents_sum_insured}</span>
+                                                            ) : null}  
+                                                            </div>
+                                                        </FormGroup>
+                                                    </Col>                         
+                                                </Row>
+
+                                                <Row>
+                                                        <Col sm={6} md={6} lg={4}>
+                                                        <label>
+                                                        Stocks of Raw Material :
+                                                        </label>
+                                                        <OverlayTrigger overlay={<Tooltip id="tooltip-disabled">{"Commodity stored inside shops for sale."}</Tooltip>}>
+                                                            <a className="infoIcon"><img src={require('../../assets/images/i.svg')} alt="" className="premtool" /></a>
+                                                        </OverlayTrigger>
+                                                        </Col>
+                                                    <Col sm={12} md={6} lg={4}>
+                                                        <FormGroup>
+                                                            <div className="insurerName">
+                                                            <Field
+                                                                name='stock_raw_mat'
+                                                                type="text"
+                                                                placeholder="Stocks of Raw Material"
+                                                                maxLength='7'
+                                                                autoComplete="off"
+                                                                onFocus={e => this.changePlaceHoldClassAdd(e)}
+                                                                onBlur={e => this.changePlaceHoldClassRemove(e)}
+                                                                value = {values.stock_raw_mat} 
+                                                                onInput= {(e)=> {
+                                                                    setFieldTouched("stock_raw_mat");
+                                                                    setFieldValue("stock_raw_mat", e.target.value);  
+                                                                }}                                                                           
+                                                            />
+                                                            {errors.stock_raw_mat && touched.stock_raw_mat ? (
+                                                            <span className="errorMsg">{errors.stock_raw_mat}</span>
+                                                            ) : null}  
+                                                            </div>
+                                                        </FormGroup>
+                                                    </Col>                         
+                                                </Row>
+                                                <Row>
+                                                        <Col sm={6} md={6} lg={4}>
+                                                        <label>
+                                                        Stock of Finished Goods :
+                                                        </label>
+                                                        <OverlayTrigger overlay={<Tooltip id="tooltip-disabled">{"Commodity stored inside shops for sale."}</Tooltip>}>
+                                                            <a className="infoIcon"><img src={require('../../assets/images/i.svg')} alt="" className="premtool" /></a>
+                                                        </OverlayTrigger>
+                                                        </Col>
+                                                    <Col sm={12} md={6} lg={4}>
+                                                        <FormGroup>
+                                                            <div className="insurerName">
+                                                            <Field
+                                                                name='finish_goods'
+                                                                type="text"
+                                                                placeholder="Stock of Finished Goods"
+                                                                maxLength='7'
+                                                                autoComplete="off"
+                                                                onFocus={e => this.changePlaceHoldClassAdd(e)}
+                                                                onBlur={e => this.changePlaceHoldClassRemove(e)}
+                                                                value = {values.finish_goods} 
+                                                                onInput= {(e)=> {
+                                                                    setFieldTouched("finish_goods");
+                                                                    setFieldValue("finish_goods", e.target.value);  
+                                                                }}                                                                           
+                                                            />
+                                                            {errors.finish_goods && touched.finish_goods ? (
+                                                            <span className="errorMsg">{errors.finish_goods}</span>
+                                                            ) : null}  
+                                                            </div>
+                                                        </FormGroup>
+                                                    </Col>                         
+                                                </Row>
+                                                <Row>
+                                                        <Col sm={6} md={6} lg={4}>
+                                                        <label>
+                                                        Stocks of Work in Progress :
+                                                        </label>
+                                                        <OverlayTrigger overlay={<Tooltip id="tooltip-disabled">{"Commodity stored inside shops for sale."}</Tooltip>}>
+                                                            <a className="infoIcon"><img src={require('../../assets/images/i.svg')} alt="" className="premtool" /></a>
+                                                        </OverlayTrigger>
+                                                        </Col>
+                                                    <Col sm={12} md={6} lg={4}>
+                                                        <FormGroup>
+                                                            <div className="insurerName">
+                                                            <Field
+                                                                name='stock_wip'
+                                                                type="text"
+                                                                placeholder="Stocks of Work in Progress"
+                                                                maxLength='7'
+                                                                autoComplete="off"
+                                                                onFocus={e => this.changePlaceHoldClassAdd(e)}
+                                                                onBlur={e => this.changePlaceHoldClassRemove(e)}
+                                                                value = {values.stock_wip} 
+                                                                onInput= {(e)=> {
+                                                                    setFieldTouched("stock_wip");
+                                                                    setFieldValue("stock_wip", e.target.value);  
+                                                                }}                                                                           
+                                                            />
+                                                            {errors.stock_wip && touched.stock_wip ? (
+                                                            <span className="errorMsg">{errors.stock_wip}</span>
+                                                            ) : null}  
+                                                            </div>
+                                                        </FormGroup>
+                                                    </Col>                         
+                                                </Row>
+                                                <Row>
+                                                            <Col sm={6} md={6} lg={4}>
+                                                        <label>
+                                                        Fire-Stock Sum Insured
+                                                        </label>
+                                                        <OverlayTrigger overlay={<Tooltip id="tooltip-disabled">{"Commodity stored inside shops for sale."}</Tooltip>}>
+                                                            <a className="infoIcon"><img src={require('../../assets/images/i.svg')} alt="" className="premtool" /></a>
+                                                        </OverlayTrigger>
+                                                        </Col>
+                                                    <Col sm={12} md={6} lg={4}>
+                                                        <FormGroup>
+                                                            <div className="insurerName">
+                                                            <Field
+                                                                name='fire_stock_sum_insured'
+                                                                type="text"
+                                                                placeholder="Fire-Stock Sum Insured"
+                                                                maxLength='7'
+                                                                autoComplete="off"
+                                                                disabled={true}
+                                                                onFocus={e => this.changePlaceHoldClassAdd(e)}
+                                                                onBlur={e => this.changePlaceHoldClassRemove(e)}
+                                                                value = {parseInt(values.stock_raw_mat) + 
+                                                                    parseInt(values.finish_goods) + 
+                                                                    parseInt(values.stock_wip)}                                                                       
+                                                            />
+                                                            {errors.fire_stock_sum_insured && touched.fire_stock_sum_insured ? (
+                                                            <span className="errorMsg">{errors.fire_stock_sum_insured}</span>
+                                                            ) : null}  
+                                                            </div>
+                                                        </FormGroup>
+                                                    </Col>                         
+                                                </Row>
                                                 <Row>
                                                             <Col sm={6} md={6} lg={4}>
                                                         <label>
@@ -756,7 +948,12 @@ class RiskDetails_sukhsam extends Component {
                                                                 autoComplete="off"
                                                                 onFocus={e => this.changePlaceHoldClassAdd(e)}
                                                                 onBlur={e => this.changePlaceHoldClassRemove(e)}
-                                                                value = {parseInt(values.buildings_sum_insured) + parseInt(values.content_sum_insured) + parseInt(values.stock_sum_insured)} 
+                                                                value = {parseInt(values.buildings_si) + 
+                                                                    parseInt(values.plant_machinary_si) + 
+                                                                    parseInt(values.furniture_fixture_si) + 
+                                                                    parseInt(values.stock_raw_mat) + 
+                                                                    parseInt(values.finish_goods) + 
+                                                                    parseInt(values.stock_wip)} 
                                                                 disabled={true}
                                                                 onInput= {(e)=> {
                                                                     setFieldTouched("Fire_sum_insured");
@@ -828,16 +1025,16 @@ const mapStateToProps = state => {
       completed_step:state.sme_fire.completed_step,
       menumaster_id:state.sme_fire.menumaster_id,
 
-      house_building_name: state.sme_fire.house_building_name,
+      shop_building_name: state.sme_fire.shop_building_name,
       block_no: state.sme_fire.block_no,
     //   street_name: state.sme_fire.street_name,
     //   plot_no: state.sme_fire.plot_no,
       house_flat_no: state.sme_fire.house_flat_no,
       pincode: state.sme_fire.pincode,
       pincode_id: state.sme_fire.pincode_id,
-      buildings_sum_insured: state.sme_fire.buildings_sum_insured,
-      content_sum_insured: state.sme_fire.content_sum_insured,
-      stock_sum_insured: state.sme_fire.stock_sum_insured,
+      buildings_si: state.sme_fire.buildings_si,
+      plant_machinary_si: state.sme_fire.plant_machinary_si,
+      furniture_fixture_si: state.sme_fire.furniture_fixture_si,
       policy_holder_id:state.sme_fire.policy_holder_id,
       menumaster_id:state.sme_fire.menumaster_id
     };

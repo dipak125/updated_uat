@@ -634,17 +634,7 @@ class SelectDuration_KSB_Micro extends Component {
                                                         <ul><b>Base</b>
                                                             <li>24 Doctor consultation calls in a year</li>
                                                             <li>1 lakh PA Cover to Primary Insured </li>
-                                                        </ul>
-                                                        <ul><b>Medium</b>
-                                                            <li>36 Doctor Consultation calls in a year</li>
-                                                            <li>Hospital Daily Cash Benefit of Rs 250/day up to 30 Days </li>
-                                                            <li>3 Lakhs PA Cover to Primary Insured  </li>
-                                                        </ul>
-                                                        <ul><b>Top</b>
-                                                            <li>60 Doctor Consultation calls in a year</li>
-                                                            <li>Hospital Daily Cash Benefit of Rs 250/day up to 60 Days </li>
-                                                            <li>5 Lakhs PA Cover to Primary Insured</li>
-                                                        </ul>
+                                                        </ul>                                                     
                                                         </div>
                                                     </Col>
                                                     <div className="d-flex justify-content-left resmb">

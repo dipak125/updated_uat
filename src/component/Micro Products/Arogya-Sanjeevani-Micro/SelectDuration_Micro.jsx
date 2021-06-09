@@ -137,7 +137,7 @@ class SelectDuration_Micro extends Component {
             return false
         }
         else if((serverResponse.HighestFamilySI > 100000) && familyMembers.length == "1"  ) {
-            swal("Quote cannot proceed with SI greater than 100000”")
+            swal("Quote cannot proceed with SI greater than 100000")
             this.props.loadingStop();
             return false
         }

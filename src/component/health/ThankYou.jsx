@@ -19,6 +19,7 @@ class ThankYouPage extends Component {
     response_text: [],
     policyNo: this.props.match.params.policyId,
     vehicletype: [],
+    dloadCounter: 0,
     refNumber:  queryString.parse(this.props.location.search).access_id ? 
                 queryString.parse(this.props.location.search).access_id : 
                 localStorage.getItem("policyHolder_refNo")
@@ -86,7 +87,7 @@ class ThankYouPage extends Component {
 
   getPolicyDoc = (access_token) => {
 
-    const { policyNo } = this.state
+    const { policyNo, dloadCounter } = this.state
     const formData = new FormData();
     //formData.append('access_token', access_token);
     //formData.append('policyNo', policyNo)
@@ -104,6 +105,7 @@ class ThankYouPage extends Component {
         this.props.loadingStop();
 
         if(res.data.error == true) {
+          this.setState({dloadCounter: dloadCounter+1})
           swal({
             title: "Alert",
             text: "PDF Generation process is taking longer time than expected. Please have patience.",
@@ -112,21 +114,24 @@ class ThankYouPage extends Component {
             dangerMode: true,
           })
           .then((willDownload) => {
-            if (willDownload) {
+            if (willDownload && dloadCounter < 3) {
             this.getAccessToken()
             }
+            else {swal(res.data.msg)}
           })
 
         }
         else if (res.data.data.getPolicyDocumentResponseBody.payload.URL[0] == "No Results found for the given Criteria") {
           // swal(res.data.getPolicyDocumentResponseBody.payload.URL[0]);
+          this.setState({dloadCounter: dloadCounter+1})
           swal("Thank you for showing your interest for buying product.Due to some reasons, we are not able to issue the policy document online. Please call 180 22 1111");
         }
         
         else {
           this.setState({
             response_text: res.data,
-            res_error: false
+            res_error: false,
+            dloadCounter: 0
           })
 
           this.generate_pdf(res.data.data, this.state.refNumber)    
@@ -229,10 +234,6 @@ class ThankYouPage extends Component {
         .catch(err => {
             
         })
-	
-	
-	
-	
 
     axios.get(`policy-holder-additional-details/${this.state.refNumber}`)
         .then(res => {
@@ -364,12 +365,12 @@ downloadWordingGSB = () => {
                       <p>{phrases['ThankYouSBI']}</p>
                       <p className="fs-16 m-b-30">{phrases['PolicyNo']} <span className="lghtBlue"> {policyId}</span></p>
                         <div className="d-flex justify-content-center align-items-center">
-                        {/* {vehicletype.download_type == 0 ?
+                        {vehicletype.download_type == 0 ?
                             <button className="policy m-l-20" onClick={this.generateDoc}>{phrases['PolicyCopy']} </button>
                             :
                             <button className="policy m-l-20" onClick={this.getAccessToken}>{phrases['PolicyCopy']} </button>
-                        } */}
-                        <button className="policy m-l-20" onClick={this.generateDoc}>{phrases['PolicyCopy']} </button>
+                        }
+                        {/* <button className="policy m-l-20" onClick={this.generateDoc}>{phrases['PolicyCopy']} </button> */}
                         {vehicletype && vehicletype.id && vehicletype.id == 13 ?
                             <button className="policy m-l-20" onClick={this.downloadWording}>Policy Wording </button>
                             :

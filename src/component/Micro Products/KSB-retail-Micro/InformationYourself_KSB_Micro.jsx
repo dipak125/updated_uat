@@ -1031,7 +1031,7 @@ class InformationYourself_KSB_Micro extends Component {
     let familyMembers = this.state.familyMembers;
     let post_data = []
     let menumaster_id = 6;
-    let vehicle_type_id = 10;
+    let vehicle_type_id = 22;
 
     let user_data = sessionStorage.getItem("users") ? JSON.parse(sessionStorage.getItem("users")): "";
     let user_id = ""
