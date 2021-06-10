@@ -44,9 +44,6 @@ const initialValue = {
 }
 
 
-
-
-
 class RiskDetails_sukhsam extends Component {
 
     state = {
@@ -163,8 +160,6 @@ class RiskDetails_sukhsam extends Component {
     
     handleSubmit=(values, actions)=>{
         const {productId} = this.props.match.params 
-        console.log('handleSubmit', values);
-        // console.log("policyHolder_id-------->",policyHolder_id)
         const formData = new FormData();
         let encryption = new Encryption();
 
@@ -255,9 +250,7 @@ class RiskDetails_sukhsam extends Component {
     fetchPolicyDetails=()=>{
         let policy_holder_ref_no = localStorage.getItem("policy_holder_ref_no") ? localStorage.getItem("policy_holder_ref_no"):0;
         let encryption = new Encryption();
-
-        // if(this.props.policy_holder_ref_no == null && policy_holder_ref_no != ''){
-            
+           
             this.props.loadingStart();
             axios.get(`sookshama/details/${policy_holder_ref_no}`)
             .then(res=>{
@@ -366,14 +359,14 @@ class RiskDetails_sukhsam extends Component {
     componentDidMount() {
         // this.getInsurerList();
         //this.fetchData();
-        this.fetchPolicyDetails();
-        this.fetchAreadetailsBack();
-        this.fireSumCalculate();
+        // this.fetchPolicyDetails();
+        // this.fetchAreadetailsBack();
+        // this.fireSumCalculate();
         
     }
     Registration_SME = (productId) => {
         // console.log('Product-----id',productId)
-        this.props.history.push(`/Registration_Sukhsam/${productId}`);
+        this.props.history.push(`/Registration_Sookshma/${productId}`);
     }
 
     render() {
@@ -382,7 +375,7 @@ class RiskDetails_sukhsam extends Component {
         const {productId} = this.props.match.params  
         const {insurerList, showClaim, previous_is_claim, motorInsurance, previousPolicy,
             stateName,pinDataArr,CustomerID,suggestions, vehicleDetails, RTO_location} = this.state
-
+            console.log('Sookshama...',this.props)
         let newInitialValues = Object.assign(initialValue,{
             shop_building_name:this.props.shop_building_name,
             block_no:this.props.block_no,
@@ -448,14 +441,12 @@ class RiskDetails_sukhsam extends Component {
                 <div className="container-fluid">
                 <div className="row">
 				
-                    <aside className="left-sidebar">
- <div className="scroll-sidebar ps-container ps-theme-default ps-active-y">
-<SideNav />
- </div>
-</aside>
+                <aside className="left-sidebar">
+                    <div className="scroll-sidebar ps-container ps-theme-default ps-active-y">
+                    <SideNav />
+                    </div>
+                </aside>
 
-					
-					
                 <div className="col-sm-12 col-md-12 col-lg-12 col-xl-12 infobox riskdetail">
                 <h4 className="text-center mt-3 mb-3">SME Pre UW</h4>
                 <section className="brand m-b-25">
@@ -532,45 +523,7 @@ class RiskDetails_sukhsam extends Component {
                                                         </FormGroup>
                                                     </Col>
                                                     </Row>
-                                                    
-                                                    {/* <Row>
-                                                    <Col sm={12} md={4} lg={4}>
-                                                        <FormGroup>
-                                                            <div className="formSection">
-                                                            <Field
-                                                                name='street_name'
-                                                                type="text"
-                                                                placeholder="Street Name"
-                                                                autoComplete="off"
-                                                                onFocus={e => this.changePlaceHoldClassAdd(e)}
-                                                                onBlur={e => this.changePlaceHoldClassRemove(e)}
-                                                                value = {values.street_name}                                                                            
-                                                            />
-                                                            {errors.street_name && touched.street_name ? (
-                                                            <span className="errorMsg">{errors.street_name}</span>
-                                                            ) : null}              
-                                                            </div>
-                                                        </FormGroup>
-                                                    </Col>
-                                                    <Col sm={12} md={4} lg={4}>
-                                                        <FormGroup>
-                                                            <div className="formSection">
-                                                            <Field
-                                                                name='plot_no'
-                                                                type="text"
-                                                                placeholder="Plot No."
-                                                                autoComplete="off"
-                                                                onFocus={e => this.changePlaceHoldClassAdd(e)}
-                                                                onBlur={e => this.changePlaceHoldClassRemove(e)}
-                                                                value = {values.plot_no}                                                                            
-                                                            />
-                                                            {errors.plot_no && touched.plot_no ? (
-                                                            <span className="errorMsg">{errors.plot_no}</span>
-                                                            ) : null}              
-                                                            </div>
-                                                        </FormGroup>
-                                                    </Col>
-                                                    </Row> */}
+
                                                     <Row>
 
                                                     <Col sm={12} md={4} lg={4}>
@@ -1017,26 +970,26 @@ const mapStateToProps = state => {
     return {
       loading: state.loader.loading,
 
-      start_date: state.sme_fire.start_date,
-      end_date: state.sme_fire.end_date,
-      policy_holder_id: state.sme_fire.policy_holder_id,
-      policy_holder_ref_no:state.sme_fire.policy_holder_ref_no,
-      request_data_id:state.sme_fire.request_data_id,
-      completed_step:state.sme_fire.completed_step,
-      menumaster_id:state.sme_fire.menumaster_id,
+      start_date: state.sukhsam.start_date,
+      end_date: state.sukhsam.end_date,
+      policy_holder_id: state.sukhsam.policy_holder_id,
+      policy_holder_ref_no:state.sukhsam.policy_holder_ref_no,
+      request_data_id:state.sukhsam.request_data_id,
+      completed_step:state.sukhsam.completed_step,
+      menumaster_id:state.sukhsam.menumaster_id,
 
-      shop_building_name: state.sme_fire.shop_building_name,
-      block_no: state.sme_fire.block_no,
-    //   street_name: state.sme_fire.street_name,
-    //   plot_no: state.sme_fire.plot_no,
-      house_flat_no: state.sme_fire.house_flat_no,
-      pincode: state.sme_fire.pincode,
-      pincode_id: state.sme_fire.pincode_id,
-      buildings_si: state.sme_fire.buildings_si,
-      plant_machinary_si: state.sme_fire.plant_machinary_si,
-      furniture_fixture_si: state.sme_fire.furniture_fixture_si,
-      policy_holder_id:state.sme_fire.policy_holder_id,
-      menumaster_id:state.sme_fire.menumaster_id
+      shop_building_name: state.sukhsam.shop_building_name,
+      block_no: state.sukhsam.block_no,
+    //   street_name: state.sukhsam.street_name,
+    //   plot_no: state.sukhsam.plot_no,
+      house_flat_no: state.sukhsam.house_flat_no,
+      pincode: state.sukhsam.pincode,
+      pincode_id: state.sukhsam.pincode_id,
+      buildings_si: state.sukhsam.buildings_si,
+      plant_machinary_si: state.sukhsam.plant_machinary_si,
+      furniture_fixture_si: state.sukhsam.furniture_fixture_si,
+      policy_holder_id:state.sukhsam.policy_holder_id,
+      menumaster_id:state.sukhsam.menumaster_id
     };
   };
   

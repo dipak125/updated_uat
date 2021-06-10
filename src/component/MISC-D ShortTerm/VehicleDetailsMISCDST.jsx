@@ -346,7 +346,7 @@ const vehicleRegistrationValidation = Yup.object().shape({
         },
         function (value) {
             const ageObj = new PersonAge();
-            if (this.parent.policy_type_id == '2'  && this.parent.valid_previous_policy == '1' && this.parent.previous_policy_name == '1' &&
+            if (this.parent.policy_type_id == '2'  && this.parent.valid_previous_policy == '1' && (this.parent.previous_policy_name == '1' || this.parent.previous_policy_name == '3') &&
             Math.floor(moment().diff(this.parent.previous_end_date, 'days', true)) <= 90 && !value) {   
                 return false;    
             }
@@ -603,7 +603,7 @@ class VehicleDetailsMISCD extends Component {
                 'previous_city':values.previous_city,
                 'previous_policy_no': values.previous_policy_no,
                 'previous_is_claim':values.previous_is_claim ? values.previous_is_claim : '0' ,
-                'previous_claim_bonus': values.previous_claim_bonus ? values.previous_claim_bonus : 1,
+                'previous_claim_bonus': (values.previous_claim_bonus || values.previous_claim_bonus == 0) ? values.previous_claim_bonus : 1,
                 'no_of_claim': values.no_of_claim,        
                 'vehicleAge': vehicleAge,
                 'policy_type': policy_type,
@@ -614,8 +614,8 @@ class VehicleDetailsMISCD extends Component {
                 'no_of_claim': values.no_of_claim,
                 'new_policy_duration': values.new_policy_duration ,
                 'duration': values.duration,
-                'new_policy_start_date' : values.new_policy_start_date,
-                'new_policy_end_date' : values.new_policy_end_date,
+                'new_policy_start_date' : values.new_policy_start_date ? moment(values.new_policy_start_date).format("YYYY-MM-DD") : "",
+                'new_policy_end_date' : values.new_policy_end_date ? moment(values.new_policy_end_date).format("YYYY-MM-DD") : "",
                 'is_new_policy' : 1
             } 
 

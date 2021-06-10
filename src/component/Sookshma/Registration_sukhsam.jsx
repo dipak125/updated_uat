@@ -59,28 +59,6 @@ class Registration_sukhsam extends Component {
         this.fetchPolicyDetails();      
     }
 
-    fetchData=()=>{
-        const {productId } = this.props.match.params
-        let policyHolder_id = localStorage.getItem("policyHolder_refNo") ? localStorage.getItem("policyHolder_refNo"):0;
-        let encryption = new Encryption();
-        this.props.loadingStart();
-        axios.get(`sookshama/details/${policyHolder_id}`)
-            .then(res=>{
-                // let decryptResp = JSON.parse(encryption.decrypt(res.data))
-                // console.log("decrypt", decryptResp)
-
-                // let policyHolder = decryptResp.data.policyHolder.motorinsurance           
-                // // let fastlanelog = decryptResp.data.policyHolder ? decryptResp.data.policyHolder.fastlanelog : {};
-                // this.setState({ 
-                //     policyHolder
-                // })
-                this.props.loadingStop();
-            })
-            .catch(err => {
-                // handle error
-                this.props.loadingStop();
-            })
-    }
 
     fetchPolicyDetails=()=>{
         let policy_holder_ref_no = localStorage.getItem("policy_holder_ref_no") ? localStorage.getItem("policy_holder_ref_no"):0;
@@ -97,17 +75,14 @@ class Registration_sukhsam extends Component {
 
                     this.props.setData({
                         start_date:decryptResp.data.policyHolder.request_data.start_date,
-                        end_date:decryptResp.data.policyHolder.request_data.end_date,
-                        
+                        end_date:decryptResp.data.policyHolder.request_data.end_date,               
                         policy_holder_id:decryptResp.data.policyHolder.id,
                         policy_holder_ref_no:policy_holder_ref_no,
                         request_data_id:decryptResp.data.policyHolder.request_data.id,
                         completed_step:decryptResp.data.policyHolder.step_no,
                         menumaster_id:decryptResp.data.policyHolder.menumaster_id,
                         payment_link_status: decryptResp.data.policyHolder && decryptResp.data.policyHolder.bcmaster ? decryptResp.data.policyHolder.bcmaster.eligible_for_payment_link : 0
-                    });
-
-                    
+                    });         
 
                 }
 
@@ -263,8 +238,7 @@ class Registration_sukhsam extends Component {
                     this.props.loadingStop();
                     this.props.setData({
                         start_date:values.pol_start_date,
-                        end_date:values.pol_end_date,
-                        
+                        end_date:values.pol_end_date,                
                         policy_holder_id:decryptResp.data.policyHolder_id,
                         policy_holder_ref_no:decryptResp.data.policyHolder_refNo,
                         request_data_id:decryptResp.data.request_data_id,
@@ -304,15 +278,13 @@ class Registration_sukhsam extends Component {
 				 <div className="page-wrapper">
                     <div className="container-fluid">
                         <div className="row">
-						
-						
+	
                             <aside className="left-sidebar">
- <div className="scroll-sidebar ps-container ps-theme-default ps-active-y">
-<SideNav />
- </div>
-</aside>
-							
-							
+                                <div className="scroll-sidebar ps-container ps-theme-default ps-active-y">
+                                <SideNav />
+                                </div>
+                            </aside>
+												
                             <div className="col-sm-12 col-md-12 col-lg-12 col-xl-12 infobox regs2">
                                 <h4 className="text-center mt-3 mb-3">Sookshma & Burglary</h4>
                                 <section className="brand">
@@ -325,7 +297,44 @@ class Registration_sukhsam extends Component {
                                             // console.log('values',values)
                                             
                                         return (
-                                            <Form>                                                                                 
+                                            <Form>        
+                                            {/* <div className="d-flex justify-content-left">
+                                                <div className="brandhead">
+                                                    <h4 >CUSTOMER INFORMATION:</h4>
+                                                </div>
+                                            </div>   
+                                            <Row>  
+                                                <Col sm={6} md={4} lg={4}>
+                                                <label>
+                                                Customer Type
+                                                </label>
+                                                </Col>
+                                            
+                                                <Col sm={6} md={4} lg={4}>
+                                                    <FormGroup>
+                                                        <div className="formSection">
+                                                            <Field
+                                                                name='customer_type'
+                                                                component="select"
+                                                                autoComplete="off"
+                                                                className="formGrp inputfs12"
+                                                                value = {values.customer_type}                                                                           
+                                                            >
+                                                                <option value="">Select</option>
+                                                                <option value="1">Individual Customer</option>
+                                                                <option value="2">Company Customer</option>
+                                                            </Field>
+                                                            {errors.customer_type && touched.customer_type ? (
+                                                            <span className="errorMsg">{errors.customer_type}</span>
+                                                            ) : null}  
+                                                        </div>
+                                                    </FormGroup>
+                                                </Col>
+                                            </Row>
+                                            <div className="brandhead"> 
+                                                <p>&nbsp;</p>
+                                            </div> */}
+
                                             <div className="d-flex justify-content-left">
                                                 <div className="brandhead">
                                                 </div>
@@ -334,7 +343,7 @@ class Registration_sukhsam extends Component {
                                                 <h4 className="fs-18 m-b-30">POLICY INFORMATION</h4>
                                             </div>
                                             <Row>
-                                                <Col sm={6} md={5} lg={5}>
+                                                <Col sm={6} md={5} lg={4}>
                                                     <h6>Policy start date & time:</h6>
                                                 </Col>
                                                 <Col sm={6} md={11} lg={4}>
@@ -376,7 +385,7 @@ class Registration_sukhsam extends Component {
                                                 </Col>
                                                 </Row>
                                                 <Row>
-                                                <Col sm={6} md={5} lg={5}>
+                                                <Col sm={6} md={5} lg={4}>
                                                     <h6>Policy end date & time:</h6>
                                                 </Col>
                                                 <Col sm={6} md={11} lg={4}>
@@ -444,13 +453,13 @@ class Registration_sukhsam extends Component {
 const mapStateToProps = state => {
     return {
       loading: state.loader.loading,
-      start_date: state.sme_fire.start_date,
-      end_date: state.sme_fire.end_date,
-      policy_holder_id: state.sme_fire.policy_holder_id,
-      policy_holder_ref_no:state.sme_fire.policy_holder_ref_no,
-      request_data_id:state.sme_fire.request_data_id,
-      completed_step:state.sme_fire.completed_step,
-      menumaster_id:state.sme_fire.menumaster_id
+      start_date: state.sukhsam.start_date,
+      end_date: state.sukhsam.end_date,
+      policy_holder_id: state.sukhsam.policy_holder_id,
+      policy_holder_ref_no:state.sukhsam.policy_holder_ref_no,
+      request_data_id:state.sukhsam.request_data_id,
+      completed_step:state.sukhsam.completed_step,
+      menumaster_id:state.sukhsam.menumaster_id
     };
   };
   

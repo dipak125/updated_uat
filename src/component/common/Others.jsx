@@ -22,16 +22,14 @@ class Others extends Component {
 		
         this.props.loadingStart();
 		
-        if(productId == '9'){
+    if(productId == '9'){
 			localStorage.removeItem('policy_holder_ref_no')
 			this.props.history.push(`/Registration_SME/${productId}`);
-			window.location.reload(false);
 		}  
 		
 		if(productId == '19'){
 			localStorage.removeItem('policy_holder_ref_no')
 			this.props.history.push(`/Registration_Sookshma/${productId}`);
-			window.location.reload(false);
 		}
 	
 	}

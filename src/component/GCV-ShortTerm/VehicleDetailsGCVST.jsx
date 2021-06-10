@@ -307,7 +307,7 @@ const vehicleRegistrationValidation = Yup.object().shape({
             return "PolicyMaxCharacter"
         }),
 
-    previous_claim_bonus:Yup.mixed()
+    previous_claim_bonus:Yup.string()
     .notRequired('No Claim bonus is required')
     .test(
         "currentMonthChecking",
@@ -315,7 +315,8 @@ const vehicleRegistrationValidation = Yup.object().shape({
             return "PleaseEPCB"
         },
         function (value) {
-            if (this.parent.previous_is_claim == '0' && this.parent.valid_previous_policy == '1' && Math.floor(moment().diff(this.parent.previous_end_date, 'days', true)) <= 90 && (this.parent.previous_policy_name == '1' || this.parent.previous_policy_name == '3') && (!value || value == '1')) {   
+            if (this.parent.previous_is_claim == '0' && this.parent.valid_previous_policy == '1' && Math.floor(moment().diff(this.parent.previous_end_date, 'days', true)) <= 90 && (this.parent.previous_policy_name == '1' || this.parent.previous_policy_name == '3') 
+                && (!value || value == '1')) {   
                 return false;    
             }
             return true;
@@ -342,7 +343,7 @@ const vehicleRegistrationValidation = Yup.object().shape({
         },
         function (value) {
             const ageObj = new PersonAge();
-            if (this.parent.policy_type_id == '2'  && this.parent.valid_previous_policy == '1' && this.parent.previous_policy_name == '1' &&
+            if (this.parent.policy_type_id == '2'  && this.parent.valid_previous_policy == '1' && (this.parent.previous_policy_name == '1' || this.parent.previous_policy_name == '3') &&
             Math.floor(moment().diff(this.parent.previous_end_date, 'days', true)) <= 90 && !value) {   
                 return false;    
             }
@@ -614,7 +615,7 @@ class VehicleDetailsGCV extends Component {
                 'previous_city':values.previous_city,
                 'previous_policy_no': values.previous_policy_no,
                 'previous_is_claim':values.previous_is_claim ? values.previous_is_claim : '0' ,
-                'previous_claim_bonus': values.previous_claim_bonus ? values.previous_claim_bonus : 1,
+                'previous_claim_bonus': (values.previous_claim_bonus || values.previous_claim_bonus == 0)  ? values.previous_claim_bonus : 1,
                 'no_of_claim': values.no_of_claim,        
                 'vehicleAge': vehicleAge,
                 'policy_type': policy_type,
@@ -628,8 +629,8 @@ class VehicleDetailsGCV extends Component {
                 'no_of_claim': values.no_of_claim,
                 'new_policy_duration': values.new_policy_duration ,
                 'duration': values.duration,
-                'new_policy_start_date' : values.new_policy_start_date,
-                'new_policy_end_date' : values.new_policy_end_date,
+                'new_policy_start_date' : values.new_policy_start_date ? moment(values.new_policy_start_date).format("YYYY-MM-DD") : "",
+                'new_policy_end_date' : values.new_policy_end_date ? moment(values.new_policy_end_date).format("YYYY-MM-DD") : "",
                 'is_new_policy' : 1
             } 
 
@@ -953,8 +954,8 @@ class VehicleDetailsGCV extends Component {
                             onSubmit={this.handleSubmit} 
                             validationSchema={vehicleRegistrationValidation}>
                             {({ values, errors, setFieldValue, setFieldTouched, isValid, isSubmitting, touched }) => {
-// console.log("values------------ ", values)
-// console.log("errors------------ ", errors)
+console.log("values------------ ", values)
+console.log("errors------------ ", errors)
                                 return (
                                     <Form enableReinitialize = {true}>
                                         <Row>
