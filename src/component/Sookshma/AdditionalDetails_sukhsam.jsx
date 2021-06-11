@@ -222,9 +222,9 @@ class AdditionalDetails_sukhsam extends Component {
         }       
     }
 
-    summary_SME = (productId) => {
+    otherDetails = (productId) => {
         // productId === 5
-        this.props.history.push(`/Summary_Sukhsam/${productId}`);
+        this.props.history.push(`/OtherDetails_Sookshma/${productId}`);
     }
 
 
@@ -257,9 +257,10 @@ class AdditionalDetails_sukhsam extends Component {
             'pincode_id': values.pincode_id,
         }
 
+        console.log("Post_data_proposer-details---------  ", post_data)
         formData.append('enc_data',encryption.encrypt(JSON.stringify(post_data)))
         this.props.loadingStart();
-        axios.post('sme/proposer-details',
+        axios.post('sookshama/proposer-details',
         formData
         ).then(res=>{
             
@@ -284,6 +285,7 @@ class AdditionalDetails_sukhsam extends Component {
                 }
             );
 
+            this.props.history.push(`/Premium_Sookshma/${productId}`);
             let formDataNew = new FormData(); 
             let post_data_new = {
                 'policy_ref_no': this.props.policy_holder_ref_no,
@@ -291,54 +293,56 @@ class AdditionalDetails_sukhsam extends Component {
                 'page_name': `AdditionalDetails_SME/${productId}`,
     
             }
-            formDataNew.append('enc_data',encryption.encrypt(JSON.stringify(post_data_new)))
-            axios.post('/sme/mdm-party',
-            formDataNew
-            ).then(res=>{
-                axios.post('/sme/create-quote',
-                formDataNew
-                ).then(res1=>{
-                   let decryptResp = JSON.parse(encryption.decrypt(res1.data));
-                   if( decryptResp.error === false) {
-                       axios.post('/sme/con-sequence',
-                    formDataNew
-                    ).then(res2=>{
-                        const {productId} = this.props.match.params;
-                        this.props.loadingStop();
-                        let decryptResp = JSON.parse(encryption.decrypt(res2.data));
+            // formDataNew.append('enc_data',encryption.encrypt(JSON.stringify(post_data_new)))
+            // axios.post('/sme/mdm-party',
+            // formDataNew
+            // ).then(res=>{
+            //     axios.post('/sme/create-quote',
+            //     formDataNew
+            //     ).then(res1=>{
+            //        let decryptResp = JSON.parse(encryption.decrypt(res1.data));
+            //        if( decryptResp.error === false) {
+            //            axios.post('/sme/con-sequence',
+            //         formDataNew
+            //         ).then(res2=>{
+            //             const {productId} = this.props.match.params;
+            //             this.props.loadingStop();
+            //             let decryptResp = JSON.parse(encryption.decrypt(res2.data));
                         
-                        if( decryptResp.error === false) {
-                            this.props.history.push(`/Premium_Sukhsam/${productId}`);
-                        } else {
-                            this.props.loadingStop();
-                            swal("Thank you for showing your interest for buying product.Due to some reasons, we are not able to issue the policy online.Please call 1800 22 1111")
-                            actions.setSubmitting(false);
-                        };
-                    }).
-                    catch(err=>
-                        {this.props.loadingStop();
-                        swal("Thank you for showing your interest for buying product.Due to some reasons, we are not able to issue the policy online.Please call 1800 22 1111");
-                        actions.setSubmitting(false);
+            //             if( decryptResp.error === false) {
+            //                 this.props.history.push(`/Premium_Sukhsam/${productId}`);
+            //             } else {
+            //                 this.props.loadingStop();
+            //                 swal("Thank you for showing your interest for buying product.Due to some reasons, we are not able to issue the policy online.Please call 1800 22 1111")
+            //                 actions.setSubmitting(false);
+            //             };
+            //         }).
+            //         catch(err=>
+            //             {this.props.loadingStop();
+            //             swal("Thank you for showing your interest for buying product.Due to some reasons, we are not able to issue the policy online.Please call 1800 22 1111");
+            //             actions.setSubmitting(false);
                         
-                    });
-                }
-                else { this.props.loadingStop()
-                    swal("Thank you for showing your interest for buying product.Due to some reasons, we are not able to issue the policy online.Please call 1800 22 1111");
-                    actions.setSubmitting(false);
-                }
-                }).
-                catch(err=>{
-                    this.props.loadingStop();
-                    actions.setSubmitting(false);
-                });
-            }).
-            catch(err=>{
-                this.props.loadingStop();
-                actions.setSubmitting(false);
-            });
+            //         });
+            //     }
+            //     else { this.props.loadingStop()
+            //         swal("Thank you for showing your interest for buying product.Due to some reasons, we are not able to issue the policy online.Please call 1800 22 1111");
+            //         actions.setSubmitting(false);
+            //     }
+            //     }).
+            //     catch(err=>{
+            //         this.props.loadingStop();
+            //         actions.setSubmitting(false);
+            //     });
+            // }).
+            // catch(err=>{
+            //     this.props.loadingStop();
+            //     actions.setSubmitting(false);
+            // });
         }).
         catch(err=>{
             this.props.loadingStop();
+            let decryptErr = JSON.parse(encryption.decrypt(err.data))
+            console.log("decryptErr------------ ", decryptErr)
             actions.setSubmitting(false);
         });
     }
@@ -500,9 +504,10 @@ class AdditionalDetails_sukhsam extends Component {
         if(this.props.policy_holder_ref_no == null && policy_holder_ref_no != ''){
             
             this.props.loadingStart();
-            axios.get(`sme/details/${policy_holder_ref_no}`)
+            axios.get(`sookshama/details/${policy_holder_ref_no}`)
             .then(res=>{
                 let decryptResp = JSON.parse(encryption.decrypt(res.data));
+                console.log("decryptResp -------->",decryptResp)
                 if(decryptResp.data.policyHolder.step_no > 0){
 
                     this.props.setData({
@@ -513,13 +518,14 @@ class AdditionalDetails_sukhsam extends Component {
                         policy_holder_ref_no:policy_holder_ref_no,
                         request_data_id:decryptResp.data.policyHolder.request_data.id,
                         completed_step:decryptResp.data.policyHolder.step_no,
-                        menumaster_id:decryptResp.data.policyHolder.menumaster_id
-                    });
+                        menumaster_id:decryptResp.data.policyHolder.menumaster_id,
+                        payment_link_status: decryptResp.data.policyHolder && decryptResp.data.policyHolder.bcmaster ? decryptResp.data.policyHolder.bcmaster.eligible_for_payment_link : 0
+                    });                   
                 }
 
                 if(decryptResp.data.policyHolder.step_no == 1 || decryptResp.data.policyHolder.step_no > 1){
 
-                    let risk_arr = JSON.parse(decryptResp.data.policyHolder.smeinfo.risk_address);
+                    let risk_arr = JSON.parse(decryptResp.data.policyHolder.sookshamainfo.risk_address);             
 
                     this.props.setRiskData(
                         {
@@ -528,26 +534,36 @@ class AdditionalDetails_sukhsam extends Component {
                             street_name:risk_arr.street_name,
                             plot_no:risk_arr.plot_no,
                             house_flat_no:risk_arr.house_flat_no,
-                            pincode:decryptResp.data.policyHolder.smeinfo.pincode,
-                            pincode_id:decryptResp.data.policyHolder.smeinfo.pincode_id,
+                            pincode:decryptResp.data.policyHolder.sookshamainfo.pincode,
+                            pincode_id:decryptResp.data.policyHolder.sookshamainfo.pincode_id,
 
-                            buildings_sum_insured:decryptResp.data.policyHolder.smeinfo.buildings_sum_insured,
-                            content_sum_insured:decryptResp.data.policyHolder.smeinfo.content_sum_insured,
-                            stock_sum_insured:decryptResp.data.policyHolder.smeinfo.stock_sum_insured
+                            buildings_si:decryptResp.data.policyHolder.sookshamainfo.buildings_si,
+                            plant_machinary_si:decryptResp.data.policyHolder.sookshamainfo.plant_machinary_si,
+                            furniture_fixture_si:decryptResp.data.policyHolder.sookshamainfo.furniture_fixture_si,
+                            stock_raw_mat:decryptResp.data.policyHolder.sookshamainfo.stock_raw_mat,
+                            finish_goods:decryptResp.data.policyHolder.sookshamainfo.finish_goods,
+                            stock_wip:decryptResp.data.policyHolder.sookshamainfo.stock_wip,
                         }
                     );
+                   
                 }
-
+                
                 if(decryptResp.data.policyHolder.step_no == 2 || decryptResp.data.policyHolder.step_no > 2){
 
                     this.props.setSmeOthersDetails({
                     
-                        Commercial_consideration:decryptResp.data.policyHolder.previouspolicy.Commercial_consideration,
                         previous_start_date:decryptResp.data.policyHolder.previouspolicy.start_date,
                         previous_end_date:decryptResp.data.policyHolder.previouspolicy.end_date,
+                        Commercial_consideration:decryptResp.data.policyHolder.previouspolicy.Commercial_consideration,
                         Previous_Policy_No:decryptResp.data.policyHolder.previouspolicy.policy_no,
                         insurance_company_id:decryptResp.data.policyHolder.previouspolicy.insurancecompany_id,
-                        previous_city:decryptResp.data.policyHolder.previouspolicy.address
+                        address:decryptResp.data.policyHolder.previouspolicy.address,
+
+                        financial_party: decryptResp.data.policyHolder.sookshamainfo.financial_party,
+                        is_claim: decryptResp.data.policyHolder.sookshamainfo.is_claim,
+                        previous_policy_check: decryptResp.data.policyHolder.previouspolicy.policy_no ? 1 : 0,
+                        financial_modgaged : decryptResp.data.policyHolder.sookshamainfo.financial_modgaged,
+                        financer_name: decryptResp.data.policyHolder.sookshamainfo.financer_name
         
                     });
                 }
@@ -605,7 +621,7 @@ class AdditionalDetails_sukhsam extends Component {
         const {productId} = this.props.match.params 
         
 
-        let newInitialValues = Object.assign(initialValue,{
+    let newInitialValues = Object.assign(initialValue,{
       first_name:this.props.first_name,
       last_name:this.props.last_name,
       salutation_id:this.props.salutation_id,
@@ -1031,7 +1047,7 @@ class AdditionalDetails_sukhsam extends Component {
                                             <h4> </h4>
                                         </div>
                                         <div className="d-flex justify-content-left resmb">
-                                        <Button className={`backBtn`} type="button" onClick= {this.summary_SME.bind(this,productId)}>
+                                        <Button className={`backBtn`} type="button" onClick= {this.otherDetails.bind(this,productId)}>
                                             {isSubmitting ? 'Wait..' : 'Back'}
                                         </Button> 
                                         <Button className={`proceedBtn`} type="submit"  disabled={isSubmitting ? true : false}>
@@ -1100,7 +1116,8 @@ const mapStateToProps = state => {
       loadingStop: () => dispatch(loaderStop()),
       setData:(data) => dispatch(setSmeData(data)),
       setRiskData:(data) => dispatch(setSmeRiskData(data)),
-      setSmeOthersDetails:(data) => dispatch(setSmeOthersDetailsData(data)),
+      setSmeOthersDetails:(data) => {console.log("data -------------- ", data)
+                                    dispatch(setSmeOthersDetailsData(data))},
       setSmeProposerDetails:(data) => dispatch(setSmeProposerDetailsData(data)),
       setAddress:(data) => dispatch(setCommunicationAddress(data))
     };

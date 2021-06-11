@@ -15,13 +15,7 @@ class Others extends Component {
 
 
     buy_policy = (productId) => {
-		
-		
-		//console.log('productId=');
-		//console.log(productId);
-		
-        this.props.loadingStart();
-		
+			
     if(productId == '9'){
 			localStorage.removeItem('policy_holder_ref_no')
 			this.props.history.push(`/Registration_SME/${productId}`);

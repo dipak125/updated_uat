@@ -81,7 +81,7 @@ class Premium_sukhsam extends Component {
     }
 
     additionalDetails = (productId) => {
-        this.props.history.push(`/AdditionalDetails_Sukhsam/${productId}`);
+        this.props.history.push(`/AdditionalDetails_Sookshma/${productId}`);
     }
 
     handleSubmit = (values) => {    
@@ -152,10 +152,10 @@ class Premium_sukhsam extends Component {
         let encryption = new Encryption();
   
             this.props.loadingStart();
-            axios.get(`sme/details/${policy_holder_ref_no}`)
+            axios.get(`sookshama/details/${policy_holder_ref_no}`)
             .then(res=>{
                 let decryptResp = JSON.parse(encryption.decrypt(res.data));
-
+                console.log("decryptResp -------->",decryptResp)
                 if(decryptResp.data.policyHolder.step_no > 0){
 
                     this.props.setData({
@@ -175,7 +175,7 @@ class Premium_sukhsam extends Component {
 
                 if(decryptResp.data.policyHolder.step_no == 1 || decryptResp.data.policyHolder.step_no > 1){
 
-                    let risk_arr = JSON.parse(decryptResp.data.policyHolder.smeinfo.risk_address);
+                    let risk_arr = JSON.parse(decryptResp.data.policyHolder.sookshamainfo.risk_address);
 
                     this.props.setRiskData(
                         {
@@ -184,30 +184,39 @@ class Premium_sukhsam extends Component {
                             street_name:risk_arr.street_name,
                             plot_no:risk_arr.plot_no,
                             house_flat_no:risk_arr.house_flat_no,
-                            pincode:decryptResp.data.policyHolder.smeinfo.pincode,
-                            pincode_id:decryptResp.data.policyHolder.smeinfo.pincode_id,
+                            pincode:decryptResp.data.policyHolder.sookshamainfo.pincode,
+                            pincode_id:decryptResp.data.policyHolder.sookshamainfo.pincode_id,
 
-                            buildings_sum_insured:decryptResp.data.policyHolder.smeinfo.buildings_sum_insured,
-                            content_sum_insured:decryptResp.data.policyHolder.smeinfo.content_sum_insured,
-                            stock_sum_insured:decryptResp.data.policyHolder.smeinfo.stock_sum_insured
+                            buildings_si:decryptResp.data.policyHolder.sookshamainfo.buildings_si,
+                            plant_machinary_si:decryptResp.data.policyHolder.sookshamainfo.plant_machinary_si,
+                            furniture_fixture_si:decryptResp.data.policyHolder.sookshamainfo.furniture_fixture_si,
+                            stock_raw_mat:decryptResp.data.policyHolder.sookshamainfo.stock_raw_mat,
+                            finish_goods:decryptResp.data.policyHolder.sookshamainfo.finish_goods,
+                            stock_wip:decryptResp.data.policyHolder.sookshamainfo.stock_wip,
                         }
                     );
                 }
 
-                // if(decryptResp.data.policyHolder.step_no == 2 || decryptResp.data.policyHolder.step_no > 2){
+                if(decryptResp.data.policyHolder.step_no == 2 || decryptResp.data.policyHolder.step_no > 2){
 
-                //     this.props.setSmeOthersDetails({
+                    this.props.setSmeOthersDetails({
                     
-                //         Commercial_consideration:decryptResp.data.policyHolder.previouspolicy.Commercial_consideration,
-                //         previous_start_date:decryptResp.data.policyHolder.previouspolicy.start_date,
-                //         previous_end_date:decryptResp.data.policyHolder.previouspolicy.end_date,
-                //         Previous_Policy_No:decryptResp.data.policyHolder.previouspolicy.policy_no,
-                //         insurance_company_id:decryptResp.data.policyHolder.previouspolicy.insurancecompany_id,
-                //         previous_city:decryptResp.data.policyHolder.previouspolicy.address
-        
-                //     });
+                        previous_start_date:decryptResp.data.policyHolder.previouspolicy.start_date,
+                        previous_end_date:decryptResp.data.policyHolder.previouspolicy.end_date,
+                        Commercial_consideration:decryptResp.data.policyHolder.previouspolicy.Commercial_consideration,
+                        Previous_Policy_No:decryptResp.data.policyHolder.previouspolicy.policy_no,
+                        insurance_company_id:decryptResp.data.policyHolder.previouspolicy.insurancecompany_id,
+                        address:decryptResp.data.policyHolder.previouspolicy.address,
 
-                // }
+                        financial_party: decryptResp.data.policyHolder.sookshamainfo.financial_party,
+                        is_claim: decryptResp.data.policyHolder.sookshamainfo.is_claim,
+                        previous_policy_check: decryptResp.data.policyHolder.previouspolicy.policy_no ? 1 : 0,
+                        financial_modgaged : decryptResp.data.policyHolder.sookshamainfo.financial_modgaged,
+                        financer_name: decryptResp.data.policyHolder.sookshamainfo.financer_name
+        
+                    });
+
+                }
 
                 if(decryptResp.data.policyHolder.step_no == 3 || decryptResp.data.policyHolder.step_no > 3){
 
@@ -237,25 +246,21 @@ class Premium_sukhsam extends Component {
                 }
 
                 let pincode_area_arr = JSON.parse(decryptResp.data.policyHolder.pincode_response);
+                let vehicleDetails = decryptResp.data.policyHolder ? decryptResp.data.policyHolder.vehiclebrandmodel : {};
                 
                 this.setState(
                     {
-                        // salutationName:decryptResp.data.policyHolder.salutation.displayvalue ,
-                        // pincodeArea:pincode_area_arr.LCLTY_SUBRB_TALUK_TEHSL_NM != null ? pincode_area_arr.LCLTY_SUBRB_TALUK_TEHSL_NM : 0,
-                        // quoteId:decryptResp.data.policyHolder.request_data.quote_id != null ? decryptResp.data.policyHolder.request_data.quote_id : 0,
-                        // gst:decryptResp.data.policyHolder.request_data.service_tax != null ? decryptResp.data.policyHolder.request_data.service_tax : 0,
-                        // netPremium:decryptResp.data.policyHolder.request_data.net_premium != null ? decryptResp.data.policyHolder.request_data.net_premium : 0,
-                        // finalPremium:decryptResp.data.policyHolder.request_data.payable_premium != null ? decryptResp.data.policyHolder.request_data.payable_premium : 0,
-
                         salutationName:decryptResp.data.policyHolder.salutation.displayvalue,
                         pincodeArea:pincode_area_arr.LCLTY_SUBRB_TALUK_TEHSL_NM,
                         quoteId:decryptResp.data.policyHolder.request_data.quote_id,
                         gst:decryptResp.data.policyHolder.request_data.service_tax,
                         grossPremium:decryptResp.data.policyHolder.request_data.gross_premium,
-                        payablePremium:decryptResp.data.policyHolder.request_data.payable_premium,
+                        payablePremium:decryptResp.data.policyHolder.request_data.net_premium,
                         refNumber:decryptResp.data.policyHolder.reference_no,
-                        logo:decryptResp.data.policyHolder.bcmaster.paymentgateway.logo,
-                        policyHolder:decryptResp.data.policyHolder
+                        // logo:decryptResp.data.policyHolder.bcmaster.paymentgateway.logo,
+                        policyHolder:decryptResp.data.policyHolder,
+                        paymentgateway: decryptResp.data.policyHolder && decryptResp.data.policyHolder.bcmaster && decryptResp.data.policyHolder.bcmaster.bcpayment,
+                        vehicleDetails
                     }
                 );
 
@@ -263,6 +268,8 @@ class Premium_sukhsam extends Component {
             })
             .catch(err => {
                 this.props.loadingStop();
+                // let decryptErr = JSON.parse(encryption.decrypt(err.data));
+                console.log("decryptErr --------> ",err.data)
                 swal("Thank you for showing your interest for buying product.Due to some reasons, we are not able to issue the policy online.Please call 1800 22 1111")
                 return false;
             })
@@ -271,7 +278,7 @@ class Premium_sukhsam extends Component {
     }
 
     render() {
-        const { policyHolder, show, fulQuoteResp, paymentgateway, error, error1, refNumber, paymentStatus, relation, memberdetails,nomineedetails, breakin_flag } = this.state
+        const { policyHolder, show, vehicleDetails, paymentgateway, error, error1, refNumber, paymentStatus, relation, memberdetails,nomineedetails, breakin_flag } = this.state
         const { productId } = this.props.match.params
 
         const policyHolder_refNo = queryString.parse(this.props.location.search).access_id ? 
@@ -372,7 +379,7 @@ class Premium_sukhsam extends Component {
                                                                                 </Col>
                                                                                 <Col sm={12} md={3}>
                                                                                     <div className="premamount">
-                                                                                        SME - Fire
+                                                                                    {vehicleDetails && vehicleDetails.vehicletype ? vehicleDetails.vehicletype.description : null}
                                                                                     </div>
                                                                                 </Col>
                                                                             </Row>

@@ -100,9 +100,12 @@ class Registration_sukhsam extends Component {
                             pincode:decryptResp.data.policyHolder.sookshamainfo.pincode,
                             pincode_id:decryptResp.data.policyHolder.sookshamainfo.pincode_id,
 
-                            buildings_sum_insured:decryptResp.data.policyHolder.sookshamainfo.buildings_sum_insured,
-                            content_sum_insured:decryptResp.data.policyHolder.sookshamainfo.content_sum_insured,
-                            stock_sum_insured:decryptResp.data.policyHolder.sookshamainfo.stock_sum_insured
+                            buildings_si:decryptResp.data.policyHolder.sookshamainfo.buildings_si,
+                            plant_machinary_si:decryptResp.data.policyHolder.sookshamainfo.plant_machinary_si,
+                            furniture_fixture_si:decryptResp.data.policyHolder.sookshamainfo.furniture_fixture_si,
+                            stock_raw_mat:decryptResp.data.policyHolder.sookshamainfo.stock_raw_mat,
+                            finish_goods:decryptResp.data.policyHolder.sookshamainfo.finish_goods,
+                            stock_wip:decryptResp.data.policyHolder.sookshamainfo.stock_wip,
                         }
                     );
                 }
@@ -116,7 +119,13 @@ class Registration_sukhsam extends Component {
                         previous_end_date:decryptResp.data.policyHolder.previouspolicy.end_date,
                         Previous_Policy_No:decryptResp.data.policyHolder.previouspolicy.policy_no,
                         insurance_company_id:decryptResp.data.policyHolder.previouspolicy.insurancecompany_id,
-                        previous_city:decryptResp.data.policyHolder.previouspolicy.address
+                        address:decryptResp.data.policyHolder.previouspolicy.address,
+
+                        financial_party: decryptResp.data.policyHolder.sookshamainfo.financial_party,
+                        is_claim: decryptResp.data.policyHolder.sookshamainfo.is_claim,
+                        previous_policy_check: decryptResp.data.policyHolder.previouspolicy.policy_no ? 1 : 0,
+                        financial_modgaged : decryptResp.data.policyHolder.sookshamainfo.financial_modgaged,
+                        financer_name: decryptResp.data.policyHolder.sookshamainfo.financer_name
         
                     });
 
@@ -213,7 +222,7 @@ class Registration_sukhsam extends Component {
                     start_date:values.pol_start_date,
                     end_date:values.pol_end_date
                 });
-                this.props.history.push(`/RiskDetails_Sukhsam/${productId}`);
+                this.props.history.push(`/RiskDetails_Sookshma/${productId}`);
             } else {
                 this.props.loadingStop();
                 swal("Thank you for showing your interest for buying product.Due to some reasons, we are not able to issue the policy online.Please call 1800 22 1111");

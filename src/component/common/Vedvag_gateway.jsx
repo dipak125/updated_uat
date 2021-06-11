@@ -137,6 +137,9 @@ class Vedvag_gateway extends Component {
         else if(productId == 18) {
             this.props.history.push(`/Premium_MISCDST/${productId}`);
         }
+        else if(productId == 19) {
+            this.props.history.push(`/Premium_Sookshma/${productId}`);
+        }
          
 
     }

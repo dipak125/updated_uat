@@ -46,17 +46,17 @@ export const setSmeRiskData = ( request ) => {
         dispatch({
             type: SUKHSAM_FIRE_RISK,
             payload: {
-                house_building_name:request.house_building_name,
+                shop_building_name:request.shop_building_name,
                 block_no:request.block_no,
-                // street_name:request.street_name,
-                // plot_no:request.plot_no,
-                content_sum_insured:request.content_sum_insured,
                 house_flat_no:request.house_flat_no,
                 pincode:request.pincode,
                 pincode_id:request.pincode_id,
-                buildings_sum_insured:request.buildings_sum_insured,
-                content_sum_insured:request.content_sum_insured,
-                stock_sum_insured:request.stock_sum_insured
+                buildings_si:request.buildings_si,
+                plant_machinary_si: request.plant_machinary_si,
+                furniture_fixture_si: request.furniture_fixture_si,
+                stock_raw_mat: request.stock_raw_mat,
+                finish_goods: request.finish_goods,
+                stock_wip: request.stock_wip,
             }
         });
     }
@@ -72,7 +72,12 @@ export const setSmeOthersDetailsData = ( request ) => {
             previous_end_date:request.previous_end_date,
             Previous_Policy_No:request.Previous_Policy_No,
             insurance_company_id:request.insurance_company_id,
-            previous_city:request.previous_city
+            address:request.address,
+            financial_party: request.financial_party,
+            is_claim: request.is_claim,
+            previous_policy_check: request.previous_policy_check,
+            financial_modgaged: request.financial_modgaged,
+            financer_name: request.financer_name,
             }
         });
     }

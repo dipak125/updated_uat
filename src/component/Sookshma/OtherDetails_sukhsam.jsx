@@ -33,7 +33,7 @@ const initialValue = {
     registration_date: "",
     location_id:"",
     previous_is_claim:"",
-    previous_city:"",
+    address:"",
     insurance_company_id:"",
     previous_policy_name:"",
     previous_end_date: "",
@@ -41,7 +41,10 @@ const initialValue = {
     previous_claim_bonus: 1,
     previous_claim_for: "",
     previous_policy_no: "",
-    previous_policy_check : '0'
+    previous_policy_check : '0',
+    financial_party: "",
+    financial_modgaged: "",
+    financer_name: ""
     // Commercial_consideration: "",
 } 
 
@@ -81,11 +84,24 @@ insurance_company_id : Yup.number().when(['previous_policy_check'], {
     then: Yup.number().required("Previous insurance company name is required"),
     otherwise: Yup.number().nullable()}),
 
-previous_city : Yup.string()
+address : Yup.string().required("This field is required")
 .matches(/^[a-zA-Z0-9][a-zA-Z0-9-/.,\s]*$/, 
     function() {
         return "Please enter valid address"
-    }).nullable()
+    }).nullable(),
+
+financial_party : Yup.string().required("This field is required"),
+
+financial_modgaged : Yup.number().when(['financial_party'], {
+    is: financial_party => financial_party == '1',       
+    then: Yup.number().required("This field is required"),
+    otherwise: Yup.number().nullable()}),
+
+financer_name : Yup.string().when(['financial_party'], {
+    is: financial_party => financial_party == '1',       
+    then: Yup.string().required("This field is required"),
+    otherwise: Yup.string().nullable()}),
+    
 })
 
 
@@ -126,8 +142,8 @@ class OtherDetails_sukhsam extends Component {
     handleSubmit=(values, actions)=>{
         const {productId} = this.props.match.params 
         const formData = new FormData();
-        let previous_start_date = values.previous_start_date == "" ? null : moment(values.previous_start_date).format('YYYY-MM-DD')
-        let previous_end_date = values.previous_end_date == "" ? null : moment(values.previous_end_date).format('YYYY-MM-DD')
+        let previous_start_date = values.previous_start_date == "" ? null : moment(values.previous_start_date).format('YYYY-MM-DD 00:00:00')
+        let previous_end_date = values.previous_end_date == "" ? null : moment(values.previous_end_date).format('YYYY-MM-DD 23:59:00')
         let previous_Policy_No = values.Previous_Policy_No == '' ? null : values.Previous_Policy_No
         let insurance_company_id = values.insurance_company_id == '' ? null : values.insurance_company_id
         let encryption = new Encryption();
@@ -137,11 +153,16 @@ class OtherDetails_sukhsam extends Component {
             'previous_end_date': previous_end_date,
             'previous_policy_no': previous_Policy_No,
             'insurance_company_id': insurance_company_id,
-            'address': values.previous_city,
+            'address': values.address,
             'menumaster_id': this.props.menumaster_id,
-            'page_name': `OtherDetails/${productId}`,
+            'page_name': `OtherDetails_Sookshma/${productId}`,
             'policy_holder_id': this.props.policy_holder_id,
             'Commercial_consideration':'5',
+            'financial_party': values.financial_party,
+            'is_claim': 0,
+            'previous_policy_check': values.previous_policy_check,
+            'financial_modgaged' : values.financial_modgaged,
+            'financer_name': values.financer_name
         }
         console.log("Post Data------------- ", post_data)
         formData.append('enc_data',encryption.encrypt(JSON.stringify(post_data)))
@@ -152,13 +173,17 @@ class OtherDetails_sukhsam extends Component {
             this.props.loadingStop();
             this.props.setSmeOthersDetails({
                 
-                previous_start_date:values.previous_start_date,
-                previous_end_date:values.previous_end_date,
+                previous_start_date: previous_start_date,
+                previous_end_date: previous_end_date,
                 Commercial_consideration:'5',
                 Previous_Policy_No:values.Previous_Policy_No,
                 insurance_company_id:values.insurance_company_id,
-                previous_city:values.previous_city
-                
+                address:values.address,
+                financial_party: values.financial_party,
+                is_claim: 0,
+                previous_policy_check: values.previous_policy_check,
+                financial_modgaged : values.financial_modgaged,
+                financer_name: values.financer_name
 
             });
             
@@ -166,23 +191,25 @@ class OtherDetails_sukhsam extends Component {
             let post_data_new = {
                 'id': this.props.policy_holder_id,
                 'menumaster_id': this.props.menumaster_id,
-                'page_name': `OtherDetails/${productId}`,
+                'page_name': `OtherDetails_Sookshma/${productId}`,
     
             }
             formDataNew.append('enc_data',encryption.encrypt(JSON.stringify(post_data_new)))
             
             this.props.loadingStart();
-            axios.post('/fullQuoteServiceSMEP01',
+            axios.post('/sookshama/quote',
             formDataNew
             ).then(res=>{
-                let decryptResp = JSON.parse(encryption.decrypt(res.data));
+                // let decryptResp = JSON.parse(encryption.decrypt(res.data));
+                let decryptResp = res.data;
                 console.log("decryptResp-------->",decryptResp)
-                
+                this.props.history.push(`/Summary_Sookshma/${productId}`);
                 
                 }).
             catch(err=>{
                 this.props.loadingStop();
                 let decryptResp = JSON.parse(encryption.decrypt(err.data));
+                // let decryptResp = err.data;
                 console.log("decryptErr -------->",decryptResp)
                 actions.setSubmitting(false);
             });
@@ -216,7 +243,6 @@ class OtherDetails_sukhsam extends Component {
         // this.props.loaderStart();
         axios.get('company')
         .then(res => {
-            console.log('fetch_data_insurance',res);
             this.setState({insurerList:res.data.data});
             this.props.loadingStop();
         })
@@ -255,7 +281,7 @@ class OtherDetails_sukhsam extends Component {
 
                 if(decryptResp.data.policyHolder.step_no == 1 || decryptResp.data.policyHolder.step_no > 1){
 
-                    let risk_arr = JSON.parse(decryptResp.data.policyHolder.smeinfo.risk_address);
+                    let risk_arr = JSON.parse(decryptResp.data.policyHolder.sookshamainfo.risk_address);
 
                     this.props.setRiskData(
                         {
@@ -264,12 +290,15 @@ class OtherDetails_sukhsam extends Component {
                             street_name:risk_arr.street_name,
                             plot_no:risk_arr.plot_no,
                             house_flat_no:risk_arr.house_flat_no,
-                            pincode:decryptResp.data.policyHolder.smeinfo.pincode,
-                            pincode_id:decryptResp.data.policyHolder.smeinfo.pincode_id,
+                            pincode:decryptResp.data.policyHolder.sookshamainfo.pincode,
+                            pincode_id:decryptResp.data.policyHolder.sookshamainfo.pincode_id,
 
-                            buildings_sum_insured:decryptResp.data.policyHolder.smeinfo.buildings_sum_insured,
-                            content_sum_insured:decryptResp.data.policyHolder.smeinfo.content_sum_insured,
-                            stock_sum_insured:decryptResp.data.policyHolder.smeinfo.stock_sum_insured
+                            buildings_si:decryptResp.data.policyHolder.sookshamainfo.buildings_si,
+                            plant_machinary_si:decryptResp.data.policyHolder.sookshamainfo.plant_machinary_si,
+                            furniture_fixture_si:decryptResp.data.policyHolder.sookshamainfo.furniture_fixture_si,
+                            stock_raw_mat:decryptResp.data.policyHolder.sookshamainfo.stock_raw_mat,
+                            finish_goods:decryptResp.data.policyHolder.sookshamainfo.finish_goods,
+                            stock_wip:decryptResp.data.policyHolder.sookshamainfo.stock_wip,
                         }
                     );
 
@@ -284,7 +313,13 @@ class OtherDetails_sukhsam extends Component {
                         Commercial_consideration:decryptResp.data.policyHolder.previouspolicy.Commercial_consideration,
                         Previous_Policy_No:decryptResp.data.policyHolder.previouspolicy.policy_no,
                         insurance_company_id:decryptResp.data.policyHolder.previouspolicy.insurancecompany_id,
-                        previous_city:decryptResp.data.policyHolder.previouspolicy.address
+                        address:decryptResp.data.policyHolder.previouspolicy.address,
+
+                        financial_party: decryptResp.data.policyHolder.sookshamainfo.financial_party,
+                        is_claim: decryptResp.data.policyHolder.sookshamainfo.is_claim,
+                        previous_policy_check: decryptResp.data.policyHolder.previouspolicy.policy_no ? 1 : 0,
+                        financial_modgaged : decryptResp.data.policyHolder.sookshamainfo.financial_modgaged,
+                        financer_name: decryptResp.data.policyHolder.sookshamainfo.financer_name
         
                     });
                 }
@@ -325,6 +360,8 @@ class OtherDetails_sukhsam extends Component {
             })
             .catch(err => {
                 this.props.loadingStop();
+                let decryptErr = JSON.parse(encryption.decrypt(err.data));
+                console.log("decryptErr -------->",decryptErr)
             })
         }
         
@@ -336,7 +373,7 @@ class OtherDetails_sukhsam extends Component {
         
     }
     RiskDetails = (productId) => {
-        this.props.history.push(`/RiskDetails_Sukhsam/${productId}`);
+        this.props.history.push(`/RiskDetails_Sookshma/${productId}`);
     }
 
     render() {
@@ -346,8 +383,13 @@ class OtherDetails_sukhsam extends Component {
             Commercial_consideration: this.props.Commercial_consideration,
             Previous_Policy_No:this.props.Previous_Policy_No != null ? this.props.Previous_Policy_No : "",
             insurance_company_id:this.props.insurance_company_id != null ? this.props.insurance_company_id : "",
-            previous_city:this.props.previous_city,
-            previous_policy_check: 0
+            address:this.props.address,
+            financial_party: this.props.financial_party,
+            is_claim: this.props.is_claim,
+            previous_policy_check: this.props.previous_policy_check,
+            financial_modgaged : this.props.financial_modgaged,
+            financer_name: this.props.financer_name
+            
         });
         
         const {productId} = this.props.match.params  
@@ -397,24 +439,24 @@ class OtherDetails_sukhsam extends Component {
                                                                 <FormGroup>
                                                                     <div className="formSection">
                                                                         <Field
-                                                                            name='finance_flag'
+                                                                            name='financial_party'
                                                                             component="select"
                                                                             autoComplete="off"
                                                                             className="formGrp inputfs12"
-                                                                            value = {values.finance_flag}                                                                           
+                                                                            value = {values.financial_party}                                                                           
                                                                         >
                                                                             <option value="">Select</option>
                                                                             <option value="1">Yes</option>
                                                                             <option value="2">No</option>
                                                                         </Field>
-                                                                        {errors.finance_flag && touched.finance_flag ? (
-                                                                        <span className="errorMsg">{errors.finance_flag}</span>
+                                                                        {errors.financial_party && touched.financial_party ? (
+                                                                        <span className="errorMsg">{errors.financial_party}</span>
                                                                         ) : null}  
                                                                     </div>
                                                                 </FormGroup>
                                                             </Col>
                                                         </Row>
-                                                        {values.finance_flag == '1' ?
+                                                        {values.financial_party == '1' ?
                                                         <Fragment>
                                                             <Row>  
                                                                 <Col sm={6} md={4} lg={4}>
@@ -427,18 +469,18 @@ class OtherDetails_sukhsam extends Component {
                                                                     <FormGroup>
                                                                         <div className="formSection">
                                                                             <Field
-                                                                                name='sbi_associates'
+                                                                                name='financial_modgaged'
                                                                                 component="select"
                                                                                 autoComplete="off"
                                                                                 className="formGrp inputfs12"
-                                                                                value = {values.sbi_associates}                                                                           
+                                                                                value = {values.financial_modgaged}                                                                           
                                                                             >
                                                                                 <option value="">Select</option>
                                                                                 <option value="1">Yes</option>
                                                                                 <option value="2">No</option>
                                                                             </Field>
-                                                                            {errors.sbi_associates && touched.sbi_associates ? (
-                                                                            <span className="errorMsg">{errors.sbi_associates}</span>
+                                                                            {errors.financial_modgaged && touched.financial_modgaged ? (
+                                                                            <span className="errorMsg">{errors.financial_modgaged}</span>
                                                                             ) : null}  
                                                                         </div>
                                                                     </FormGroup>
@@ -534,77 +576,6 @@ class OtherDetails_sukhsam extends Component {
                                                         </Row>
                                                     </Col>
                                                 </Row>
-
-                                                {/* <div className="brandhead"> 
-                                                    <p>&nbsp;</p>
-                                                </div>
-                                            
-                                                <Row>
-                                                    <Col sm={12} md={9} lg={9}>
-                                                        <div className="d-flex justify-content-left">
-                                                            <div className="brandhead">
-                                                                <h4>OTHER DETAILS</h4>
-                                                            </div>
-                                                        </div>   
-                                                        <Row>  
-                                                             <Col sm={12} md={4} lg={4}>
-                                                                <FormGroup>
-                                                                    <div className="formSection">
-                                                                        <Field
-                                                                            name="Cost_of_sale"
-                                                                            component="select"
-                                                                            autoComplete="off"
-                                                                            value={values.Cost_of_sale}
-                                                                            className="formGrp"
-                                                                        >
-                                                                        <option value="">Cost of sale</option>
-
-                                                                        </Field>     
-                                                                        {errors.Cost_of_sale && touched.Cost_of_sale ? (
-                                                                            <span className="errorMsg">{errors.Cost_of_sale}</span>
-                                                                        ) : null}     
-                                                                    </div>
-                                                                </FormGroup>   
-                                                            </Col> 
-                                                            <Col sm={12} md={4} lg={4}><FormGroup>
-                                                                    <div className="insurerName">
-                                                                        <Field
-                                                                            name="Commercial_consideration"
-                                                                            type="text"
-                                                                            placeholder="Commercial consideration in %"
-                                                                            autoComplete="off"
-                                                                            minimum=""
-                                                                            maximum="100"
-                                                                            onFocus={e => this.changePlaceHoldClassAdd(e)}
-                                                                            onBlur={e => this.changePlaceHoldClassRemove(e)}   
-                                                                        />
-                                                                        {errors.Commercial_consideration && touched.Commercial_consideration ? (
-                                                                            <span className="errorMsg">{errors.Commercial_consideration}</span>
-                                                                        ) : null}
-                                                                    </div>
-                                                                </FormGroup>
-                                                            </Col> 
-                                                             <Col sm={12} md={4} lg={4}>
-                                                                <FormGroup>
-                                                                    <div className="insurerName">
-                                                                    <Field
-                                                                        name='Loan_Account_Number'
-                                                                        type="text"
-                                                                        placeholder="Loan Account Number"
-                                                                        autoComplete="off"
-                                                                        onFocus={e => this.changePlaceHoldClassAdd(e)}
-                                                                        onBlur={e => this.changePlaceHoldClassRemove(e)}
-                                                                        value = {values.Loan_Account_Number}                                                                            
-                                                                    />
-                                                                    {errors.Loan_Account_Number && touched.Loan_Account_Number ? (
-                                                                    <span className="errorMsg">{errors.Loan_Account_Number}</span>
-                                                                    ) : null}  
-                                                                    </div>
-                                                                </FormGroup>
-                                                            </Col>                 
-                                                         </Row> 
-                                                    </Col>
-                                                </Row>  */}
 
                                                 <div className="brandhead"> 
                                                     <p>&nbsp;</p>
@@ -763,15 +734,15 @@ class OtherDetails_sukhsam extends Component {
                                                                 <FormGroup>
                                                                     <div className="insurerName">
                                                                         <Field
-                                                                            name="previous_city"
+                                                                            name="address"
                                                                             type="text"
                                                                             placeholder="Insurance Company Address"
                                                                             autoComplete="off"
                                                                             onFocus={e => this.changePlaceHoldClassAdd(e)}
                                                                             onBlur={e => this.changePlaceHoldClassRemove(e)}     
                                                                         />
-                                                                        {errors.previous_city && touched.previous_city ? (
-                                                                            <span className="errorMsg">{errors.previous_city}</span>
+                                                                        {errors.address && touched.address ? (
+                                                                            <span className="errorMsg">{errors.address}</span>
                                                                         ) : null}
                                                                     </div>
                                                                 </FormGroup>
@@ -828,7 +799,7 @@ const mapStateToProps = state => {
       Commercial_consideration:state.sukhsam.Commercial_consideration,
       Previous_Policy_No:state.sukhsam.Previous_Policy_No,
       insurance_company_id:state.sukhsam.insurance_company_id,
-      previous_city:state.sukhsam.previous_city,
+      address:state.sukhsam.address,
 
       policy_holder_id: state.sukhsam.policy_holder_id,
       policy_holder_ref_no:state.sukhsam.policy_holder_ref_no,
@@ -838,7 +809,13 @@ const mapStateToProps = state => {
 
 
       content_sum_insured: state.sukhsam.content_sum_insured,
-      stock_sum_insured: state.sukhsam.stock_sum_insured
+      stock_sum_insured: state.sukhsam.stock_sum_insured,
+
+      financial_party: state.sukhsam.financial_party,
+      is_claim: state.sukhsam.is_claim,
+      previous_policy_check: state.sukhsam.previous_policy_check,
+      financial_modgaged : state.sukhsam.financial_modgaged,
+      financer_name: state.sukhsam.financer_name
 
     };
   };
@@ -850,7 +827,7 @@ const mapStateToProps = state => {
       setData:(data) => dispatch(setSmeData(data)),
       setRiskData:(data) => dispatch(setSmeRiskData(data)),
       setSmeProposerDetails:(data) => dispatch(setSmeProposerDetailsData(data)),
-      setSmeOthersDetails:(data) => dispatch(setSmeOthersDetailsData(data))
+      setSmeOthersDetails:(data) => dispatch(setSmeOthersDetailsData(data))                                  
     };
   };
 

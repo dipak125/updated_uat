@@ -188,7 +188,7 @@ class RiskDetails_sukhsam extends Component {
         parseInt(values.finish_goods) + 
         parseInt(values.stock_wip);
 
-        console.log('Sookshama...',post_data)
+        console.log('Sookshama....post_data..--- ',post_data)
         formData.append('enc_data',encryption.encrypt(JSON.stringify(post_data)))
 
         if (Fire_sum_insured < 500000) {
@@ -212,9 +212,6 @@ class RiskDetails_sukhsam extends Component {
 
                     shop_building_name:values.shop_building_name,
                     block_no:values.block_no,
-                    // street_name:values.street_name,
-                    // plot_no:values.plot_no,
-                    // plant_machinary_si:values.plant_machinary_si,
                     house_flat_no:values.house_flat_no,
                     pincode:values.pincode,
                     pincode_id:values.pincode_id,
@@ -227,7 +224,6 @@ class RiskDetails_sukhsam extends Component {
                 }
             );
             const {productId} = this.props.match.params;
-            // console.log("Fire_sum_insured-------",Fire_sum_insured)
             this.props.loadingStop()
             this.setState({ Fire_sum_insured : Fire_sum_insured })
             
@@ -255,7 +251,7 @@ class RiskDetails_sukhsam extends Component {
             axios.get(`sookshama/details/${policy_holder_ref_no}`)
             .then(res=>{
                 let decryptResp = JSON.parse(encryption.decrypt(res.data));
-
+console.log("decrypt resp ----------------- ", decryptResp)
                 if(decryptResp.data.policyHolder.step_no > 0){
                     this.props.setData({
                         start_date:decryptResp.data.policyHolder.request_data.start_date,
@@ -278,8 +274,6 @@ class RiskDetails_sukhsam extends Component {
                         {
                             shop_building_name:risk_arr.shop_building_name,
                             block_no:risk_arr.block_no,
-                            // street_name:risk_arr.street_name,
-                            // plot_no:risk_arr.plot_no,
                             house_flat_no:risk_arr.house_flat_no,
                             pincode:decryptResp.data.policyHolder.sookshamainfo.pincode,
                             pincode_id:decryptResp.data.policyHolder.sookshamainfo.pincode_id,
@@ -303,7 +297,13 @@ class RiskDetails_sukhsam extends Component {
                         previous_end_date:decryptResp.data.policyHolder.previouspolicy.end_date,
                         Previous_Policy_No:decryptResp.data.policyHolder.previouspolicy.policy_no,
                         insurance_company_id:decryptResp.data.policyHolder.previouspolicy.insurancecompany_id,
-                        previous_city:decryptResp.data.policyHolder.previouspolicy.address
+                        address:decryptResp.data.policyHolder.previouspolicy.address,
+
+                        financial_party: decryptResp.data.policyHolder.sookshamainfo.financial_party,
+                        is_claim: decryptResp.data.policyHolder.sookshamainfo.is_claim,
+                        previous_policy_check: decryptResp.data.policyHolder.previouspolicy.policy_no ? 1 : 0,
+                        financial_modgaged : decryptResp.data.policyHolder.sookshamainfo.financial_modgaged,
+                        financer_name: decryptResp.data.policyHolder.sookshamainfo.financer_name
         
                     });
 
@@ -359,13 +359,12 @@ class RiskDetails_sukhsam extends Component {
     componentDidMount() {
         // this.getInsurerList();
         //this.fetchData();
-        // this.fetchPolicyDetails();
-        // this.fetchAreadetailsBack();
-        // this.fireSumCalculate();
+        this.fetchPolicyDetails();
+        this.fetchAreadetailsBack();
+        this.fireSumCalculate();
         
     }
     Registration_SME = (productId) => {
-        // console.log('Product-----id',productId)
         this.props.history.push(`/Registration_Sookshma/${productId}`);
     }
 
@@ -375,24 +374,21 @@ class RiskDetails_sukhsam extends Component {
         const {productId} = this.props.match.params  
         const {insurerList, showClaim, previous_is_claim, motorInsurance, previousPolicy,
             stateName,pinDataArr,CustomerID,suggestions, vehicleDetails, RTO_location} = this.state
-            console.log('Sookshama...',this.props)
+            // console.log('Sookshama...',this.props)
         let newInitialValues = Object.assign(initialValue,{
             shop_building_name:this.props.shop_building_name,
             block_no:this.props.block_no,
-            // street_name:this.props.street_name,
-            // plot_no:this.props.plot_no,
-            // plant_machinary_si:this.props.plant_machinary_si,
             house_flat_no:this.props.house_flat_no,
             pincode:this.props.pincode,
             pincode_id:this.props.pincode_id,
-            buildings_si:this.props.buildings_si,
-            plant_machinary_si:this.props.plant_machinary_si,
-            furniture_fixture_si:this.props.furniture_fixture_si,
-            stock_raw_mat:this.props.stock_raw_mat,
-            stock_wip:this.props.stock_wip,
-            finish_goods:this.props.finish_goods,
-            fire_contents_sum_insured:Fire_contents_sum_insured,
-            fire_stock_sum_insured:Fire_stock_sum_insured
+            buildings_si:this.props.buildings_si && Math.round(this.props.buildings_si),
+            plant_machinary_si:this.props.plant_machinary_si && Math.round(this.props.plant_machinary_si),
+            furniture_fixture_si:this.props.furniture_fixture_si && Math.round(this.props.furniture_fixture_si),
+            stock_raw_mat:this.props.stock_raw_mat && Math.round(this.props.stock_raw_mat),
+            stock_wip:this.props.stock_wip && Math.round(this.props.stock_wip),
+            finish_goods:this.props.finish_goods && Math.round(this.props.finish_goods),
+            fire_contents_sum_insured:Fire_contents_sum_insured && Math.round(Fire_contents_sum_insured),
+            fire_stock_sum_insured:Fire_stock_sum_insured && Math.round(Fire_stock_sum_insured)
         });
 
         // VALIDATION :----------------------------------------///////////////////////////
@@ -569,7 +565,6 @@ class RiskDetails_sukhsam extends Component {
                                                                     <option value={resource.id}>{resource.LCLTY_SUBRB_TALUK_TEHSL_NM}</option>
                                                                 )}
                                                                     
-                                                                    {/*<option value="area2">Area 2</option>*/}
                                                                 </Field>     
                                                                 {errors.pincode_id && touched.pincode_id ? (
                                                                     <span className="errorMsg">{errors.pincode_id}</span>
@@ -592,31 +587,8 @@ class RiskDetails_sukhsam extends Component {
                                                 <div className="d-flex justify-content-left">
                                                     <h4 className="fs-18 m-b-30">Please enter Sum Insured below :</h4>
                                                 </div>  
-                                                    {/* <Col sm={12} md={4} lg={4}>
-                                                        <FormGroup>
-                                                            <div className="formSection">
-                                                                <Field
-                                                                    name="SI_Building"
-                                                                    component="select"
-                                                                    autoComplete="off"
-                                                                    value={values.SI_Building}
-                                                                    className="formGrp"
-                                                                >
-                                                                <option value="">Basis of SI-Building/Contents</option>
-                                                                {pinDataArr && pinDataArr.length > 0 && pinDataArr.map((resource,rindex)=>
-                                                                    <option value={resource.id}>{resource.LCLTY_SUBRB_TALUK_TEHSL_NM}</option>
-                                                                )}
-                                                                    
-                                                                    <option value="area2">Area 2</option>
-                                                                </Field>     
-                                                                {errors.SI_Building && touched.SI_Building ? (
-                                                                    <span className="errorMsg">{errors.SI_Building}</span>
-                                                                ) : null}     
-                                                            </div>
-                                                        </FormGroup>                                                        
-                                                    </Col> */}
                                                     <Row> 
-                                                            <Col sm={6} md={6} lg={4}>
+                                                        <Col sm={6} md={6} lg={4}>
                                                         <label>
                                                         Fire-Building-Sum Insured:
                                                         </label>
@@ -650,7 +622,7 @@ class RiskDetails_sukhsam extends Component {
                                                         </Col>
                                                     </Row>
                                                     <Row>
-                                                            <Col sm={6} md={6} lg={4}>
+                                                        <Col sm={6} md={6} lg={4}>
                                                         <label>
                                                         Plant & Machinery Sum Insured:
                                                         </label>
@@ -684,7 +656,7 @@ class RiskDetails_sukhsam extends Component {
                                                     </Row>
                                                    
                                                 <Row>
-                                                        <Col sm={6} md={6} lg={4}>
+                                                    <Col sm={6} md={6} lg={4}>
                                                         <label>
                                                         Furniture, Fixture & Fittings Sum Insured:
                                                         </label>
@@ -718,7 +690,7 @@ class RiskDetails_sukhsam extends Component {
                                                 </Row>
 
                                                 <Row>
-                                                            <Col sm={6} md={6} lg={4}>
+                                                    <Col sm={6} md={6} lg={4}>
                                                         <label>
                                                         Fire-Contents Sum Insured:
                                                         </label>
@@ -751,7 +723,7 @@ class RiskDetails_sukhsam extends Component {
                                                 </Row>
 
                                                 <Row>
-                                                        <Col sm={6} md={6} lg={4}>
+                                                    <Col sm={6} md={6} lg={4}>
                                                         <label>
                                                         Stocks of Raw Material :
                                                         </label>
@@ -784,7 +756,7 @@ class RiskDetails_sukhsam extends Component {
                                                     </Col>                         
                                                 </Row>
                                                 <Row>
-                                                        <Col sm={6} md={6} lg={4}>
+                                                    <Col sm={6} md={6} lg={4}>
                                                         <label>
                                                         Stock of Finished Goods :
                                                         </label>
@@ -817,7 +789,7 @@ class RiskDetails_sukhsam extends Component {
                                                     </Col>                         
                                                 </Row>
                                                 <Row>
-                                                        <Col sm={6} md={6} lg={4}>
+                                                    <Col sm={6} md={6} lg={4}>
                                                         <label>
                                                         Stocks of Work in Progress :
                                                         </label>
@@ -882,7 +854,7 @@ class RiskDetails_sukhsam extends Component {
                                                     </Col>                         
                                                 </Row>
                                                 <Row>
-                                                            <Col sm={6} md={6} lg={4}>
+                                                    <Col sm={6} md={6} lg={4}>
                                                         <label>
                                                         Fire-Total Sum Insured:
                                                         </label>
@@ -925,17 +897,6 @@ class RiskDetails_sukhsam extends Component {
                                                     <p>&nbsp;</p>
                                                 </div>
                                             
-                                                {/* <div className="d-flex justify-content-left resmb">
-                                                <a href="javascript:void(0);" className={`backBtn`} onClick= {this.Registration_SME.bind(this,productId)} >
-                                                    {isSubmitting ? 'Wait..' : 'Back'}
-                                                </a> */}
-                                                {/* <Button className={`backBtn`} type="button" onClick= {this.Registration_SME.bind(this,productId)} >
-                                                    {isSubmitting ? 'Wait..' : 'Back'}
-                                                </Button>  */}
-                                                {/* <Button className={`proceedBtn`} type="submit" disabled={isValid ? false : true} >
-                                                    {isSubmitting ? 'Wait..' : 'Next'}
-                                                </Button> 
-                                                </div> */}
                                                 <div className="d-flex justify-content-left resmb">
                                                 <Button className={`backBtn`} type="button"  disabled={isSubmitting ? true : false} onClick= {this.Registration_SME.bind(this,productId)}>
                                                     {isSubmitting ? 'Wait..' : 'Back'}
@@ -980,8 +941,6 @@ const mapStateToProps = state => {
 
       shop_building_name: state.sukhsam.shop_building_name,
       block_no: state.sukhsam.block_no,
-    //   street_name: state.sukhsam.street_name,
-    //   plot_no: state.sukhsam.plot_no,
       house_flat_no: state.sukhsam.house_flat_no,
       pincode: state.sukhsam.pincode,
       pincode_id: state.sukhsam.pincode_id,
@@ -989,7 +948,11 @@ const mapStateToProps = state => {
       plant_machinary_si: state.sukhsam.plant_machinary_si,
       furniture_fixture_si: state.sukhsam.furniture_fixture_si,
       policy_holder_id:state.sukhsam.policy_holder_id,
-      menumaster_id:state.sukhsam.menumaster_id
+      menumaster_id:state.sukhsam.menumaster_id,
+
+      stock_raw_mat:state.sukhsam.stock_raw_mat,
+      stock_wip:state.sukhsam.stock_wip,
+      finish_goods:state.sukhsam.finish_goods,
     };
   };
   

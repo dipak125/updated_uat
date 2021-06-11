@@ -1271,7 +1271,7 @@ class AdditionalDetailsMISCD extends Component {
                                                     }                                                                           
                                             />
                                             {errors.pancard && touched.pancard ? (
-                                            <span className="errorMsg">{errors.pancard}</span>
+                                            <span className="errorMsg">{phrases[errors.pancard]}</span>
                                             ) : null} 
                                             </div>
                                         </FormGroup>

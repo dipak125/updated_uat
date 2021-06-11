@@ -91,7 +91,7 @@ class Summary_sukhsam extends Component {
         //     ).then(res=>{
         const { productId } = this.props.match.params;
         this.props.loadingStop();
-        this.props.history.push(`/AdditionalDetails_Sukhsam/${productId}`);
+        this.props.history.push(`/AdditionalDetails_Sookshma/${productId}`);
         //     }).
         //     catch(err=>{
         //         this.props.loadingStop();
@@ -107,48 +107,49 @@ class Summary_sukhsam extends Component {
         let encryption = new Encryption();
 
         this.props.loadingStart();
-        axios.get(`sme/details/${policy_holder_ref_no}`)
+        axios.get(`sookshama/details/${policy_holder_ref_no}`)
             .then(res => {
                 let decryptResp = JSON.parse(encryption.decrypt(res.data));
+                console.log("decryptResp -------->",decryptResp)
                 let rawData = decryptResp.data
 
-                if (decryptResp.data.policyHolder.step_no > 0) {
+                // if (decryptResp.data.policyHolder.step_no > 0) {
 
-                    this.props.setData({
-                        start_date: decryptResp.data.policyHolder.request_data.start_date,
-                        end_date: decryptResp.data.policyHolder.request_data.end_date,
+                //     this.props.setData({
+                //         start_date: decryptResp.data.policyHolder.request_data.start_date,
+                //         end_date: decryptResp.data.policyHolder.request_data.end_date,
 
-                        policy_holder_id: decryptResp.data.policyHolder.id,
-                        policy_holder_ref_no: policy_holder_ref_no,
-                        request_data_id: decryptResp.data.policyHolder.request_data.id,
-                        completed_step: decryptResp.data.policyHolder.step_no,
-                        menumaster_id: decryptResp.data.policyHolder.menumaster_id
-                    });
+                //         policy_holder_id: decryptResp.data.policyHolder.id,
+                //         policy_holder_ref_no: policy_holder_ref_no,
+                //         request_data_id: decryptResp.data.policyHolder.request_data.id,
+                //         completed_step: decryptResp.data.policyHolder.step_no,
+                //         menumaster_id: decryptResp.data.policyHolder.menumaster_id
+                //     });
+                // }
 
+                // if (decryptResp.data.policyHolder.step_no == 1 || decryptResp.data.policyHolder.step_no > 1) {
 
+                //     let risk_arr = JSON.parse(decryptResp.data.policyHolder.sookshamainfo.risk_address); 
 
-                }
+                //     this.props.setRiskData(
+                //         {
+                //             house_building_name:risk_arr.house_building_name,
+                //             block_no:risk_arr.block_no,
+                //             street_name:risk_arr.street_name,
+                //             plot_no:risk_arr.plot_no,
+                //             house_flat_no:risk_arr.house_flat_no,
+                //             pincode:decryptResp.data.policyHolder.sookshamainfo.pincode,
+                //             pincode_id:decryptResp.data.policyHolder.sookshamainfo.pincode_id,
 
-                if (decryptResp.data.policyHolder.step_no == 1 || decryptResp.data.policyHolder.step_no > 1) {
-
-                    let risk_arr = JSON.parse(decryptResp.data.policyHolder.smeinfo.risk_address);
-
-                    this.props.setRiskData(
-                        {
-                            house_building_name: risk_arr.house_building_name,
-                            block_no: risk_arr.block_no,
-                            street_name: risk_arr.street_name,
-                            plot_no: risk_arr.plot_no,
-                            house_flat_no: risk_arr.house_flat_no,
-                            pincode: decryptResp.data.policyHolder.smeinfo.pincode,
-                            pincode_id: decryptResp.data.policyHolder.smeinfo.pincode_id,
-
-                            buildings_sum_insured: decryptResp.data.policyHolder.smeinfo.buildings_sum_insured,
-                            content_sum_insured: decryptResp.data.policyHolder.smeinfo.content_sum_insured,
-                            stock_sum_insured: decryptResp.data.policyHolder.smeinfo.stock_sum_insured
-                        }
-                    );
-                }
+                //             buildings_si:decryptResp.data.policyHolder.sookshamainfo.buildings_si,
+                //             plant_machinary_si:decryptResp.data.policyHolder.sookshamainfo.plant_machinary_si,
+                //             furniture_fixture_si:decryptResp.data.policyHolder.sookshamainfo.furniture_fixture_si,
+                //             stock_raw_mat:decryptResp.data.policyHolder.sookshamainfo.stock_raw_mat,
+                //             finish_goods:decryptResp.data.policyHolder.sookshamainfo.finish_goods,
+                //             stock_wip:decryptResp.data.policyHolder.sookshamainfo.stock_wip,
+                //         }
+                //     );
+                // }
 
                 // if(decryptResp.data.policyHolder.step_no == 2 || decryptResp.data.policyHolder.step_no > 2){
 
@@ -200,9 +201,9 @@ class Summary_sukhsam extends Component {
                         // pincodeArea:pincode_area_arr.LCLTY_SUBRB_TALUK_TEHSL_NM != null ? pincode_area_arr.LCLTY_SUBRB_TALUK_TEHSL_NM : 0,
                         quoteId: decryptResp.data.policyHolder.request_data.quote_id != null ? decryptResp.data.policyHolder.request_data.quote_id : 0,
                         gst: decryptResp.data.policyHolder.request_data.service_tax != null ? decryptResp.data.policyHolder.request_data.service_tax : 0,
-                        netPremium: decryptResp.data.policyHolder.request_data.net_premium != null ? decryptResp.data.policyHolder.request_data.net_premium : 0,
-                        finalPremium: decryptResp.data.policyHolder.request_data.payable_premium != null ? decryptResp.data.policyHolder.request_data.payable_premium : 0,
-                        rawData: rawData.policyHolder.smeinfo.smecoverages != null ? rawData.policyHolder.smeinfo.smecoverages : 0,
+                        netPremium: decryptResp.data.policyHolder.request_data.gross_premium != null ? decryptResp.data.policyHolder.request_data.gross_premium : 0,
+                        finalPremium: decryptResp.data.policyHolder.request_data.net_premium != null ? decryptResp.data.policyHolder.request_data.net_premium : 0,
+                        rawData: rawData.policyHolder.sookshamainfo.sookshama_coverages != null ? rawData.policyHolder.sookshamainfo.sookshama_coverages : 0,
                     }
                 );
                 this.props.loadingStop();
@@ -232,7 +233,7 @@ class Summary_sukhsam extends Component {
 
     otherDetails = (productId) => {
         // productId === 5
-        this.props.history.push(`/OtherDetails_Sukhsam/${productId}`);
+        this.props.history.push(`/OtherDetails_Sookshma/${productId}`);
     }
 
     getPostcodeArea = (com_pincode_id) => {
@@ -242,7 +243,7 @@ class Summary_sukhsam extends Component {
     render() {
         const { policyHolder, show, fulQuoteResp, motorInsurance, error, error1, refNumber, paymentStatus, relation, memberdetails, nomineedetails, vehicleDetails, breakin_flag, rawData } = this.state
         const { productId } = this.props.match.params
-        // console.log("rawData-----",rawData)
+        console.log("rawData-----",rawData)
         // console.log("data------",rawData.policyHolder.smeinfo)
         const errMsg =
             error && error.message ? (
@@ -272,8 +273,8 @@ class Summary_sukhsam extends Component {
             rawData && rawData.length > 0
                 ? rawData.map((listing, qIndex) => (
                     <tr>
-                        <td>{listing.coverage.description} :</td>
-                        <td>{listing.coverage.description == "Architecture and Surveyor Fee (Upto 3% of Claim Amount)" || listing.coverage.description == "Removal of Debris (Upto 1% claim amount)" ? '   ----' : listing.sum_insured}
+                        <td style={({ width: "400px" })}>{listing.coverage.description}:</td>
+                        <td style={({ width: "120px" })}>{listing.coverage.description == "Architecture and Surveyor Fee (Upto 3% of Claim Amount)" || listing.coverage.description == "Removal of Debris (Upto 1% claim amount)" ? '   ----' : listing.sum_insured}
                             {/* <td>{listing.sum_insured == null ? 0 : listing.sum_insured}</td> */}</td>
                         <td>{listing.premium == null ? 0 : listing.premium}</td>
                     </tr>
@@ -283,20 +284,18 @@ class Summary_sukhsam extends Component {
         return (
             <>
                 <BaseComponent>
+                <div className="page-wrapper">
                     <div className="container-fluid">
                         <div className="row">
-                            <div className="col-sm-12 col-md-12 col-lg-2 col-xl-2 pd-l-0">
+                            <aside className="left-sidebar">
+                                <div className="scroll-sidebar ps-container ps-theme-default ps-active-y">
                                 <SideNav />
-                            </div>
+                                </div>
+                            </aside>
 
                             <div className="col-sm-12 col-md-12 col-lg-10 col-xl-10 infobox">
                                 <div className="text">
                                 <h4 className="text-center mt-3 mb-0">SME Summary</h4>
-                                {/* <a className="text-right mt-0 mb-3" href="">
-                                    <Blink color='blue' text='SME Pre Underwritten Shopkeeper Policy' fontSize='14'>
-                                    SME Pre Underwritten Shopkeeper Policy
-                                    </Blink>
-                                </a> */}
                                 </div>
                                 <h1 className="text-center mt-3 mb-4"> {" "} </h1>
                                 <Formik initialValues={initialValue} onSubmit={this.handleSubmit}
@@ -323,213 +322,10 @@ class Summary_sukhsam extends Component {
 
                                                     <Row>
                                                         <Col sm={12} md={9} lg={9}>
-                                                            {/* <div className="rghtsideTrigr">
-                                                                <Collapsible trigger="Proposer Details" >
-                                                                    <div className="listrghtsideTrigr">
-                                                                        <div>
-                                                                            <Row>
-                                                                                <Col sm={12} md={6}>
-                                                                                    <Row>
-                                                                                        <Col sm={12} md={6}>
-                                                                                            <FormGroup>Title:</FormGroup>
-                                                                                        </Col>
-                                                                                        <Col sm={12} md={6}>
-                                                                                            <FormGroup>{this.state.salutationName}</FormGroup>
-                                                                                        </Col>
-                                                                                    </Row>
-
-                                                                                </Col>
-                                                                            </Row>
-                                                                            <Row>
-                                                                                <Col sm={12} md={6}>
-                                                                                    <Row>
-                                                                                        <Col sm={12} md={6}>
-                                                                                            <FormGroup>First Name:</FormGroup>
-                                                                                        </Col>
-                                                                                        <Col sm={12} md={6}>
-                                                                                            <FormGroup>{this.props.first_name}</FormGroup>
-                                                                                        </Col>
-                                                                                    </Row>
-
-                                                                                </Col>
-                                                                            </Row>
-                                                                            <Row>
-                                                                                <Col sm={12} md={6}>
-                                                                                    <Row>
-                                                                                        <Col sm={12} md={6}>
-                                                                                            <FormGroup>Last Name:</FormGroup>
-                                                                                        </Col>
-                                                                                        <Col sm={12} md={6}>
-                                                                                            <FormGroup>{this.props.last_name}</FormGroup>
-                                                                                        </Col>
-                                                                                    </Row>
-
-                                                                                </Col>
-                                                                            </Row>
-                                                                            <Row>
-                                                                                <Col sm={12} md={6}>
-                                                                                    <Row>
-                                                                                        <Col sm={12} md={6}>
-                                                                                            <FormGroup>Email:</FormGroup>
-                                                                                        </Col>
-                                                                                        <Col sm={12} md={6}>
-                                                                                            <FormGroup>{this.props.email_id}</FormGroup>
-                                                                                        </Col>
-                                                                                    </Row>
-
-                                                                                </Col>
-                                                                            </Row>
-                                                                            <Row>
-                                                                                <Col sm={12} md={6}>
-                                                                                    <Row>
-                                                                                        <Col sm={12} md={6}>
-                                                                                            <FormGroup>Date Of Birth:</FormGroup>
-                                                                                        </Col>
-                                                                                        <Col sm={12} md={6}>
-                                                                                            <FormGroup>{moment(new Date(this.props.date_of_birth)).format('LL')}</FormGroup>
-                                                                                        </Col>
-                                                                                    </Row>
-
-                                                                                </Col>
-                                                                            </Row>
-                                                                            <Row>
-                                                                                <Col sm={12} md={6}>
-                                                                                    <Row>
-                                                                                        <Col sm={12} md={6}>
-                                                                                            <FormGroup>Mobile Number:</FormGroup>
-                                                                                        </Col>
-                                                                                        <Col sm={12} md={6}>
-                                                                                            <FormGroup>{this.props.mobile}</FormGroup>
-                                                                                        </Col>
-                                                                                    </Row>
-
-                                                                                </Col>
-                                                                            </Row>
-                                                                            <Row>
-                                                                                <Col sm={12} md={6}>
-                                                                                    <Row>
-                                                                                        <Col sm={12} md={6}>
-                                                                                            <FormGroup>Gender:</FormGroup>
-                                                                                        </Col>
-                                                                                        <Col sm={12} md={6}>
-                                                                                            <FormGroup>{this.getGender(this.props.gender)}</FormGroup>
-                                                                                        </Col>
-                                                                                    </Row>
-
-                                                                                </Col>
-                                                                            </Row>
-                                                                            <Row>
-                                                                                <Col sm={12} md={6}>
-                                                                                    <Row>
-                                                                                        <Col sm={12} md={6}>
-                                                                                            <FormGroup>GSTN:</FormGroup>
-                                                                                        </Col>
-                                                                                        <Col sm={12} md={6}>
-                                                                                            <FormGroup>{this.props.gstn_no}</FormGroup>
-                                                                                        </Col>
-                                                                                    </Row>
-
-                                                                                </Col>
-                                                                            </Row>
-                                                                            <Row>
-                                                                                <Col sm={12} md={6}>
-                                                                                    <Row>
-                                                                                        <Col sm={12} md={6}>
-                                                                                            <FormGroup>Pan No.:</FormGroup>
-                                                                                        </Col>
-                                                                                        <Col sm={12} md={6}>
-                                                                                            <FormGroup>{this.props.pan_no}</FormGroup>
-                                                                                        </Col>
-                                                                                    </Row>
-
-                                                                                </Col>
-                                                                            </Row>
-                                                                            <Row>
-                                                                                <p></p>
-                                                                            </Row>
-                                                                        </div>
-                                                                    </div>
-                                                                </Collapsible>
-                                                            </div>
-
-                                                            <div className="rghtsideTrigr m-b-30">
-                                                                <Collapsible trigger="Communication Details" >
-                                                                    <div className="listrghtsideTrigr">
-                                                                        <div>
-                                                                            <Row>
-                                                                                <Col sm={12} md={6}>
-                                                                                    <Row>
-                                                                                        <Col sm={12} md={6}>
-                                                                                            <FormGroup>House/Building Name:</FormGroup>
-                                                                                        </Col>
-                                                                                        <Col sm={12} md={6}>
-                                                                                            <FormGroup>{this.props.com_building_name}</FormGroup>
-                                                                                        </Col>
-                                                                                    </Row>
-                                                                                </Col>
-                                                                            </Row>
-                                                                            <Row>
-                                                                                <Col sm={12} md={6}>
-                                                                                    <Row>
-                                                                                        <Col sm={12} md={6}>
-                                                                                            <FormGroup>Street Name:</FormGroup>
-                                                                                        </Col>
-                                                                                        <Col sm={12} md={6}>
-                                                                                            <FormGroup>{this.props.com_street_name}</FormGroup>
-                                                                                        </Col>
-                                                                                    </Row>
-                                                                                </Col>
-                                                                            </Row>
-                                                                            <Row>
-                                                                                <Col sm={12} md={6}>
-                                                                                    <Row>
-                                                                                        <Col sm={12} md={6}>
-                                                                                            <FormGroup>Plot No.:</FormGroup>
-                                                                                        </Col>
-                                                                                        <Col sm={12} md={6}>
-                                                                                            <FormGroup>{this.props.com_plot_no}</FormGroup>
-                                                                                        </Col>
-                                                                                    </Row>
-                                                                                </Col>
-                                                                            </Row>
-                                                                            <Row>
-                                                                                <Col sm={12} md={6}>
-                                                                                    <Row>
-                                                                                        <Col sm={12} md={6}>
-                                                                                            <FormGroup>Pincode:</FormGroup>
-                                                                                        </Col>
-                                                                                        <Col sm={12} md={6}>
-                                                                                            <FormGroup>{this.props.com_pincode}</FormGroup>
-                                                                                        </Col>
-                                                                                    </Row>
-                                                                                </Col>
-                                                                            </Row>
-                                                                            <Row>
-                                                                                <Col sm={12} md={6}>
-                                                                                    <Row>
-                                                                                        <Col sm={12} md={6}>
-                                                                                            <FormGroup>Pincode Area:</FormGroup>
-                                                                                        </Col>
-                                                                                        <Col sm={12} md={6}>
-                                                                                            <FormGroup>{this.state.pincodeArea}</FormGroup>
-                                                                                        </Col>
-                                                                                    </Row>
-                                                                                </Col>
-                                                                            </Row>
-                                                                            <Row>
-                                                                                <p></p>
-                                                                            </Row>
-                                                                        </div>
-                                                                    </div>
-                                                                </Collapsible>    
-                                                            </div> */}
-
                                                             <div className="rghtsideTrigr m-b-30">
                                                                 <Collapsible trigger="Policy Summary" open={true}>
                                                                     <div className="listrghtsideTrigr">
                                                                         <div>
-                                                                            {/* <strong>Policy Summary:</strong>
-                                                                            <br/> */}
                                                                             <Row>
                                                                                 <Col sm={12} md={6}>
                                                                                     <Row>
@@ -554,7 +350,7 @@ class Summary_sukhsam extends Component {
                                                                                 </Col>
                                                                             </Row>
                                                                             <Row>
-                                                                                <Col sm={12} md={6}>
+                                                                                <Col sm={12} md={12}>
                                                                                     <table style={({ width: "45rem" })}>
                                                                                         <thead>
                                                                                             <tr>
@@ -639,6 +435,7 @@ class Summary_sukhsam extends Component {
                             <Footer />
                         </div>
                     </div>
+                </div>
                 </BaseComponent>
             </>
         );
