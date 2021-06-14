@@ -653,11 +653,11 @@ class TwoWheelerVerify extends Component {
                 <div className="container-fluid">
                 <div className="row">
 				
-                    <aside className="left-sidebar">
- <div className="scroll-sidebar ps-container ps-theme-default ps-active-y">
-<SideNav />
- </div>
-</aside>
+                <aside className="left-sidebar">
+                    <div className="scroll-sidebar ps-container ps-theme-default ps-active-y">
+                    <SideNav />
+                    </div>
+                </aside>
 					
 					
                 <div className="col-sm-12 col-md-12 col-lg-12 col-xl-12 infobox twoVerify">

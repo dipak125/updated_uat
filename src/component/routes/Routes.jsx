@@ -696,8 +696,9 @@ class Routes extends Component {
                         <Route exact path="/Intermediary_LogIn" component={Intermediary_LogIn} /> 
                         <Route exact path="/logout" component={Logout} /> 
                         <Route exact path="/Reset_Password" component={Reset_Password} /> 
-                        <PrivateRoute exact path="/Error" component={Error} />
+                        <Route exact path="/UnderMaintenance" component={UnderMaintenance} />
 
+                        <PrivateRoute exact path="/Error" component={Error} />
                         <PrivateRoute exact path="/Products" component={Products} />
 
                         <PrivateRoute exact path="/Health/:productId" component={Health} />
@@ -891,8 +892,6 @@ class Routes extends Component {
                         {/************ Trabscrop Payment Gateway ******************/}
                         <PrivateRoute exact path="/Transcrop_gateway/:productId" component={TranscropGateway} />
 
-
-                        <PrivateRoute exact path="/UnderMaintenance" component={UnderMaintenance} />
 						
 						{/************ Four-Wheeler OD ******************/}
 						<PrivateRoute exact path="/RegistrationOD/:productId" component={RegistrationOD} />                    
