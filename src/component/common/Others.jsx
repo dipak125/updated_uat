@@ -22,8 +22,9 @@ class Others extends Component {
 		}  
 		
 		if(productId == '19'){
-			localStorage.removeItem('policy_holder_ref_no')
+			localStorage.removeItem('policy_holder_ref_no')  
 			this.props.history.push(`/Registration_Sookshma/${productId}`);
+            window.location.reload(true);
 		}
 	
 	}

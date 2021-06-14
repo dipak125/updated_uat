@@ -193,6 +193,8 @@ class Premium_sukhsam extends Component {
                             stock_raw_mat:decryptResp.data.policyHolder.sookshamainfo.stock_raw_mat,
                             finish_goods:decryptResp.data.policyHolder.sookshamainfo.finish_goods,
                             stock_wip:decryptResp.data.policyHolder.sookshamainfo.stock_wip,
+                            content_sum_insured: decryptResp.data.policyHolder.sookshamainfo.fire_content_si,
+                            stock_sum_insured : decryptResp.data.policyHolder.sookshamainfo.fire_stock_si
                         }
                     );
                 }
@@ -278,7 +280,7 @@ class Premium_sukhsam extends Component {
     }
 
     render() {
-        const { policyHolder, show, vehicleDetails, paymentgateway, error, error1, refNumber, paymentStatus, relation, memberdetails,nomineedetails, breakin_flag } = this.state
+        const { policyHolder, show, vehicleDetails, paymentgateway, error, error1, quoteId, paymentStatus, relation, memberdetails,nomineedetails, breakin_flag } = this.state
         const { productId } = this.props.match.params
 
         const policyHolder_refNo = queryString.parse(this.props.location.search).access_id ? 
@@ -323,7 +325,7 @@ class Premium_sukhsam extends Component {
                             </aside>
 
                             <div className="col-sm-12 col-md-12 col-lg-12 col-xl-12 infobox">
-                                <h4 className="text-center mt-3 mb-3">SME Pre UW</h4>
+                                <h4 className="text-center mt-3 mb-3">SME – Pre UW Package Sookshma Udyog</h4>
                                 <Formik initialValues={initialValue} onSubmit={this.handleSubmit}
                                 validationSchema={validatePremium}
                                 >
@@ -334,7 +336,7 @@ class Premium_sukhsam extends Component {
                                                 <section className="brand m-t-11 m-b-25">
                                                     <div className="d-flex justify-content-left">
                                                         <div className="brandhead m-b-10">
-                                                            <h4>SME FIRE </h4>
+                                                       { quoteId ? <h4>Your Quotation Number is: {quoteId} </h4> : null }
                                                         </div>
                                                     </div>
                                                     <div className="brandhead m-b-30">

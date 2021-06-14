@@ -543,6 +543,8 @@ class AdditionalDetails_sukhsam extends Component {
                             stock_raw_mat:decryptResp.data.policyHolder.sookshamainfo.stock_raw_mat,
                             finish_goods:decryptResp.data.policyHolder.sookshamainfo.finish_goods,
                             stock_wip:decryptResp.data.policyHolder.sookshamainfo.stock_wip,
+                            content_sum_insured: decryptResp.data.policyHolder.sookshamainfo.fire_content_si,
+                            stock_sum_insured : decryptResp.data.policyHolder.sookshamainfo.fire_stock_si
                         }
                     );
                    
@@ -665,7 +667,7 @@ class AdditionalDetails_sukhsam extends Component {
 
                             
                         <div className="col-sm-12 col-md-12 col-lg-10 col-xl-10 infobox">
-                        <h4 className="text-center mt-3 mb-3">SME Pre UW</h4>
+                        <h4 className="text-center mt-3 mb-3">SME – Pre UW Package Sookshma Udyog</h4>
 
                         <section className="brand m-b-25">
                             <div className="brand-bg">

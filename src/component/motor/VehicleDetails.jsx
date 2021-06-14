@@ -442,7 +442,7 @@ class VehicleDetails extends Component {
                 'previous_city':values.previous_city,
                 'previous_policy_no': values.previous_policy_no,
                 'previous_is_claim':values.previous_is_claim ? values.previous_is_claim : '0' ,
-                'previous_claim_bonus': values.previous_claim_bonus ? values.previous_claim_bonus : 1,
+                'previous_claim_bonus': values.previous_claim_bonus && Math.floor(moment().diff(values.previous_end_date, 'days', true)) <= 90 ? values.previous_claim_bonus : 1,
                 'previous_claim_for': values.previous_claim_for,        
                 'vehicleAge': vehicleAge,
                 'policy_type': policy_type,
@@ -626,17 +626,12 @@ class VehicleDetails extends Component {
                 <div className="container-fluid">
                 <div className="row">
 				
-					<aside className="left-sidebar">
-		 				 <div className="scroll-sidebar ps-container ps-theme-default ps-active-y">
-						 <SideNav />
-						</div>
-						</aside>
+                <aside className="left-sidebar">
+                        <div className="scroll-sidebar ps-container ps-theme-default ps-active-y">
+                        <SideNav />
+                    </div>
+                </aside>
 								
-					 {/*<div className="col-sm-12 col-md-12 col-lg-2 col-xl-2 pd-l-0">               
-						<SideNav />
-             		 </div>*/}			
-				
-                    
                 <div className="col-sm-12 col-md-12 col-lg-12 col-xl-12 infobox">
                 <h4 className="text-center mt-3 mb-3">{phrases['SBIGICL']}</h4>
                 <section className="brand m-b-25">
@@ -648,7 +643,7 @@ class VehicleDetails extends Component {
                     <div className="brand-bg">
                         <Formik initialValues={newInitialValues} onSubmit={this.handleSubmit} validationSchema={vehicleRegistrationValidation}>
                             {({ values, errors, setFieldValue, setFieldTouched, isValid, isSubmitting, touched }) => {
-console.log("errors------------ ", errors)
+
                                 return (
                                     <Form>
                                         <Row>

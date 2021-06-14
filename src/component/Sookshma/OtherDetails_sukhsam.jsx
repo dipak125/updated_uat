@@ -90,7 +90,7 @@ address : Yup.string().required("This field is required")
         return "Please enter valid address"
     }).nullable(),
 
-financial_party : Yup.string().required("This field is required"),
+financial_party : Yup.string().required("This field is required").nullable(),
 
 financial_modgaged : Yup.number().when(['financial_party'], {
     is: financial_party => financial_party == '1',       
@@ -299,6 +299,8 @@ class OtherDetails_sukhsam extends Component {
                             stock_raw_mat:decryptResp.data.policyHolder.sookshamainfo.stock_raw_mat,
                             finish_goods:decryptResp.data.policyHolder.sookshamainfo.finish_goods,
                             stock_wip:decryptResp.data.policyHolder.sookshamainfo.stock_wip,
+                            content_sum_insured: decryptResp.data.policyHolder.sookshamainfo.fire_content_si,
+                            stock_sum_insured : decryptResp.data.policyHolder.sookshamainfo.fire_stock_si
                         }
                     );
 
@@ -360,8 +362,8 @@ class OtherDetails_sukhsam extends Component {
             })
             .catch(err => {
                 this.props.loadingStop();
-                let decryptErr = JSON.parse(encryption.decrypt(err.data));
-                console.log("decryptErr -------->",decryptErr)
+                // let decryptErr = JSON.parse(encryption.decrypt(err.data));
+                // console.log("decryptErr -------->",decryptErr)
             })
         }
         
@@ -411,7 +413,7 @@ class OtherDetails_sukhsam extends Component {
                         </aside>
                             
                         <div className="col-sm-12 col-md-12 col-lg-12 col-xl-12 infobox otherDetail2">
-                        <h4 className="text-center mt-3 mb-3">SME Pre UW</h4>
+                        <h4 className="text-center mt-3 mb-3">SME – Pre UW Package Sookshma Udyog</h4>
                         <section className="brand m-b-25">
                             <div className="brand-bg">
                                 <Formik initialValues={newInitialValues} onSubmit={this.handleSubmit} 

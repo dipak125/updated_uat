@@ -57,6 +57,8 @@ export const setSmeRiskData = ( request ) => {
                 stock_raw_mat: request.stock_raw_mat,
                 finish_goods: request.finish_goods,
                 stock_wip: request.stock_wip,
+                content_sum_insured: request.content_sum_insured,
+                stock_sum_insured : request.stock_sum_insured
             }
         });
     }

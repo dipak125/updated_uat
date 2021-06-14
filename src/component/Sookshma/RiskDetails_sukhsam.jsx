@@ -41,6 +41,7 @@ const initialValue = {
     previous_policy_no: "",
     stateName: "",
     pinDataArr: [],
+    fire_sum_insured: 0
 }
 
 
@@ -181,7 +182,7 @@ class RiskDetails_sukhsam extends Component {
         }
 
         
-        const Fire_sum_insured = parseInt(values.buildings_si) + 
+        var Fire_sum_insured = parseInt(values.buildings_si) + 
         parseInt(values.plant_machinary_si) + 
         parseInt(values.furniture_fixture_si) + 
         parseInt(values.stock_raw_mat) + 
@@ -220,7 +221,9 @@ class RiskDetails_sukhsam extends Component {
                     furniture_fixture_si:values.furniture_fixture_si,
                     stock_raw_mat:values.stock_raw_mat,
                     finish_goods:values.finish_goods,
-                    stock_wip:values.stock_wip
+                    stock_wip:values.stock_wip,
+                    content_sum_insured: Fire_sum_insured,
+                    stock_sum_insured : parseInt(values.stock_raw_mat) + parseInt(values.finish_goods) + parseInt(values.stock_wip)
                 }
             );
             const {productId} = this.props.match.params;
@@ -284,6 +287,8 @@ console.log("decrypt resp ----------------- ", decryptResp)
                             stock_raw_mat:decryptResp.data.policyHolder.sookshamainfo.stock_raw_mat,
                             finish_goods:decryptResp.data.policyHolder.sookshamainfo.finish_goods,
                             stock_wip:decryptResp.data.policyHolder.sookshamainfo.stock_wip,
+                            content_sum_insured: decryptResp.data.policyHolder.sookshamainfo.fire_content_si,
+                            stock_sum_insured : decryptResp.data.policyHolder.sookshamainfo.fire_stock_si
                         }
                     );
                 }
@@ -444,7 +449,7 @@ console.log("decrypt resp ----------------- ", decryptResp)
                 </aside>
 
                 <div className="col-sm-12 col-md-12 col-lg-12 col-xl-12 infobox riskdetail">
-                <h4 className="text-center mt-3 mb-3">SME Pre UW</h4>
+                <h4 className="text-center mt-3 mb-3">SME – Pre UW Package Sookshma Udyog</h4>
                 <section className="brand m-b-25">
                     <div className="brand-bg">
                         <Formik initialValues={newInitialValues} onSubmit={this.handleSubmit} validationSchema={vehicleRegistrationValidation}>
@@ -710,7 +715,7 @@ console.log("decrypt resp ----------------- ", decryptResp)
                                                                 disabled={true}
                                                                 onFocus={e => this.changePlaceHoldClassAdd(e)}
                                                                 onBlur={e => this.changePlaceHoldClassRemove(e)}
-                                                                value = {parseInt(values.plant_machinary_si) + 
+                                                                value = {values.plant_machinary_si && values.furniture_fixture_si && parseInt(values.plant_machinary_si) + 
                                                                     parseInt(values.furniture_fixture_si)}  
                                                                                                                                 
                                                             />
@@ -842,7 +847,8 @@ console.log("decrypt resp ----------------- ", decryptResp)
                                                                 disabled={true}
                                                                 onFocus={e => this.changePlaceHoldClassAdd(e)}
                                                                 onBlur={e => this.changePlaceHoldClassRemove(e)}
-                                                                value = {parseInt(values.stock_raw_mat) + 
+                                                                value = {values.stock_raw_mat && values.finish_goods && values.stock_wip && 
+                                                                    parseInt(values.stock_raw_mat) + 
                                                                     parseInt(values.finish_goods) + 
                                                                     parseInt(values.stock_wip)}                                                                       
                                                             />

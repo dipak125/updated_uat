@@ -525,6 +525,10 @@ class VehicleDetailsMISCD extends Component {
             return false
         }
 
+        if(Math.floor(moment().diff(values.previous_end_date, 'days', true)) > 90) {
+            values.previous_claim_bonus = 1
+        }
+
 
         const formData = new FormData(); 
         let encryption = new Encryption();

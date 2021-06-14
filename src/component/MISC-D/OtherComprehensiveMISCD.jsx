@@ -296,7 +296,7 @@ const ComprehensiveValidation = Yup.object().shape({
                 ),
 
             chassisNo: Yup.string().required('Chassis no is required')
-                .matches(/^[0-9]*$/, function () {
+                .matches(/^[0-9a-zA-Z]*$/, function () {
                     return "Invalid chassis No"
                 }).min(5, function () {
                     return "Chassis no. should be minimum 5 characters"

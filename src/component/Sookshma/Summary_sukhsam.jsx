@@ -273,9 +273,7 @@ class Summary_sukhsam extends Component {
             rawData && rawData.length > 0
                 ? rawData.map((listing, qIndex) => (
                     <tr>
-                        <td style={({ width: "400px" })}>{listing.coverage.description}:</td>
-                        <td style={({ width: "120px" })}>{listing.coverage.description == "Architecture and Surveyor Fee (Upto 3% of Claim Amount)" || listing.coverage.description == "Removal of Debris (Upto 1% claim amount)" ? '   ----' : listing.sum_insured}
-                            {/* <td>{listing.sum_insured == null ? 0 : listing.sum_insured}</td> */}</td>
+                        <td style={({ width: "400px" })}>{listing.coverage.description}:</td>   
                         <td>{listing.premium == null ? 0 : listing.premium}</td>
                     </tr>
                 ))
@@ -295,7 +293,7 @@ class Summary_sukhsam extends Component {
 
                             <div className="col-sm-12 col-md-12 col-lg-10 col-xl-10 infobox">
                                 <div className="text">
-                                <h4 className="text-center mt-3 mb-0">SME Summary</h4>
+                                <h4 className="text-center mt-3 mb-0">SME – Pre UW Package Sookshma Udyog</h4>
                                 </div>
                                 <h1 className="text-center mt-3 mb-4"> {" "} </h1>
                                 <Formik initialValues={initialValue} onSubmit={this.handleSubmit}
@@ -308,7 +306,7 @@ class Summary_sukhsam extends Component {
                                                 <section className="brand m-t-11 m-b-25">
                                                     <div className="d-flex justify-content-left">
                                                         <div className="brandhead m-b-10">
-                                                            <h4>SME FIRE </h4>
+                                                            <h4>SME – Pre UW Package Sookshma Udyog </h4>
                                                             <p>You are just one steps away in getting your policy ready.</p> <p>Your Quotation Number is: <span><strong>{this.state.quoteId}</strong></span></p>
                                                         </div>
                                                     </div>
@@ -355,7 +353,6 @@ class Summary_sukhsam extends Component {
                                                                                         <thead>
                                                                                             <tr>
                                                                                                 <th>Cover Type</th>
-                                                                                                <th>Sum Insured(₹)</th>
                                                                                                 <th>Premium(₹)</th>
                                                                                             </tr>
                                                                                         </thead>

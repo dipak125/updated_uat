@@ -99,6 +99,8 @@ const sukhsam = ( state = initialState, action) => {
             stock_raw_mat: action.payload.stock_raw_mat,
             finish_goods: action.payload.finish_goods,
             stock_wip: action.payload.stock_wip,
+            content_sum_insured: action.payload.content_sum_insured,
+            stock_sum_insured : action.payload.stock_sum_insured      
         }
             
         case SUKHSAM_FIRE_OTHER_DETAILS: return {...state, 
