@@ -117,11 +117,11 @@ class Registration_sukhsam extends Component {
                     this.props.setSmeOthersDetails({
                     
                         Commercial_consideration:decryptResp.data.policyHolder.previouspolicy.Commercial_consideration,
-                        previous_start_date:decryptResp.data.policyHolder.previouspolicy.start_date,
-                        previous_end_date:decryptResp.data.policyHolder.previouspolicy.end_date,
-                        Previous_Policy_No:decryptResp.data.policyHolder.previouspolicy.policy_no,
-                        insurance_company_id:decryptResp.data.policyHolder.previouspolicy.insurancecompany_id,
-                        address:decryptResp.data.policyHolder.previouspolicy.address,
+                        // previous_start_date:decryptResp.data.policyHolder.previouspolicy.start_date,
+                        // previous_end_date:decryptResp.data.policyHolder.previouspolicy.end_date,
+                        // Previous_Policy_No:decryptResp.data.policyHolder.previouspolicy.policy_no,
+                        // insurance_company_id:decryptResp.data.policyHolder.previouspolicy.insurancecompany_id,
+                        // address:decryptResp.data.policyHolder.previouspolicy.address,
 
                         financial_party: decryptResp.data.policyHolder.sookshamainfo.financial_party,
                         is_claim: decryptResp.data.policyHolder.sookshamainfo.is_claim,
