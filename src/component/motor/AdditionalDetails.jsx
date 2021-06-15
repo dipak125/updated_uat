@@ -51,13 +51,14 @@ const initialValue = {
 const ownerValidation = Yup.object().shape({
     first_name: Yup.string().required('NameRequired')
         .min(3, function() {
-            return "First name must be 3 chracters & last name 1 characters long"
+            return "FirstNameMin"
         })
         .max(40, function() {
-            return "Full name must be maximum 40 chracters"
+            return "FullNameMax"
         })
-        .matches(/^[a-zA-Z]+([\s]?[a-zA-Z]+)([\s]?[a-zA-Z]+)$/, function() {
-            return "Please enter valid name"
+        // .matches(/^[a-zA-Z]+([\s]?[a-zA-Z]+)([\s]?[a-zA-Z]+)$/, function() {
+        .matches(/^[a-zA-Z]+([\s]?[a-zA-Z]+)$/, function() {
+            return "ValidName"
         }),
     // last_name:Yup.string().required('Last name is required'),
     gender: Yup.string().required('GenderRequired')

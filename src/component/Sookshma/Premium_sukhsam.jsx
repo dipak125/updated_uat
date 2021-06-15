@@ -205,14 +205,14 @@ class Premium_sukhsam extends Component {
                     
                         // previous_start_date:decryptResp.data.policyHolder.previouspolicy.start_date,
                         // previous_end_date:decryptResp.data.policyHolder.previouspolicy.end_date,
-                        Commercial_consideration:decryptResp.data.policyHolder.previouspolicy.Commercial_consideration,
+                        // Commercial_consideration:decryptResp.data.policyHolder.previouspolicy.Commercial_consideration,
                         // Previous_Policy_No:decryptResp.data.policyHolder.previouspolicy.policy_no,
                         // insurance_company_id:decryptResp.data.policyHolder.previouspolicy.insurancecompany_id,
                         // address:decryptResp.data.policyHolder.previouspolicy.address,
+                        // is_claim: decryptResp.data.policyHolder.sookshamainfo.is_claim,
+                        // previous_policy_check: decryptResp.data.policyHolder.previouspolicy.policy_no ? 1 : 0,
 
                         financial_party: decryptResp.data.policyHolder.sookshamainfo.financial_party,
-                        is_claim: decryptResp.data.policyHolder.sookshamainfo.is_claim,
-                        previous_policy_check: decryptResp.data.policyHolder.previouspolicy.policy_no ? 1 : 0,
                         financial_modgaged : decryptResp.data.policyHolder.sookshamainfo.financial_modgaged,
                         financer_name: decryptResp.data.policyHolder.sookshamainfo.financer_name
         

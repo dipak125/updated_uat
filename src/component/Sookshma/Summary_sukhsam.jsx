@@ -277,7 +277,7 @@ class Summary_sukhsam extends Component {
                         <td>{listing.premium == null ? 0 : listing.premium}</td>
                     </tr>
                 ))
-                : null;
+                :  null;
 
         return (
             <>
@@ -358,15 +358,20 @@ class Summary_sukhsam extends Component {
                                                                                         </thead>
                                                                                         <tbody>
                                                                                             {sme_Coverages}
+                                                                                            {/* <tr>
+                                                                                                <td style={({ width: "400px" })}>Net Premium(₹) :</td>   
+                                                                                                <td>{this.state.netPremium}</td>
+                                                                                            </tr> */}
                                                                                         </tbody>
                                                                                     </table>
                                                                                 </Col>
                                                                             </Row>
                                                                             <Row>
-                                                                                <p></p>
+                                                                                <p>&nbsp;</p>
                                                                             </Row>
+
                                                                             <Row>
-                                                                                <Col sm={12} md={6}>
+                                                                                <Col sm={12} md={12}>
                                                                                     <Row>
                                                                                         <Col sm={12} md={6}>
                                                                                             <FormGroup><strong>Net Premium(₹) :</strong></FormGroup>
@@ -378,7 +383,7 @@ class Summary_sukhsam extends Component {
                                                                                 </Col>
                                                                             </Row>
                                                                             <Row>
-                                                                                <Col sm={12} md={6}>
+                                                                                <Col sm={12} md={12}>
                                                                                     <Row>
                                                                                         <Col sm={12} md={6}>
                                                                                             <FormGroup><strong>GST(₹) :</strong></FormGroup>
@@ -390,7 +395,7 @@ class Summary_sukhsam extends Component {
                                                                                 </Col>
                                                                             </Row>
                                                                             <Row>
-                                                                                <Col sm={12} md={6}>
+                                                                                <Col sm={12} md={12}>
                                                                                     <Row>
                                                                                         <Col sm={12} md={6}>
                                                                                             <FormGroup><strong>Final Premium(₹) :</strong></FormGroup>

@@ -49,14 +49,14 @@ Commercial_consideration : Yup.string().matches(/^[0-9]*$/, function() {
 
 financial_party : Yup.string().required("This field is required").nullable(),
 
-financial_modgaged : Yup.number().when(['financial_party'], {
+financial_modgaged : Yup.string().when(['financial_party'], {
     is: financial_party => financial_party == '1',       
-    then: Yup.number().required("This field is required"),
-    otherwise: Yup.number().nullable()}),
+    then: Yup.string().required("This field is required").nullable(),
+    otherwise: Yup.string().nullable()}),
 
 financer_name : Yup.string().when(['financial_party'], {
     is: financial_party => financial_party == '1',       
-    then: Yup.string().required("This field is required"),
+    then: Yup.string().required("This field is required").nullable(),
     otherwise: Yup.string().nullable()}),
     
 })
@@ -106,18 +106,12 @@ class OtherDetails_sukhsam extends Component {
         let encryption = new Encryption();
 
         let post_data = {
-            // 'previous_start_date': previous_start_date,
-            // 'previous_end_date': previous_end_date,
-            // 'previous_policy_no': previous_Policy_No,
-            // 'insurance_company_id': insurance_company_id,
-            // 'address': values.address,
             'menumaster_id': this.props.menumaster_id,
             'page_name': `OtherDetails_Sookshma/${productId}`,
             'policy_holder_id': this.props.policy_holder_id,
             'Commercial_consideration':'5',
             'financial_party': values.financial_party,
             'is_claim': 0,
-            'previous_policy_check': values.previous_policy_check,
             'financial_modgaged' : values.financial_modgaged,
             'financer_name': values.financer_name
         }
@@ -264,18 +258,19 @@ class OtherDetails_sukhsam extends Component {
                     
                         // previous_start_date:decryptResp.data.policyHolder.previouspolicy.start_date,
                         // previous_end_date:decryptResp.data.policyHolder.previouspolicy.end_date,
-                        Commercial_consideration:decryptResp.data.policyHolder.previouspolicy.Commercial_consideration,
+                        // Commercial_consideration:decryptResp.data.policyHolder.previouspolicy.Commercial_consideration,
                         // Previous_Policy_No:decryptResp.data.policyHolder.previouspolicy.policy_no,
                         // insurance_company_id:decryptResp.data.policyHolder.previouspolicy.insurancecompany_id,
                         // address:decryptResp.data.policyHolder.previouspolicy.address,
+                        // is_claim: decryptResp.data.policyHolder.sookshamainfo.is_claim,
+                        // previous_policy_check: decryptResp.data.policyHolder.previouspolicy.policy_no ? 1 : 0,
 
-                        financial_party: decryptResp.data.policyHolder.sookshamainfo.financial_party,
-                        is_claim: decryptResp.data.policyHolder.sookshamainfo.is_claim,
-                        previous_policy_check: decryptResp.data.policyHolder.previouspolicy.policy_no ? 1 : 0,
+                        financial_party: decryptResp.data.policyHolder.sookshamainfo.financial_party,      
                         financial_modgaged : decryptResp.data.policyHolder.sookshamainfo.financial_modgaged,
                         financer_name: decryptResp.data.policyHolder.sookshamainfo.financer_name
         
                     });
+
                 }
 
                 if(decryptResp.data.policyHolder.step_no == 3 || decryptResp.data.policyHolder.step_no > 3){

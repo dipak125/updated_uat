@@ -167,7 +167,7 @@ class RiskDetails_sukhsam extends Component {
         let post_data = {
             'policy_holder_id': this.props.policy_holder_id,
             'menumaster_id': this.props.menumaster_id,
-            'page_name': `RiskDetails/${productId}`,
+            'page_name': `RiskDetails_Sookshma/${productId}`,
             'shop_building_name': values.shop_building_name,
             'block_no': values.block_no,
             'house_flat_no': values.house_flat_no,
@@ -297,16 +297,16 @@ console.log("decrypt resp ----------------- ", decryptResp)
 
                     this.props.setSmeOthersDetails({
                     
-                        Commercial_consideration:decryptResp.data.policyHolder.previouspolicy.Commercial_consideration,
+                        // Commercial_consideration:decryptResp.data.policyHolder.previouspolicy.Commercial_consideration,
                         // previous_start_date:decryptResp.data.policyHolder.previouspolicy.start_date,
                         // previous_end_date:decryptResp.data.policyHolder.previouspolicy.end_date,
                         // Previous_Policy_No:decryptResp.data.policyHolder.previouspolicy.policy_no,
                         // insurance_company_id:decryptResp.data.policyHolder.previouspolicy.insurancecompany_id,
                         // address:decryptResp.data.policyHolder.previouspolicy.address,
+                        // is_claim: decryptResp.data.policyHolder.sookshamainfo.is_claim,
+                        // previous_policy_check: decryptResp.data.policyHolder.previouspolicy.policy_no ? 1 : 0,
 
                         financial_party: decryptResp.data.policyHolder.sookshamainfo.financial_party,
-                        is_claim: decryptResp.data.policyHolder.sookshamainfo.is_claim,
-                        previous_policy_check: decryptResp.data.policyHolder.previouspolicy.policy_no ? 1 : 0,
                         financial_modgaged : decryptResp.data.policyHolder.sookshamainfo.financial_modgaged,
                         financer_name: decryptResp.data.policyHolder.sookshamainfo.financer_name
         
