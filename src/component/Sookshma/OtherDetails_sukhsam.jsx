@@ -33,15 +33,6 @@ const initialValue = {
     registration_date: "",
     location_id:"",
     previous_is_claim:"",
-    address:"",
-    insurance_company_id:"",
-    previous_policy_name:"",
-    previous_end_date: "",
-    previous_start_date: "",
-    previous_claim_bonus: 1,
-    previous_claim_for: "",
-    previous_policy_no: "",
-    previous_policy_check : '0',
     financial_party: "",
     financial_modgaged: "",
     financer_name: ""
@@ -51,44 +42,10 @@ const initialValue = {
 // VALIDATION :---------------------------------
 const vehicleRegistrationValidation = 
 Yup.object().shape({
-previous_start_date : Yup.date().when(['previous_policy_check'], {
-    is: previous_policy_check => previous_policy_check == '1',       
-    then: Yup.date().required("Please select previous policy start date"),
-    otherwise: Yup.date().nullable()}),
-    
-previous_end_date : Yup.date().when(['previous_policy_check'], {
-    is: previous_policy_check => previous_policy_check == '1',       
-    then: Yup.date().required("Please select previous policy end date"),
-    otherwise: Yup.date().nullable()}),
 
 Commercial_consideration : Yup.string().matches(/^[0-9]*$/, function() {
     return "Please enter commercial consideration % in number"
 }).nullable(),
-
-Previous_Policy_No : Yup.string().when(['previous_policy_check'], {
-    is: previous_policy_check => previous_policy_check == '1',       
-    then: Yup.string().required("Previous policy number is required")
-.matches(/^[a-zA-Z0-9][a-zA-Z0-9\s-/]*$/, 
-    function() {
-        return "Please enter valid policy number"
-    }).min(6, function() {
-        return "Policy No. must be minimum 6 characters"
-    })
-    .max(28, function() {
-        return "Policy No. must be maximum 28 characters"
-    }),
-    otherwise: Yup.string().nullable()}),
-
-insurance_company_id : Yup.number().when(['previous_policy_check'], {
-    is: previous_policy_check => previous_policy_check == '1',       
-    then: Yup.number().required("Previous insurance company name is required"),
-    otherwise: Yup.number().nullable()}),
-
-address : Yup.string().required("This field is required")
-.matches(/^[a-zA-Z0-9][a-zA-Z0-9-/.,\s]*$/, 
-    function() {
-        return "Please enter valid address"
-    }).nullable(),
 
 financial_party : Yup.string().required("This field is required").nullable(),
 
@@ -149,11 +106,11 @@ class OtherDetails_sukhsam extends Component {
         let encryption = new Encryption();
 
         let post_data = {
-            'previous_start_date': previous_start_date,
-            'previous_end_date': previous_end_date,
-            'previous_policy_no': previous_Policy_No,
-            'insurance_company_id': insurance_company_id,
-            'address': values.address,
+            // 'previous_start_date': previous_start_date,
+            // 'previous_end_date': previous_end_date,
+            // 'previous_policy_no': previous_Policy_No,
+            // 'insurance_company_id': insurance_company_id,
+            // 'address': values.address,
             'menumaster_id': this.props.menumaster_id,
             'page_name': `OtherDetails_Sookshma/${productId}`,
             'policy_holder_id': this.props.policy_holder_id,
@@ -173,15 +130,10 @@ class OtherDetails_sukhsam extends Component {
             this.props.loadingStop();
             this.props.setSmeOthersDetails({
                 
-                previous_start_date: previous_start_date,
-                previous_end_date: previous_end_date,
                 Commercial_consideration:'5',
-                Previous_Policy_No:values.Previous_Policy_No,
                 insurance_company_id:values.insurance_company_id,
-                address:values.address,
                 financial_party: values.financial_party,
                 is_claim: 0,
-                previous_policy_check: values.previous_policy_check,
                 financial_modgaged : values.financial_modgaged,
                 financer_name: values.financer_name
 
@@ -582,189 +534,12 @@ class OtherDetails_sukhsam extends Component {
                                                 <div className="brandhead"> 
                                                     <p>&nbsp;</p>
                                                 </div>
-                                            
-                                                <Row>
-                                                    <Col sm={12} md={9} lg={9}>
-                                                        <FormGroup>
-                                                        <div className="d-flex justify-content-left">
-                                                        <div className="brandhead">
-                                                        <h4 className="fs-18 m-b-32"> Do you have any previous policy ? </h4>
-                                                        </div>
-                                                        </div>
-                                                        <div className="d-inline-flex m-b-35">
-                                                        <div className="p-r-25">
-                                                            <label className="customRadio3">
-                                                                <Field
-                                                                type="radio"
-                                                                name='previous_policy_check'                                            
-                                                                value='0'
-                                                                key='1'  
-                                                                onChange={(e) => {
-                                                                    setFieldTouched('previous_policy_check')
-                                                                    setFieldValue(`previous_policy_check`, e.target.value);
-                                                                                        
-                                                                }}
-                                                                    checked={values.previous_policy_check == '0' ? true : false}
-                                                                />
-                                                                    <span className="checkmark " /><span className="fs-14"> No</span>
-                                                            </label>
-                                                        </div>
-
-                                                        <div className="">
-                                                            <label className="customRadio3">
-                                                            <Field
-                                                            type="radio"
-                                                            name='previous_policy_check'                                            
-                                                            value='1'
-                                                            key='1'  
-                                                            onChange={(e) => {
-                                                            setFieldTouched('previous_policy_check')
-                                                            setFieldValue(`previous_policy_check`, e.target.value);
-                                                        }}
-                                                            checked={values.previous_policy_check == '1' ? true : false}
-                                                            />
-                                                            <span className="checkmark" />
-                                                            <span className="fs-14">Yes</span>
-                                                            </label>
-                                                            {errors.previous_policy_check && touched.previous_policy_check ? (
-                                                            <span className="errorMsg">{errors.previous_policy_check}</span>
-                                                        ) : null}
-                                                            </div>
-                                                        </div>
-                                                        </FormGroup>
-                                                    </Col> 
-                                                    { values.previous_policy_check == '1' ?
-                                                    <Col sm={12} md={9} lg={9}>
-                                                        <div className="d-flex justify-content-left">
-                                                            <div className="brandhead">
-                                                                <h4 >PREVIOUS INSURANCE DETAILS</h4>
-                                                            </div>
-                                                        </div>   
-                                                        <Row>
-                                                            <Col sm={12} md={11} lg={4}>
-                                                                <FormGroup>
-                                                                    <DatePicker
-                                                                        name="previous_start_date"
-                                                                        minDate={new Date(minDate)}
-                                                                        maxDate={new Date(maxDate)}
-                                                                        dateFormat="dd MMM yyyy"
-                                                                        placeholderText="Policy start date"
-                                                                        autoComplete="off"
-                                                                        showMonthDropdown
-                                                                        showYearDropdown
-                                                                        dropdownMode="select"
-                                                                        className="datePckr inputfs12"
-                                                                        selected={values.previous_start_date}
-                                                                        onChange={(val) => {
-                                                                            //setFieldTouched('previous_start_date')
-                                                                            setFieldValue('previous_start_date', val);
-                                                                            setFieldValue('previous_end_date', new Date(moment(val).add(365, 'day')));
-                                                                            //this.setState({disable_end_date:false});
-                                                                            // endMinDate = moment(val).add(364, 'day');
-                                                                        }}
-                                                                    />
-                                                                    {errors.previous_start_date && touched.previous_start_date ? (
-                                                                        <span className="errorMsg">{errors.previous_start_date}</span>
-                                                                    ) : null}
-                                                                </FormGroup>
-                                                            </Col>
-
-                                                            <Col sm={12} md={11} lg={4}>
-                                                                <FormGroup>
-                                                                    <DatePicker
-                                                                        name="previous_end_date"
-                                                                        dateFormat="dd MMM yyyy"
-                                                                        placeholderText="Policy end date"
-                                                                        disabled = {this.state.disable_end_date}
-                                                                        minDate={new Date(endMinDate)}
-                                                                        dropdownMode="select"
-                                                                        className="datePckr inputfs12"
-                                                                        selected={values.previous_end_date}
-                                                                        onChange={(val) => {
-                                                                            setFieldTouched('previous_end_date');
-                                                                            setFieldValue('previous_end_date', val);
-                                                                        }}
-                                                                    />
-                                                                    {errors.previous_end_date && touched.previous_end_date ? (
-                                                                        <span className="errorMsg">{errors.previous_end_date}</span>
-                                                                    ) : null}
-                                                                </FormGroup>
-                                                            </Col>
-                                                            <Col sm={12} md={5} lg={4}>
-                                                                <FormGroup>
-                                                                    <div className="insurerName">
-                                                                        <Field
-                                                                            name="Previous_Policy_No"
-                                                                            type="text"
-                                                                            placeholder="Previous Policy No"
-                                                                            autoComplete="off"
-                                                                            minimum="6"
-                                                                            maximum="28"
-                                                                            onFocus={e => this.changePlaceHoldClassAdd(e)}
-                                                                            onBlur={e => this.changePlaceHoldClassRemove(e)}   
-                                                                        />
-                                                                        {errors.Previous_Policy_No && touched.Previous_Policy_No ? (
-                                                                            <span className="errorMsg">{errors.Previous_Policy_No}</span>
-                                                                        ) : null}
-                                                                    </div>
-                                                                </FormGroup>
-                                                            </Col>  
-                                                        </Row>
-
-                                                        <Row>                                                  
-                                                            <Col sm={12} md={6} lg={6}>
-                                                                <FormGroup>
-                                                                    <div className="formSection">
-                                                                    <Field
-                                                                        name='insurance_company_id'
-                                                                        component="select"
-                                                                        autoComplete="off"                                                                        
-                                                                        className="formGrp"
-                                                                    >
-                                                                        <option value="">Previous Insurance</option>
-                                                                        {insurerList.map((insurer, qIndex) => ( 
-                                                                            <option value= {insurer.Id}>{insurer.name}</option>
-                                                                        ))}
-                                                                    </Field>     
-                                                                    {errors.insurance_company_id && touched.insurance_company_id ? (
-                                                                    <span className="errorMsg">{errors.insurance_company_id}</span>
-                                                                    ) : null}          
-                                                                    </div>
-                                                                </FormGroup>
-                                                            </Col>
-                                                            <Col sm={12} md={5} lg={5}>
-                                                                <FormGroup>
-                                                                    <div className="insurerName">
-                                                                        <Field
-                                                                            name="address"
-                                                                            type="text"
-                                                                            placeholder="Insurance Company Address"
-                                                                            autoComplete="off"
-                                                                            onFocus={e => this.changePlaceHoldClassAdd(e)}
-                                                                            onBlur={e => this.changePlaceHoldClassRemove(e)}     
-                                                                        />
-                                                                        {errors.address && touched.address ? (
-                                                                            <span className="errorMsg">{errors.address}</span>
-                                                                        ) : null}
-                                                                    </div>
-                                                                </FormGroup>
-                                                            </Col>
-                                                        </Row>                    
-                                                    </Col>  
-                                                    : null}
-                                                </Row>
-                                                        
+                                                                                               
                                                 <div className="brandhead"> 
                                                     <p>&nbsp;</p>
                                                 </div>
                                             
                                                 <div className="d-flex justify-content-left resmb">
-                                                {/* <Button className={`backBtn`} type="button"  onClick= {this.RiskDetails.bind(this,productId)} >
-                                                    {isSubmitting ? 'Wait..' : 'Back'}
-                                                </Button> 
-                                                <Button className={`proceedBtn`} type="submit"  disabled={isSubmitting ? true : false}>
-                                                    {isSubmitting ? 'Wait..' : 'Next'}
-                                                </Button>  */}
                                                 <Button className={`backBtn`} type="button"  disabled={isSubmitting ? true : false} onClick= {this.RiskDetails.bind(this,productId)}>
                                                             {isSubmitting ? 'Wait..' : 'Back'}
                                                         </Button> 

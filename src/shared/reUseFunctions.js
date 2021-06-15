@@ -120,7 +120,7 @@ export const paymentGateways = (values,policyHolder,refNumber, productId) => {
 }
 
 function payment(refNumber, productId) {
-	const motor_productIds = [2,3,4,6,7,8,11,15,16,17,18];
+	const motor_productIds = [2,3,4,6,7,8,11,15,16,17,18,19];
     productId = parseInt(productId)
 	if(motor_productIds.includes(productId)){
 		window.location = `${process.env.REACT_APP_PAYMENT_URL}/ConnectPG/payment_motor.php?refrence_no=${refNumber}`
