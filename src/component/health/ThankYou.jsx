@@ -17,7 +17,7 @@ class ThankYouPage extends Component {
   state = {
     accessToken: "",
     response_text: [],
-    policyNo: this.props.match.params,
+    policyNo: this.props.match.params.policyId,
     vehicletype: [],
     dloadCounter: 0,
     refNumber:  queryString.parse(this.props.location.search).access_id ? 
