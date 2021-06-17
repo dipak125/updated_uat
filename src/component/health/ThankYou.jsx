@@ -67,9 +67,10 @@ class ThankYouPage extends Component {
     const { policyNo, dloadCounter } = this.state
     const formData = new FormData();
     const post_data_obj = {
-      'policyNo': policyNo,
+      'policyNo': this.props.match.params,
       'policyHolder_Id':  this.state.refNumber
     }
+    console.log('post_data_obj', post_data_obj)
     let encryption = new Encryption();
     formData.append('enc_data', encryption.encrypt(JSON.stringify(post_data_obj)))
     this.props.loadingStart();
