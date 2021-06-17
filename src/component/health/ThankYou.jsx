@@ -62,37 +62,11 @@ class ThankYouPage extends Component {
 
 
   //--------------------------------------CCM Service PDF ------------------------------------------
-    getAccessToken = () => {
-    this.props.loadingStart();
-    axios
-      .post(`/callTokenService`)
-      .then(res => {
-        this.setState({
-          accessToken: res.data.access_token
-        })
-        return new Promise(resolve => {setTimeout(() => {
-          this.getPolicyDoc(res.data.access_token)
-            }
-            ,5000)
-        })
-        
-      })
-      .catch(err => {
-        this.setState({
-          accessToken: []
-        });
-        this.props.loadingStop();
-      });
-  }
-
-  getPolicyDoc = (access_token) => {
+  getPolicyDoc = () => {
 
     const { policyNo, dloadCounter } = this.state
     const formData = new FormData();
-    //formData.append('access_token', access_token);
-    //formData.append('policyNo', policyNo)
     const post_data_obj = {
-      'access_token': access_token,
       'policyNo': policyNo,
       'policyHolder_Id':  this.state.refNumber
     }
@@ -100,7 +74,7 @@ class ThankYouPage extends Component {
     formData.append('enc_data', encryption.encrypt(JSON.stringify(post_data_obj)))
     this.props.loadingStart();
     axios
-      .post(`/callDocApi`, formData)
+      .post(`/policy-download/external`, formData)
       .then(res => {
         this.props.loadingStop();
 
@@ -115,7 +89,7 @@ class ThankYouPage extends Component {
           })
           .then((willDownload) => {
             if (willDownload && dloadCounter < 3) {
-            this.getAccessToken()
+            this.getPolicyDoc()
             }
             else {swal(res.data.msg)}
           })
@@ -368,7 +342,7 @@ downloadWordingGSB = () => {
                         {vehicletype.download_type == 0 ?
                             <button className="policy m-l-20" onClick={this.generateDoc}>{phrases['PolicyCopy']} </button>
                             :
-                            <button className="policy m-l-20" onClick={this.getAccessToken}>{phrases['PolicyCopy']} </button>
+                            <button className="policy m-l-20" onClick={this.getPolicyDoc}>{phrases['PolicyCopy']} </button>
                         }
                         {/* <button className="policy m-l-20" onClick={this.generateDoc}>{phrases['PolicyCopy']} </button> */}
                         {vehicletype && vehicletype.id && vehicletype.id == 13 ?
