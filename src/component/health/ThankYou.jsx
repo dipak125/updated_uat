@@ -67,14 +67,12 @@ class ThankYouPage extends Component {
     const { policyNo, dloadCounter } = this.state
     const formData = new FormData();
     const post_data_obj = {
-      'policyNo': this.props.match.params,
+      'policyNo': policyNo,
       'policyHolder_Id':  this.state.refNumber
     }
-    formData.append('policyNo', policyNo)
-    formData.append('policyHolder_Id', this.state.refNumber)
-    console.log('policyNo', policyNo)
-    // let encryption = new Encryption();
-    // formData.append('enc_data', encryption.encrypt(JSON.stringify(post_data_obj)))
+    console.log('post_data_obj', post_data_obj)
+    let encryption = new Encryption();
+    formData.append('enc_data', encryption.encrypt(JSON.stringify(post_data_obj)))
     this.props.loadingStart();
     axios
       .post(`/policy-download/external`, formData)
