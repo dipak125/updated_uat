@@ -70,9 +70,9 @@ class ThankYouPage extends Component {
       'policyNo': this.props.match.params,
       'policyHolder_Id':  this.state.refNumber
     }
-    formData.append('policyNo', this.props.match.params)
+    formData.append('policyNo', policyNo)
     formData.append('policyHolder_Id', this.state.refNumber)
-    console.log('formData', formData)
+    console.log('policyNo', policyNo)
     // let encryption = new Encryption();
     // formData.append('enc_data', encryption.encrypt(JSON.stringify(post_data_obj)))
     this.props.loadingStart();
