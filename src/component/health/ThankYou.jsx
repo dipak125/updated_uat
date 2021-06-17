@@ -70,9 +70,11 @@ class ThankYouPage extends Component {
       'policyNo': this.props.match.params,
       'policyHolder_Id':  this.state.refNumber
     }
-    console.log('post_data_obj', post_data_obj)
-    let encryption = new Encryption();
-    formData.append('enc_data', encryption.encrypt(JSON.stringify(post_data_obj)))
+    formData.append('policyNo', this.props.match.params)
+    formData.append('policyHolder_Id', this.state.refNumber)
+    console.log('formData', formData)
+    // let encryption = new Encryption();
+    // formData.append('enc_data', encryption.encrypt(JSON.stringify(post_data_obj)))
     this.props.loadingStart();
     axios
       .post(`/policy-download/external`, formData)
