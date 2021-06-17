@@ -145,7 +145,7 @@ class Intermediary_LogIn extends Component {
                         if(this.callFetchPhrase()){
                             setTimeout(
                                 function() {
-                                    this.props.history.push('/Dashboard')
+                                    this.props.history.push('/Products')
                                     window.location.reload(true);   
                                 }
                                 .bind(this),
