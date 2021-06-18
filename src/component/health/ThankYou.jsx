@@ -58,18 +58,6 @@ class ThankYouPage extends Component {
 
   }
 
-  downloadCCMDoc = (file_path) => {
-    const url = file_path;
-    const pom = document.createElement('a');
-
-    pom.style.display = 'none';
-    pom.href = url;
-    document.body.appendChild(pom);
-    pom.click(); 
-    window.URL.revokeObjectURL(url);
-
-  }
-
   //-----------------------------------Custom PDF End----------------------------------------
 
 
@@ -108,20 +96,8 @@ class ThankYouPage extends Component {
           })
 
         }
-        else if (res.data.data.getPolicyDocumentResponseBody.payload.URL[0] == "No Results found for the given Criteria") {
-          // swal(res.data.getPolicyDocumentResponseBody.payload.URL[0]);
-          this.setState({dloadCounter: dloadCounter+1})
-          swal("Thank you for showing your interest for buying product.Due to some reasons, we are not able to issue the policy document online. Please call 180 22 1111");
-        }
-        
         else {
-          this.setState({
-            response_text: res.data,
-            res_error: false,
-            dloadCounter: 0
-          })
-
-          this.generate_pdf(res.data.data, this.state.refNumber)    
+          this.downloadCCMDoc(res.data.data.uploded_path) 
         }
       })
       .catch(err => {
@@ -132,79 +108,16 @@ class ThankYouPage extends Component {
       });
   }
 
-  generate_pdf = (response_text, refNumber) => {
-    // const {response_text, refNumber, res_error} = this.state
-    const { policyNo } = this.state
-    if (response_text && refNumber) {
-      const formData = new FormData();
-      //  formData.append('refNumber', refNumber);
-      // formData.append('policy_no', policyNo);
-      //formData.append('response_text', JSON.stringify(response_text))
-      const post_data_obj = {
-        'policy_holder_id': refNumber,
-        'policy_no': policyNo,
-        'response_text': JSON.stringify(response_text)
-      }
-
-      let encryption = new Encryption();
-      formData.append('enc_data', encryption.encrypt(JSON.stringify(post_data_obj)))
-      this.props.loadingStart();
-      axios
-        .post(`/generate-pdf`, formData)
-        .then(res => {
-          this.props.loadingStop();
-          this.downloadCCMDoc(res.data.data.uploded_path)
-        })
-        .catch(err => {
-          this.setState({
-          });
-          this.props.loadingStop();
-        });
-    }
-    else {
-      swal("Could not get policy document")
-    }
-
-  }
-
-  downloadDoc = () => {
-    let file_path = `${process.env.REACT_APP_PAYMENT_URL}/ConnectPG/policy_pdf_download.php?refrence_no=${this.state.refNumber}`
-    console.log(file_path);
-    const { policyNo } = this.state
+  downloadCCMDoc = (file_path) => {
     const url = file_path;
     const pom = document.createElement('a');
 
     pom.style.display = 'none';
     pom.href = url;
-
     document.body.appendChild(pom);
     pom.click(); 
     window.URL.revokeObjectURL(url);
 
-    // fetch(file_path,{
-    //   mode: 'no-cors' // 'cors' by default
-    // })
-    //   .then(resp => resp.blob())
-    //   .then(blob => {
-    //     const url = window.URL.createObjectURL(blob);
-    //     const a = document.createElement('a');
-    //     a.style.display = 'none';
-    //     a.href = url;
-    //     // the filename you want
-    //     // a.download = 'b7b98d12c9da4f44b7f5e372945fbf7f.pdf';
-    //     a.download = policyNo+'.pdf';
-    //     document.body.appendChild(a);
-    //     a.click();
-    //     window.URL.revokeObjectURL(url);
-    //     this.props.loadingStop();
-    //     //alert('your file has downloaded!'); // or you know, something with better UX...
-    //   })
-     
-    //   .catch(() => {
-    //    this.props.loadingStop();
-
-    //   });
-      
   }
 
   //-----------------------------------CCM Service PDF End----------------------------------------
