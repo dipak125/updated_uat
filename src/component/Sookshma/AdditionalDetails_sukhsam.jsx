@@ -238,7 +238,7 @@ class AdditionalDetails_sukhsam extends Component {
             'bcmaster_id': '1',
             'policy_holder_id': this.props.policy_holder_id,
             'menumaster_id': this.props.menumaster_id,
-            'page_name': `AdditionalDetails_SME/${productId}`,
+            'page_name': `AdditionalDetails_Sookshma/${productId}`,
             'first_name': values.first_name,
             'last_name': values.last_name,
             'salutation_id': values.salutation_id,

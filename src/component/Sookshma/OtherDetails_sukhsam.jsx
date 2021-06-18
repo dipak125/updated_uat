@@ -56,7 +56,10 @@ financial_modgaged : Yup.string().when(['financial_party'], {
 
 financer_name : Yup.string().when(['financial_party'], {
     is: financial_party => financial_party == '1',       
-    then: Yup.string().required("This field is required").nullable(),
+    then: Yup.string().required("This field is required")
+            .matches(/^[a-zA-Z]*$/, function() {
+                return "Invalid Name"
+            }).nullable(),
     otherwise: Yup.string().nullable()}),
     
 })
@@ -265,8 +268,8 @@ class OtherDetails_sukhsam extends Component {
                         // is_claim: decryptResp.data.policyHolder.sookshamainfo.is_claim,
                         // previous_policy_check: decryptResp.data.policyHolder.previouspolicy.policy_no ? 1 : 0,
 
-                        financial_party: decryptResp.data.policyHolder.sookshamainfo.financial_party,      
-                        financial_modgaged : decryptResp.data.policyHolder.sookshamainfo.financial_modgaged,
+                        financial_party: decryptResp.data.policyHolder.sookshamainfo.financial_party ? decryptResp.data.policyHolder.sookshamainfo.financial_party : "",      
+                        financial_modgaged : decryptResp.data.policyHolder.sookshamainfo.financial_modgaged ? decryptResp.data.policyHolder.sookshamainfo.financial_modgaged : "",
                         financer_name: decryptResp.data.policyHolder.sookshamainfo.financer_name
         
                     });

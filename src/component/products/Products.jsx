@@ -125,9 +125,10 @@ class Products extends Component {
     render() {
         const { product_id, motor_list, health_list, misc_list, personalAccident_list, fire_list, defaultTab } = this.state
         let phrases = localStorage.getItem("phrases") ? JSON.parse(localStorage.getItem("phrases")) : null
-        console.log('product_id', defaultTab)
+
         return (
             <>
+            
                 <BaseComponent>
 				
 				<div className="page-wrapper">

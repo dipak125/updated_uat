@@ -158,6 +158,35 @@ const PolicyDetails_Micro = Loadable({
 
 // =======================================================
 
+// ========== AROGYA SANJEEVANI Group =============================================
+
+const Health_Group = Loadable({
+    loader: () => import(/*webpackChunkName: "Products" */"../Micro Products/Arogya-Sanjeevani-Group/InformationYourself_Group.jsx"),
+    loading: () => loadingContent
+});
+const MedicalDetails_Group = Loadable({
+    loader: () => import(/*webpackChunkName: "Products" */"../Micro Products/Arogya-Sanjeevani-Group/MedicalDetails_Group.jsx"),
+    loading: () => loadingContent
+});
+const SelectDuration_Group = Loadable({
+    loader: () => import(/*webpackChunkName: "Products" */"../Micro Products/Arogya-Sanjeevani-Group/SelectDuration_Group.jsx"),
+    loading: () => loadingContent
+});
+const Address_Group = Loadable({
+    loader: () => import(/*webpackChunkName: "Products" */"../Micro Products/Arogya-Sanjeevani-Group/Address_Group.jsx"),
+    loading: () => loadingContent
+});
+const NomineeDetails_Group = Loadable({
+    loader: () => import(/*webpackChunkName: "Products" */"../Micro Products/Arogya-Sanjeevani-Group/NomineeDetails_Group.jsx"),
+    loading: () => loadingContent
+});
+const PolicyDetails_Group = Loadable({
+    loader: () => import(/*webpackChunkName: "Products" */"../Micro Products/Arogya-Sanjeevani-Group/PolicyDetails_Group.jsx"),
+    loading: () => loadingContent
+});
+
+// =======================================================
+
 const ThankYou = Loadable({
     loader: () => import(/*webpackChunkName: "Products" */"../health/ThankYou.jsx"),
     loading: () => loadingContent
@@ -719,6 +748,15 @@ class Routes extends Component {
                         <PrivateRoute exact path="/Address_Micro/:productId" component={Address_Micro} />    
                         <PrivateRoute exact path="/NomineeDetails_Micro/:productId" component={NomineeDetails_Micro} /> 
                         <PrivateRoute exact path="/PolicyDetails_Micro/:productId" component={PolicyDetails_Micro} />
+
+                        {/* ============================ Arogya Sanjeevani Group================================ */}
+                        
+                        <PrivateRoute exact path="/Health_Group/:productId" component={Health_Group} />
+                        <PrivateRoute exact path="/MedicalDetails_Group/:productId" component={MedicalDetails_Group} />
+                        <PrivateRoute exact path="/SelectDuration_Group/:productId" component={SelectDuration_Group} />
+                        <PrivateRoute exact path="/Address_Group/:productId" component={Address_Group} />    
+                        <PrivateRoute exact path="/NomineeDetails_Group/:productId" component={NomineeDetails_Group} /> 
+                        <PrivateRoute exact path="/PolicyDetails_Group/:productId" component={PolicyDetails_Group} />
 
                         {/* ======================================== M4W Comprehensive ===================================================== */}
                      
