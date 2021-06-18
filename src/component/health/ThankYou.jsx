@@ -58,6 +58,18 @@ class ThankYouPage extends Component {
 
   }
 
+  downloadCCMDoc = (file_path) => {
+    const url = file_path;
+    const pom = document.createElement('a');
+
+    pom.style.display = 'none';
+    pom.href = url;
+    document.body.appendChild(pom);
+    pom.click(); 
+    window.URL.revokeObjectURL(url);
+
+  }
+
   //-----------------------------------Custom PDF End----------------------------------------
 
 
@@ -78,7 +90,7 @@ class ThankYouPage extends Component {
       .post(`/policy-download/external`, formData)
       .then(res => {
         this.props.loadingStop();
-
+        console.log('external_res', res)
         if(res.data.error == true) {
           this.setState({dloadCounter: dloadCounter+1})
           swal({
@@ -141,7 +153,7 @@ class ThankYouPage extends Component {
         .post(`/generate-pdf`, formData)
         .then(res => {
           this.props.loadingStop();
-          this.downloadDoc(res.data.data.uploded_path)
+          this.downloadCCMDoc(res.data.data.uploded_path)
         })
         .catch(err => {
           this.setState({
