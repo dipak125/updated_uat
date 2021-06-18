@@ -194,11 +194,11 @@ class RiskDetails_sukhsam extends Component {
 
         if (Fire_sum_insured < 500000) {
             this.props.loadingStop();
-            swal("Sum total of fire buildings sum insured,contents sum insured and stock sum insured should be more than 5 Lakhs")
+            swal("Sum total of fire buildings sum insured, fire contents sum insured and stock sum insured should be more than 5 Lakhs")
             return false;
         } else if(Fire_sum_insured > 10000000) {
              this.props.loadingStop();
-            swal("Sum total of fire buildings sum insured,contents sum insured and stock sum insured should be less than 1 crore")
+            swal("Sum total of fire buildings sum insured, fire contents sum insured and stock sum insured should be less than 1 crore")
             return false;
         } else {
         this.props.loadingStart();
@@ -592,49 +592,49 @@ console.log("decrypt resp ----------------- ", decryptResp)
                                                 <div className="d-flex justify-content-left">
                                                     <h4 className="fs-18 m-b-30">Please enter Sum Insured below :</h4>
                                                 </div>  
-                                                    <Row> 
-                                                        <Col sm={6} md={6} lg={4}>
-                                                        <label>
-                                                        Fire-Building-Sum Insured:
-                                                        </label>
-                                                        <OverlayTrigger overlay={<Tooltip id="tooltip-disabled">{"Building Structure including Plinth and Foundation"}</Tooltip>}>
-                                                            <a className="infoIcon"><img src={require('../../assets/images/i.svg')} alt="" className="premtool" /></a>
-                                                        </OverlayTrigger>
-                                                        </Col>
-                                                        <Col sm={12} md={6} lg={4}>
-                                                        <FormGroup>
-                                                            <div className="insurerName">
-                                                            <Field
-                                                                name='buildings_si'
-                                                                type="text"
-                                                                placeholder="Fire-Building-Sum Insured"
-                                                                maxLength='7'
-                                                                autoComplete="off"
-                                                                onFocus={e => this.changePlaceHoldClassAdd(e)}
-                                                                onBlur={e => this.changePlaceHoldClassRemove(e)}
-                                                                value = {values.buildings_si} 
-                                                                onInput= {(e)=> {
-                                                                    setFieldTouched("buildings_si");
-                                                                    setFieldValue("buildings_si", e.target.value);  
-                                                                }}   
-                                                                       
-                                                            />
-                                                            {errors.buildings_si && touched.buildings_si ? (
-                                                            <span className="errorMsg">{errors.buildings_si}</span>
-                                                            ) : null}  
-                                                            </div>
-                                                        </FormGroup>
-                                                        </Col>
-                                                    </Row>
-                                                    <Row>
-                                                        <Col sm={6} md={6} lg={4}>
+                                                <Row> 
+                                                    <Col sm={6} md={6} lg={6}>
+                                                    <label>
+                                                    Fire-Building-Sum Insured:
+                                                    </label>
+                                                    <OverlayTrigger overlay={<Tooltip id="tooltip-disabled">{"Building Structure including Plinth and Foundation"}</Tooltip>}>
+                                                        <a className="infoIcon"><img src={require('../../assets/images/i.svg')} alt="" className="premtool" /></a>
+                                                    </OverlayTrigger>
+                                                    </Col>
+                                                    <Col sm={12} md={6} lg={4}>
+                                                    <FormGroup>
+                                                        <div className="insurerName">
+                                                        <Field
+                                                            name='buildings_si'
+                                                            type="text"
+                                                            placeholder="Fire-Building-Sum Insured"
+                                                            maxLength='7'
+                                                            autoComplete="off"
+                                                            onFocus={e => this.changePlaceHoldClassAdd(e)}
+                                                            onBlur={e => this.changePlaceHoldClassRemove(e)}
+                                                            value = {values.buildings_si} 
+                                                            onInput= {(e)=> {
+                                                                setFieldTouched("buildings_si");
+                                                                setFieldValue("buildings_si", e.target.value);  
+                                                            }}   
+                                                                    
+                                                        />
+                                                        {errors.buildings_si && touched.buildings_si ? (
+                                                        <span className="errorMsg">{errors.buildings_si}</span>
+                                                        ) : null}  
+                                                        </div>
+                                                    </FormGroup>
+                                                    </Col>
+                                                </Row>
+                                                <Row>
+                                                    <Col sm={6} md={6} lg={6}>
                                                         <label>
                                                         Plant & Machinery Sum Insured:
                                                         </label>
-                                                        <OverlayTrigger overlay={<Tooltip id="tooltip-disabled">{"Furniture, Fixtures, Fittings and Electrical Installations."}</Tooltip>}>
+                                                        <OverlayTrigger overlay={<Tooltip id="tooltip-disabled">{"Plant & Machinery Sum Insured."}</Tooltip>}>
                                                             <a className="infoIcon"><img src={require('../../assets/images/i.svg')} alt="" className="premtool" /></a>
                                                         </OverlayTrigger>
-                                                        </Col>
+                                                    </Col>
                                                     <Col sm={12} md={6} lg={4}>
                                                     <FormGroup>
                                                         <div className="insurerName">
@@ -658,14 +658,14 @@ console.log("decrypt resp ----------------- ", decryptResp)
                                                         </div>
                                                     </FormGroup>
                                                     </Col>
-                                                    </Row>
-                                                   
+                                                </Row>
+                                                
                                                 <Row>
-                                                    <Col sm={6} md={6} lg={4}>
+                                                    <Col sm={6} md={6} lg={6}>
                                                         <label>
                                                         Furniture, Fixture & Fittings Sum Insured:
                                                         </label>
-                                                        <OverlayTrigger overlay={<Tooltip id="tooltip-disabled">{"Commodity stored inside shops for sale."}</Tooltip>}>
+                                                        <OverlayTrigger overlay={<Tooltip id="tooltip-disabled">{"Furniture, Fixtures, Fittings and Electrical Installations."}</Tooltip>}>
                                                             <a className="infoIcon"><img src={require('../../assets/images/i.svg')} alt="" className="premtool" /></a>
                                                         </OverlayTrigger>
                                                         </Col>
@@ -695,7 +695,7 @@ console.log("decrypt resp ----------------- ", decryptResp)
                                                 </Row>
 
                                                 <Row>
-                                                    <Col sm={6} md={6} lg={4}>
+                                                    <Col sm={6} md={6} lg={6}>
                                                         <label>
                                                         Fire-Contents Sum Insured:
                                                         </label>
@@ -728,7 +728,7 @@ console.log("decrypt resp ----------------- ", decryptResp)
                                                 </Row>
 
                                                 <Row>
-                                                    <Col sm={6} md={6} lg={4}>
+                                                    <Col sm={6} md={6} lg={6}>
                                                         <label>
                                                         Stocks of Raw Material :
                                                         </label>
@@ -761,7 +761,7 @@ console.log("decrypt resp ----------------- ", decryptResp)
                                                     </Col>                         
                                                 </Row>
                                                 <Row>
-                                                    <Col sm={6} md={6} lg={4}>
+                                                    <Col sm={6} md={6} lg={6}>
                                                         <label>
                                                         Stock of Finished Goods :
                                                         </label>
@@ -794,7 +794,7 @@ console.log("decrypt resp ----------------- ", decryptResp)
                                                     </Col>                         
                                                 </Row>
                                                 <Row>
-                                                    <Col sm={6} md={6} lg={4}>
+                                                    <Col sm={6} md={6} lg={6}>
                                                         <label>
                                                         Stocks of Work in Progress :
                                                         </label>
@@ -827,7 +827,7 @@ console.log("decrypt resp ----------------- ", decryptResp)
                                                     </Col>                         
                                                 </Row>
                                                 <Row>
-                                                            <Col sm={6} md={6} lg={4}>
+                                                    <Col sm={6} md={6} lg={6}>
                                                         <label>
                                                         Fire-Stock Sum Insured
                                                         </label>
@@ -860,11 +860,11 @@ console.log("decrypt resp ----------------- ", decryptResp)
                                                     </Col>                         
                                                 </Row>
                                                 <Row>
-                                                    <Col sm={6} md={6} lg={4}>
+                                                    <Col sm={6} md={6} lg={6}>
                                                         <label>
                                                         Fire-Total Sum Insured:
                                                         </label>
-                                                        <OverlayTrigger overlay={<Tooltip id="tooltip-disabled">{"Sum total of fire building sum insured, fire content sum insured and fire stock sum insured"}</Tooltip>}>
+                                                        <OverlayTrigger overlay={<Tooltip id="tooltip-disabled">{"Sum total of fire buildings sum insured, fire content sum insured and fire stock sum insured"}</Tooltip>}>
                                                             <a className="infoIcon"><img src={require('../../assets/images/i.svg')} alt="" className="premtool" /></a>
                                                         </OverlayTrigger>
                                                         </Col>

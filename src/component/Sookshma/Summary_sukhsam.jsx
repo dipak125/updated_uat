@@ -273,7 +273,7 @@ class Summary_sukhsam extends Component {
             rawData && rawData.length > 0
                 ? rawData.map((listing, qIndex) => (
                     <tr>
-                        <td style={({ width: "400px" })}>{listing.coverage.description}:</td>   
+                        <td style={({ width: "400px" })}>{listing.coverage.description} :</td>   
                         <td>{listing.premium == null ? 0 : listing.premium}</td>
                     </tr>
                 ))
@@ -358,10 +358,26 @@ class Summary_sukhsam extends Component {
                                                                                         </thead>
                                                                                         <tbody>
                                                                                             {sme_Coverages}
-                                                                                            {/* <tr>
-                                                                                                <td style={({ width: "400px" })}>Net Premium(₹) :</td>   
-                                                                                                <td>{this.state.netPremium}</td>
-                                                                                            </tr> */}
+                                                                                            <tr>
+                                                                                                <td style={({ width: "400px" })}>Other Cover Premium :</td>   
+                                                                                                <td>0.00</td>
+                                                                                            </tr>
+                                                                                            <tr>
+                                                                                                <td style={({ width: "400px" })}>Discount/Loading if any :</td>   
+                                                                                                <td>0.00</td>
+                                                                                            </tr>
+                                                                                            <tr>
+                                                                                                <td style={({ width: "400px" })}>Taxes as applicable :</td>   
+                                                                                                <td>{this.state.gst}</td>
+                                                                                            </tr>
+                                                                                            <tr>
+                                                                                                <td style={({ width: "400px" })}>Kerala Cess :</td>   
+                                                                                                <td>0.00</td>
+                                                                                            </tr>
+                                                                                            <tr>
+                                                                                                <td style={({ width: "400px" })}><strong>Net Premium(₹) :</strong></td>   
+                                                                                                <td><strong>{this.state.netPremium}</strong></td>
+                                                                                            </tr>
                                                                                         </tbody>
                                                                                     </table>
                                                                                 </Col>
@@ -370,7 +386,7 @@ class Summary_sukhsam extends Component {
                                                                                 <p>&nbsp;</p>
                                                                             </Row>
 
-                                                                            <Row>
+                                                                            {/* <Row>
                                                                                 <Col sm={12} md={12}>
                                                                                     <Row>
                                                                                         <Col sm={12} md={6}>
@@ -408,7 +424,7 @@ class Summary_sukhsam extends Component {
                                                                             </Row>
                                                                             <Row>
                                                                                 <p></p>
-                                                                            </Row>
+                                                                            </Row> */}
                                                                         </div>
                                                                     </div>
 

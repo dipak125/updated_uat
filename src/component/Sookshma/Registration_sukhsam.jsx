@@ -297,7 +297,7 @@ class Registration_sukhsam extends Component {
                             </aside>
 												
                             <div className="col-sm-12 col-md-12 col-lg-12 col-xl-12 infobox regs2">
-                                <h4 className="text-center mt-3 mb-3">Sookshma & Burglary</h4>
+                                <h4 className="text-center mt-3 mb-3">SME – Pre UW Package Sookshma Udyog</h4>
                                 <section className="brand">
                                     <div className="boxpd">
                                         <Formik initialValues={newInitialValues} 

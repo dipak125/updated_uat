@@ -12,19 +12,18 @@ import { BootstrapTable, TableHeaderColumn, ExportCSVButton } from "react-bootst
 import { Formik, Form, Field } from 'formik';
 import swal from 'sweetalert';
 import LinkWithTooltip from "../../../shared/LinkWithTooltip";
+import axios from "../../../shared/axios"
 
 const initialValues = {
     ksb_branch_id: ''
-
 }
 
 const ksbFileUploadValidation = Yup.object().shape({
-    ksb_branch_id: Yup.string().required('Please select branch'),
+    // ksb_branch_id: Yup.string().required('Please select branch'),
     fpo_ksb_file: Yup.mixed().required('Only xls, xlsx file format is allowed'),
     fpo_ksb_file: Yup.mixed()
         .required('Please select a file')
         .test('type', "Only xls, xlsx file format is allowed", (value) => {
-            console.log(value);
             if (value) {
                 let fileType = value[0].name.split('.').pop();
                 return (fileType === 'xlsx' || fileType === 'xls');
@@ -65,10 +64,11 @@ class KSB_File_Micro extends Component {
         this.handleClose = this.handleClose.bind(this);
         this.state = {
             KSBbranches: [],
-            is_ksb_uploaded: "",
             clickedKSBStatus: "",
             clickedKSBBranch: "",
             clickedKSBAction: "",
+            resmessage: "",
+            reserror: false
         };
     }
 
@@ -78,7 +78,6 @@ class KSB_File_Micro extends Component {
             let selectedFileSize = uploadFile[0].size;
             setFieldTouched("fileSize")
             setFieldValue("fileSize", selectedFileSize);
-            // if (selectedFileSize <= 4194304) {//Max size to upload is 4.19MB
             let selectedFile = uploadFile[0];
             let selectedFileName = uploadFile[0].name;
             setFieldTouched("fpo_ksb_file")
@@ -88,14 +87,6 @@ class KSB_File_Micro extends Component {
                 selectedFile,
                 selectedFileName
             })
-            //}
-            /* else {
-                 await this.setState({
-                     selectedFile: "",
-                     selectedFileName: ""
-                 })
-             }*/
-
 
         }
 
@@ -140,23 +131,34 @@ class KSB_File_Micro extends Component {
         formData.append('user_type', user_type);
         formData.append('master_id', master_id);
         formData.append('user_id', user_id);
-        formData.append('ksb_branch_id', values.ksb_branch_id);
-
+        const { productId } = this.props.match.params
         const { selectedFile, selectedFileName } = this.state;
-        formData.append('attachment_file', selectedFile);
+        formData.append('excel_file', selectedFile);
         formData.append('fileName', selectedFileName);
-        const res = true;
-        //if data uploaded/inserted
-        if (res) {
-            this.setState({
-                is_ksb_uploaded: 'Yes'
+        formData.append('product_id', productId);
+        this.props.loadingStart();
+        axios
+            .post("ksb-group-excel/upload", formData)
+            .then(res => {
+                if (!res.data.error) {
+                    this.setState({
+                        resmessage: res.data.msg,
+                        reserror: res.data.error
+                    })
+                    swal('File successfully uploaded');
+                } else {
+                    this.setState({
+                        resmessage: res.data.msg,
+                        reserror: res.data.error,
+                        tempBatchId: res.data.data.temp_batch_id
+                    })
+                }
+                this.props.loadingStop();
             })
-            swal('File successfully uploaded');
-        } else {
-            this.setState({
-                is_ksb_uploaded: 'No'
-            })
-        }
+            .catch(err => {
+                this.props.loadingStop();
+            });
+
     }
 
     fetchBranches = () => {
@@ -189,13 +191,23 @@ class KSB_File_Micro extends Component {
         })
     }
 
+    downloadErrorFile = () => {
+        const { tempBatchId } = this.state;
+        const url = `http://14.140.119.44/sbig-csc/core/auth/ksb-group-excel/error-file/${tempBatchId}`;
+        this.props.loadingStart();
+        const anchortag = document.createElement('a');
+        anchortag.style.display = 'none';
+        anchortag.href = url;
+        document.body.appendChild(anchortag);
+        anchortag.click();
+    }
+
     componentDidMount() {
         this.fetchBranches();
     }
 
     render() {
-        const { KSBbranches, is_ksb_uploaded, clickedKSBStatus, clickedKSBBranch, clickedKSBAction } = this.state;
-
+        const { KSBbranches, reserror, resmessage, clickedKSBStatus, clickedKSBBranch, clickedKSBAction } = this.state;
         let ksbFileList =
             [{
                 branch: 'Branch 1', status: 'NA', action: 'Pay'
@@ -251,16 +263,14 @@ class KSB_File_Micro extends Component {
                                     <h4 className="text-center mt-3 mb-3">SBI General Insurance Company Limited</h4>
                                     <section className="brand">
                                         <div className="boxpd">
-                                            <h4 className="m-b-30">Upload Group KSB File</h4>
-                                            <h5 className="m-b-30">Download Sample Group KSB File</h5>
+                                            {/* <h5 className="m-b-30">Download Sample Group KSB File</h5> */}
+                                            <button class="policy m-b-10" onClick={this.downloadErrorFile} style={{ float: 'left' }}>Download Sample Group KSB File </button>
                                             <Formik initialValues={initialValues}
                                                 onSubmit={this.handleFormSubmit}
                                                 validationSchema={ksbFileUploadValidation}>
                                                 {({ values, errors, setFieldValue, setFieldTouched, touched }) => {
                                                     return (
                                                         <Form>
-                                                            {console.log("Errors =>", errors)}
-                                                            {console.log("touched =>", touched)}
                                                             <div className="row formSection">
                                                                 <label className="col-md-4">Branch:</label>
                                                                 <div className="col-md-4">
@@ -302,8 +312,12 @@ class KSB_File_Micro extends Component {
                                                                     ) : null}
                                                                 </div>
                                                             </div>
-                                                            {is_ksb_uploaded == 'No' ? (
-                                                                <h4 className="m-b-30" style={{ float: 'right' }}>Download the Error FPO-KSB file</h4>
+                                                            {reserror ? (
+                                                                <>
+                                                                    {resmessage ? <span className="errorMsg" style={{ textAlign: 'right' }}>{resmessage}</span> : null}
+                                                                    <button className="policy m-l-20" onClick={this.downloadErrorFile} style={{ float: 'right' }}>Download the Error FPO-KSB file </button>
+
+                                                                </>
                                                             ) : null}
 
                                                             <div className="cntrbtn">
