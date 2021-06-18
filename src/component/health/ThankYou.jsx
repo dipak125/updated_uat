@@ -77,7 +77,6 @@ class ThankYouPage extends Component {
     axios
       .post(`/policy-download/external`, formData)
       .then(res => {
-        this.props.loadingStop();
         console.log('external_res', res)
         if(res.data.error == true) {
           this.setState({dloadCounter: dloadCounter+1})
@@ -97,7 +96,7 @@ class ThankYouPage extends Component {
 
         }
         else {
-          this.downloadCCMDoc(res.data.data.uploded_path) 
+          this.downloadCCMDoc(res.data.data.uploded_path, res.data.data.file_name) 
         }
       })
       .catch(err => {
@@ -108,7 +107,7 @@ class ThankYouPage extends Component {
       });
   }
 
-  downloadCCMDoc = (fileURL) => {
+  downloadCCMDoc = (fileURL, fileName) => {
     // const url = file_path;
     // const pom = document.createElement('a');
 
@@ -133,7 +132,7 @@ class ThankYouPage extends Component {
       link.href = url;
       link.setAttribute(
         'download',
-        `FileName.pdf`,
+        fileName,
       );
 
       // Append to html link element page
@@ -144,6 +143,7 @@ class ThankYouPage extends Component {
 
       // Clean up and remove the link
       link.parentNode.removeChild(link);
+      this.props.loadingStop();
     });
 
   }
