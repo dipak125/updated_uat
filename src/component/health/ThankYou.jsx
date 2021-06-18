@@ -108,15 +108,43 @@ class ThankYouPage extends Component {
       });
   }
 
-  downloadCCMDoc = (file_path) => {
-    const url = file_path;
-    const pom = document.createElement('a');
+  downloadCCMDoc = (fileURL) => {
+    // const url = file_path;
+    // const pom = document.createElement('a');
 
-    pom.style.display = 'none';
-    pom.href = url;
-    document.body.appendChild(pom);
-    pom.click(); 
-    window.URL.revokeObjectURL(url);
+    // pom.style.display = 'none';
+    // pom.href = url;
+    // document.body.appendChild(pom);
+    // pom.click(); 
+    // window.URL.revokeObjectURL(url);
+    fetch(fileURL, {
+    method: 'GET',
+    headers: {
+      'Content-Type': 'application/pdf',
+    },
+    })
+    .then((response) => response.blob())
+    .then((blob) => {
+      // Create blob link to download
+      const url = window.URL.createObjectURL(
+        new Blob([blob]),
+      );
+      const link = document.createElement('a');
+      link.href = url;
+      link.setAttribute(
+        'download',
+        `FileName.pdf`,
+      );
+
+      // Append to html link element page
+      document.body.appendChild(link);
+
+      // Start download
+      link.click();
+
+      // Clean up and remove the link
+      link.parentNode.removeChild(link);
+    });
 
   }
 
