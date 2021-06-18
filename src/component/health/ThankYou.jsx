@@ -245,6 +245,18 @@ downloadWordingGSB = () => {
   window.URL.revokeObjectURL(url);
 }
 
+downloadWordingSME = () => {
+  let file_path = `${process.env.REACT_APP_PAYMENT_URL}/policy_pdf_download.php?sme_wording=1`
+  const url = file_path;
+  const pom = document.createElement('a');
+
+  pom.style.display = 'none';
+  pom.href = url;
+  document.body.appendChild(pom);
+  pom.click(); 
+  window.URL.revokeObjectURL(url);
+}
+
   componentDidMount() {      
     const { policyId } = this.props.match.params
     this.fetchData()
@@ -307,6 +319,12 @@ downloadWordingGSB = () => {
                         
                         {vehicletype && vehicletype.id && vehicletype.id == 14 ?
                             <button className="policy m-l-20" onClick={this.downloadWordingGSB}>Policy Wording </button>
+                            :
+                           null
+                        }
+
+                        {vehicletype && vehicletype.id && vehicletype.id == 19 ?
+                            <button className="policy m-l-20" onClick={this.downloadWordingSME}>Policy Wording </button>
                             :
                            null
                         }
