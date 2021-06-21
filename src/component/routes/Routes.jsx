@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Route, Switch, BrowserRouter,Redirect, withRouter, HashRouter } from "react-router-dom";
+import { Route, Switch, BrowserRouter, Redirect, withRouter, HashRouter } from "react-router-dom";
 import { Formik, Field, Form } from "formik";
 
 import { connect } from "react-redux";
@@ -9,7 +9,7 @@ import { PrivateRoute } from "../../shared/private-route";
 import Loader from "react-loader-spinner";
 
 import LogIn from "../common/login/LogIn";
-import Intermediary_LogIn from "../common/intermediary_login/Intermediary_LogIn"; 
+import Intermediary_LogIn from "../common/intermediary_login/Intermediary_LogIn";
 import Reset_Password from "../common/intermediary_login/Reset_Password";
 
 import Registration from '../motor/Registration';
@@ -153,35 +153,6 @@ const NomineeDetails_Micro = Loadable({
 });
 const PolicyDetails_Micro = Loadable({
     loader: () => import(/*webpackChunkName: "Products" */"../Micro Products/Arogya-Sanjeevani-Micro/PolicyDetails_Micro.jsx"),
-    loading: () => loadingContent
-});
-
-// =======================================================
-
-// ========== AROGYA SANJEEVANI Group =============================================
-
-const Health_Group = Loadable({
-    loader: () => import(/*webpackChunkName: "Products" */"../Micro Products/Arogya-Sanjeevani-Group/InformationYourself_Group.jsx"),
-    loading: () => loadingContent
-});
-const MedicalDetails_Group = Loadable({
-    loader: () => import(/*webpackChunkName: "Products" */"../Micro Products/Arogya-Sanjeevani-Group/MedicalDetails_Group.jsx"),
-    loading: () => loadingContent
-});
-const SelectDuration_Group = Loadable({
-    loader: () => import(/*webpackChunkName: "Products" */"../Micro Products/Arogya-Sanjeevani-Group/SelectDuration_Group.jsx"),
-    loading: () => loadingContent
-});
-const Address_Group = Loadable({
-    loader: () => import(/*webpackChunkName: "Products" */"../Micro Products/Arogya-Sanjeevani-Group/Address_Group.jsx"),
-    loading: () => loadingContent
-});
-const NomineeDetails_Group = Loadable({
-    loader: () => import(/*webpackChunkName: "Products" */"../Micro Products/Arogya-Sanjeevani-Group/NomineeDetails_Group.jsx"),
-    loading: () => loadingContent
-});
-const PolicyDetails_Group = Loadable({
-    loader: () => import(/*webpackChunkName: "Products" */"../Micro Products/Arogya-Sanjeevani-Group/PolicyDetails_Group.jsx"),
     loading: () => loadingContent
 });
 
@@ -521,6 +492,10 @@ const Health_KSB_Micro = Loadable({
     loader: () => import(/*webpackChunkName: "Products" */"../Micro Products/KSB-retail-Micro/InformationYourself_KSB_Micro.jsx"),
     loading: () => loadingContent
 });
+const Health_KSB_Micro_Group = Loadable({
+    loader: () => import(/*webpackChunkName: "Products" */"../Micro Products/KSB-retail-Micro-Group/KSB_File_Micro.jsx"),
+    loading: () => loadingContent
+});
 const PreExistingDisease_KSB_Micro = Loadable({
     loader: () => import(/*webpackChunkName: "Products" */"../Micro Products/KSB-retail-Micro/PreExistingDisease_KSB_Micro.jsx"),
     loading: () => loadingContent
@@ -623,7 +598,7 @@ const PolicyDetails_GSB = Loadable({
 // ====================================================================
 
 // ========== Four-Wheeler OD =============================================
-						
+
 const RegistrationOD = Loadable({
     loader: () => import(/*webpackChunkName: "Products" */"../motor-OD/RegistrationOD.jsx"),
     loading: () => loadingContent
@@ -663,14 +638,14 @@ const VedvagGateway = Loadable({
 const SahipayGateway = Loadable({
     loader: () => import(/*webpackChunkName: "Products" */"../common/Sahipay_gateway.jsx"),
     loading: () => loadingContent
-}); 
+});
 
 //  ************ Transcrop Payment Gateway ******************
 
 const TranscropGateway = Loadable({
     loader: () => import(/*webpackChunkName: "Products" */"../common/Transcrop_gateway.jsx"),
     loading: () => loadingContent
-}); 
+});
 
 
 //  ************ Renewal ******************
@@ -721,75 +696,65 @@ class Routes extends Component {
             <>
                 <HashRouter>
                     <Switch>
-                        <Route exact path="/login" component={LogIn} />                
-                        <Route exact path="/Intermediary_LogIn" component={Intermediary_LogIn} /> 
-                        <Route exact path="/logout" component={Logout} /> 
-                        <Route exact path="/Reset_Password" component={Reset_Password} /> 
-                        <Route exact path="/UnderMaintenance" component={UnderMaintenance} />
-
+                        <Route exact path="/login" component={LogIn} />
+                        <Route exact path="/Intermediary_LogIn" component={Intermediary_LogIn} />
+                        <Route exact path="/logout" component={Logout} />
+                        <Route exact path="/Reset_Password" component={Reset_Password} />
                         <PrivateRoute exact path="/Error" component={Error} />
+
                         <PrivateRoute exact path="/Products" component={Products} />
 
                         <PrivateRoute exact path="/Health/:productId" component={Health} />
                         <PrivateRoute exact path="/MedicalDetails/:productId" component={MedicalDetails} />
                         <PrivateRoute exact path="/SelectDuration/:productId" component={SelectDuration} />
-                        <PrivateRoute exact path="/Address/:productId" component={Address} />    
-                        <PrivateRoute exact path="/NomineeDetails/:productId" component={NomineeDetails} /> 
+                        <PrivateRoute exact path="/Address/:productId" component={Address} />
+                        <PrivateRoute exact path="/NomineeDetails/:productId" component={NomineeDetails} />
                         <PrivateRoute exact path="/PolicyDetails/:productId" component={PolicyDetails} />
                         {/* <PrivateRoute exact path="/PolicySummery/:productId" component={PolicySummery} />                  */}
                         <PrivateRoute exact path="/ThankYou/:policyId" component={ThankYou} />
                         <PrivateRoute exact path="/ThankYouCCM" component={ThankYouCCM} />
 
                         {/* ============================ Arogya Sanjeevani Micro================================ */}
-                        
+
                         <PrivateRoute exact path="/Health_Micro/:productId" component={Health_Micro} />
                         <PrivateRoute exact path="/MedicalDetails_Micro/:productId" component={MedicalDetails_Micro} />
                         <PrivateRoute exact path="/SelectDuration_Micro/:productId" component={SelectDuration_Micro} />
-                        <PrivateRoute exact path="/Address_Micro/:productId" component={Address_Micro} />    
-                        <PrivateRoute exact path="/NomineeDetails_Micro/:productId" component={NomineeDetails_Micro} /> 
+                        <PrivateRoute exact path="/Address_Micro/:productId" component={Address_Micro} />
+                        <PrivateRoute exact path="/NomineeDetails_Micro/:productId" component={NomineeDetails_Micro} />
                         <PrivateRoute exact path="/PolicyDetails_Micro/:productId" component={PolicyDetails_Micro} />
 
-                        {/* ============================ Arogya Sanjeevani Group================================ */}
-                        
-                        <PrivateRoute exact path="/Health_Group/:productId" component={Health_Group} />
-                        <PrivateRoute exact path="/MedicalDetails_Group/:productId" component={MedicalDetails_Group} />
-                        <PrivateRoute exact path="/SelectDuration_Group/:productId" component={SelectDuration_Group} />
-                        <PrivateRoute exact path="/Address_Group/:productId" component={Address_Group} />    
-                        <PrivateRoute exact path="/NomineeDetails_Group/:productId" component={NomineeDetails_Group} /> 
-                        <PrivateRoute exact path="/PolicyDetails_Group/:productId" component={PolicyDetails_Group} />
-
                         {/* ======================================== M4W Comprehensive ===================================================== */}
-                     
-                        <PrivateRoute exact path="/Registration/:productId" component={Registration} />                    
+
+                        <PrivateRoute exact path="/Registration/:productId" component={Registration} />
                         <PrivateRoute exact path="/Select-brand/:productId" component={SelectBrand} />
                         <PrivateRoute exact path="/VehicleDetails/:productId" component={VehicleDetails} />
                         <PrivateRoute exact path="/OtherComprehensive/:productId" component={OtherComprehensive} />
                         <PrivateRoute exact path="/Additional_details/:productId" component={AdditionalDetails} />
                         <PrivateRoute exact path="/Premium/:productId" component={Premium} />
                         {/* <PrivateRoute exact path="/ThankYou_motor/:policyId" component={ThankYou_motor} /> */}
-                        
-                        {/* ********************** LandingPage ***************  */}                  
-                        <PrivateRoute exact path="/Dashboard" component={Dashboard} />  
-                        
-                        {/* ******************* Individual Personal Accident ************* */}              
-                        <PrivateRoute exact path="/AccidentSelectPlan/:productId" component={AccidentSelectPlan} /> 
-                        <PrivateRoute exact path="/AccidentAddDetails/:productId" component={AccidentAddDetails} /> 
-                        <PrivateRoute exact path="/AccidentAdditionalDetails/:productId" component={AccidentAdditionalDetails} /> 
-                        <PrivateRoute exact path="/AccidentAdditionalPremium/:productId" component={IPA_Premium} /> 
 
-                        {/* ******************* Individual Personal Accident Micro ************* */}              
-                        <PrivateRoute exact path="/AccidentSelectPlan_Micro/:productId" component={AccidentSelectPlan_Micro} /> 
-                        <PrivateRoute exact path="/AccidentAddDetails_Micro/:productId" component={AccidentAddDetails_Micro} /> 
-                        <PrivateRoute exact path="/AccidentAdditionalDetails_Micro/:productId" component={AccidentAdditionalDetails_Micro} /> 
-                        <PrivateRoute exact path="/AccidentAdditionalPremium_Micro/:productId" component={IPA_Premium_Micro} /> 
+                        {/* ********************** LandingPage ***************  */}
+                        <PrivateRoute exact path="/Dashboard" component={Dashboard} />
+
+                        {/* ******************* Individual Personal Accident ************* */}
+                        <PrivateRoute exact path="/AccidentSelectPlan/:productId" component={AccidentSelectPlan} />
+                        <PrivateRoute exact path="/AccidentAddDetails/:productId" component={AccidentAddDetails} />
+                        <PrivateRoute exact path="/AccidentAdditionalDetails/:productId" component={AccidentAdditionalDetails} />
+                        <PrivateRoute exact path="/AccidentAdditionalPremium/:productId" component={IPA_Premium} />
+
+                        {/* ******************* Individual Personal Accident Micro ************* */}
+                        <PrivateRoute exact path="/AccidentSelectPlan_Micro/:productId" component={AccidentSelectPlan_Micro} />
+                        <PrivateRoute exact path="/AccidentAddDetails_Micro/:productId" component={AccidentAddDetails_Micro} />
+                        <PrivateRoute exact path="/AccidentAdditionalDetails_Micro/:productId" component={AccidentAdditionalDetails_Micro} />
+                        <PrivateRoute exact path="/AccidentAdditionalPremium_Micro/:productId" component={IPA_Premium_Micro} />
 
                         {/* ********************* AROGYA TOPUP ***************** */}
-                        
+
                         <PrivateRoute exact path="/arogya_Health/:productId" component={arogya_Health} />
                         <PrivateRoute exact path="/arogya_MedicalDetails/:productId" component={arogya_MedicalDetails} />
                         <PrivateRoute exact path="/arogya_SelectDuration/:productId" component={arogya_SelectDuration} />
-                        <PrivateRoute exact path="/arogya_Address/:productId" component={arogya_Address} />    
-                        <PrivateRoute exact path="/arogya_NomineeDetails/:productId" component={arogya_NomineeDetails} /> 
+                        <PrivateRoute exact path="/arogya_Address/:productId" component={arogya_Address} />
+                        <PrivateRoute exact path="/arogya_NomineeDetails/:productId" component={arogya_NomineeDetails} />
                         <PrivateRoute exact path="/arogya_PolicyDetails/:productId" component={arogya_PolicyDetails} />
 
 
@@ -799,7 +764,7 @@ class Routes extends Component {
                         <PrivateRoute exact path="/two_wheeler_Vehicle_details/:productId" component={TwoWheelerVehicleDetails} />
                         <PrivateRoute exact path="/two_wheeler_OtherComprehensive/:productId" component={TwoWheelerOtherComprehensive} />
                         <PrivateRoute exact path="/two_wheeler_verify/:productId" component={TwoWheelerVerify} />
-                        <PrivateRoute exact path="/two_wheeler_additional_details/:productId" component={TwoWheelerAdditionalDetails} />  
+                        <PrivateRoute exact path="/two_wheeler_additional_details/:productId" component={TwoWheelerAdditionalDetails} />
                         <PrivateRoute exact path="/two_wheeler_policy_premium_details/:productId" component={TwoWheelerPolicyPremiumDetails} />
                         {/* <PrivateRoute exact path="/two_wheeler_ThankYou_motor/:policyId" component={TwoWheelerThankYou_motor} /> */}
 
@@ -808,7 +773,7 @@ class Routes extends Component {
                         <PrivateRoute exact path="/two_wheeler_Vehicle_detailsTP/:productId" component={TwoWheelerVehicleDetailsTP} />
                         <PrivateRoute exact path="/two_wheeler_OtherComprehensiveTP/:productId" component={TwoWheelerOtherComprehensiveTP} />
                         <PrivateRoute exact path="/two_wheeler_verifyTP/:productId" component={TwoWheelerVerifyTP} />
-                        <PrivateRoute exact path="/two_wheeler_additional_detailsTP/:productId" component={TwoWheelerAdditionalDetailsTP} />  
+                        <PrivateRoute exact path="/two_wheeler_additional_detailsTP/:productId" component={TwoWheelerAdditionalDetailsTP} />
                         <PrivateRoute exact path="/two_wheeler_policy_premium_detailsTP/:productId" component={TwoWheelerPolicyPremiumDetailsTP} />
                         {/* <PrivateRoute exact path="/two_wheeler_ThankYou_motorTP/:policyId" component={TwoWheelerThankYou_motorTP} /> */}
 
@@ -817,7 +782,7 @@ class Routes extends Component {
                         <PrivateRoute exact path="/two_wheeler_Select-brandOD/:productId" component={TwoWheelerSelectBrandOD} />
                         <PrivateRoute exact path="/two_wheeler_Vehicle_detailsOD/:productId" component={TwoWheelerVehicleDetailsOD} />
                         <PrivateRoute exact path="/two_wheeler_OtherComprehensiveOD/:productId" component={TwoWheelerOtherComprehensiveOD} />
-                        <PrivateRoute exact path="/two_wheeler_additional_detailsOD/:productId" component={TwoWheelerAdditionalDetailsOD} />  
+                        <PrivateRoute exact path="/two_wheeler_additional_detailsOD/:productId" component={TwoWheelerAdditionalDetailsOD} />
                         <PrivateRoute exact path="/two_wheeler_policy_premium_detailsOD/:productId" component={TwoWheelerPolicyPremiumDetailsOD} />
 
                         {/************ FourWheelerTP ******************/}
@@ -825,15 +790,15 @@ class Routes extends Component {
                         <PrivateRoute exact path="/four_wheeler_Vehicle_detailsTP/:productId" component={FourWheelerVehicleDetailsTP} />
                         <PrivateRoute exact path="/four_wheeler_OtherComprehensiveTP/:productId" component={FourWheelerOtherComprehensiveTP} />
                         <PrivateRoute exact path="/four_wheeler_verifyTP/:productId" component={FourWheelerVerifyTP} />
-                        <PrivateRoute exact path="/four_wheeler_additional_detailsTP/:productId" component={FourWheelerAdditionalDetailsTP} />  
+                        <PrivateRoute exact path="/four_wheeler_additional_detailsTP/:productId" component={FourWheelerAdditionalDetailsTP} />
                         <PrivateRoute exact path="/four_wheeler_policy_premium_detailsTP/:productId" component={FourWheelerPolicyPremiumDetailsTP} />
 
                         {/************ MotorGCV ******************/}
-                         <PrivateRoute exact path="/Registration_GCV/:productId" component={RegistrationGCV} />
+                        <PrivateRoute exact path="/Registration_GCV/:productId" component={RegistrationGCV} />
                         <PrivateRoute exact path="/SelectBrand_GCV/:productId" component={SelectBrandGCV} />
                         <PrivateRoute exact path="/VehicleDetails_GCV/:productId" component={VehicleDetailsGCV} />
                         <PrivateRoute exact path="/OtherComprehensive_GCV/:productId" component={OtherComprehensiveGCV} />
-                        <PrivateRoute exact path="/AdditionalDetails_GCV/:productId" component={AdditionalDetailsGCV} />  
+                        <PrivateRoute exact path="/AdditionalDetails_GCV/:productId" component={AdditionalDetailsGCV} />
                         <PrivateRoute exact path="/Premium_GCV/:productId" component={PremiumGCV} />
 
                         {/************ MotorGCV Short Term******************/}
@@ -841,7 +806,7 @@ class Routes extends Component {
                         <PrivateRoute exact path="/SelectBrand_GCVST/:productId" component={SelectBrandGCVST} />
                         <PrivateRoute exact path="/VehicleDetails_GCVST/:productId" component={VehicleDetailsGCVST} />
                         <PrivateRoute exact path="/OtherComprehensive_GCVST/:productId" component={OtherComprehensiveGCVST} />
-                        <PrivateRoute exact path="/AdditionalDetails_GCVST/:productId" component={AdditionalDetailsGCVST} />  
+                        <PrivateRoute exact path="/AdditionalDetails_GCVST/:productId" component={AdditionalDetailsGCVST} />
                         <PrivateRoute exact path="/Premium_GCVST/:productId" component={PremiumGCVST} />
 
                         {/************ MotorGCV - TP ******************/}
@@ -849,7 +814,7 @@ class Routes extends Component {
                         <PrivateRoute exact path="/SelectBrand_GCV_TP/:productId" component={SelectBrandGCVTP} />
                         <PrivateRoute exact path="/VehicleDetails_GCV_TP/:productId" component={VehicleDetailsGCVTP} />
                         <PrivateRoute exact path="/OtherComprehensive_GCV_TP/:productId" component={OtherComprehensiveGCVTP} />
-                        <PrivateRoute exact path="/AdditionalDetails_GCV_TP/:productId" component={AdditionalDetailsGCVTP} />  
+                        <PrivateRoute exact path="/AdditionalDetails_GCV_TP/:productId" component={AdditionalDetailsGCVTP} />
                         <PrivateRoute exact path="/Premium_GCV_TP/:productId" component={PremiumGCVTP} />
 
                         {/************ SME - Fire ******************/}
@@ -860,25 +825,25 @@ class Routes extends Component {
                         <PrivateRoute exact path="/Summary_SME/:productId" component={SummarySME} />  
                         <PrivateRoute exact path="/Premium_SME/:productId" component={PremiumSME} />   */}
 
-                         {/************ Sookshma - Fire ******************/}
-                         <PrivateRoute exact path="/Registration_Sookshma/:productId" component={RegistrationSukhsam} /> 
+                        {/************ Sookshma - Fire ******************/}
+                        <PrivateRoute exact path="/Registration_Sookshma/:productId" component={RegistrationSukhsam} />
                         <PrivateRoute exact path="/RiskDetails_Sookshma/:productId" component={RiskDetailsSukhsam} />
                         <PrivateRoute exact path="/OtherDetails_Sookshma/:productId" component={OtherDetailsSukhsam} />
                         <PrivateRoute exact path="/AdditionalDetails_Sookshma/:productId" component={AdditionalDetailsSukhsam} />
-                        <PrivateRoute exact path="/Summary_Sookshma/:productId" component={SummarySukhsam} />  
-                        <PrivateRoute exact path="/Premium_Sookshma/:productId" component={PremiumSukhsam} />  
+                        <PrivateRoute exact path="/Summary_Sookshma/:productId" component={SummarySukhsam} />
+                        <PrivateRoute exact path="/Premium_Sookshma/:productId" component={PremiumSukhsam} />
 
                         {/************ Support ******************/}
                         <PrivateRoute exact path="/Documents" component={Documents} />
                         <PrivateRoute exact path="/Supports" component={Supports} />
-                        <PrivateRoute exact path="/TicketCount" component={TicketCount} /> 
+                        <PrivateRoute exact path="/TicketCount" component={TicketCount} />
 
                         {/************ BREAK IN ******************/}
                         <PrivateRoute exact path="/Break_in" component={Break_in} />
-                        <PrivateRoute exact path="/Break_form" component={Break_form} /> 
+                        <PrivateRoute exact path="/Break_form" component={Break_form} />
 
                         {/************ Dashboard ******************/}
-                        <PrivateRoute exact path="/PolicySearch" component={PolicySearch} />   
+                        <PrivateRoute exact path="/PolicySearch" component={PolicySearch} />
                         <PrivateRoute exact path="/QuoteHistory" component={QuoteSearch} />
 
                         {/************ Services ******************/}
@@ -889,7 +854,7 @@ class Routes extends Component {
                         <PrivateRoute exact path="/SelectBrand_MISCD/:productId" component={SelectBrandMISCD} />
                         <PrivateRoute exact path="/VehicleDetails_MISCD/:productId" component={VehicleDetailsMISCD} />
                         <PrivateRoute exact path="/OtherComprehensive_MISCD/:productId" component={OtherComprehensiveMISCD} />
-                        <PrivateRoute exact path="/AdditionalDetails_MISCD/:productId" component={AdditionalDetailsMISCD} />  
+                        <PrivateRoute exact path="/AdditionalDetails_MISCD/:productId" component={AdditionalDetailsMISCD} />
                         <PrivateRoute exact path="/Premium_MISCD/:productId" component={PremiumMISCD} />
 
                         {/************ Motor MISC-D Short Term******************/}
@@ -897,61 +862,66 @@ class Routes extends Component {
                         <PrivateRoute exact path="/SelectBrand_MISCDST/:productId" component={SelectBrandMISCDST} />
                         <PrivateRoute exact path="/VehicleDetails_MISCDST/:productId" component={VehicleDetailsMISCDST} />
                         <PrivateRoute exact path="/OtherComprehensive_MISCDST/:productId" component={OtherComprehensiveMISCDST} />
-                        <PrivateRoute exact path="/AdditionalDetails_MISCDST/:productId" component={AdditionalDetailsMISCDST} />  
+                        <PrivateRoute exact path="/AdditionalDetails_MISCDST/:productId" component={AdditionalDetailsMISCDST} />
                         <PrivateRoute exact path="/Premium_MISCDST/:productId" component={PremiumMISCDST} />
 
                         {/************ KSB-Retail ******************/}
                         <PrivateRoute exact path="/Health_KSB/:productId" component={Health_KSB} />
                         <PrivateRoute exact path="/PreExistingDisease_KSB/:productId" component={PreExistingDisease_KSB} />
                         <PrivateRoute exact path="/SelectDuration_KSB/:productId" component={SelectDuration_KSB} />
-                        <PrivateRoute exact path="/Address_KSB/:productId" component={Address_KSB} />    
-                        <PrivateRoute exact path="/NomineeDetails_KSB/:productId" component={NomineeDetails_KSB} /> 
+                        <PrivateRoute exact path="/Address_KSB/:productId" component={Address_KSB} />
+                        <PrivateRoute exact path="/NomineeDetails_KSB/:productId" component={NomineeDetails_KSB} />
                         <PrivateRoute exact path="/PolicyDetails_KSB/:productId" component={PolicyDetails_KSB} />
 
                         {/************ KSB-Retail Micro ******************/}
                         <PrivateRoute exact path="/Health_KSB_Micro/:productId" component={Health_KSB_Micro} />
                         <PrivateRoute exact path="/PreExistingDisease_KSB_Micro/:productId" component={PreExistingDisease_KSB_Micro} />
                         <PrivateRoute exact path="/SelectDuration_KSB_Micro/:productId" component={SelectDuration_KSB_Micro} />
-                        <PrivateRoute exact path="/Address_KSB_Micro/:productId" component={Address_KSB_Micro} />    
-                        <PrivateRoute exact path="/NomineeDetails_KSB_Micro/:productId" component={NomineeDetails_KSB_Micro} /> 
+                        <PrivateRoute exact path="/Address_KSB_Micro/:productId" component={Address_KSB_Micro} />
+                        <PrivateRoute exact path="/NomineeDetails_KSB_Micro/:productId" component={NomineeDetails_KSB_Micro} />
                         <PrivateRoute exact path="/PolicyDetails_KSB_Micro/:productId" component={PolicyDetails_KSB_Micro} />
-                        
+
+                        {/************ KSB-Retail Micro GROUP ******************/}
+                        <PrivateRoute exact path="/Health_KSB_Micro_Group/:productId" component={Health_KSB_Micro_Group} />
+
                         {/************ GSB ******************/}
                         <PrivateRoute exact path="/SelectPlan_GSB/:productId" component={SelectPlan_GSB} />
-                        <PrivateRoute exact path="/AdditionalDetails_GSB/:productId" component={AdditionalDetails_GSB} /> 
+                        <PrivateRoute exact path="/AdditionalDetails_GSB/:productId" component={AdditionalDetails_GSB} />
                         <PrivateRoute exact path="/PolicyDetails_GSB/:productId" component={PolicyDetails_GSB} />
 
                         {/************ Vedvag Payment Gateway ******************/}
-                        <PrivateRoute exact path="/Vedvag_gateway/:productId" component={VedvagGateway} />  
+                        <PrivateRoute exact path="/Vedvag_gateway/:productId" component={VedvagGateway} />
 
                         {/************ Sahipay Payment Gateway ******************/}
                         <PrivateRoute exact path="/Sahipay_gateway/:productId" component={SahipayGateway} />
-                        
+
                         {/************ Trabscrop Payment Gateway ******************/}
                         <PrivateRoute exact path="/Transcrop_gateway/:productId" component={TranscropGateway} />
 
-						
-						{/************ Four-Wheeler OD ******************/}
-						<PrivateRoute exact path="/RegistrationOD/:productId" component={RegistrationOD} />                    
+
+                        <PrivateRoute exact path="/UnderMaintenance" component={UnderMaintenance} />
+
+                        {/************ Four-Wheeler OD ******************/}
+                        <PrivateRoute exact path="/RegistrationOD/:productId" component={RegistrationOD} />
                         <PrivateRoute exact path="/Select-brandOD/:productId" component={SelectBrandOD} />
                         <PrivateRoute exact path="/VehicleDetailsOD/:productId" component={VehicleDetailsOD} />
                         <PrivateRoute exact path="/OtherComprehensiveOD/:productId" component={OtherComprehensiveOD} />
                         <PrivateRoute exact path="/Additional_detailsOD/:productId" component={AdditionalDetailsOD} />
                         <PrivateRoute exact path="/PremiumOD/:productId" component={PremiumOD} />
                         {/* <PrivateRoute exact path="/ThankYou_motor/:policyId" component={ThankYou_motor} /> */}
-                        
+
                         {/************ Claim Intimation ******************/}
-                        <PrivateRoute exact path="/ClaimIntimation" component={ClaimIntimation} />  
-                        <PrivateRoute exact path="/ClaimStatus" component={ClaimStatus} />      
+                        <PrivateRoute exact path="/ClaimIntimation" component={ClaimIntimation} />
+                        <PrivateRoute exact path="/ClaimStatus" component={ClaimStatus} />
 
 
                         {/************ Renewal ******************/}
-						<PrivateRoute exact path="/Renewal" component={Renewal} />     
-                        <PrivateRoute exact path="/MotorSummery" component={MotorSummery} />   
+                        <PrivateRoute exact path="/Renewal" component={Renewal} />
+                        <PrivateRoute exact path="/MotorSummery" component={MotorSummery} />
                         <PrivateRoute exact path="/MotorCoverages" component={MotorCoverages} />
-                        <PrivateRoute exact path="/HealthSummery" component={HealthSummery} />   
-                        <PrivateRoute exact path="/ThankYouRenewal" component={ThankYouRenewal} />             
-						
+                        <PrivateRoute exact path="/HealthSummery" component={HealthSummery} />
+                        <PrivateRoute exact path="/ThankYouRenewal" component={ThankYouRenewal} />
+
                         <Redirect from="/" to="/Dashboard" />
                     </Switch>
                 </HashRouter>
@@ -965,16 +935,16 @@ const mapStateToProps = (state) => {
     return {
         token: state.auth.token
     }
-  
-  }
-  
-  const mapDispatchToProps = dispatch => {
+
+}
+
+const mapDispatchToProps = dispatch => {
     return {
         onAuthPersist: () => dispatch(authValidate())
     }
-  }
-  
-  export default connect(mapStateToProps, mapDispatchToProps)(Routes);
+}
+
+export default connect(mapStateToProps, mapDispatchToProps)(Routes);
 
 
 

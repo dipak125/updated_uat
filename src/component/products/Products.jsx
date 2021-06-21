@@ -102,9 +102,7 @@ class Products extends Component {
                 localStorage.removeItem('registration_number');
                 localStorage.removeItem('policy_type');
                 localStorage.removeItem('check_registration');
-                localStorage.removeItem('confirm');   
-                localStorage.removeItem('policy_holder_ref_no');  
-                
+                localStorage.removeItem('confirm');     
                 this.props.loadingStop();
             }
             else {
@@ -125,10 +123,9 @@ class Products extends Component {
     render() {
         const { product_id, motor_list, health_list, misc_list, personalAccident_list, fire_list, defaultTab } = this.state
         let phrases = localStorage.getItem("phrases") ? JSON.parse(localStorage.getItem("phrases")) : null
-
+        console.log('product_id', defaultTab)
         return (
             <>
-            
                 <BaseComponent>
 				
 				<div className="page-wrapper">

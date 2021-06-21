@@ -62,48 +62,22 @@ class ThankYouPage extends Component {
 
 
   //--------------------------------------CCM Service PDF ------------------------------------------
-    getAccessToken = () => {
-    this.props.loadingStart();
-    axios
-      .post(`/callTokenService`)
-      .then(res => {
-        this.setState({
-          accessToken: res.data.access_token
-        })
-        return new Promise(resolve => {setTimeout(() => {
-          this.getPolicyDoc(res.data.access_token)
-            }
-            ,5000)
-        })
-        
-      })
-      .catch(err => {
-        this.setState({
-          accessToken: []
-        });
-        this.props.loadingStop();
-      });
-  }
-
-  getPolicyDoc = (access_token) => {
+  getPolicyDoc = () => {
 
     const { policyNo, dloadCounter } = this.state
     const formData = new FormData();
-    //formData.append('access_token', access_token);
-    //formData.append('policyNo', policyNo)
     const post_data_obj = {
-      'access_token': access_token,
       'policyNo': policyNo,
       'policyHolder_Id':  this.state.refNumber
     }
+    console.log('post_data_obj', post_data_obj)
     let encryption = new Encryption();
     formData.append('enc_data', encryption.encrypt(JSON.stringify(post_data_obj)))
     this.props.loadingStart();
     axios
-      .post(`/callDocApi`, formData)
+      .post(`/policy-download/external`, formData)
       .then(res => {
-        this.props.loadingStop();
-
+        console.log('external_res', res)
         if(res.data.error == true) {
           this.setState({dloadCounter: dloadCounter+1})
           swal({
@@ -115,26 +89,14 @@ class ThankYouPage extends Component {
           })
           .then((willDownload) => {
             if (willDownload && dloadCounter < 3) {
-            this.getAccessToken()
+            this.getPolicyDoc()
             }
             else {swal(res.data.msg)}
           })
 
         }
-        else if (res.data.data.getPolicyDocumentResponseBody.payload.URL[0] == "No Results found for the given Criteria") {
-          // swal(res.data.getPolicyDocumentResponseBody.payload.URL[0]);
-          this.setState({dloadCounter: dloadCounter+1})
-          swal("Thank you for showing your interest for buying product.Due to some reasons, we are not able to issue the policy document online. Please call 180 22 1111");
-        }
-        
         else {
-          this.setState({
-            response_text: res.data,
-            res_error: false,
-            dloadCounter: 0
-          })
-
-          this.generate_pdf(res.data.data, this.state.refNumber)    
+          this.downloadCCMDoc(res.data.data.uploded_path, res.data.data.file_name) 
         }
       })
       .catch(err => {
@@ -145,79 +107,45 @@ class ThankYouPage extends Component {
       });
   }
 
-  generate_pdf = (response_text, refNumber) => {
-    // const {response_text, refNumber, res_error} = this.state
-    const { policyNo } = this.state
-    if (response_text && refNumber) {
-      const formData = new FormData();
-      //  formData.append('refNumber', refNumber);
-      // formData.append('policy_no', policyNo);
-      //formData.append('response_text', JSON.stringify(response_text))
-      const post_data_obj = {
-        'policy_holder_id': refNumber,
-        'policy_no': policyNo,
-        'response_text': JSON.stringify(response_text)
-      }
+  downloadCCMDoc = (fileURL, fileName) => {
+    // const url = file_path;
+    // const pom = document.createElement('a');
 
-      let encryption = new Encryption();
-      formData.append('enc_data', encryption.encrypt(JSON.stringify(post_data_obj)))
-      this.props.loadingStart();
-      axios
-        .post(`/generate-pdf`, formData)
-        .then(res => {
-          this.props.loadingStop();
-          this.downloadDoc(res.data.data.uploded_path)
-        })
-        .catch(err => {
-          this.setState({
-          });
-          this.props.loadingStop();
-        });
-    }
-    else {
-      swal("Could not get policy document")
-    }
+    // pom.style.display = 'none';
+    // pom.href = url;
+    // document.body.appendChild(pom);
+    // pom.click(); 
+    // window.URL.revokeObjectURL(url);
+    fetch(fileURL, {
+    method: 'GET',
+    headers: {
+      'Content-Type': 'application/pdf',
+    },
+    })
+    .then((response) => response.blob())
+    .then((blob) => {
+      // Create blob link to download
+      const url = window.URL.createObjectURL(
+        new Blob([blob]),
+      );
+      const link = document.createElement('a');
+      link.href = url;
+      link.setAttribute(
+        'download',
+        fileName,
+      );
 
-  }
+      // Append to html link element page
+      document.body.appendChild(link);
 
-  downloadDoc = () => {
-    let file_path = `${process.env.REACT_APP_PAYMENT_URL}/ConnectPG/policy_pdf_download.php?refrence_no=${this.state.refNumber}`
-    console.log(file_path);
-    const { policyNo } = this.state
-    const url = file_path;
-    const pom = document.createElement('a');
+      // Start download
+      link.click();
 
-    pom.style.display = 'none';
-    pom.href = url;
+      // Clean up and remove the link
+      link.parentNode.removeChild(link);
+      this.props.loadingStop();
+    });
 
-    document.body.appendChild(pom);
-    pom.click(); 
-    window.URL.revokeObjectURL(url);
-
-    // fetch(file_path,{
-    //   mode: 'no-cors' // 'cors' by default
-    // })
-    //   .then(resp => resp.blob())
-    //   .then(blob => {
-    //     const url = window.URL.createObjectURL(blob);
-    //     const a = document.createElement('a');
-    //     a.style.display = 'none';
-    //     a.href = url;
-    //     // the filename you want
-    //     // a.download = 'b7b98d12c9da4f44b7f5e372945fbf7f.pdf';
-    //     a.download = policyNo+'.pdf';
-    //     document.body.appendChild(a);
-    //     a.click();
-    //     window.URL.revokeObjectURL(url);
-    //     this.props.loadingStop();
-    //     //alert('your file has downloaded!'); // or you know, something with better UX...
-    //   })
-     
-    //   .catch(() => {
-    //    this.props.loadingStop();
-
-    //   });
-      
   }
 
   //-----------------------------------CCM Service PDF End----------------------------------------
@@ -317,6 +245,18 @@ downloadWordingGSB = () => {
   window.URL.revokeObjectURL(url);
 }
 
+downloadWordingSME = () => {
+  let file_path = `${process.env.REACT_APP_PAYMENT_URL}/policy_pdf_download.php?sme_wording=1`
+  const url = file_path;
+  const pom = document.createElement('a');
+
+  pom.style.display = 'none';
+  pom.href = url;
+  document.body.appendChild(pom);
+  pom.click(); 
+  window.URL.revokeObjectURL(url);
+}
+
   componentDidMount() {      
     const { policyId } = this.props.match.params
     this.fetchData()
@@ -368,7 +308,7 @@ downloadWordingGSB = () => {
                         {vehicletype.download_type == 0 ?
                             <button className="policy m-l-20" onClick={this.generateDoc}>{phrases['PolicyCopy']} </button>
                             :
-                            <button className="policy m-l-20" onClick={this.getAccessToken}>{phrases['PolicyCopy']} </button>
+                            <button className="policy m-l-20" onClick={this.getPolicyDoc}>{phrases['PolicyCopy']} </button>
                         }
                         {/* <button className="policy m-l-20" onClick={this.generateDoc}>{phrases['PolicyCopy']} </button> */}
                         {vehicletype && vehicletype.id && vehicletype.id == 13 ?
@@ -379,6 +319,12 @@ downloadWordingGSB = () => {
                         
                         {vehicletype && vehicletype.id && vehicletype.id == 14 ?
                             <button className="policy m-l-20" onClick={this.downloadWordingGSB}>Policy Wording </button>
+                            :
+                           null
+                        }
+
+                        {vehicletype && vehicletype.id && vehicletype.id == 19 ?
+                            <button className="policy m-l-20" onClick={this.downloadWordingSME}>Policy Wording </button>
                             :
                            null
                         }
