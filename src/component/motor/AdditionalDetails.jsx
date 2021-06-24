@@ -486,8 +486,6 @@ console.log('post_data', post_data);
                 this.props.loadingStop();
             })
 			
-			
-
     }
 	
 	tpaInsuranceRepository = () => {

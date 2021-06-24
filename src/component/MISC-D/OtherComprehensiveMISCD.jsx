@@ -74,7 +74,7 @@ const ComprehensiveValidation = Yup.object().shape({
         .min(5, function () {
             return "ChasisMin"
         })
-        .max(17, function () {
+        .max(20, function () {
             return "ChasisMax"
         }),
 
@@ -301,7 +301,7 @@ const ComprehensiveValidation = Yup.object().shape({
                 }).min(5, function () {
                     return "Chassis no. should be minimum 5 characters"
                 })
-                .max(17, function () {
+                .max(20, function () {
                     return "Chassis no. should be maximum 17 characters"
                 })
         })
@@ -1723,7 +1723,7 @@ class OtherComprehensiveMISCD extends Component {
                                                                                         onFocus={e => this.changePlaceHoldClassAdd(e)}
                                                                                         onBlur={e => this.changePlaceHoldClassRemove(e)}
                                                                                         value={values.chasis_no.toUpperCase()}
-                                                                                        maxLength="17"
+                                                                                        maxLength="20"
                                                                                         onChange={(e) => {
                                                                                             setFieldTouched('chasis_no')
                                                                                             setFieldValue('chasis_no', e.target.value)

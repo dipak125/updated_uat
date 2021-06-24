@@ -232,9 +232,7 @@ const vehicleRegistrationValidation = Yup.object().shape({
         },
         function (value) {
             console.log('PleaseEPCB'+this.parent.previous_is_claim+' ==== '+this.parent.previous_policy_name+' ==== '+value)
-            let prevdate = new Date(this.parent.previous_end_date)
-            let todaydate = new Date()
-            if (prevdate > todaydate && this.parent.previous_is_claim == '0' && this.parent.previous_policy_name == '1' && (!value || value == '1')) {   
+            if (Math.floor(moment().diff(this.parent.previous_end_date, 'days', true)) <= 90 && this.parent.previous_is_claim == '0' && this.parent.previous_policy_name == '1' && (!value || value == '1')) {   
                 return false;    
             }
             return true;

@@ -103,7 +103,8 @@ class SelectDuration_Micro extends Component {
         error: [],
         endDateFlag: false,
         serverResponse: [],
-        familyMembers: []
+        familyMembers: [],
+        requested_data: []
       };
 
 
@@ -160,17 +161,17 @@ class SelectDuration_Micro extends Component {
         axios
         .post(`/duration-premium`, formData)
         .then(res => { 
+            this.props.loadingStop();
             this.props.history.push(`/Address_Micro/${productId}`);
         })
         .catch(err => {
     
           this.props.loadingStop();
         });     
-        this.props.loadingStop();
 
     }
 
-    getAccessToken = () => {
+    getAccessToken = (requested_data) => {
         axios
           .post(`/callTokenService`)
           .then(res => {
@@ -179,8 +180,8 @@ class SelectDuration_Micro extends Component {
                     accessToken: res.data.access_token
                 }) 
                 let value = []
-                value['polStartDate'] = new Date()
-                value['polEndDate'] = new Date(moment(value['polStartDate']).add(1, 'years').format("YYYY-MM-DD"))
+                value['polStartDate'] = requested_data && requested_data.start_date ? moment(requested_data.start_date).format("YYYY-MM-DD") : new Date()
+                value['polEndDate'] = new Date(moment(value['polStartDate']).add(364, 'days').format("YYYY-MM-DD"))
                 this.props.loadingStop();
                 this.quote(value)
             }
@@ -203,11 +204,12 @@ class SelectDuration_Micro extends Component {
           .get(`/policy-holder/${localStorage.getItem('policyHolder_id')}`)
           .then(res => { 
             var familyMembers = res.data.data.policyHolder.request_data && res.data.data.policyHolder.request_data.family_members
+            var requested_data = res.data.data.policyHolder.request_data && res.data.data.policyHolder.request_data
             this.setState({
                 policyHolderDetails: res.data.data.policyHolder,
-                familyMembers
+                familyMembers,requested_data
             }) 
-            this.getAccessToken()
+            this.getAccessToken(requested_data)
           })
           .catch(err => {
             this.setState({
@@ -217,7 +219,7 @@ class SelectDuration_Micro extends Component {
           });
       }
 
-    quote = (value) => {
+    quote = (values) => {
       const {accessToken, familyMembers} = this.state
       if(accessToken)
       {   
@@ -254,14 +256,12 @@ class SelectDuration_Micro extends Component {
                 si = familyMembers.length > "1" ? '3' : '1';
         }
 
-        let polStartDate = moment(value.polStartDate).format("YYYY-MM-DD");
-        let polEndDate = moment(value.polEndDate).format("YYYY-MM-DD");
+        let polStartDate = moment(values.polStartDate).format("YYYY-MM-DD");
+        let polEndDate = moment(values.polEndDate).format("YYYY-MM-DD");
         
-        let insureValue = value.insureValue ? value.insureValue : si;
+        let insureValue = values.insureValue ? values.insureValue : si;
         const formData = new FormData(); 
         this.props.loadingStart();
-       
-      console.log('insureValue', insureValue);
 
       const post_data = {
         'id':localStorage.getItem('policyHolder_id'),
@@ -303,7 +303,7 @@ class SelectDuration_Micro extends Component {
     }
 
     handleChange =(value) => {
-        let endDate = moment(value).add(1, 'years').format("YYYY-MM-DD")
+        let endDate = moment(value).add(364, 'days').format("YYYY-MM-DD")
         this.setState({
             EndDate: endDate,
             endDateFlag: true,
@@ -338,7 +338,7 @@ class SelectDuration_Micro extends Component {
 
         const newInitialValues = Object.assign(initialValues, {
             polStartDate: start_date ? start_date : new Date,
-            polEndDate: end_date  ? end_date : new Date(moment().add(1, 'years').format("YYYY-MM-DD")),
+            polEndDate: end_date  ? end_date : new Date(moment().add(364, 'days').format("YYYY-MM-DD")),
             // insureValue: policyHolderDetails && policyHolderDetails.request_data && policyHolderDetails.request_data.sum_insured ? Math.floor(policyHolderDetails.request_data.sum_insured) : initialValues.insureValue
             insureValue: policyHolderDetails && policyHolderDetails.request_data && policyHolderDetails.request_data.sum_insured ? sum_assured[policyHolderDetails.request_data.sum_insured] : (familyMembers.length > "1" ? '3' : '1')
         })
@@ -405,7 +405,7 @@ class SelectDuration_Micro extends Component {
                                                             onChange={(value) => {
                                                                 setFieldTouched("polStartDate");
                                                                 setFieldValue("polStartDate", value);
-                                                                setFieldValue("polEndDate", addDays(new Date(), 364));
+                                                                setFieldValue("polEndDate", addDays(value, 364));
                                                                 this.handleChange(value);
                                                             }}
                                                             selected={values.polStartDate}
@@ -429,7 +429,7 @@ class SelectDuration_Micro extends Component {
                                                             placeholderText="End Date"
                                                             disabled = {true}
                                                             className="datePckr"
-                                                            selected={addDays(new Date(values.polStartDate), 364)}
+                                                            selected={addDays(new Date(values.polStartDate), 364)}                        
                                                         />
                                                         {errors.polEndDate && touched.polEndDate ? (
                                                         <span className="errorMsg">{errors.polEndDate}</span>

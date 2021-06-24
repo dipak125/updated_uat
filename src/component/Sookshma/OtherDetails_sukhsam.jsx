@@ -57,7 +57,7 @@ financial_modgaged : Yup.string().when(['financial_party'], {
 financer_name : Yup.string().when(['financial_party'], {
     is: financial_party => financial_party == '1',       
     then: Yup.string().required("This field is required")
-            .matches(/^[a-zA-Z]*$/, function() {
+            .matches(/^[a-zA-Z]+([\s]?[a-zA-Z])*$/, function() {
                 return "Invalid Name"
             }).nullable(),
     otherwise: Yup.string().nullable()}),

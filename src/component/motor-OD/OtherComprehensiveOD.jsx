@@ -83,7 +83,7 @@ const ComprehensiveValidation = Yup.object().shape({
     .min(5, function() {
         return "ChasisMin"
     })
-    .max(17, function() {
+    .max(20, function() {
         return "ChasisMax"
     }),
 
@@ -1203,7 +1203,7 @@ class OtherComprehensiveOD extends Component {
                                                             onFocus={e => this.changePlaceHoldClassAdd(e)}
                                                             onBlur={e => this.changePlaceHoldClassRemove(e)}
                                                             value= {values.chasis_no.toUpperCase()}
-                                                            maxLength="17"
+                                                            maxLength="20"
                                                             onChange = {(e) => {
                                                                 setFieldTouched('chasis_no')
                                                                 setFieldValue('chasis_no', e.target.value)                       

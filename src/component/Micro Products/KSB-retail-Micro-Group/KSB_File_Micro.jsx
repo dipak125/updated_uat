@@ -12,7 +12,9 @@ import { BootstrapTable, TableHeaderColumn, ExportCSVButton } from "react-bootst
 import { Formik, Form, Field } from 'formik';
 import swal from 'sweetalert';
 import LinkWithTooltip from "../../../shared/LinkWithTooltip";
-import axios from "../../../shared/axios"
+import axios from "../../../shared/axios";
+import moment from "moment";
+
 
 const initialValues = {
     ksb_branch_id: ''
@@ -43,32 +45,44 @@ function statusFormatter(cell) {
 
 const actionFormatter = (refObj) => (cell, row, enumObject) => {
     return (
-        <LinkWithTooltip
-            tooltip="Pay"
+        <div>
+            <span
+                href="#"
+                onClick={() => refObj.KSBFileDownload(cell)
+                }
+                id="tooltip-1"
+            >
+                <Button type="button" >
+                    Download
+                </Button>
+            </span>
+                &nbsp;
+            <span
             href="#"
-            clicked={() => refObj.KSBFileDetails(row)
+            onClick={() => refObj.KSBFileDelete(cell)
             }
             id="tooltip-1"
-        >
-            <Button type="button" >
-                Pay
+            >
+            <Button type="button" className="btn btn-danger">
+                Delete
             </Button>
-        </LinkWithTooltip>
+            <i className="far fa-trash-alt" />
+            </span>
+        </div>
     )
 }
 
 class KSB_File_Micro extends Component {
     constructor(props) {
         super(props);
-        this.handleShow = this.handleShow.bind(this);
-        this.handleClose = this.handleClose.bind(this);
         this.state = {
             KSBbranches: [],
             clickedKSBStatus: "",
             clickedKSBBranch: "",
             clickedKSBAction: "",
             resmessage: "",
-            reserror: false
+            reserror: false,
+            ksbFileList: []
         };
     }
 
@@ -92,17 +106,10 @@ class KSB_File_Micro extends Component {
 
     }
 
-    handleClose() {
-        this.setState({ show: false });
-    }
-
-    handleShow() {
-        this.setState({ show: true });
-    }
-
-    handleFormSubmit = (values) => {
+    handleFormSubmit = (values, { resetForm }) => {
         const formData = new FormData();
         let encryption = new Encryption();
+        let randomString = Math.random().toString(36);
 
         let user_type = ""
         let master_id = ""
@@ -143,22 +150,26 @@ class KSB_File_Micro extends Component {
                 if (!res.data.error) {
                     this.setState({
                         resmessage: res.data.msg,
-                        reserror: res.data.error
+                        reserror: res.data.error,
+                        theInputKey: randomString
                     })
                     swal('File successfully uploaded');
+                    this.batchList()
                 } else {
                     this.setState({
                         resmessage: res.data.msg,
                         reserror: res.data.error,
-                        tempBatchId: res.data.data.temp_batch_id
+                        tempBatchId: res.data.data.temp_batch_id,
+                        theInputKey: randomString
                     })
                 }
+                resetForm();
                 this.props.loadingStop();
             })
             .catch(err => {
                 this.props.loadingStop();
+                console.log(err);
             });
-
     }
 
     fetchBranches = () => {
@@ -181,25 +192,133 @@ class KSB_File_Micro extends Component {
         this.setState({
             KSBbranches
         })
-        this.props.loadingStop();
-    }
-    KSBFileDetails(row) {
-        this.setState({
-            clickedKSBStatus: row.status,
-            clickedKSBBranch: row.branch,
-            clickedKSBAction: row.action
-        })
+        this.batchList()
     }
 
-    downloadErrorFile = () => {
-        const { tempBatchId } = this.state;
-        const url = `http://14.140.119.44/sbig-csc/core/auth/ksb-group-excel/error-file/${tempBatchId}`;
+    
+    KSBFileDelete = (cell) => {
+        swal({
+          title: 'Delete',
+          text: 'Delete File',
+          icon: "warning",
+          buttons: true,
+          dangerMode: true,
+      }).then((willDelete) => {
+        if (willDelete) {
+            axios.get(`ksb-group-excel/delete-batch/${cell}`)
+            .then(res => {
+                if(res.data.error == false) {
+                swal(res.data.msg, {
+                    icon: "success",
+                }).then(() => {
+                    this.batchList();
+                });
+                }
+                else {
+                    swal("", res.data.msg, 'error');
+                }
+            })
+            .catch(err => {
+              swal("", err.data.msg, 'error');
+              this.props.loadingStop();
+            });
+          }
+        });
+      }
+
+    KSBFileDownload(cell) {
+        const url = `${process.env.REACT_APP_API_URL}/ksb-group-excel/succeed-file/${cell}`;
+        console.log(url);
         this.props.loadingStart();
         const anchortag = document.createElement('a');
         anchortag.style.display = 'none';
         anchortag.href = url;
         document.body.appendChild(anchortag);
         anchortag.click();
+        this.props.loadingStop();
+    }
+
+    downloadErrorFile = () => {
+        const { tempBatchId } = this.state;
+        const url = `${process.env.REACT_APP_API_URL}/ksb-group-excel/error-file/${tempBatchId}`;
+        console.log(url);
+        this.props.loadingStart();
+        const anchortag = document.createElement('a');
+        anchortag.style.display = 'none';
+        anchortag.href = url;
+        document.body.appendChild(anchortag);
+        anchortag.click();
+        this.props.loadingStop();
+    }
+
+    downloadSampleFile = () => {
+        const { tempBatchId } = this.state;
+        const url = `${process.env.REACT_APP_API_URL}/ksb-group-excel/sample-file`;
+        console.log(url);
+        this.props.loadingStart();
+        const anchortag = document.createElement('a');
+        anchortag.style.display = 'none';
+        anchortag.href = url;
+        document.body.appendChild(anchortag);
+        anchortag.click();
+        this.props.loadingStop();
+    }
+
+    
+
+    batchList = () => {
+        const formData = new FormData();
+        let encryption = new Encryption();
+
+        let user_type = ""
+        let master_id = ""
+        let user_id = ""
+
+        let user_data = sessionStorage.getItem("users") ? JSON.parse(sessionStorage.getItem("users")) : "";
+        if (user_data) {
+            user_data = JSON.parse(encryption.decrypt(user_data.user));
+        }
+
+        if (user_data.login_type == '4') {
+            let bc_data = sessionStorage.getItem('bcLoginData') ? sessionStorage.getItem('bcLoginData') : "";
+            if (bc_data) {
+                bc_data = JSON.parse(encryption.decrypt(bc_data));
+            }
+            user_type = sessionStorage.getItem('csc_id') ? 'csc' : 'bc'
+            master_id = sessionStorage.getItem('csc_id') ? '5' : bc_data ? bc_data.agent_id : "0"
+            user_id = sessionStorage.getItem('csc_id') ? sessionStorage.getItem('csc_id') : bc_data ? bc_data.user_info.data.user.username : ""
+        }
+        else {
+            user_type = user_data.user_type
+            master_id = user_data.bc_master_id
+            user_id = user_data.master_user_id
+        }
+
+        const { productId } = this.props.match.params
+
+        formData.append('user_type', user_type);
+        formData.append('master_id', master_id);
+        formData.append('user_id', user_id);       
+        formData.append('product_id', productId);
+        this.props.loadingStart();
+        axios
+            .post("ksb-group-excel/uploded-batch-list", formData)
+            .then(res => {
+                if (!res.data.error) {
+                    this.setState({
+                        ksbFileList: res.data.data.batch_details
+                    })
+                } else {                
+                    this.setState({
+                        ksbFileList: []
+                    })
+                }
+                this.props.loadingStop();
+            })
+            .catch(err => {
+                this.props.loadingStop();
+                console.log(err);
+            });
     }
 
     componentDidMount() {
@@ -207,17 +326,7 @@ class KSB_File_Micro extends Component {
     }
 
     render() {
-        const { KSBbranches, reserror, resmessage, clickedKSBStatus, clickedKSBBranch, clickedKSBAction } = this.state;
-        let ksbFileList =
-            [{
-                branch: 'Branch 1', status: 'NA', action: 'Pay'
-            }, {
-                branch: 'Branch 2', status: 'NA', action: 'Pay'
-            }, {
-                branch: 'Branch 3', status: 'NA', action: 'Pay'
-            }, {
-                branch: 'Branch 4', status: 'NA', action: 'Pay'
-            }]
+        const { KSBbranches, reserror, resmessage, clickedKSBStatus, clickedKSBBranch, ksbFileList } = this.state;
         let phrases = localStorage.getItem("phrases") ? JSON.parse(localStorage.getItem("phrases")) : null
         const options = {
             // afterColumnFilter: this.afterColumnFilter,
@@ -263,8 +372,7 @@ class KSB_File_Micro extends Component {
                                     <h4 className="text-center mt-3 mb-3">SBI General Insurance Company Limited</h4>
                                     <section className="brand">
                                         <div className="boxpd">
-                                            {/* <h5 className="m-b-30">Download Sample Group KSB File</h5> */}
-                                            <button class="policy m-b-10" onClick={this.downloadErrorFile} style={{ float: 'left' }}>Download Sample Group KSB File </button>
+                                            <button class="policy m-b-10" onClick={this.downloadSampleFile} style={{ float: 'left' }}>Download Sample Group KSB File </button>
                                             <Formik initialValues={initialValues}
                                                 onSubmit={this.handleFormSubmit}
                                                 validationSchema={ksbFileUploadValidation}>
@@ -284,6 +392,7 @@ class KSB_File_Micro extends Component {
                                                                         onChange={(e) => {
                                                                             setFieldValue('ksb_branch_id', e.target.value);
                                                                         }}
+                                                                        disabled
                                                                     >
                                                                         <option value="">Select Branch</option>
                                                                         {KSBbranches.map((KSBbranch, qIndex) => (
@@ -299,7 +408,7 @@ class KSB_File_Micro extends Component {
                                                             <div className="row formSection">
                                                                 <label className="col-md-4">Upload the FPO-KSB file:</label>
                                                                 <div className="col-md-4">
-                                                                    <input type="file" key='2' name="fpo_ksb_file"
+                                                                    <input type="file" key={this.state.theInputKey || '' } name="fpo_ksb_file"
                                                                         onChange={(e) => {
                                                                             const { target } = e
                                                                             if (target.value.length > 0) {
@@ -312,13 +421,6 @@ class KSB_File_Micro extends Component {
                                                                     ) : null}
                                                                 </div>
                                                             </div>
-                                                            {reserror ? (
-                                                                <>
-                                                                    {resmessage ? <span className="errorMsg" style={{ textAlign: 'right' }}>{resmessage}</span> : null}
-                                                                    <button className="policy m-l-20" onClick={this.downloadErrorFile} style={{ float: 'right' }}>Download the Error FPO-KSB file </button>
-
-                                                                </>
-                                                            ) : null}
 
                                                             <div className="cntrbtn">
                                                                 <Button className={`btnPrimary`} type="submit" >
@@ -329,9 +431,16 @@ class KSB_File_Micro extends Component {
                                                     );
                                                 }}
                                             </Formik>
+                                            {reserror ? (
+                                                <>
+                                                    {resmessage ? <span className="errorMsg" style={{ textAlign: 'right' }}>{resmessage}</span> : null}
+                                                    <button className="policy m-l-20" onClick={this.downloadErrorFile} style={{ float: 'right' }}>Download the Error FPO-KSB file </button>
+
+                                                </>
+                                            ) : null}
 
                                             <Fragment>
-                                                <div className="contBox m-b-45 tickedTable" style={{ marginTop: "10px" }}>
+                                                <div className="contBox m-b-45 tickedTable" style={{ marginTop: "50px" }}>
                                                     <h4 className="text-center mt-3 mb-3">KSB Uploaded Files</h4>
                                                     <div className="customInnerTable dataTableCustom">
                                                         <BootstrapTable ref="table"
@@ -342,9 +451,12 @@ class KSB_File_Micro extends Component {
                                                             hover
                                                             wrapperClasses="table-responsive"
                                                         >
-                                                            <TableHeaderColumn width="150px" dataField='branch' isKey dataSort dataFormat={branchFormatter}>Branch Code</TableHeaderColumn>
-                                                            <TableHeaderColumn width='150px' dataField='status' dataFormat={statusFormatter} >Status</TableHeaderColumn>
-                                                            <TableHeaderColumn width='150px' dataField='action' dataFormat={actionFormatter(this)} >Action</TableHeaderColumn>
+                                                            <TableHeaderColumn width="100px" dataField='batch_no' isKey >Batch Code</TableHeaderColumn>
+                                                            <TableHeaderColumn width='100px' dataField='status' dataFormat={(cell) => (cell == '1' ? 'Excel uploaded' : 'Premium calculated')} >Status</TableHeaderColumn>
+                                                            <TableHeaderColumn width='100px' dataField='total_members' >Total Member</TableHeaderColumn>
+                                                            <TableHeaderColumn width='100px' dataField='all_total_premium' >Total Premium</TableHeaderColumn>
+                                                            <TableHeaderColumn width='100px' dataField='uploded_time'  dataFormat={(cell) => (cell !== '0000-00-00 00:00:00' ? moment(cell).format("DD-MM-YYYY") : '')}>Upload Date</TableHeaderColumn>
+                                                            <TableHeaderColumn width='150px' dataField='batch_no' dataFormat={actionFormatter(this)} >Action</TableHeaderColumn>
                                                         </BootstrapTable>
                                                     </div>
                                                 </div>

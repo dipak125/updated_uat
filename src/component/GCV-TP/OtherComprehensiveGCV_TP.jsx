@@ -73,7 +73,7 @@ const ComprehensiveValidation = Yup.object().shape({
     .min(5, function() {
         return "ChasisMin"
     })
-    .max(17, function() {
+    .max(20, function() {
         return "ChasisMax"
     }),
 
@@ -262,7 +262,7 @@ const ComprehensiveValidation = Yup.object().shape({
     }),
 
     fuel_type: Yup.string().required("Select fuel type"),
-geographical_extension_length: Yup.string().when(['Geographical_flag'], {
+    geographical_extension_length: Yup.string().when(['Geographical_flag'], {
         is: Geographical_flag => Geographical_flag == '1',
         then: Yup.string().test(
             "geoExtention",
@@ -1413,7 +1413,7 @@ class OtherComprehensiveGCV extends Component {
                                                 onFocus={e => this.changePlaceHoldClassAdd(e)}
                                                 onBlur={e => this.changePlaceHoldClassRemove(e)}
                                                 value= {values.chasis_no.toUpperCase()}
-                                                maxLength="17"
+                                                maxLength="20"
                                                 onChange = {(e) => {
                                                     setFieldTouched('chasis_no')
                                                     setFieldValue('chasis_no', e.target.value)                       
