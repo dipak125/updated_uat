@@ -234,7 +234,7 @@ class PolicyDetails_KSB_Micro extends Component {
                       <FormGroup>Date Of Birth:</FormGroup>
                     </Col>
                     <Col sm={12} md={6}>
-                      <FormGroup>{member.DateOfBirth}</FormGroup>
+                      <FormGroup>{member.DateOfBirth ? moment(member.DateOfBirth).format("DD-MM-YYYY") : null}</FormGroup>
                     </Col>
                   </Row>
 

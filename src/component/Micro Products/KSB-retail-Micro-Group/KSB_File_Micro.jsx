@@ -14,7 +14,7 @@ import swal from 'sweetalert';
 import LinkWithTooltip from "../../../shared/LinkWithTooltip";
 import axios from "../../../shared/axios";
 import moment from "moment";
-
+import queryString from 'query-string';
 
 const initialValues = {
     ksb_branch_id: ''
@@ -46,7 +46,7 @@ function statusFormatter(cell) {
 const actionFormatter = (refObj) => (cell, row, enumObject) => {
     return (
         <div>
-            <span
+            {/* <span
                 href="#"
                 onClick={() => refObj.KSBFileDownload(cell)
                 }
@@ -55,23 +55,64 @@ const actionFormatter = (refObj) => (cell, row, enumObject) => {
                 <Button type="button" >
                     Download
                 </Button>
-            </span>
-                &nbsp;
-            <span
-            href="#"
-            onClick={() => refObj.KSBFileDelete(cell)
-            }
-            id="tooltip-1"
+
+            </span> */}
+            &nbsp;
+            {row.microbatchstatus.id && row.microbatchstatus.id !== 3 ? (<span
+                href="#"
+                onClick={() => refObj.KSBFileDelete(cell)
+                }
+                id="tooltip-1"
             >
-            <Button type="button" className="btn btn-danger">
-                Delete
-            </Button>
-            <i className="far fa-trash-alt" />
-            </span>
+                <Button type="button" className="btn btn-danger">
+                    Delete
+                </Button>
+                <i className="far fa-trash-alt" />
+            </span>) : null}
+            &nbsp;
+            {row.microbatchstatus.id && row.microbatchstatus.id == 2 ? (<span
+                href="#"
+                onClick={() => makePayment(cell)
+                }
+                id="tooltip-1"
+            >
+                <Button type="button" className="btn btn-success">
+                    Pay now
+                </Button>
+                <i className="far fa-trash-alt" />
+            </span>) : null}
         </div>
     )
 }
 
+const downloadFormatter = (refObj) => (cell, row, enumObject) => {
+    return (
+        <div>
+            {
+                <a
+                    href={`${process.env.REACT_APP_API_URL}/ksb-group-excel/succeed-file/${cell}`}
+                    title="Download"
+                >
+                    {cell}
+                </a>}
+
+        </div>
+    )
+}
+
+
+
+const makePayment = cell => {
+    window.location = `${process.env.REACT_APP_PAYMENT_URL}/razorpay/micro_group_pay.php?batch_id=${cell}`
+}
+
+const paymentStatusFormatter = (refObj) => (cell, row, enumObject) => {
+    return (
+        <div>
+            {cell.status_name ? cell.status_name : null}
+        </div>
+    )
+}
 class KSB_File_Micro extends Component {
     constructor(props) {
         super(props);
@@ -85,6 +126,8 @@ class KSB_File_Micro extends Component {
             ksbFileList: []
         };
     }
+
+
 
     fileUpload = async (uploadFile, setFieldValue, setFieldTouched) => {
 
@@ -168,7 +211,6 @@ class KSB_File_Micro extends Component {
             })
             .catch(err => {
                 this.props.loadingStop();
-                console.log(err);
             });
     }
 
@@ -195,40 +237,39 @@ class KSB_File_Micro extends Component {
         this.batchList()
     }
 
-    
+
     KSBFileDelete = (cell) => {
         swal({
-          title: 'Delete',
-          text: 'Delete File',
-          icon: "warning",
-          buttons: true,
-          dangerMode: true,
-      }).then((willDelete) => {
-        if (willDelete) {
-            axios.get(`ksb-group-excel/delete-batch/${cell}`)
-            .then(res => {
-                if(res.data.error == false) {
-                swal(res.data.msg, {
-                    icon: "success",
-                }).then(() => {
-                    this.batchList();
-                });
-                }
-                else {
-                    swal("", res.data.msg, 'error');
-                }
-            })
-            .catch(err => {
-              swal("", err.data.msg, 'error');
-              this.props.loadingStop();
-            });
-          }
+            title: 'Delete',
+            text: 'Delete File',
+            icon: "warning",
+            buttons: true,
+            dangerMode: true,
+        }).then((willDelete) => {
+            if (willDelete) {
+                axios.get(`ksb-group-excel/delete-batch/${cell}`)
+                    .then(res => {
+                        if (res.data.error == false) {
+                            swal(res.data.msg, {
+                                icon: "success",
+                            }).then(() => {
+                                this.batchList();
+                            });
+                        }
+                        else {
+                            swal("", res.data.msg, 'error');
+                        }
+                    })
+                    .catch(err => {
+                        swal("", err.data.msg, 'error');
+                        this.props.loadingStop();
+                    });
+            }
         });
-      }
+    }
 
     KSBFileDownload(cell) {
         const url = `${process.env.REACT_APP_API_URL}/ksb-group-excel/succeed-file/${cell}`;
-        console.log(url);
         this.props.loadingStart();
         const anchortag = document.createElement('a');
         anchortag.style.display = 'none';
@@ -241,7 +282,6 @@ class KSB_File_Micro extends Component {
     downloadErrorFile = () => {
         const { tempBatchId } = this.state;
         const url = `${process.env.REACT_APP_API_URL}/ksb-group-excel/error-file/${tempBatchId}`;
-        console.log(url);
         this.props.loadingStart();
         const anchortag = document.createElement('a');
         anchortag.style.display = 'none';
@@ -254,7 +294,6 @@ class KSB_File_Micro extends Component {
     downloadSampleFile = () => {
         const { tempBatchId } = this.state;
         const url = `${process.env.REACT_APP_API_URL}/ksb-group-excel/sample-file`;
-        console.log(url);
         this.props.loadingStart();
         const anchortag = document.createElement('a');
         anchortag.style.display = 'none';
@@ -264,7 +303,7 @@ class KSB_File_Micro extends Component {
         this.props.loadingStop();
     }
 
-    
+
 
     batchList = () => {
         const formData = new FormData();
@@ -298,7 +337,7 @@ class KSB_File_Micro extends Component {
 
         formData.append('user_type', user_type);
         formData.append('master_id', master_id);
-        formData.append('user_id', user_id);       
+        formData.append('user_id', user_id);
         formData.append('product_id', productId);
         this.props.loadingStart();
         axios
@@ -308,7 +347,7 @@ class KSB_File_Micro extends Component {
                     this.setState({
                         ksbFileList: res.data.data.batch_details
                     })
-                } else {                
+                } else {
                     this.setState({
                         ksbFileList: []
                     })
@@ -317,12 +356,37 @@ class KSB_File_Micro extends Component {
             })
             .catch(err => {
                 this.props.loadingStop();
-                console.log(err);
             });
     }
 
     componentDidMount() {
         this.fetchBranches();
+        this.paymentmesg();
+
+    }
+
+    paymentmesg = () => {
+        const payment_status = queryString.parse(this.props.location.search).status;
+        const access_id = queryString.parse(this.props.location.search).access_id;
+        if (access_id !== '' && payment_status == 'pay_success') {
+            axios
+                .get(`group-excel/check-payment-status/${access_id}`)
+                .then(res => {
+                    if (!res.data.error) {
+                        swal(res.data.msg, {
+                            icon: "success",
+                        })
+                    } else {
+                        swal(res.data.msg, {
+                            icon: "error",
+                        })
+                    }
+                    this.props.loadingStop();
+                })
+                .catch(err => {
+                    this.props.loadingStop();
+                });
+        }
     }
 
     render() {
@@ -379,7 +443,7 @@ class KSB_File_Micro extends Component {
                                                 {({ values, errors, setFieldValue, setFieldTouched, touched }) => {
                                                     return (
                                                         <Form>
-                                                            <div className="row formSection">
+                                                            {/* <div className="row formSection">
                                                                 <label className="col-md-4">Branch:</label>
                                                                 <div className="col-md-4">
                                                                     <Field
@@ -403,12 +467,12 @@ class KSB_File_Micro extends Component {
                                                                         <span className="errorMsg">{errors.ksb_branch_id}</span>
                                                                     ) : null}
                                                                 </div>
-                                                            </div>
+                                                            </div> */}
 
                                                             <div className="row formSection">
                                                                 <label className="col-md-4">Upload the FPO-KSB file:</label>
                                                                 <div className="col-md-4">
-                                                                    <input type="file" key={this.state.theInputKey || '' } name="fpo_ksb_file"
+                                                                    <input type="file" key={this.state.theInputKey || ''} name="fpo_ksb_file"
                                                                         onChange={(e) => {
                                                                             const { target } = e
                                                                             if (target.value.length > 0) {
@@ -420,13 +484,14 @@ class KSB_File_Micro extends Component {
                                                                         <span className="errorMsg">{errors.fpo_ksb_file}</span>
                                                                     ) : null}
                                                                 </div>
+                                                                <div className="cntrbtn">
+                                                                    <Button className={`btnPrimary`} type="submit" >
+                                                                        Upload
+                                                                    </Button>
+                                                                </div>
                                                             </div>
 
-                                                            <div className="cntrbtn">
-                                                                <Button className={`btnPrimary`} type="submit" >
-                                                                    Upload
-                                                                </Button>
-                                                            </div>
+
                                                         </Form>
                                                     );
                                                 }}
@@ -438,7 +503,6 @@ class KSB_File_Micro extends Component {
 
                                                 </>
                                             ) : null}
-
                                             <Fragment>
                                                 <div className="contBox m-b-45 tickedTable" style={{ marginTop: "50px" }}>
                                                     <h4 className="text-center mt-3 mb-3">KSB Uploaded Files</h4>
@@ -451,11 +515,11 @@ class KSB_File_Micro extends Component {
                                                             hover
                                                             wrapperClasses="table-responsive"
                                                         >
-                                                            <TableHeaderColumn width="100px" dataField='batch_no' isKey >Batch Code</TableHeaderColumn>
-                                                            <TableHeaderColumn width='100px' dataField='status' dataFormat={(cell) => (cell == '1' ? 'Excel uploaded' : 'Premium calculated')} >Status</TableHeaderColumn>
+                                                            <TableHeaderColumn width="100px" dataField='batch_no' isKey dataFormat={downloadFormatter(this)}>Batch Code</TableHeaderColumn>
+                                                            <TableHeaderColumn width='100px' dataField='microbatchstatus' dataFormat={paymentStatusFormatter(this)} >Status</TableHeaderColumn>
                                                             <TableHeaderColumn width='100px' dataField='total_members' >Total Member</TableHeaderColumn>
                                                             <TableHeaderColumn width='100px' dataField='all_total_premium' >Total Premium</TableHeaderColumn>
-                                                            <TableHeaderColumn width='100px' dataField='uploded_time'  dataFormat={(cell) => (cell !== '0000-00-00 00:00:00' ? moment(cell).format("DD-MM-YYYY") : '')}>Upload Date</TableHeaderColumn>
+                                                            <TableHeaderColumn width='100px' dataField='uploded_time' dataFormat={(cell) => (cell !== '0000-00-00 00:00:00' ? moment(cell).format("DD-MM-YYYY") : '')}>Upload Date</TableHeaderColumn>
                                                             <TableHeaderColumn width='150px' dataField='batch_no' dataFormat={actionFormatter(this)} >Action</TableHeaderColumn>
                                                         </BootstrapTable>
                                                     </div>
@@ -479,7 +543,7 @@ class KSB_File_Micro extends Component {
                                                     </div>
                                                     <div className="cntrbtn">
                                                         <Button className={`btnPrimary`} disabled="true" >
-                                                            Pay Now
+                                                            Pay now
                                                         </Button>
                                                     </div>
                                                 </Fragment>

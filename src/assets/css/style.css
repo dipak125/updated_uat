@@ -1633,3 +1633,7 @@ li.nav-item.dropdown select.listSelect {
 .canvas-container {
     height:  60vh;
   }
+/* --- Short term width */
+  .inputfs12ST {
+      width: 189px;
+  }

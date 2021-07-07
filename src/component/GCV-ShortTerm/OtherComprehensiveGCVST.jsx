@@ -1364,6 +1364,7 @@ class OtherComprehensiveGCV extends Component {
         let maxBodyVal = PolicyArray.length > 0 ? (PolicyArray[0].PolicyRiskList[0].MSP - (PolicyArray[0].PolicyRiskList[0].MSP * (depreciationPercentage / 100))) : 0
 
         let minBodyIDV = 0
+        //let maxBodyIDV = PolicyArray.length > 0 ? Math.floor(maxBodyVal / 2) : 0
         let maxBodyIDV = PolicyArray.length > 0 ? Math.floor(maxBodyVal / 2) : 0
         //let defaultBodySliderValue =  motorInsurance && motorInsurance.body_idv_value ? Math.round(motorInsurance.body_idv_value) : 0
         let defaultBodySliderValue = bodySliderVal

@@ -11,7 +11,8 @@ const images = require.context('../../../assets/images', true);
 
 class SideNav extends Component {
   state = {
-    userMenu : []
+    userMenu : [],
+    login_type: []
   }
 
 
@@ -60,16 +61,17 @@ class SideNav extends Component {
   checkBC = () => {
     const formData = new FormData();
     let encryption = new Encryption();
-    // let post_data = {};
     let user_data = sessionStorage.getItem("users")
       ? JSON.parse(sessionStorage.getItem("users"))
       : "";
     if (user_data) {
-      user_data = JSON.parse(encryption.decrypt(user_data.userMenu));
+      let login_type = JSON.parse(encryption.decrypt(user_data.user));
+      user_data = JSON.parse(encryption.decrypt(user_data.userMenu));     
       let userMenu =  user_data ? user_data : null
-      // console.log('user_data------>',userMenu)
+      console.log('login_type------>',login_type)
       this.setState ({
-        userMenu
+        userMenu, 
+        login_type
       })
     }
   }
@@ -79,13 +81,13 @@ class SideNav extends Component {
   }
 
   render() {
-    const { userMenu } = this.state
+    const { userMenu, login_type } = this.state
     let childPhrase = localStorage.getItem("phrases") ? JSON.parse(localStorage.getItem("phrases")) : null
     let url_prefix = "../../../assets/images"
 
     return (
       <>
-      {childPhrase ?
+      {childPhrase && login_type.bc_master_id != '9' ?
         <nav className="flex-fill leftNav">
           <ul className="navPan">
             {userMenu && userMenu.length && userMenu.map((values,index) => (

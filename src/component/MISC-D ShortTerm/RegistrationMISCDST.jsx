@@ -370,10 +370,10 @@ regnoFormat = (e, setFieldTouched, setFieldValue) => {
         const {motorInsurance, subVehicleList} = this.state
 	    var tempRegNo = motorInsurance && motorInsurance.registration_part_numbers && JSON.parse(motorInsurance.registration_part_numbers)
         const newInitialValues = Object.assign(initialValues,{
-	        reg_number_part_one: tempRegNo && tempRegNo.reg_number_part_one,
-            reg_number_part_two: tempRegNo && tempRegNo.reg_number_part_two,
-            reg_number_part_three: tempRegNo && tempRegNo.reg_number_part_three,
-            reg_number_part_four: tempRegNo && tempRegNo.reg_number_part_four,
+	        reg_number_part_one: tempRegNo ? tempRegNo.reg_number_part_one : "",
+            reg_number_part_two: tempRegNo ? tempRegNo.reg_number_part_two : "",
+            reg_number_part_three: tempRegNo ? tempRegNo.reg_number_part_three : "",
+            reg_number_part_four: tempRegNo ? tempRegNo.reg_number_part_four : "",
             regNumber: motorInsurance && motorInsurance.registration_no ? motorInsurance.registration_no : "",
             policy_type: "2",
             policy_for: '1',

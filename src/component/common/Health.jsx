@@ -26,6 +26,8 @@ class Health extends Component {
             this.props.history.push(`/arogya_Health/${productId}`);
         if (productId == '20')
             this.props.history.push(`/Health_Micro/${productId}`);
+        if (productId == '21')
+            this.props.history.push(`/Health_Group/${productId}`);
         if (productId == '22')
             this.props.history.push(`/Health_KSB_Micro/${productId}`);
         if (productId == '23')

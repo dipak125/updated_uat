@@ -156,6 +156,33 @@ const PolicyDetails_Micro = Loadable({
     loading: () => loadingContent
 });
 
+// ========== AROGYA SANJEEVANI MICRO GROUP =============================================
+
+const Health_Group = Loadable({
+    loader: () => import(/*webpackChunkName: "Products" */"../Micro Products/Arogya-Sanjeevani-Group/InformationYourself_Group.jsx"),
+    loading: () => loadingContent
+});
+const MedicalDetails_Group = Loadable({
+    loader: () => import(/*webpackChunkName: "Products" */"../Micro Products/Arogya-Sanjeevani-Group/MedicalDetails_Group.jsx"),
+    loading: () => loadingContent
+});
+const SelectDuration_Group = Loadable({
+    loader: () => import(/*webpackChunkName: "Products" */"../Micro Products/Arogya-Sanjeevani-Group/SelectDuration_Group.jsx"),
+    loading: () => loadingContent
+});
+const Address_Group = Loadable({
+    loader: () => import(/*webpackChunkName: "Products" */"../Micro Products/Arogya-Sanjeevani-Group/Address_Group.jsx"),
+    loading: () => loadingContent
+});
+const NomineeDetails_Group = Loadable({
+    loader: () => import(/*webpackChunkName: "Products" */"../Micro Products/Arogya-Sanjeevani-Group/NomineeDetails_Group.jsx"),
+    loading: () => loadingContent
+});
+const PolicyDetails_Group = Loadable({
+    loader: () => import(/*webpackChunkName: "Products" */"../Micro Products/Arogya-Sanjeevani-Group/PolicyDetails_Group.jsx"),
+    loading: () => loadingContent
+});
+
 // =======================================================
 
 const ThankYou = Loadable({
@@ -537,6 +564,13 @@ const IPA_Premium = Loadable({
     loading: () => loadingContent
 });
 
+// =================== INDIVIDUAL PERSONAL ACCIDENT  Micro Group =============================== //
+
+const AccidentSelectPlan_Micro_Group = Loadable({
+    loader: () => import(/*webpackChunkName: "Products" */"../Micro Products/IndividualPersonalAccident-Micro-Group/IPA_File_Micro"),
+    loading: () => loadingContent
+});
+
 // =================== INDIVIDUAL PERSONAL ACCIDENT  Micro =============================== //
 
 const AccidentSelectPlan_Micro = Loadable({
@@ -710,7 +744,7 @@ class Routes extends Component {
                         <PrivateRoute exact path="/Address/:productId" component={Address} />
                         <PrivateRoute exact path="/NomineeDetails/:productId" component={NomineeDetails} />
                         <PrivateRoute exact path="/PolicyDetails/:productId" component={PolicyDetails} />
-                        {/* <PrivateRoute exact path="/PolicySummery/:productId" component={PolicySummery} />                  */}
+                        {/* <PrivateRoute exact path="/PolicySummery/:productId" component={PolicySummery} /> */}
                         <PrivateRoute exact path="/ThankYou/:policyId" component={ThankYou} />
                         <PrivateRoute exact path="/ThankYouCCM" component={ThankYouCCM} />
 
@@ -722,6 +756,16 @@ class Routes extends Component {
                         <PrivateRoute exact path="/Address_Micro/:productId" component={Address_Micro} />
                         <PrivateRoute exact path="/NomineeDetails_Micro/:productId" component={NomineeDetails_Micro} />
                         <PrivateRoute exact path="/PolicyDetails_Micro/:productId" component={PolicyDetails_Micro} />
+
+                        {/* ============================ Arogya Sanjeevani Micro Group ================================ */}
+
+                        <PrivateRoute exact path="/Health_Group/:productId" component={Health_Group} />
+                        <PrivateRoute exact path="/MedicalDetails_Group/:productId" component={MedicalDetails_Group} />
+                        <PrivateRoute exact path="/SelectDuration_Group/:productId" component={SelectDuration_Group} />
+                        <PrivateRoute exact path="/Address_Group/:productId" component={Address_Group} />
+                        <PrivateRoute exact path="/NomineeDetails_Group/:productId" component={NomineeDetails_Group} />
+                        <PrivateRoute exact path="/PolicyDetails_Group/:productId" component={PolicyDetails_Group} />
+
 
                         {/* ======================================== M4W Comprehensive ===================================================== */}
 
@@ -748,6 +792,9 @@ class Routes extends Component {
                         <PrivateRoute exact path="/AccidentAdditionalDetails_Micro/:productId" component={AccidentAdditionalDetails_Micro} />
                         <PrivateRoute exact path="/AccidentAdditionalPremium_Micro/:productId" component={IPA_Premium_Micro} />
 
+                        {/* ******************* Individual Personal Accident Micro Group ************* */}
+                        <PrivateRoute exact path="/AccidentSelectPlan_Micro_Group/:productId" component={AccidentSelectPlan_Micro_Group} />
+                        
                         {/* ********************* AROGYA TOPUP ***************** */}
 
                         <PrivateRoute exact path="/arogya_Health/:productId" component={arogya_Health} />

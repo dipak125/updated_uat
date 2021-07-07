@@ -16,6 +16,7 @@ import "react-datepicker/dist/react-datepicker.css";
 import "react-datepicker/dist/react-datepicker-cssmodules.min.css";
 import { addDays } from "date-fns";
 import moment from "moment";
+import Select from 'react-select';
 
 const initialValues = {
   pol_start_date: "",
@@ -106,7 +107,8 @@ class AccidentAddDetails extends Component {
     this.setState({
       serverResponse: [],
       error: [],
-      declineStatus
+      declineStatus,
+      selectedOption: []
     })
   }
 
@@ -257,8 +259,14 @@ class AccidentAddDetails extends Component {
       });
   };
 
+  handleSelectedValChange = (selectedOption,setFieldValue,setFieldTouched)  => {
+    setFieldValue('occupation_id', selectedOption.value)
+    this.setState({ selectedOption });
+    console.log(`Option selected:`, selectedOption);
+  };
+
   render() {
-    const { occupationList, accidentDetails, requestedData, serverResponse, validation_error, error } = this.state;
+    const { occupationList, accidentDetails, requestedData, serverResponse, validation_error, error, selectedOption } = this.state;
     const { productId } = this.props.match.params
     const newInitialValues = Object.assign(initialValues, {
       pol_start_date: requestedData && requestedData.start_date ? new Date(requestedData.start_date) : new Date(),
@@ -272,8 +280,7 @@ class AccidentAddDetails extends Component {
       occupation_id: accidentDetails && accidentDetails.ipainfo && accidentDetails.ipainfo.occupation ? accidentDetails.ipainfo.occupation.id : "",
       gender: accidentDetails ? accidentDetails.gender : ""
     });
-    console.log("validation_error-------- ", validation_error)
-    console.log("error-------- ", error)
+    
     const errMsg = error && error.message ? (
       <span className="errorMsg"><h6><strong>{error.message}</strong></h6></span>
       // <span className="errorMsg"><h6><strong>Thank you for showing your interest for buying product.Due to some reasons, we are not able to issue the policy online.Please call 1800 22 1111</strong></h6></span>                                
@@ -294,21 +301,31 @@ class AccidentAddDetails extends Component {
         ))
       ) : null;
 
+      const options = 
+        occupationList && occupationList.length > 0 ? occupationList.map((insurer, qIndex) => (
+          { value: insurer.id, label: insurer.occupation }
+        )) : []
+        
+
+      // const options = [
+      //   { value: 'chocolate', label: 'Chocolate' },
+      //   { value: 'strawberry', label: 'Strawberry' },
+      //   { value: 'vanilla', label: 'Vanilla' },
+      // ];
+
     return (
       <>
         <BaseComponent>
-		<div className="page-wrapper">
+		    <div className="page-wrapper">
           <div className="container-fluid">
             <div className="row">
-			
-			
+
              <aside className="left-sidebar">
- <div className="scroll-sidebar ps-container ps-theme-default ps-active-y">
-<SideNav />
- </div>
-</aside>
-			  
-			  
+            <div className="scroll-sidebar ps-container ps-theme-default ps-active-y">
+            <SideNav />
+            </div>
+            </aside>
+			  		  
               <div className="col-sm-12 col-md-12 col-lg-12 col-xl-12 infobox add2">
                 <h4 className="text-center mt-3 mb-3">
                   SBI General Insurance Company Limited
@@ -323,7 +340,7 @@ class AccidentAddDetails extends Component {
                       validationSchema={vehicleRegistrationValidation}
                     >
                       {({ values, errors, setFieldValue, setFieldTouched, isValid, isSubmitting, touched }) => {
-                        // console.log('values',values)
+                        console.log('values------------------',values)
 
                         return (
                           <Form>
@@ -530,7 +547,7 @@ class AccidentAddDetails extends Component {
                             <Row>
                             <Col sm={6} md={6} lg={9}>
                                 <FormGroup>
-                                  <div className="formSection">
+                                  {/* <div className="formSection">
                                     <Field
                                       name="occupation_id"
                                       component="select"
@@ -550,6 +567,20 @@ class AccidentAddDetails extends Component {
                                         <option key={qIndex} value={insurer.id} > {insurer.occupation} </option>
                                       ))}
                                     </Field>
+                                    {errors.occupation_id && touched.occupation_id ? (
+                                      <span className="errorMsg">
+                                        {errors.occupation_id}
+                                      </span>
+                                    ) : null}
+                                  </div> */}
+                                  <div className="formSection">
+                                  <Select
+                                  placeholder = "Select Occupation"
+                                  value={selectedOption ? selectedOption : options ? options.find(option => option.value === values.occupation_id ) : ''}
+                                  name='occupation_id'
+                                  onChange={(e)=>this.handleSelectedValChange(e,setFieldValue,setFieldTouched)}
+                                  options={options}
+                                  />
                                     {errors.occupation_id && touched.occupation_id ? (
                                       <span className="errorMsg">
                                         {errors.occupation_id}

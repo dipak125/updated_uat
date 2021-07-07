@@ -24,6 +24,9 @@ class Others extends Component {
         if(productId == '24'){
             this.props.history.push(`/AccidentSelectPlan_Micro/${productId}`);
         }
+        if(productId == '25'){
+            this.props.history.push(`/AccidentSelectPlan_Micro_Group/${productId}`);
+        }
     }
 
 

@@ -268,9 +268,9 @@ class OtherDetails_sukhsam extends Component {
                         // is_claim: decryptResp.data.policyHolder.sookshamainfo.is_claim,
                         // previous_policy_check: decryptResp.data.policyHolder.previouspolicy.policy_no ? 1 : 0,
 
-                        financial_party: decryptResp.data.policyHolder.sookshamainfo.financial_party ? decryptResp.data.policyHolder.sookshamainfo.financial_party : "",      
+                        financial_party: decryptResp.data.policyHolder.sookshamainfo.financial_party ? decryptResp.data.policyHolder.sookshamainfo.financial_party : "",
                         financial_modgaged : decryptResp.data.policyHolder.sookshamainfo.financial_modgaged ? decryptResp.data.policyHolder.sookshamainfo.financial_modgaged : "",
-                        financer_name: decryptResp.data.policyHolder.sookshamainfo.financer_name
+                        financer_name: decryptResp.data.policyHolder.sookshamainfo.financer_name ? decryptResp.data.policyHolder.sookshamainfo.financer_name : ""
         
                     });
 
@@ -363,7 +363,7 @@ class OtherDetails_sukhsam extends Component {
                         </aside>
                             
                         <div className="col-sm-12 col-md-12 col-lg-12 col-xl-12 infobox otherDetail2">
-                        <h4 className="text-center mt-3 mb-3">SME – Pre UW Package Sookshma Udyog</h4>
+                        <h4 className="text-center mt-3 mb-3">SME Package Insurance</h4>
                         <section className="brand m-b-25">
                             <div className="brand-bg">
                                 <Formik initialValues={newInitialValues} onSubmit={this.handleSubmit} 

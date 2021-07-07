@@ -249,7 +249,7 @@ class LogIn extends Component {
                             setTimeout(
                                 function() {                              
                                     this.props.history.push('/Products')
-                                    window.location.reload(true);             
+                                    // window.location.reload(true);             
                                 }
                                 .bind(this),
                                 300

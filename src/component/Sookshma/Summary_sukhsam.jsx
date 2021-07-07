@@ -293,7 +293,7 @@ class Summary_sukhsam extends Component {
 
                             <div className="col-sm-12 col-md-12 col-lg-10 col-xl-10 infobox">
                                 <div className="text">
-                                <h4 className="text-center mt-3 mb-0">SME – Pre UW Package Sookshma Udyog</h4>
+                                <h4 className="text-center mt-3 mb-0">SME Package Insurance</h4>
                                 </div>
                                 <h1 className="text-center mt-3 mb-4"> {" "} </h1>
                                 <Formik initialValues={initialValue} onSubmit={this.handleSubmit}
@@ -306,7 +306,7 @@ class Summary_sukhsam extends Component {
                                                 <section className="brand m-t-11 m-b-25">
                                                     <div className="d-flex justify-content-left">
                                                         <div className="brandhead m-b-10">
-                                                            <h4>SME – Pre UW Package Sookshma Udyog </h4>
+                                                            <h4>SME Package Insurance </h4>
                                                             <p>You are just one steps away in getting your policy ready.</p> <p>Your Quotation Number is: <span><strong>{this.state.quoteId}</strong></span></p>
                                                         </div>
                                                     </div>

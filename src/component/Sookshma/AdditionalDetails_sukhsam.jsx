@@ -61,11 +61,14 @@ const vehicleRegistrationValidation = Yup.object().shape({
     first_name: Yup.string().required('First Name is required').min(3, function() {return "First name must be 3 characters"}).max(40,function() {
         return "Full name must be maximum 40 characters"
     }).matches(/^[A-Za-z]+$/, function() {return "Please enter valid first name"}).nullable(),
-    last_name: Yup.string().required('Last Name is required').min(1, function() {return "Last name must be 1 characters"}).max(40, function() {return "Full name must be maximum 40 characters"})
-    .matches(/^[A-Za-z]+$/, function() {
-        return "Please enter valid last name"
-    }).nullable(),
-    // last_name: Yup.string().required('Name is required').nullable(),
+    // last_name: Yup.string().notRequired('Last Name is required').min(1, function() {return "Last name must be 1 characters"}).max(40, function() {return "Full name must be maximum 40 characters"})
+    // .matches(/^[A-Za-z]+$/, function() {
+    //     return "Please enter valid last name"
+    // }).nullable(),
+    last_name: Yup.string().notRequired('Name is required')
+        .matches(/^[A-Za-z]+$/, function() {
+            return "Please enter valid last name"
+        }).nullable(),
     date_of_birth: Yup.date().required("Please enter date of birth").nullable(),
     email_id: Yup.string().email().required('Email is required').min(8, function() {
         return "Email must be minimum 8 characters"
@@ -563,9 +566,9 @@ class AdditionalDetails_sukhsam extends Component {
                         // is_claim: decryptResp.data.policyHolder.sookshamainfo.is_claim,
                         // previous_policy_check: decryptResp.data.policyHolder.previouspolicy.policy_no ? 1 : 0,
 
-                        financial_party: decryptResp.data.policyHolder.sookshamainfo.financial_party,  
-                        financial_modgaged : decryptResp.data.policyHolder.sookshamainfo.financial_modgaged,
-                        financer_name: decryptResp.data.policyHolder.sookshamainfo.financer_name
+                        financial_party: decryptResp.data.policyHolder.sookshamainfo.financial_party ? decryptResp.data.policyHolder.sookshamainfo.financial_party : "",
+                        financial_modgaged : decryptResp.data.policyHolder.sookshamainfo.financial_modgaged ? decryptResp.data.policyHolder.sookshamainfo.financial_modgaged : "",
+                        financer_name: decryptResp.data.policyHolder.sookshamainfo.financer_name ? decryptResp.data.policyHolder.sookshamainfo.financer_name : ""
         
                     });
                 }
@@ -667,7 +670,7 @@ class AdditionalDetails_sukhsam extends Component {
 
                             
                         <div className="col-sm-12 col-md-12 col-lg-10 col-xl-10 infobox">
-                        <h4 className="text-center mt-3 mb-3">SME – Pre UW Package Sookshma Udyog</h4>
+                        <h4 className="text-center mt-3 mb-3">SME Package Insurance</h4>
 
                         <section className="brand m-b-25">
                             <div className="brand-bg">
