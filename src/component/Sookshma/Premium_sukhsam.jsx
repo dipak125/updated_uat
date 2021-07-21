@@ -179,7 +179,7 @@ class Premium_sukhsam extends Component {
 
                     this.props.setRiskData(
                         {
-                            house_building_name:risk_arr.house_building_name,
+                            shop_building_name:risk_arr.shop_building_name,
                             block_no:risk_arr.block_no,
                             street_name:risk_arr.street_name,
                             plot_no:risk_arr.plot_no,
@@ -287,6 +287,8 @@ class Premium_sukhsam extends Component {
         queryString.parse(this.props.location.search).access_id : 
         localStorage.getItem("policyHolder_refNo")
 
+        let phrases = localStorage.getItem("phrases") ? JSON.parse(localStorage.getItem("phrases")) : null
+        
         const errMsg =
             error && error.message ? (
                 <span className="errorMsg">
@@ -396,7 +398,7 @@ class Premium_sukhsam extends Component {
                                                                         <Row>
                                                                             <Col sm={12} md={3}>
                                                                                 <div className="motopremium">
-                                                                                    Premium:
+                                                                                {phrases['Premium']}:
                                                                                 </div>
                                                                             </Col>
 
@@ -420,7 +422,7 @@ class Premium_sukhsam extends Component {
 
                                                                             <Col sm={12} md={3}>
                                                                                 <div className="motopremium">
-                                                                                    Gross Premium:
+                                                                                {phrases['GrossPremium']}:
                                                                                 </div>
                                                                             </Col>
 

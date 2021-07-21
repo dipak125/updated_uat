@@ -257,6 +257,8 @@ class IPA_Premium_Micro extends Component {
     const { fulQuoteResp, error, show, policyHolderDetails, nomineeDetails, paymentStatus, policyCoverage, relationArr, 
       ipaInfo, bcMaster, paymentgateway, vehicleDetails } = this.state;
 
+    let phrases = localStorage.getItem("phrases") ? JSON.parse(localStorage.getItem("phrases")) : null
+
     const policyCoverageList =  policyCoverage && policyCoverage.length > 0 ?
     policyCoverage.map((coverage, qIndex) => (
         coverage.PolicyBenefitList && coverage.PolicyBenefitList.map((benefit, bIndex) => (
@@ -509,7 +511,7 @@ class IPA_Premium_Micro extends Component {
                                                     </FormGroup>
                                                   </Col>
                                                   <Col sm={12} md={6} lg={3}>
-                                                    <FormGroup>Gross Premium:</FormGroup>
+                                                    <FormGroup>{phrases['GrossPremium']}:</FormGroup>
                                                   </Col>
                                                   <Col sm={12} md={6} lg={3}>
                                                     <FormGroup>
@@ -518,7 +520,7 @@ class IPA_Premium_Micro extends Component {
                                                     </FormGroup>
                                                   </Col>
                                                   <Col sm={12} md={6} lg={3}>
-                                                    <FormGroup>Net Premium:</FormGroup>
+                                                    <FormGroup>{phrases['Premium']}:</FormGroup>
                                                   </Col>
                                                   <Col sm={12} md={6} lg={3}>
                                                     <FormGroup>

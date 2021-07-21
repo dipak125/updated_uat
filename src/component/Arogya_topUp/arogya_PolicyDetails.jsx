@@ -243,6 +243,7 @@ sendPaymentLink = () => {
     const { fulQuoteResp, addressArray, error, serverResponse, policyHolderDetails, nomineedetails, paymentStatus,
       paymentgateway, bcMaster, menumaster, request_data } = this.state;
 
+    let phrases = localStorage.getItem("phrases") ? JSON.parse(localStorage.getItem("phrases")) : null
     const AddressDetails = addressArray ? (
         <div>
           <Row>
@@ -562,7 +563,7 @@ sendPaymentLink = () => {
                                                     </FormGroup>
                                                   </Col>
                                                  <Col sm={12} md={6} lg={3}>
-                                                    <FormGroup>Gross Premium:</FormGroup>
+                                                    <FormGroup>{phrases['GrossPremium']}:</FormGroup>
                                                   </Col>
                                                   <Col sm={12} md={6} lg={3}>
                                                     <FormGroup>
@@ -571,7 +572,7 @@ sendPaymentLink = () => {
                                                     </FormGroup>
                                                   </Col>
                                                   <Col sm={12} md={6} lg={3}>
-                                                    <FormGroup>Net Premium:</FormGroup>
+                                                    <FormGroup>{phrases['Premium']}:</FormGroup>
                                                   </Col>
                                                  <Col sm={12} md={6} lg={3}>
                                                     <FormGroup>

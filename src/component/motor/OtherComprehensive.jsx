@@ -18,6 +18,7 @@ import * as Yup from "yup";
 import swal from 'sweetalert';
 import moment from "moment";
 import {  validRegistrationNumber } from "../../shared/validationFunctions";
+import {  userTypes } from "../../shared/staticValues";
 
 
 let translation = localStorage.getItem("phrases") ? JSON.parse(localStorage.getItem("phrases")) : []
@@ -743,28 +744,34 @@ class OtherComprehensive extends Component {
         let user_data = sessionStorage.getItem("users") ? JSON.parse(sessionStorage.getItem("users")) : "";
         if (user_data.user && total_idv) {
             user_data = JSON.parse(encryption.decrypt(user_data.user));
-
-            if((total_idv> 5000000) && user_data.user_type == "POSP"  ) {
-                swal("Quote cannot proceed with IDV greater than 5000000")
-                this.props.loadingStop();
+            if(userTypes.includes(user_data.login_type) && add_more_coverage.indexOf('B00015') < 0){
+                swal("This cover is mandated by IRDAI, it is compulsory for Owner-Driver to possess a PA cover of minimum Rs 15 Lacs, except in certain conditions. By not choosing this cover, you confirm that you hold an existing PA cover or you do not possess a valid driving license.")
                 return false
             }
-            else {
-                formData.append('enc_data', encryption.encrypt(JSON.stringify(post_data)))
-                this.props.loadingStart();
-                axios.post('update-insured-value', formData).then(res => {
+            else{
+                if((total_idv> 5000000) && user_data.user_type == "POSP"  ) {
+                    swal("Quote cannot proceed with IDV greater than 5000000")
                     this.props.loadingStop();
-                    
-                    if (res.data.error == false) {
-                        this.props.history.push(`/Additional_details/${productId}`);
-                    }
-        
-                })
-                .catch(err => {
-                    // handle error
-                    this.props.loadingStop();
-                })
+                    return false
+                }
+                else {
+                    formData.append('enc_data', encryption.encrypt(JSON.stringify(post_data)))
+                    this.props.loadingStart();
+                    axios.post('update-insured-value', formData).then(res => {
+                        this.props.loadingStop();
+                        
+                        if (res.data.error == false) {
+                            this.props.history.push(`/Additional_details/${productId}`);
+                        }
+            
+                    })
+                    .catch(err => {
+                        // handle error
+                        this.props.loadingStop();
+                    })
+                }
             }
+
         }   
     }
 
@@ -772,7 +779,6 @@ class OtherComprehensive extends Component {
 
         const { add_more_coverage } = this.state;
         var drv = [];
-
 
         if (isSelect) {
             add_more_coverage.push(values);
@@ -827,7 +833,7 @@ class OtherComprehensive extends Component {
                 setFieldTouched("PA_Cover");
                 setFieldValue("PA_Cover", '');
             } 
-            if(values == "B00015") {
+            if(values == "B00015" ) {
                 setFieldTouched("PA_cover_flag");
                 setFieldValue("PA_cover_flag", '0');
             } 

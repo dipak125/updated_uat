@@ -210,7 +210,7 @@ class PolicyDetails extends Component {
     const { fulQuoteResp, error,  serverResponse, policyHolderDetails, refNumber, paymentStatus, nomineeDetails, bcMaster,
        menumaster, request_data, vehicleDetails, paymentgateway } = this.state;
 
-    console.log("policyHolderDetails ", policyHolderDetails)
+    let phrases = localStorage.getItem("phrases") ? JSON.parse(localStorage.getItem("phrases")) : null
     const items =
       fulQuoteResp &&
       fulQuoteResp.PolicyLobList && fulQuoteResp.PolicyLobList.length > 0 && 
@@ -462,7 +462,7 @@ class PolicyDetails extends Component {
                                                     </FormGroup>
                                                   </Col>
                                                    <Col sm={12} md={6} lg={3}>
-                                                    <FormGroup>Gross Premium:</FormGroup>
+                                                    <FormGroup>{phrases['GrossPremium']}:</FormGroup>
                                                   </Col>
                                                    <Col sm={12} md={6} lg={3}>
                                                     <FormGroup>
@@ -471,7 +471,7 @@ class PolicyDetails extends Component {
                                                     </FormGroup>
                                                   </Col>
                                                    <Col sm={12} md={6} lg={3}>
-                                                    <FormGroup>Net Premium:</FormGroup>
+                                                    <FormGroup>{phrases['Premium']}:</FormGroup>
                                                   </Col>
                                                    <Col sm={12} md={6} lg={3}>
                                                     <FormGroup>

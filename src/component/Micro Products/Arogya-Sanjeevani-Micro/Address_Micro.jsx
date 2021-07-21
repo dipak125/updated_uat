@@ -453,6 +453,12 @@ class Address_Micro extends Component {
                 this.props.loadingStop();
             })          
         }       
+        else {
+            this.setState({
+                pinDataArr: [],
+                stateName: [],
+            });
+        }  
     }
 
     changePlaceHoldClassRemove(e) {

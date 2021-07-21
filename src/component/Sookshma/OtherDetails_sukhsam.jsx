@@ -234,7 +234,7 @@ class OtherDetails_sukhsam extends Component {
 
                     this.props.setRiskData(
                         {
-                            house_building_name:risk_arr.house_building_name,
+                            shop_building_name:risk_arr.shop_building_name,
                             block_no:risk_arr.block_no,
                             street_name:risk_arr.street_name,
                             plot_no:risk_arr.plot_no,
@@ -490,7 +490,7 @@ class OtherDetails_sukhsam extends Component {
                                                                         autoComplete="off"
                                                                         onFocus={e => this.changePlaceHoldClassAdd(e)}
                                                                         onBlur={e => this.changePlaceHoldClassRemove(e)}
-                                                                        value = {this.props.content_sum_insured}     
+                                                                        value = {this.props.content_sum_insured ? Math.round(this.props.content_sum_insured) : 0}     
                                                                         disabled={true}                                                                       
                                                                     />
                                                                     {errors.Contents_Sum_Insured && touched.Contents_Sum_Insured ? (
@@ -516,7 +516,7 @@ class OtherDetails_sukhsam extends Component {
                                                                         autoComplete="off"
                                                                         onFocus={e => this.changePlaceHoldClassAdd(e)}
                                                                         onBlur={e => this.changePlaceHoldClassRemove(e)}
-                                                                        value = {this.props.stock_sum_insured}
+                                                                        value = {this.props.stock_sum_insured ? Math.round(this.props.stock_sum_insured) : 0}
                                                                         disabled={true}                                                                              
                                                                     />
                                                                     {errors.Stocks_Sum_Insured && touched.Stocks_Sum_Insured ? (

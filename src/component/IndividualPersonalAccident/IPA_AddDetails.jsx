@@ -307,16 +307,6 @@ class AccidentAddDetails extends Component {
         )) : []
         
 
-<<<<<<< HEAD
-      
-=======
-      // const options = [
-      //   { value: 'chocolate', label: 'Chocolate' },
-      //   { value: 'strawberry', label: 'Strawberry' },
-      //   { value: 'vanilla', label: 'Vanilla' },
-      // ];
->>>>>>> 0e31e53c369eea5c7cf1dbfeb51d7be55d71d1f3
-
     return (
       <>
         <BaseComponent>

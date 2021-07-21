@@ -297,12 +297,12 @@ const ComprehensiveValidation = Yup.object().shape({
 
             chassisNo: Yup.string().required('Chassis no is required')
                 .matches(/^[0-9A-Za-z]*$/, function () {
-                    return "Invalid chassis No"
+                    return "InvalidChasisNumber"
                 }).min(5, function () {
-                    return "Chassis no. should be minimum 5 characters"
+                    return "ChasisMin"
                 })
                 .max(20, function () {
-                    return "Chassis no. should be maximum 17 characters"
+                    return "ChasisMax"
                 })
         })
     ),
@@ -494,7 +494,7 @@ class OtherComprehensiveMISCD extends Component {
                 else {
                     vehicle_age = moment(previous_end_date).add(1, 'day').diff(registration_date, 'days', true)
                 }
-                console.log("vehicle_age---------- ", vehicle_age)
+                // console.log("vehicle_age---------- ", vehicle_age)
 
                 trailer_array = trailer_array != null ? JSON.parse(trailer_array) : []
                 let values = []
@@ -754,7 +754,7 @@ class OtherComprehensiveMISCD extends Component {
     fullQuote = (access_token, values) => {
         const { PolicyArray, sliderVal, add_more_coverage, motorInsurance, bodySliderVal, vehicleDetails, chasis_price, userIdvStatus, bodyIdvStatus } = this.state
 
-        console.log("values----------------///--- ", values)
+        // console.log("values----------------///--- ", values)
         // let cng_kit_flag = 0;
         // let cngKit_Cost = 0;
         // if(values.toString()) {            
@@ -844,7 +844,7 @@ class OtherComprehensiveMISCD extends Component {
                         serverResponse: res.data.data.PolicyObject,
                         policyCoverage: res.data.data.PolicyObject.PolicyLobList ? res.data.data.PolicyObject.PolicyLobList[0].PolicyRiskList[0].PolicyCoverageList : [],
                     });
-                    console.log('chasis_price', res.data.data.chasis_price)
+                    // console.log('chasis_price', res.data.data.chasis_price)
                 }
                 else if (res.data.data.PolicyObject && res.data.data.UnderwritingResult && res.data.data.UnderwritingResult.Status == "Fail") {
                     var validationErrors = []
@@ -1218,7 +1218,7 @@ class OtherComprehensiveMISCD extends Component {
     };
 
 
-    handleClaims = (values, errors, touched, setFieldTouched, setFieldValue) => {
+    handleClaims = (values, errors, touched, setFieldTouched, setFieldValue, phrases) => {
         let field_array = []
 
         for (var i = 0; i < values.B00007_value; i++) {
@@ -1262,8 +1262,8 @@ class OtherComprehensiveMISCD extends Component {
 
                                     />
                                     {errors.trailer_array && errors.trailer_array[i] && errors.trailer_array[i].chassisNo ? (
-                                        <span className="errorMsg">{errors.trailer_array[i].chassisNo}</span>
-                                    ) : null}
+                                    <span className="errorMsg">{phrases[errors.trailer_array[i].chassisNo]}</span>
+                                    ) : null}   
                                 </div>
                             </FormGroup>
                         </Col>
@@ -1403,7 +1403,7 @@ class OtherComprehensiveMISCD extends Component {
         for (var i = 0; i < covList.length; i++) {
             newInnitialArray[covList[i]] = covList[i];
         }
-        console.log("defaultSliderValue--1111--------- ", defaultSliderValue)
+        // console.log("defaultSliderValue--1111--------- ", defaultSliderValue)
         newInnitialArray.slider = defaultSliderValue
         newInnitialArray.PA_flag = PA_flag
         newInnitialArray.trailer_flag = trailer_flag
@@ -2484,7 +2484,7 @@ class OtherComprehensiveMISCD extends Component {
                                                                             </Fragment> : null
                                                                         }
                                                                         {values.trailer_flag == '1' && values[coverage.code] == 'B00007' && values.B00007_value != "" ?
-                                                                            this.handleClaims(values, errors, touched, setFieldTouched, setFieldValue) : null
+                                                                            this.handleClaims(values, errors, touched, setFieldTouched, setFieldValue, phrases) : null
                                                                         }
                                                                     </Row>
                                                                 )) : null}

@@ -247,7 +247,7 @@ class KSB_File_Micro extends Component {
             dangerMode: true,
         }).then((willDelete) => {
             if (willDelete) {
-                axios.get(`ksb-group-excel/delete-batch/${cell}`)
+                axios.get(`group-excel/delete-batch/${cell}/ksb`)
                     .then(res => {
                         if (res.data.error == false) {
                             swal(res.data.msg, {
@@ -506,7 +506,7 @@ class KSB_File_Micro extends Component {
                                             <Fragment>
                                                 <div className="contBox m-b-45 tickedTable" style={{ marginTop: "50px" }}>
                                                     <h4 className="text-center mt-3 mb-3">KSB Uploaded Files</h4>
-                                                    <div className="customInnerTable dataTableCustom">
+                                                    <div className="customInnerTable dataTableCustom customAlign">
                                                         <BootstrapTable ref="table"
                                                             data={ksbFileList}
                                                             pagination={true}

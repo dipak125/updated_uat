@@ -79,27 +79,11 @@ class Summary_sukhsam extends Component {
     }
 
     handleSubmit = (values) => {
-        // let formDataNew = new FormData(); 
-        // formDataNew.append('menumaster_id',this.props.menumaster_id)
-        // formDataNew.append('policy_ref_no',this.props.policy_holder_ref_no)
-        // this.props.loadingStart();
-        // axios.post('/sme/create-quote',
-        // formDataNew
-        // ).then(res=>{
-        //     axios.post('/sme/con-sequence',
-        //     formDataNew
-        //     ).then(res=>{
+
         const { productId } = this.props.match.params;
         this.props.loadingStop();
         this.props.history.push(`/AdditionalDetails_Sookshma/${productId}`);
-        //     }).
-        //     catch(err=>{
-        //         this.props.loadingStop();
-        //     });
-        // }).
-        // catch(err=>{
-        //     this.props.loadingStop();
-        // });
+
     }
 
     fetchPolicyDetails = () => {
@@ -113,86 +97,6 @@ class Summary_sukhsam extends Component {
                 console.log("decryptResp -------->",decryptResp)
                 let rawData = decryptResp.data
 
-                // if (decryptResp.data.policyHolder.step_no > 0) {
-
-                //     this.props.setData({
-                //         start_date: decryptResp.data.policyHolder.request_data.start_date,
-                //         end_date: decryptResp.data.policyHolder.request_data.end_date,
-
-                //         policy_holder_id: decryptResp.data.policyHolder.id,
-                //         policy_holder_ref_no: policy_holder_ref_no,
-                //         request_data_id: decryptResp.data.policyHolder.request_data.id,
-                //         completed_step: decryptResp.data.policyHolder.step_no,
-                //         menumaster_id: decryptResp.data.policyHolder.menumaster_id
-                //     });
-                // }
-
-                // if (decryptResp.data.policyHolder.step_no == 1 || decryptResp.data.policyHolder.step_no > 1) {
-
-                //     let risk_arr = JSON.parse(decryptResp.data.policyHolder.sookshamainfo.risk_address); 
-
-                //     this.props.setRiskData(
-                //         {
-                //             house_building_name:risk_arr.house_building_name,
-                //             block_no:risk_arr.block_no,
-                //             street_name:risk_arr.street_name,
-                //             plot_no:risk_arr.plot_no,
-                //             house_flat_no:risk_arr.house_flat_no,
-                //             pincode:decryptResp.data.policyHolder.sookshamainfo.pincode,
-                //             pincode_id:decryptResp.data.policyHolder.sookshamainfo.pincode_id,
-
-                //             buildings_si:decryptResp.data.policyHolder.sookshamainfo.buildings_si,
-                //             plant_machinary_si:decryptResp.data.policyHolder.sookshamainfo.plant_machinary_si,
-                //             furniture_fixture_si:decryptResp.data.policyHolder.sookshamainfo.furniture_fixture_si,
-                //             stock_raw_mat:decryptResp.data.policyHolder.sookshamainfo.stock_raw_mat,
-                //             finish_goods:decryptResp.data.policyHolder.sookshamainfo.finish_goods,
-                //             stock_wip:decryptResp.data.policyHolder.sookshamainfo.stock_wip,
-                //         }
-                //     );
-                // }
-
-                // if(decryptResp.data.policyHolder.step_no == 2 || decryptResp.data.policyHolder.step_no > 2){
-
-                //     this.props.setSmeOthersDetails({
-
-                //         Commercial_consideration:decryptResp.data.policyHolder.previouspolicy.Commercial_consideration,
-                //         previous_start_date:decryptResp.data.policyHolder.previouspolicy.start_date,
-                //         previous_end_date:decryptResp.data.policyHolder.previouspolicy.end_date,
-                //         Previous_Policy_No:decryptResp.data.policyHolder.previouspolicy.policy_no,
-                //         insurance_company_id:decryptResp.data.policyHolder.previouspolicy.insurancecompany_id,
-                //         previous_city:decryptResp.data.policyHolder.previouspolicy.address
-
-                //     });
-
-                // }
-
-                // if(decryptResp.data.policyHolder.step_no == 3 || decryptResp.data.policyHolder.step_no > 3){
-
-                //     let address = JSON.parse(decryptResp.data.policyHolder.address);
-
-                //     this.props.setSmeProposerDetails(
-                //         {
-                //             first_name:decryptResp.data.policyHolder.first_name,
-                //             last_name:decryptResp.data.policyHolder.last_name,
-                //             salutation_id:decryptResp.data.policyHolder.salutation_id,
-                //             date_of_birth:decryptResp.data.policyHolder.dob,
-                //             email_id:decryptResp.data.policyHolder.email_id,
-                //             mobile:decryptResp.data.policyHolder.mobile,
-                //             gender:decryptResp.data.policyHolder.gender,
-                //             pan_no:decryptResp.data.policyHolder.pancard,
-                //             gstn_no:decryptResp.data.policyHolder.gstn_no,
-
-                //             com_street_name:address.street_name,
-                //             com_plot_no:address.plot_no,
-                //             com_building_name:address.house_building_name,
-                //             com_block_no:address.block_no,
-                //             com_house_flat_no:address.house_flat_no,
-                //             com_pincode:decryptResp.data.policyHolder.pincode,
-                //             com_pincode_id:decryptResp.data.policyHolder.pincode_id
-                //         }
-                //     );
-                // }
-
                 let pincode_area_arr = JSON.parse(decryptResp.data.policyHolder.pincode_response);
 
                 this.setState(
@@ -201,7 +105,7 @@ class Summary_sukhsam extends Component {
                         // pincodeArea:pincode_area_arr.LCLTY_SUBRB_TALUK_TEHSL_NM != null ? pincode_area_arr.LCLTY_SUBRB_TALUK_TEHSL_NM : 0,
                         quoteId: decryptResp.data.policyHolder.request_data.quote_id != null ? decryptResp.data.policyHolder.request_data.quote_id : 0,
                         gst: decryptResp.data.policyHolder.request_data.service_tax != null ? decryptResp.data.policyHolder.request_data.service_tax : 0,
-                        netPremium: decryptResp.data.policyHolder.request_data.gross_premium != null ? decryptResp.data.policyHolder.request_data.gross_premium : 0,
+                        netPremium: decryptResp.data.policyHolder.request_data.net_premium != null ? decryptResp.data.policyHolder.request_data.net_premium : 0,
                         finalPremium: decryptResp.data.policyHolder.request_data.net_premium != null ? decryptResp.data.policyHolder.request_data.net_premium : 0,
                         rawData: rawData.policyHolder.sookshamainfo.sookshama_coverages != null ? rawData.policyHolder.sookshamainfo.sookshama_coverages : 0,
                     }
@@ -274,7 +178,7 @@ class Summary_sukhsam extends Component {
                 ? rawData.map((listing, qIndex) => (
                     <tr>
                         <td style={({ width: "400px" })}>{listing.coverage.description} :</td>   
-                        <td>{listing.premium == null ? 0 : listing.premium}</td>
+                        <td>{listing.premium == null ? 0 : Math.round(listing.premium)}</td>
                     </tr>
                 ))
                 :  null;
@@ -360,23 +264,23 @@ class Summary_sukhsam extends Component {
                                                                                             {sme_Coverages}
                                                                                             <tr>
                                                                                                 <td style={({ width: "400px" })}>Other Cover Premium :</td>   
-                                                                                                <td>0.00</td>
+                                                                                                <td>0</td>
                                                                                             </tr>
                                                                                             <tr>
                                                                                                 <td style={({ width: "400px" })}>Discount/Loading if any :</td>   
-                                                                                                <td>0.00</td>
+                                                                                                <td>0</td>
                                                                                             </tr>
                                                                                             <tr>
                                                                                                 <td style={({ width: "400px" })}>Taxes as applicable :</td>   
-                                                                                                <td>{this.state.gst}</td>
+                                                                                                <td>{this.state.gst ? Math.round(this.state.gst) : 0}</td>
                                                                                             </tr>
                                                                                             <tr>
                                                                                                 <td style={({ width: "400px" })}>Kerala Cess :</td>   
-                                                                                                <td>0.00</td>
+                                                                                                <td>0</td>
                                                                                             </tr>
                                                                                             <tr>
-                                                                                                <td style={({ width: "400px" })}><strong>Net Premium(₹) :</strong></td>   
-                                                                                                <td><strong>{this.state.netPremium}</strong></td>
+                                                                                                <td style={({ width: "400px" })}><strong>Final Premium(₹) :</strong></td>   
+                                                                                                <td><strong>{this.state.netPremium ? Math.round(this.state.netPremium) : 0}</strong></td>
                                                                                             </tr>
                                                                                         </tbody>
                                                                                     </table>

@@ -279,9 +279,10 @@ class PolicyDetails_Group extends Component {
       fulQuoteResp.PolicyLobList[0].PolicyRiskList
         ? fulQuoteResp.PolicyLobList[0].PolicyRiskList.map((member, qIndex) => {
             return (
-              <div>
+              <div>    
               <Row>
-                <Col sm={12} md={12}>
+                <strong>Member {qIndex + 1}:</strong>
+                <Col sm={12} md={12}>          
                   <Row>
                     <Col sm={12} md={6}>
                       <FormGroup>Name:</FormGroup>
@@ -549,10 +550,16 @@ class PolicyDetails_Group extends Component {
                                           <div className="rghtsideTrigr">
                                             <Collapsible trigger=" Member Details">
                                               <div className="listrghtsideTrigr">{items}</div>
-                                              <strong>Nominee Details :</strong>
+                                            </Collapsible>
+                                          </div>
+
+                                          <div className="rghtsideTrigr">
+                                            <Collapsible trigger=" Nominee Details">
+                                            <strong>Nominee Details :</strong>
                                               <div className="listrghtsideTrigr">{nomineeData}</div>
                                               {nomineeDetails && nomineeDetails.is_appointee == '1' ? <strong>Appointee Details :</strong> : null }
-                                              {nomineeDetails && nomineeDetails.is_appointee == '1' ? <div className="listrghtsideTrigr">{apointeeData}</div> : null }
+                                              {nomineeDetails && nomineeDetails.is_appointee == '1' ? <div className="listrghtsideTrigr">{apointeeData}</div>
+                                              : null}
                                             </Collapsible>
                                           </div>
 
@@ -560,7 +567,7 @@ class PolicyDetails_Group extends Component {
                                             <Collapsible trigger=" Contact information">
                                               <div className="listrghtsideTrigr">
                                                 <div className="d-flex justify-content-end carloan">
-                                                  <Link to ={`/Address/${productId}`}> Edit</Link>
+                                                  <Link to ={`/Address_Group/${productId}`}> Edit</Link>
                                                 </div>
                                                 <Row>
                                                   <Col sm={12} md={12}>

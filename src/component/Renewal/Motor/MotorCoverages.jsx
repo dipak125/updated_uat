@@ -537,8 +537,8 @@ class MotorCoverages extends Component {
                 policyCoverage.map((coverage,Index) => {
                     add_more_coverage.push(coverage.cover_type_id)
                     coverage.renewalsubcoverage && coverage.renewalsubcoverage.length > 0 && coverage.renewalsubcoverage.map((benefit, bIndex) => (
-                        // benefit.interest_premium && parseInt(benefit.interest_premium) != 0 ? add_more_coverage.push(benefit.interest_id) : null
-                        add_more_coverage.push(benefit.interest_id)
+                        benefit.interest_premium && parseInt(benefit.interest_premium) != 0 ? add_more_coverage.push(benefit.interest_id) : null
+                        // add_more_coverage.push(benefit.interest_id)
                         ))
                 })
 
@@ -1230,7 +1230,7 @@ class MotorCoverages extends Component {
         const policyCoverageList =  policyCoverage && policyCoverage.length > 0 ?
             policyCoverage.map((coverage, qIndex) => (
                 coverage.renewalsubcoverage && coverage.renewalsubcoverage.length > 0 ? coverage.renewalsubcoverage.map((benefit, bIndex) => (
-                    // parseInt(benefit.interest_premium) != 0 ?
+                    parseInt(benefit.interest_premium) != 0 ?
                     <div>
                         <Row>
                             <Col sm={12} md={6}>
@@ -1241,9 +1241,9 @@ class MotorCoverages extends Component {
                             </Col>
                         </Row>
                     </div> 
-                    // : null
+                    : null
             )) : 
-            // parseInt(coverage.annual_premium) != 0 ?
+            parseInt(coverage.annual_premium) != 0 ?
             <div>
                 <Row>
                     <Col sm={12} md={6}>
@@ -1254,7 +1254,7 @@ class MotorCoverages extends Component {
                     </Col>
                 </Row> 
             </div> 
-            // : null
+            : null
         )) : null  
 
         const premiumBreakup = policyCoverage && policyCoverage.length > 0 ?

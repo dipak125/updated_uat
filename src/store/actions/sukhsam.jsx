@@ -116,13 +116,13 @@ export const setCommunicationAddress = ( request ) => {
         dispatch({
             type: SUKHSAM_COMM_ADDRESS,
             payload: {
-                com_street_name:request.street_name,
-                com_plot_no:request.plot_no,
-                com_building_name:request.building_name,
+                // com_street_name:request.street_name,
+                // com_plot_no:request.plot_no,
+                // com_building_name:request.building_name,
                 com_pincode:request.pincode,
                 com_pincode_id:request.pincode_id,
-                com_block_no:request.block_no,
-                com_house_flat_no:request.house_flat_no,
+                // com_block_no:request.block_no,
+                // com_house_flat_no:request.house_flat_no,
             }
         });
     }

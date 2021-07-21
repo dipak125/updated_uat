@@ -70,6 +70,11 @@ const PolicySearch = Loadable({
     loading: () => loadingContent
 });
 
+const AgentCashDeposit = Loadable({
+    loader: () => import(/*webpackChunkName: "Deposits" */"../common/ACD/AgentCashDeposit.jsx"),
+    loading: () => loadingContent
+});
+
 const QuoteSearch = Loadable({
     loader: () => import(/*webpackChunkName: "Products" */"../common/QuoteSearch.jsx"),
     loading: () => loadingContent
@@ -892,6 +897,9 @@ class Routes extends Component {
                         {/************ Dashboard ******************/}
                         <PrivateRoute exact path="/PolicySearch" component={PolicySearch} />
                         <PrivateRoute exact path="/QuoteHistory" component={QuoteSearch} />
+
+                        {/************ Agent Cash Deposit ******************/}
+                        <PrivateRoute exact path="/AgentCashDeposit" component={AgentCashDeposit} />
 
                         {/************ Services ******************/}
                         <PrivateRoute exact path="/Services" component={Services} />

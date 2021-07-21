@@ -297,12 +297,12 @@ const ComprehensiveValidation = Yup.object().shape({
 
             chassisNo: Yup.string().required('Chassis no is required')
                 .matches(/^[0-9a-zA-Z]*$/, function () {
-                    return "Invalid chassis No"
+                    return "InvalidChasisNumber"
                 }).min(5, function () {
-                    return "Chassis no. should be minimum 5 characters"
+                    return "ChasisMin"
                 })
                 .max(20, function () {
-                    return "Chassis no. should be maximum 17 characters"
+                    return "ChasisMax"
                 })
         })
     ),
@@ -1215,7 +1215,7 @@ class OtherComprehensiveMISCD extends Component {
     };
 
 
-    handleClaims = (values, errors, touched, setFieldTouched, setFieldValue) => {
+    handleClaims = (values, errors, touched, setFieldTouched, setFieldValue, phrases) => {
         let field_array = []
 
         for (var i = 0; i < values.B00007_value; i++) {
@@ -1259,8 +1259,8 @@ class OtherComprehensiveMISCD extends Component {
 
                                     />
                                     {errors.trailer_array && errors.trailer_array[i] && errors.trailer_array[i].chassisNo ? (
-                                        <span className="errorMsg">{errors.trailer_array[i].chassisNo}</span>
-                                    ) : null}
+                                    <span className="errorMsg">{phrases[errors.trailer_array[i].chassisNo]}</span>
+                                    ) : null}   
                                 </div>
                             </FormGroup>
                         </Col>
@@ -2481,7 +2481,7 @@ class OtherComprehensiveMISCD extends Component {
                                                                             </Fragment> : null
                                                                         }
                                                                         {values.trailer_flag == '1' && values[coverage.code] == 'B00007' && values.B00007_value != "" ?
-                                                                            this.handleClaims(values, errors, touched, setFieldTouched, setFieldValue) : null
+                                                                            this.handleClaims(values, errors, touched, setFieldTouched, setFieldValue, phrases) : null
                                                                         }
                                                                     </Row>
                                                                 )) : null}

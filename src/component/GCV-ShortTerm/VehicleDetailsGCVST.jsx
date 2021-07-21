@@ -327,7 +327,7 @@ const vehicleRegistrationValidation = Yup.object().shape({
                 return "PleaseEPCB"
             },
             function (value) {
-                if (this.parent.previous_is_claim == '1' && !value && this.parent.no_of_claim == '2') {
+                if (this.parent.previous_is_claim == '1' && (!value || value == '1') && this.parent.no_of_claim == '2') {
                     return false;
                 }
                 return true;
@@ -627,8 +627,8 @@ class VehicleDetailsGCV extends Component {
             'no_of_claim': values.no_of_claim,
             'new_policy_duration': values.new_policy_duration,
             'duration': values.duration,
-            'new_policy_start_date': values.new_policy_start_date,
-            'new_policy_end_date': values.new_policy_end_date,
+            'new_policy_start_date': values.new_policy_start_date ? moment(values.new_policy_start_date).format("YYYY-MM-DD") : "",
+            'new_policy_end_date': values.new_policy_end_date ? moment(values.new_policy_end_date).format("YYYY-MM-DD") : "",
             'is_new_policy': 1
         }
 
@@ -900,7 +900,7 @@ class VehicleDetailsGCV extends Component {
             previous_city: previousPolicy && previousPolicy.city ? previousPolicy.city : "",
             previous_policy_no: previousPolicy && previousPolicy.policy_no ? previousPolicy.policy_no : "",
             previous_is_claim: previous_is_claim,
-            previous_claim_bonus: previousPolicy && (previousPolicy.claim_bonus || previousPolicy.claim_bonus == '0') ? Math.floor(previousPolicy.claim_bonus) : "1",
+            previous_claim_bonus: previousPolicy && (previousPolicy.claim_bonus || previousPolicy.claim_bonus == 0) ? previousPolicy.claim_bonus.toString() : "1",
             no_of_claim: previousPolicy && previousPolicy.previouspoliciesclaims ? previousPolicy.previouspoliciesclaims.length : "",
             goodscarriedtypes_id: motorInsurance && motorInsurance.goodscarriedtype_id ? motorInsurance.goodscarriedtype_id : "",
             averagemonthlyusages_id: motorInsurance && motorInsurance.averagemonthlyusage_id ? motorInsurance.averagemonthlyusage_id : "",

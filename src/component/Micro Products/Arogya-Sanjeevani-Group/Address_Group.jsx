@@ -23,7 +23,7 @@ import Encryption from '../../../shared/payload-encryption';
 
 const maxDob = dateformat(new Date(), 'mm/dd/yyyy');
 // const minDobAdult = moment(moment().subtract(56, 'years').calendar()).add(1, 'day').calendar()
-const minDobAdult = moment(moment().subtract(20453, 'day').calendar()).add(1, 'day').calendar()
+const minDobAdult = moment(moment().subtract(23741, 'day').calendar()).add(1, 'day').calendar()
 const maxDobAdult = moment().subtract(18, 'years').calendar();
 
 const initialFamilyDetails = {
@@ -159,19 +159,18 @@ const validateAddress =  Yup.object().shape({
                         .test(
                             "18YearsChecking",
                             function() {
-                                return "Age should me minium 18 years and maximum 55 years"
+                                return "Age should me minium 18 years and maximum 65 years"
                             },
                             function (value) {
                                 if (value) {
                                     const ageObj = new PersonAge();
-                                    return ageObj.whatIsMyAge(value) < 56 && ageObj.whatIsMyAge(value) >= 18;
+                                    return ageObj.whatIsMyAge(value) < 65 && ageObj.whatIsMyAge(value) >= 18;
                                 }
                                 return true;
                             }
                         )
 
-                })
-               
+                })              
                 ,
                 gender: Yup.string().nullable().required("Require Gender"),        
 
@@ -249,13 +248,13 @@ const validateAddress =  Yup.object().shape({
     }).test(
         "18YearsChecking",
         function() {
-            return "Proposer age should be between 18 to 55 years"
+            return "Proposer age should be between 18 to 65 years"
         },
         function (value) {
             const ageObj = new PersonAge();
             if (value) {
                 const age_Obj = new PersonAge();
-                return ageObj.whatIsMyAge(value) < 56 && ageObj.whatIsMyAge(value) >= 18;
+                return ageObj.whatIsMyAge(value) < 65 && ageObj.whatIsMyAge(value) >= 18;
             }
             return true;
     }),
@@ -452,7 +451,13 @@ class Address_Group extends Component {
             catch(err=>{
                 this.props.loadingStop();
             })          
-        }       
+        }    
+        else {
+            this.setState({
+                pinDataArr: [],
+                stateName: [],
+            });
+        }   
     }
 
     changePlaceHoldClassRemove(e) {
@@ -680,7 +685,8 @@ class Address_Group extends Component {
                                     validationSchema={validateAddress}
                                     >
                                     {({ values, errors, setFieldValue, setFieldTouched, isValid, isSubmitting, touched }) => {                                    
-                                    return (
+                                 console.log("errors----------- ", errors)  
+                                   return (
                                     <Form>
                                         <div className="d-flex flex-column flex-sm-column flex-md-column flex-lg-row justify-content-left m-b-15">
                                             <div className="proposr prsres m-r-60"><p>Is the Proposer same as insured</p></div>
@@ -873,7 +879,7 @@ class Address_Group extends Component {
                                                                         onBlur={e => this.changePlaceHoldClassRemove(e)}
                                                                         value = {values.family_members[index].fname}
                                                                     />
-                                                                     {errors.family_members && errors.family_members[index] && errors.family_members[index].fname ? (
+                                                                     {errors.family_members && errors.family_members[index] && errors.family_members[index].fname && touched.family_members ? (
                                                                     <span className="errorMsg">{errors.family_members[index].fname}</span>
                                                                     ) : null}
                                                                 </div>
@@ -891,7 +897,7 @@ class Address_Group extends Component {
                                                                             onBlur={e => this.changePlaceHoldClassRemove(e)}
                                                                             value = {values.family_members[index].lname}                                                                            
                                                                     />
-                                                                     {errors.family_members && errors.family_members[index] && errors.family_members[index].lname ? (
+                                                                     {errors.family_members && errors.family_members[index] && errors.family_members[index].lname && touched.family_members ? (
                                                                     <span className="errorMsg">{errors.family_members[index].lname}</span>
                                                                     ) : null}
                                                                 </div>
@@ -1153,9 +1159,8 @@ class Address_Group extends Component {
                                             <OverlayTrigger overlay={<Tooltip id="tooltip-disabled">The e-Insurance account or Electronic Insurance Account offers policyholders online space to hold all their insurance policies electronically under one e-insurance account number. This allows the policyholder to access all their policies with a few clicks and no risk of losing the physical insurance policy</Tooltip>}>
                                             <a href="#" className="infoIcon"><img src={require('../../../assets/images/i.svg')} alt="" /></a>
                                             </OverlayTrigger></p>
-                            
-                              
-                                                </div>
+                                            </div>
+
                                             <div className="d-inline-flex">
                                                 <div className="p-r-25">
                                                     <label className="customRadio3">
@@ -1271,8 +1276,8 @@ class Address_Group extends Component {
                                         />
                                             <span className="checkmark" />
                                             <span className="fs-14">No</span>
-                                            {errors.name=='is_eia_account2' && touched.name=='is_eia_account2' ? (
-                                            <span className="errorMsg">{errors.name='is_eia_account2' }</span>
+                                            {errors.is_eia_account2 && touched.is_eia_account2 ? (
+                                            <span className="errorMsg">{phrases[errors.is_eia_account2] }</span>
                                         ) : null}
                                         </label>
                                     </div>

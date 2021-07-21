@@ -230,7 +230,7 @@ class Address extends Component {
                 looking_for: resource.relation_with,
                 family_member_id: resource.id,
                 preExistingDisease: ksbPreExisting && ksbPreExisting.length > 0 && index < ksbPreExisting.length ? ksbPreExisting[index].description : "",
-                preExistingDetails: ksbPreExisting && ksbPreExisting.length > 0 && index < ksbPreExisting.length ? ksbPreExisting[index].pre_existing_details : ""
+                preExistingDetails: ksbPreExisting && ksbPreExisting.length > 0 && index < ksbPreExisting.length && ksbPreExisting[index].pre_existing_details ? ksbPreExisting[index].pre_existing_details : ""
 			}));
 		} else {
 			return [initialFamilyDetails];
@@ -257,10 +257,10 @@ console.log("innitial family_members------------------- ", newInitialValues)
                         <div className="row">
 						
                             <aside className="left-sidebar">
- <div className="scroll-sidebar ps-container ps-theme-default ps-active-y">
-<SideNav />
- </div>
-</aside>
+                            <div className="scroll-sidebar ps-container ps-theme-default ps-active-y">
+                            <SideNav />
+                            </div>
+                            </aside>
 							
                             <div className="col-sm-12 col-md-12 col-lg-12 col-xl-12 infobox prehealthex">
                                 <h4 className="text-center mt-3 mb-3">KSB Retail Policy</h4>

@@ -22,7 +22,6 @@ const initialState = {
         end_date:null,
         
         shop_building_name: null,
-        house_building_name:null,
         block_no:null,
         house_flat_no:null,
         pincode:null,
@@ -137,13 +136,13 @@ const sukhsam = ( state = initialState, action) => {
         }
 
         case SUKHSAM_COMM_ADDRESS: return {...state, 
-            com_building_name:action.payload.com_building_name,
+            // com_building_name:action.payload.com_building_name,
             com_pincode:action.payload.com_pincode,
             com_pincode_id:action.payload.com_pincode_id,
-            com_block_no:action.payload.com_block_no,
-            com_house_flat_no:action.payload.com_house_flat_no,
-            com_street_name:action.payload.com_street_name,
-            com_plot_no:action.payload.com_plot_no
+            // com_block_no:action.payload.com_block_no,
+            // com_house_flat_no:action.payload.com_house_flat_no,
+            // com_street_name:action.payload.com_street_name,
+            // com_plot_no:action.payload.com_plot_no
         }
 
         case SUKHSAM_TRANSACTION_ID: return {...state, 

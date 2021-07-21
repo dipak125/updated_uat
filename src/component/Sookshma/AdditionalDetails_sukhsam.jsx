@@ -97,7 +97,7 @@ const vehicleRegistrationValidation = Yup.object().shape({
     )
     .nullable(),
 
-    building_name: Yup.string().required("Please enter Building name").matches(/^[a-zA-Z0-9][a-zA-Z0-9-/.,-\s]*$/, 
+    com_building_name: Yup.string().required("Please enter Building name").matches(/^[a-zA-Z0-9][a-zA-Z0-9-/.,-\s]*$/, 
         function() {
             return "Please enter valid building name"
         }).nullable(),
@@ -227,7 +227,7 @@ class AdditionalDetails_sukhsam extends Component {
 
     otherDetails = (productId) => {
         // productId === 5
-        this.props.history.push(`/OtherDetails_Sookshma/${productId}`);
+        this.props.history.push(`/Summary_Sookshma/${productId}`);
     }
 
 
@@ -251,7 +251,7 @@ class AdditionalDetails_sukhsam extends Component {
             'gender': values.gender,
             'pan_no': values.pan_no,
             'gstn_no': values.gstn_no,
-            'house_building_name': values.building_name,
+            'house_building_name': values.com_building_name,
             'block_no': "",
             'house_flat_no': "",
             'plot_no': values.plot_no,
@@ -280,7 +280,7 @@ class AdditionalDetails_sukhsam extends Component {
                     gstn_no:values.gstn_no,
                     com_street_name:values.street_name,
                     com_plot_no:values.plot_no,
-                    com_building_name:values.building_name,
+                    com_building_name:values.com_building_name,
                     com_block_no:values.block_no,
                     com_house_flat_no:values.flat_no,
                     com_pincode:values.pincode,
@@ -350,7 +350,7 @@ class AdditionalDetails_sukhsam extends Component {
         });
     }
 
-    fetchAreadetails=(e)=>{
+    fetchAreadetails=(e, setFieldValue,setFieldTouched)=>{
         let pinCode = e.target.value;      
 
         if(pinCode.length==6){
@@ -382,7 +382,16 @@ class AdditionalDetails_sukhsam extends Component {
                 this.props.loadingStop();
             })          
         }       
+        else {
+            this.setState({
+                pinDataArr: [],
+                stateName: [],
+            });
+            setFieldTouched('pincode_id')
+            setFieldValue('pincode_id',"")
+        }  
     }
+
     fetchAreadetailsBack=(pincode_input = null)=>{
         let pinCode = '';
 
@@ -417,13 +426,27 @@ class AdditionalDetails_sukhsam extends Component {
                 this.props.loadingStop();
             })          
         }       
+
+        else {
+            this.setState({
+                pinDataArr: [],
+                stateName: [],
+            });
+            this.props.setAddress(
+                {
+                    com_pincode:null,
+                    com_pincode_id:null
+                }
+            );
+        } 
     }
 
     
-    fetchPrevAreaDetails=(addressDetails)=>{
+    fetchAreaDetails=(addressDetails)=>{
         if(addressDetails){
             let pincode = addressDetails.PIN_CD;
             const formData = new FormData();
+            console.log('fetchAreadetails pinCode')
             // let encryption = new Encryption();
 
         //    const post_data_obj = {
@@ -448,6 +471,12 @@ class AdditionalDetails_sukhsam extends Component {
                 this.props.loadingStop();
             })
         }
+        else {
+            this.setState({
+                pinDataArr: [],
+                stateName: [],
+            });
+        }  
         
     }
 
@@ -464,7 +493,7 @@ class AdditionalDetails_sukhsam extends Component {
                 titleList
             });
             this.props.loadingStop();
-            this.fetchPrevAreaDetails(addressDetails)
+            this.fetchAreaDetails(addressDetails)
         }).
         catch(err=>{
             this.props.loadingStop();
@@ -474,24 +503,6 @@ class AdditionalDetails_sukhsam extends Component {
         })
     
     }
-
-    // autoPopulateAddress = () => {
-    //     if(this.props.com_pincode === null){
-    //         console.log('this.props.pincode_id',this.props.pincode_id);
-    //         this.props.setAddress({
-    //             building_name:this.props.house_building_name,
-    //             block_no:this.props.block_no,
-    //             street_name:this.props.street_name,
-    //             plot_no:this.props.plot_no,
-    //             house_flat_no:this.props.house_flat_no,
-    //             pincode:this.props.pincode,
-    //             pincode_id:this.props.pincode_id
-    //         });
-    //         this.fetchAreadetailsBack(this.props.pincode);
-    //     }else{
-    //         this.fetchAreadetailsBack();
-    //     }
-    // }
 
     componentDidMount() {
         this.fetchSalutation()
@@ -532,7 +543,7 @@ class AdditionalDetails_sukhsam extends Component {
 
                     this.props.setRiskData(
                         {
-                            house_building_name:risk_arr.house_building_name,
+                            shop_building_name:risk_arr.shop_building_name,
                             block_no:risk_arr.block_no,
                             street_name:risk_arr.street_name,
                             plot_no:risk_arr.plot_no,
@@ -638,7 +649,7 @@ class AdditionalDetails_sukhsam extends Component {
       gstn_no:this.props.gstn_no,
       street_name:this.props.com_street_name,
       plot_no:this.props.com_plot_no,
-      building_name:this.props.com_building_name,
+      com_building_name:this.props.com_building_name,
       block_no:this.props.com_block_no,
       flat_no:this.props.com_house_flat_no,
       pincode:this.props.com_pincode,
@@ -667,8 +678,7 @@ class AdditionalDetails_sukhsam extends Component {
                             <SideNav />
                             </div>
                         </aside>
-
-                            
+             
                         <div className="col-sm-12 col-md-12 col-lg-10 col-xl-10 infobox">
                         <h4 className="text-center mt-3 mb-3">SME Package Insurance</h4>
 
@@ -915,12 +925,10 @@ class AdditionalDetails_sukhsam extends Component {
                                                             maxlength = "6"
                                                             onFocus={e => this.changePlaceHoldClassAdd(e)}
                                                             onBlur={e => this.changePlaceHoldClassRemove(e)}
-                                                            onKeyUp={e=> this.fetchAreadetails(e)}
+                                                            onKeyUp={e=> this.fetchAreadetails(e,setFieldValue,setFieldTouched)}
                                                             value={values.pincode}
                                                             maxLength="6"
-                                                            onInput= {(e)=> {
-                                                            
-                                                            }}
+                                                           
                                                         />
                                                         {errors.pincode && touched.pincode ? (
                                                         <span className="errorMsg">{errors.pincode}</span>
@@ -957,58 +965,22 @@ class AdditionalDetails_sukhsam extends Component {
                                                 <FormGroup>
                                                     <div className="insurerName">
                                                     <Field
-                                                        name='building_name'
+                                                        name='com_building_name'
                                                         type="text"
                                                         placeholder="Building/House Name"
                                                         autoComplete="off"
                                                         onFocus={e => this.changePlaceHoldClassAdd(e)}
                                                         onBlur={e => this.changePlaceHoldClassRemove(e)}
-                                                        value = {values.building_name}                                                                            
+                                                        value = {values.com_building_name}                                                                            
                                                     />
-                                                    {errors.building_name && touched.building_name ? (
-                                                    <span className="errorMsg">{errors.building_name}</span>
+                                                    {errors.com_building_name && touched.com_building_name ? (
+                                                    <span className="errorMsg">{errors.com_building_name}</span>
                                                     ) : null}  
                                                     </div>
                                                 </FormGroup>
                                             </Col>
                                         </Row> 
                                         <Row>
-                                            {/* <Col sm={12} md={4} lg={4}>
-                                                <FormGroup>
-                                                    <div className="insurerName">
-                                                    <Field
-                                                        name='block_no'
-                                                        type="text"
-                                                        placeholder="Block No. "
-                                                        autoComplete="off"
-                                                        onFocus={e => this.changePlaceHoldClassAdd(e)}
-                                                        onBlur={e => this.changePlaceHoldClassRemove(e)}
-                                                        value = {values.block_no}                                                                            
-                                                    />
-                                                    {errors.block_no && touched.block_no ? (
-                                                    <span className="errorMsg">{errors.block_no}</span>
-                                                    ) : null}  
-                                                    </div>
-                                                </FormGroup>
-                                            </Col> */}
-                                            {/* <Col sm={12} md={4} lg={4}>
-                                                <FormGroup>
-                                                    <div className="insurerName">
-                                                    <Field
-                                                        name='flat_no'
-                                                        type="text"
-                                                        placeholder="House/Flat No"
-                                                        autoComplete="off"
-                                                        onFocus={e => this.changePlaceHoldClassAdd(e)}
-                                                        onBlur={e => this.changePlaceHoldClassRemove(e)}
-                                                        value = {values.flat_no}                                                                            
-                                                    />
-                                                    {errors.flat_no && touched.flat_no ? (
-                                                    <span className="errorMsg">{errors.flat_no}</span>
-                                                    ) : null}  
-                                                    </div>
-                                                </FormGroup>
-                                            </Col> */}
                                         </Row><Row>
                                             <Col sm={12} md={4} lg={4}>
                                                 <FormGroup>
@@ -1101,7 +1073,7 @@ const mapStateToProps = state => {
       com_pincode:state.sukhsam.com_pincode,
       com_pincode_id:state.sukhsam.com_pincode_id,
 
-      house_building_name: state.sukhsam.house_building_name,
+    //   house_building_name: state.sukhsam.house_building_name,
       block_no: state.sukhsam.block_no,
       street_name: state.sukhsam.street_name,
       plot_no: state.sukhsam.plot_no,
@@ -1121,8 +1093,7 @@ const mapStateToProps = state => {
       loadingStop: () => dispatch(loaderStop()),
       setData:(data) => dispatch(setSmeData(data)),
       setRiskData:(data) => dispatch(setSmeRiskData(data)),
-      setSmeOthersDetails:(data) => {console.log("data -------------- ", data)
-                                    dispatch(setSmeOthersDetailsData(data))},
+      setSmeOthersDetails:(data) =>  dispatch(setSmeOthersDetailsData(data)),
       setSmeProposerDetails:(data) => dispatch(setSmeProposerDetailsData(data)),
       setAddress:(data) => dispatch(setCommunicationAddress(data))
     };

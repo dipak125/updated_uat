@@ -85,6 +85,7 @@ export const checkGreaterTimes = (time1, time2) => {
     return false;
 }
 
+
 export const checkGreaterStartEndTimes = (time1, time2) => {
     if (time1 != '' && time2 != '') {
         let time3 = new Date(time1);

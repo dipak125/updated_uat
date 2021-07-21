@@ -527,12 +527,27 @@ class OtherComprehensiveGCV extends Component {
                 let decryptResp = JSON.parse(encryption.decrypt(res.data))
                 console.log("decrypt--fetchData-- ", decryptResp)
                 let motorInsurance = decryptResp.data.policyHolder ? decryptResp.data.policyHolder.motorinsurance : {}
+                let previouspolicy = decryptResp.data.policyHolder ? decryptResp.data.policyHolder.previouspolicy : {}
                 let request_data = decryptResp.data.policyHolder ? decryptResp.data.policyHolder.request_data : {};
                 let vehicleDetails = decryptResp.data.policyHolder ? decryptResp.data.policyHolder.vehiclebrandmodel : {};
                 // console.log('motorInsurance.trailers',motorInsurance.trailers)
                 let trailer_array = motorInsurance.trailers && motorInsurance.trailers != null ? motorInsurance.trailers : null
-
                 trailer_array = trailer_array != null ? JSON.parse(trailer_array) : []
+                
+                let vehicle_age = 0
+                let registration_date = motorInsurance && motorInsurance.registration_date ? motorInsurance.registration_date : ""
+                let previous_end_date = previouspolicy && previouspolicy.end_date ? previouspolicy.end_date : ""
+                let valid_previous_policy = motorInsurance ? motorInsurance.valid_previous_policy : "0"
+                let policytype_id = motorInsurance ? motorInsurance.policytype_id : ""
+                if (Math.floor(moment().diff(previous_end_date, 'months', true)) > 1 || valid_previous_policy == "0" || policytype_id == "1") {
+                    let val = moment().format("YYYY-MM-DD")
+                    vehicle_age = moment(val).diff(registration_date, 'days', true)
+                }
+                else {
+                    vehicle_age = moment(previous_end_date).add(1, 'day').diff(registration_date, 'days', true)
+                }
+                // console.log("vehicle_age---------- ", vehicle_age)
+
                 let values = []
                 let add_more_coverage = []
                 let bodySliderVal = motorInsurance && motorInsurance.body_idv_value ? motorInsurance.body_idv_value : 0
@@ -616,15 +631,43 @@ class OtherComprehensiveGCV extends Component {
                     vahanVerify: motorInsurance.chasis_no && motorInsurance.engine_no ? true : false,
                     selectFlag: motorInsurance && motorInsurance.add_more_coverage != null ? '0' : '1',
                     no_of_claim: add_more_coverage_request_array.B00007 ? add_more_coverage_request_array.B00007.value : "",
-                    add_more_coverage_request_array, trailer_array, geographical_extension
+                    add_more_coverage_request_array, trailer_array, geographical_extension, vehicle_age
                 })
                 this.props.loadingStop();
+                this.depreciation(values)
                 this.getAccessToken(values)
             })
             .catch(err => {
                 // handle error
                 this.props.loadingStop();
             })
+    }
+
+    depreciation = (values) => {
+        const { vehicle_age } = this.state
+        const formData = new FormData();
+        this.props.loadingStart();
+        const post_data = {
+            'vehicle_age': vehicle_age,
+        }
+        let encryption = new Encryption();
+        formData.append('enc_data', encryption.encrypt(JSON.stringify(post_data)))
+        axios
+            .post(`/miscd/getMaxBodyIDV`, formData)
+            .then((res) => {
+                let decryptResp = JSON.parse(encryption.decrypt(res.data))
+                this.setState({
+                    depreciationPercentage: decryptResp.data,
+                });
+                this.getAccessToken(values)
+            })
+            .catch((err) => {
+                this.setState({
+                    accessToken: '',
+                });
+                this.props.loadingStop();
+            });
+
     }
 
     getAccessToken = (values) => {
@@ -1649,7 +1692,7 @@ class OtherComprehensiveGCV extends Component {
                                             onSubmit={serverResponse && serverResponse != "" ? (serverResponse.message ? this.getAccessToken : this.handleSubmit) : this.getAccessToken}
                                             validationSchema={ComprehensiveValidation}>
                                             {({ values, errors, setFieldValue, setFieldTouched, isValid, isSubmitting, touched }) => {
-                                                console.log("values------------> ", values)
+                                                // console.log("values------------> ", values)
                                                 return (
                                                     <Form>
                                                         <Row>
@@ -1833,9 +1876,9 @@ class OtherComprehensiveGCV extends Component {
                                                                             </div>
                                                                         </FormGroup>
                                                                     </Col>
-                                                                    {console.log("minIDV------------- ", minIDV)}
+                                                                    {/* {console.log("minIDV------------- ", minIDV)}
                                                                     {console.log("maxIDV------------- ", maxIDV)}
-                                                                    {console.log("IDV_Suggested------------- ", defaultSliderValue)}
+                                                                    {console.log("IDV_Suggested------------- ", defaultSliderValue)} */}
                                                                     {defaultSliderValue ?
 
                                                                         <Col sm={12} md={12} lg={6}>

@@ -122,6 +122,12 @@ class RiskDetails_sukhsam extends Component {
                 this.props.loadingStop();
             })  
         }       
+        else {
+            this.setState({
+                pinDataArr: [],
+                stateName: [],
+            });
+        }  
     }
 
     fetchAreadetailsBack=(pincode_input=null)=>{
@@ -156,7 +162,14 @@ class RiskDetails_sukhsam extends Component {
             catch(err=>{
                 this.props.loadingStop();
             })          
-        }     
+        }
+        else {
+            this.setState({
+                pinDataArr: [],
+                stateName: [],
+            });
+        }  
+        
     }
     
     handleSubmit=(values, actions)=>{
@@ -277,6 +290,8 @@ class RiskDetails_sukhsam extends Component {
                         {
                             shop_building_name:risk_arr.shop_building_name,
                             block_no:risk_arr.block_no,
+                            street_name:risk_arr.street_name,
+                            plot_no:risk_arr.plot_no,
                             house_flat_no:risk_arr.house_flat_no,
                             pincode:decryptResp.data.policyHolder.sookshamainfo.pincode,
                             pincode_id:decryptResp.data.policyHolder.sookshamainfo.pincode_id,
@@ -338,7 +353,7 @@ class RiskDetails_sukhsam extends Component {
 
                                 com_street_name:address.street_name,
                                 com_plot_no:address.plot_no,
-                                com_building_name:address.shop_building_name,
+                                com_building_name:address.house_building_name,
                                 com_block_no:address.block_no,
                                 com_house_flat_no:address.house_flat_no,
                                 com_pincode:decryptResp.data.policyHolder.pincode,

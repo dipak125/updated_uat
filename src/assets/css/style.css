@@ -1514,6 +1514,10 @@ ul.navPan { height:100%;}
     display: block;
 }
 
+.contBox.m-b-45.tickedTable .customInnerTable.dataTableCustom tbody td {
+    max-width: 100px;
+}
+
 @media (max-width: 576px){
 
   /*.infobox { padding-left: 97px !important;}*/
@@ -1637,3 +1641,7 @@ li.nav-item.dropdown select.listSelect {
   .inputfs12ST {
       width: 189px;
   }
+
+.customAlign table.table th, .customAlign table.table td {
+    text-align: center !important;
+}

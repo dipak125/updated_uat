@@ -614,8 +614,8 @@ class VehicleDetailsMISCD extends Component {
             'no_of_claim': values.no_of_claim,
             'new_policy_duration': values.new_policy_duration,
             'duration': values.duration,
-            'new_policy_start_date': values.new_policy_start_date,
-            'new_policy_end_date': values.new_policy_end_date,
+            'new_policy_start_date': values.new_policy_start_date ? moment(values.new_policy_start_date).format("YYYY-MM-DD") : "",
+            'new_policy_end_date': values.new_policy_end_date ? moment(values.new_policy_end_date).format("YYYY-MM-DD") : "",
             'is_new_policy': 1
         }
 
@@ -803,7 +803,7 @@ class VehicleDetailsMISCD extends Component {
                                 >
                                     <option value="">{phrases['SelectYear']}</option>
                                     <option value={pol_start_date}>{pol_start_date}</option>
-                                    <option value={pol_end_date}>{pol_end_date}</option>
+                                    {pol_start_date != pol_end_date ? <option value={pol_end_date}>{pol_end_date}</option> : null}
                                 </Field>
 
                                 {errors.claim_array && errors.claim_array[i] && errors.claim_array[i].claim_year ? (
@@ -1220,6 +1220,7 @@ class VehicleDetailsMISCD extends Component {
                                                                                             showMonthDropdown
                                                                                             showYearDropdown
                                                                                             dropdownMode="select"
+                                                                                            className="datePckr inputfs12"
                                                                                             className={values.previous_policy_name == '3' ? "datePckr inputfs12ST" : "datePckr inputfs12"}
                                                                                             selected={values.previous_start_date}
                                                                                             onChange={(val) => {
@@ -1567,9 +1568,9 @@ class VehicleDetailsMISCD extends Component {
                                                                                             peekPreviousMonth
                                                                                             autoComplete="off"
                                                                                             peekPreviousYear
+                                                                                            disabled={true}
                                                                                             showMonthDropdown
                                                                                             showYearDropdown
-                                                                                            disabled={true}
                                                                                             dropdownMode="select"
                                                                                             className="datePckr inputfs12"
                                                                                             selected={values.new_policy_start_date}
