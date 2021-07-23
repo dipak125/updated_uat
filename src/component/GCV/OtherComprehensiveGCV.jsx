@@ -18,8 +18,14 @@ import * as Yup from "yup";
 import swal from 'sweetalert';
 import moment from "moment";
 import { validRegistrationNumber } from "../../shared/validationFunctions";
+import {  userTypes } from "../../shared/staticValues";
 
+let tempEncryption = new Encryption()
 let translation = localStorage.getItem("phrases") ? JSON.parse(localStorage.getItem("phrases")) : []
+let user_data = sessionStorage.getItem("users") ? JSON.parse(sessionStorage.getItem("users")) : "";
+if (user_data.user) {
+    user_data = JSON.parse(tempEncryption.decrypt(user_data.user));
+}
 
 const insert = (arr, index, newItem) => [
     // part of the array before the specified index
@@ -1025,38 +1031,42 @@ class OtherComprehensiveGCV extends Component {
             total_idv = parseInt(post_data.idv_value) + parseInt(post_data.body_idv_value)
         }
 
-        let user_data = sessionStorage.getItem("users") ? JSON.parse(sessionStorage.getItem("users")) : "";
         if (user_data) {
-            user_data = JSON.parse(encryption.decrypt(user_data.user));
-
-            if ((total_idv > 5000000) && user_data.user_type == "POSP") {
-                swal("Quote cannot proceed with IDV greater than 5000000")
-                this.props.loadingStop();
+            if(userTypes.includes(user_data.login_type) && add_more_coverage.indexOf('B00015') < 0){
+                swal("This cover is mandated by IRDAI, it is compulsory for Owner-Driver to possess a PA cover of minimum Rs 15 Lacs, except in certain conditions. By not choosing this cover, you confirm that you hold an existing PA cover or you do not possess a valid driving license.")
                 return false
             }
-        }
-
-        console.log("--post Data-- ", post_data)
-        formData.append('enc_data', encryption.encrypt(JSON.stringify(post_data)))
-        this.props.loadingStart();
-        axios.post('gcv/update-insured-value', formData).then(res => {
-            this.props.loadingStop();
-            let decryptResp = JSON.parse(encryption.decrypt(res.data))
-            console.log("decrypt--fetchData-- ", decryptResp)
-            if (decryptResp.error == false) {
-                this.props.history.push(`/AdditionalDetails_GCV/${productId}`);
-            }
             else {
-                swal(decryptResp.msg)
-            }
-
-        })
-            .catch(err => {
-                // handle error
-                let decryptResp = JSON.parse(encryption.decrypt(err.data))
-                console.log("decryptErr--fetchData-- ", decryptResp)
-                this.props.loadingStop();
-            })
+                if ((total_idv > 5000000) && user_data.user_type == "POSP") {
+                    swal("Quote cannot proceed with IDV greater than 5000000")
+                    this.props.loadingStop();
+                    return false
+                }
+                else {
+                    console.log("--post Data-- ", post_data)
+                    formData.append('enc_data', encryption.encrypt(JSON.stringify(post_data)))
+                    this.props.loadingStart();
+                    axios.post('gcv/update-insured-value', formData).then(res => {
+                        this.props.loadingStop();
+                        let decryptResp = JSON.parse(encryption.decrypt(res.data))
+                        console.log("decrypt--fetchData-- ", decryptResp)
+                        if (decryptResp.error == false) {
+                            this.props.history.push(`/AdditionalDetails_GCV/${productId}`);
+                        }
+                        else {
+                            swal(decryptResp.msg)
+                        }
+            
+                    })
+                    .catch(err => {
+                        // handle error
+                        let decryptResp = JSON.parse(encryption.decrypt(err.data))
+                        console.log("decryptErr--fetchData-- ", decryptResp)
+                        this.props.loadingStop();
+                    })
+                }
+            }         
+        }
     }
 
     onRowSelect = (value, values, isSelect, setFieldTouched, setFieldValue) => {
@@ -1659,18 +1669,11 @@ class OtherComprehensiveGCV extends Component {
                         <div className="container-fluid">
                             <div className="row">
 
-
                                 <aside className="left-sidebar">
                                     <div className="scroll-sidebar ps-container ps-theme-default ps-active-y">
                                         <SideNav />
                                     </div>
                                 </aside>
-
-                                {/*<div className="col-sm-12 col-md-12 col-lg-2 col-xl-2 pd-l-0">        
-						<SideNav />
-             		 </div>*/}
-
-
 
                                 <div className="col-sm-12 col-md-12 col-lg-12 col-xl-12 infobox ocGcv">
                                     <h4 className="text-center mt-3 mb-3">{phrases['SBIGICL']}</h4>
@@ -1685,7 +1688,7 @@ class OtherComprehensiveGCV extends Component {
                                             onSubmit={serverResponse && serverResponse != "" ? (serverResponse.message ? this.getAccessToken : this.handleSubmit) : this.getAccessToken}
                                             validationSchema={ComprehensiveValidation}>
                                             {({ values, errors, setFieldValue, setFieldTouched, isValid, isSubmitting, touched }) => {
-                                                console.log("values------------> ", values)
+                                                // console.log("values------------> ", values)
                                                 return (
                                                     <Form>
                                                         <Row>
@@ -1869,9 +1872,9 @@ class OtherComprehensiveGCV extends Component {
                                                                             </div>
                                                                         </FormGroup>
                                                                     </Col>
-                                                                    {console.log("minIDV------------- ", minIDV)}
+                                                                    {/* {console.log("minIDV------------- ", minIDV)}
                                                                     {console.log("maxIDV------------- ", maxIDV)}
-                                                                    {console.log("IDV_Suggested------------- ", defaultSliderValue)}
+                                                                    {console.log("IDV_Suggested------------- ", defaultSliderValue)} */}
                                                                     {defaultSliderValue ?
 
                                                                         <Col sm={12} md={12} lg={6}>
@@ -1944,42 +1947,42 @@ class OtherComprehensiveGCV extends Component {
                                                                 </Row>
 
                                                                 {/* <Row>
-                                <Col sm={12} md={5} lg={4}>
-                                    <FormGroup>
-                                        <div className="insurerName">
-                                             Fuel Type
-                                        </div>
-                                    </FormGroup>
-                                </Col>
-                                <Col sm={12} md={3} lg={3}>
-                                    <FormGroup>                                      
-                                        <div className="formSection">
-                                            <Field
-                                                name='fuel_type'
-                                                component="select"
-                                                autoComplete="off"
-                                                className="formGrp inputfs12"
-                                                value = {values.fuel_type}
-                                                onChange={(e) => {
-                                                    setFieldTouched('fuel_type')
-                                                    setFieldValue('fuel_type', e.target.value);
-                                                    this.handleChange()
-                                                }}  
-                                            >
-                                                <option value="">Fuel Type</option>
-                                                {fuelList.map((fuel, qIndex) => ( 
-                                                    <option value= {fuel.id}>{fuel.descriptions}</option>
-                                                ))}
-                                    
-                                            </Field>
-                                            {errors.fuel_type && touched.fuel_type ? (
-                                                <span className="errorMsg">{errors.fuel_type}</span>
-                                            ) : null}
-                                        </div>               
-                                    </FormGroup>
-                                </Col>
-                            </Row>
-                             */}
+                                                                    <Col sm={12} md={5} lg={4}>
+                                                                        <FormGroup>
+                                                                            <div className="insurerName">
+                                                                                Fuel Type
+                                                                            </div>
+                                                                        </FormGroup>
+                                                                    </Col>
+                                                                    <Col sm={12} md={3} lg={3}>
+                                                                        <FormGroup>                                      
+                                                                            <div className="formSection">
+                                                                                <Field
+                                                                                    name='fuel_type'
+                                                                                    component="select"
+                                                                                    autoComplete="off"
+                                                                                    className="formGrp inputfs12"
+                                                                                    value = {values.fuel_type}
+                                                                                    onChange={(e) => {
+                                                                                        setFieldTouched('fuel_type')
+                                                                                        setFieldValue('fuel_type', e.target.value);
+                                                                                        this.handleChange()
+                                                                                    }}  
+                                                                                >
+                                                                                    <option value="">Fuel Type</option>
+                                                                                    {fuelList.map((fuel, qIndex) => ( 
+                                                                                        <option value= {fuel.id}>{fuel.descriptions}</option>
+                                                                                    ))}
+                                                                        
+                                                                                </Field>
+                                                                                {errors.fuel_type && touched.fuel_type ? (
+                                                                                    <span className="errorMsg">{errors.fuel_type}</span>
+                                                                                ) : null}
+                                                                            </div>               
+                                                                        </FormGroup>
+                                                                    </Col>
+                                                                </Row>
+                                                                */}
                                                                 <Row>
                                                                     <Col sm={12} md={12} lg={12}>
                                                                         <FormGroup>
@@ -2004,10 +2007,11 @@ class OtherComprehensiveGCV extends Component {
                                                                                         name={coverage.code}
                                                                                         value={coverage.code}
                                                                                         className="user-self"
-                                                                                        // checked={values.roadsideAssistance ? true : false}
+                                                                                        disabled={(userTypes.includes(user_data.login_type) && values[coverage.code] == 'B00015') ? true : false}
                                                                                         onClick={(e) => {
                                                                                             if (e.target.checked == false && values[coverage.code] == 'B00015') {
-                                                                                                swal(phrases.SwalIRDAI)
+                                                                                                swal(phrases.SwalIRDAI,
+                                                                                                    {button: phrases.OK})
                                                                                             }
                                                                                             this.onRowSelect(e.target.value, values, e.target.checked, setFieldTouched, setFieldValue)
                                                                                         }
@@ -2109,60 +2113,60 @@ class OtherComprehensiveGCV extends Component {
 
 
                                                                         {/* {values.trailer_flag_TP == '1' && values[coverage.code] == 'B00011' ?
-                                     <Fragment>
-                                        <Col sm={12} md={11} lg={2} key={qIndex+"b"}>
-                                            <FormGroup>
-                                                <div className="formSection">
-                                                    <Field
-                                                        name='B00011_value'
-                                                        component="select"
-                                                        autoComplete="off"
-                                                        className="formGrp inputfs12"
-                                                        value = {values.B00011_value}
-                                                        onChange={(e) => {
-                                                            setFieldTouched('B00011_value')
-                                                            setFieldValue('B00011_value', e.target.value);
-                                                            this.handleChange()
-                                                        }}
-                                                    >
-                                                        <option value="">No of Trailer</option>
-                                                        {JSON.parse(coverage.covarage_value).value.length > 0 && JSON.parse(coverage.covarage_value).value.map((insurer, qIndex) => (
-                                                                <option value= {insurer}>{insurer}</option>
-                                                            ))}  
-                                            
-                                                    </Field>
-                                                    {errors.B00011_value ? (
-                                                        <span className="errorMsg">{errors.B00011_value}</span>
-                                                    ) : null}
-                                                </div>
-                                            </FormGroup>
-                                        </Col>
-                                        <Col sm={12} md={11} lg={3} key={qIndex+"c"}>
-                                            <FormGroup>
-                                                <div className="formSection">
-                                                    <Field
-                                                        name="B00011_description"
-                                                        type="text"
-                                                        placeholder="Trailer IDV"
-                                                        autoComplete="off"
-                                                        maxLength="8"
-                                                        onFocus={e => this.changePlaceHoldClassAdd(e)}
-                                                        onBlur={e => this.changePlaceHoldClassRemove(e)}
-                                                        onChange={(e) => {
-                                                            setFieldTouched('B00011_description')
-                                                            setFieldValue('B00011_description', e.target.value);
-                                                            this.handleChange()
-                                                        }}
-                                                    >                                     
-                                                    </Field>
-                                                    {errors.B00011_description   ? (
-                                                        <span className="errorMsg">{errors.B00011_description   }</span>
-                                                    ) : null}
-                                                </div>
-                                            </FormGroup>
-                                        </Col>
-                                        </Fragment> : null
-                                    } */}
+                                                                        <Fragment>
+                                                                            <Col sm={12} md={11} lg={2} key={qIndex+"b"}>
+                                                                                <FormGroup>
+                                                                                    <div className="formSection">
+                                                                                        <Field
+                                                                                            name='B00011_value'
+                                                                                            component="select"
+                                                                                            autoComplete="off"
+                                                                                            className="formGrp inputfs12"
+                                                                                            value = {values.B00011_value}
+                                                                                            onChange={(e) => {
+                                                                                                setFieldTouched('B00011_value')
+                                                                                                setFieldValue('B00011_value', e.target.value);
+                                                                                                this.handleChange()
+                                                                                            }}
+                                                                                        >
+                                                                                            <option value="">No of Trailer</option>
+                                                                                            {JSON.parse(coverage.covarage_value).value.length > 0 && JSON.parse(coverage.covarage_value).value.map((insurer, qIndex) => (
+                                                                                                    <option value= {insurer}>{insurer}</option>
+                                                                                                ))}  
+                                                                                
+                                                                                        </Field>
+                                                                                        {errors.B00011_value ? (
+                                                                                            <span className="errorMsg">{errors.B00011_value}</span>
+                                                                                        ) : null}
+                                                                                    </div>
+                                                                                </FormGroup>
+                                                                            </Col>
+                                                                            <Col sm={12} md={11} lg={3} key={qIndex+"c"}>
+                                                                                <FormGroup>
+                                                                                    <div className="formSection">
+                                                                                        <Field
+                                                                                            name="B00011_description"
+                                                                                            type="text"
+                                                                                            placeholder="Trailer IDV"
+                                                                                            autoComplete="off"
+                                                                                            maxLength="8"
+                                                                                            onFocus={e => this.changePlaceHoldClassAdd(e)}
+                                                                                            onBlur={e => this.changePlaceHoldClassRemove(e)}
+                                                                                            onChange={(e) => {
+                                                                                                setFieldTouched('B00011_description')
+                                                                                                setFieldValue('B00011_description', e.target.value);
+                                                                                                this.handleChange()
+                                                                                            }}
+                                                                                        >                                     
+                                                                                        </Field>
+                                                                                        {errors.B00011_description   ? (
+                                                                                            <span className="errorMsg">{errors.B00011_description   }</span>
+                                                                                        ) : null}
+                                                                                    </div>
+                                                                                </FormGroup>
+                                                                            </Col>
+                                                                            </Fragment> : null
+                                                                        } */}
                                                                         {values.pa_coolie_flag == '1' && values[coverage.code] == 'B00073' ?
                                                                             <Fragment>
                                                                                 <Col sm={12} md={11} lg={2} key={qIndex + "b"}>

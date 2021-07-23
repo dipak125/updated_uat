@@ -17,9 +17,17 @@ import Encryption from '../../shared/payload-encryption';
 import * as Yup from "yup";
 import swal from 'sweetalert';
 import moment from "moment";
-import {  validRegistrationNumber } from "../../shared/validationFunctions";
+import { validRegistrationNumber } from "../../shared/validationFunctions";
+import {  userTypes } from "../../shared/staticValues";
 
+let tempEncryption = new Encryption()
 let translation = localStorage.getItem("phrases") ? JSON.parse(localStorage.getItem("phrases")) : []
+let user_data = sessionStorage.getItem("users") ? JSON.parse(sessionStorage.getItem("users")) : "";
+if (user_data.user) {
+    user_data = JSON.parse(tempEncryption.decrypt(user_data.user));
+}
+
+
 
 const ComprehensiveValidation = Yup.object().shape({
     // is_carloan: Yup.number().required('Please select one option')
@@ -753,17 +761,6 @@ class OtherComprehensiveGCV extends Component {
         let defaultBodySliderValue =  0
         let coverage_data = {}
 
-        let csc_data = localStorage.getItem('users') ? localStorage.getItem('users') : "";
-        let csc_user_type = "";
-
-        if(csc_data && sessionStorage.getItem('csc_id')) {
-            let encryption = new Encryption();
-            csc_data = JSON.parse(csc_data)        
-            csc_data = csc_data.user
-            csc_data = JSON.parse(encryption.decrypt(csc_data));           
-            csc_user_type = csc_data.type
-        }
-
         if(add_more_coverage) {
             coverage_data = {
                 'B00018' : {'value': values.B00018_value },
@@ -807,28 +804,38 @@ class OtherComprehensiveGCV extends Component {
             }
 
         console.log('post_data',post_data)
-        if(post_data.idv_value > 5000000 && csc_user_type == "POSP" ) {
-            swal("Quote cannot proceed with IDV greater than 5000000")
-            this.props.loadingStop();
-            return false
-        }
 
-        formData.append('enc_data', encryption.encrypt(JSON.stringify(post_data)))
-        this.props.loadingStart();
-        axios.post('gcv-tp/update-insured-value', formData).then(res => {
-            this.props.loadingStop();
-            let decryptResp = JSON.parse(encryption.decrypt(res.data))
-            console.log("decrypt--fetchData-- ", decryptResp)
-            if (decryptResp.error == false) {
-                this.props.history.push(`/AdditionalDetails_GCV_TP/${productId}`);
+        if (user_data) {
+            if(userTypes.includes(user_data.login_type) && add_more_coverage.indexOf('B00015') < 0){
+                swal("This cover is mandated by IRDAI, it is compulsory for Owner-Driver to possess a PA cover of minimum Rs 15 Lacs, except in certain conditions. By not choosing this cover, you confirm that you hold an existing PA cover or you do not possess a valid driving license.")
+                return false
             }
-        })
-            .catch(err => {
-                // handle error
-                let decryptResp = JSON.parse(encryption.decrypt(err.data))
-            console.log("decrypterr--fetchData-- ", decryptResp)
-                this.props.loadingStop();
-            })
+            else {
+                if(post_data.idv_value > 5000000 && user_data.user_type == "POSP" ) {
+                    swal("Quote cannot proceed with IDV greater than 5000000")
+                    this.props.loadingStop();
+                    return false
+                }
+                else {
+                    formData.append('enc_data', encryption.encrypt(JSON.stringify(post_data)))
+                    this.props.loadingStart();
+                    axios.post('gcv-tp/update-insured-value', formData).then(res => {
+                        this.props.loadingStop();
+                        let decryptResp = JSON.parse(encryption.decrypt(res.data))
+                        console.log("decrypt--fetchData-- ", decryptResp)
+                        if (decryptResp.error == false) {
+                            this.props.history.push(`/AdditionalDetails_GCV_TP/${productId}`);
+                        }
+                    })
+                    .catch(err => {
+                        // handle error
+                        let decryptResp = JSON.parse(encryption.decrypt(err.data))
+                    console.log("decrypterr--fetchData-- ", decryptResp)
+                        this.props.loadingStop();
+                    })
+                }
+            }
+        }
     }
 
     onRowSelect = (values, isSelect, setFieldTouched, setFieldValue) => {
@@ -1486,10 +1493,11 @@ class OtherComprehensiveGCV extends Component {
                                                     name={coverage.code}
                                                     value={coverage.code}
                                                     className="user-self"
-                                                    // checked={values.roadsideAssistance ? true : false}
+                                                    disabled={(userTypes.includes(user_data.login_type) && values[coverage.code] == 'B00015') ? true : false}
                                                     onClick={(e) =>{
                                                         if( e.target.checked == false && values[coverage.code] == 'B00015') {
-                                                            swal(phrases.SwalIRDAI)
+                                                            swal(phrases.SwalIRDAI,
+                                                                {button: phrases.OK})
                                                         }
                                                         this.onRowSelect(e.target.value, e.target.checked, setFieldTouched, setFieldValue)         
                                                     }

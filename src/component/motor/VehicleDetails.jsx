@@ -14,13 +14,13 @@ import { Formik, Field, Form, FieldArray } from "formik";
 import axios from "../../shared/axios"
 import moment from "moment";
 import Encryption from '../../shared/payload-encryption';
-import {  PersonAge } from "../../shared/dateFunctions";
+import { PersonAge } from "../../shared/dateFunctions";
 import Autosuggest from 'react-autosuggest';
 import { addDays } from 'date-fns';
 import {
     checkGreaterTimes,
     checkGreaterStartEndTimes
-  } from "../../shared/validationFunctions";
+} from "../../shared/validationFunctions";
 
 const year = new Date('Y')
 const ageObj = new PersonAge();
@@ -34,244 +34,246 @@ const maxRegnDate = new Date();
 
 const initialValue = {
     registration_date: "",
-    location_id:"",
-    previous_is_claim:"",
-    previous_city:"",
-    insurance_company_id:"",
-    previous_policy_name:"",
+    location_id: "",
+    previous_is_claim: "",
+    previous_city: "",
+    insurance_company_id: "",
+    previous_policy_name: "",
     previous_end_date: "",
     previous_start_date: "",
-    previous_claim_bonus: "",
+    previous_claim_bonus: 1,
     previous_claim_for: "",
     previous_policy_no: ""
 }
 const vehicleRegistrationValidation = Yup.object().shape({
     registration_date: Yup.string().required('RegistrationRequired')
-    .test(
-        "checkGreaterTimes",
-        "RegistrationLessPrevious",
-        function (value) {
-            if (value) {
-                return checkGreaterStartEndTimes(value, this.parent.previous_start_date);
+        .test(
+            "checkGreaterTimes",
+            "RegistrationLessPrevious",
+            function (value) {
+                if (value) {
+                    return checkGreaterStartEndTimes(value, this.parent.previous_start_date);
+                }
+                return true;
             }
-            return true;
-        }
-    ),
+        ),
     // location_id:Yup.string().matches(/^[A-Za-z0-9 ]+$/,'No special Character allowed').required('Registration city is required'),
 
     location_id: Yup.string()
-    .required(function() {
-        return "CityRequired"
-    })
-    .matches(/^([0-9]*)$/, function() {
-        return "No special Character allowed"
-    }),
-
-    previous_start_date:Yup.date()
-    .notRequired('Previous Start date is required')
-    .test(
-        "currentMonthChecking",
-        function() {
-            return "PleaseESD"
-        },
-        function (value) {
-            const ageObj = new PersonAge();
-            if (ageObj.whatIsCurrentMonth(this.parent.registration_date) > 0 && !value) {   
-                return false;    
-            }
-            return true;
-        }
-    ).test(
-        "checkGreaterTimes",
-        "StartDateLessEnd",
-        function (value) {
-            if (value) {
-                return checkGreaterStartEndTimes(value, this.parent.previous_end_date);
-            }
-            return true;
-        }
-    ).test(
-      "checkStartDate",
-      "Enter Start Date",
-      function (value) {       
-          if ( this.parent.previous_end_date != undefined && value == undefined) {
-              return false;
-          }
-          return true;
-      }
-    ),
-    previous_end_date:Yup.date()
-    .notRequired('Previous end date is required')
-    .test(
-        "currentMonthChecking",
-        function() {
-            return "PleaseEED"
-        },
-        function (value) {
-            const ageObj = new PersonAge();
-            if (ageObj.whatIsCurrentMonth(this.parent.registration_date) > 0 && !value) {   
-                return false;    
-            }
-            return true;
-        }
-    ).test( 
-        "checkGreaterTimes",
-        "EndDateGreaterStart",
-        function (value) {
-            if (value) {
-                return checkGreaterTimes(value, this.parent.previous_start_date);
-            }
-            return true;
-        }
-        ).test(
-        "checkEndDate",
-        "PleaseEED",
-        function (value) {     
-            if ( this.parent.previous_start_date != undefined && value == undefined) {
-                return false;
-            }
-            return true;
-        }
-    ),
-    previous_policy_name:Yup.string()
-    .notRequired('Please select Policy Type')
-    .test(
-        "currentMonthChecking",
-        function() {
-            return "PleaseSPT"
-        },
-        function (value) {
-            const ageObj = new PersonAge();
-            if (ageObj.whatIsCurrentMonth(this.parent.registration_date) > 0 && !value) {   
-                return false;    
-            }
-            return true;
-        }
-    )
-    .test(
-        "currentMonthChecking",
-        function() {
-            return "Since previous policy is a liability policy, issuance of a package policy will be subjet to successful inspection of your vehicle. Our Customer care executive will call you to assit on same, shortly"
-        },
-        function (value) {
-            // if (value == '2' ) {   
-            //     return false;    
-            // }
-            return true;
-        }
-    ),
-    insurance_company_id:Yup.number()
-    .notRequired('Insurance company is required')
-    .test(
-        "currentMonthChecking",
-        function() {
-            return "PleaseEPIC"
-        },
-        function (value) {
-            const ageObj = new PersonAge();
-            if (ageObj.whatIsCurrentMonth(this.parent.registration_date) > 0 && !value) {   
-                return false;    
-            }
-            return true;
-        }
-    ),
-    previous_city:Yup.string()
-    .notRequired('PleaseEPICC')
-    .test(
-        "currentMonthChecking",
-        function() {
-            return "PleaseEPICC"
-        },
-        function (value) {
-            const ageObj = new PersonAge();
-            if (ageObj.whatIsCurrentMonth(this.parent.registration_date) > 0 && !value) {   
-                return false;    
-            }
-            return true;
-        }
-    )
-    .matches(/^[a-zA-Z0-9][a-zA-Z0-9-/.,\s]*$/, 
-        function() {
-            return "PleaseEnterValidAddress"
-    })
-    .max(100, function() {
-        return "AddressMustBeMaximum100Chracters"
-    }),
-
-    previous_policy_no:Yup.string()
-    .notRequired('PleaseEPPN')
-    .test(
-        "currentMonthChecking",
-        function() {
-            return "PleaseEPPN"
-        },
-        function (value) {
-            const ageObj = new PersonAge();
-            if (ageObj.whatIsCurrentMonth(this.parent.registration_date) > 0 && !value) {   
-                return false;    
-            }
-            return true;
-        }
-    )
-    .matches(/^[a-zA-Z0-9][a-zA-Z0-9\s-/]*$/, 
-        function() {
-            return "PleasePolicyNumber"
-        }).min(6, function() {
-            return "PolicyMinCharacter"
+        .required(function () {
+            return "CityRequired"
         })
-        .max(28, function() {
+        .matches(/^([0-9]*)$/, function () {
+            return "No special Character allowed"
+        }),
+
+    previous_start_date: Yup.date()
+        .notRequired('Previous Start date is required')
+        .test(
+            "currentMonthChecking",
+            function () {
+                return "PleaseESD"
+            },
+            function (value) {
+                const ageObj = new PersonAge();
+                if (ageObj.whatIsCurrentMonth(this.parent.registration_date) > 0 && !value) {
+                    return false;
+                }
+                return true;
+            }
+        ).test(
+            "checkGreaterTimes",
+            "StartDateLessEnd",
+            function (value) {
+                if (value) {
+                    return checkGreaterStartEndTimes(value, this.parent.previous_end_date);
+                }
+                return true;
+            }
+        ).test(
+            "checkStartDate",
+            "Enter Start Date",
+            function (value) {
+                if (this.parent.previous_end_date != undefined && value == undefined) {
+                    return false;
+                }
+                return true;
+            }
+        ),
+    previous_end_date: Yup.date()
+        .notRequired('Previous end date is required')
+        .test(
+            "currentMonthChecking",
+            function () {
+                return "PleaseEED"
+            },
+            function (value) {
+                const ageObj = new PersonAge();
+                if (ageObj.whatIsCurrentMonth(this.parent.registration_date) > 0 && !value) {
+                    return false;
+                }
+                return true;
+            }
+        ).test(
+            "checkGreaterTimes",
+            "EndDateGreaterStart",
+            function (value) {
+                if (value) {
+                    return checkGreaterTimes(value, this.parent.previous_start_date);
+                }
+                return true;
+            }
+        ).test(
+            "checkEndDate",
+            "PleaseEED",
+            function (value) {
+                if (this.parent.previous_start_date != undefined && value == undefined) {
+                    return false;
+                }
+                return true;
+            }
+        ),
+    previous_policy_name: Yup.string()
+        .notRequired('Please select Policy Type')
+        .test(
+            "currentMonthChecking",
+            function () {
+                return "PleaseSPT"
+            },
+            function (value) {
+                const ageObj = new PersonAge();
+                if (ageObj.whatIsCurrentMonth(this.parent.registration_date) > 0 && !value) {
+                    return false;
+                }
+                return true;
+            }
+        )
+        .test(
+            "currentMonthChecking",
+            function () {
+                return "Since previous policy is a liability policy, issuance of a package policy will be subjet to successful inspection of your vehicle. Our Customer care executive will call you to assit on same, shortly"
+            },
+            function (value) {
+                // if (value == '2' ) {   
+                //     return false;    
+                // }
+                return true;
+            }
+        ),
+    insurance_company_id: Yup.number()
+        .notRequired('Insurance company is required')
+        .test(
+            "currentMonthChecking",
+            function () {
+                return "PleaseEPIC"
+            },
+            function (value) {
+                const ageObj = new PersonAge();
+                if (ageObj.whatIsCurrentMonth(this.parent.registration_date) > 0 && !value) {
+                    return false;
+                }
+                return true;
+            }
+        ),
+    previous_city: Yup.string()
+        .notRequired('PleaseEPICC')
+        .test(
+            "currentMonthChecking",
+            function () {
+                return "PleaseEPICC"
+            },
+            function (value) {
+                const ageObj = new PersonAge();
+                if (ageObj.whatIsCurrentMonth(this.parent.registration_date) > 0 && !value) {
+                    return false;
+                }
+                return true;
+            }
+        )
+        .matches(/^[a-zA-Z0-9][a-zA-Z0-9-/.,\s]*$/,
+            function () {
+                return "PleaseEnterValidAddress"
+            })
+        .max(100, function () {
+            return "AddressMustBeMaximum100Chracters"
+        }),
+
+    previous_policy_no: Yup.string()
+        .notRequired('PleaseEPPN')
+        .test(
+            "currentMonthChecking",
+            function () {
+                return "PleaseEPPN"
+            },
+            function (value) {
+                const ageObj = new PersonAge();
+                if (ageObj.whatIsCurrentMonth(this.parent.registration_date) > 0 && !value) {
+                    return false;
+                }
+                return true;
+            }
+        )
+        .matches(/^[a-zA-Z0-9][a-zA-Z0-9\s-/]*$/,
+            function () {
+                return "PleasePolicyNumber"
+            }).min(6, function () {
+                return "PolicyMinCharacter"
+            })
+        .max(28, function () {
             return "PolicyMaxCharacter"
         }),
 
-    previous_claim_bonus:Yup.string()
-    .notRequired()
-    .test(
-        "currentMonthChecking",
-        function() {
-            return "PleaseEPCB"
-        },
-        function (value) {
-            console.log('PleaseEPCB'+this.parent.previous_is_claim+' ==== '+this.parent.previous_policy_name+' ==== '+value)
-            if (Math.floor(moment().diff(this.parent.previous_end_date, 'days', true)) <= 90 && this.parent.previous_is_claim == '0' && this.parent.previous_policy_name == '1' && (!value || value == '1')) {   
-                return false;    
+    previous_claim_bonus: Yup.string()
+        .notRequired()
+        .test(
+            "currentMonthChecking",
+            function () {
+                return "PleaseEPCB"
+            },
+            function (value) {
+                console.log('PleaseEPCB' + this.parent.previous_is_claim + ' ==== ' + this.parent.previous_policy_name + ' ==== ' + value)
+                let prevdate = new Date(this.parent.previous_end_date)
+                let todaydate = new Date()
+                if (prevdate > todaydate && this.parent.previous_is_claim == '0' && this.parent.previous_policy_name == '1' && (!value || value == '1')) {
+                    return false;
+                }
+                return true;
             }
-            return true;
-        }
-    )
-    .test(
-        "previousClaimChecking",
-        function() {
-            return "PleaseEPCB"
-        },
-        function (value) {
-            if (this.parent.previous_is_claim == '1' && !value && this.parent.previous_claim_for == '2') {   
-                return false;    
+        )
+        .test(
+            "previousClaimChecking",
+            function () {
+                return "PleaseEPCB"
+            },
+            function (value) {
+                if (this.parent.previous_is_claim == '1' && !value && this.parent.previous_claim_for == '2') {
+                    return false;
+                }
+                return true;
             }
-            return true;
-        }
-    ),
-    previous_is_claim:Yup.string()
-    .notRequired()
-    .test(
-        "currentMonthChecking",
-        function() {
-            return "PleaseSPC"
-        },
-        function (value) {
-            const ageObj = new PersonAge();
-            if (ageObj.whatIsCurrentMonth(this.parent.registration_date) > 0 && this.parent.previous_policy_name == '1' &&
-            Math.floor(moment().diff(this.parent.previous_end_date, 'days', true)) <= 90 && !value) {   
-                return false;    
+        ),
+    previous_is_claim: Yup.string()
+        .notRequired()
+        .test(
+            "currentMonthChecking",
+            function () {
+                return "PleaseSPC"
+            },
+            function (value) {
+                const ageObj = new PersonAge();
+                if (ageObj.whatIsCurrentMonth(this.parent.registration_date) > 0 && this.parent.previous_policy_name == '1' &&
+                    Math.floor(moment().diff(this.parent.previous_end_date, 'days', true)) <= 90 && !value) {
+                    return false;
+                }
+                return true;
             }
-            return true;
-        }
-    ),
-    previous_claim_for:Yup.string().when(['previous_is_claim'], {
-        is: previous_is_claim => previous_is_claim == '1',       
+        ),
+    previous_claim_for: Yup.string().when(['previous_is_claim'], {
+        is: previous_is_claim => previous_is_claim == '1',
         then: Yup.string().required('PleasePPCF'),
         otherwise: Yup.string()
     }),
-   
+
 });
 
 const fuel = {
@@ -287,9 +289,9 @@ class VehicleDetails extends Component {
         insurerList: [],
         showClaim: false,
         previous_is_claim: "",
-        motorInsurance:{},
+        motorInsurance: {},
         previousPolicy: {},
-        CustomerID: '',  
+        CustomerID: '',
         suggestions: [],
         customerDetails: [],
         selectedCustomerRecords: [],
@@ -304,7 +306,7 @@ class VehicleDetails extends Component {
     }
     onChange = (e, setFieldValue) => {
         setFieldValue('location_id', "")
-      };
+    };
 
     changePlaceHoldClassRemove(e) {
         let element = e.target.parentElement;
@@ -312,236 +314,236 @@ class VehicleDetails extends Component {
     }
 
     selectVehicleBrand = (productId) => {
-        if(localStorage.getItem('brandEdit') == '1') {
+        if (localStorage.getItem('brandEdit') == '1') {
             localStorage.setItem('newBrandEdit', 1)
         }
-        else if(localStorage.getItem('brandEdit') == '2') {
+        else if (localStorage.getItem('brandEdit') == '2') {
             localStorage.setItem('newBrandEdit', '2')
         }
 
-        let brandEdit = {'brandEdit' : 1}
-            this.props.setData(brandEdit)
+        let brandEdit = { 'brandEdit': 1 }
+        this.props.setData(brandEdit)
         this.props.history.push(`/Select-brand/${productId}`);
     }
 
     selectBrand = (productId) => {
-        if(this.props.data && this.props.data.fastLaneData){
+        if (this.props.data && this.props.data.fastLaneData) {
             this.props.history.push(`/Registration/${productId}`);
-        } 
+        }
         else {
-            let brandEdit = {'brandEdit' : 1}
+            let brandEdit = { 'brandEdit': 1 }
             this.props.setData(brandEdit)
             this.props.history.push(`/Select-brand/${productId}`);
         }
-        
+
     }
 
     editBrand = (productId) => {
-        let brandEdit = {'brandEdit' : 1}
-            this.props.setData(brandEdit)
-            this.props.history.push(`/Select-brand/${productId}`);     
+        let brandEdit = { 'brandEdit': 1 }
+        this.props.setData(brandEdit)
+        this.props.history.push(`/Select-brand/${productId}`);
     }
 
 
-    showClaimText = (value) =>{
-        if(value == 1){
+    showClaimText = (value) => {
+        if (value == 1) {
             this.setState({
-                showClaim:true,
-                previous_is_claim:1
+                showClaim: true,
+                previous_is_claim: 1
             })
         }
-        else{
+        else {
             this.setState({
-                showClaim:false,
-                previous_is_claim:0
+                showClaim: false,
+                previous_is_claim: 0
             })
         }
     }
 
-      // ----------------AddressId------------
+    // ----------------AddressId------------
     onSuggestionsClearRequested = () => {
-    this.setState({
-        suggestions: []   
-    });
+        this.setState({
+            suggestions: []
+        });
     };
 
     escapeRegexCharacters(str) {
-    return str.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+        return str.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
     }
-    
+
 
     onChangeCustomerID = (event, { newValue, method }) => {
         //const input = newValue;
-           // if (/^[a-zA-Z]+$/.test(input) || input === "") {
-                this.setState({
-                    CustomerID: newValue,
-                    RTO_location: ""
-                    });
-            //}
-        
-    };
-  
-   getCustomerIDSuggestions(value) {
-    const escapedValue = this.escapeRegexCharacters(value.trim());   
-    if (escapedValue === '') {
-      return [];
-    }  
-    // const regex = new RegExp('^' + escapedValue, 'i');
-    const regex = new RegExp( escapedValue, 'i');
-    console.log('newValue', regex)
-    if(this.state.customerDetails && escapedValue.length >1) {
-      return this.state.customerDetails.filter(language => regex.test(language.RTO_LOCATION));
-    }
-    else return 0;
-    
-  }
-  
-  onSuggestionsFetchCustomerID = ({ value }) => {
-    this.setState({
-      suggestions: this.getCustomerIDSuggestions(value)
-    });
-  };
+        // if (/^[a-zA-Z]+$/.test(input) || input === "") {
+        this.setState({
+            CustomerID: newValue,
+            RTO_location: ""
+        });
+        //}
 
-   getCustomerIDSuggestionValue = (suggestion) => {
-    this.setState({
-      selectedCustomerRecords: suggestion
-    });
-    return suggestion.RTO_LOCATION;
-  }
-  
-   renderCustomerIDSuggestion(suggestion) {
-    return (
-      <span>{suggestion.RTO_LOCATION}</span>
-    );
-  }
-  //--------------------------------------------------------
+    };
+
+    getCustomerIDSuggestions(value) {
+        const escapedValue = this.escapeRegexCharacters(value.trim());
+        if (escapedValue === '') {
+            return [];
+        }
+        // const regex = new RegExp('^' + escapedValue, 'i');
+        const regex = new RegExp(escapedValue, 'i');
+        console.log('newValue', regex)
+        if (this.state.customerDetails && escapedValue.length > 1) {
+            return this.state.customerDetails.filter(language => regex.test(language.RTO_LOCATION));
+        }
+        else return 0;
+
+    }
+
+    onSuggestionsFetchCustomerID = ({ value }) => {
+        this.setState({
+            suggestions: this.getCustomerIDSuggestions(value)
+        });
+    };
+
+    getCustomerIDSuggestionValue = (suggestion) => {
+        this.setState({
+            selectedCustomerRecords: suggestion
+        });
+        return suggestion.RTO_LOCATION;
+    }
+
+    renderCustomerIDSuggestion(suggestion) {
+        return (
+            <span>{suggestion.RTO_LOCATION}</span>
+        );
+    }
+    //--------------------------------------------------------
 
     handleSubmit = (values, actions) => {
-        const {productId} = this.props.match.params 
-        const {motorInsurance} = this.state
+        const { productId } = this.props.match.params
+        const { motorInsurance } = this.state
         let policy_type = ageObj.whatIsCurrentMonth(values.registration_date) < 7 ? 6 : 1
         // let vehicleAge = ageObj.whatIsMyVehicleAge(values.registration_date)
         let vehicleAge = Math.floor(moment().diff(values.registration_date, 'months', true))
         // let ageDiff = Math.floor(moment().diff(values.registration_date, 'days', true));
         let ageDiff = ageObj.whatIsCurrentMonth(values.registration_date);
-        const formData = new FormData(); 
+        const formData = new FormData();
         let encryption = new Encryption();
         let post_data = {}
-        if(ageObj.whatIsCurrentMonth(values.registration_date) > 0 && values.previous_policy_name == '1' ) {
+        if (ageObj.whatIsCurrentMonth(values.registration_date) > 0 && values.previous_policy_name == '1') {
             post_data = {
-                'policy_holder_id':localStorage.getItem('policyHolder_id'),
-                'menumaster_id':1,
-                'registration_date':moment(values.registration_date).format("YYYY-MM-DD"),
-                'location_id':values.location_id,
-                'previous_start_date':moment(values.previous_start_date).format("YYYY-MM-DD"),
-                'previous_end_date':moment(values.previous_end_date).format("YYYY-MM-DD"),
-                'previous_policy_name':values.previous_policy_name,
-                'insurance_company_id':values.insurance_company_id,
-                'previous_city':values.previous_city,
+                'policy_holder_id': localStorage.getItem('policyHolder_id'),
+                'menumaster_id': 1,
+                'registration_date': moment(values.registration_date).format("YYYY-MM-DD"),
+                'location_id': values.location_id,
+                'previous_start_date': moment(values.previous_start_date).format("YYYY-MM-DD"),
+                'previous_end_date': moment(values.previous_end_date).format("YYYY-MM-DD"),
+                'previous_policy_name': values.previous_policy_name,
+                'insurance_company_id': values.insurance_company_id,
+                'previous_city': values.previous_city,
                 'previous_policy_no': values.previous_policy_no,
-                'previous_is_claim':values.previous_is_claim ? values.previous_is_claim : '0' ,
-                'previous_claim_bonus': values.previous_claim_bonus && Math.floor(moment().diff(values.previous_end_date, 'days', true)) <= 90 ? values.previous_claim_bonus : 1,
-                'previous_claim_for': values.previous_claim_for,        
+                'previous_is_claim': values.previous_is_claim ? values.previous_is_claim : '0',
+                'previous_claim_bonus': values.previous_claim_bonus ? values.previous_claim_bonus : 1,
+                'previous_claim_for': values.previous_claim_for,
                 'vehicleAge': vehicleAge,
                 'policy_type': policy_type,
                 'prev_policy_flag': 1,
-                'page_name': `VehicleDetails/${productId}`          
-            } 
+                'page_name': `VehicleDetails/${productId}`
+            }
         }
 
-        else if(ageObj.whatIsCurrentMonth(values.registration_date) > 0 && values.previous_policy_name == '2') {
+        else if (ageObj.whatIsCurrentMonth(values.registration_date) > 0 && values.previous_policy_name == '2') {
             post_data = {
-                'policy_holder_id':localStorage.getItem('policyHolder_id'),
-                'menumaster_id':1,
-                'registration_date':moment(values.registration_date).format("YYYY-MM-DD"),
-                'location_id':values.location_id,
-                'previous_start_date':moment(values.previous_start_date).format("YYYY-MM-DD"),
-                'previous_end_date':moment(values.previous_end_date).format("YYYY-MM-DD"),
-                'previous_policy_name':values.previous_policy_name,
-                'insurance_company_id':values.insurance_company_id,
-                'previous_city':values.previous_city,
+                'policy_holder_id': localStorage.getItem('policyHolder_id'),
+                'menumaster_id': 1,
+                'registration_date': moment(values.registration_date).format("YYYY-MM-DD"),
+                'location_id': values.location_id,
+                'previous_start_date': moment(values.previous_start_date).format("YYYY-MM-DD"),
+                'previous_end_date': moment(values.previous_end_date).format("YYYY-MM-DD"),
+                'previous_policy_name': values.previous_policy_name,
+                'insurance_company_id': values.insurance_company_id,
+                'previous_city': values.previous_city,
                 'previous_policy_no': values.previous_policy_no,
                 'vehicleAge': vehicleAge,
                 'policy_type': policy_type,
                 'prev_policy_flag': 1,
-                'previous_is_claim':'0', 
+                'previous_is_claim': '0',
                 'previous_claim_bonus': 1,
-                'page_name': `VehicleDetails/${productId}`          
-            } 
+                'page_name': `VehicleDetails/${productId}`
+            }
         }
-        else if(ageObj.whatIsCurrentMonth(values.registration_date) <= 0)  {
+        else if (ageObj.whatIsCurrentMonth(values.registration_date) <= 0) {
             post_data = {
-                'policy_holder_id':localStorage.getItem('policyHolder_id'),
-                'menumaster_id':1,
-                'registration_date':moment(values.registration_date).format("YYYY-MM-DD"),
-                'location_id':values.location_id,    
-                'previous_is_claim':'0', 
+                'policy_holder_id': localStorage.getItem('policyHolder_id'),
+                'menumaster_id': 1,
+                'registration_date': moment(values.registration_date).format("YYYY-MM-DD"),
+                'location_id': values.location_id,
+                'previous_is_claim': '0',
                 'previous_claim_bonus': 1,
-                'vehicleAge': vehicleAge ,
+                'vehicleAge': vehicleAge,
                 'policy_type': policy_type,
                 'prev_policy_flag': 0,
                 'page_name': `VehicleDetails/${productId}`
-            } 
+            }
         }
 
-        if(ageDiff < 1 && motorInsurance && motorInsurance.registration_no == "") {
+        if (ageDiff < 1 && motorInsurance && motorInsurance.registration_no == "") {
             localStorage.setItem('registration_number', "NEW");
         }
         else {
             localStorage.removeItem('registration_number');
         }
         console.log("post_data", post_data)
-        formData.append('enc_data',encryption.encrypt(JSON.stringify(post_data)))
+        formData.append('enc_data', encryption.encrypt(JSON.stringify(post_data)))
         this.props.loadingStart();
         axios
-        .post(`/insert-vehicle-details`, formData)
-        .then(res => { 
-            this.props.loadingStop();
-            if(res.data.error == false){
-                this.props.history.push(`/OtherComprehensive/${productId}`);
-            }
-            else{
+            .post(`/insert-vehicle-details`, formData)
+            .then(res => {
+                this.props.loadingStop();
+                if (res.data.error == false) {
+                    this.props.history.push(`/OtherComprehensive/${productId}`);
+                }
+                else {
+                    actions.setSubmitting(false)
+                }
+
+            })
+            .catch(err => {
+                this.props.loadingStop();
                 actions.setSubmitting(false)
-            }
-            
-        })
-        .catch(err => {
-          this.props.loadingStop();
-          actions.setSubmitting(false)
-        });
+            });
     }
 
     getInsurerList = () => {
         this.props.loadingStart();
         axios
-          .get(`/company/1`)
-          .then(res => {
-            this.setState({
-                insurerList: res.data.data
+            .get(`/company/1`)
+            .then(res => {
+                this.setState({
+                    insurerList: res.data.data
+                });
+                this.getAllAddress()
+            })
+            .catch(err => {
+                this.setState({
+                    insurerList: []
+                });
+                this.props.loadingStop();
             });
-            this.getAllAddress()
-          })
-          .catch(err => {
-            this.setState({
-                insurerList: []
-            });
-            this.props.loadingStop();
-          });
     }
 
     getAllAddress() {
         let policyHolder_id = localStorage.getItem("policyHolder_id") ? localStorage.getItem("policyHolder_id") : 0;
         axios.get(`location-list/${policyHolder_id}`)
-          .then(res => {
-            this.setState({
-              customerDetails: res.data.data
+            .then(res => {
+                this.setState({
+                    customerDetails: res.data.data
+                });
+                this.props.loadingStop();
+            })
+            .catch(err => {
+                this.props.loadingStop();
             });
-            this.props.loadingStop();
-          })
-          .catch(err => {
-            this.props.loadingStop();
-          });
-      }
+    }
 
     fetchData = () => {
         const { productId } = this.props.match.params
@@ -550,15 +552,15 @@ class VehicleDetails extends Component {
         this.props.loadingStart();
         axios.get(`policy-holder/motor/${policyHolder_id}`)
             .then(res => {
-                 let decryptResp = JSON.parse(encryption.decrypt(res.data))
-                 console.log("decrypt", decryptResp)
-                 let motorInsurance = decryptResp.data.policyHolder ? decryptResp.data.policyHolder.motorinsurance : {};
-                 let previousPolicy = decryptResp.data.policyHolder ? decryptResp.data.policyHolder.previouspolicy : {};
-                 let vehicleDetails = decryptResp.data.policyHolder ? decryptResp.data.policyHolder.vehiclebrandmodel : {};
-                 let RTO_location = motorInsurance && motorInsurance.location && motorInsurance.location.RTO_LOCATION ? motorInsurance.location.RTO_LOCATION : ""
-                 let previous_is_claim= previousPolicy && (previousPolicy.is_claim == 0 || previousPolicy.is_claim == 1) ? previousPolicy.is_claim : ""
+                let decryptResp = JSON.parse(encryption.decrypt(res.data))
+                console.log("decrypt", decryptResp)
+                let motorInsurance = decryptResp.data.policyHolder ? decryptResp.data.policyHolder.motorinsurance : {};
+                let previousPolicy = decryptResp.data.policyHolder ? decryptResp.data.policyHolder.previouspolicy : {};
+                let vehicleDetails = decryptResp.data.policyHolder ? decryptResp.data.policyHolder.vehiclebrandmodel : {};
+                let RTO_location = motorInsurance && motorInsurance.location && motorInsurance.location.RTO_LOCATION ? motorInsurance.location.RTO_LOCATION : ""
+                let previous_is_claim = previousPolicy && (previousPolicy.is_claim == 0 || previousPolicy.is_claim == 1) ? previousPolicy.is_claim : ""
                 this.setState({
-                    motorInsurance, previousPolicy, vehicleDetails,RTO_location, previous_is_claim
+                    motorInsurance, previousPolicy, vehicleDetails, RTO_location, previous_is_claim
                 })
                 this.props.loadingStop();
             })
@@ -568,35 +570,35 @@ class VehicleDetails extends Component {
             })
     }
 
-    handleChange =(value) => {
+    handleChange = (value) => {
         let endDate = moment(value).add(1, 'years').format("YYYY-MM-DD")
         this.setState({
             EndDate: endDate,
             endDateFlag: true,
             serverResponse: [],
             error: []
-        }) 
+        })
     }
 
     componentDidMount() {
         this.getInsurerList();
         this.fetchData();
-        
+
     }
     registration = (productId) => {
         this.props.history.push(`/Registration/${productId}`);
     }
 
     render() {
-        const {productId} = this.props.match.params  
-        const {insurerList, showClaim, previous_is_claim, motorInsurance, previousPolicy,
-            CustomerID,suggestions, vehicleDetails, RTO_location} = this.state
-        
+        const { productId } = this.props.match.params
+        const { insurerList, showClaim, previous_is_claim, motorInsurance, previousPolicy,
+            CustomerID, suggestions, vehicleDetails, RTO_location } = this.state
+
         let phrases = localStorage.getItem("phrases") ? JSON.parse(localStorage.getItem("phrases")) : null
 
         let newInitialValues = Object.assign(initialValue, {
             registration_date: motorInsurance && motorInsurance.registration_date ? new Date(motorInsurance.registration_date) : "",
-            location_id:  motorInsurance && motorInsurance.location_id ? motorInsurance.location_id : "",
+            location_id: motorInsurance && motorInsurance.location_id ? motorInsurance.location_id : "",
             previous_start_date: previousPolicy && previousPolicy.start_date ? new Date(previousPolicy.start_date) : "",
             previous_end_date: previousPolicy && previousPolicy.end_date ? new Date(previousPolicy.end_date) : "",
             previous_policy_name: previousPolicy && previousPolicy.name ? previousPolicy.name : "",
@@ -604,482 +606,492 @@ class VehicleDetails extends Component {
             previous_city: previousPolicy && previousPolicy.city ? previousPolicy.city : "",
             previous_policy_no: previousPolicy && previousPolicy.policy_no ? previousPolicy.policy_no : "",
             previous_is_claim: previous_is_claim,
-            previous_claim_bonus: previousPolicy && (previousPolicy.claim_bonus || previousPolicy.claim_bonus == 0) ? previousPolicy.claim_bonus.toString() : "",
+            previous_claim_bonus: previousPolicy && (previousPolicy.claim_bonus || previousPolicy.claim_bonus == 0) ? previousPolicy.claim_bonus.toString() : "1",
             previous_claim_for: previousPolicy && previousPolicy.claim_for ? previousPolicy.claim_for : "",
-
+            policy_type_id: motorInsurance && motorInsurance.policytype_id ? motorInsurance.policytype_id : "",
+            lapse_duration: motorInsurance && motorInsurance.lapse_duration ? motorInsurance.lapse_duration : "",
         });
 
         const inputCustomerID = {
             placeholder: phrases['SearchCity'],
             value: CustomerID ? CustomerID : RTO_location,
             onChange: this.onChangeCustomerID
-          };
-          
+        };
 
         return (
             <>
                 <BaseComponent>
-                {phrases ? 
-				<div className="page-wrapper">
-                <div className="container-fluid">
-                <div className="row">
-				
-                <aside className="left-sidebar">
-                        <div className="scroll-sidebar ps-container ps-theme-default ps-active-y">
-                        <SideNav />
-                    </div>
-                </aside>
-								
-                <div className="col-sm-12 col-md-12 col-lg-12 col-xl-12 infobox">
-                <h4 className="text-center mt-3 mb-3">{phrases['SBIGICL']}</h4>
-                <section className="brand m-b-25">
-                    <div className="d-flex justify-content-left">
-                        <div className="brandhead">
-                            <h4 className="fs-18 m-b-30">{phrases['PleaseVehicleDetails']}.</h4>
-                        </div>
-                    </div>
-                    <div className="brand-bg">
-                        <Formik initialValues={newInitialValues} onSubmit={this.handleSubmit} validationSchema={vehicleRegistrationValidation}>
-                            {({ values, errors, setFieldValue, setFieldTouched, isValid, isSubmitting, touched }) => {
+                    {phrases ?
+                        <div className="page-wrapper">
+                            <div className="container-fluid">
+                                <div className="row">
 
-                                return (
-                                    <Form>
-                                        <Row>
-                                            <Col sm={12} md={9} lg={9}>
+                                    <aside className="left-sidebar">
+                                        <div className="scroll-sidebar ps-container ps-theme-default ps-active-y">
+                                            <SideNav />
+                                        </div>
+                                    </aside>
 
-                                                <Row>
-                                                    <Col sm={12} md={6} lg={6}>
-                                                        <FormGroup>
-                                                            <div className="fs-18">
-                                                                {phrases['FirstRegDate']}
-                                                            </div>
-                                                        </FormGroup>
-                                                    </Col>
-                                                   
-                                                    <Col sm={12} md={11} lg={4}>
-                                                        <FormGroup>
-                                                            <DatePicker
-                                                                name="registration_date"
-                                                                minDate={new Date(minRegnDate)}
-                                                                maxDate={new Date(maxRegnDate)}
-                                                                dateFormat="dd MMM yyyy"
-                                                                placeholderText={phrases['RegDate']}
-                                                                peekPreviousMonth
-                                                                peekPreviousYear
-                                                                showMonthDropdown
-                                                                showYearDropdown
-                                                                dropdownMode="select"
-                                                                className="datePckr inputfs12"
-                                                                selected={values.registration_date}
-                                                                onChange={(val) => {
-                                                                    setFieldTouched('registration_date');
-                                                                    setFieldValue('registration_date', val); 
+                                    {/*<div className="col-sm-12 col-md-12 col-lg-2 col-xl-2 pd-l-0">               
+						<SideNav />
+             		 </div>*/}
 
-                                                                    setFieldValue('previous_end_date', ""); 
-                                                                    setFieldValue('previous_start_date', ""); 
-                                                                    
-                                                                }}
-                                                                
-                                                            />
-                                                            {errors.registration_date && touched.registration_date ? (
-                                                                <span className="errorMsg">{phrases[errors.registration_date]}</span>
-                                                            ) : null}
-                                                        </FormGroup>
-                                                    </Col>
-                                                </Row>
 
-                                                <Row>
-                                                    <Col sm={12} md={4} lg={4}>
-                                                        <FormGroup>
-                                                            <div className="fs-18">
-                                                                {phrases['RegCity']}
-                                                         </div>
-                                                        </FormGroup>
-                                                    </Col>
-                                                    <Col sm={12} md={6} lg={6}>
-                                                        <FormGroup>
-                                                            <div className="insurerName">
-                                                                <Autosuggest 
-                                                                suggestions={suggestions}
-                                                                onSuggestionsFetchRequested={this.onSuggestionsFetchCustomerID}
-                                                                onSuggestionsClearRequested={this.onSuggestionsClearRequested}
-                                                                getSuggestionValue={this.getCustomerIDSuggestionValue }
-                                                                shouldRenderSuggestions={this.customerIDRender}
-                                                                renderSuggestion={this.renderCustomerIDSuggestion}
-                                                                inputProps={inputCustomerID} 
-                                                                onChange={e=>this.onChange(e,setFieldValue)}
-                                                                onSuggestionSelected={(e, {suggestion,suggestionValue}) => {
-                                                                    setFieldTouched('location_id')
-                                                                    setFieldValue("location_id", suggestion.id)    
-                                                                    }}
-                                                                />
-                                                                {errors.location_id && touched.location_id ? (
-                                                                    <span className="errorMsg">{phrases[errors.location_id]}</span>
-                                                                ) : null}
-                                                            </div>
-                                                        </FormGroup>
-                                                    </Col>
-                                                </Row>
-                                            {ageObj.whatIsCurrentMonth(values.registration_date) > 0 || values.registration_date == "" ?
-                                                <Fragment>
-                                                <Row>
-                                                    <Col sm={12}>
-                                                        <FormGroup>
-                                                            <div className="carloan">
-                                                                <h4> {phrases['PPD']}</h4>
-                                                            </div>
-                                                        </FormGroup>
-                                                    </Col>
-                                                </Row>
-
-                                                <Row>
-                                                    <Col sm={12} md={11} lg={4}>
-                                                        <FormGroup>
-
-                                                            <DatePicker
-                                                                name='previous_start_date'
-                                                                minDate={new Date(minDate)}
-                                                                maxDate={new Date(maxDate)}
-                                                                dateFormat="dd MMM yyyy"
-                                                                placeholderText={phrases['PPSD']}
-                                                                peekPreviousMonth
-                                                                peekPreviousYear
-                                                                showMonthDropdown
-                                                                showYearDropdown
-                                                                dropdownMode="select"
-                                                                className="datePckr inputfs12"
-                                                                selected={values.previous_start_date}
-                                                                onChange={(val) => {
-                                                                    var date = new Date(val)
-                                                                    date = date.setFullYear(date.getFullYear() + 1);
-                                                                    var date2 = new Date(date)
-                                                                    date2 = date2.setDate(date2.getDate() - 1);
-
-                                                                    setFieldTouched('previous_start_date')
-                                                                    setFieldValue("previous_end_date", new Date(date2));
-                                                                    setFieldValue('previous_start_date', val);
-                                                                }}
-                                                            />
-                                                            {errors.previous_start_date && touched.previous_start_date ? (
-                                                                <span className="errorMsg">{phrases[errors.previous_start_date]}</span>
-                                                            ) : null}
-                                                        </FormGroup>
-                                                    </Col>
-
-                                                    <Col sm={12} md={11} lg={4}>
-                                                        <FormGroup>
-                                                            <DatePicker
-                                                                name="previous_end_date"
-                                                                dateFormat="dd MMM yyyy"
-                                                                placeholderText={phrases['PPED']}
-                                                                disabled = {true}
-                                                                dropdownMode="select"
-                                                                className="datePckr inputfs12"
-                                                                selected={values.previous_end_date}
-                                                                onChange={(val) => {
-                                                                    setFieldTouched('previous_end_date');
-                                                                    setFieldValue('previous_end_date', val);
-                                                                }}
-                                                            />
-                                                            {errors.previous_end_date && touched.previous_end_date ? (
-                                                                <span className="errorMsg">{phrases[errors.previous_end_date]}</span>
-                                                            ) : null}
-                                                        </FormGroup>
-                                                    </Col>
-                                                    <Col sm={12} md={11} lg={3}>
-                                                        <FormGroup>
-                                                            <div className="formSection">
-                                                                <Field
-                                                                    name="previous_policy_name"
-                                                                    component="select"
-                                                                    autoComplete="off"
-                                                                    className="formGrp inputfs12"
-                                                                    value = {values.previous_policy_name}
-                                                                    // value={ageObj.whatIsCurrentMonth(values.registration_date) < 7 ? 6 : values.previous_policy_name}
-                                                                >
-                                                                    <option value="">{phrases['SPT']}</option>
-                                                                    <option value="1">{phrases['Package']}</option>
-                                                                    <option value="2">{phrases['LiabilityOnly']}</option>  
-                                                        
-                                                                </Field>
-                                                                {errors.previous_policy_name && touched.previous_policy_name ? (
-                                                                    <span className="errorMsg">{phrases[errors.previous_policy_name]}</span>
-                                                                ) : null}
-                                                            </div>
-                                                        </FormGroup>
-                                                    </Col>
-                                                </Row>
-
-                                                <Row>
-                                                    <Col sm={12} md={6} lg={6}>
-                                                    <FormGroup>
-                                                        <div className="formSection">
-                                                        <Field
-                                                            name="insurance_company_id"
-                                                            component="select"
-                                                            autoComplete="off"                                                                        
-                                                            className="formGrp"
-                                                        >
-                                                            <option value="">{phrases['SelectInsurer']}</option>
-                                                            {insurerList.map((insurer, qIndex) => ( 
-                                                                <option value= {insurer.Id}>{insurer.name}</option>
-                                                            ))}
-                                                        </Field>     
-                                                        {errors.insurance_company_id && touched.insurance_company_id ? (
-                                                        <span className="errorMsg">{phrases[errors.insurance_company_id]}</span>
-                                                        ) : null}          
-                                                        </div>
-                                                    </FormGroup>
-                                                    </Col>
-
-                                                    <Col sm={12} md={5} lg={5}>
-                                                        <FormGroup>
-                                                            <div className="insurerName">
-                                                                <Field
-                                                                    name="previous_city"
-                                                                    type="text"
-                                                                    placeholder={phrases['PInsurerAddress']}
-                                                                    autoComplete="off"
-                                                                    onFocus={e => this.changePlaceHoldClassAdd(e)}
-                                                                    onBlur={e => this.changePlaceHoldClassRemove(e)}
-                                                                    
-                                                                />
-                                                                {errors.previous_city && touched.previous_city ? (
-                                                                    <span className="errorMsg">{phrases[errors.previous_city]}</span>
-                                                                ) : null}
-                                                            </div>
-                                                        </FormGroup>
-                                                    </Col>
-                                                </Row>
-                                                <Row>
-                                                <Col sm={12} md={5} lg={5}>
-                                                        <FormGroup>
-                                                            <div className="insurerName">
-                                                                <Field
-                                                                    name="previous_policy_no"
-                                                                    type="text"
-                                                                    placeholder={phrases['PPolicyNumber']}
-                                                                    autoComplete="off"
-                                                                    maxLength="28"
-                                                                    onFocus={e => this.changePlaceHoldClassAdd(e)}
-                                                                    onBlur={e => this.changePlaceHoldClassRemove(e)}
-                                                                    
-                                                                />
-                                                                {errors.previous_policy_no && touched.previous_policy_no ? (
-                                                                    <span className="errorMsg">{phrases[errors.previous_policy_no]}</span>
-                                                                ) : null}
-                                                            </div>
-                                                        </FormGroup>
-                                                    </Col>
-                                                </Row>
-                                                { values.previous_policy_name == '1' && Math.floor(moment().diff(values.previous_end_date, 'days', true)) <= 90 ?
-                                                    <Fragment>
-                                                    <Row>
-                                                        <Col sm={12}>
-                                                            <FormGroup>
-                                                                <div className="carloan">
-                                                                    <h4>{phrases['ClaimPolicy']}</h4>
-                                                                </div>
-                                                            </FormGroup>
-                                                        </Col>
-                                                    </Row>
-
-                                                    <Row>
-                                                        <Col sm={4}>
-                                                            <FormGroup>
-                                                                <div className="d-inline-flex m-b-35">
-                                                                    <div className="p-r-25">
-                                                                        <label className="customRadio3">
-                                                                        <Field
-                                                                            type="radio"
-                                                                            name='previous_is_claim'                                            
-                                                                            value='0'
-                                                                            key='1'  
-                                                                            onChange={(e) => {
-                                                                                setFieldTouched('previous_is_claim')
-                                                                                setFieldValue(`previous_is_claim`, e.target.value);
-                                                                                setFieldValue('previous_claim_for', "")
-                                                                                this.showClaimText(0);
-                                                                            }}
-                                                                            checked={values.previous_is_claim == '0' ? true : false}
-                                                                        />
-                                                                            <span className="checkmark " /><span className="fs-14"> {phrases['NoIHavent']}</span>
-                                                                        </label>
-                                                                    </div>
-
-                                                                    <div className="">
-                                                                        <label className="customRadio3">
-                                                                        <Field
-                                                                            type="radio"
-                                                                            name='previous_is_claim'                                            
-                                                                            value='1'
-                                                                            key='1'  
-                                                                            onChange={(e) => {
-                                                                                setFieldTouched('previous_is_claim')
-                                                                                setFieldValue(`previous_is_claim`, e.target.value);
-                                                                                setFieldValue('previous_claim_for', "")
-                                                                                this.showClaimText(1);
-                                                                            }}
-                                                                            checked={values.previous_is_claim == '1' ? true : false}
-                                                                        />
-                                                                            <span className="checkmark" />
-                                                                            <span className="fs-14">{phrases['YesIHave']}</span>
-                                                                        </label>
-                                                                        {errors.previous_is_claim && touched.previous_is_claim ? (
-                                                                        <span className="errorMsg">{phrases[errors.previous_is_claim]}</span>
-                                                                    ) : null}
-                                                                    </div>
-                                                                </div>
-                                                            </FormGroup>
-                                                        </Col>
-                                                    </Row>
-                                                {showClaim || previous_is_claim == 1 ?
-                                                    <Row className="m-b-30">
-                                                        <Col sm={12} md={5} lg={5}>
-                                                            <FormGroup>
-                                                                <div className="fs-18">
-                                                                {phrases['ClaimedFor']}
-                                                        </div>
-                                                            </FormGroup>
-                                                        </Col>
-                                                        <Col sm={12} md={6} lg={6}>
-                                                            <FormGroup>
-                                                                <div className="formSection">
-                                                                    <Field
-                                                                        name='previous_claim_for'
-                                                                        component="select"
-                                                                        autoComplete="off"                                                                        
-                                                                        className="formGrp"
-                                                                        value = {values.previous_claim_for}
-                                                                        onChange = {(e) => {
-                                                                            setFieldTouched('previous_claim_for')
-                                                                            setFieldValue('previous_claim_for', e.target.value)
-                                                                            if(e.target.value == '1') {
-                                                                                setFieldValue('previous_claim_bonus', '1')
-                                                                            }
-                                                                            
-                                                                        } 
-                                                                        }
-                                                                    >
-                                                                        <option value="">--{phrases['Select']}--</option>
-                                                                        <option value="1">{phrases['OwnDamage']}</option>
-                                                                        <option value="2">{phrases['Liability']}</option>
-                                                                    </Field>     
-                                                                    {errors.previous_claim_for && touched.previous_claim_for ? (
-                                                                    <span className="errorMsg">{phrases[errors.previous_claim_for]}</span>
-                                                                    ) : null}       
-                                                                </div>
-                                                            </FormGroup>
-                                                        </Col>
-                                                    </Row>
-                                                : null }
-                                                { values.previous_claim_for == "2" || previous_is_claim == "0" ?
-                                                    <Row className="m-b-30">
-                                                        <Col sm={12} md={5} lg={5}>
-                                                            <FormGroup>
-                                                                <div className="fs-18">
-                                                                {phrases['SelectNCB']}
-                                                        </div>
-                                                            </FormGroup>
-                                                        </Col>
-                                                        <Col sm={12} md={6} lg={6}>
-                                                            <FormGroup>
-                                                                <div className="formSection">
-                                                                    <Field
-                                                                        name='previous_claim_bonus'
-                                                                        component="select"
-                                                                        autoComplete="off"                                                                        
-                                                                        className="formGrp"
-                                                                        value = {values.previous_claim_bonus}
-                                                                        
-                                                                    >
-                                                                        <option value="">--{phrases['Select']}--</option>
-                                                                        <option value="0">0</option>
-                                                                        <option value="20">20</option>
-                                                                        <option value="25">25</option>
-                                                                        <option value="35">35</option>
-                                                                        <option value="45">45</option>
-                                                                        <option value="50">50</option>
-                                                                    </Field>     
-                                                                    {errors.previous_claim_bonus && touched.previous_claim_bonus ? (
-                                                                    <span className="errorMsg">{phrases[errors.previous_claim_bonus]}</span>
-                                                                    ) : null}       
-                                                                </div>
-                                                            </FormGroup>
-                                                        </Col>
-                                                    </Row>
-                                                : null} 
-                                                </Fragment> : null}
-                                                
-                                            </Fragment> : null }
-
-                                                <div className="d-flex justify-content-left resmb">
-                                                <Button className={`backBtn`} type="button"  disabled={isSubmitting ? true : false} onClick= {this.selectBrand.bind(this,productId)}>
-                                                    {isSubmitting ? phrases['Wait'] : phrases['Back']}
-                                                </Button> 
-                                                <Button className={`proceedBtn`} type="submit"  disabled={isSubmitting ? true : false}>
-                                                    {isSubmitting ? phrases['Wait'] : phrases['Next']}
-                                                </Button> 
+                                    <div className="col-sm-12 col-md-12 col-lg-12 col-xl-12 infobox">
+                                        <h4 className="text-center mt-3 mb-3">{phrases['SBIGICL']}</h4>
+                                        <section className="brand m-b-25">
+                                            <div className="d-flex justify-content-left">
+                                                <div className="brandhead">
+                                                    <h4 className="fs-18 m-b-30">{phrases['PleaseVehicleDetails']}.</h4>
                                                 </div>
+                                            </div>
+                                            <div className="brand-bg">
+                                                <Formik initialValues={newInitialValues} onSubmit={this.handleSubmit} validationSchema={vehicleRegistrationValidation}>
+                                                    {({ values, errors, setFieldValue, setFieldTouched, isValid, isSubmitting, touched }) => {
+                                                        console.log("errors------------ ", errors)
+                                                        return (
+                                                            <Form>
+                                                                <Row>
+                                                                    <Col sm={12} md={9} lg={9}>
 
-                                            </Col>
+                                                                        <Row>
+                                                                            <Col sm={12} md={6} lg={6}>
+                                                                                <FormGroup>
+                                                                                    <div className="fs-18">
+                                                                                        {phrases['FirstRegDate']}
+                                                                                    </div>
+                                                                                </FormGroup>
+                                                                            </Col>
 
-                                            <Col sm={12} md={3}>
-                                                <div className="vehbox">
-                                                    <Row className="m-b-25">
-                                                        <Col sm={12} md={7}>
-                                                            <div className="txtRegistr">{phrases['RegNo']}.<br />
-                                                            {motorInsurance && motorInsurance.registration_no}</div>
-                                                        </Col>
+                                                                            <Col sm={12} md={11} lg={4}>
+                                                                                <FormGroup>
+                                                                                    <DatePicker
+                                                                                        name="registration_date"
+                                                                                        minDate={new Date(minRegnDate)}
+                                                                                        maxDate={new Date(maxRegnDate)}
+                                                                                        dateFormat="dd MMM yyyy"
+                                                                                        placeholderText={phrases['RegDate']}
+                                                                                        peekPreviousMonth
+                                                                                        peekPreviousYear
+                                                                                        showMonthDropdown
+                                                                                        showYearDropdown
+                                                                                        dropdownMode="select"
+                                                                                        className="datePckr inputfs12"
+                                                                                        selected={values.registration_date}
+                                                                                        onChange={(val) => {
+                                                                                            setFieldTouched('registration_date');
+                                                                                            setFieldValue('registration_date', val);
 
-                                                        <Col sm={12} md={5} className="text-right">
-                                                            <button className="rgistrBtn" onClick={this.registration.bind(this, productId)}>{phrases['Edit']}</button>
-                                                        </Col>
-                                                    </Row>
+                                                                                            setFieldValue('previous_end_date', "");
+                                                                                            setFieldValue('previous_start_date', "");
 
-                                                    <Row className="m-b-25">
-                                                        <Col sm={12} md={7}>
-                                                            <div className="txtRegistr">{phrases['Brand']}<br/>
-                                                                <strong>{vehicleDetails && vehicleDetails.vehiclebrand && vehicleDetails.vehiclebrand.name ? vehicleDetails.vehiclebrand.name : ""}</strong></div>
-                                                        </Col>
+                                                                                        }}
 
-                                                        <Col sm={12} md={5} className="text-right">
-                                                            <button className="rgistrBtn" onClick= {this.editBrand.bind(this,productId)}>{phrases['Edit']}</button>
-                                                        </Col>
-                                                    </Row>
+                                                                                    />
+                                                                                    {errors.registration_date && touched.registration_date ? (
+                                                                                        <span className="errorMsg">{phrases[errors.registration_date]}</span>
+                                                                                    ) : null}
+                                                                                </FormGroup>
+                                                                            </Col>
+                                                                        </Row>
 
-                                                    <Row className="m-b-25">
-                                                        <Col sm={12} md={7}>
-                                                            <div className="txtRegistr">{phrases['Model']}<br/>
-                                                                <strong>{vehicleDetails && vehicleDetails.vehiclemodel && vehicleDetails.vehiclemodel.description ? vehicleDetails.vehiclemodel.description+" "+vehicleDetails.varientmodel.varient : ""}</strong></div>
-                                                        </Col>
+                                                                        <Row>
+                                                                            <Col sm={12} md={4} lg={4}>
+                                                                                <FormGroup>
+                                                                                    <div className="fs-18">
+                                                                                        {phrases['RegCity']}
+                                                                                    </div>
+                                                                                </FormGroup>
+                                                                            </Col>
+                                                                            <Col sm={12} md={6} lg={6}>
+                                                                                <FormGroup>
+                                                                                    <div className="insurerName">
+                                                                                        <Autosuggest
+                                                                                            suggestions={suggestions}
+                                                                                            onSuggestionsFetchRequested={this.onSuggestionsFetchCustomerID}
+                                                                                            onSuggestionsClearRequested={this.onSuggestionsClearRequested}
+                                                                                            getSuggestionValue={this.getCustomerIDSuggestionValue}
+                                                                                            shouldRenderSuggestions={this.customerIDRender}
+                                                                                            renderSuggestion={this.renderCustomerIDSuggestion}
+                                                                                            inputProps={inputCustomerID}
+                                                                                            onChange={e => this.onChange(e, setFieldValue)}
+                                                                                            onSuggestionSelected={(e, { suggestion, suggestionValue }) => {
+                                                                                                setFieldTouched('location_id')
+                                                                                                setFieldValue("location_id", suggestion.id)
+                                                                                            }}
+                                                                                        />
+                                                                                        {errors.location_id && touched.location_id ? (
+                                                                                            <span className="errorMsg">{phrases[errors.location_id]}</span>
+                                                                                        ) : null}
+                                                                                    </div>
+                                                                                </FormGroup>
+                                                                            </Col>
+                                                                        </Row>
+                                                                        {/* {ageObj.whatIsCurrentMonth(values.registration_date) > 0 || values.registration_date == "" ? */
 
-                                                        <Col sm={12} md={5} className="text-right">
-                                                            <button className="rgistrBtn" onClick= {this.selectVehicleBrand.bind(this,productId)}>{phrases['Edit']}</button>
-                                                        </Col>
-                                                    </Row>
+                                                                            console.log("motorInsurance", motorInsurance)}
+                                                                        {
+                                                                            (motorInsurance && motorInsurance.policytype_id && motorInsurance.policytype_id == '3' &&
+                                                                                motorInsurance && motorInsurance.lapse_duration == '1') ?
+                                                                                <Fragment>
+                                                                                    <Row>
+                                                                                        <Col sm={12}>
+                                                                                            <FormGroup>
+                                                                                                <div className="carloan">
+                                                                                                    <h4> {phrases['PPD']}</h4>
+                                                                                                </div>
+                                                                                            </FormGroup>
+                                                                                        </Col>
+                                                                                    </Row>
 
-                                                    <Row className="m-b-25">
-                                                        <Col sm={12} md={7}>
-                                                            <div className="txtRegistr">{phrases['Fuel']}<br/>
-                                                                <strong>{vehicleDetails && vehicleDetails.varientmodel && vehicleDetails.varientmodel.fuel_type ? fuel[vehicleDetails.varientmodel.fuel_type] : null} </strong></div>
-                                                        </Col>
-                                                    </Row>
-                                                </div>
-                                            </Col>
-                                        </Row>
-                                    </Form>
-                                );
-                            }}
-                        </Formik>
-                    </div>
-                </section>
-                <Footer />
-                </div>
-                </div>
-				 </div>
-                </div> : null }
-            </BaseComponent>
+                                                                                    <Row>
+                                                                                        <Col sm={12} md={11} lg={4}>
+                                                                                            <FormGroup>
+
+                                                                                                <DatePicker
+                                                                                                    name='previous_start_date'
+                                                                                                    minDate={new Date(minDate)}
+                                                                                                    maxDate={new Date(maxDate)}
+                                                                                                    dateFormat="dd MMM yyyy"
+                                                                                                    placeholderText={phrases['PPSD']}
+                                                                                                    peekPreviousMonth
+                                                                                                    peekPreviousYear
+                                                                                                    showMonthDropdown
+                                                                                                    showYearDropdown
+                                                                                                    dropdownMode="select"
+                                                                                                    className="datePckr inputfs12"
+                                                                                                    selected={values.previous_start_date}
+                                                                                                    onChange={(val) => {
+                                                                                                        var date = new Date(val)
+                                                                                                        date = date.setFullYear(date.getFullYear() + 1);
+                                                                                                        var date2 = new Date(date)
+                                                                                                        date2 = date2.setDate(date2.getDate() - 1);
+
+                                                                                                        setFieldTouched('previous_start_date')
+                                                                                                        setFieldValue("previous_end_date", new Date(date2));
+                                                                                                        setFieldValue('previous_start_date', val);
+                                                                                                    }}
+                                                                                                />
+                                                                                                {errors.previous_start_date && touched.previous_start_date ? (
+                                                                                                    <span className="errorMsg">{phrases[errors.previous_start_date]}</span>
+                                                                                                ) : null}
+                                                                                            </FormGroup>
+                                                                                        </Col>
+
+                                                                                        <Col sm={12} md={11} lg={4}>
+                                                                                            <FormGroup>
+                                                                                                <DatePicker
+                                                                                                    name="previous_end_date"
+                                                                                                    dateFormat="dd MMM yyyy"
+                                                                                                    placeholderText={phrases['PPED']}
+                                                                                                    disabled={true}
+                                                                                                    dropdownMode="select"
+                                                                                                    className="datePckr inputfs12"
+                                                                                                    selected={values.previous_end_date}
+                                                                                                    onChange={(val) => {
+                                                                                                        setFieldTouched('previous_end_date');
+                                                                                                        setFieldValue('previous_end_date', val);
+                                                                                                    }}
+                                                                                                />
+                                                                                                {errors.previous_end_date && touched.previous_end_date ? (
+                                                                                                    <span className="errorMsg">{phrases[errors.previous_end_date]}</span>
+                                                                                                ) : null}
+                                                                                            </FormGroup>
+                                                                                        </Col>
+                                                                                        <Col sm={12} md={11} lg={3}>
+                                                                                            <FormGroup>
+                                                                                                <div className="formSection">
+                                                                                                    <Field
+                                                                                                        name="previous_policy_name"
+                                                                                                        component="select"
+                                                                                                        autoComplete="off"
+                                                                                                        className="formGrp inputfs12"
+                                                                                                        value={values.previous_policy_name}
+                                                                                                    // value={ageObj.whatIsCurrentMonth(values.registration_date) < 7 ? 6 : values.previous_policy_name}
+                                                                                                    >
+                                                                                                        <option value="">{phrases['SPT']}</option>
+                                                                                                        <option value="1">{phrases['Package']}</option>
+                                                                                                        <option value="2">{phrases['LiabilityOnly']}</option>
+
+                                                                                                    </Field>
+                                                                                                    {errors.previous_policy_name && touched.previous_policy_name ? (
+                                                                                                        <span className="errorMsg">{phrases[errors.previous_policy_name]}</span>
+                                                                                                    ) : null}
+                                                                                                </div>
+                                                                                            </FormGroup>
+                                                                                        </Col>
+                                                                                    </Row>
+
+                                                                                    <Row>
+                                                                                        <Col sm={12} md={6} lg={6}>
+                                                                                            <FormGroup>
+                                                                                                <div className="formSection">
+                                                                                                    <Field
+                                                                                                        name="insurance_company_id"
+                                                                                                        component="select"
+                                                                                                        autoComplete="off"
+                                                                                                        className="formGrp"
+                                                                                                    >
+                                                                                                        <option value="">{phrases['SelectInsurer']}</option>
+                                                                                                        {insurerList.map((insurer, qIndex) => (
+                                                                                                            <option value={insurer.Id}>{insurer.name}</option>
+                                                                                                        ))}
+                                                                                                    </Field>
+                                                                                                    {errors.insurance_company_id && touched.insurance_company_id ? (
+                                                                                                        <span className="errorMsg">{phrases[errors.insurance_company_id]}</span>
+                                                                                                    ) : null}
+                                                                                                </div>
+                                                                                            </FormGroup>
+                                                                                        </Col>
+
+                                                                                        <Col sm={12} md={5} lg={5}>
+                                                                                            <FormGroup>
+                                                                                                <div className="insurerName">
+                                                                                                    <Field
+                                                                                                        name="previous_city"
+                                                                                                        type="text"
+                                                                                                        placeholder={phrases['PInsurerAddress']}
+                                                                                                        autoComplete="off"
+                                                                                                        onFocus={e => this.changePlaceHoldClassAdd(e)}
+                                                                                                        onBlur={e => this.changePlaceHoldClassRemove(e)}
+
+                                                                                                    />
+                                                                                                    {errors.previous_city && touched.previous_city ? (
+                                                                                                        <span className="errorMsg">{phrases[errors.previous_city]}</span>
+                                                                                                    ) : null}
+                                                                                                </div>
+                                                                                            </FormGroup>
+                                                                                        </Col>
+                                                                                    </Row>
+                                                                                    <Row>
+                                                                                        <Col sm={12} md={5} lg={5}>
+                                                                                            <FormGroup>
+                                                                                                <div className="insurerName">
+                                                                                                    <Field
+                                                                                                        name="previous_policy_no"
+                                                                                                        type="text"
+                                                                                                        placeholder={phrases['PPolicyNumber']}
+                                                                                                        autoComplete="off"
+                                                                                                        maxLength="28"
+                                                                                                        onFocus={e => this.changePlaceHoldClassAdd(e)}
+                                                                                                        onBlur={e => this.changePlaceHoldClassRemove(e)}
+
+                                                                                                    />
+                                                                                                    {errors.previous_policy_no && touched.previous_policy_no ? (
+                                                                                                        <span className="errorMsg">{phrases[errors.previous_policy_no]}</span>
+                                                                                                    ) : null}
+                                                                                                </div>
+                                                                                            </FormGroup>
+                                                                                        </Col>
+                                                                                    </Row>
+                                                                                    {values.previous_policy_name == '1' && Math.floor(moment().diff(values.previous_end_date, 'days', true)) <= 90 ?
+                                                                                        <Fragment>
+                                                                                            <Row>
+                                                                                                <Col sm={12}>
+                                                                                                    <FormGroup>
+                                                                                                        <div className="carloan">
+                                                                                                            <h4>{phrases['ClaimPolicy']}</h4>
+                                                                                                        </div>
+                                                                                                    </FormGroup>
+                                                                                                </Col>
+                                                                                            </Row>
+
+                                                                                            <Row>
+                                                                                                <Col sm={4}>
+                                                                                                    <FormGroup>
+                                                                                                        <div className="d-inline-flex m-b-35">
+                                                                                                            <div className="p-r-25">
+                                                                                                                <label className="customRadio3">
+                                                                                                                    <Field
+                                                                                                                        type="radio"
+                                                                                                                        name='previous_is_claim'
+                                                                                                                        value='0'
+                                                                                                                        key='1'
+                                                                                                                        onChange={(e) => {
+                                                                                                                            setFieldTouched('previous_is_claim')
+                                                                                                                            setFieldValue(`previous_is_claim`, e.target.value);
+                                                                                                                            setFieldValue('previous_claim_for', "")
+                                                                                                                            this.showClaimText(0);
+                                                                                                                        }}
+                                                                                                                        checked={values.previous_is_claim == '0' ? true : false}
+                                                                                                                    />
+                                                                                                                    <span className="checkmark " /><span className="fs-14"> {phrases['NoIHavent']}</span>
+                                                                                                                </label>
+                                                                                                            </div>
+
+                                                                                                            <div className="">
+                                                                                                                <label className="customRadio3">
+                                                                                                                    <Field
+                                                                                                                        type="radio"
+                                                                                                                        name='previous_is_claim'
+                                                                                                                        value='1'
+                                                                                                                        key='1'
+                                                                                                                        onChange={(e) => {
+                                                                                                                            setFieldTouched('previous_is_claim')
+                                                                                                                            setFieldValue(`previous_is_claim`, e.target.value);
+                                                                                                                            setFieldValue('previous_claim_for', "")
+                                                                                                                            this.showClaimText(1);
+                                                                                                                        }}
+                                                                                                                        checked={values.previous_is_claim == '1' ? true : false}
+                                                                                                                    />
+                                                                                                                    <span className="checkmark" />
+                                                                                                                    <span className="fs-14">{phrases['YesIHave']}</span>
+                                                                                                                </label>
+                                                                                                                {errors.previous_is_claim && touched.previous_is_claim ? (
+                                                                                                                    <span className="errorMsg">{phrases[errors.previous_is_claim]}</span>
+                                                                                                                ) : null}
+                                                                                                            </div>
+                                                                                                        </div>
+                                                                                                    </FormGroup>
+                                                                                                </Col>
+                                                                                            </Row>
+                                                                                            {showClaim || previous_is_claim == 1 ?
+                                                                                                <Row className="m-b-30">
+                                                                                                    <Col sm={12} md={5} lg={5}>
+                                                                                                        <FormGroup>
+                                                                                                            <div className="fs-18">
+                                                                                                                {phrases['ClaimedFor']}
+                                                                                                            </div>
+                                                                                                        </FormGroup>
+                                                                                                    </Col>
+                                                                                                    <Col sm={12} md={6} lg={6}>
+                                                                                                        <FormGroup>
+                                                                                                            <div className="formSection">
+                                                                                                                <Field
+                                                                                                                    name='previous_claim_for'
+                                                                                                                    component="select"
+                                                                                                                    autoComplete="off"
+                                                                                                                    className="formGrp"
+                                                                                                                    value={values.previous_claim_for}
+                                                                                                                    onChange={(e) => {
+                                                                                                                        setFieldTouched('previous_claim_for')
+                                                                                                                        setFieldValue('previous_claim_for', e.target.value)
+                                                                                                                        if (e.target.value == '1') {
+                                                                                                                            setFieldValue('previous_claim_bonus', '1')
+                                                                                                                        }
+
+                                                                                                                    }
+                                                                                                                    }
+                                                                                                                >
+                                                                                                                    <option value="">--{phrases['Select']}--</option>
+                                                                                                                    <option value="1">{phrases['OwnDamage']}</option>
+                                                                                                                    <option value="2">{phrases['Liability']}</option>
+                                                                                                                </Field>
+                                                                                                                {errors.previous_claim_for && touched.previous_claim_for ? (
+                                                                                                                    <span className="errorMsg">{phrases[errors.previous_claim_for]}</span>
+                                                                                                                ) : null}
+                                                                                                            </div>
+                                                                                                        </FormGroup>
+                                                                                                    </Col>
+                                                                                                </Row>
+                                                                                                : null}
+                                                                                            {values.previous_claim_for == "2" || previous_is_claim == "0" ?
+                                                                                                <Row className="m-b-30">
+                                                                                                    <Col sm={12} md={5} lg={5}>
+                                                                                                        <FormGroup>
+                                                                                                            <div className="fs-18">
+                                                                                                                {phrases['SelectNCB']}
+                                                                                                            </div>
+                                                                                                        </FormGroup>
+                                                                                                    </Col>
+                                                                                                    <Col sm={12} md={6} lg={6}>
+                                                                                                        <FormGroup>
+                                                                                                            <div className="formSection">
+                                                                                                                <Field
+                                                                                                                    name='previous_claim_bonus'
+                                                                                                                    component="select"
+                                                                                                                    autoComplete="off"
+                                                                                                                    className="formGrp"
+                                                                                                                    value={values.previous_claim_bonus}
+
+                                                                                                                >
+                                                                                                                    <option value="">--{phrases['Select']}--</option>
+                                                                                                                    <option value="0">0</option>
+                                                                                                                    <option value="20">20</option>
+                                                                                                                    <option value="25">25</option>
+                                                                                                                    <option value="35">35</option>
+                                                                                                                    <option value="45">45</option>
+                                                                                                                    <option value="50">50</option>
+                                                                                                                </Field>
+                                                                                                                {errors.previous_claim_bonus && touched.previous_claim_bonus ? (
+                                                                                                                    <span className="errorMsg">{phrases[errors.previous_claim_bonus]}</span>
+                                                                                                                ) : null}
+                                                                                                            </div>
+                                                                                                        </FormGroup>
+                                                                                                    </Col>
+                                                                                                </Row>
+                                                                                                : null}
+                                                                                        </Fragment> : null}
+
+                                                                                </Fragment> : null}
+
+                                                                        <div className="d-flex justify-content-left resmb">
+                                                                            <Button className={`backBtn`} type="button" disabled={isSubmitting ? true : false} onClick={this.selectBrand.bind(this, productId)}>
+                                                                                {isSubmitting ? phrases['Wait'] : phrases['Back']}
+                                                                            </Button>
+                                                                            <Button className={`proceedBtn`} type="submit" disabled={isSubmitting ? true : false}>
+                                                                                {isSubmitting ? phrases['Wait'] : phrases['Next']}
+                                                                            </Button>
+                                                                        </div>
+
+                                                                    </Col>
+
+                                                                    <Col sm={12} md={3}>
+                                                                        <div className="vehbox">
+                                                                            <Row className="m-b-25">
+                                                                                <Col sm={12} md={7}>
+                                                                                    <div className="txtRegistr">{phrases['RegNo']}.<br />
+                                                                                        {motorInsurance && motorInsurance.registration_no}</div>
+                                                                                </Col>
+
+                                                                                <Col sm={12} md={5} className="text-right">
+                                                                                    <button className="rgistrBtn" onClick={this.registration.bind(this, productId)}>{phrases['Edit']}</button>
+                                                                                </Col>
+                                                                            </Row>
+
+                                                                            <Row className="m-b-25">
+                                                                                <Col sm={12} md={7}>
+                                                                                    <div className="txtRegistr">{phrases['Brand']}<br />
+                                                                                        <strong>{vehicleDetails && vehicleDetails.vehiclebrand && vehicleDetails.vehiclebrand.name ? vehicleDetails.vehiclebrand.name : ""}</strong></div>
+                                                                                </Col>
+
+                                                                                <Col sm={12} md={5} className="text-right">
+                                                                                    <button className="rgistrBtn" onClick={this.editBrand.bind(this, productId)}>{phrases['Edit']}</button>
+                                                                                </Col>
+                                                                            </Row>
+
+                                                                            <Row className="m-b-25">
+                                                                                <Col sm={12} md={7}>
+                                                                                    <div className="txtRegistr">{phrases['Model']}<br />
+                                                                                        <strong>{vehicleDetails && vehicleDetails.vehiclemodel && vehicleDetails.vehiclemodel.description ? vehicleDetails.vehiclemodel.description + " " + vehicleDetails.varientmodel.varient : ""}</strong></div>
+                                                                                </Col>
+
+                                                                                <Col sm={12} md={5} className="text-right">
+                                                                                    <button className="rgistrBtn" onClick={this.selectVehicleBrand.bind(this, productId)}>{phrases['Edit']}</button>
+                                                                                </Col>
+                                                                            </Row>
+
+                                                                            <Row className="m-b-25">
+                                                                                <Col sm={12} md={7}>
+                                                                                    <div className="txtRegistr">{phrases['Fuel']}<br />
+                                                                                        <strong>{vehicleDetails && vehicleDetails.varientmodel && vehicleDetails.varientmodel.fuel_type ? fuel[vehicleDetails.varientmodel.fuel_type] : null} </strong></div>
+                                                                                </Col>
+                                                                            </Row>
+                                                                        </div>
+                                                                    </Col>
+                                                                </Row>
+                                                            </Form>
+                                                        );
+                                                    }}
+                                                </Formik>
+                                            </div>
+                                        </section>
+                                        <Footer />
+                                    </div>
+                                </div>
+                            </div>
+                        </div> : null}
+                </BaseComponent>
             </>
         );
     }
@@ -1088,17 +1100,17 @@ class VehicleDetails extends Component {
 
 const mapStateToProps = state => {
     return {
-      loading: state.loader.loading,
-      data: state.processData.data
+        loading: state.loader.loading,
+        data: state.processData.data
     };
-  };
-  
-  const mapDispatchToProps = dispatch => {
-    return {
-      loadingStart: () => dispatch(loaderStart()),
-      loadingStop: () => dispatch(loaderStop()),
-      setData: (data) => dispatch(setData(data))
-    };
-  };
+};
 
-export default withRouter (connect( mapStateToProps, mapDispatchToProps)(VehicleDetails));
+const mapDispatchToProps = dispatch => {
+    return {
+        loadingStart: () => dispatch(loaderStart()),
+        loadingStop: () => dispatch(loaderStop()),
+        setData: (data) => dispatch(setData(data))
+    };
+};
+
+export default withRouter(connect(mapStateToProps, mapDispatchToProps)(VehicleDetails));

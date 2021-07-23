@@ -23,64 +23,69 @@ const initialValues = {
     reg_number_part_two: '',
     reg_number_part_three: '',
     reg_number_part_four: '',
-    check_registration: 2
+    check_registration: 2,
+    policy_for: "1",
+    lapse_duration: ''
 }
 
 const vehicleRegistrationValidation = Yup.object().shape({
 
+    policy_type: Yup.string().required("PleasePT"),
+    policy_for: Yup.string().required("PleasePIC"),
+
     check_registration: Yup.string().notRequired(),
 
     reg_number_part_one: Yup.string().when(['check_registration'], {
-        is: check_registration => check_registration == '2', 
+        is: check_registration => check_registration == '2',
         then: Yup.string().required('RegistrationNumber')
-        .test(
-            "firstDigitcheck",
-            function () {
-                return "InvalidRegistrationNumber"
-            },
-            function (value) {         
-                return registrationNumberFirstBlock(value);
-            }
-        ),
+            .test(
+                "firstDigitcheck",
+                function () {
+                    return "InvalidRegistrationNumber"
+                },
+                function (value) {
+                    return registrationNumberFirstBlock(value);
+                }
+            ),
         otherwise: Yup.string().nullable()
     }),
     reg_number_part_two: Yup.string().when(['check_registration'], {
-        is: check_registration => check_registration == '2', 
+        is: check_registration => check_registration == '2',
         then: Yup.string()
-        .test(
-            "secondDigitcheck",
-            function () {
-                return "InvalidRegistrationNumber"
-            },
-            function (value) {         
-                return registrationNumberSecondBlock(value);
-            }
-        ),
+            .test(
+                "secondDigitcheck",
+                function () {
+                    return "InvalidRegistrationNumber"
+                },
+                function (value) {
+                    return registrationNumberSecondBlock(value);
+                }
+            ),
         otherwise: Yup.string().nullable()
     }),
     reg_number_part_three: Yup.string().when(['check_registration'], {
-        is: check_registration => check_registration == '2', 
+        is: check_registration => check_registration == '2',
         then: Yup.string()
-        .test(
-            "thirdDigitcheck",
-            function () {
-                return "InvalidRegistrationNumber"
-            },
-            function (value) {         
-                return registrationNumberThirdBlock(value);
-            }
-        ),
+            .test(
+                "thirdDigitcheck",
+                function () {
+                    return "InvalidRegistrationNumber"
+                },
+                function (value) {
+                    return registrationNumberThirdBlock(value);
+                }
+            ),
         otherwise: Yup.string().nullable()
     }),
     reg_number_part_four: Yup.string().when(['check_registration'], {
-        is: check_registration => check_registration == '2', 
+        is: check_registration => check_registration == '2',
         then: Yup.string().required('RegistrationNumber')
             .test(
                 "last4digitcheck",
                 function () {
                     return "InvalidRegistrationNumber"
                 },
-                function (value) {         
+                function (value) {
                     return registrationNumberLastBlock(value);
                 }
             ),
@@ -112,6 +117,11 @@ const vehicleRegistrationValidation = Yup.object().shape({
     //             return true;
     //         }
     //     ),
+    lapse_duration: Yup.string().when("policy_type", {
+        is: "3",
+        then: Yup.string().required('LapseDuration'),
+        otherwise: Yup.string()
+    }),
 
 });
 
@@ -166,7 +176,7 @@ class Registration extends Component {
 
     fetchFastlane = (values) => {
         const formData = new FormData();
-        var regNumber = values.reg_number_part_one+values.reg_number_part_two+values.reg_number_part_three+values.reg_number_part_four
+        var regNumber = values.reg_number_part_one + values.reg_number_part_two + values.reg_number_part_three + values.reg_number_part_four
         if (values.check_registration == '2') {
             formData.append('registration_no', regNumber)
             formData.append('menumaster_id', '1')
@@ -204,28 +214,28 @@ class Registration extends Component {
         const formData = new FormData();
         let encryption = new Encryption();
         let post_data = {}
-        var registration_part_numbers  = {}
+        var registration_part_numbers = {}
         var regNumber = ""
-        if(values.check_registration == '2') {
-            registration_part_numbers  = {
+        if (values.check_registration == '2') {
+            registration_part_numbers = {
                 reg_number_part_one: values.reg_number_part_one,
                 reg_number_part_two: values.reg_number_part_two,
                 reg_number_part_three: values.reg_number_part_three,
                 reg_number_part_four: values.reg_number_part_four
-            } 
-            regNumber = values.reg_number_part_one+values.reg_number_part_two+values.reg_number_part_three+values.reg_number_part_four
+            }
+            regNumber = values.reg_number_part_one + values.reg_number_part_two + values.reg_number_part_three + values.reg_number_part_four
         }
         else {
-            registration_part_numbers  = {
+            registration_part_numbers = {
                 reg_number_part_one: "",
                 reg_number_part_two: "",
                 reg_number_part_three: "",
                 reg_number_part_four: ""
-    
-            } 
+
+            }
             regNumber = "NEW"
         }
-        
+
         let policyHolder_id = localStorage.getItem('policyHolder_id') ? localStorage.getItem('policyHolder_id') : 0
 
         let bc_data = sessionStorage.getItem('bcLoginData') ? sessionStorage.getItem('bcLoginData') : "";
@@ -248,6 +258,10 @@ class Registration extends Component {
                     'bcmaster_id': "5",
                     'page_name': `Registration/${productId}`,
 
+                    'lapse_duration': values.lapse_duration,
+                    'policy_for': values.policy_for,
+                    'policy_type_id': values.policy_type,
+
                 }
             }
             else {
@@ -261,6 +275,10 @@ class Registration extends Component {
                     'bcmaster_id': bc_data ? bc_data.agent_id : "",
                     'bc_token': bc_data ? bc_data.token : "",
                     'bc_agent_id': bc_data ? bc_data.user_info.data.user.username : "",
+
+                    'lapse_duration': values.lapse_duration,
+                    'policy_for': values.policy_for,
+                    'policy_type_id': values.policy_type,
                     'page_name': `Registration/${productId}`,
 
                 }
@@ -303,6 +321,10 @@ class Registration extends Component {
                     'bcmaster_id': "5",
                     'page_name': `Registration/${productId}`,
 
+                    'lapse_duration': values.lapse_duration,
+                    'policy_for': values.policy_for,
+                    'policy_type_id': values.policy_type,
+
                 }
             }
             else {
@@ -316,6 +338,10 @@ class Registration extends Component {
                     'bc_token': bc_data ? bc_data.token : "",
                     'bc_agent_id': bc_data ? bc_data.user_info.data.user.username : "",
                     'page_name': `Registration/${productId}`,
+
+                    'lapse_duration': values.lapse_duration,
+                    'policy_for': values.policy_for,
+                    'policy_type_id': values.policy_type,
 
                 }
             }
@@ -361,6 +387,11 @@ class Registration extends Component {
 
     }
 
+    handleChange = (values, setFieldTouched, setFieldValue) => {
+        if (values.regNumber == "NEW") {
+            setFieldValue('regNumber', "");
+        }
+    }
 
     render() {
         const { motorInsurance } = this.state
@@ -370,184 +401,345 @@ class Registration extends Component {
             reg_number_part_two: tempRegNo && tempRegNo.reg_number_part_two,
             reg_number_part_three: tempRegNo && tempRegNo.reg_number_part_three,
             reg_number_part_four: tempRegNo && tempRegNo.reg_number_part_four,
-	        regNumber: motorInsurance ? motorInsurance.registration_no : '',
-            check_registration: motorInsurance && motorInsurance.registration_no == "NEW" ? '1' : '2'
+            regNumber: motorInsurance ? motorInsurance.registration_no : '',
+            check_registration: motorInsurance && motorInsurance.registration_no == "NEW" ? '1' : '2',
+
+            lapse_duration: motorInsurance && motorInsurance.lapse_duration ? motorInsurance.lapse_duration : "",
+            policy_type: motorInsurance && motorInsurance.policytype_id ? motorInsurance.policytype_id : "",
+            policy_for: motorInsurance && motorInsurance.policy_for ? motorInsurance.policy_for : "1",
         })
         let phrases = localStorage.getItem("phrases") ? JSON.parse(localStorage.getItem("phrases")) : null
-        
 
+        console.log("motorInsurance", motorInsurance);
         return (
             <>
                 <BaseComponent>
                     {phrases ?
-					<div className="page-wrapper">
-					
-                        <div className="container-fluid">
-                            <div className="row">
-							
-                                <aside className="left-sidebar">
-		 						 <div className="scroll-sidebar ps-container ps-theme-default ps-active-y">
-								 <SideNav />
-								 </div>
-								</aside>
-								
-                                <div className="col-sm-12 col-md-12 col-lg-12 col-xl-12 infobox registerbr">
-                                    <h4 className="text-center mt-3 mb-3">{phrases['SBIGICL']}</h4>
-                                    <section className="brand">
-                                        <div className="boxpd">
-                                            <h4 className="m-b-30">{phrases['About']}</h4>
-                                            <Formik initialValues={newInitialValues}
-                                                onSubmit={this.fetchFastlane}
-                                                validationSchema={vehicleRegistrationValidation}>
-                                                {({ values, errors, setFieldValue, setFieldTouched, isValid, isSubmitting, touched }) => {
+                        <div className="page-wrapper">
 
-                                                    return (
-                                                        <Form>
-                                                            <div className="row formSection">
-                                                                <label className="col-md-4">{phrases['RegName']} :</label>
-                                                                <div className="col-md-1">
+                            <div className="container-fluid">
+                                <div className="row">
 
-                                                                    <Field
-                                                                        name="reg_number_part_one"
-                                                                        type="text"
-                                                                        autoComplete="off"
-                                                                        onFocus={e => this.changePlaceHoldClassAdd(e)}
-                                                                        onBlur={e => this.changePlaceHoldClassRemove(e)}
-                                                                        value={values.reg_number_part_one}
-                                                                        disabled= {values.check_registration == '1' ? true : false}
-                                                                        maxLength="2"
-                                                                        onInput={e => {
-                                                                            this.regnoFormat(e, setFieldTouched, setFieldValue)
-                                                                            setFieldTouched('check_registration')
-                                                                            setFieldValue('check_registration', '2');
-                                                                        }}
+                                    <aside className="left-sidebar">
+                                        <div className="scroll-sidebar ps-container ps-theme-default ps-active-y">
+                                            <SideNav />
+                                        </div>
+                                    </aside>
 
-                                                                    />
+                                    <div className="col-sm-12 col-md-12 col-lg-12 col-xl-12 infobox registerbr">
+                                        <h4 className="text-center mt-3 mb-3">{phrases['SBIGICL']}</h4>
+                                        <section className="brand">
+                                            <div className="boxpd">
+                                                <Formik initialValues={newInitialValues}
+                                                    onSubmit={this.fetchFastlane}
+                                                    validationSchema={vehicleRegistrationValidation}>
+                                                    {({ values, errors, setFieldValue, setFieldTouched, isValid, isSubmitting, touched }) => {
+
+                                                        return (
+                                                            <Form>
+                                                                <div className="brandhead">
+                                                                    <p>{phrases['TakingFourPolicy']}</p>
+                                                                    <div className="d-inline-flex m-b-15">
+                                                                        <div className="p-r-25">
+                                                                            <label className="customRadio3">
+                                                                                <Field
+                                                                                    type="radio"
+                                                                                    name='policy_for'
+                                                                                    value='1'
+                                                                                    key='1'
+                                                                                    checked={values.policy_for == '1' ? true : false}
+                                                                                    onChange={() => {
+                                                                                        setFieldTouched('policy_for')
+                                                                                        setFieldValue('policy_for', '1');
+                                                                                        this.handleChange(values, setFieldTouched, setFieldValue)
+                                                                                    }
+                                                                                    }
+                                                                                />
+                                                                                <span className="checkmark " /><span className="fs-14"> {phrases['Individual']}</span>
+                                                                            </label>
+                                                                        </div>
+                                                                        <div className="p-r-25">
+                                                                            <label className="customRadio3">
+                                                                                <Field
+                                                                                    type="radio"
+                                                                                    name='policy_for'
+                                                                                    value='2'
+                                                                                    key='1'
+                                                                                    checked={values.policy_for == '2' ? true : false}
+                                                                                    onChange={() => {
+                                                                                        setFieldTouched('policy_for')
+                                                                                        setFieldValue('policy_for', '2');
+                                                                                        this.handleChange(values, setFieldTouched, setFieldValue)
+                                                                                    }
+                                                                                    }
+                                                                                />
+                                                                                <span className="checkmark " /><span className="fs-14"> {phrases['Corporate']}</span>
+                                                                            </label>
+                                                                            {errors.policy_for && touched.policy_for ? (
+                                                                                <span className="errorMsg">{phrases[errors.policy_for]}</span>
+                                                                            ) : null}
+                                                                        </div>
+
+                                                                    </div>
                                                                 </div>
-                                                                <div className="col-md-1">
+                                                                <div className="d-flex justify-content-left">
+                                                                    <div className="brandhead">
+                                                                        <p>{phrases['TellAboutPolicy']}</p>
 
-                                                                    <Field
-                                                                        name="reg_number_part_two"
-                                                                        type="text"
-                                                                        autoComplete="off"
-                                                                        onFocus={e => this.changePlaceHoldClassAdd(e)}
-                                                                        onBlur={e => this.changePlaceHoldClassRemove(e)}
-                                                                        value={values.reg_number_part_two}
-                                                                        disabled= {values.check_registration == '1' ? true : false}
-                                                                        maxLength="3"
-                                                                        onInput={e => {
-                                                                            this.regnoFormat(e, setFieldTouched, setFieldValue)
-                                                                            setFieldTouched('check_registration')
-                                                                            setFieldValue('check_registration', '2');
-                                                                        }}
+                                                                        <div className="d-inline-flex m-b-15">
+                                                                            <div className="p-r-25">
+                                                                                <label className="customRadio3">
+                                                                                    <Field
+                                                                                        type="radio"
+                                                                                        name='policy_type'
+                                                                                        value='1'
+                                                                                        key='1'
+                                                                                        checked={values.policy_type == '1' ? true : false}
+                                                                                        onChange={() => {
+                                                                                            setFieldTouched('policy_type')
+                                                                                            setFieldValue('policy_type', '1');
+                                                                                            this.handleChange(values, setFieldTouched, setFieldValue)
+                                                                                        }
+                                                                                        }
+                                                                                    />
+                                                                                    <span className="checkmark " /><span className="fs-14"> {phrases['NewPolicy']}</span>
+                                                                                </label>
+                                                                            </div>
 
-                                                                    />         
+                                                                            <div className="p-r-25">
+                                                                                <label className="customRadio3">
+                                                                                    <Field
+                                                                                        type="radio"
+                                                                                        name='policy_type'
+                                                                                        value='2'
+                                                                                        key='1'
+                                                                                        checked={values.policy_type == '2' ? true : false}
+                                                                                        onChange={() => {
+                                                                                            setFieldTouched('policy_type')
+                                                                                            setFieldValue('policy_type', '2');
+                                                                                            this.handleChange(values, setFieldTouched, setFieldValue)
+                                                                                        }
+                                                                                        }
+                                                                                    />
+                                                                                    <span className="checkmark " /><span className="fs-14"> {phrases['RollOver']}</span>
+                                                                                </label>
+                                                                            </div>
+
+                                                                            <div>
+                                                                                <label className="customRadio3">
+                                                                                    <Field
+                                                                                        type="radio"
+                                                                                        name='policy_type'
+                                                                                        value='3'
+                                                                                        key='1'
+                                                                                        checked={values.policy_type == '3' ? true : false}
+                                                                                        onChange={() => {
+                                                                                            setFieldTouched('policy_type')
+                                                                                            setFieldValue('policy_type', '3');
+                                                                                            this.handleChange(values, setFieldTouched, setFieldValue)
+                                                                                        }
+                                                                                        }
+                                                                                    />
+                                                                                    <span className="checkmark" />
+                                                                                    <span className="fs-14">{phrases['LapsedPolicy']}</span>
+                                                                                </label>
+                                                                                {errors.policy_type && touched.policy_type ? (
+                                                                                    <span className="errorMsg">{phrases[errors.policy_type]}</span>
+                                                                                ) : null}
+                                                                            </div>
+                                                                        </div>
+                                                                    </div>
                                                                 </div>
-                                                                <div className="col-md-1">
 
-                                                                    <Field
-                                                                        name="reg_number_part_three"
-                                                                        type="text"
-                                                                        autoComplete="off"
-                                                                        onFocus={e => this.changePlaceHoldClassAdd(e)}
-                                                                        onBlur={e => this.changePlaceHoldClassRemove(e)}
-                                                                        value={values.reg_number_part_three}
-                                                                        disabled= {values.check_registration == '1' ? true : false}
-                                                                        maxLength="3"
-                                                                        onInput={e => {
-                                                                            this.regnoFormat(e, setFieldTouched, setFieldValue)
-                                                                            setFieldTouched('check_registration')
-                                                                            setFieldValue('check_registration', '2');
-                                                                        }}
+                                                                {values.policy_type == '3' ?
+                                                                    <div className="d-flex justify-content-left">
+                                                                        <div className="brandhead">
+                                                                            <p>{phrases['LapseDuration']}</p>
+                                                                            <div className="d-inline-flex m-b-15">
+                                                                                <div className="p-r-25">
+                                                                                    <label className="customRadio3">
+                                                                                        <Field
+                                                                                            type="radio"
+                                                                                            name='lapse_duration'
+                                                                                            value='1'
+                                                                                            key='1'
+                                                                                            checked={values.lapse_duration == '1' ? true : false}
+                                                                                        />
+                                                                                        <span className="checkmark " /><span className="fs-14"> {phrases['BeforeNinety']}</span>
+                                                                                    </label>
+                                                                                </div>
+                                                                                <div className="p-r-25">
+                                                                                    <label className="customRadio3">
+                                                                                        <Field
+                                                                                            type="radio"
+                                                                                            name='lapse_duration'
+                                                                                            value='2'
+                                                                                            key='1'
+                                                                                            checked={values.lapse_duration == '2' ? true : false}
+                                                                                        />
+                                                                                        <span className="checkmark " /><span className="fs-14"> {phrases['OverNinety']}</span>
+                                                                                    </label>
+                                                                                    {errors.lapse_duration && touched.lapse_duration ? (
+                                                                                        <span className="errorMsg">{phrases[errors.lapse_duration]}</span>
+                                                                                    ) : null}
+                                                                                </div>
+                                                                            </div>
+                                                                        </div>
+                                                                    </div> : null}
 
-                                                                    />
+                                                                <div className="brandhead">
+                                                                    <h4 className="m-b-30">{phrases['About']}</h4>
                                                                 </div>
-                                                                <div className="col-md-1">
 
-                                                                    <Field
-                                                                        name="reg_number_part_four"
-                                                                        type="text"
-                                                                        autoComplete="off"
-                                                                        onFocus={e => this.changePlaceHoldClassAdd(e)}
-                                                                        onBlur={e => this.changePlaceHoldClassRemove(e)}
-                                                                        value={values.reg_number_part_four}
-                                                                        disabled= {values.check_registration == '1' ? true : false}
-                                                                        maxLength="4"
-                                                                        onInput={e => {
-                                                                            this.regnoFormat(e, setFieldTouched, setFieldValue)
-                                                                            setFieldTouched('check_registration')
-                                                                            setFieldValue('check_registration', '2');
-                                                                        }}
+                                                                <div className="row formSection">
+                                                                    <label className="col-md-4">{phrases['RegName']} :</label>
+                                                                    <div className="col-md-1">
 
-                                                                    />
-                                                                </div>
-                                                                {(errors.reg_number_part_one || errors.reg_number_part_two || errors.reg_number_part_three || errors.reg_number_part_four) 
-                                                                && (touched.reg_number_part_one || touched.reg_number_part_two || touched.reg_number_part_three || touched.reg_number_part_four) ? (
+                                                                        <Field
+                                                                            name="reg_number_part_one"
+                                                                            type="text"
+                                                                            autoComplete="off"
+                                                                            onFocus={e => this.changePlaceHoldClassAdd(e)}
+                                                                            onBlur={e => this.changePlaceHoldClassRemove(e)}
+                                                                            value={values.reg_number_part_one}
+                                                                            disabled={values.check_registration == '1' ? true : false}
+                                                                            maxLength="2"
+                                                                            onInput={e => {
+                                                                                this.regnoFormat(e, setFieldTouched, setFieldValue)
+                                                                                setFieldTouched('check_registration')
+                                                                                setFieldValue('check_registration', '2');
+                                                                            }}
+
+                                                                        />
+                                                                    </div>
+
+                                                                    <div className="col-md-1">
+
+                                                                        <Field
+                                                                            name="reg_number_part_two"
+                                                                            type="text"
+                                                                            autoComplete="off"
+                                                                            onFocus={e => this.changePlaceHoldClassAdd(e)}
+                                                                            onBlur={e => this.changePlaceHoldClassRemove(e)}
+                                                                            value={values.reg_number_part_two}
+                                                                            disabled={values.check_registration == '1' ? true : false}
+                                                                            maxLength="3"
+                                                                            onInput={e => {
+                                                                                this.regnoFormat(e, setFieldTouched, setFieldValue)
+                                                                                setFieldTouched('check_registration')
+                                                                                setFieldValue('check_registration', '2');
+                                                                            }}
+
+                                                                        />
+                                                                    </div>
+                                                                    <div className="col-md-1">
+
+                                                                        <Field
+                                                                            name="reg_number_part_three"
+                                                                            type="text"
+                                                                            autoComplete="off"
+                                                                            onFocus={e => this.changePlaceHoldClassAdd(e)}
+                                                                            onBlur={e => this.changePlaceHoldClassRemove(e)}
+                                                                            value={values.reg_number_part_three}
+                                                                            disabled={values.check_registration == '1' ? true : false}
+                                                                            maxLength="3"
+                                                                            onInput={e => {
+                                                                                this.regnoFormat(e, setFieldTouched, setFieldValue)
+                                                                                setFieldTouched('check_registration')
+                                                                                setFieldValue('check_registration', '2');
+                                                                            }}
+
+                                                                        />
+                                                                    </div>
+                                                                    <div className="col-md-1">
+
+                                                                        <Field
+                                                                            name="reg_number_part_four"
+                                                                            type="text"
+                                                                            autoComplete="off"
+                                                                            onFocus={e => this.changePlaceHoldClassAdd(e)}
+                                                                            onBlur={e => this.changePlaceHoldClassRemove(e)}
+                                                                            value={values.reg_number_part_four}
+                                                                            disabled={values.check_registration == '1' ? true : false}
+                                                                            maxLength="4"
+                                                                            onInput={e => {
+                                                                                this.regnoFormat(e, setFieldTouched, setFieldValue)
+                                                                                setFieldTouched('check_registration')
+                                                                                setFieldValue('check_registration', '2');
+                                                                            }}
+
+                                                                        />
+                                                                    </div>
+                                                                    {(errors.reg_number_part_one || errors.reg_number_part_two || errors.reg_number_part_three || errors.reg_number_part_four)
+                                                                        && (touched.reg_number_part_one || touched.reg_number_part_two || touched.reg_number_part_three || touched.reg_number_part_four) ? (
                                                                         <span className="errorMsg">{phrases["InvalidRegistrationNumber"]}</span>
                                                                     ) : null}
-                                                            </div>
-                                                            <div className="row formSection">
-                                                                <label className="customCheckBox formGrp formGrp">
-                                                                    {phrases['WithoutNo']}
-                                                                    <Field
-                                                                        type="checkbox"
-                                                                        name="check_registration"
-                                                                        value="1"
-                                                                        className="user-self"
-                                                                        onChange={(e) => {
-                                                                            if (e.target.checked === true) {
-                                                                                setFieldTouched('reg_number_part_one')
-                                                                                setFieldValue('reg_number_part_one', '');
-                                                                                setFieldTouched('reg_number_part_two')
-                                                                                setFieldValue('reg_number_part_two', '');
-                                                                                setFieldTouched('reg_number_part_three')
-                                                                                setFieldValue('reg_number_part_three', '');
-                                                                                setFieldTouched('reg_number_part_four')
-                                                                                setFieldValue('reg_number_part_four', '');
-                                                                                setFieldTouched('check_registration')
-                                                                                setFieldValue('check_registration', e.target.value);
+                                                                </div>
+                                                                {values.policy_type == '1' ?
+                                                                    <div className="row formSection">
+                                                                        <label className="customCheckBox formGrp formGrp">
+                                                                            {phrases['WithoutNo']}
+                                                                            <Field
+                                                                                type="checkbox"
+                                                                                name="check_registration"
+                                                                                value="1"
+                                                                                className="user-self"
+                                                                                onChange={(e) => {
+                                                                                    if (e.target.checked === true) {
+                                                                                        setFieldTouched('reg_number_part_one')
+                                                                                        setFieldValue('reg_number_part_one', '');
+                                                                                        setFieldTouched('reg_number_part_two')
+                                                                                        setFieldValue('reg_number_part_two', '');
+                                                                                        setFieldTouched('reg_number_part_three')
+                                                                                        setFieldValue('reg_number_part_three', '');
+                                                                                        setFieldTouched('reg_number_part_four')
+                                                                                        setFieldValue('reg_number_part_four', '');
+                                                                                        setFieldTouched('check_registration')
+                                                                                        setFieldValue('check_registration', e.target.value);
 
-                                                                            } else {
-                                                                                setFieldTouched('check_registration')
-                                                                                setFieldValue('check_registration', '2');                                                                            }
-                                                                            if (this.setValueData()) {
-                                                                                this.setState({
-                                                                                    check_registration: 1
-                                                                                })
-                                                                            }
-                                                                            else {
-                                                                                this.setState({
-                                                                                    check_registration: 2
-                                                                                })
-                                                                            }
-                                                                        }}
-                                                                        checked={values.check_registration == '1' ? true : false}
-                                                                    />
-                                                                    <span className="checkmark mL-0"></span>
-                                                                </label>
-                                                                {errors.check_registration ?
-                                                                    <span className="error-message">{errors.check_registration}</span> : ""
-                                                                }
-                                                                
-                                                            </div>
-                                                            <div className="cntrbtn">
-                                                                <Button className={`btnPrimary`} type="submit" >
-                                                                    {phrases['Go']}
-                                                                </Button>
+                                                                                    } else {
+                                                                                        setFieldTouched('check_registration')
+                                                                                        setFieldValue('check_registration', '2');
+                                                                                    }
+                                                                                    if (this.setValueData()) {
+                                                                                        this.setState({
+                                                                                            check_registration: 1
+                                                                                        })
+                                                                                    }
+                                                                                    else {
+                                                                                        this.setState({
+                                                                                            check_registration: 2
+                                                                                        })
+                                                                                    }
+                                                                                }}
+                                                                                checked={values.check_registration == '1' ? true : false}
+                                                                            />
+                                                                            <span className="checkmark mL-0"></span>
+                                                                        </label>
+                                                                        {errors.check_registration ?
+                                                                            <span className="error-message">{errors.check_registration}</span> : ""
+                                                                        }
+
+                                                                    </div> : null}
+
+                                                                <div className="cntrbtn">
+                                                                    <Button className={`btnPrimary`} type="submit" >
+                                                                        {phrases['Go']}
+                                                                    </Button>
 
 
-                                                            </div>
-                                                        </Form>
-                                                    );
-                                                }}
-                                            </Formik>
-                                        </div>
+                                                                </div>
+                                                            </Form>
+                                                        );
+                                                    }}
+                                                </Formik>
+                                            </div>
 
-                                    </section>
-                                    <Footer />
+                                        </section>
+                                        <Footer />
+                                    </div>
                                 </div>
                             </div>
-							</div>
                         </div> : null}
                 </BaseComponent>
             </>

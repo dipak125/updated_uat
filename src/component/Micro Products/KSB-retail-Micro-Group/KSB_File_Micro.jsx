@@ -46,9 +46,10 @@ function statusFormatter(cell) {
 const actionFormatter = (refObj) => (cell, row, enumObject) => {
     return (
         <div>
-            {/* <span
+            {row.microbatchstatus.id && row.microbatchstatus.id == 5 ?
+            (<span
                 href="#"
-                onClick={() => refObj.KSBFileDownload(cell)
+                onClick={() => refObj.GroupPDFDownload(cell)
                 }
                 id="tooltip-1"
             >
@@ -56,9 +57,9 @@ const actionFormatter = (refObj) => (cell, row, enumObject) => {
                     Download
                 </Button>
 
-            </span> */}
+            </span>) : null }
             &nbsp;
-            {row.microbatchstatus.id && row.microbatchstatus.id !== 3 ? (<span
+            {row.microbatchstatus.id && (row.microbatchstatus.id == 1 || row.microbatchstatus.id == 2) ? (<span
                 href="#"
                 onClick={() => refObj.KSBFileDelete(cell)
                 }
@@ -72,7 +73,7 @@ const actionFormatter = (refObj) => (cell, row, enumObject) => {
             &nbsp;
             {row.microbatchstatus.id && row.microbatchstatus.id == 2 ? (<span
                 href="#"
-                onClick={() => makePayment(cell)
+                onClick={() => refObj.makePayment(cell)
                 }
                 id="tooltip-1"
             >
@@ -95,16 +96,10 @@ const downloadFormatter = (refObj) => (cell, row, enumObject) => {
                 >
                     {cell}
                 </a>}
-
         </div>
     )
 }
 
-
-
-const makePayment = cell => {
-    window.location = `${process.env.REACT_APP_PAYMENT_URL}/razorpay/micro_group_pay.php?batch_id=${cell}`
-}
 
 const paymentStatusFormatter = (refObj) => (cell, row, enumObject) => {
     return (
@@ -127,6 +122,38 @@ class KSB_File_Micro extends Component {
         };
     }
 
+
+    makePayment = (cell) => {
+        let encryption = new Encryption();
+        let user_data = sessionStorage.getItem("users") ? JSON.parse(sessionStorage.getItem("users")): "";
+        let user_id = "";
+        if (user_data) {
+            user_id = JSON.parse(encryption.decrypt(user_data.user));
+            user_id = user_id.master_user_id
+            this.props.loadingStart();
+            axios.get(`acd/status-change-batch-policy/${user_id}/${cell}`)
+            .then(res => {
+                if(res.data.error == false) {
+                    swal(res.data.msg, {
+                        icon: "success",
+                    }).then(() => {
+                        this.batchList();
+                    });
+                }
+                else {
+                    this.props.loadingStop();
+                    swal(res.data.msg)
+                }
+            })
+            .catch(err => {
+                this.props.loadingStop();
+                swal(err.data.msg)
+            })
+        }
+        else {
+            swal("User Id not found")
+        }
+    }
 
 
     fileUpload = async (uploadFile, setFieldValue, setFieldTouched) => {
@@ -270,6 +297,17 @@ class KSB_File_Micro extends Component {
 
     KSBFileDownload(cell) {
         const url = `${process.env.REACT_APP_API_URL}/ksb-group-excel/succeed-file/${cell}`;
+        this.props.loadingStart();
+        const anchortag = document.createElement('a');
+        anchortag.style.display = 'none';
+        anchortag.href = url;
+        document.body.appendChild(anchortag);
+        anchortag.click();
+        this.props.loadingStop();
+    }
+
+    GroupPDFDownload(cell) {
+        const url = `${process.env.REACT_APP_API_URL}/group-excel/download-zip-policy-pdf/${cell}`;
         this.props.loadingStart();
         const anchortag = document.createElement('a');
         anchortag.style.display = 'none';

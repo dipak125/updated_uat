@@ -18,8 +18,14 @@ import * as Yup from "yup";
 import swal from 'sweetalert';
 import moment from "moment";
 import { validRegistrationNumber } from "../../shared/validationFunctions";
+import {  userTypes } from "../../shared/staticValues";
 
+let tempEncryption = new Encryption()
 let translation = localStorage.getItem("phrases") ? JSON.parse(localStorage.getItem("phrases")) : []
+let user_data = sessionStorage.getItem("users") ? JSON.parse(sessionStorage.getItem("users")) : "";
+if (user_data.user) {
+    user_data = JSON.parse(tempEncryption.decrypt(user_data.user));
+}
 
 const insert = (arr, index, newItem) => [
     // part of the array before the specified index
@@ -1030,38 +1036,43 @@ class OtherComprehensiveGCV extends Component {
             }
             total_idv = parseInt(post_data.idv_value) + parseInt(post_data.body_idv_value)
         }
-        let user_data = sessionStorage.getItem("users") ? JSON.parse(sessionStorage.getItem("users")) : "";
+
         if (user_data) {
-            user_data = JSON.parse(encryption.decrypt(user_data.user));
-
-            if ((total_idv > 5000000) && user_data.user_type == "POSP") {
-                swal("Quote cannot proceed with IDV greater than 5000000")
-                this.props.loadingStop();
-                return false
-            }
+            // if(userTypes.includes(user_data.login_type) && add_more_coverage.indexOf('B00015') < 0){
+            //     swal("This cover is mandated by IRDAI, it is compulsory for Owner-Driver to possess a PA cover of minimum Rs 15 Lacs, except in certain conditions. By not choosing this cover, you confirm that you hold an existing PA cover or you do not possess a valid driving license.")
+            //     return false
+            // }
+            // else {
+                if ((total_idv > 5000000) && user_data.user_type == "POSP") {
+                    swal("Quote cannot proceed with IDV greater than 5000000")
+                    this.props.loadingStop();
+                    return false
+                }
+                else {
+                    console.log("--post Data-- ", post_data)
+                    formData.append('enc_data', encryption.encrypt(JSON.stringify(post_data)))
+                    this.props.loadingStart();
+                    axios.post('gcv/update-insured-value', formData).then(res => {
+                        this.props.loadingStop();
+                        let decryptResp = JSON.parse(encryption.decrypt(res.data))
+                        console.log("decrypt--fetchData-- ", decryptResp)
+                        if (decryptResp.error == false) {
+                            this.props.history.push(`/AdditionalDetails_GCVST/${productId}`);
+                        }
+                        else {
+                            swal(decryptResp.msg)
+                        }
+            
+                    })
+                    .catch(err => {
+                        // handle error
+                        let decryptResp = JSON.parse(encryption.decrypt(err.data))
+                        console.log("decryptErr--fetchData-- ", decryptResp)
+                        this.props.loadingStop();
+                    })
+                }
+            // }          
         }
-
-        console.log("--post Data-- ", post_data)
-        formData.append('enc_data', encryption.encrypt(JSON.stringify(post_data)))
-        this.props.loadingStart();
-        axios.post('gcv/update-insured-value', formData).then(res => {
-            this.props.loadingStop();
-            let decryptResp = JSON.parse(encryption.decrypt(res.data))
-            console.log("decrypt--fetchData-- ", decryptResp)
-            if (decryptResp.error == false) {
-                this.props.history.push(`/AdditionalDetails_GCVST/${productId}`);
-            }
-            else {
-                swal(decryptResp.msg)
-            }
-
-        })
-            .catch(err => {
-                // handle error
-                let decryptResp = JSON.parse(encryption.decrypt(err.data))
-                console.log("decryptErr--fetchData-- ", decryptResp)
-                this.props.loadingStop();
-            })
     }
 
     onRowSelect = (value, values, isSelect, setFieldTouched, setFieldValue) => {
@@ -1666,18 +1677,11 @@ class OtherComprehensiveGCV extends Component {
                         <div className="container-fluid">
                             <div className="row">
 
-
                                 <aside className="left-sidebar">
                                     <div className="scroll-sidebar ps-container ps-theme-default ps-active-y">
                                         <SideNav />
                                     </div>
                                 </aside>
-
-                                {/*<div className="col-sm-12 col-md-12 col-lg-2 col-xl-2 pd-l-0">        
-						<SideNav />
-             		 </div>*/}
-
-
 
                                 <div className="col-sm-12 col-md-12 col-lg-12 col-xl-12 infobox ocGcv">
                                     <h4 className="text-center mt-3 mb-3">{phrases['SBIGICL']}</h4>
@@ -1876,11 +1880,8 @@ class OtherComprehensiveGCV extends Component {
                                                                             </div>
                                                                         </FormGroup>
                                                                     </Col>
-                                                                    {/* {console.log("minIDV------------- ", minIDV)}
-                                                                    {console.log("maxIDV------------- ", maxIDV)}
-                                                                    {console.log("IDV_Suggested------------- ", defaultSliderValue)} */}
-                                                                    {defaultSliderValue ?
 
+                                                                    {defaultSliderValue ?
                                                                         <Col sm={12} md={12} lg={6}>
                                                                             <FormGroup>
                                                                                 <input type="range" className="W-90"
@@ -2011,7 +2012,7 @@ class OtherComprehensiveGCV extends Component {
                                                                                         name={coverage.code}
                                                                                         value={coverage.code}
                                                                                         className="user-self"
-                                                                                        // checked={values.roadsideAssistance ? true : false}
+                                                                                        // disabled={(userTypes.includes(user_data.login_type) && values[coverage.code] == 'B00015') ? true : false}
                                                                                         onClick={(e) => {
                                                                                             if (e.target.checked == false && values[coverage.code] == 'B00015') {
                                                                                                 swal(phrases.SwalIRDAI)

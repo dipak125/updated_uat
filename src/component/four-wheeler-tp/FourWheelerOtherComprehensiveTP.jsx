@@ -16,9 +16,15 @@ import axios from "../../shared/axios"
 import Encryption from '../../shared/payload-encryption';
 import * as Yup from "yup";
 import swal from 'sweetalert';
+import {  userTypes } from "../../shared/staticValues";
 
 let encryption = new Encryption()
 let translation = localStorage.getItem("phrases") ? JSON.parse(localStorage.getItem("phrases")) : null
+
+let user_data = sessionStorage.getItem("users") ? JSON.parse(sessionStorage.getItem("users")) : "";
+if (user_data.user) {
+    user_data = JSON.parse(encryption.decrypt(user_data.user));
+}
 
 const insert = (arr, index, newItem) => [
     // part of the array before the specified index
@@ -332,22 +338,28 @@ class TwoWheelerOtherComprehensive extends Component {
         }
         console.log('post_data', post_data)
         formData.append('enc_data', encryption.encrypt(JSON.stringify(post_data)))
-        this.props.loadingStart();
-        axios.post('four-wh-tp/insured-value', formData).then(res => {
-            this.props.loadingStop();
-            let decryptResp = JSON.parse(encryption.decrypt(res.data));
-            console.log('decryptResp---', decryptResp)
-            if (decryptResp.error == false) {
-                this.props.history.push(`/four_wheeler_verifyTP/${productId}`);
-            }
-
-        })
+        if(userTypes.includes(user_data.login_type) && add_more_coverage.indexOf('B00015') < 0){
+            swal("This cover is mandated by IRDAI, it is compulsory for Owner-Driver to possess a PA cover of minimum Rs 15 Lacs, except in certain conditions. By not choosing this cover, you confirm that you hold an existing PA cover or you do not possess a valid driving license.")
+            return false
+        }
+        else {
+            this.props.loadingStart();
+            axios.post('four-wh-tp/insured-value', formData).then(res => {
+                this.props.loadingStop();
+                let decryptResp = JSON.parse(encryption.decrypt(res.data));
+                console.log('decryptResp---', decryptResp)
+                if (decryptResp.error == false) {
+                    this.props.history.push(`/four_wheeler_verifyTP/${productId}`);
+                }
+    
+            })
             .catch(err => {
                 // handle error
                 this.props.loadingStop();
                 let decryptResp = JSON.parse(encryption.decrypt(err.data));
-            console.log('decrypterr---', decryptResp)
+                console.log('decrypterr---', decryptResp)
             })
+        }
     }
 
     onRowSelect = (values, isSelect, setFieldTouched, setFieldValue) => {
@@ -648,10 +660,11 @@ class TwoWheelerOtherComprehensive extends Component {
                                                                             name={coverage.code}
                                                                             value={coverage.code}
                                                                             className="user-self"
-                                                                            // checked={values.roadsideAssistance ? true : false}
+                                                                            disabled={(userTypes.includes(user_data.login_type) && values[coverage.code] == 'B00015') ? true : false}
                                                                             onClick={(e) =>{
                                                                                 if( e.target.checked == false && values[coverage.code] == 'B00015') {
-                                                                                    swal(phrases.SwalIRDAI)
+                                                                                    swal(phrases.SwalIRDAI,
+                                                                                        {button: phrases.OK})
                                                                                 }
                                                                                 this.onRowSelect(e.target.value, e.target.checked, setFieldTouched, setFieldValue)         
                                                                             }
