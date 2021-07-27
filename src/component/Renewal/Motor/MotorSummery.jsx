@@ -610,14 +610,14 @@ class MotorSummery extends Component {
                                                                                         )}	
                                                                                         </Col>	
                                                                                     </Row>	
-                                                                                    <Row>	
+                                                                                    {/* <Row>	
                                                                                         <Col sm={12} md={6}>	
                                                                                             <FormGroup>{phrases['Gender']}</FormGroup>	
                                                                                         </Col>	
                                                                                         <Col sm={12} md={6}>	
                                                                                             <FormGroup>{nomineedetails && nomineedetails.gender == "m" ? "Male" : "Female"}</FormGroup>	
                                                                                         </Col>	
-                                                                                    </Row>	
+                                                                                    </Row>	 */}
                                                                                 </Col>	
                                                                             </Row>	
                                                                             <Row>	
