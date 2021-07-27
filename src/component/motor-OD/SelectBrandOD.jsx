@@ -419,8 +419,6 @@ class SelectBrandOD extends Component {
                                                             <Col sm={12} md={9}>
                                                                 <BrandTable brandList={brandList && brandList.length > 0 ? brandList : []} selectBrandFunc={this.setBrandName} otherBrandFunc={this.getOtherBrands}/>
 
-
-
                                                                 <div className="d-flex justify-content-left resmb">
                                                                     <Button className={`backBtn`} type="button" onClick={this.registration.bind(this, productId)}>
                                                                         {phrases['Back']}
@@ -429,7 +427,6 @@ class SelectBrandOD extends Component {
                                                                         {phrases['Continue']}
                                                                 </Button>
                                                                 </div>
-
 
                                                             </Col>
 
@@ -442,8 +439,6 @@ class SelectBrandOD extends Component {
 
                                                                         <div> <button type="button" className="rgistrBtn" onClick={this.registration.bind(this, productId)}>{phrases['Edit']}</button></div>
                                                                     </div>
-
-
 
                                                                     <div className="d-flex justify-content-between flex-lg-row flex-md-column m-b-25">
                                                                         <div className="txtRegistr resmb-15">{phrases['Brand']}

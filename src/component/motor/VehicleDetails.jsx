@@ -68,8 +68,10 @@ const vehicleRegistrationValidation = Yup.object().shape({
         }),
 
     previous_start_date: Yup.date()
-        .notRequired('Previous Start date is required')
-        .test(
+    .when(['policy_type_id','lapse_duration'], {
+        is: (policy_type_id, lapse_duration) => (policy_type_id == '3' && lapse_duration == '2'),       
+    then: Yup.date(),
+    otherwise: Yup.date().test(
             "currentMonthChecking",
             function () {
                 return "PleaseESD"
@@ -99,10 +101,13 @@ const vehicleRegistrationValidation = Yup.object().shape({
                 }
                 return true;
             }
-        ),
+        )
+    }),
     previous_end_date: Yup.date()
-        .notRequired('Previous end date is required')
-        .test(
+    .when(['policy_type_id','lapse_duration'], {
+        is: (policy_type_id, lapse_duration) => (policy_type_id == '3' && lapse_duration == '2'),       
+    then: Yup.date(),
+    otherwise: Yup.date().test(
             "currentMonthChecking",
             function () {
                 return "PleaseEED"
@@ -132,10 +137,13 @@ const vehicleRegistrationValidation = Yup.object().shape({
                 }
                 return true;
             }
-        ),
+        )
+    }),
     previous_policy_name: Yup.string()
-        .notRequired('Please select Policy Type')
-        .test(
+        .when(['policy_type_id','lapse_duration'], {
+            is: (policy_type_id, lapse_duration) => (policy_type_id == '3' && lapse_duration == '2'),       
+        then: Yup.string(),
+        otherwise: Yup.string().test(
             "currentMonthChecking",
             function () {
                 return "PleaseSPT"
@@ -159,10 +167,13 @@ const vehicleRegistrationValidation = Yup.object().shape({
                 // }
                 return true;
             }
-        ),
+        ) 
+    }),
     insurance_company_id: Yup.number()
-        .notRequired('Insurance company is required')
-        .test(
+        .when(['policy_type_id','lapse_duration'], {
+            is: (policy_type_id, lapse_duration) => (policy_type_id == '3' && lapse_duration == '2'),       
+        then: Yup.number(),
+        otherwise: Yup.number().test(
             "currentMonthChecking",
             function () {
                 return "PleaseEPIC"
@@ -174,10 +185,13 @@ const vehicleRegistrationValidation = Yup.object().shape({
                 }
                 return true;
             }
-        ),
+        )
+    }),
     previous_city: Yup.string()
-        .notRequired('PleaseEPICC')
-        .test(
+        .when(['policy_type_id','lapse_duration'], {
+            is: (policy_type_id, lapse_duration) => (policy_type_id == '3' && lapse_duration == '2'),       
+        then: Yup.string(),
+        otherwise: Yup.string().test(
             "currentMonthChecking",
             function () {
                 return "PleaseEPICC"
@@ -196,11 +210,14 @@ const vehicleRegistrationValidation = Yup.object().shape({
             })
         .max(100, function () {
             return "AddressMustBeMaximum100Chracters"
-        }),
+        })
+    }),
 
     previous_policy_no: Yup.string()
-        .notRequired('PleaseEPPN')
-        .test(
+        .when(['policy_type_id','lapse_duration'], {
+            is: (policy_type_id, lapse_duration) => (policy_type_id == '3' && lapse_duration == '2'),       
+        then: Yup.string(),
+        otherwise: Yup.string().test(
             "currentMonthChecking",
             function () {
                 return "PleaseEPPN"
@@ -221,17 +238,19 @@ const vehicleRegistrationValidation = Yup.object().shape({
             })
         .max(28, function () {
             return "PolicyMaxCharacter"
-        }),
+        })
+    }),
 
     previous_claim_bonus: Yup.string()
-        .notRequired()
-        .test(
+        .when(['policy_type_id','lapse_duration'], {
+            is: (policy_type_id, lapse_duration) => (policy_type_id == '3' && lapse_duration == '2'),       
+        then: Yup.string(),
+        otherwise: Yup.string().test(
             "currentMonthChecking",
             function () {
                 return "PleaseEPCB"
             },
             function (value) {
-                console.log('PleaseEPCB' + this.parent.previous_is_claim + ' ==== ' + this.parent.previous_policy_name + ' ==== ' + value)
                 let prevdate = new Date(this.parent.previous_end_date)
                 let todaydate = new Date()
                 if (prevdate > todaydate && this.parent.previous_is_claim == '0' && this.parent.previous_policy_name == '1' && (!value || value == '1')) {
@@ -251,10 +270,13 @@ const vehicleRegistrationValidation = Yup.object().shape({
                 }
                 return true;
             }
-        ),
+        )
+    }),
     previous_is_claim: Yup.string()
-        .notRequired()
-        .test(
+        .when(['policy_type_id','lapse_duration'], {
+            is: (policy_type_id, lapse_duration) => (policy_type_id == '3' && lapse_duration == '2'),       
+        then: Yup.string(),
+        otherwise: Yup.string().test(
             "currentMonthChecking",
             function () {
                 return "PleaseSPC"
@@ -267,7 +289,8 @@ const vehicleRegistrationValidation = Yup.object().shape({
                 }
                 return true;
             }
-        ),
+        )
+    }),
     previous_claim_for: Yup.string().when(['previous_is_claim'], {
         is: previous_is_claim => previous_is_claim == '1',
         then: Yup.string().required('PleasePPCF'),
@@ -429,49 +452,65 @@ class VehicleDetails extends Component {
         const formData = new FormData();
         let encryption = new Encryption();
         let post_data = {}
-        if (ageObj.whatIsCurrentMonth(values.registration_date) > 0 && values.previous_policy_name == '1') {
-            post_data = {
-                'policy_holder_id': localStorage.getItem('policyHolder_id'),
-                'menumaster_id': 1,
-                'registration_date': moment(values.registration_date).format("YYYY-MM-DD"),
-                'location_id': values.location_id,
-                'previous_start_date': moment(values.previous_start_date).format("YYYY-MM-DD"),
-                'previous_end_date': moment(values.previous_end_date).format("YYYY-MM-DD"),
-                'previous_policy_name': values.previous_policy_name,
-                'insurance_company_id': values.insurance_company_id,
-                'previous_city': values.previous_city,
-                'previous_policy_no': values.previous_policy_no,
-                'previous_is_claim': values.previous_is_claim ? values.previous_is_claim : '0',
-                'previous_claim_bonus': values.previous_claim_bonus ? values.previous_claim_bonus : 1,
-                'previous_claim_for': values.previous_claim_for,
-                'vehicleAge': vehicleAge,
-                'policy_type': policy_type,
-                'prev_policy_flag': 1,
-                'page_name': `VehicleDetails/${productId}`
+        if(values.policy_type_id == '1' || values.policy_type_id == '2' || (values.policy_type_id == '3' && values.lapse_duration == '1') ) {
+            if (ageObj.whatIsCurrentMonth(values.registration_date) > 0 && values.previous_policy_name == '1') {
+                post_data = {
+                    'policy_holder_id': localStorage.getItem('policyHolder_id'),
+                    'menumaster_id': 1,
+                    'registration_date': moment(values.registration_date).format("YYYY-MM-DD"),
+                    'location_id': values.location_id,
+                    'previous_start_date': moment(values.previous_start_date).format("YYYY-MM-DD"),
+                    'previous_end_date': moment(values.previous_end_date).format("YYYY-MM-DD"),
+                    'previous_policy_name': values.previous_policy_name,
+                    'insurance_company_id': values.insurance_company_id,
+                    'previous_city': values.previous_city,
+                    'previous_policy_no': values.previous_policy_no,
+                    'previous_is_claim': values.previous_is_claim ? values.previous_is_claim : '0',
+                    'previous_claim_bonus': values.previous_claim_bonus ? values.previous_claim_bonus : 1,
+                    'previous_claim_for': values.previous_claim_for,
+                    'vehicleAge': vehicleAge,
+                    'policy_type': policy_type,
+                    'prev_policy_flag': 1,
+                    'page_name': `VehicleDetails/${productId}`
+                }
             }
-        }
 
-        else if (ageObj.whatIsCurrentMonth(values.registration_date) > 0 && values.previous_policy_name == '2') {
-            post_data = {
-                'policy_holder_id': localStorage.getItem('policyHolder_id'),
-                'menumaster_id': 1,
-                'registration_date': moment(values.registration_date).format("YYYY-MM-DD"),
-                'location_id': values.location_id,
-                'previous_start_date': moment(values.previous_start_date).format("YYYY-MM-DD"),
-                'previous_end_date': moment(values.previous_end_date).format("YYYY-MM-DD"),
-                'previous_policy_name': values.previous_policy_name,
-                'insurance_company_id': values.insurance_company_id,
-                'previous_city': values.previous_city,
-                'previous_policy_no': values.previous_policy_no,
-                'vehicleAge': vehicleAge,
-                'policy_type': policy_type,
-                'prev_policy_flag': 1,
-                'previous_is_claim': '0',
-                'previous_claim_bonus': 1,
-                'page_name': `VehicleDetails/${productId}`
+            else if (ageObj.whatIsCurrentMonth(values.registration_date) > 0 && values.previous_policy_name == '2') {
+                post_data = {
+                    'policy_holder_id': localStorage.getItem('policyHolder_id'),
+                    'menumaster_id': 1,
+                    'registration_date': moment(values.registration_date).format("YYYY-MM-DD"),
+                    'location_id': values.location_id,
+                    'previous_start_date': moment(values.previous_start_date).format("YYYY-MM-DD"),
+                    'previous_end_date': moment(values.previous_end_date).format("YYYY-MM-DD"),
+                    'previous_policy_name': values.previous_policy_name,
+                    'insurance_company_id': values.insurance_company_id,
+                    'previous_city': values.previous_city,
+                    'previous_policy_no': values.previous_policy_no,
+                    'vehicleAge': vehicleAge,
+                    'policy_type': policy_type,
+                    'prev_policy_flag': 1,
+                    'previous_is_claim': '0',
+                    'previous_claim_bonus': 1,
+                    'page_name': `VehicleDetails/${productId}`
+                }
+            }
+            else if (ageObj.whatIsCurrentMonth(values.registration_date) <= 0) {
+                post_data = {
+                    'policy_holder_id': localStorage.getItem('policyHolder_id'),
+                    'menumaster_id': 1,
+                    'registration_date': moment(values.registration_date).format("YYYY-MM-DD"),
+                    'location_id': values.location_id,
+                    'previous_is_claim': '0',
+                    'previous_claim_bonus': 1,
+                    'vehicleAge': vehicleAge,
+                    'policy_type': policy_type,
+                    'prev_policy_flag': 0,
+                    'page_name': `VehicleDetails/${productId}`
+                }
             }
         }
-        else if (ageObj.whatIsCurrentMonth(values.registration_date) <= 0) {
+        else {
             post_data = {
                 'policy_holder_id': localStorage.getItem('policyHolder_id'),
                 'menumaster_id': 1,
@@ -485,6 +524,7 @@ class VehicleDetails extends Component {
                 'page_name': `VehicleDetails/${productId}`
             }
         }
+            
 
         if (ageDiff < 1 && motorInsurance && motorInsurance.registration_no == "") {
             localStorage.setItem('registration_number', "NEW");
@@ -631,11 +671,6 @@ class VehicleDetails extends Component {
                                             <SideNav />
                                         </div>
                                     </aside>
-
-                                    {/*<div className="col-sm-12 col-md-12 col-lg-2 col-xl-2 pd-l-0">               
-						<SideNav />
-             		 </div>*/}
-
 
                                     <div className="col-sm-12 col-md-12 col-lg-12 col-xl-12 infobox">
                                         <h4 className="text-center mt-3 mb-3">{phrases['SBIGICL']}</h4>

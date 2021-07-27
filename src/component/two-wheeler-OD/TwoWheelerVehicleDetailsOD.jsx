@@ -90,8 +90,10 @@ const vehicleRegistrationValidation = Yup.object().shape({
     }),
 
     previous_start_date:Yup.date()
-    .notRequired('Previous Start date is required')
-    .test(
+    .when(['policy_type_id','lapse_duration'], {
+        is: (policy_type_id, lapse_duration) => (policy_type_id == '3' && lapse_duration == '2'),       
+    then: Yup.date(),
+    otherwise: Yup.date().test(
         "currentMonthChecking",
         function() {
             return "PleaseESD"
@@ -146,10 +148,13 @@ const vehicleRegistrationValidation = Yup.object().shape({
           }
           return true;
       }
-    ),
+    )
+    }),
     previous_end_date:Yup.date()
-    .notRequired('Previous end date is required')
-    .test(
+    .when(['policy_type_id','lapse_duration'], {
+        is: (policy_type_id, lapse_duration) => (policy_type_id == '3' && lapse_duration == '2'),       
+    then: Yup.date(),
+    otherwise: Yup.date().test(
         "currentMonthChecking",
         function() {
             return "PleaseEED"
@@ -203,11 +208,14 @@ const vehicleRegistrationValidation = Yup.object().shape({
             }
             return true;
         }
-    ),
+    )
+    }),
 
     insurance_company_id:Yup.number()
-    .notRequired('Insurance company is required')
-    .test(
+    .when(['policy_type_id','lapse_duration'], {
+        is: (policy_type_id, lapse_duration) => (policy_type_id == '3' && lapse_duration == '2'),       
+    then: Yup.number(),
+    otherwise: Yup.number().test(
         "currentMonthChecking",
         function() {
             return "PleaseEPIC"
@@ -219,10 +227,13 @@ const vehicleRegistrationValidation = Yup.object().shape({
             }
             return true;
         }
-    ),
+    )
+    }),
     previous_city:Yup.string()
-    .notRequired('Previous city is required')
-    .test(
+    .when(['policy_type_id','lapse_duration'], {
+        is: (policy_type_id, lapse_duration) => (policy_type_id == '3' && lapse_duration == '2'),       
+    then: Yup.string(),
+    otherwise: Yup.string().test(
         "currentMonthChecking",
         function() {
             return "PleaseEPICC"
@@ -238,11 +249,14 @@ const vehicleRegistrationValidation = Yup.object().shape({
     .matches(/^[a-zA-Z0-9][a-zA-Z0-9-/.,\s]*$/, 
         function() {
             return "PleaseValidAddress"
-        }),
+        })
+    }),
 
     previous_policy_no:Yup.string()
-    .notRequired('Previous policy number is required')
-    .test(
+    .when(['policy_type_id','lapse_duration'], {
+        is: (policy_type_id, lapse_duration) => (policy_type_id == '3' && lapse_duration == '2'),       
+    then: Yup.string(),
+    otherwise: Yup.string().test(
         "currentMonthChecking",
         function() {
             return "PleaseEPPN"
@@ -263,11 +277,14 @@ const vehicleRegistrationValidation = Yup.object().shape({
         })
         .max(28, function() {
             return "PolicyNo18Char "
-        }),
+        })
+    }),
 
     previous_claim_bonus:Yup.string()
-    .notRequired('No Claim bonus is required')
-    .test(
+    .when(['policy_type_id','lapse_duration'], {
+        is: (policy_type_id, lapse_duration) => (policy_type_id == '3' && lapse_duration == '2'),       
+    then: Yup.string(),
+    otherwise: Yup.string().test(
         "currentMonthChecking",
         function() {
             return "PleaseEPCB"
@@ -279,21 +296,24 @@ const vehicleRegistrationValidation = Yup.object().shape({
             return true;
         }
     )
-    .test(
-        "previousClaimChecking",
-        function() {
-            return "PleaseEPCB"
-        },
-        function (value) {
-            if (this.parent.previous_is_claim == '1' && !value) {   
-                return false;    
-            }
-            return true;
-        }
-    ),
+    // .test(
+    //     "previousClaimChecking",
+    //     function() {
+    //         return "PleaseEPCB"
+    //     },
+    //     function (value) {
+    //         if (this.parent.previous_is_claim == '1' && !value) {   
+    //             return false;    
+    //         }
+    //         return true;
+    //     }
+    // )
+    }),
     previous_is_claim:Yup.string()
-    .notRequired('Please select one option')
-    .test(
+    .when(['policy_type_id','lapse_duration'], {
+        is: (policy_type_id, lapse_duration) => (policy_type_id == '3' && lapse_duration == '2'),       
+    then: Yup.string(),
+    otherwise: Yup.string().test(
         "currentMonthChecking",
         function() {
             return "PleaseSPC"
@@ -306,7 +326,8 @@ const vehicleRegistrationValidation = Yup.object().shape({
             }
             return true;
         }
-    ),
+    )
+    }),
     no_of_claim:Yup.string().when(['previous_is_claim'], {
         is: previous_is_claim => previous_is_claim == '1',       
         then: Yup.string().required('PleasePNOC'),
@@ -319,8 +340,10 @@ const vehicleRegistrationValidation = Yup.object().shape({
     // }),
 
     previous_policy_name:Yup.string()
-    .required("PleaseSPT")
-    .test(
+    .when(['policy_type_id','lapse_duration'], {
+        is: (policy_type_id, lapse_duration) => (policy_type_id == '3' && lapse_duration == '2'),       
+    then: Yup.string(),
+    otherwise: Yup.string().test(
         "currentMonthChecking",
         function() {
             return "PreviousPolicyLiabilityPolicy"
@@ -331,7 +354,8 @@ const vehicleRegistrationValidation = Yup.object().shape({
             }
             return true;
         }
-    ),
+    )
+    }),
 
 
     active_policy_name: Yup.string()
@@ -432,25 +456,6 @@ const vehicleRegistrationValidation = Yup.object().shape({
             return true;
         }
     ),
-    // active_policy_address:Yup.string()
-    // .notRequired('Previous city is required')
-    // .test(
-    //     "currentMonthChecking",
-    //     function() {
-    //         return "PleaseEAICC"
-    //     },
-    //     function (value) {
-    //         const ageObj = new PersonAge();
-    //         if (ageObj.whatIsCurrentMonth(this.parent.registration_date) > 0 && !value) {   
-    //             return false;    
-    //         }
-    //         return true;
-    //     }
-    // )
-    // .matches(/^[a-zA-Z0-9][a-zA-Z0-9-/.,\s]*$/, 
-    //     function() {
-    //         return "PleaseValidAddress"
-    //     }),
 
     active_policy_no: Yup.string()
         .notRequired('Previous policy number is required')
@@ -478,9 +483,14 @@ const vehicleRegistrationValidation = Yup.object().shape({
             }),
 
     valid_previous_policy: Yup.string()
+    .when(['policy_type_id','lapse_duration'], {
+        is: (policy_type_id, lapse_duration) => (policy_type_id == '3' && lapse_duration == '2'),       
+    then: Yup.string(),
+    otherwise: Yup.string()
         .required(function() {
             return "RequiredField"
-        }),
+        })
+    }),
 
     claim_array: Yup.array().of(
         Yup.object().shape({
@@ -657,7 +667,7 @@ class TwoWheelerVehicleDetailsOD extends Component {
         const { motorInsurance, changeFlag } = this.state
 	    let policy_type = 16
 
-        if(values.valid_previous_policy == "0") {
+        if(values.valid_previous_policy == "0" && (motorInsurance.policytype_id == 2 || (values.policy_type_id == '3' && values.lapse_duration == '1') )) {
             swal({
                 text: "Kindly connect with nearest branch for Policy Issuance",
                 icon: "error",
@@ -665,9 +675,9 @@ class TwoWheelerVehicleDetailsOD extends Component {
             actions.setSubmitting(false)
             return false;
         }
-        let newPolStartDate = prevEndDate(values.previous_start_date)
-        newPolStartDate = addDays(new Date(newPolStartDate), 1)
-        let newPolEndDate = prevEndDate(newPolStartDate)
+        let newPolStartDate = values.previous_start_date ? prevEndDate(values.previous_start_date) : ""
+        newPolStartDate = newPolStartDate ? addDays(new Date(newPolStartDate), 1) : addDays(new Date(), 1)
+        let newPolEndDate = newPolStartDate ? prevEndDate(newPolStartDate) : ""
         let vehicleAge = Math.floor(moment(newPolStartDate).diff(values.registration_date, 'months', true))
         if(vehicleAge < 6 || vehicleAge > 60) {
             swal({
@@ -680,37 +690,58 @@ class TwoWheelerVehicleDetailsOD extends Component {
         const formData = new FormData(); 
         let encryption = new Encryption();
         let post_data = {}
+        if(values.policy_type_id == '2' || (values.policy_type_id == '3' && values.lapse_duration == '1') ) {
+            post_data = {
+                'policy_holder_id': localStorage.getItem("policyHolder_id"),
+                'menumaster_id': 3,
+                'registration_date': moment(values.registration_date).format("YYYY-MM-DD"),
+                'location_id': values.location_id,
+                'previous_start_date': moment(values.previous_start_date).format("YYYY-MM-DD"),
+                'previous_end_date': moment(values.previous_end_date).format("YYYY-MM-DD"),
+                'previous_policy_name': values.previous_policy_name,
+                'insurance_company_id': values.insurance_company_id,
+                'previous_city': values.previous_city,
+                'previous_policy_no': values.previous_policy_no,
+                'previous_is_claim':values.previous_is_claim ? values.previous_is_claim : '0' ,
+                'previous_claim_bonus': values.previous_claim_bonus ? values.previous_claim_bonus : 1,
+                'previous_claim_for': 1,        
+                'vehicleAge': vehicleAge,
+                'pol_start_date': moment(newPolStartDate).format('YYYY-MM-DD'),
+                'pol_end_date': moment(newPolEndDate).format('YYYY-MM-DD'),
+                'policy_type': policy_type,
+                'prev_policy_flag': 1,
+                'valid_previous_policy': values.valid_previous_policy,
+                'claim_array': values.previous_is_claim == '1' ?  JSON.stringify(values.claim_array) : "",
+                'no_of_claim': values.no_of_claim,
 
-        post_data = {
-            'policy_holder_id': localStorage.getItem("policyHolder_id"),
-            'menumaster_id': 3,
-            'registration_date': moment(values.registration_date).format("YYYY-MM-DD"),
-            'location_id': values.location_id,
-            'previous_start_date': moment(values.previous_start_date).format("YYYY-MM-DD"),
-            'previous_end_date': moment(values.previous_end_date).format("YYYY-MM-DD"),
-            'previous_policy_name': values.previous_policy_name,
-            'insurance_company_id': values.insurance_company_id,
-            'previous_city': values.previous_city,
-            'previous_policy_no': values.previous_policy_no,
-            'previous_is_claim':values.previous_is_claim ? values.previous_is_claim : '0' ,
-            'previous_claim_bonus': values.previous_claim_bonus ? values.previous_claim_bonus : 1,
-            'previous_claim_for': 1,        
-            'vehicleAge': vehicleAge,
-            'pol_start_date': moment(newPolStartDate).format('YYYY-MM-DD'),
-            'pol_end_date': moment(newPolEndDate).format('YYYY-MM-DD'),
-            'policy_type': policy_type,
-            'prev_policy_flag': 1,
-            'valid_previous_policy': values.valid_previous_policy,
-            'claim_array': JSON.stringify(values.claim_array),
-            'no_of_claim': values.no_of_claim,
-
-            'active_start_date': moment(values.active_start_date).format("YYYY-MM-DD"),
-            'active_end_date': moment(values.active_end_date).format("YYYY-MM-DD"),
-            'active_policy_name': values.active_policy_name,
-            'active_insurance_company_id': values.active_insurance_company_id,
-            'active_policy_address': values.active_policy_address,
-            'active_policy_no': values.active_policy_no,
-            'page_name': `two_wheeler_Vehicle_detailsOD/${productId}`,
+                'active_start_date': moment(values.active_start_date).format("YYYY-MM-DD"),
+                'active_end_date': moment(values.active_end_date).format("YYYY-MM-DD"),
+                'active_policy_name': values.active_policy_name,
+                'active_insurance_company_id': values.active_insurance_company_id,
+                'active_policy_address': values.active_policy_address,
+                'active_policy_no': values.active_policy_no,
+                'page_name': `two_wheeler_Vehicle_detailsOD/${productId}`,
+            }
+        }
+        else {
+            post_data = {
+                'policy_holder_id': localStorage.getItem("policyHolder_id"),
+                'menumaster_id': 3,
+                'registration_date': moment(values.registration_date).format("YYYY-MM-DD"),
+                'location_id': values.location_id,        
+                'vehicleAge': vehicleAge,
+                'pol_start_date': moment(newPolStartDate).format('YYYY-MM-DD'),
+                'pol_end_date': moment(newPolEndDate).format('YYYY-MM-DD'),
+                'policy_type': policy_type,
+                'prev_policy_flag': 1,
+                'active_start_date': moment(values.active_start_date).format("YYYY-MM-DD"),
+                'active_end_date': moment(values.active_end_date).format("YYYY-MM-DD"),
+                'active_policy_name': values.active_policy_name,
+                'active_insurance_company_id': values.active_insurance_company_id,
+                'active_policy_address': values.active_policy_address,
+                'active_policy_no': values.active_policy_no,
+                'page_name': `two_wheeler_Vehicle_detailsOD/${productId}`,
+            }
         }
 
         console.log('post_data', post_data)
@@ -935,29 +966,54 @@ class TwoWheelerVehicleDetailsOD extends Component {
         const { insurerList, showClaim, previous_is_claim, motorInsurance, previousPolicy,
             CustomerID, suggestions, vehicleDetails, RTO_location, location_reset_flag } = this.state
         let phrases = localStorage.getItem("phrases") ? JSON.parse(localStorage.getItem("phrases")) : null
-        let newInitialValues = Object.assign(initialValue, {
-            registration_date: motorInsurance && motorInsurance.registration_date ? new Date(motorInsurance.registration_date) : "",
-            location_id: motorInsurance && motorInsurance.location_id && location_reset_flag == 0 ? motorInsurance.location_id : "",
-            previous_start_date: previousPolicy && previousPolicy[0] && previousPolicy[0].start_date ? new Date(previousPolicy[0].start_date) : "",
-            previous_end_date: previousPolicy && previousPolicy[0] && previousPolicy[0].end_date ? new Date(previousPolicy[0].end_date) : "",
-            previous_policy_name: "1",
-            insurance_company_id: previousPolicy && previousPolicy[0] && previousPolicy[0].insurancecompany && previousPolicy[0].insurancecompany.Id ? previousPolicy[0].insurancecompany.Id : "",
+        let newInitialValues = {}
 
-            previous_city: previousPolicy && previousPolicy[0] && previousPolicy[0].address ? previousPolicy[0].address : "",
-            previous_is_claim: previousPolicy && previousPolicy[0] && (previousPolicy[0].is_claim == 0 || previousPolicy[0].is_claim == 1) ? previousPolicy[0].is_claim : "",
-            previous_claim_bonus: previousPolicy && previousPolicy[0] && ncbArr[previousPolicy[0].claim_bonus] && previousPolicy[0].claim_bonus != 2 ? Math.floor(previousPolicy[0].claim_bonus) : "",
-            previous_policy_no: previousPolicy && previousPolicy[0] && previousPolicy[0].policy_no ? previousPolicy[0].policy_no : "",
+        if(( motorInsurance && motorInsurance.policytype_id && motorInsurance.policytype_id == '3' && motorInsurance.lapse_duration == '1') ||
+                motorInsurance && motorInsurance.policytype_id && motorInsurance.policytype_id == '2' ) {
+            newInitialValues = Object.assign(initialValue, {
+                registration_date: motorInsurance && motorInsurance.registration_date ? new Date(motorInsurance.registration_date) : "",
+                location_id: motorInsurance && motorInsurance.location_id && location_reset_flag == 0 ? motorInsurance.location_id : "",
+                previous_start_date: previousPolicy && previousPolicy[0] && previousPolicy[0].start_date ? new Date(previousPolicy[0].start_date) : "",
+                previous_end_date: previousPolicy && previousPolicy[0] && previousPolicy[0].end_date ? new Date(previousPolicy[0].end_date) : "",
+                previous_policy_name: "1",
+                insurance_company_id: previousPolicy && previousPolicy[0] && previousPolicy[0].insurancecompany && previousPolicy[0].insurancecompany.Id ? previousPolicy[0].insurancecompany.Id : "",
 
-            active_start_date: previousPolicy && previousPolicy[1] && previousPolicy[1].start_date ? new Date(previousPolicy[1].start_date) : "",
-            active_end_date: previousPolicy && previousPolicy[1] && previousPolicy[1].end_date ? new Date(previousPolicy[1].end_date) : "",
-            active_policy_name: '2',
-            active_insurance_company_id: previousPolicy && previousPolicy[1] && previousPolicy[1].insurancecompany && previousPolicy[1].insurancecompany.Id ? previousPolicy[1].insurancecompany.Id : "",
-            active_policy_address: previousPolicy && previousPolicy[1] && previousPolicy[1].address ? previousPolicy[1].address : "test",
-            active_policy_no: previousPolicy && previousPolicy[1] && previousPolicy[1].policy_no ? previousPolicy[1].policy_no : "",
-            valid_previous_policy: motorInsurance && (motorInsurance.valid_previous_policy == 0 || motorInsurance.valid_previous_policy == 1) ? motorInsurance.valid_previous_policy : "",
-            no_of_claim: previousPolicy && previousPolicy[0] && previousPolicy[0].previouspoliciesclaims ? previousPolicy[0].previouspoliciesclaims.length : "",
-            claim_array: this.initClaimDetailsList()
-        });
+                previous_city: previousPolicy && previousPolicy[0] && previousPolicy[0].address ? previousPolicy[0].address : "",
+                previous_is_claim: previousPolicy && previousPolicy[0] && (previousPolicy[0].is_claim == 0 || previousPolicy[0].is_claim == 1) ? previousPolicy[0].is_claim : "",
+                previous_claim_bonus: previousPolicy && previousPolicy[0] && ncbArr[previousPolicy[0].claim_bonus] && previousPolicy[0].claim_bonus != 2 ? Math.floor(previousPolicy[0].claim_bonus) : "",
+                previous_policy_no: previousPolicy && previousPolicy[0] && previousPolicy[0].policy_no ? previousPolicy[0].policy_no : "",
+
+                active_start_date: previousPolicy && previousPolicy[1] && previousPolicy[1].start_date ? new Date(previousPolicy[1].start_date) : "",
+                active_end_date: previousPolicy && previousPolicy[1] && previousPolicy[1].end_date ? new Date(previousPolicy[1].end_date) : "",
+                active_policy_name: '2',
+                active_insurance_company_id: previousPolicy && previousPolicy[1] && previousPolicy[1].insurancecompany && previousPolicy[1].insurancecompany.Id ? previousPolicy[1].insurancecompany.Id : "",
+                active_policy_address: previousPolicy && previousPolicy[1] && previousPolicy[1].address ? previousPolicy[1].address : "test",
+                active_policy_no: previousPolicy && previousPolicy[1] && previousPolicy[1].policy_no ? previousPolicy[1].policy_no : "",
+                valid_previous_policy: motorInsurance && (motorInsurance.valid_previous_policy == 0 || motorInsurance.valid_previous_policy == 1) ? motorInsurance.valid_previous_policy : "",
+                no_of_claim: previousPolicy && previousPolicy[0] && previousPolicy[0].previouspoliciesclaims ? previousPolicy[0].previouspoliciesclaims.length : "",
+                lapse_duration: motorInsurance && motorInsurance.lapse_duration ? motorInsurance.lapse_duration : "",
+                policy_type_id: motorInsurance && motorInsurance.policytype_id ? motorInsurance.policytype_id : "",
+                claim_array: this.initClaimDetailsList()
+            });
+        }
+        else{
+            newInitialValues = Object.assign(initialValue, {
+                registration_date: motorInsurance && motorInsurance.registration_date ? new Date(motorInsurance.registration_date) : "",
+                location_id: motorInsurance && motorInsurance.location_id ? motorInsurance.location_id : "",
+                previous_policy_name: "1",            
+                valid_previous_policy: motorInsurance && (motorInsurance.valid_previous_policy == 0 || motorInsurance.valid_previous_policy == 1) ? motorInsurance.valid_previous_policy : "0",
+                active_start_date: previousPolicy && previousPolicy[0] && previousPolicy[0].start_date ? new Date(previousPolicy[0].start_date) : "",
+                active_end_date: previousPolicy && previousPolicy[0] && previousPolicy[0].end_date ? new Date(previousPolicy[0].end_date) : "",
+                active_policy_name: '2',
+                active_insurance_company_id: previousPolicy && previousPolicy[0] && previousPolicy[0].insurancecompany && previousPolicy[0].insurancecompany.Id ? previousPolicy[0].insurancecompany.Id : "",
+                active_policy_address: previousPolicy && previousPolicy[0] && previousPolicy[0].address ? previousPolicy[0].address : "test",
+                active_policy_no: previousPolicy && previousPolicy[0] && previousPolicy[0].policy_no ? previousPolicy[0].policy_no : "",
+                lapse_duration: motorInsurance && motorInsurance.lapse_duration ? motorInsurance.lapse_duration : "",
+                policy_type_id: motorInsurance && motorInsurance.policytype_id ? motorInsurance.policytype_id : "",
+                claim_array: this.initClaimDetailsList()
+    
+            });
+        }
 
 
         const inputCustomerID = {
@@ -1077,7 +1133,6 @@ class TwoWheelerVehicleDetailsOD extends Component {
                                                                         </Col>
                                                                     </Row>
 
-
                                                                             <Row>
                                                                                 <Col sm={12}>
                                                                                     <FormGroup>
@@ -1183,6 +1238,7 @@ class TwoWheelerVehicleDetailsOD extends Component {
 
                                                                             <Row>&nbsp;</Row>
 
+                                                                            {( (values.policy_type_id == '2') || (values.policy_type_id == '3' && values.lapse_duration == '1' ) ) ?
                                                                             <Fragment>
                                                                                 <Row>
                                                                                     <Col sm={12}>
@@ -1239,10 +1295,9 @@ class TwoWheelerVehicleDetailsOD extends Component {
                                                                                         </FormGroup>
                                                                                     </Col>
                                                                                 </Row>
-                                                                            </Fragment>
-                                                                            {values.valid_previous_policy == '1' ?
+                                                                            </Fragment> : null }
+                                                                            {(values.policy_type_id == '2' || (values.policy_type_id == '3' && values.lapse_duration == '1' ) ) && values.valid_previous_policy == '1' ?
                                                                                 <Fragment>
-
                                                                                     <Row>
                                                                                         <Col sm={12}>
                                                                                             <FormGroup>
@@ -1369,18 +1424,18 @@ class TwoWheelerVehicleDetailsOD extends Component {
                                                                                         </Col>
                                                                                     </Row>
 
-                                                                <Row>&nbsp;</Row>
-                                                                { values.previous_policy_name == '1' && Math.floor(moment().diff(values.previous_end_date, 'days', true)) <= 90 ?
-                                                                    <Fragment>
-                                                                    <Row>
-                                                                        <Col sm={12}>
-                                                                            <FormGroup>
-                                                                                <div className="carloan">
-                                                                                    <h4>{phrases['ClaimPolicy']}</h4>
-                                                                                </div>
-                                                                            </FormGroup>
-                                                                        </Col>
-                                                                    </Row>
+                                                                                    <Row>&nbsp;</Row>
+                                                                                    { values.previous_policy_name == '1' && Math.floor(moment().diff(values.previous_end_date, 'days', true)) <= 90 ?
+                                                                                    <Fragment>
+                                                                                    <Row>
+                                                                                        <Col sm={12}>
+                                                                                            <FormGroup>
+                                                                                                <div className="carloan">
+                                                                                                    <h4>{phrases['ClaimPolicy']}</h4>
+                                                                                                </div>
+                                                                                            </FormGroup>
+                                                                                        </Col>
+                                                                                    </Row>
 
                                                                                     <Row>
                                                                                         <Col sm={4}>
@@ -1415,7 +1470,7 @@ class TwoWheelerVehicleDetailsOD extends Component {
                                                                                                                 onChange={(e) => {
                                                                                                                     setFieldTouched('previous_is_claim')
                                                                                                                     setFieldValue(`previous_is_claim`, e.target.value);
-                                                                                                                    setFieldValue('no_of_claim', "")
+                                                                                                                    setFieldValue('previous_claim_bonus', "")
                                                                                                                     this.showClaimText(1, values);
                                                                                                                 }}
                                                                                                                 checked={values.previous_is_claim == '1' ? true : false}
@@ -1516,7 +1571,7 @@ class TwoWheelerVehicleDetailsOD extends Component {
                                                                                         this.handleClaims(values, errors, touched, setFieldTouched, setFieldValue)
                                                                                         : null}
                                                                                 </Fragment> : null}
-                                                            </Fragment> : null }
+                                                                            </Fragment> : null }
 
                                                                     <div className="d-flex justify-content-left resmb">
                                                                         <Button className={`backBtn`} type="button" disabled={isSubmitting ? true : false} onClick={this.selectBrand.bind(this, productId)}>

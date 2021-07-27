@@ -101,8 +101,10 @@ const vehicleRegistrationValidation = Yup.object().shape({
     }),
 
     previous_start_date:Yup.date()
-    .notRequired('Previous Start date is required')
-    .test(
+    .when(['policy_type_id','lapse_duration'], {
+        is: (policy_type_id, lapse_duration) => (policy_type_id == '3' && lapse_duration == '2'),       
+    then: Yup.date(),
+    otherwise: Yup.date().test(
         "currentMonthChecking",
         function() {
             return "PleaseESD"
@@ -132,10 +134,13 @@ const vehicleRegistrationValidation = Yup.object().shape({
           }
           return true;
       }
-    ),
+    )
+    }),
     previous_end_date:Yup.date()
-    .notRequired()
-    .test(
+    .when(['policy_type_id','lapse_duration'], {
+        is: (policy_type_id, lapse_duration) => (policy_type_id == '3' && lapse_duration == '2'),       
+    then: Yup.date(),
+    otherwise: Yup.date().test(
         "currentMonthChecking",
         function() {
             return "PleaseEED"
@@ -165,10 +170,13 @@ const vehicleRegistrationValidation = Yup.object().shape({
             }
             return true;
         }
-    ),
+    )
+    }),
     previous_policy_name:Yup.string()
-    .notRequired('PleaseSPT')
-    .test(
+    .when(['policy_type_id','lapse_duration'], {
+        is: (policy_type_id, lapse_duration) => (policy_type_id == '3' && lapse_duration == '2'),       
+    then: Yup.string(),
+    otherwise: Yup.string().test(
         "currentMonthChecking",
         function() {
             return "PleaseSPT"
@@ -191,10 +199,13 @@ const vehicleRegistrationValidation = Yup.object().shape({
             // }
             return true;
         }
-    ),
+    )
+    }),
     insurance_company_id:Yup.number()
-    .notRequired('Insurance company is required')
-    .test(
+    .when(['policy_type_id','lapse_duration'], {
+        is: (policy_type_id, lapse_duration) => (policy_type_id == '3' && lapse_duration == '2'),       
+    then: Yup.number(),
+    otherwise: Yup.number().test(
         "currentMonthChecking",
         function() {
             return "PleaseEPIC"
@@ -205,10 +216,14 @@ const vehicleRegistrationValidation = Yup.object().shape({
             }
             return true;
         }
-    ),
+    )
+    }),
+
     previous_city:Yup.string()
-    .notRequired()
-    .test(
+    .when(['policy_type_id','lapse_duration'], {
+        is: (policy_type_id, lapse_duration) => (policy_type_id == '3' && lapse_duration == '2'),       
+    then: Yup.string(),
+    otherwise: Yup.string().test(
         "currentMonthChecking",
         function() {
             return "PleaseEPICC"
@@ -226,11 +241,14 @@ const vehicleRegistrationValidation = Yup.object().shape({
     })
     .max(100, function() {
         return "AddressMustBeMaximum100Chracters"
+    })
     }),
 
     previous_policy_no:Yup.string()
-    .notRequired()
-    .test(
+    .when(['policy_type_id','lapse_duration'], {
+        is: (policy_type_id, lapse_duration) => (policy_type_id == '3' && lapse_duration == '2'),       
+    then: Yup.string(),
+    otherwise: Yup.string().test(
         "currentMonthChecking",
         function() {
             return "PleaseEPPN"
@@ -250,11 +268,14 @@ const vehicleRegistrationValidation = Yup.object().shape({
         })
         .max(28, function() {
             return "PolicyMaxCharacter"
-        }),
+        })
+    }),
 
     previous_claim_bonus:Yup.string()
-    .notRequired()
-    .test(
+    .when(['policy_type_id','lapse_duration'], {
+        is: (policy_type_id, lapse_duration) => (policy_type_id == '3' && lapse_duration == '2'),       
+    then: Yup.string(),
+    otherwise: Yup.string().test(
         "currentMonthChecking",
         function() {
             return "PleaseEPCB"
@@ -279,10 +300,13 @@ const vehicleRegistrationValidation = Yup.object().shape({
             }
             return true;
         }
-    ),
+    )
+    }),
     previous_is_claim:Yup.string()
-    .notRequired()
-    .test(
+    .when(['policy_type_id','lapse_duration'], {
+        is: (policy_type_id, lapse_duration) => (policy_type_id == '3' && lapse_duration == '2'),       
+    then: Yup.string(),
+    otherwise: Yup.string().test(
         "currentMonthChecking",
         function() {
             return "PleaseSPC"
@@ -295,7 +319,8 @@ const vehicleRegistrationValidation = Yup.object().shape({
             }
             return true;
         }
-    ),
+    ) 
+    }),
     no_of_claim:Yup.string().when(['previous_is_claim'], {
         is: previous_is_claim => previous_is_claim == '1',       
         then: Yup.string().required('PleasePNOC'),
@@ -303,21 +328,14 @@ const vehicleRegistrationValidation = Yup.object().shape({
     }),
 
     valid_previous_policy: Yup.string()
-    .required(function() {
-        return "RequiredField"
+    .when(['policy_type_id','lapse_duration'], {
+        is: (policy_type_id, lapse_duration) => (policy_type_id == '3' && lapse_duration == '2'),       
+    then: Yup.string(),
+    otherwise: Yup.string()
+        .required(function() {
+            return "RequiredField"
+        })
     }),
-    // .test(
-    //     "currentMonthChecking",
-    //     function() {
-    //         return "ValidPrevPolicy "
-    //     },
-    //     function (value) {
-    //         if (value == '0' && this.parent.policy_type_id != '1') {   
-    //             return false;    
-    //         }
-    //         return true;
-    //     }
-    // ),
 
 
     claim_array: Yup.array().of(
@@ -353,7 +371,7 @@ const vehicleRegistrationValidation = Yup.object().shape({
         is: (previous_policy_name,valid_previous_policy) => (previous_policy_name=='3') && (valid_previous_policy == '1'), 
         then: Yup.string().required("Previous policy duration required"),
         otherwise: Yup.string()
-    }), 
+    }) 
     
 });
 
@@ -520,12 +538,12 @@ class VehicleDetailsMISCD extends Component {
         //     return false
         // }
 
-        if(values.valid_previous_policy == "0" && values.policy_type_id == "2") {
+        if(values.valid_previous_policy == "0" && (motorInsurance.policytype_id == 2 || (values.policy_type_id == '3' && values.lapse_duration == '1') )) {
             swal("Thank you for showing your interest for buying product.Due to some reasons, we are not able to issue the policy online.Please call 1800 22 1111")
             return false
         }
 
-        if(Math.floor(moment().diff(values.previous_end_date, 'days', true)) > 90) {
+        if(Math.floor(moment().diff(values.previous_end_date, 'days', true)) > 90 || (values.policy_type_id == '3' && values.lapse_duration == '2')) {
             values.previous_claim_bonus = 1
         }
 
@@ -533,7 +551,7 @@ class VehicleDetailsMISCD extends Component {
         const formData = new FormData(); 
         let encryption = new Encryption();
         let post_data = {}
-        if(values.policy_type_id == '2') {
+        if(values.policy_type_id == '2' || (values.policy_type_id == '3' && values.lapse_duration == '1') ) {
             post_data = {
                 'policy_holder_id':localStorage.getItem('policyHolder_id'),
                 'menumaster_id':menumaster_id,
@@ -560,7 +578,7 @@ class VehicleDetailsMISCD extends Component {
                 'is_new_policy' : 0
             } 
         }
-        else if(values.policy_type_id == '1')  {
+        else if(values.policy_type_id == '1' || (values.policy_type_id == '3' && values.lapse_duration == '2') )  {
             post_data = {
                 'policy_holder_id':localStorage.getItem('policyHolder_id'),
                 'menumaster_id':menumaster_id,
@@ -866,6 +884,7 @@ class VehicleDetailsMISCD extends Component {
             policy_type_id: motorInsurance && motorInsurance.policytype_id ? motorInsurance.policytype_id : "",
             valid_previous_policy: motorInsurance && (motorInsurance.valid_previous_policy == 0 || motorInsurance.valid_previous_policy == 1) ? motorInsurance.valid_previous_policy : "",           
             duration: previousPolicy && previousPolicy.duration ? previousPolicy.duration : "",
+            lapse_duration: motorInsurance && motorInsurance.lapse_duration ? motorInsurance.lapse_duration : "",
             claim_array:  this.initClaimDetailsList()
         });
         let phrases = localStorage.getItem("phrases") ? JSON.parse(localStorage.getItem("phrases")) : null
@@ -885,19 +904,12 @@ class VehicleDetailsMISCD extends Component {
 				<div className="page-wrapper">
                 <div className="container-fluid">
                 <div className="row">
-				
-				
-				
-						<aside className="left-sidebar">
-		 				 <div className="scroll-sidebar ps-container ps-theme-default ps-active-y">
-						 <SideNav />
-						</div>
-						</aside>
 								
-					 {/* <div className="col-sm-12 col-md-12 col-lg-2 col-xl-2 pd-l-0">           
-						<SideNav />
-             		 </div>*/}
-                  
+                <aside className="left-sidebar">
+                    <div className="scroll-sidebar ps-container ps-theme-default ps-active-y">
+                        <SideNav />
+                    </div>
+                </aside>
 					
 					
                 <div className="col-sm-12 col-md-12 col-lg-12 col-xl-12 infobox sbbrand2">
@@ -915,7 +927,7 @@ class VehicleDetailsMISCD extends Component {
                             onSubmit={this.handleSubmit} 
                             validationSchema={vehicleRegistrationValidation}>
                             {({ values, errors, setFieldValue, setFieldTouched, isValid, isSubmitting, touched }) => {
-
+console.log("errors-------------- ", errors)
                                 return (
                                     <Form enableReinitialize = {true}>
                                         <Row>
@@ -991,80 +1003,7 @@ class VehicleDetailsMISCD extends Component {
                                                         </FormGroup>
                                                     </Col>
                                                 </Row>
-{/*                                                 
-                                                <Row>
-                                                    <Col sm={12} md={11} lg={4}>
-                                                        <FormGroup>
-                                                            <div className="formSection">
-                                                                <Field
-                                                                    name='goodscarriedtypes_id'
-                                                                    component="select"
-                                                                    autoComplete="off"
-                                                                    className="formGrp inputfs12"
-                                                                    value = {values.goodscarriedtypes_id}
-                                                                    // value={ageObj.whatIsCurrentMonth(values.registration_date) < 7 ? 6 : values.previous_policy_name}
-                                                                >
-                                                                    <option value="">Select Type of goods carried</option>
-                                                                    {goodscarriedtypes.map((subVehicle, qIndex) => ( 
-                                                                        <option value= {subVehicle.id}>{subVehicle.goodscarriedtype}</option>
-                                                                    ))}
-                                                        
-                                                                </Field>
-                                                                {errors.goodscarriedtypes_id && touched.goodscarriedtypes_id ? (
-                                                                    <span className="errorMsg">{errors.goodscarriedtypes_id}</span>
-                                                                ) : null}
-                                                            </div>
-                                                        </FormGroup>
-                                                    </Col>
 
-                                                    <Col sm={12} md={11} lg={4}>
-                                                        <FormGroup>
-                                                            <div className="formSection">
-                                                                <Field
-                                                                    name='averagemonthlyusages_id'
-                                                                    component="select"
-                                                                    autoComplete="off"
-                                                                    className="formGrp inputfs12"
-                                                                    value = {values.averagemonthlyusages_id}
-                                                                    // value={ageObj.whatIsCurrentMonth(values.registration_date) < 7 ? 6 : values.previous_policy_name}
-                                                                >
-                                                                    <option value="">Average Monthly use of Vehicle</option>
-                                                                    {averagemonthlyusages.map((monthlyusages, qIndex) => ( 
-                                                                        <option value= {monthlyusages.id}>{monthlyusages.usage_description}</option>
-                                                                    ))}
-                                                        
-                                                                </Field>
-                                                                {errors.averagemonthlyusages_id && touched.averagemonthlyusages_id ? (
-                                                                    <span className="errorMsg">{errors.averagemonthlyusages_id}</span>
-                                                                ) : null}
-                                                            </div>
-                                                        </FormGroup>
-                                                    </Col>
-                                                    <Col sm={12} md={11} lg={3}>
-                                                        <FormGroup>
-                                                            <div className="formSection">
-                                                                <Field
-                                                                    name='permittypes_id'
-                                                                    component="select"
-                                                                    autoComplete="off"
-                                                                    className="formGrp inputfs12"
-                                                                    value = {values.permittypes_id}
-                                                                    // value={ageObj.whatIsCurrentMonth(values.registration_date) < 7 ? 6 : values.previous_policy_name}
-                                                                >
-                                                                    <option value="">Select Type of permit</option>
-                                                                    {permittypes.map((permittype, qIndex) => ( 
-                                                                        <option value= {permittype.id}>{permittype.permittype}</option>
-                                                                    ))}
-                                                        
-                                                                </Field>
-                                                                {errors.permittypes_id && touched.permittypes_id ? (
-                                                                    <span className="errorMsg">{errors.permittypes_id}</span>
-                                                                ) : null}
-                                                            </div>
-                                                        </FormGroup>
-                                                    </Col>
-                                                </Row>
-                                                 */}
                                                 <Row>
                                                     <Col sm={12}>
                                                         <FormGroup>
@@ -1074,7 +1013,7 @@ class VehicleDetailsMISCD extends Component {
                                                         </FormGroup>
                                                     </Col>
                                                 </Row>
-                                            {values.policy_type_id == '2' ?
+                                            {(values.policy_type_id == '2') || (values.policy_type_id == '3' && values.lapse_duration == '1' )  ?
                                                 <Fragment>
                                                     <Row>
                                                         <Col sm={12}>
@@ -1133,7 +1072,7 @@ class VehicleDetailsMISCD extends Component {
                                                     </Row>
                                                 </Fragment> : null }
 
-                                            {values.policy_type_id == '2' && values.valid_previous_policy == '1' ?
+                                            {(values.policy_type_id == '2' || (values.policy_type_id == '3' && values.lapse_duration == '1' ) ) && values.valid_previous_policy == '1' ?
                                                 <Fragment>
                                                 <Row>
                                                     <Col sm={12}>

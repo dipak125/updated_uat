@@ -78,7 +78,7 @@ class ThankYouPage extends Component {
       .post(`/policy-download/external`, formData)
       .then(res => {
         console.log('external_res', res)
-        if(res.data.error == true) {
+        if(res.data.data.length === 0) {
           this.setState({dloadCounter: dloadCounter+1})
           swal({
             title: "Alert",

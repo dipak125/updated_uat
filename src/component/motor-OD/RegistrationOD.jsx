@@ -466,7 +466,7 @@ class RegistrationOD extends Component {
                                                                         <p>{phrases['TellAboutPolicy']}</p>
 
                                                                         <div className="d-inline-flex m-b-15">
-                                                                            <div className="p-r-25">
+                                                                            {/* <div className="p-r-25">
                                                                                 <label className="customRadio3">
                                                                                     <Field
                                                                                         type="radio"
@@ -483,7 +483,7 @@ class RegistrationOD extends Component {
                                                                                     />
                                                                                     <span className="checkmark " /><span className="fs-14"> {phrases['NewPolicy']}</span>
                                                                                 </label>
-                                                                            </div>
+                                                                            </div> */}
 
                                                                             <div className="p-r-25">
                                                                                 <label className="customRadio3">
@@ -496,6 +496,7 @@ class RegistrationOD extends Component {
                                                                                         onChange={() => {
                                                                                             setFieldTouched('policy_type')
                                                                                             setFieldValue('policy_type', '2');
+                                                                                            setFieldValue('lapse_duration', '');
                                                                                             this.handleChange(values, setFieldTouched, setFieldValue)
                                                                                         }
                                                                                         }

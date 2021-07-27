@@ -23,12 +23,6 @@ import {  userTypes } from "../../shared/staticValues";
 
 let translation = localStorage.getItem("phrases") ? JSON.parse(localStorage.getItem("phrases")) : []
 
-let user_data = sessionStorage.getItem("users") ? JSON.parse(sessionStorage.getItem("users")) : "";
-let tempEncryption = new Encryption();
-if (user_data.user) {
-    user_data = JSON.parse(tempEncryption.decrypt(user_data.user));
-}
-
 const insert = (arr, index, newItem) => [
     // part of the array before the specified index
     ...arr.slice(0, index),
@@ -688,6 +682,11 @@ class OtherComprehensive extends Component {
         let coverage_data = {}
         let total_idv=0
         let other_idv=0    
+        var user_data = sessionStorage.getItem("users") ? JSON.parse(sessionStorage.getItem("users")) : "";
+        var tempEncryption = new Encryption();
+        if (user_data.user) {
+            user_data = JSON.parse(tempEncryption.decrypt(user_data.user));
+        }
           
         if(add_more_coverage) {
             coverage_data = {
@@ -927,6 +926,12 @@ class OtherComprehensive extends Component {
         const {showCNG, vahanDetails,error, policyCoverage, vahanVerify, selectFlag, fulQuoteResp, PolicyArray, geographical_extension,ncbDiscount,validation_error,
             moreCoverage, sliderVal, motorInsurance, serverResponse, engine_no, chasis_no, initialValue, add_more_coverage, add_more_coverage_request_array} = this.state
         const {productId} = this.props.match.params 
+
+        var user_data = sessionStorage.getItem("users") ? JSON.parse(sessionStorage.getItem("users")) : "";
+        var tempEncryption = new Encryption();
+        if (user_data.user) {
+            user_data = JSON.parse(tempEncryption.decrypt(user_data.user));
+        }
 
         let defaultSliderValue = PolicyArray.length > 0 ? Math.round(PolicyArray[0].PolicyRiskList[0].IDV_Suggested) : 0
         let sliderValue = sliderVal

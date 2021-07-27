@@ -729,7 +729,8 @@ class TwoWheelerSelectBrandOD extends Component {
                                                                             checked = {values.policy_type == '2' ? true : false}
                                                                             onChange = {() =>{
                                                                                 setFieldTouched('policy_type')
-                                                                                setFieldValue('policy_type', '2');
+                                                                                setFieldValue('policy_type', '2'); 
+                                                                                setFieldValue('lapse_duration', '');
                                                                                 this.handleChange(values,setFieldTouched, setFieldValue)
                                                                             }  
                                                                             }
@@ -737,10 +738,68 @@ class TwoWheelerSelectBrandOD extends Component {
                                                                         <span className="checkmark " /><span className="fs-14"> {phrases['RollOver']}</span>
                                                                     </label>
                                                                 </div>
+
+                                                                <div>
+                                                                    <label className="customRadio3">
+                                                                        <Field
+                                                                            type="radio"
+                                                                            name='policy_type'
+                                                                            value='3'
+                                                                            key='1'
+                                                                            checked = {values.policy_type == '3' ? true : false}
+                                                                            onChange = {() =>{
+                                                                                setFieldTouched('policy_type')
+                                                                                setFieldValue('policy_type', '3');
+                                                                                this.handleChange(values,setFieldTouched, setFieldValue)
+                                                                            }  
+                                                                            }
+                                                                        />
+                                                                        <span className="checkmark" />
+                                                                        <span className="fs-14">{phrases['LapsedPolicy']}</span>
+                                                                    </label>
+                                                                    {errors.policy_type && touched.policy_type ? (
+                                                                        <span className="errorMsg">{phrases[errors.policy_type]}</span>
+                                                                    ) : null}
+                                                                </div>
                                                             </div>
                                                         </div>
                                                     </div>
-                                                    
+                                                    {values.policy_type == '3' ? 
+                                                    <div className="d-flex justify-content-left">
+                                                        <div className="brandhead"> 
+                                                        <p>{phrases['LapseDuration']}</p>
+                                                            <div className="d-inline-flex m-b-15">
+                                                                <div className="p-r-25">
+                                                                    <label className="customRadio3">
+                                                                        <Field
+                                                                            type="radio"
+                                                                            name='lapse_duration'
+                                                                            value='1'
+                                                                            key='1'
+                                                                            checked = {values.lapse_duration == '1' ? true : false}
+                                                                        />
+                                                                        <span className="checkmark " /><span className="fs-14"> {phrases['BeforeNinety']}</span>
+                                                                    </label>
+                                                                </div>
+                                                                <div className="p-r-25">
+                                                                    <label className="customRadio3">
+                                                                        <Field
+                                                                            type="radio"
+                                                                            name='lapse_duration'
+                                                                            value='2'
+                                                                            key='1'
+                                                                            checked = {values.lapse_duration == '2' ? true : false}
+                                                                        />
+                                                                        <span className="checkmark " /><span className="fs-14"> {phrases['OverNinety']}</span>
+                                                                    </label>
+                                                                    {errors.lapse_duration && touched.lapse_duration ? (
+                                                                        <span className="errorMsg">{phrases[errors.lapse_duration]}</span>
+                                                                    ) : null}
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div> : null }
+
                                                     <div className="brandhead">
                                                     <h4 className="m-b-30">{phrases['AboutVehicle']}</h4></div>
                                                     <Row className="m-b-15">

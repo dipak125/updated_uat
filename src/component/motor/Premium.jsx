@@ -206,6 +206,7 @@ class Premium extends Component {
         const formData = new FormData();
         let encryption = new Encryption();
         let dateDiff = 0
+        let policy_type_id= motorInsurance && motorInsurance.policytype_id ? motorInsurance.policytype_id : ""
         const {previousPolicy, request_data, policyHolder} = this.state
         const post_data = {
             'ref_no':this.state.policyHolder_refNo ? this.state.policyHolder_refNo : '0',
@@ -237,10 +238,11 @@ class Premium extends Component {
                     });
                 }
                 this.props.loadingStop();
-
-                if(previousPolicy && policyHolder.break_in_status != "Vehicle Recommended and Reports Uploaded"){
-                    dateDiff = Math.floor(moment().diff(previousPolicy.end_date, 'days', true));
-                    if(dateDiff > 0 || previousPolicy.name == "2") {
+                if((previousPolicy && policyHolder.break_in_status != "Vehicle Recommended and Reports Uploaded") || (policy_type_id == "3" && policyHolder.break_in_status != "Vehicle Recommended and Reports Uploaded") ){
+                    dateDiff = previousPolicy ? Math.floor(moment().diff(previousPolicy.end_date, 'days', true)) : "";
+                    let previousPolicyName = previousPolicy ? previousPolicy.name : ""
+                   
+                    if(dateDiff > 0 || previousPolicyName == "2" || policy_type_id == "3") {
                         this.setState({breakin_flag: 1})
                             const formData1 = new FormData();
                             let policyHolder_id = this.state.policyHolder_refNo ? this.state.policyHolder_refNo : '0'

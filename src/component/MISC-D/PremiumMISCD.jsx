@@ -197,11 +197,11 @@ class PremiumMISCD extends Component {
     fullQuote = ( motorInsurance) => {
         const formData = new FormData();
         let encryption = new Encryption();
-
         const {previousPolicy, request_data, policyHolder} = this.state
-
+        let dateDiff = 0
         let trailer_array = motorInsurance.trailers ? motorInsurance.trailers : null
         trailer_array = trailer_array ? JSON.parse(trailer_array) : []
+        let policy_type_id= motorInsurance && motorInsurance.policytype_id ? motorInsurance.policytype_id : ""
 
         const post_data = {
             'ref_no':this.state.policyHolder_refNo ? this.state.policyHolder_refNo : '0',
@@ -242,9 +242,11 @@ class PremiumMISCD extends Component {
                 }
                 this.props.loadingStop();
 
-                if(previousPolicy && policyHolder.break_in_status != "Vehicle Recommended and Reports Uploaded"){
-                    let dateDiff = Math.floor(moment().diff(previousPolicy.end_date, 'days', true));
-                    if(dateDiff > 0 || previousPolicy.name == "2") {
+                if((previousPolicy && policyHolder.break_in_status != "Vehicle Recommended and Reports Uploaded") || (policy_type_id == "3" && policyHolder.break_in_status != "Vehicle Recommended and Reports Uploaded") ){
+                    dateDiff = previousPolicy ? Math.floor(moment().diff(previousPolicy.end_date, 'days', true)) : "";
+                    let previousPolicyName = previousPolicy ? previousPolicy.name : ""
+
+                     if(dateDiff > 0 || previousPolicyName == "2" || policy_type_id == "3") {
                             const formData1 = new FormData();
                             let policyHolder_id = this.state.policyHolder_refNo ? this.state.policyHolder_refNo : '0'
                             formData1.append('policy_ref_no',policyHolder_id)

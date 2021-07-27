@@ -100,8 +100,10 @@ const vehicleRegistrationValidation = Yup.object().shape({
     }),
 
     previous_start_date:Yup.date()
-    .notRequired('Previous Start date is required')
-    .test(
+    .when(['policy_type_id','lapse_duration'], {
+        is: (policy_type_id, lapse_duration) => (policy_type_id == '3' && lapse_duration == '2'),       
+    then: Yup.date(),
+    otherwise: Yup.date().test(
         "currentMonthChecking",
         function() {
             return "PleaseESD"
@@ -113,28 +115,32 @@ const vehicleRegistrationValidation = Yup.object().shape({
             }
             return true;
         }
-    ).test(
-        "checkGreaterTimes",
-        "StartDateLessEnd",
-        function (value) {
-            if (value && this.parent.policy_type_id == '2'  && this.parent.valid_previous_policy == '1'  && this.parent.valid_previous_policy == '1') {
-                return checkGreaterStartEndTimes(value, this.parent.previous_end_date);
+        ).test(
+            "checkGreaterTimes",
+            "StartDateLessEnd",
+            function (value) {
+                if (value && this.parent.policy_type_id == '2'  && this.parent.valid_previous_policy == '1'  && this.parent.valid_previous_policy == '1') {
+                    return checkGreaterStartEndTimes(value, this.parent.previous_end_date);
+                }
+                return true;
             }
-            return true;
-        }
-    ).test(
-      "checkStartDate",
-      "Enter Start Date",
-      function (value) {       
-          if ( this.parent.previous_end_date != undefined && value == undefined && this.parent.policy_type_id == '2'  && this.parent.valid_previous_policy == '1') {
-              return false;
+        ).test(
+          "checkStartDate",
+          "Enter Start Date",
+          function (value) {       
+              if ( this.parent.previous_end_date != undefined && value == undefined && this.parent.policy_type_id == '2'  && this.parent.valid_previous_policy == '1') {
+                  return false;
+              }
+              return true;
           }
-          return true;
-      }
-    ),
+        )
+    }),
+
     previous_end_date:Yup.date()
-    .notRequired('Previous end date is required')
-    .test(
+    .when(['policy_type_id','lapse_duration'], {
+        is: (policy_type_id, lapse_duration) => (policy_type_id == '3' && lapse_duration == '2'),       
+    then: Yup.date(),
+    otherwise: Yup.date().test(
         "currentMonthChecking",
         function() {
             return "PleaseEED"
@@ -146,7 +152,7 @@ const vehicleRegistrationValidation = Yup.object().shape({
             }
             return true;
         }
-    ).test( 
+        ).test( 
         "checkGreaterTimes",
         "EndDateGreaterStart",
         function (value) {
@@ -164,10 +170,13 @@ const vehicleRegistrationValidation = Yup.object().shape({
             }
             return true;
         }
-    ),
+        )
+    }),
     previous_policy_name:Yup.string()
-    .notRequired('PleaseSPT')
-    .test(
+    .when(['policy_type_id','lapse_duration'], {
+        is: (policy_type_id, lapse_duration) => (policy_type_id == '3' && lapse_duration == '2'),       
+    then: Yup.string(),
+    otherwise: Yup.string().test(
         "currentMonthChecking",
         function() {
             return "PleaseSPT"
@@ -178,8 +187,8 @@ const vehicleRegistrationValidation = Yup.object().shape({
             }
             return true;
         }
-    )
-    .test(
+        )
+        .test(
         "currentMonthChecking",
         function() {
             return "PreviousPolicyLiabilityPolicy"
@@ -190,10 +199,12 @@ const vehicleRegistrationValidation = Yup.object().shape({
             // }
             return true;
         }
-    ),
+    ) }),
     insurance_company_id:Yup.number()
-    .notRequired('Insurance company is required')
-    .test(
+    .when(['policy_type_id','lapse_duration'], {
+        is: (policy_type_id, lapse_duration) => (policy_type_id == '3' && lapse_duration == '2'),       
+    then: Yup.number(),
+    otherwise: Yup.number().test(
         "currentMonthChecking",
         function() {
             return "PleaseEPIC"
@@ -204,10 +215,12 @@ const vehicleRegistrationValidation = Yup.object().shape({
             }
             return true;
         }
-    ),
+    ) }),
     previous_city:Yup.string()
-    .notRequired()
-    .test(
+    .when(['policy_type_id','lapse_duration'], {
+        is: (policy_type_id, lapse_duration) => (policy_type_id == '3' && lapse_duration == '2'),       
+    then: Yup.string(),
+    otherwise: Yup.string().test(
         "currentMonthChecking",
         function() {
             return "PleaseEPICC"
@@ -218,18 +231,21 @@ const vehicleRegistrationValidation = Yup.object().shape({
             }
             return true;
         }
-    )
-    .matches(/^[a-zA-Z0-9][a-zA-Z0-9-/.,\s]*$/, 
-        function() {
-            return "PleaseValidAddress"
-    })
-    .max(100, function() {
-        return "AddressMustBeMaximum100Chracters"
+        )
+        .matches(/^[a-zA-Z0-9][a-zA-Z0-9-/.,\s]*$/, 
+            function() {
+                return "PleaseValidAddress"
+        })
+        .max(100, function() {
+            return "AddressMustBeMaximum100Chracters"
+        })
     }),
 
     previous_policy_no:Yup.string()
-    .notRequired()
-    .test(
+    .when(['policy_type_id','lapse_duration'], {
+        is: (policy_type_id, lapse_duration) => (policy_type_id == '3' && lapse_duration == '2'),       
+    then: Yup.string(),
+    otherwise: Yup.string().test(
         "currentMonthChecking",
         function() {
             return "PleaseEPPN"
@@ -240,20 +256,23 @@ const vehicleRegistrationValidation = Yup.object().shape({
             }
             return true;
         }
-    )
-    .matches(/^[a-zA-Z0-9][a-zA-Z0-9\s-/]*$/, 
-        function() {
-            return "PleasePolicyNumber"
-        }).min(6, function() {
-            return "PolicyMinCharacter"
+        )
+        .matches(/^[a-zA-Z0-9][a-zA-Z0-9\s-/]*$/, 
+            function() {
+                return "PleasePolicyNumber"
+            }).min(6, function() {
+                return "PolicyMinCharacter"
+            })
+            .max(28, function() {
+                return "PolicyMaxCharacter"
         })
-        .max(28, function() {
-            return "PolicyMaxCharacter"
-        }),
+    }),
 
     previous_claim_bonus:Yup.mixed()
-    .notRequired('No Claim bonus is required')
-    .test(
+    .when(['policy_type_id','lapse_duration'], {
+        is: (policy_type_id, lapse_duration) => (policy_type_id == '3' && lapse_duration == '2'),       
+    then: Yup.mixed(),
+    otherwise: Yup.mixed().test(
         "currentMonthChecking",
         function() {
             return "PleaseEPCB"
@@ -264,22 +283,25 @@ const vehicleRegistrationValidation = Yup.object().shape({
             }
             return true;
         }
-    )
-    .test(
-        "previousClaimChecking",
-        function() {
-            return "PleaseEPCB"
-        },
-        function (value) {
-            if (this.parent.previous_is_claim == '1' && !value && this.parent.no_of_claim == '2') {   
-                return false;    
+        )
+        .test(
+            "previousClaimChecking",
+            function() {
+                return "PleaseEPCB"
+            },
+            function (value) {
+                if (this.parent.previous_is_claim == '1' && !value && this.parent.no_of_claim == '2') {   
+                    return false;    
+                }
+                return true;
             }
-            return true;
-        }
-    ),
+        )
+    }),
     previous_is_claim:Yup.string()
-    .notRequired('Please select one option')
-    .test(
+    .when(['policy_type_id','lapse_duration'], {
+        is: (policy_type_id, lapse_duration) => (policy_type_id == '3' && lapse_duration == '2'),       
+    then: Yup.string(),
+    otherwise: Yup.string().test(
         "currentMonthChecking",
         function() {
             return "PleaseSPC"
@@ -292,7 +314,8 @@ const vehicleRegistrationValidation = Yup.object().shape({
             }
             return true;
         }
-    ),
+        )
+    }),
     no_of_claim:Yup.string().when(['previous_is_claim'], {
         is: previous_is_claim => previous_is_claim == '1',       
         then: Yup.string().required('PleasePNOC'),
@@ -323,8 +346,13 @@ const vehicleRegistrationValidation = Yup.object().shape({
         return "PleaseSTOP"
     }),
     valid_previous_policy: Yup.string()
-    .required(function() {
-        return "RequiredField"
+    .when(['policy_type_id','lapse_duration'], {
+        is: (policy_type_id, lapse_duration) => (policy_type_id == '3' && lapse_duration == '2'),       
+    then: Yup.string(),
+    otherwise: Yup.string()
+        .required(function() {
+            return "RequiredField"
+        })
     }),
 
 
@@ -532,19 +560,19 @@ class VehicleDetailsGCV extends Component {
         //     return false
         // }
 
-        if(values.valid_previous_policy == "0" && motorInsurance.policytype_id == 2) {
+        if(values.valid_previous_policy == "0" && (motorInsurance.policytype_id == 2 || (values.policy_type_id == '3' && values.lapse_duration == '1') )) {
             swal("Thank you for showing your interest for buying product.Due to some reasons, we are not able to issue the policy online.Please call 1800 22 1111")
             return false
         }
 
-        if(Math.floor(moment().diff(values.previous_end_date, 'days', true)) > 90) {
+        if(Math.floor(moment().diff(values.previous_end_date, 'days', true)) > 90 || (values.policy_type_id == '3' && values.lapse_duration == '2')) {
             values.previous_claim_bonus = 1
         }
 
         const formData = new FormData(); 
         let encryption = new Encryption();
         let post_data = {}
-        if(values.policy_type_id == '2') {
+        if(values.policy_type_id == '2' || (values.policy_type_id == '3' && values.lapse_duration == '1') ) {
             post_data = {
                 'policy_holder_id':localStorage.getItem('policyHolder_id'),
                 'menumaster_id':4,
@@ -573,7 +601,7 @@ class VehicleDetailsGCV extends Component {
                 'is_new_policy' : 0
             } 
         }
-        else if(values.policy_type_id == '1')  {
+        else if(values.policy_type_id == '1' || (values.policy_type_id == '3' && values.lapse_duration == '2') )  {
             post_data = {
                 'policy_holder_id':localStorage.getItem('policyHolder_id'),
                 'menumaster_id':4,
@@ -878,6 +906,7 @@ class VehicleDetailsGCV extends Component {
             policy_type_id: motorInsurance && motorInsurance.policytype_id ? motorInsurance.policytype_id : "",
             valid_previous_policy: motorInsurance && (motorInsurance.valid_previous_policy == 0 || motorInsurance.valid_previous_policy == 1) ? motorInsurance.valid_previous_policy : "",           
             duration: previousPolicy && previousPolicy.duration ? previousPolicy.duration : "",
+            lapse_duration: motorInsurance && motorInsurance.lapse_duration ? motorInsurance.lapse_duration : "",
             claim_array:  this.initClaimDetailsList()
         });
         
@@ -919,7 +948,7 @@ class VehicleDetailsGCV extends Component {
                             validationSchema={vehicleRegistrationValidation}>
                             {({ values, errors, setFieldValue, setFieldTouched, isValid, isSubmitting, touched }) => {
 // console.log("values------------ ", values)
-// console.log("errors------------ ", errors)
+console.log("errors------------ ", errors)
                                 return (
                                     <Form enableReinitialize = {true}>
                                         <Row>
@@ -1076,7 +1105,7 @@ class VehicleDetailsGCV extends Component {
                                                         </FormGroup>
                                                     </Col>
                                                 </Row>
-                                            {values.policy_type_id == '2' ?
+                                            {( (values.policy_type_id == '2') || (values.policy_type_id == '3' && values.lapse_duration == '1' ) ) ?
                                                 <Fragment>
                                                     <Row>
                                                         <Col sm={12}>
@@ -1135,7 +1164,7 @@ class VehicleDetailsGCV extends Component {
                                                     </Row>
                                                 </Fragment> : null }
 
-                                                {values.policy_type_id == '2' && values.valid_previous_policy == '1' ?
+                                                {(values.policy_type_id == '2' || (values.policy_type_id == '3' && values.lapse_duration == '1' ) ) && values.valid_previous_policy == '1' ?
                                                 <Fragment>
                                                 <Row>
                                                     <Col sm={12}>
@@ -1348,7 +1377,7 @@ class VehicleDetailsGCV extends Component {
                                                     </Col>
                                                 </Row>
                                                 <Row>
-                                                <Col sm={12} md={5} lg={6}>
+                                                    <Col sm={12} md={5} lg={6}>
                                                         <FormGroup>
                                                             <div className="insurerName">
                                                                 <Field

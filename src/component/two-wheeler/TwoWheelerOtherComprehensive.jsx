@@ -22,10 +22,7 @@ import {
 import {  userTypes } from "../../shared/staticValues";
 
 let encryption = new Encryption()
-let user_data = sessionStorage.getItem("users") ? JSON.parse(sessionStorage.getItem("users")) : "";
-if (user_data.user) {
-    user_data = JSON.parse(encryption.decrypt(user_data.user));
-}
+
 
  let initialValue = {
     // add_more_coverage: "",
@@ -400,6 +397,10 @@ class TwoWheelerOtherComprehensive extends Component {
 
         const formData = new FormData();
         let encryption = new Encryption();
+        let user_data = sessionStorage.getItem("users") ? JSON.parse(sessionStorage.getItem("users")) : "";
+        if (user_data.user) {
+            user_data = JSON.parse(encryption.decrypt(user_data.user));
+        }
         let post_data = {}
         if (add_more_coverage.length > 0) {
             post_data = {
@@ -618,13 +619,19 @@ class TwoWheelerOtherComprehensive extends Component {
         const { vahanDetails, error, policyCoverage, vahanVerify, fulQuoteResp, PolicyArray, motorInsurance, serverResponse, add_more_coverage,
             step_completed, vehicleDetails, selectFlag, sliderVal, moreCoverage, ncbDiscount,validation_error} = this.state
         const { productId } = this.props.match.params
+        
+        let encryption = new Encryption();
+        let user_data = sessionStorage.getItem("users") ? JSON.parse(sessionStorage.getItem("users")) : "";
+        if (user_data.user) {
+            user_data = JSON.parse(encryption.decrypt(user_data.user));
+        }
+
         let translation = localStorage.getItem("phrases") ? JSON.parse(localStorage.getItem("phrases")) : []
         let covList = motorInsurance && motorInsurance.add_more_coverage ? motorInsurance.add_more_coverage.split(",") : ""
         let newInnitialArray = {}
         let PA_flag = motorInsurance && (motorInsurance.pa_cover == null || motorInsurance.pa_cover == "") ? '0' : '1'
         let PA_Cover = motorInsurance &&  motorInsurance.pa_cover != null ? motorInsurance.pa_cover : ''
         let tyre_cover_flag=  '0'
-        console.log("validation_error------------------ ", validation_error)
         const Coverage = {
             "B00002":translation["B00002"],
             "B00008":translation["B00008"],

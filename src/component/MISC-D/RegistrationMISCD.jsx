@@ -20,7 +20,8 @@ const initialValues = {
     reg_number_part_two: '',
     reg_number_part_three: '',
     reg_number_part_four: '',
-    check_registration: 2
+    check_registration: 2,
+    lapse_duration: ''
 }
 
 const vehicleRegistrationValidation = Yup.object().shape({
@@ -87,6 +88,11 @@ const vehicleRegistrationValidation = Yup.object().shape({
     policy_type: Yup.string().required("PleaseSPT"),
     policy_for: Yup.string().required("PleasePIC"),
     subclass_id: Yup.string().required("PleaseSSP"),
+    lapse_duration: Yup.string().when("policy_type", {
+        is: "3",       
+        then: Yup.string().required('LapseDuration'),
+        otherwise: Yup.string()
+    }),
 
 });
 
@@ -228,6 +234,7 @@ handleSubmit=(values)=>{
                 'agent_name':sessionStorage.getItem('agent_name') ? sessionStorage.getItem('agent_name') : "",
                 'product_id':sessionStorage.getItem('product_id') ? sessionStorage.getItem('product_id') : "",
                 'bc_token': "5",
+		        'lapse_duration': values.lapse_duration,
                 'page_name': `Registration/${productId}`,
                 'policy_type_id':values.policy_type,
                 'policy_for': values.policy_for,
@@ -240,8 +247,9 @@ handleSubmit=(values)=>{
             post_data = {
                 'policy_holder_id': policyHolder_id,
                 'registration_no': regNumber,
-                    'registration_part_numbers': JSON.stringify(registration_part_numbers),
+                'registration_part_numbers': JSON.stringify(registration_part_numbers),
                 'check_registration': values.check_registration,
+		        'lapse_duration': values.lapse_duration,
                 'menumaster_id':menumaster_id,
                 'vehicle_type_id':productId,
                 'bcmaster_id': bc_data ? bc_data.agent_id : "",
@@ -288,7 +296,7 @@ handleSubmit=(values)=>{
         if(sessionStorage.getItem('csc_id')) {
             post_data = {
                 'registration_no': regNumber,
-                    'registration_part_numbers': JSON.stringify(registration_part_numbers),
+                'registration_part_numbers': JSON.stringify(registration_part_numbers),
                 'check_registration': values.check_registration,
                 'menumaster_id':menumaster_id,
                 'vehicle_type_id':productId,
@@ -296,6 +304,7 @@ handleSubmit=(values)=>{
                 'agent_name':sessionStorage.getItem('agent_name') ? sessionStorage.getItem('agent_name') : "",
                 'product_id':sessionStorage.getItem('product_id') ? sessionStorage.getItem('product_id') : "",
                 'bcmaster_id': "5",
+		        'lapse_duration': values.lapse_duration,
                 'page_name': `Registration_MISCD/${productId}`,
                 'policy_type_id':values.policy_type,
                 'policy_for': values.policy_for,
@@ -306,8 +315,9 @@ handleSubmit=(values)=>{
         else {
             post_data = {
                 'registration_no': regNumber,
-                    'registration_part_numbers': JSON.stringify(registration_part_numbers),
+                'registration_part_numbers': JSON.stringify(registration_part_numbers),
                 'check_registration': values.check_registration,
+		        'lapse_duration': values.lapse_duration,
                 'menumaster_id':menumaster_id,
                 'vehicle_type_id':productId,
                 'bcmaster_id': bc_data ? bc_data.agent_id : "",
@@ -384,6 +394,7 @@ regnoFormat = (e, setFieldTouched, setFieldValue) => {
             policy_for: motorInsurance && motorInsurance.policy_for ? motorInsurance.policy_for : "",
             subclass_id : motorInsurance && motorInsurance.subclass_id ? motorInsurance.subclass_id : "",
 	        check_registration: motorInsurance && motorInsurance.registration_no == "NEW"? '1' : '2',
+            lapse_duration: motorInsurance && motorInsurance.lapse_duration ? motorInsurance.lapse_duration : "",
         })
         let phrases = localStorage.getItem("phrases") ? JSON.parse(localStorage.getItem("phrases")) : null
 
@@ -506,9 +517,67 @@ regnoFormat = (e, setFieldTouched, setFieldValue) => {
                                                                     <span className="errorMsg">{phrases[errors.policy_type]}</span>
                                                                 ) : null}
                                                         </div>
+
+                                                        <div className="p-r-25">
+                                                            <label className="customRadio3">
+                                                                <Field
+                                                                    type="radio"
+                                                                    name='policy_type'
+                                                                    value='3'
+                                                                    key='1'
+                                                                    checked = {values.policy_type == '3' ? true : false}
+                                                                    onChange = {() =>{
+                                                                        setFieldTouched('policy_type')
+                                                                        setFieldValue('policy_type', '3');
+                                                                        this.handleChange(values,setFieldTouched, setFieldValue)
+                                                                    }  
+                                                                    }
+                                                                />
+                                                                <span className="checkmark " /><span className="fs-14"> {phrases['LapsedPolicy']}</span>
+                                                            </label>
+                                                            {errors.policy_type && touched.policy_type ? (
+                                                                    <span className="errorMsg">{phrases[errors.policy_type]}</span>
+                                                                ) : null}
+                                                        </div>
                                                     </div>
                                                 </div>
                                             </div>
+                                            {values.policy_type == '3' ? 
+                                            <div className="d-flex justify-content-left">
+                                                <div className="brandhead"> 
+                                                <p>{phrases['LapseDuration']}</p>
+                                                    <div className="d-inline-flex m-b-15">
+                                                        <div className="p-r-25">
+                                                            <label className="customRadio3">
+                                                                <Field
+                                                                    type="radio"
+                                                                    name='lapse_duration'
+                                                                    value='1'
+                                                                    key='1'
+                                                                    checked = {values.lapse_duration == '1' ? true : false}
+                                                                />
+                                                                <span className="checkmark " /><span className="fs-14"> {phrases['BeforeNinety']}</span>
+                                                            </label>
+                                                        </div>
+                                                        <div className="p-r-25">
+                                                            <label className="customRadio3">
+                                                                <Field
+                                                                    type="radio"
+                                                                    name='lapse_duration'
+                                                                    value='2'
+                                                                    key='1'
+                                                                    checked = {values.lapse_duration == '2' ? true : false}
+                                                                />
+                                                                <span className="checkmark " /><span className="fs-14"> {phrases['OverNinety']}</span>
+                                                            </label>
+                                                            {errors.lapse_duration && touched.lapse_duration ? (
+                                                                <span className="errorMsg">{phrases[errors.lapse_duration]}</span>
+                                                            ) : null}
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div> : null }
+
                                             <div className="row formSection">
                                                 <label className="col-md-4">{phrases['SubProduct']}:</label>
                                                 <div className="col-md-4">

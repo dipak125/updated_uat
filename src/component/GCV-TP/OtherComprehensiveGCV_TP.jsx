@@ -20,13 +20,8 @@ import moment from "moment";
 import { validRegistrationNumber } from "../../shared/validationFunctions";
 import {  userTypes } from "../../shared/staticValues";
 
-let tempEncryption = new Encryption()
+let encryption = new Encryption()
 let translation = localStorage.getItem("phrases") ? JSON.parse(localStorage.getItem("phrases")) : []
-let user_data = sessionStorage.getItem("users") ? JSON.parse(sessionStorage.getItem("users")) : "";
-if (user_data.user) {
-    user_data = JSON.parse(tempEncryption.decrypt(user_data.user));
-}
-
 
 
 const ComprehensiveValidation = Yup.object().shape({
@@ -783,6 +778,10 @@ class OtherComprehensiveGCV extends Component {
         const formData = new FormData();
         let encryption = new Encryption();
         let post_data = {}
+        let user_data = sessionStorage.getItem("users") ? JSON.parse(sessionStorage.getItem("users")) : "";
+        if (user_data.user) {
+            user_data = JSON.parse(encryption.decrypt(user_data.user));
+        }
 
             post_data = {
                 'policy_holder_id': localStorage.getItem('policyHolder_id'),
@@ -1060,6 +1059,11 @@ class OtherComprehensiveGCV extends Component {
             moreCoverage, sliderVal, bodySliderVal, motorInsurance, serverResponse, engine_no, chasis_no, initialValue, add_more_coverage_request_array} = this.state
         const {productId} = this.props.match.params 
 
+        let user_data = sessionStorage.getItem("users") ? JSON.parse(sessionStorage.getItem("users")) : "";
+        if (user_data.user) {
+            user_data = JSON.parse(encryption.decrypt(user_data.user));
+        }
+
         let covList = motorInsurance && motorInsurance.add_more_coverage ? motorInsurance.add_more_coverage.split(",") : ""
         let newInnitialArray = {}
         let PA_flag = motorInsurance && (motorInsurance.pa_cover == null || motorInsurance.pa_cover == "") ? '0' : '1'
@@ -1254,20 +1258,13 @@ class OtherComprehensiveGCV extends Component {
 				<div className="page-wrapper">
                 <div className="container-fluid">
                 <div className="row">
-				
-				
-                    <aside className="left-sidebar">
-		 				 <div className="scroll-sidebar ps-container ps-theme-default ps-active-y">
-						 <SideNav />
-						</div>
-						</aside>
+
+                <aside className="left-sidebar">
+                    <div className="scroll-sidebar ps-container ps-theme-default ps-active-y">
+                    <SideNav />
+                </div>
+                </aside>
 								
-					 {/*<div className="col-sm-12 col-md-12 col-lg-2 col-xl-2 pd-l-0">        
-						<SideNav />
-             		 </div>*/}
-					
-					
-					
                 <div className="col-sm-12 col-md-12 col-lg-12 col-xl-12 infobox otherGcvt">
                 <h4 className="text-center mt-3 mb-3">{phrases['SBIGICL']}</h4>
                 <section className="brand colpd m-b-25">

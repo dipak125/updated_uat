@@ -20,12 +20,9 @@ import moment from "moment";
 import { validRegistrationNumber } from "../../shared/validationFunctions";
 import {  userTypes } from "../../shared/staticValues";
 
-let tempEncryption = new Encryption()
+let encryption = new Encryption()
 let translation = localStorage.getItem("phrases") ? JSON.parse(localStorage.getItem("phrases")) : []
-let user_data = sessionStorage.getItem("users") ? JSON.parse(sessionStorage.getItem("users")) : "";
-if (user_data.user) {
-    user_data = JSON.parse(tempEncryption.decrypt(user_data.user));
-}
+
 
 const insert = (arr, index, newItem) => [
     // part of the array before the specified index
@@ -986,6 +983,10 @@ class OtherComprehensiveGCV extends Component {
 
         const formData = new FormData();
         let encryption = new Encryption();
+        let user_data = sessionStorage.getItem("users") ? JSON.parse(sessionStorage.getItem("users")) : "";
+        if (user_data.user) {
+            user_data = JSON.parse(encryption.decrypt(user_data.user));
+        }
         let total_idv = 0
         let other_idv = 0
         let post_data = {}
@@ -1402,6 +1403,11 @@ class OtherComprehensiveGCV extends Component {
         const { add_more_coverage, is_CNG_account, vahanDetails, error, policyCoverage, vahanVerify, selectFlag, fulQuoteResp, PolicyArray, fuelList, depreciationPercentage, vehicleDetails, geographical_extension,
             moreCoverage, sliderVal, bodySliderVal, motorInsurance, serverResponse, engine_no, chasis_no, initialValue, add_more_coverage_request_array, ncbDiscount } = this.state
         const { productId } = this.props.match.params
+        let user_data = sessionStorage.getItem("users") ? JSON.parse(sessionStorage.getItem("users")) : "";
+        if (user_data.user) {
+            user_data = JSON.parse(encryption.decrypt(user_data.user));
+        }
+
         //let defaultSliderValue = PolicyArray.length > 0 ? Math.round(PolicyArray[0].PolicyRiskList[0].IDV_User) : 0
         let defaultSliderValue = sliderVal
         let min_IDV_suggested = PolicyArray.length > 0 ? PolicyArray[0].PolicyRiskList[0].MinIDV_Suggested : 0

@@ -301,6 +301,13 @@ class TwoWheelerOtherComprehensive extends Component {
 
         const formData = new FormData();
         let encryption = new Encryption();
+
+        var user_data = sessionStorage.getItem("users") ? JSON.parse(sessionStorage.getItem("users")) : "";
+        var tempEncryption = new Encryption();
+        if (user_data.user) {
+            user_data = JSON.parse(tempEncryption.decrypt(user_data.user));
+        }
+
         let post_data = {}
         let coverage_data = {}
         if(add_more_coverage) {
@@ -488,6 +495,11 @@ class TwoWheelerOtherComprehensive extends Component {
         const { vahanDetails, error, policyCoverage, vahanVerify, fulQuoteResp, PolicyArray, motorInsurance, serverResponse, add_more_coverage,
             step_completed, vehicleDetails, selectFlag, moreCoverage, geographical_extension} = this.state
         const { productId } = this.props.match.params
+        var user_data = sessionStorage.getItem("users") ? JSON.parse(sessionStorage.getItem("users")) : "";
+        var tempEncryption = new Encryption();
+        if (user_data.user) {
+            user_data = JSON.parse(tempEncryption.decrypt(user_data.user));
+        }
         let covList = motorInsurance && motorInsurance.add_more_coverage ? motorInsurance.add_more_coverage.split(",") : ""
         let newInnitialArray = {}
         let PA_flag = motorInsurance && (motorInsurance.pa_cover == null || motorInsurance.pa_cover == "") ? '0' : '1'
