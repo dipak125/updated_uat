@@ -248,12 +248,22 @@ handleSubmit = (values) => {
 
                   <Row>
                     <Col sm={12} md={6}>
+                      <FormGroup>Relation With Proposer</FormGroup>
+                    </Col>
+                    <Col sm={12} md={6}>
+                      <FormGroup>{member.relation_with}</FormGroup>
+                    </Col>
+                  </Row>
+
+                  <Row>
+                    <Col sm={12} md={6}>
                       <FormGroup>Gender</FormGroup>
                     </Col>
                     <Col sm={12} md={6}>
                       <FormGroup>{genderArr[member.gender]}</FormGroup>
                     </Col>
                   </Row>
+
                 </Col>
               </Row>
               <Row>

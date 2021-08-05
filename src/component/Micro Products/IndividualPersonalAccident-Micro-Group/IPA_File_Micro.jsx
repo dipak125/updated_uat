@@ -39,7 +39,8 @@ const gpaFileUploadValidation = Yup.object().shape({
 const actionFormatter = (refObj) => (cell, row, enumObject) => {
     return (
         <div>
-            <span
+            {row.microbatchstatus.id && row.microbatchstatus.id == 5 ?
+            (<span
                 href="#"
                 onClick={() => refObj.GPAFileDownload(cell)
                 }
@@ -48,10 +49,9 @@ const actionFormatter = (refObj) => (cell, row, enumObject) => {
                 <Button type="button" >
                     Download
                 </Button>
-
-            </span>
+            </span>) : null}
             &nbsp;
-            {row.microbatchstatus.id && row.microbatchstatus.id !== 3 ? (<span
+            {row.microbatchstatus.id && (row.microbatchstatus.id == 1 || row.microbatchstatus.id == 2) ? (<span
                 href="#"
                 onClick={() => refObj.GPAFileDelete(cell)
                 }
@@ -65,7 +65,7 @@ const actionFormatter = (refObj) => (cell, row, enumObject) => {
             &nbsp;
             {row.microbatchstatus.id && row.microbatchstatus.id == 2 ? (<span
                 href="#"
-                onClick={() => makePayment(cell)
+                onClick={() => refObj.makePayment(cell)
                 }
                 id="tooltip-1"
             >
@@ -78,11 +78,20 @@ const actionFormatter = (refObj) => (cell, row, enumObject) => {
     )
 }
 
-
-
-const makePayment = cell => {
-    window.location = `${process.env.REACT_APP_PAYMENT_URL}/razorpay/micro_group_pay.php?batch_id=${cell}`
+const downloadFormatter = (refObj) => (cell, row, enumObject) => {
+    return (
+        <div>
+            {
+                <a
+                    href={`${process.env.REACT_APP_API_URL}/group-excel/succeed-file/${cell}`}
+                    title="Download"
+                >
+                    {cell}
+                </a>}
+        </div>
+    )
 }
+
 
 const paymentStatusFormatter = (refObj) => (cell, row, enumObject) => {
     return (
@@ -104,7 +113,39 @@ class GPA_File_Micro extends Component {
             ksbFileList: []
         };
     }
+    
 
+    makePayment = (cell) => {
+        let encryption = new Encryption();
+        let user_data = sessionStorage.getItem("users") ? JSON.parse(sessionStorage.getItem("users")): "";
+        let user_id = "";
+        if (user_data) {
+            user_id = JSON.parse(encryption.decrypt(user_data.user));
+            user_id = user_id.master_user_id
+            this.props.loadingStart();
+            axios.get(`acd/status-change-batch-policy/${user_id}/${cell}`)
+            .then(res => {
+                if(res.data.error == false) {
+                    swal(res.data.msg, {
+                        icon: "success",
+                    }).then(() => {
+                        this.batchList();
+                    });
+                }
+                else {
+                    this.props.loadingStop();
+                    swal(res.data.msg)
+                }
+            })
+            .catch(err => {
+                this.props.loadingStop();
+                swal(err.data.msg)
+            })
+        }
+        else {
+            swal("User Id not found")
+        }
+    }
 
 
     fileUpload = async (uploadFile, setFieldValue, setFieldTouched) => {
@@ -225,7 +266,7 @@ class GPA_File_Micro extends Component {
     }
 
     GPAFileDownload(cell) {
-        const url = `${process.env.REACT_APP_API_URL}/ksb-group-excel/succeed-file/${cell}`;
+        const url = `${process.env.REACT_APP_API_URL}/group-excel/download-zip-policy-pdf/${cell}`;
         this.props.loadingStart();
         const anchortag = document.createElement('a');
         anchortag.style.display = 'none';
@@ -438,7 +479,7 @@ class GPA_File_Micro extends Component {
                                             <Fragment>
                                                 <div className="contBox m-b-45 tickedTable" style={{ marginTop: "50px" }}>
                                                     <h4 className="text-center mt-3 mb-3">Jan Rakshak Personal Accident Uploaded Files</h4>
-                                                    <div className="customInnerTable dataTableCustom">
+                                                    <div className="customInnerTable dataTableCustom customAlign">
                                                         <BootstrapTable ref="table"
                                                             data={ksbFileList}
                                                             pagination={true}
@@ -447,7 +488,7 @@ class GPA_File_Micro extends Component {
                                                             hover
                                                             wrapperClasses="table-responsive"
                                                         >
-                                                            <TableHeaderColumn width="100px" dataField='batch_no' isKey >Batch Code</TableHeaderColumn>
+                                                            <TableHeaderColumn width="100px" dataField='batch_no' isKey dataFormat={downloadFormatter(this)} >Batch Code</TableHeaderColumn>
                                                             <TableHeaderColumn width='100px' dataField='microbatchstatus' dataFormat={paymentStatusFormatter(this)} >Status</TableHeaderColumn>
                                                             <TableHeaderColumn width='100px' dataField='total_members' >Total Member</TableHeaderColumn>
                                                             <TableHeaderColumn width='100px' dataField='all_total_premium' >Total Premium</TableHeaderColumn>

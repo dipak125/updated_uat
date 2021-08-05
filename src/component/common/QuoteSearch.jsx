@@ -39,14 +39,9 @@ function polNumFormatter(cell) {
 } 
 
 function productFormatter(cell, row) {
-    if(row.menumaster_id == '2'){
-        return 'Arogya Sanjeevani'
-    }else if(row.menumaster_id == '8'){
-        return 'Arogya Topup'
-    }else{
-        return (cell ? (cell.vehicletype ? cell.vehicletype.name : null): null);
-    }
+    return (cell ? (cell.vehicletype ? cell.vehicletype.name : null): null);
 }
+
 
 function nameFormatter(cell, row){
 

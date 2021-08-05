@@ -230,7 +230,7 @@ class PreExistingDisease_KSB_Micro extends Component {
                 looking_for: resource.relation_with,
                 family_member_id: resource.id,
                 preExistingDisease: ksbPreExisting && ksbPreExisting.length > 0 && index < ksbPreExisting.length ? ksbPreExisting[index].description : "",
-                preExistingDetails: ksbPreExisting && ksbPreExisting.length > 0 && index < ksbPreExisting.length ? ksbPreExisting[index].pre_existing_details : ""
+                preExistingDetails: ksbPreExisting && ksbPreExisting.length > 0 && index < ksbPreExisting.length && ksbPreExisting[index].pre_existing_details ? ksbPreExisting[index].pre_existing_details : ""
 			}));
 		} else {
 			return [initialFamilyDetails];

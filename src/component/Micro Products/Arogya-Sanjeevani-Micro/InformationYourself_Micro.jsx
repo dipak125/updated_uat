@@ -141,7 +141,7 @@ const validateFamilyMembers = Yup.object().shape({
             .test(
                 "18YearsChecking",
                 function () {
-                    return "Age should be minimum 18 and maximum 45 years"
+                    return "Age should be minimum 18 and maximum 55 years"
                 },
                 function (value) {
                     if (value) {
@@ -159,7 +159,7 @@ const validateFamilyMembers = Yup.object().shape({
             .test(
                 "18YearsChecking",
                 function () {
-                    return "Age should be minimum 18 years"
+                    return "Age should be minimum 18 and maximum 55 years"
                 },
                 function (value) {
                     if (value) {
@@ -440,26 +440,26 @@ const validateFamilyMembers = Yup.object().shape({
                 }
             }
         )
-            .test(
-                "greaterAgeDiffChecking",
-                function () {
-                    return "Child age should be less than spouse"
-                },
-                function (value) {
-                    if (typeof this.parent.dob_1 != 'undefined') {
-                        var ageDiff = Math.floor(moment(value).diff(this.parent.dob_1, 'years', true));
-                        if (ageDiff < 0) {
-                            return false;
-                        }
-                        else {
-                            return true;
-                        }
+        .test(
+            "greaterAgeDiffChecking",
+            function () {
+                return "Child age should be less than spouse"
+            },
+            function (value) {
+                if (typeof this.parent.dob_1 != 'undefined') {
+                    var ageDiff = Math.floor(moment(value).diff(this.parent.dob_1, 'years', true));
+                    if (ageDiff < 0) {
+                        return false;
                     }
                     else {
                         return true;
                     }
                 }
-            ),
+                else {
+                    return true;
+                }
+            }
+        ),
         othewise: Yup.string()
     }),
     child3Gender: Yup.string().when(['looking_for_4'], {
@@ -474,7 +474,7 @@ const validateFamilyMembers = Yup.object().shape({
             .test(
                 "18YearsChecking",
                 function () {
-                    return "Age should be minimum 18 years"
+                    return "Age should be minimum 18 and maximum 55 years"
                 },
                 function (value) {
                     if (value) {
@@ -556,7 +556,7 @@ const validateFamilyMembers = Yup.object().shape({
             .test(
                 "18YearsChecking",
                 function () {
-                    return "Age should be minimum 18 years"
+                    return "Age should be minimum 18 and maximum 55 years"
                 },
                 function (value) {
                     if (value) {
@@ -638,7 +638,7 @@ const validateFamilyMembers = Yup.object().shape({
             .test(
                 "18YearsChecking",
                 function () {
-                    return "Age should be minimum 18 years"
+                    return "Age should be minimum 18 and maximum 55 years"
                 },
                 function (value) {
                     if (value) {
@@ -719,7 +719,7 @@ const validateFamilyMembers = Yup.object().shape({
             .test(
                 "18YearsChecking",
                 function () {
-                    return "Age should be minimum 18 years"
+                    return "Age should be minimum 18 and maximum 55 years"
                 },
                 function (value) {
                     if (value) {
@@ -794,8 +794,6 @@ const validateFamilyMembers = Yup.object().shape({
             ),
         othewise: Yup.string()
     }),
-
-
 })
 
 function checkSelfData(str) {

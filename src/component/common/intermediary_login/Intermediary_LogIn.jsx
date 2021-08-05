@@ -133,6 +133,13 @@ class Intermediary_LogIn extends Component {
         return new Promise(resolve => {
             setTimeout(() => {
                 let values = {}
+                let bcLoginData = {}
+                let encryption = new Encryption();
+                bcLoginData.agent_id = 0
+                bcLoginData.token = ""
+                bcLoginData.user_info  =  { data: {user : {username:""}} }
+                sessionStorage.setItem('bcLoginData', encryption.encrypt(JSON.stringify(bcLoginData)));
+
                 this.props.loadingStart();
                 values.rememberMe = this.state.rememberMe;
                 values.emailAddress= value.userId;

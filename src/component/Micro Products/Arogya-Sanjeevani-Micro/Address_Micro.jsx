@@ -517,7 +517,7 @@ class Address_Micro extends Component {
         formArr['last_name'] = last_name
         formArr['dob'] = dob
         formArr['pancard_no'] = pancard_no
-        formArr['page_name'] = `Address/${productId}`
+        formArr['page_name'] = `Address_Micro/${productId}`
 
         formArr['policy_holder_id'] = policyHolder_id;
 

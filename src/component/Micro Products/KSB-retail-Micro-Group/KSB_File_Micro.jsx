@@ -91,7 +91,7 @@ const downloadFormatter = (refObj) => (cell, row, enumObject) => {
         <div>
             {
                 <a
-                    href={`${process.env.REACT_APP_API_URL}/ksb-group-excel/succeed-file/${cell}`}
+                    href={`${process.env.REACT_APP_API_URL}/group-excel/succeed-file/${cell}`}
                     title="Download"
                 >
                     {cell}

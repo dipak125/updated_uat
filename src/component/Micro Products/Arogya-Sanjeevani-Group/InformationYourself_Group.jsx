@@ -20,7 +20,7 @@ import { changeFormat, get18YearsBeforeDate, PersonAge } from "../../../shared/d
 import Encryption from '../../../shared/payload-encryption';
 
 // const minDobAdult = moment(moment().subtract(56, 'years').calendar()).add(1, 'day').calendar()
-const minDobAdult = moment(moment().subtract(23741, 'day').calendar()).add(1, 'day').calendar()
+const minDobAdult = moment(moment().subtract(20453, 'day').calendar()).add(1, 'day').calendar()
 const maxDobAdult = moment().subtract(18, 'years').calendar();
 
 const minDobChild = moment(moment().subtract(26, 'years').calendar()).add(1, 'day').calendar()
@@ -48,7 +48,6 @@ const initialValues = {
     occupation_description: "",
 
 }
-
 
 
 const vehicleInspectionValidation = Yup.object().shape({
@@ -141,12 +140,12 @@ const validateFamilyMembers = Yup.object().shape({
             .test(
                 "18YearsChecking",
                 function () {
-                    return "Age should be minimum 18 and maximum 65 years"
+                    return "Age should be minimum 18 and maximum 55 years"
                 },
                 function (value) {
                     if (value) {
                         const ageObj = new PersonAge();
-                        return ageObj.whatIsMyAge(value) < 65 && ageObj.whatIsMyAge(value) >= 18;
+                        return ageObj.whatIsMyAge(value) < 56 && ageObj.whatIsMyAge(value) >= 18;
                     }
                     return true;
                 }
@@ -159,12 +158,12 @@ const validateFamilyMembers = Yup.object().shape({
             .test(
                 "18YearsChecking",
                 function () {
-                    return "Age should be minimum 18 and maximum 65 years"
+                    return "Age should be minimum 18 and maximum 55 years"
                 },
                 function (value) {
                     if (value) {
                         const ageObj = new PersonAge();
-                        return ageObj.whatIsMyAge(value) < 65 && ageObj.whatIsMyAge(value) >= 18;
+                        return ageObj.whatIsMyAge(value) < 56 && ageObj.whatIsMyAge(value) >= 18;
                     }
                     return true;
                 }
@@ -474,12 +473,12 @@ const validateFamilyMembers = Yup.object().shape({
             .test(
                 "18YearsChecking",
                 function () {
-                    return "Age should be minimum 18 and maximum 65 years"
+                    return "Age should be minimum 18 and maximum 55 years"
                 },
                 function (value) {
                     if (value) {
                         const ageObj = new PersonAge();
-                        return ageObj.whatIsMyAge(value) < 65 && ageObj.whatIsMyAge(value) >= 18;
+                        return ageObj.whatIsMyAge(value) < 56 && ageObj.whatIsMyAge(value) >= 18;
                     }
                     return true;
                 }
@@ -556,12 +555,12 @@ const validateFamilyMembers = Yup.object().shape({
             .test(
                 "18YearsChecking",
                 function () {
-                    return "Age should be minimum 18 and maximum 65 years"
+                    return "Age should be minimum 18 and maximum 55 years"
                 },
                 function (value) {
                     if (value) {
                         const ageObj = new PersonAge();
-                        return ageObj.whatIsMyAge(value) < 65 && ageObj.whatIsMyAge(value) >= 18;
+                        return ageObj.whatIsMyAge(value) < 56 && ageObj.whatIsMyAge(value) >= 18;
                     }
                     return true;
                 }
@@ -638,12 +637,12 @@ const validateFamilyMembers = Yup.object().shape({
             .test(
                 "18YearsChecking",
                 function () {
-                    return "Age should be minimum 18 and maximum 65 years"
+                    return "Age should be minimum 18 and maximum 55 years"
                 },
                 function (value) {
                     if (value) {
                         const ageObj = new PersonAge();
-                        return ageObj.whatIsMyAge(value) < 65 && ageObj.whatIsMyAge(value) >= 18;
+                        return ageObj.whatIsMyAge(value) < 56 && ageObj.whatIsMyAge(value) >= 18;
                     }
                     return true;
                 }
@@ -719,12 +718,12 @@ const validateFamilyMembers = Yup.object().shape({
             .test(
                 "18YearsChecking",
                 function () {
-                    return "Age should be minimum 18 and maximum 65 years"
+                    return "Age should be minimum 18 and maximum 55 years"
                 },
                 function (value) {
                     if (value) {
                         const ageObj = new PersonAge();
-                        return ageObj.whatIsMyAge(value) < 65 && ageObj.whatIsMyAge(value) >= 18;
+                        return ageObj.whatIsMyAge(value) < 56 && ageObj.whatIsMyAge(value) >= 18;
                     }
                     return true;
                 }

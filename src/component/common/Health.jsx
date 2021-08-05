@@ -32,6 +32,8 @@ class Health extends Component {
             this.props.history.push(`/Health_KSB_Micro/${productId}`);
         if (productId == '23')
             this.props.history.push(`/Health_KSB_Micro_Group/${productId}`);
+        if (productId == '26')
+            this.props.history.push(`/Arogya_Plus/${productId}`);
     }
 
 

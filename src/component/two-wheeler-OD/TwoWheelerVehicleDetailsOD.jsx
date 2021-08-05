@@ -1451,8 +1451,10 @@ class TwoWheelerVehicleDetailsOD extends Component {
                                                                                                                 onChange={(e) => {
                                                                                                                     setFieldTouched('previous_is_claim')
                                                                                                                     setFieldValue(`previous_is_claim`, e.target.value);
-                                                                                                                    setFieldValue('no_of_claim', "")
                                                                                                                     this.showClaimText(0, values);
+                                                                                                                    if(e.target.checked == true) {
+                                                                                                                        setFieldValue('no_of_claim', "")
+                                                                                                                    }
                                                                                                                 }}
                                                                                                                 checked={values.previous_is_claim == '0' ? true : false}
                                                                                                             />
@@ -1470,8 +1472,10 @@ class TwoWheelerVehicleDetailsOD extends Component {
                                                                                                                 onChange={(e) => {
                                                                                                                     setFieldTouched('previous_is_claim')
                                                                                                                     setFieldValue(`previous_is_claim`, e.target.value);
-                                                                                                                    setFieldValue('previous_claim_bonus', "")
                                                                                                                     this.showClaimText(1, values);
+                                                                                                                    if(e.target.checked == true) {
+                                                                                                                        setFieldValue('previous_claim_bonus', "1")
+                                                                                                                    }
                                                                                                                 }}
                                                                                                                 checked={values.previous_is_claim == '1' ? true : false}
                                                                                                             />

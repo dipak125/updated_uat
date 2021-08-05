@@ -29,12 +29,13 @@ class AgentCashDeposit extends Component {
         const formData = new FormData();
         let user_data = sessionStorage.getItem("users") ? JSON.parse(sessionStorage.getItem("users")) : "";
         if (user_data) {
+
             let encryption = new Encryption();
             user_data = JSON.parse(encryption.decrypt(user_data.user));
 
             const user_id = user_data.master_user_id ? user_data.master_user_id : null;
-            formData.append("user_id", user_id);
-            axios.post('acd/acd-balance', formData)
+            console.log("User Id", `acd/acd-balance/${user_id}`);
+            axios.get(`acd/acd-balance/${user_id}`)
                 .then(res => {
                     console.log(res);
                     if (res.data.error == true) {
@@ -50,6 +51,7 @@ class AgentCashDeposit extends Component {
                 }).
                 catch(err => {
                     console.log(err);
+                    console.log("User Id", `acd/acd-balance/${user_id}`);
                     this.props.loadingStop();
                 })
         }

@@ -733,7 +733,7 @@ class VehicleDetailsOD extends Component {
                 'policy_type': policy_type,
                 'prev_policy_flag': 1,
                 'valid_previous_policy': values.valid_previous_policy,
-                'claim_array': JSON.stringify(values.claim_array),
+                'claim_array':  values.previous_is_claim == '1' ?  JSON.stringify(values.claim_array) : "",
                 'no_of_claim': values.no_of_claim,
     
                 'active_start_date': moment(values.active_start_date).format("YYYY-MM-DD"),
@@ -1439,8 +1439,10 @@ console.log("errors ------------- ", errors)
                                                                                                                     onChange={(e) => {
                                                                                                                         setFieldTouched('previous_is_claim')
                                                                                                                         setFieldValue(`previous_is_claim`, e.target.value);
-                                                                                                                        setFieldValue('no_of_claim', "")
                                                                                                                         this.showClaimText(0, values);
+                                                                                                                        if(e.target.checked == true) {
+                                                                                                                            setFieldValue('no_of_claim', "")
+                                                                                                                        }
                                                                                                                     }}
                                                                                                                     checked={values.previous_is_claim == '0' ? true : false}
                                                                                                                 />
@@ -1458,8 +1460,10 @@ console.log("errors ------------- ", errors)
                                                                                                                     onChange={(e) => {
                                                                                                                         setFieldTouched('previous_is_claim')
                                                                                                                         setFieldValue(`previous_is_claim`, e.target.value);
-                                                                                                                        setFieldValue('no_of_claim', "")
                                                                                                                         this.showClaimText(1, values);
+                                                                                                                        if(e.target.checked == true) {
+                                                                                                                            setFieldValue('previous_claim_bonus', "1")
+                                                                                                                        }
                                                                                                                     }}
                                                                                                                     checked={values.previous_is_claim == '1' ? true : false}
                                                                                                                 />
