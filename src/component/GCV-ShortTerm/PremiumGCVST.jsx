@@ -773,7 +773,7 @@ class PremiumGCV extends Component {
                                                             <Row>&nbsp;</Row>
                                                             <div className="d-flex justify-content-left resmb">
                                                                 <Button className="backBtn" type="button" onClick={this.additionalDetails.bind(this, productId)}>{phrases['Back']}</Button>
-                                                            {bcMaster && bcMaster.eligible_for_payment_link == 1 ?
+                                                            {bcMaster && bcMaster.eligible_for_payment_link == 1 && breakin_flag == 0 ?
                                                                 <div>
                                                                 <Button type="button" className="proceedBtn" onClick = {this.sendPaymentLink.bind(this)}>  {phrases['PaymentLink']}  </Button>
                                                                 &nbsp;&nbsp;&nbsp;&nbsp;

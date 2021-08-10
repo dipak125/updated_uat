@@ -491,6 +491,7 @@ regnoFormat = (e, setFieldTouched, setFieldValue) => {
                                                                     onChange = {() =>{
                                                                         setFieldTouched('policy_type')
                                                                         setFieldValue('policy_type', '2');
+                                                                        setFieldValue('check_registration', '2');
                                                                         this.handleChange(values,setFieldTouched, setFieldValue)
                                                                     }  
                                                                     }
@@ -513,6 +514,7 @@ regnoFormat = (e, setFieldTouched, setFieldValue) => {
                                                                     onChange = {() =>{
                                                                         setFieldTouched('policy_type')
                                                                         setFieldValue('policy_type', '3');
+                                                                        setFieldValue('check_registration', '2');
                                                                         this.handleChange(values,setFieldTouched, setFieldValue)
                                                                     }  
                                                                     }

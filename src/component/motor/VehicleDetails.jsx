@@ -762,12 +762,9 @@ class VehicleDetails extends Component {
                                                                                 </FormGroup>
                                                                             </Col>
                                                                         </Row>
-                                                                        {/* {ageObj.whatIsCurrentMonth(values.registration_date) > 0 || values.registration_date == "" ? */
-
-                                                                            console.log("motorInsurance", motorInsurance)}
-                                                                        {
+                                                                        {/* {ageObj.whatIsCurrentMonth(values.registration_date) > 0 || values.registration_date == "" ? */  
                                                                             (motorInsurance && motorInsurance.policytype_id && motorInsurance.policytype_id == '3' &&
-                                                                                motorInsurance && motorInsurance.lapse_duration == '1') ?
+                                                                                motorInsurance && motorInsurance.lapse_duration == '1') || (ageObj.whatIsCurrentMonth(values.registration_date) > 0 ) ?
                                                                                 <Fragment>
                                                                                     <Row>
                                                                                         <Col sm={12}>

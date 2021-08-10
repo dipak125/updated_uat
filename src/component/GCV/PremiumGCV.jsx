@@ -229,21 +229,23 @@ class PremiumGCV extends Component {
                     });
                 } 
                 this.props.loadingStop();
+                
                 if((previousPolicy && policyHolder.break_in_status != "Vehicle Recommended and Reports Uploaded") || (policy_type_id == "3" && policyHolder.break_in_status != "Vehicle Recommended and Reports Uploaded") ){
                     dateDiff = previousPolicy ? Math.floor(moment().diff(previousPolicy.end_date, 'days', true)) : "";
                     let previousPolicyName = previousPolicy ? previousPolicy.name : ""
 
-                    if(dateDiff > 0 || previousPolicyName == "2" || policy_type_id == "3") {
-                        this.setState({breakin_flag: 1})
-                            const formData1 = new FormData();
-                            let policyHolder_id = this.state.policyHolder_refNo ? this.state.policyHolder_refNo : '0'
-                            formData1.append('policy_ref_no',policyHolder_id)
-                            axios.post('breakin/checking', formData1)
-                            .then(res => {	
-                                let break_in_checking = res.data.data.break_in_checking	
-                                let break_in_inspection_no = res.data.data.break_in_inspection_no
-                                let break_in_status = res.data.data.break_in_status
-                                if( break_in_checking == true && break_in_inspection_no == "" && (break_in_status == null || break_in_status == "0")) {
+                    if(dateDiff > 0 || previousPolicyName == "2" || policy_type_id == "3") {                
+                        const formData1 = new FormData();
+                        let policyHolder_id = this.state.policyHolder_refNo ? this.state.policyHolder_refNo : '0'
+                        formData1.append('policy_ref_no',policyHolder_id)
+                        axios.post('breakin/checking', formData1)
+                        .then(res => {	
+                            let break_in_checking = res.data.data.break_in_checking	
+                            let break_in_inspection_no = res.data.data.break_in_inspection_no
+                            let break_in_status = res.data.data.break_in_status
+                            if( break_in_checking == true) {
+                                this.setState({breakin_flag: 1})
+                                if(break_in_inspection_no == "" && (break_in_status == null || break_in_status == "0")) {
                                     swal({
                                         title: "Breakin",
                                         text: `Your Quotation number is ${request_data.quote_id}. Your vehicle needs inspection. Do you want to raise inspection.`,
@@ -267,11 +269,13 @@ class PremiumGCV extends Component {
                                         icon: "warning",
                                     })
                                 }
-                            })
-                            .catch(err => {
-                                this.setState({breakin_flag: 1})
-                                this.props.loadingStop();
-                            })
+                            }
+                            
+                        })
+                        .catch(err => {
+                            this.setState({breakin_flag: 1})
+                            this.props.loadingStop();
+                        })
                     }
                 }
             })
@@ -776,7 +780,7 @@ class PremiumGCV extends Component {
                                                             <Row>&nbsp;</Row>
                                                             <div className="d-flex justify-content-left resmb">
                                                                 <Button className="backBtn" type="button" onClick={this.additionalDetails.bind(this, productId)}>{phrases['Back']}</Button>
-                                                            {bcMaster && bcMaster.eligible_for_payment_link == 1 ?
+                                                            {bcMaster && bcMaster.eligible_for_payment_link == 1 && breakin_flag == 0 ?
                                                                 <div>
                                                                 <Button type="button" className="proceedBtn" onClick = {this.sendPaymentLink.bind(this)}>  {phrases['PaymentLink']}  </Button>
                                                                 &nbsp;&nbsp;&nbsp;&nbsp;

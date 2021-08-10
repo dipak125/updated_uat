@@ -55,6 +55,18 @@ const passResetValidation = Yup.object().shape({
     });
 
 
+const asyncLocalStorage = {
+    setItem: function (key, value) {
+        return Promise.resolve().then(function () {
+            localStorage.setItem(key, value);
+        });
+    },
+    getItem: function (key) {
+        return Promise.resolve().then(function () {
+            return localStorage.getItem(key);
+        });
+    }
+};
 
 class Intermediary_LogIn extends Component {
     state = {
@@ -74,16 +86,15 @@ class Intermediary_LogIn extends Component {
           .post(`maintenance/fetchPhrases`, {})
           .then(res => {
             let phraseData = (res.data.phrase ? res.data.phrase : []);
-            localStorage.setItem("phrases", JSON.stringify(phraseData) )
-            this.props.loadingStop();
-            // return true
+            asyncLocalStorage.setItem("phrases", JSON.stringify(phraseData) ).then(
+                this.props.loadingStop()
+            ).then( this.props.history.push('/Products') )
           })
           .catch(err => {
             this.setState({
               phrases: []
             });
             this.props.loadingStop();
-            return false
           });
       }
 
@@ -123,8 +134,10 @@ class Intermediary_LogIn extends Component {
           });
     }
 
+
     callFetchPhrase = async () => {
         const result = await this.fetchPhrases();
+        return result;
     }
 
 
@@ -149,16 +162,18 @@ class Intermediary_LogIn extends Component {
                 this.props.onFormSubmit(values,
                     () => {
                         this.props.loadingStop();
-                        if(this.callFetchPhrase()){
-                            setTimeout(
-                                function() {
-                                    this.props.history.push('/Products')
-                                    // window.location.reload(true);   
-                                }
-                                .bind(this),
-                                300
-                            );
-                        }
+                        this.callFetchPhrase()
+                        // if(this.callFetchPhrase()  ){
+                            // this.props.history.push('/Products')
+                            // setTimeout(
+                            //     function() {
+                            //         this.props.history.push('/Products')
+                            //         // window.location.reload(true);   
+                            //     }
+                            //     .bind(this),
+                            //     300
+                            // );
+                        // }
                     },
                     (err) => {
                         this.props.loadingStop();

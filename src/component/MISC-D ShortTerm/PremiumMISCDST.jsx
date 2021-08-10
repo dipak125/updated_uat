@@ -361,12 +361,11 @@ console.log("post_Data MISDST_Summery--------- ", post_data)
 				<div className="page-wrapper">
                     <div className="container-fluid">
                         <div className="row">
-			<aside className="left-sidebar">
-			 <div className="scroll-sidebar ps-container ps-theme-default ps-active-y">
-			 <SideNav />
-			</div>
-			</aside>
-
+                        <aside className="left-sidebar">
+                            <div className="scroll-sidebar ps-container ps-theme-default ps-active-y">
+                            <SideNav />
+                            </div>
+                        </aside>
 
                             { step_completed >= '4' && vehicleDetails.vehicletype_id == '18' ?
                             <div className="col-sm-12 col-md-12 col-lg-12 col-xl-12 infobox premiumMisd">

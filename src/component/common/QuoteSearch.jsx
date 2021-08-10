@@ -61,7 +61,7 @@ function nameFormatter(cell, row){
 const statusFormatter = (refObj) => (cell,row) => {
     let trans = localStorage.getItem("phrases") ? JSON.parse(localStorage.getItem("phrases")) : null
     return (
-        <div>{trans['QuoteIssued']}</div>
+        cell.payment_link_status == '0' ? <div>{trans['QuoteIssued']}</div> :  <div>Payment link sent</div>
     )
 }
 
