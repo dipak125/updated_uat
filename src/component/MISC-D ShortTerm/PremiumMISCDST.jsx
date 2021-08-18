@@ -164,6 +164,7 @@ class PremiumMISCD extends Component {
         formData.append('bcmaster_id', sessionStorage.getItem('csc_id') ? "5" : bc_data ? bc_data.agent_id : "" )
         formData.append('ref_no', policyHolder_id)
         formData.append('registrationNo', val)
+        formData.append('page_name', `Premium_MISCDST/${this.props.match.params.productId}`)
 
         this.props.loadingStart();
         axios.post('breakin/create',formData)
@@ -200,7 +201,7 @@ class PremiumMISCD extends Component {
             'bodyIdvStatus' : 1,
             'trailer_array' : trailer_array,
         }
-console.log("post_Data MISDST_Summery--------- ", post_data)
+        console.log("post_Data MISDST_Summery--------- ", post_data)
         formData.append('enc_data',encryption.encrypt(JSON.stringify(post_data)))
 
         axios.post('fullQuoteMISCDShortTerm', formData)
@@ -211,6 +212,7 @@ console.log("post_Data MISDST_Summery--------- ", post_data)
                         PolicyArray: res.data.data.PolicyObject.PolicyLobList,
                         error: [],
                     });
+                    this.fetchRequestData()
                 }
                 else if(res.data.data.ValidateResult) {
                     swal(res.data.data.ValidateResult.message)
@@ -278,6 +280,23 @@ console.log("post_Data MISDST_Summery--------- ", post_data)
             })
     }
 
+    fetchRequestData = () => {
+        let policyHolder_id = this.state.policyHolder_refNo ? this.state.policyHolder_refNo : '0'
+        let encryption = new Encryption();
+    
+        axios.get(`miscd/policy-holder/details/${policyHolder_id}`)
+            .then(res => {
+                let decryptResp = JSON.parse(encryption.decrypt(res.data))
+                let request_data = decryptResp.data.policyHolder ? decryptResp.data.policyHolder.request_data : {}
+                this.setState({
+                    request_data
+                })
+            })
+            .catch(err => {
+                // handle error
+                this.props.loadingStop();
+            })
+    }
 
     fetchRelationships=()=>{
 

@@ -158,6 +158,7 @@ class PremiumGCV extends Component {
         formData.append('bcmaster_id', sessionStorage.getItem('csc_id') ? "5" : bc_data ? bc_data.agent_id : "" )
         formData.append('ref_no', policyHolder_id)
         formData.append('registrationNo', val)
+        formData.append('page_name', `Premium_GCVST/${this.props.match.params.productId}`)
         this.props.loadingStart();
         axios.post('breakin/create',formData)
         .then(res=>{
@@ -168,6 +169,7 @@ class PremiumGCV extends Component {
             this.props.loadingStop();
         })
     }
+
     getAccessToken = (motorInsurance) => {
         axios
             .post(`/callTokenService`)
@@ -184,6 +186,7 @@ class PremiumGCV extends Component {
                 this.props.loadingStop();
             });
     };
+
     fullQuote = (access_token, motorInsurance) => {
         const formData = new FormData();
         let encryption = new Encryption();
@@ -216,6 +219,7 @@ class PremiumGCV extends Component {
                         PolicyArray: res.data.PolicyObject.PolicyLobList,
                         error: [],
                     });
+                    this.fetchRequestData()
                 }
                 else if(res.data.ValidateResult) {
                     swal(res.data.ValidateResult.message)
@@ -300,6 +304,8 @@ class PremiumGCV extends Component {
         })
 
     }
+
+
     sendPaymentLink = () => {
         let encryption = new Encryption();
         const formData = new FormData();

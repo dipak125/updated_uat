@@ -693,7 +693,7 @@ class arogya_SelectDuration extends Component {
                                                                     <table className="table">
                                                                         <tbody>
                                                                             <tr>
-                                                                                <td>Gross Premium:</td>
+                                                                                <td>Net Premium:</td>
                                                                                 <td>₹{Math.round(serverResponse ? (serverResponse.message ? 0 : serverResponse.BeforeVatPremium) : 0)}</td>
                                                                             </tr>
                                                                             <tr>
@@ -701,7 +701,7 @@ class arogya_SelectDuration extends Component {
                                                                                 <td>₹{Math.round(serverResponse ? (serverResponse.message ? 0 : serverResponse.TGST) : 0)}</td>
                                                                             </tr>
                                                                             <tr>
-                                                                                <td>Net Premium:</td>
+                                                                                <td>Gross Premium:</td>
                                                                                 <td>₹{serverResponse ? (serverResponse.message ? 0 : serverResponse.DuePremium) : 0}</td>
                                                                             </tr>
                                                                         </tbody>

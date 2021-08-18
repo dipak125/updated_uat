@@ -158,6 +158,7 @@ class PremiumGCV extends Component {
         formData.append('bcmaster_id', sessionStorage.getItem('csc_id') ? "5" : bc_data ? bc_data.agent_id : "" )
         formData.append('ref_no', policyHolder_id)
         formData.append('registrationNo', val)
+        formData.append('page_name', `Premium_GCV/${this.props.match.params.productId}`)
         this.props.loadingStart();
         axios.post('breakin/create',formData)
         .then(res=>{

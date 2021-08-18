@@ -77,9 +77,9 @@ const IPA__Validation = Yup.object().shape({
     .nullable(),
   city: Yup.string()
     .required("Please enter City")
-    .matches(/^[a-zA-Z0-9][a-zA-Z0-9-/.,-\s]*$/, function () {
-      return "Please enter valid City";
-    })
+    // .matches(/^[a-zA-Z0-9][a-zA-Z0-9-/.,-\s]*$/, function () {
+    //   return "Please enter valid City";
+    // })
     .nullable(),
   street_name: Yup.string()
     .required("Please enter City")

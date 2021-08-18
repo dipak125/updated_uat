@@ -1005,9 +1005,6 @@ class InformationYourself_KSB_Micro extends Component {
             });
 
         }
-        
-
-
         this.setState({
             gender: value,
           //  display_gender:display_gender_new

@@ -331,18 +331,16 @@ class IPA_SelectPlan_Micro extends Component {
     return (
       <>
         <BaseComponent>
-		<div className="page-wrapper">
+		    <div className="page-wrapper">
           <div className="container-fluid">
             <div className="row">
-			
-			
-             <aside className="left-sidebar">
- <div className="scroll-sidebar ps-container ps-theme-default ps-active-y">
-<SideNav />
- </div>
-</aside>
-			  
-			  
+		
+            <aside className="left-sidebar">
+              <div className="scroll-sidebar ps-container ps-theme-default ps-active-y">
+              <SideNav />
+              </div>
+            </aside>
+	  
               <div className="col-sm-12 col-md-12 col-lg-12 col-xl-12 infobox induvidualplan">
                 <h4 className="text-center mt-3 mb-3">
                   SBI General Insurance Company Limited

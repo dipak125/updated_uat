@@ -1,5 +1,5 @@
 import React, { Component } from "react";
-import { Router, Route, Link } from "react-router-dom";
+import { Router, Route, Link, NavLink } from "react-router-dom";
 import axios from "../../../shared/axios";
 import { authLogout } from "../../../store/actions/auth";
 import { connect } from "react-redux";
@@ -107,6 +107,30 @@ class SideNav extends Component {
             </li>
             ))        
           }
+
+          <li className="treeview leftIcon02">
+            <Link to= '#' activeClassName="active" onClick = {this.toggle.bind(this)}>
+                <span className="leftIcon01">
+                  <img
+                    src={require('../../../assets/images/leftIcon02Hover.svg')}
+                    alt=""
+                  />
+                </span>
+                <span className="hidemenu">Endorsement</span>
+              </Link>
+            <ul className="treeview-menu" >
+              <li>
+                  <NavLink to="/NewEndorsement">                 
+                        New Endorsement Request
+                  </NavLink>
+              </li>
+              <li>
+                  <NavLink to="#">
+                        View Status
+                  </NavLink>
+              </li>
+           </ul>
+          </li>
 
 					<li className="logoutbtn">
 					 <button className="btn-lg" onClick={this.handleLogout}>

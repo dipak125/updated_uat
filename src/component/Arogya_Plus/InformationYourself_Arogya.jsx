@@ -58,7 +58,7 @@ const vehicleInspectionValidation = Yup.object().shape({
             is: occupation_id => occupation_id == 193,
             then: Yup.string().required('Please Specify')
                 .matches(/^([a-zA-Z])*$/, 'Invalid occupation'),
-            othewise: Yup.string()
+            otherwise: Yup.string()
         })
 
 });
@@ -68,65 +68,123 @@ const validateFamilyMembers = Yup.object().shape({
     confirm: Yup.string().when(['looking_for_2'], {
         is: looking_for_2 => looking_for_2 == 'child1',
         then: Yup.string().required('Please agree to the terms'),
-        othewise: Yup.string()
+        otherwise: Yup.string()
     }).when(['looking_for_3'], {
         is: looking_for_3 => looking_for_3 == 'child2',
         then: Yup.string().required('Please agree to the terms'),
-        othewise: Yup.string()
+        otherwise: Yup.string()
     }),
 
 
     looking_for_1: Yup.string(),
     looking_for_4: Yup.string(),
+
     looking_for_0: Yup.string().when(['looking_for_2', 'cover_type_id'], {
         is: (looking_for_2, cover_type_id) => (looking_for_2 == 'child1' && cover_type_id == '3'),
         then: Yup.string().required('Please select self'),
-        othewise: Yup.string()
+        otherwise: Yup.string()
     }).when(['looking_for_3', 'cover_type_id'], {
         is: (looking_for_3, cover_type_id) => (looking_for_3 == 'child2' && cover_type_id == '3'),
         then: Yup.string().required('Please select self'),
-        othewise: Yup.string()
+        otherwise: Yup.string()
     })
     .when(['looking_for_1', 'looking_for_4', 'cover_type_id'], {
         is: (looking_for_1, looking_for_4, cover_type_id) => (looking_for_1 == 'spouse' && looking_for_4 == 'father' && cover_type_id == '3'),
         then: Yup.string().required('Please select self'),
-        othewise: Yup.string()
+        otherwise: Yup.string()
     }).when(['looking_for_1', 'looking_for_5', 'cover_type_id'], {
         is: (looking_for_1, looking_for_5, cover_type_id) => (looking_for_1 == 'spouse' && looking_for_5 == 'mother' && cover_type_id == '3'),
         then: Yup.string().required('Please select self'),
-        othewise: Yup.string()
+        otherwise: Yup.string()
     }).when(['looking_for_1', 'looking_for_6', 'cover_type_id'], {
         is: (looking_for_1, looking_for_6, cover_type_id) => (looking_for_1 == 'spouse' && looking_for_6 == 'fatherInLaw' && cover_type_id == '3'),
         then: Yup.string().required('Please select self'),
-        othewise: Yup.string()
+        otherwise: Yup.string()
     }).when(['looking_for_1', 'looking_for_7', 'cover_type_id'], {
         is: (looking_for_1, looking_for_7, cover_type_id) => (looking_for_1 == 'spouse' && looking_for_7 == 'motherInLaw' && cover_type_id == '3'),
         then: Yup.string().required('Please select self'),
-        othewise: Yup.string()
+        otherwise: Yup.string()
     }).when(['looking_for_4', 'looking_for_5', 'cover_type_id'], {
         is: (looking_for_4, looking_for_5, cover_type_id) => (looking_for_4 == 'father' && looking_for_5 == 'mother' && cover_type_id == '3'),
         then: Yup.string().required('Please select self'),
-        othewise: Yup.string()
+        otherwise: Yup.string()
     }).when(['looking_for_4', 'looking_for_6', 'cover_type_id'], {
         is: (looking_for_4, looking_for_6, cover_type_id) => (looking_for_4 == 'father' && looking_for_6 == 'fatherInLaw' && cover_type_id == '3'),
         then: Yup.string().required('Please select self'),
-        othewise: Yup.string()
+        otherwise: Yup.string()
     }).when(['looking_for_4', 'looking_for_7', 'cover_type_id'], {
         is: (looking_for_4, looking_for_7, cover_type_id) => (looking_for_4 == 'father' && looking_for_7 == 'motherInLaw' && cover_type_id == '3'),
         then: Yup.string().required('Please select self'),
-        othewise: Yup.string()
+        otherwise: Yup.string()
     }).when(['looking_for_5', 'looking_for_6', 'cover_type_id'], {
         is: (looking_for_5, looking_for_6, cover_type_id) => (looking_for_5 == 'mother' && looking_for_6 == 'fatherInLaw' && cover_type_id == '3'),
         then: Yup.string().required('Please select self'),
-        othewise: Yup.string()
+        otherwise: Yup.string()
     }).when(['looking_for_5', 'looking_for_7', 'cover_type_id'], {
         is: (looking_for_5, looking_for_7, cover_type_id) => (looking_for_5 == 'mother' && looking_for_7 == 'motherInLaw' && cover_type_id == '3'),
         then: Yup.string().required('Please select self'),
-        othewise: Yup.string()
+        otherwise: Yup.string()
     }).when(['looking_for_6', 'looking_for_7', 'cover_type_id'], {
         is: (looking_for_6, looking_for_7, cover_type_id) => (looking_for_6 == 'fatherInLaw' && looking_for_7 == 'motherInLaw' && cover_type_id == '3'),
         then: Yup.string().required('Please select self'),
-        othewise: Yup.string()
+        otherwise: Yup.string()
+    }),
+
+    looking_for_4: Yup.string()
+    .when(['cover_type_id'], {
+        is: ( cover_type_id) => (cover_type_id == '3'),
+        then: Yup.string().test( "familyFloaterChecking", function () {
+                return "Parents & In-Laws not allowed in family floater"
+            },
+            function (value) {          
+                if (value) {
+                    return false;
+                }
+                return true;
+            }),
+        otherwise: Yup.string()
+    }),
+    looking_for_5: Yup.string()
+    .when(['cover_type_id'], {
+        is: ( cover_type_id) => (cover_type_id == '3'),
+        then: Yup.string().test( "familyFloaterChecking", function () {
+            return "Parents & In-Laws not allowed in family floater"
+        },
+        function (value) {          
+            if (value) {
+                return false;
+            }
+            return true;
+        }),
+        otherwise: Yup.string()
+    }),
+    looking_for_6: Yup.string()
+    .when(['cover_type_id'], {
+        is: ( cover_type_id) => (cover_type_id == '3'),
+        then: Yup.string().test( "familyFloaterChecking", function () {
+            return "Parents & In-Laws not allowed in family floater"
+        },
+        function (value) {          
+            if (value) {
+                return false;
+            }
+            return true;
+        }),
+        otherwise: Yup.string()
+    }),
+    looking_for_7: Yup.string()
+    .when(['cover_type_id'], {
+        is: ( cover_type_id) => (cover_type_id == '3'),
+        then: Yup.string().test( "familyFloaterChecking", function () {
+            return "Parents & In-Laws not allowed in family floater"
+        },
+        function (value) {          
+            if (value) {
+                return false;
+            }
+            return true;
+        }),
+        otherwise: Yup.string()
     }),
 
     dob_0: Yup.string().when(['looking_for_0'], {
@@ -145,7 +203,7 @@ const validateFamilyMembers = Yup.object().shape({
                     return true;
                 }
             ).nullable(),
-        othewise: Yup.string()
+        otherwise: Yup.string()
     }),
     dob_1: Yup.string().when(['looking_for_1'], {
         is: looking_for_1 => looking_for_1 == 'spouse',
@@ -163,7 +221,7 @@ const validateFamilyMembers = Yup.object().shape({
                     return true;
                 }
             ),
-        othewise: Yup.string()
+        otherwise: Yup.string()
     }),
     dob_2: Yup.string().when(['looking_for_2'], {
         is: looking_for_2 => looking_for_2 == 'child1',
@@ -258,12 +316,12 @@ const validateFamilyMembers = Yup.object().shape({
                 }
             ),
 
-        othewise: Yup.string()
+        otherwise: Yup.string()
     }),
     child1Gender: Yup.string().when(['looking_for_2'], {
         is: looking_for_2 => looking_for_2 == 'child1',
         then: Yup.string().required('Child 1 Gender field is required'),
-        othewise: Yup.string()
+        otherwise: Yup.string()
     }).nullable(),
 
     dob_3: Yup.string().when(['looking_for_3'], {
@@ -356,12 +414,12 @@ const validateFamilyMembers = Yup.object().shape({
                     }
                 }
             ),
-        othewise: Yup.string()
+        otherwise: Yup.string()
     }),
     child2Gender: Yup.string().when(['looking_for_3'], {
         is: looking_for_3 => looking_for_3 == 'child2',
         then: Yup.string().required('Child 2 Gender field is required'),
-        othewise: Yup.string()
+        otherwise: Yup.string()
     }).nullable(),
 
 
@@ -444,7 +502,7 @@ const validateFamilyMembers = Yup.object().shape({
                     return true;
                 }
             ),
-        othewise: Yup.string()
+        otherwise: Yup.string()
     }),
 
     dob_5: Yup.string().when(['looking_for_5'], {
@@ -526,7 +584,7 @@ const validateFamilyMembers = Yup.object().shape({
                     return true;
                 }
             ),
-        othewise: Yup.string()
+        otherwise: Yup.string()
     }),
 
     dob_6: Yup.string().when(['looking_for_6'], {
@@ -608,7 +666,7 @@ const validateFamilyMembers = Yup.object().shape({
                     return true;
                 }
             ),
-        othewise: Yup.string()
+        otherwise: Yup.string()
     }),
     dob_7: Yup.string().when(['looking_for_7'], {
         is: looking_for_7 => looking_for_7 == 'motherInLaw',
@@ -689,7 +747,7 @@ const validateFamilyMembers = Yup.object().shape({
                     return true;
                 }
             ),
-        othewise: Yup.string()
+        otherwise: Yup.string()
     }),
 
     cover_type_id: Yup.string().required("Select policy type")
@@ -1799,10 +1857,12 @@ class arogya_InformationYourself extends Component {
                                                                                 errors.dob_4 && touched.dob_4 ?
                                                                                     <span className="error-message">{errors.dob_4}</span> : ''
                                                                             }
+                                                                             
                                                                         </label>
 
                                                                     </FormGroup>
                                                                 </div>
+                                                                
                                                             </div>
 
                                                             <div className="row dropinput">
@@ -1869,6 +1929,10 @@ class arogya_InformationYourself extends Component {
                                                                             {
                                                                                 errors.dob_5 && touched.dob_5 ?
                                                                                     <span className="error-message">{errors.dob_5}</span> : ''
+                                                                            }
+                                                                             {
+                                                                                errors.looking_for_5 && <touched className="looking_for_5"></touched> ?
+                                                                                    <span className="error-message">{errors.looking_for_5}</span> : ''
                                                                             }
                                                                         </label>
                                                                     </FormGroup>
@@ -1939,6 +2003,10 @@ class arogya_InformationYourself extends Component {
                                                                                 errors.dob_6 && touched.dob_6 ?
                                                                                     <span className="error-message">{errors.dob_6}</span> : ''
                                                                             }
+                                                                             {
+                                                                                errors.looking_for_6 && touched.looking_for_6 ?
+                                                                                    <span className="error-message">{errors.looking_for_6}</span> : ''
+                                                                            }
                                                                         </label>
                                                                     </FormGroup>
                                                                 </div>
@@ -2007,6 +2075,10 @@ class arogya_InformationYourself extends Component {
                                                                             {
                                                                                 errors.dob_7 && touched.dob_7 ?
                                                                                     <span className="error-message">{errors.dob_7}</span> : ''
+                                                                            }
+                                                                             {
+                                                                                errors.looking_for_7 && touched.looking_for_7 ?
+                                                                                    <span className="error-message">{errors.looking_for_7}</span> : ''
                                                                             }
                                                                         </label>
                                                                     </FormGroup>

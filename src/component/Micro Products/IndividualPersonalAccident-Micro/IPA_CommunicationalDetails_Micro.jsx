@@ -77,9 +77,9 @@ const IPA__Validation = Yup.object().shape({
     .nullable(),
   city: Yup.string()
     .required("Please enter City")
-    .matches(/^[a-zA-Z0-9][a-zA-Z0-9-/.,-\s]*$/, function () {
-      return "Please enter valid City";
-    })
+    // .matches(/^[a-zA-Z0-9][a-zA-Z0-9-/.,-\s]*$/, function () {
+    //   return "Please enter valid City";
+    // })
     .nullable(),
   street_name: Yup.string()
     .required("Please enter City")
@@ -665,19 +665,16 @@ class IPA_CommunicationalDetails_Micro extends Component {
     return (
       <>
         <BaseComponent>
-		 <div className="page-wrapper">
+		    <div className="page-wrapper">
           <div className="container-fluid">
             <div className="row">
-			
-			
-             <aside className="left-sidebar">
- <div className="scroll-sidebar ps-container ps-theme-default ps-active-y">
-<SideNav />
- </div>
-</aside>
-			  
-			  
-			  
+
+              <aside className="left-sidebar">
+                <div className="scroll-sidebar ps-container ps-theme-default ps-active-y">
+                <SideNav />
+                </div>
+              </aside>
+
               <div className="col-sm-12 col-md-12 col-lg-12 col-xl-12 infobox cmdpol2">
                 <h4 className="text-center mt-3 mb-3">
                   SBI General Insurance Company Limited

@@ -121,7 +121,9 @@ class HealthSummery extends Component {
     policyHolder_refNo: queryString.parse(this.props.location.search).access_id ? 
                         queryString.parse(this.props.location.search).access_id : 
                         localStorage.getItem("policyHolder_refNo"),
-    ipaInfo: []
+    ipaInfo: [],
+    nomineeDetails: [],
+    nomineeLength: 0
   };
 
   changePlaceHoldClassAdd(e) {
@@ -181,7 +183,9 @@ class HealthSummery extends Component {
             this.setState({	
                 policyHolder,vehicleDetails,request_data,menumaster,step_completed, bcMaster,	policyCoverage,paymentgateway,
                 paymentStatus: decryptResp.data.policyHolder.payment ? decryptResp.data.policyHolder.payment[0] : [],	
-                nomineeDetails: request_data && request_data.nominee ? request_data.nominee[0]:[]	
+                nomineeDetails: request_data && request_data.nominee ? request_data.nominee[0]:[]	,
+                nomineeLength: request_data && request_data.nominee ? request_data.nominee.length : 0	
+
             })	
             this.props.loadingStop();     	
         })	
@@ -202,7 +206,7 @@ handleSubmit = (values) => {
   render() {
     const { productId } = this.props.match.params;
     const { fulQuoteResp, error, show, policyHolder, nomineeDetails, paymentStatus, policyCoverage, 
-      request_data, bcMaster, menumaster, vehicleDetails, paymentgateway } = this.state;
+      request_data, bcMaster, menumaster, vehicleDetails, paymentgateway, nomineeLength } = this.state;
 
     const policyCoverageList =  policyCoverage && policyCoverage.length > 0 ?(
       <div><p>Your Health Insurance covers you for following :</p>
@@ -497,7 +501,7 @@ handleSubmit = (values) => {
                                                       <Col sm={12} md={6} lg={3}>
                                                         <FormGroup>
                                                           <strong>Rs:</strong>{" "}
-                                                          {request_data.sum_insured}
+                                                          {Math.round(request_data.sum_insured)}
                                                         </FormGroup>
                                                       </Col>
                                                       <Col sm={12} md={6} lg={3}>
@@ -509,7 +513,7 @@ handleSubmit = (values) => {
                                                         </FormGroup>
                                                       </Col>
                                                       <Col sm={12} md={6} lg={3}>
-                                                        <FormGroup>Gross Premium:</FormGroup>
+                                                        <FormGroup>Net Premium:</FormGroup>
                                                       </Col>
                                                       <Col sm={12} md={6} lg={3}>
                                                         <FormGroup>
@@ -518,7 +522,7 @@ handleSubmit = (values) => {
                                                         </FormGroup>
                                                       </Col>
                                                       <Col sm={12} md={6} lg={3}>
-                                                        <FormGroup>Net Premium:</FormGroup>
+                                                        <FormGroup>Gross Premium:</FormGroup>
                                                       </Col>
                                                       <Col sm={12} md={6} lg={3}>
                                                         <FormGroup>
@@ -537,8 +541,8 @@ handleSubmit = (values) => {
                                                   <div className="listrghtsideTrigr">{memberDetails}</div>
                                                   <strong>Nominee Details :</strong>
                                                   <div className="listrghtsideTrigr">{nomineeData}</div>
-                                                  {nomineeDetails && nomineeDetails.is_appointee == '1' ? <strong>Appointee Details :</strong> : null }
-                                                  {nomineeDetails && nomineeDetails.is_appointee == '1' ? <div className="listrghtsideTrigr">{apointeeData}</div> : null }
+                                                  {nomineeDetails  && nomineeLength > 0 && nomineeDetails.is_appointee == '1' && (nomineeDetails.appointee_name != null || nomineeDetails.appointee_name != 'null' ) ? <strong>Appointee Details :</strong> : null }
+                                                  {nomineeDetails && nomineeLength > 0 &&  nomineeDetails.is_appointee == '1' && (nomineeDetails.appointee_name != null || nomineeDetails.appointee_name != 'null') ? <div className="listrghtsideTrigr">{apointeeData}</div> : null }
                                                 </Collapsible>
                                               </div>
 

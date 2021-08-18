@@ -155,7 +155,7 @@ class SelectDuration extends Component {
             'page_name': `SelectDuration/${productId}`
         }
         formData.append('enc_data',encryption.encrypt(JSON.stringify(post_data)))
-
+        console.log("post_data duration-premium --------- ", post_data)
         this.props.loadingStart();
         axios
         .post(`/duration-premium`, formData)

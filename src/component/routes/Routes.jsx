@@ -752,7 +752,16 @@ const ClaimIntimation = Loadable({
 const ClaimStatus = Loadable({
     loader: () => import(/*webpackChunkName: "Products" */"../Claim_Intimation/ClaimStatus/ClaimStatus.jsx"),
     loading: () => loadingContent
+})
+;
+
+//  ************ DIY Endorsement ******************
+
+const NewEndorsement = Loadable({
+    loader: () => import(/*webpackChunkName: "Products" */"../DIY-Endorsement/NewEndorsement.jsx"),
+    loading: () => loadingContent
 });
+
 
 
 
@@ -1013,6 +1022,10 @@ class Routes extends Component {
                         <PrivateRoute exact path="/MotorCoverages" component={MotorCoverages} />
                         <PrivateRoute exact path="/HealthSummery" component={HealthSummery} />
                         <PrivateRoute exact path="/ThankYouRenewal" component={ThankYouRenewal} />
+
+                        {/************ DIY Endorsement ******************/}
+                        <PrivateRoute exact path="/NewEndorsement" component={NewEndorsement} />
+                        
 
                         <Redirect from="/" to="/Dashboard" />
                     </Switch>
