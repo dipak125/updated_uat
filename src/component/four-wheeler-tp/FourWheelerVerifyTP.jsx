@@ -418,8 +418,9 @@ class FourWheelerVerifyTP extends Component {
     };
 
     getInsurerList = () => {
+        let policyHolder_id = localStorage.getItem("policyHolder_id") ? localStorage.getItem("policyHolder_id") : 0;
         axios
-          .get(`/company/1`)
+          .get(`/company/1/${policyHolder_id}`)
           .then(res => {
             this.setState({
                 insurerList: res.data.data

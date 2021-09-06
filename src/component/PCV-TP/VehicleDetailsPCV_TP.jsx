@@ -22,18 +22,19 @@ import {
   } from "../../shared/validationFunctions";
 import swal from 'sweetalert';
 
+
+const menumaster_id = 4
 const year = new Date('Y')
 const ageObj = new PersonAge();
 // const minDate = moment(moment().subtract(1, 'years').calendar()).add(1, 'day').calendar();
 // const maxDate = moment(minDate).add(30, 'day').calendar();
 const minDate = moment(moment().subtract(20, 'years').calendar()).add(1, 'day').calendar();
 const maxDate = moment(moment().subtract(1, 'years').calendar()).add(0, 'day').calendar();
-const maxDatePYPST = moment(moment().subtract(1, 'month').calendar()).add(1, 'day').calendar();
 const maxDatePYP = moment(moment().subtract(1, 'years').calendar()).add(30, 'day').calendar();
-const startRegnDate = moment().subtract(30, 'years').calendar();
-const minRegnDate = startRegnDate;
-// const minRegnDate = moment(startRegnDate).startOf('year').format('YYYY-MM-DD hh:mm');
-const minRegnDateNew = moment(moment().subtract(1, 'months').calendar()).add(1, 'day').calendar();
+const maxDatePYPST = moment(moment().subtract(1, 'month').calendar()).add(1, 'day').calendar();
+const minRegnDate = moment().subtract(20, 'years').calendar();
+// const minRegnDateNew = moment(moment().subtract(1, 'months').calendar()).add(1, 'day').calendar();
+const minRegnDateNew = moment().subtract(1, 'months').calendar();
 const maxDateForValidtion = moment(moment().subtract(1, 'years').calendar()).add(31, 'day').calendar();
 
 const initialValue = {
@@ -46,14 +47,16 @@ const initialValue = {
     previous_end_date: "",
     previous_start_date: "",
     previous_claim_bonus: 1,
-    previous_claim_for: "",
+    no_of_claim: "",
     previous_policy_no: "",
-    goodscarriedtypes_id: "",
+    proposed_used_id: "",
     averagemonthlyusages_id: "",
     permittypes_id: "",
     valid_previous_policy: "",
+    claim_array: [],
     duration: "",
 }
+
 const vehicleRegistrationValidation = Yup.object().shape({
     registration_date: Yup.string().required('RegistrationRequired')
     .test(
@@ -72,7 +75,7 @@ const vehicleRegistrationValidation = Yup.object().shape({
         function (value) {
             if (value && this.parent.policy_type_id == '1') {
                 // return checkGreaterStartEndTimes(value, new Date()) && checkGreaterStartEndTimes(minRegnDateNew, value);
-                return checkGreaterStartEndTimes(value, new Date()) && Math.floor(moment(minRegnDateNew).diff(value, 'days', true)<0); 
+                return checkGreaterStartEndTimes(value, new Date()) && Math.floor(moment(minRegnDateNew).diff(value, 'days', true)<=0);       
             }
             return true;
         }
@@ -94,12 +97,14 @@ const vehicleRegistrationValidation = Yup.object().shape({
         return "CityRequired"
     })
     .matches(/^([0-9]*)$/, function() {
-        return "No special Character allowed"
+        return "NoCharacterAllowed"
     }),
 
     previous_start_date:Yup.date()
-    .notRequired('Previous Start date is required')
-    .test(
+    .when(['policy_type_id','lapse_duration'], {
+        is: (policy_type_id, lapse_duration) => (policy_type_id == '3' && lapse_duration == '2'),       
+    then: Yup.date(),
+    otherwise: Yup.date().test(
         "currentMonthChecking",
         function() {
             return "PleaseESD"
@@ -113,9 +118,7 @@ const vehicleRegistrationValidation = Yup.object().shape({
         }
     ).test(
         "checkGreaterTimes",
-        function() {
-            return "StartDateLessEnd"
-        },
+        "StartDateLessEnd",
         function (value) {
             if (value && this.parent.policy_type_id == '2'  && this.parent.valid_previous_policy == '1'  && this.parent.valid_previous_policy == '1') {
                 return checkGreaterStartEndTimes(value, this.parent.previous_end_date);
@@ -124,19 +127,20 @@ const vehicleRegistrationValidation = Yup.object().shape({
         }
     ).test(
       "checkStartDate",
-      function() {
-        return "PleaseESD"
-        },
+      "PleaseESD",
       function (value) {       
           if ( this.parent.previous_end_date != undefined && value == undefined && this.parent.policy_type_id == '2'  && this.parent.valid_previous_policy == '1') {
               return false;
           }
           return true;
       }
-    ),
+    )
+    }),
     previous_end_date:Yup.date()
-    .notRequired('Previous end date is required')
-    .test(
+    .when(['policy_type_id','lapse_duration'], {
+        is: (policy_type_id, lapse_duration) => (policy_type_id == '3' && lapse_duration == '2'),       
+    then: Yup.date(),
+    otherwise: Yup.date().test(
         "currentMonthChecking",
         function() {
             return "PleaseEED"
@@ -150,9 +154,7 @@ const vehicleRegistrationValidation = Yup.object().shape({
         }
     ).test( 
         "checkGreaterTimes",
-        function() {
-            return "EndDateGreaterStart"
-        },
+        "EndDateGreaterStart",
         function (value) {
             if (value && this.parent.policy_type_id == '2'  && this.parent.valid_previous_policy == '1') {
                 return checkGreaterTimes(value, this.parent.previous_start_date);
@@ -161,19 +163,20 @@ const vehicleRegistrationValidation = Yup.object().shape({
         }
         ).test(
         "checkEndDate",
-        function() {
-            return "PleaseEED"
-        },
+        "PleaseEED",
         function (value) {     
             if ( this.parent.previous_start_date != undefined && value == undefined && this.parent.policy_type_id == '2'  && this.parent.valid_previous_policy == '1') {
                 return false;
             }
             return true;
         }
-    ),
+    )
+    }),
     previous_policy_name:Yup.string()
-    .notRequired('PleaseSPT')
-    .test(
+    .when(['policy_type_id','lapse_duration'], {
+        is: (policy_type_id, lapse_duration) => (policy_type_id == '3' && lapse_duration == '2'),       
+    then: Yup.string(),
+    otherwise: Yup.string().test(
         "currentMonthChecking",
         function() {
             return "PleaseSPT"
@@ -188,7 +191,7 @@ const vehicleRegistrationValidation = Yup.object().shape({
     .test(
         "currentMonthChecking",
         function() {
-            return "Since previous policy is a liability policy, issuance of a package policy will be subjet to successful inspection of your vehicle. Our Customer care executive will call you to assit on same, shortly"
+            return "PreviousPolicyLiabilityPolicy"
         },
         function (value) {
             // if (value == '2' ) {   
@@ -196,10 +199,13 @@ const vehicleRegistrationValidation = Yup.object().shape({
             // }
             return true;
         }
-    ),
+    )
+    }),
     insurance_company_id:Yup.number()
-    .notRequired('Insurance company is required')
-    .test(
+    .when(['policy_type_id','lapse_duration'], {
+        is: (policy_type_id, lapse_duration) => (policy_type_id == '3' && lapse_duration == '2'),       
+    then: Yup.number(),
+    otherwise: Yup.number().test(
         "currentMonthChecking",
         function() {
             return "PleaseEPIC"
@@ -210,10 +216,14 @@ const vehicleRegistrationValidation = Yup.object().shape({
             }
             return true;
         }
-    ),
+    )
+    }),
+
     previous_city:Yup.string()
-    .notRequired()
-    .test(
+    .when(['policy_type_id','lapse_duration'], {
+        is: (policy_type_id, lapse_duration) => (policy_type_id == '3' && lapse_duration == '2'),       
+    then: Yup.string(),
+    otherwise: Yup.string().test(
         "currentMonthChecking",
         function() {
             return "PleaseEPICC"
@@ -231,11 +241,14 @@ const vehicleRegistrationValidation = Yup.object().shape({
     })
     .max(100, function() {
         return "AddressMustBeMaximum100Chracters"
+    })
     }),
 
     previous_policy_no:Yup.string()
-    .notRequired('Previous policy number is required')
-    .test(
+    .when(['policy_type_id','lapse_duration'], {
+        is: (policy_type_id, lapse_duration) => (policy_type_id == '3' && lapse_duration == '2'),       
+    then: Yup.string(),
+    otherwise: Yup.string().test(
         "currentMonthChecking",
         function() {
             return "PleaseEPPN"
@@ -249,48 +262,38 @@ const vehicleRegistrationValidation = Yup.object().shape({
     )
     .matches(/^[a-zA-Z0-9][a-zA-Z0-9\s-/]*$/, 
         function() {
-            return "Please enter valid policy number"
+            return "ValidPolicyNumber"
         }).min(6, function() {
             return "PolicyMinCharacter"
         })
         .max(28, function() {
             return "PolicyMaxCharacter"
-        }),
-
-
-    goodscarriedtypes_id: Yup.string()
-    .required(function() {
-        return "PleaseSTOG"
-    }).test(
-        "currentMonthChecking",
-        function() {
-            return "HazardousGNA"
-        },
-        function (value) {
-            if (value == '1' ) {   
-                return false;    
-            }
-            return true;
-        }
-    ),
-    averagemonthlyusages_id: Yup.string()
-    .required(function() {
-        return "PleaseSAM"
+        })
     }),
-    permittypes_id: Yup.string()
-    .required(function() {
-        return "PleaseSTOP"
-    }),
+
     valid_previous_policy: Yup.string()
-    .required(function() {
-        return "This field is required"
+    .when(['policy_type_id','lapse_duration'], {
+        is: (policy_type_id, lapse_duration) => (policy_type_id == '3' && lapse_duration == '2'),       
+    then: Yup.string(),
+    otherwise: Yup.string()
+        .required(function() {
+            return "RequiredField"
+        })
     }),
+    proposed_used_id: Yup.string().required("PleaseSPUID"),
+    averagemonthlyusages_id: Yup.string().required("PleaseSAM"),
+    permittypes_id: Yup.string().required("PleaseSTOP"),
+
+    duration: Yup.string().when(['previous_policy_name','valid_previous_policy'], {
+        is: (previous_policy_name,valid_previous_policy) => (previous_policy_name=='3') && (valid_previous_policy == '1'), 
+        then: Yup.string().required("Previous policy duration required"),
+        otherwise: Yup.string()
+    }) 
     
 });
 
 
-
-class VehicleDetailsGCV extends Component {
+class VehicleDetailsPCV_TP extends Component {
 
     state = {
         insurerList: [],
@@ -307,12 +310,17 @@ class VehicleDetailsGCV extends Component {
         previous_is_claim: "",
         vehicleDetails: [],
         averagemonthlyusages: [],
-        goodscarriedtypes: [],
+        proposedUse: [],
         permittypes: [],
         location_reset_flag: 0,
-        changeFlag: 0
+        changeFlag: 0,
+        no_of_claim: [],
 
     };
+
+    dateRange = () => {
+        return "2008"
+    }
 
     changePlaceHoldClassAdd(e) {
         let element = e.target.parentElement;
@@ -334,15 +342,15 @@ class VehicleDetailsGCV extends Component {
         else if(localStorage.getItem('brandEdit') == '2') {
             localStorage.setItem('newBrandEdit', '2')
         }
-        this.props.history.push(`/SelectBrand_GCV_TP/${productId}`);
+        this.props.history.push(`/SelectBrand_PCV_TP/${productId}`);
     }
 
     selectBrand = (productId) => {
-        this.props.history.push(`/SelectBrand_GCV_TP/${productId}`);
+        this.props.history.push(`/SelectBrand_PCV_TP/${productId}`);
     }
 
 
-    showClaimText = (value) =>{
+    showClaimText = (value,values) =>{
         if(value == 1){
             this.setState({
                 showClaim:true,
@@ -352,8 +360,9 @@ class VehicleDetailsGCV extends Component {
         else{
             this.setState({
                 showClaim:false,
-                previous_is_claim:0
+                previous_is_claim:0,          
             })
+            values.claim_array = []
         }
     }
 
@@ -390,14 +399,13 @@ class VehicleDetailsGCV extends Component {
     }  
     // const regex = new RegExp('^' + escapedValue, 'i');
     const regex = new RegExp( escapedValue, 'i');
-    console.log('newValue', regex)
     if(this.state.customerDetails && escapedValue.length >1) {
       return this.state.customerDetails.filter(language => regex.test(language.RTO_LOCATION));
     }
     else return 0;
     
   }
-  
+
   SuggestionSelected = (setFieldTouched,setFieldValue,suggestion) => {
     this.setState({
       changeFlag: 0, 
@@ -405,7 +413,7 @@ class VehicleDetailsGCV extends Component {
   setFieldTouched('location_id')
   setFieldValue("location_id", suggestion.id)
 }
-
+  
   onSuggestionsFetchCustomerID = ({ value }) => {
     this.setState({
       suggestions: this.getCustomerIDSuggestions(value)
@@ -429,30 +437,41 @@ class VehicleDetailsGCV extends Component {
     handleSubmit = (values, actions) => {
         const {productId} = this.props.match.params 
         const {motorInsurance, changeFlag} = this.state
-        let policy_type = 2
-        // let vehicleAge = ageObj.whatIsMyVehicleAge(values.registration_date)
+        let policy_type = 1
         let vehicleAge = Math.floor(moment().diff(values.registration_date, 'months', true))
-        // let ageDiff = Math.floor(moment().diff(values.registration_date, 'days', true));
-        let ageDiff = ageObj.whatIsCurrentMonth(values.registration_date);
-        
+
         if(changeFlag == 1) {
             swal("Registration city is required")
             return false
-            }
+        }
 
-        // if(values.valid_previous_policy == "0" && values.policy_type_id == "2") {
+        if(values.no_of_claim != values.claim_array.length && values.previous_is_claim == 1) {
+            swal("Please fill all claim details")
+            return false
+        }
+
+        // if((values.valid_previous_policy == "0" || values.previous_policy_name == "2" || Math.floor(moment().diff(values.previous_end_date, 'days', true)) >0 ) && values.policy_type_id == "2") {
         //     swal("Thank you for showing your interest for buying product.Due to some reasons, we are not able to issue the policy online.Please call 1800 22 1111")
         //     return false
         // }
-    
+
+        // if(values.valid_previous_policy == "0" && (motorInsurance.policytype_id == 2 || (values.policy_type_id == '3' && values.lapse_duration == '1') )) {
+        //     swal("Thank you for showing your interest for buying product.Due to some reasons, we are not able to issue the policy online.Please call 1800 22 1111")
+        //     return false
+        // }
+
+        if(Math.floor(moment().diff(values.previous_end_date, 'days', true)) > 90 || (values.policy_type_id == '3' && values.lapse_duration == '2')) {
+            values.previous_claim_bonus = 1
+        }
+
 
         const formData = new FormData(); 
         let encryption = new Encryption();
         let post_data = {}
-        if(values.policy_type_id == '2') {
+        if(values.policy_type_id == '2' || (values.policy_type_id == '3' && values.lapse_duration == '1') ) {
             post_data = {
                 'policy_holder_id':localStorage.getItem('policyHolder_id'),
-                'menumaster_id':4,
+                'menumaster_id':menumaster_id,
                 'registration_date':moment(values.registration_date).format("YYYY-MM-DD"),
                 'location_id':values.location_id,
                 'previous_start_date': values.previous_start_date ? moment(values.previous_start_date).format("YYYY-MM-DD") : "",
@@ -463,23 +482,25 @@ class VehicleDetailsGCV extends Component {
                 'previous_policy_no': values.previous_policy_no,
                 'previous_is_claim':values.previous_is_claim ? values.previous_is_claim : '0' ,
                 'previous_claim_bonus': values.previous_claim_bonus ? values.previous_claim_bonus : 1,
-                'previous_claim_for': values.previous_claim_for,        
+                'no_of_claim': values.no_of_claim,        
                 'vehicleAge': vehicleAge,
                 'policy_type': policy_type,
                 'prev_policy_flag': 1,
-                'averagemonthlyusage_id': values.averagemonthlyusages_id,
-                'goodscarriedtype_id': values.goodscarriedtypes_id,
-                'permittype_id': values.permittypes_id,
                 'valid_previous_policy': values.valid_previous_policy,
-                'page_name': `VehicleDetails_GCV_TP/${productId}`,
+                'claim_array': JSON.stringify(values.claim_array),
+                'no_of_claim': values.no_of_claim,
+                'page_name': `VehicleDetails_PCV_TP/${productId}`,
                 'duration': values.duration,
+                'proposed_used_id' : values.proposed_used_id,
+                'averagemonthlyusage_id': values.averagemonthlyusages_id,
+                'permittype_id': values.permittypes_id,
                 'is_new_policy' : 0
             } 
         }
-        else if(values.policy_type_id == '1')  {
+        else if(values.policy_type_id == '1' || (values.policy_type_id == '3' && values.lapse_duration == '2') )  {
             post_data = {
                 'policy_holder_id':localStorage.getItem('policyHolder_id'),
-                'menumaster_id':4,
+                'menumaster_id':menumaster_id,
                 'registration_date':moment(values.registration_date).format("YYYY-MM-DD"),
                 'location_id':values.location_id,    
                 'previous_is_claim':'0', 
@@ -487,12 +508,14 @@ class VehicleDetailsGCV extends Component {
                 'vehicleAge': vehicleAge ,
                 'policy_type': policy_type,
                 'prev_policy_flag': 0,
-                'averagemonthlyusage_id': values.averagemonthlyusages_id,
-                'goodscarriedtype_id': values.goodscarriedtypes_id,
-                'permittype_id': values.permittypes_id,
                 'valid_previous_policy': 0,
-                'page_name': `VehicleDetails_GCV_TP/${productId}`,
+                'claim_array': JSON.stringify(values.claim_array),
+                'no_of_claim': values.no_of_claim,
+                'page_name': `VehicleDetails_PCV_TP/${productId}`,
                 'duration': values.duration,
+                'proposed_used_id' : values.proposed_used_id,
+                'averagemonthlyusage_id': values.averagemonthlyusages_id,
+                'permittype_id': values.permittypes_id,
                 'is_new_policy' : 0
             } 
         }
@@ -507,14 +530,14 @@ class VehicleDetailsGCV extends Component {
         formData.append('enc_data',encryption.encrypt(JSON.stringify(post_data)))
         this.props.loadingStart();
         axios
-        .post(`gcv-tp/insert-vehicle-details`, formData)
+        .post(`pcv-tp/insert-vehicle-details`, formData)
         .then(res => { 
             let decryptResp = JSON.parse(encryption.decrypt(res.data))
             console.log("decrypt", decryptResp)
 
             this.props.loadingStop();
             if(decryptResp.error == false){
-                this.props.history.push(`/OtherComprehensive_GCV_TP/${productId}`);
+                this.props.history.push(`/OtherComprehensive_PCV_TP/${productId}`);
             }
             else{
                 actions.setSubmitting(false)
@@ -551,7 +574,7 @@ class VehicleDetailsGCV extends Component {
     getAllAddress() {
         let policyHolder_id = localStorage.getItem("policyHolder_id") ? localStorage.getItem("policyHolder_id") : 0;
         let encryption = new Encryption();
-        axios.get(`gcv-tp/location-list/${policyHolder_id}`)
+        axios.get(`gcv/location-list/${policyHolder_id}`)
           .then(res => {
             let decryptResp = JSON.parse(encryption.decrypt(res.data))
             this.setState({
@@ -564,24 +587,20 @@ class VehicleDetailsGCV extends Component {
           });
       }
 
-    fetchData = () => {
-        const { productId } = this.props.match.params
-        let policyHolder_id = localStorage.getItem("policyHolder_refNo") ? localStorage.getItem("policyHolder_refNo") : 0;
+    fetchProposedUse=()=>{
+        const {productId } = this.props.match.params
         let encryption = new Encryption();
-        axios.get(`gcv-tp/policy-holder/details/${policyHolder_id}`)
-            .then(res => {
-                 let decryptResp = JSON.parse(encryption.decrypt(res.data))
-                 console.log("decrypt", decryptResp)
-                 let motorInsurance = decryptResp.data.policyHolder ? decryptResp.data.policyHolder.motorinsurance : {};
-                 motorInsurance.valid_previous_policy = motorInsurance.policytype_id && motorInsurance.policytype_id == '1' ? '0' : motorInsurance.valid_previous_policy;
-                 let previousPolicy = decryptResp.data.policyHolder ? decryptResp.data.policyHolder.previouspolicy : {};
-                 let vehicleDetails = decryptResp.data.policyHolder ? decryptResp.data.policyHolder.vehiclebrandmodel : {};
-                 let RTO_location = motorInsurance && motorInsurance.rtolocation && motorInsurance.rtolocation.RTO_LOCATION ? motorInsurance.rtolocation.RTO_LOCATION : ""
-                 let previous_is_claim= previousPolicy && (previousPolicy.is_claim == 0 || previousPolicy.is_claim == 1) ? previousPolicy.is_claim : ""
-                this.setState({
-                    motorInsurance, previousPolicy, vehicleDetails,RTO_location, previous_is_claim
+        this.props.loadingStart();
+        axios.post(`pcv-tp/proposed-use`)
+            .then(res=>{
+                let decryptResp = JSON.parse(encryption.decrypt(res.data))
+                console.log("decrypt--fetchProposedUse------ ", decryptResp)
+    
+                let proposedUse = decryptResp.data        
+                this.setState({ 
+                    proposedUse
                 })
-                this.props.loadingStop();
+                this.fetchData()
             })
             .catch(err => {
                 // handle error
@@ -593,20 +612,19 @@ class VehicleDetailsGCV extends Component {
         const {productId } = this.props.match.params
         let encryption = new Encryption();
         this.props.loadingStart();
-        axios.get(`gcv-tp/carrying-capacity-list/4 `)
+        axios.get(`gcv/carrying-capacity-list/4 `)
             .then(res=>{
                 let decryptResp = JSON.parse(encryption.decrypt(res.data))
     
                 let averagemonthlyusages =  decryptResp.data ? decryptResp.data.averagemonthlyusages : []
-                let goodscarriedtypes =  decryptResp.data ? decryptResp.data.goodscarriedtypes : []
                 let permittypes =  decryptResp.data ? decryptResp.data.permittypes : []
 
                 console.log("decrypt--fetchSubVehicle------ ", averagemonthlyusages)
 
                 this.setState({ 
-                    averagemonthlyusages, goodscarriedtypes, permittypes
+                    averagemonthlyusages, permittypes
                 })
-                this.fetchData()
+                this.fetchProposedUse()
             })
             .catch(err => {
                 // let decryptResp = JSON.parse(encryption.decrypt(err.data))
@@ -615,6 +633,33 @@ class VehicleDetailsGCV extends Component {
                 this.props.loadingStop();
             })
     }
+
+    fetchData = () => {
+        const { productId } = this.props.match.params
+        let policyHolder_id = localStorage.getItem("policyHolder_refNo") ? localStorage.getItem("policyHolder_refNo") : 0;
+        let encryption = new Encryption();
+        axios.get(`pcv-tp/policy-holder/details/${policyHolder_id}`)
+            .then(res => {
+                 let decryptResp = JSON.parse(encryption.decrypt(res.data))
+                 console.log("decrypt", decryptResp)
+                 let motorInsurance = decryptResp.data.policyHolder ? decryptResp.data.policyHolder.motorinsurance : {};
+                 motorInsurance.valid_previous_policy = motorInsurance.policytype_id && motorInsurance.policytype_id == '1' ? '0' : motorInsurance.valid_previous_policy;
+                 let previousPolicy = decryptResp.data.policyHolder && decryptResp.data.policyHolder.previouspolicy ? decryptResp.data.policyHolder.previouspolicy : {};
+                 let vehicleDetails = decryptResp.data.policyHolder ? decryptResp.data.policyHolder.vehiclebrandmodel : {};
+                 let no_of_claim = previousPolicy && previousPolicy.previouspoliciesclaims ? previousPolicy.previouspoliciesclaims.length : ""
+                 let RTO_location = motorInsurance && motorInsurance.rtolocation && motorInsurance.rtolocation.RTO_LOCATION ? motorInsurance.rtolocation.RTO_LOCATION : ""
+                 let previous_is_claim= previousPolicy && (previousPolicy.is_claim == 0 || previousPolicy.is_claim == 1) ? previousPolicy.is_claim : ""
+                this.setState({
+                    motorInsurance, previousPolicy, vehicleDetails,RTO_location, previous_is_claim, no_of_claim
+                })
+                this.props.loadingStop();
+            })
+            .catch(err => {
+                // handle error
+                this.props.loadingStop();
+            })
+    }
+
 
     handleChange =(value) => {
         let endDate = moment(value).add(1, 'years').format("YYYY-MM-DD")
@@ -626,19 +671,30 @@ class VehicleDetailsGCV extends Component {
         }) 
     }
 
+
+
     componentDidMount() {
         this.getInsurerList();
         this.fetchVehicleCarryingList();
         
     }
     registration = (productId) => {
-        this.props.history.push(`/Registration_GCV_TP/${productId}`);
+        this.props.history.push(`/Registration_PCV/${productId}`);
     }
 
     render() {
         const {productId} = this.props.match.params  
-        const {insurerList, showClaim, previous_is_claim, motorInsurance, previousPolicy,CustomerID,suggestions,
-              vehicleDetails, RTO_location, averagemonthlyusages,goodscarriedtypes,permittypes, location_reset_flag} = this.state
+        const {insurerList, showClaim, previous_is_claim, motorInsurance, previousPolicy,CustomerID,suggestions, 
+              vehicleDetails, RTO_location, averagemonthlyusages, proposedUse,permittypes, location_reset_flag} = this.state
+              
+        var defaultDate = new Date()
+        var date = previousPolicy && previousPolicy.start_date ? new Date(previousPolicy.start_date) : ""
+
+        var day = previousPolicy && previousPolicy.start_date ? date.getDate() : defaultDate.getDate()
+        var month = previousPolicy && previousPolicy.start_date ? date.getMonth() : defaultDate.getMonth()      
+        var year =  previousPolicy && previousPolicy.start_date ? date.getFullYear() : defaultDate.getFullYear()-1
+
+        var pypDateToOpen = new Date(year,month,day)
 
         let newInitialValues = Object.assign(initialValue, {
             registration_date: motorInsurance && motorInsurance.registration_date ? new Date(motorInsurance.registration_date) : "",
@@ -650,16 +706,18 @@ class VehicleDetailsGCV extends Component {
             previous_city: previousPolicy && previousPolicy.city ? previousPolicy.city : "",
             previous_policy_no: previousPolicy && previousPolicy.policy_no ? previousPolicy.policy_no : "",
             previous_is_claim: previous_is_claim,
-            previous_claim_bonus: previousPolicy && previousPolicy.claim_bonus ? Math.floor(previousPolicy.claim_bonus) : "",
-            previous_claim_for: previousPolicy && previousPolicy.claim_for ? previousPolicy.claim_for : "",
-            goodscarriedtypes_id: motorInsurance && motorInsurance.goodscarriedtype_id ? motorInsurance.goodscarriedtype_id : "",
-            averagemonthlyusages_id: motorInsurance && motorInsurance.averagemonthlyusage_id ? motorInsurance.averagemonthlyusage_id : "",
-            permittypes_id: motorInsurance && motorInsurance.permittype_id ? motorInsurance.permittype_id : "",
+            previous_claim_bonus: previousPolicy && (previousPolicy.claim_bonus || previousPolicy.claim_bonus == 0) ? previousPolicy.claim_bonus.toString() : "1",
+            no_of_claim: previousPolicy && previousPolicy.previouspoliciesclaims ? previousPolicy.previouspoliciesclaims.length : "",
             policy_type_id: motorInsurance && motorInsurance.policytype_id ? motorInsurance.policytype_id : "",
-            valid_previous_policy: motorInsurance && (motorInsurance.valid_previous_policy == 0 || motorInsurance.valid_previous_policy == 1) ? motorInsurance.valid_previous_policy : "",
+            valid_previous_policy: motorInsurance && (motorInsurance.valid_previous_policy == 0 || motorInsurance.valid_previous_policy == 1) ? motorInsurance.valid_previous_policy : "",           
             duration: previousPolicy && previousPolicy.duration ? previousPolicy.duration : "",
+            lapse_duration: motorInsurance && motorInsurance.lapse_duration ? motorInsurance.lapse_duration : "",
+            averagemonthlyusages_id: motorInsurance && motorInsurance.averagemonthlyusage_id ? motorInsurance.averagemonthlyusage_id : "",
+            proposed_used_id : vehicleDetails && vehicleDetails.proposed_used_id ? vehicleDetails.proposed_used_id : "",
+            permittypes_id: motorInsurance && motorInsurance.permittype_id ? motorInsurance.permittype_id : "",
         });
         let phrases = localStorage.getItem("phrases") ? JSON.parse(localStorage.getItem("phrases")) : null
+        
 
         const inputCustomerID = {
             placeholder: phrases['SearchCity'],
@@ -671,18 +729,19 @@ class VehicleDetailsGCV extends Component {
         return (
             <>
                 <BaseComponent>
+				
 				<div className="page-wrapper">
                 <div className="container-fluid">
                 <div className="row">
-				
-				
-                    <aside className="left-sidebar">
-                        <div className="scroll-sidebar ps-container ps-theme-default ps-active-y">
+								
+                <aside className="left-sidebar">
+                    <div className="scroll-sidebar ps-container ps-theme-default ps-active-y">
                         <SideNav />
                     </div>
-                    </aside>
-		
-                <div className="col-sm-12 col-md-12 col-lg-12 col-xl-12 infobox vehiGcvd">
+                </aside>
+					
+					
+                <div className="col-sm-12 col-md-12 col-lg-12 col-xl-12 infobox sbbrand2">
                 <h4 className="text-center mt-3 mb-3">{phrases['SBIGICL']}</h4>
                 <section className="brand m-b-25">
                     <div className="d-flex justify-content-left">
@@ -691,11 +750,15 @@ class VehicleDetailsGCV extends Component {
                         </div>
                     </div>
                     <div className="brand-bg">
-                        <Formik initialValues={newInitialValues} onSubmit={this.handleSubmit} validationSchema={vehicleRegistrationValidation}>
+                        <Formik 
+                        initialValues={newInitialValues} 
+                            enableReinitialize={true} 
+                            onSubmit={this.handleSubmit} 
+                            validationSchema={vehicleRegistrationValidation}>
                             {({ values, errors, setFieldValue, setFieldTouched, isValid, isSubmitting, touched }) => {
-
+console.log("errors-------------- ", errors)
                                 return (
-                                    <Form>
+                                    <Form enableReinitialize = {true}>
                                         <Row>
                                             <Col sm={12} md={9} lg={9}>
                                                 <Row>
@@ -727,8 +790,7 @@ class VehicleDetailsGCV extends Component {
                                                                     setFieldValue('registration_date', val); 
 
                                                                     setFieldValue('previous_end_date', ""); 
-                                                                    setFieldValue('previous_start_date', ""); 
-                                                                    
+                                                                    setFieldValue('previous_start_date', "");                                                                    
                                                                 }}
                                                                 
                                                             />
@@ -775,21 +837,21 @@ class VehicleDetailsGCV extends Component {
                                                         <FormGroup>
                                                             <div className="formSection">
                                                                 <Field
-                                                                    name='goodscarriedtypes_id'
+                                                                    name='proposed_used_id'
                                                                     component="select"
                                                                     autoComplete="off"
                                                                     className="formGrp inputfs12"
-                                                                    value = {values.goodscarriedtypes_id}
+                                                                    value = {values.proposed_used_id}
                                                                     // value={ageObj.whatIsCurrentMonth(values.registration_date) < 7 ? 6 : values.previous_policy_name}
                                                                 >
-                                                                    <option value="">{phrases['GCVGoodsType']}</option>
-                                                                    {goodscarriedtypes.map((subVehicle, qIndex) => ( 
-                                                                        <option value= {subVehicle.id}>{subVehicle.goodscarriedtype}</option>
+                                                                    <option value="">{phrases['SelectProposedUsage']}</option>
+                                                                    {proposedUse.map((subVehicle, qIndex) => ( 
+                                                                        <option value= {subVehicle.id}>{subVehicle.description}</option>
                                                                     ))}
                                                         
                                                                 </Field>
-                                                                {errors.goodscarriedtypes_id && touched.goodscarriedtypes_id ? (
-                                                                    <span className="errorMsg">{phrases[errors.goodscarriedtypes_id]}</span>
+                                                                {errors.proposed_used_id && touched.proposed_used_id ? (
+                                                                    <span className="errorMsg">{phrases[errors.proposed_used_id]}</span>
                                                                 ) : null}
                                                             </div>
                                                         </FormGroup>
@@ -842,16 +904,17 @@ class VehicleDetailsGCV extends Component {
                                                         </FormGroup>
                                                     </Col>
                                                 </Row>
+                                                
                                                 <Row>
                                                     <Col sm={12}>
                                                         <FormGroup>
                                                             <div className="carloan">
-                                                                <h4> &nbsp;</h4>
+                                                                <h4>&nbsp; </h4>
                                                             </div>
                                                         </FormGroup>
                                                     </Col>
                                                 </Row>
-                                                {values.policy_type_id == '2' ?
+                                            {(values.policy_type_id == '2') || (values.policy_type_id == '3' && values.lapse_duration == '1' )  ?
                                                 <Fragment>
                                                     <Row>
                                                         <Col sm={12}>
@@ -863,53 +926,54 @@ class VehicleDetailsGCV extends Component {
                                                         </Col>
                                                     </Row>
                                                     <Row>
-                                                    <Col sm={4}>
-                                                        <FormGroup>
-                                                            <div className="d-inline-flex m-b-35">
-                                                                <div className="p-r-25">
-                                                                    <label className="customRadio3">
-                                                                    <Field
-                                                                        type="radio"
-                                                                        name='valid_previous_policy'                                            
-                                                                        value='0'
-                                                                        key='1'  
-                                                                        onChange={(e) => {
-                                                                            setFieldTouched('valid_previous_policy')
-                                                                            setFieldValue(`valid_previous_policy`, e.target.value);
-                                                                            
-                                                                        }}
-                                                                        checked={values.valid_previous_policy == '0' ? true : false}
-                                                                    />
-                                                                    <span className="checkmark " /><span className="fs-14"> {phrases['No']}</span>
-                                                                    </label>
-                                                                </div>
+                                                        <Col sm={4}>
+                                                            <FormGroup>
+                                                                <div className="d-inline-flex m-b-35">
+                                                                    <div className="p-r-25">
+                                                                        <label className="customRadio3">
+                                                                        <Field
+                                                                            type="radio"
+                                                                            name='valid_previous_policy'                                            
+                                                                            value='0'
+                                                                            key='1'  
+                                                                            onChange={(e) => {
+                                                                                setFieldTouched('valid_previous_policy')
+                                                                                setFieldValue(`valid_previous_policy`, e.target.value);
+                                                                                
+                                                                            }}
+                                                                            checked={values.valid_previous_policy == '0' ? true : false}
+                                                                        />
+                                                                            <span className="checkmark " /><span className="fs-14"> {phrases['No']}</span>
+                                                                        </label>
+                                                                    </div>
 
-                                                                <div className="">
-                                                                    <label className="customRadio3">
-                                                                    <Field
-                                                                        type="radio"
-                                                                        name='valid_previous_policy'                                            
-                                                                        value='1'
-                                                                        key='1'  
-                                                                        onChange={(e) => {
-                                                                            setFieldTouched('valid_previous_policy')
-                                                                            setFieldValue(`valid_previous_policy`, e.target.value);
-                                                                        }}
-                                                                        checked={values.valid_previous_policy == '1' ? true : false}
-                                                                    />
-                                                                        <span className="checkmark" />
-                                                                        <span className="fs-14">{phrases['Yes']}</span>
-                                                                    </label>
-                                                                    {errors.valid_previous_policy && touched.valid_previous_policy ? (
-                                                                    <span className="errorMsg">{phrases[errors.valid_previous_policy]}</span>
-                                                                ) : null}
+                                                                    <div className="">
+                                                                        <label className="customRadio3">
+                                                                        <Field
+                                                                            type="radio"
+                                                                            name='valid_previous_policy'                                            
+                                                                            value='1'
+                                                                            key='1'  
+                                                                            onChange={(e) => {
+                                                                                setFieldTouched('valid_previous_policy')
+                                                                                setFieldValue(`valid_previous_policy`, e.target.value);
+                                                                            }}
+                                                                            checked={values.valid_previous_policy == '1' ? true : false}
+                                                                        />
+                                                                            <span className="checkmark" />
+                                                                            <span className="fs-14">{phrases['Yes']}</span>
+                                                                        </label>
+                                                                        {errors.valid_previous_policy && touched.valid_previous_policy ? (
+                                                                        <span className="errorMsg">{phrases[errors.valid_previous_policy]}</span>
+                                                                    ) : null}
+                                                                    </div>
                                                                 </div>
-                                                            </div>
-                                                        </FormGroup>
-                                                    </Col>
-                                                </Row>
-                                            </Fragment> : null }
-                                            {values.policy_type_id == '2' && values.valid_previous_policy == '1' ?
+                                                            </FormGroup>
+                                                        </Col>
+                                                    </Row>
+                                                </Fragment> : null }
+
+                                            {(values.policy_type_id == '2' || (values.policy_type_id == '3' && values.lapse_duration == '1' ) ) && values.valid_previous_policy == '1' ?
                                                 <Fragment>
                                                 <Row>
                                                     <Col sm={12}>
@@ -965,7 +1029,7 @@ class VehicleDetailsGCV extends Component {
                                                                 <option value="">{phrases['SPT']}</option>
                                                                 <option value="1">{phrases['Package']}</option>
                                                                 <option value="2">{phrases['LiabilityOnly']}</option> 
-                                                                <option value="3">{phrases['shortTerm']}</option>
+                                                                {/* <option value="3">{phrases['shortTerm']}</option> */}
                                                         
                                                                 </Field>
                                                                 {errors.previous_policy_name && touched.previous_policy_name ? (
@@ -1141,19 +1205,10 @@ class VehicleDetailsGCV extends Component {
                                                             </div>
                                                         </FormGroup>
                                                     </Col>                                         
-                                                </Row>
+                                                </Row> 
                                                 
-                                                <Row>
-                                                    <Col sm={12}>
-                                                        <FormGroup>
-                                                            <div className="carloan">
-                                                                <h4> </h4>
-                                                            </div>
-                                                        </FormGroup>
-                                                    </Col>
-                                                </Row>
-
-                                            </Fragment> : null }
+                                            </Fragment> 
+                                             : null } 
 
                                                 <div className="d-flex justify-content-left resmb">
                                                 <Button className={`backBtn`} type="button"  disabled={isSubmitting ? true : false} onClick= {this.selectBrand.bind(this,productId)}>
@@ -1179,7 +1234,7 @@ class VehicleDetailsGCV extends Component {
 
 
                                                     <div className="d-flex justify-content-between flex-lg-row flex-md-column m-b-25">
-                                                        <div className="txtRegistr resmb-15">{phrases['GCVBrand']}
+                                                        <div className="txtRegistr resmb-15">{phrases['PCVBrand']}
                                                             - <strong>{vehicleDetails && vehicleDetails.vehiclebrand && vehicleDetails.vehiclebrand.name ? vehicleDetails.vehiclebrand.name : ""}</strong>
                                                         </div>
 
@@ -1187,20 +1242,20 @@ class VehicleDetailsGCV extends Component {
                                                     </div>
 
                                                     <div className="d-flex justify-content-between flex-lg-row flex-md-column m-b-25">
-                                                        <div className="txtRegistr">{phrases['GCVModel']}<br />
+                                                        <div className="txtRegistr">{phrases['PCVModel']}<br />
                                                         <strong>{vehicleDetails && vehicleDetails.vehiclemodel && vehicleDetails.vehiclemodel.description ? vehicleDetails.vehiclemodel.description+" "+vehicleDetails.varientmodel.varient : ""}</strong></div>
 
                                                         <div> <button type="button" className="rgistrBtn" onClick={this.selectVehicleBrand.bind(this, productId)}>{phrases['Edit']}</button></div>
                                                     </div>
 
                                                     <div className="d-flex justify-content-between flex-lg-row flex-md-column m-b-25">
-                                                        <div className="txtRegistr">{phrases['Seating']}<br />
-                                                            <strong>{ vehicleDetails && vehicleDetails.varientmodel && vehicleDetails.varientmodel.seating ? vehicleDetails.varientmodel.seating: ""}</strong></div>
+                                                        <div className="txtRegistr">{phrases['BodyStyle']}<br />
+                                                            <strong>{ vehicleDetails && vehicleDetails.varientmodel && vehicleDetails.varientmodel.bodystyle ? vehicleDetails.varientmodel.bodystyle.DESCRIPTION: ""}</strong></div>
                                                     </div>
 
                                                     <div className="d-flex justify-content-between flex-lg-row flex-md-column m-b-25">
-                                                        <div className="txtRegistr">{phrases['GVW']}<br />
-                                                            <strong>{ vehicleDetails && vehicleDetails.varientmodel && vehicleDetails.varientmodel.gross_vechicle_weight ? vehicleDetails.varientmodel.gross_vechicle_weight : ""}</strong></div>
+                                                        <div className="txtRegistr">{phrases['carryingCapacity']}<br />
+                                                            <strong>{ vehicleDetails && vehicleDetails.varientmodel && vehicleDetails.varientmodel.carrying ? vehicleDetails.varientmodel.carrying : ""}</strong></div>
                                                     </div>
 
                                                     <div className="d-flex justify-content-between flex-lg-row flex-md-column m-b-25">
@@ -1223,7 +1278,7 @@ class VehicleDetailsGCV extends Component {
                 </div>
                 </div>
                 </div>
-				</div>
+				 </div>
             </BaseComponent>
             </>
         );
@@ -1244,4 +1299,4 @@ const mapStateToProps = state => {
     };
   };
 
-export default withRouter (connect( mapStateToProps, mapDispatchToProps)(VehicleDetailsGCV));
+export default withRouter (connect( mapStateToProps, mapDispatchToProps)(VehicleDetailsPCV_TP));

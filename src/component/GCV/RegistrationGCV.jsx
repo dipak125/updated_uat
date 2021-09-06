@@ -369,12 +369,12 @@ regnoFormat = (e, setFieldTouched, setFieldValue) => {
 
     render() {
         const {motorInsurance, subVehicleList} = this.state
-	    var tempRegNo = motorInsurance && motorInsurance.registration_part_numbers && JSON.parse(motorInsurance.registration_part_numbers)
+        var tempRegNo = motorInsurance && motorInsurance.registration_part_numbers ? JSON.parse(motorInsurance.registration_part_numbers) : []
         const newInitialValues = Object.assign(initialValues,{
-	        reg_number_part_one: tempRegNo && tempRegNo.reg_number_part_one,
-            reg_number_part_two: tempRegNo && tempRegNo.reg_number_part_two,
-            reg_number_part_three: tempRegNo && tempRegNo.reg_number_part_three,
-            reg_number_part_four: tempRegNo && tempRegNo.reg_number_part_four,
+            reg_number_part_one: tempRegNo && tempRegNo.reg_number_part_one ? tempRegNo.reg_number_part_one : "",
+            reg_number_part_two: tempRegNo && tempRegNo.reg_number_part_two ? tempRegNo.reg_number_part_two : "",
+            reg_number_part_three: tempRegNo && tempRegNo.reg_number_part_three ? tempRegNo.reg_number_part_three : "",
+            reg_number_part_four: tempRegNo && tempRegNo.reg_number_part_four ? tempRegNo.reg_number_part_four : "",
             regNumber: motorInsurance && motorInsurance.registration_no ? motorInsurance.registration_no : "",
             policy_type: motorInsurance && motorInsurance.policytype_id ? motorInsurance.policytype_id : "",
             policy_for: motorInsurance && motorInsurance.policy_for ? motorInsurance.policy_for : "",
@@ -470,8 +470,8 @@ regnoFormat = (e, setFieldTouched, setFieldValue) => {
                                                                     key='1'
                                                                     checked = {values.policy_type == '1' ? true : false}
                                                                     onChange = {() =>{
-                                                                        setFieldTouched('policy_type')
                                                                         setFieldValue('policy_type', '1');
+                                                                        setFieldValue('lapse_duration', '')
                                                                         this.handleChange(values,setFieldTouched, setFieldValue)
                                                                     }  
                                                                     }
@@ -489,18 +489,15 @@ regnoFormat = (e, setFieldTouched, setFieldValue) => {
                                                                     key='1'
                                                                     checked = {values.policy_type == '2' ? true : false}
                                                                     onChange = {() =>{
-                                                                        setFieldTouched('policy_type')
                                                                         setFieldValue('policy_type', '2');
+                                                                        setFieldValue('lapse_duration', '')
                                                                         setFieldValue('check_registration', '2');
                                                                         this.handleChange(values,setFieldTouched, setFieldValue)
                                                                     }  
                                                                     }
                                                                 />
                                                                 <span className="checkmark " /><span className="fs-14"> {phrases['RollOver']}</span>
-                                                            </label>
-                                                            {errors.policy_type && touched.policy_type ? (
-                                                                    <span className="errorMsg">{phrases[errors.policy_type]}</span>
-                                                                ) : null}
+                                                            </label>     
                                                         </div>
 
                                                         <div className="p-r-25">
@@ -512,7 +509,6 @@ regnoFormat = (e, setFieldTouched, setFieldValue) => {
                                                                     key='1'
                                                                     checked = {values.policy_type == '3' ? true : false}
                                                                     onChange = {() =>{
-                                                                        setFieldTouched('policy_type')
                                                                         setFieldValue('policy_type', '3');
                                                                         setFieldValue('check_registration', '2');
                                                                         this.handleChange(values,setFieldTouched, setFieldValue)

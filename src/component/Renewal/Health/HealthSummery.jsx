@@ -541,8 +541,9 @@ handleSubmit = (values) => {
                                                   <div className="listrghtsideTrigr">{memberDetails}</div>
                                                   <strong>Nominee Details :</strong>
                                                   <div className="listrghtsideTrigr">{nomineeData}</div>
-                                                  {nomineeDetails  && nomineeLength > 0 && nomineeDetails.is_appointee == '1' && (nomineeDetails.appointee_name != null || nomineeDetails.appointee_name != 'null' ) ? <strong>Appointee Details :</strong> : null }
-                                                  {nomineeDetails && nomineeLength > 0 &&  nomineeDetails.is_appointee == '1' && (nomineeDetails.appointee_name != null || nomineeDetails.appointee_name != 'null') ? <div className="listrghtsideTrigr">{apointeeData}</div> : null }
+                                                  {console.log("nomineeDetails.appointee_name ---------- ", nomineeDetails.appointee_name)}
+                                                  {nomineeDetails  && nomineeLength > 0 && nomineeDetails.is_appointee == 1 && nomineeDetails.appointee_name != 'null' ? <strong>Appointee Details :</strong> : null }
+                                                  {nomineeDetails && nomineeLength > 0 &&  nomineeDetails.is_appointee == 1 && nomineeDetails.appointee_name != 'null' ? <div className="listrghtsideTrigr">{apointeeData}</div> : null }
                                                 </Collapsible>
                                               </div>
 

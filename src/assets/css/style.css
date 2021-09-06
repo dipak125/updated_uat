@@ -388,7 +388,20 @@ ul.navPan li a span{ margin-bottom:8px; display: block; }
 /*---------Vehicle Details Start-------*/
 
 .vehbox { box-sizing: border-box; border-radius: 12px; background-color: #2770b3; padding: 30px 25px 50px; overflow: hidden;}
-.insurerName .react-autosuggest__suggestions-list {list-style: none; margin: 0; padding: 10px 0; border-radius: 25px; border-bottom-left-radius: 0; border-bottom-right-radius: 0; border-color: rgba(223,225,229,0); box-shadow: 0 1px 6px 0 rgba(32,33,36,0.28);}
+.insurerName .react-autosuggest__suggestions-list {
+list-style: none; 
+margin: 0; 
+padding: 10px 0; 
+border-radius: 25px; 
+border-bottom-left-radius: 0;
+border-bottom-right-radius: 0;
+border-color: rgba(223,225,229,0);  
+box-shadow: 0 1px 6px 0 rgba(32,33,36,0.28);
+overflow: hidden;
+max-height: 280px;
+overflow-y: auto;
+min-width:290px;
+}
 .react-autosuggest__suggestion {padding-left: 10px;}
 .react-autosuggest__suggestion:hover {background-color: #2770b3; color: #ffffff;}
 

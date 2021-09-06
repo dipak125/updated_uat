@@ -24,13 +24,17 @@ import {
 
 const year = new Date('Y')
 const ageObj = new PersonAge();
-// const minDate = moment(moment().subtract(1, 'years').calendar()).add(1, 'day').calendar();
+const maxDate = moment(moment().subtract(1, 'years').calendar()).subtract(1, 'day').calendar();
 // const maxDate = moment(minDate).add(30, 'day').calendar();
 const minDate = moment(moment().subtract(20, 'years').calendar()).add(1, 'day').calendar();
-const maxDate = moment(moment().subtract(1, 'years').calendar()).add(30, 'day').calendar();
+const minDatePypLapsed = moment(moment().subtract(1, 'years').calendar()).subtract(89, 'day').calendar();
+const maxDatePYP = moment(moment().subtract(1, 'years').calendar()).add(30, 'day').calendar();
+const maxDatePYPLapsed = moment().subtract(1, 'years').calendar();
 const startRegnDate = moment().subtract(20, 'years').calendar();
 const minRegnDate = moment(startRegnDate).startOf('year').format('YYYY-MM-DD hh:mm');
 const maxRegnDate = new Date();
+const maxDateForValidtion = moment(moment().subtract(1, 'years').calendar()).add(31, 'day').calendar();
+
 
 const initialValue = {
     registration_date: "",
@@ -554,9 +558,10 @@ class VehicleDetails extends Component {
     }
 
     getInsurerList = () => {
+        let policyHolder_id = localStorage.getItem("policyHolder_id") ? localStorage.getItem("policyHolder_id") : 0;
         this.props.loadingStart();
         axios
-            .get(`/company/1`)
+            .get(`/company/1/${policyHolder_id}`)
             .then(res => {
                 this.setState({
                     insurerList: res.data.data
@@ -704,6 +709,7 @@ class VehicleDetails extends Component {
                                                                                         name="registration_date"
                                                                                         minDate={new Date(minRegnDate)}
                                                                                         maxDate={new Date(maxRegnDate)}
+                                                                                        maxDate={values.policy_type_id == '3' ? new Date(maxDate) : new Date(maxRegnDate) }
                                                                                         dateFormat="dd MMM yyyy"
                                                                                         placeholderText={phrases['RegDate']}
                                                                                         peekPreviousMonth
@@ -764,7 +770,7 @@ class VehicleDetails extends Component {
                                                                         </Row>
                                                                         {/* {ageObj.whatIsCurrentMonth(values.registration_date) > 0 || values.registration_date == "" ? */  
                                                                             (motorInsurance && motorInsurance.policytype_id && motorInsurance.policytype_id == '3' &&
-                                                                                motorInsurance && motorInsurance.lapse_duration == '1') || (ageObj.whatIsCurrentMonth(values.registration_date) > 0 ) ?
+                                                                                motorInsurance && motorInsurance.lapse_duration == '2') || (ageObj.whatIsCurrentMonth(values.registration_date) <= 0 ) ? null :
                                                                                 <Fragment>
                                                                                     <Row>
                                                                                         <Col sm={12}>
@@ -782,8 +788,8 @@ class VehicleDetails extends Component {
 
                                                                                                 <DatePicker
                                                                                                     name='previous_start_date'
-                                                                                                    minDate={new Date(minDate)}
-                                                                                                    maxDate={new Date(maxDate)}
+                                                                                                    minDate={values.policy_type_id == '3' ? new Date(minDatePypLapsed) : new Date(minDate)}
+                                                                                                    maxDate={values.policy_type_id == '3' ? new Date(maxDatePYPLapsed) : new Date(maxDatePYP)}
                                                                                                     dateFormat="dd MMM yyyy"
                                                                                                     placeholderText={phrases['PPSD']}
                                                                                                     peekPreviousMonth
@@ -1055,7 +1061,7 @@ class VehicleDetails extends Component {
                                                                                                 : null}
                                                                                         </Fragment> : null}
 
-                                                                                </Fragment> : null}
+                                                                                </Fragment> }
 
                                                                         <div className="d-flex justify-content-left resmb">
                                                                             <Button className={`backBtn`} type="button" disabled={isSubmitting ? true : false} onClick={this.selectBrand.bind(this, productId)}>

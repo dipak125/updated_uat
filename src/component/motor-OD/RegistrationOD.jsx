@@ -25,7 +25,8 @@ const initialValues = {
     reg_number_part_four: '',
     check_registration: 2,
     policy_for: "1",
-    lapse_duration: ''
+    lapse_duration: '',
+    policy_type: ''
 }
 
 const vehicleRegistrationValidation = Yup.object().shape({
@@ -114,8 +115,6 @@ class RegistrationOD extends Component {
         let element = e.target.parentElement;
         e.target.value.length === 0 && element.classList.remove('active');
     }
-
-
 
 
 
@@ -373,12 +372,12 @@ class RegistrationOD extends Component {
 
     render() {
         const { motorInsurance } = this.state
-        var tempRegNo = motorInsurance && motorInsurance.registration_part_numbers && JSON.parse(motorInsurance.registration_part_numbers)
+        var tempRegNo = motorInsurance && motorInsurance.registration_part_numbers ? JSON.parse(motorInsurance.registration_part_numbers) : []
         const newInitialValues = Object.assign(initialValues, {
-            reg_number_part_one: tempRegNo.reg_number_part_one,
-            reg_number_part_two: tempRegNo.reg_number_part_two,
-            reg_number_part_three: tempRegNo.reg_number_part_three,
-            reg_number_part_four: tempRegNo.reg_number_part_four,
+            reg_number_part_one: tempRegNo && tempRegNo.reg_number_part_one ? tempRegNo.reg_number_part_one : "",
+            reg_number_part_two: tempRegNo && tempRegNo.reg_number_part_two ? tempRegNo.reg_number_part_two : "",
+            reg_number_part_three: tempRegNo && tempRegNo.reg_number_part_three ? tempRegNo.reg_number_part_three : "",
+            reg_number_part_four: tempRegNo && tempRegNo.reg_number_part_four ? tempRegNo.reg_number_part_four : "",
             regNumber: motorInsurance ? motorInsurance.registration_no : '',
             check_registration: 2,
 
@@ -412,7 +411,8 @@ class RegistrationOD extends Component {
                                                     onSubmit={this.fetchFastlane}
                                                     validationSchema={vehicleRegistrationValidation}>
                                                     {({ values, errors, setFieldValue, setFieldTouched, isValid, isSubmitting, touched }) => {
-                                                        // console.log('values',values)
+                                                        console.log('values-------------',values)
+                                                        console.log('errors-------------',errors)
 
                                                         return (
                                                             <Form>
@@ -427,12 +427,12 @@ class RegistrationOD extends Component {
                                                                                     value='1'
                                                                                     key='1'
                                                                                     checked={values.policy_for == '1' ? true : false}
-                                                                                    onChange={() => {
-                                                                                        setFieldTouched('policy_for')
-                                                                                        setFieldValue('policy_for', '1');
-                                                                                        this.handleChange(values, setFieldTouched, setFieldValue)
-                                                                                    }
-                                                                                    }
+                                                                                    // onChange={() => {
+                                                                                    //     // setFieldTouched('policy_for')
+                                                                                    //     setFieldValue('policy_for', '1');
+                                                                                    //     // this.handleChange(values, setFieldTouched, setFieldValue)
+                                                                                    // }
+                                                                                    // }
                                                                                 />
                                                                                 <span className="checkmark " /><span className="fs-14"> {phrases['Individual']}</span>
                                                                             </label>
@@ -445,12 +445,12 @@ class RegistrationOD extends Component {
                                                                                     value='2'
                                                                                     key='1'
                                                                                     checked={values.policy_for == '2' ? true : false}
-                                                                                    onChange={() => {
-                                                                                        setFieldTouched('policy_for')
-                                                                                        setFieldValue('policy_for', '2');
-                                                                                        this.handleChange(values, setFieldTouched, setFieldValue)
-                                                                                    }
-                                                                                    }
+                                                                                    // onChange={() => {
+                                                                                    //     // setFieldTouched('policy_for')
+                                                                                    //     setFieldValue('policy_for', '2');
+                                                                                    //     // this.handleChange(values, setFieldTouched, setFieldValue)
+                                                                                    // }
+                                                                                    // }
                                                                                 />
                                                                                 <span className="checkmark " /><span className="fs-14"> {phrases['Corporate']}</span>
                                                                             </label>
@@ -494,10 +494,11 @@ class RegistrationOD extends Component {
                                                                                         key='1'
                                                                                         checked={values.policy_type == '2' ? true : false}
                                                                                         onChange={() => {
-                                                                                            setFieldTouched('policy_type')
+                                                                                            // setFieldTouched('policy_type')
+                                                                                            this.handleChange(values, setFieldTouched, setFieldValue)
                                                                                             setFieldValue('policy_type', '2');
                                                                                             setFieldValue('lapse_duration', '');
-                                                                                            this.handleChange(values, setFieldTouched, setFieldValue)
+                                                                                            
                                                                                         }
                                                                                         }
                                                                                     />
@@ -514,9 +515,10 @@ class RegistrationOD extends Component {
                                                                                         key='1'
                                                                                         checked={values.policy_type == '3' ? true : false}
                                                                                         onChange={() => {
-                                                                                            setFieldTouched('policy_type')
-                                                                                            setFieldValue('policy_type', '3');
+                                                                                            // setFieldTouched('policy_type')
                                                                                             this.handleChange(values, setFieldTouched, setFieldValue)
+                                                                                            setFieldValue('policy_type', '3');
+                                                                                            
                                                                                         }
                                                                                         }
                                                                                     />

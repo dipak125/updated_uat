@@ -519,6 +519,35 @@ const PremiumMISCDST = Loadable({
     loading: () => loadingContent
 });
 
+
+// ======================== Motor PCV ========================================
+
+const RegistrationPCV = Loadable({
+    loader: () => import(/*webpackChunkName: "Products" */"../PCV/RegistrationPCV.jsx"),
+    loading: () => loadingContent
+});
+const SelectBrandPCV = Loadable({
+    loader: () => import(/*webpackChunkName: "Products" */"../PCV/SelectBrandPCV.jsx"),
+    loading: () => loadingContent
+});
+const VehicleDetailsPCV = Loadable({
+    loader: () => import(/*webpackChunkName: "Products" */"../PCV/VehicleDetailsPCV.jsx"),
+    loading: () => loadingContent
+});
+const OtherComprehensivePCV = Loadable({
+    loader: () => import(/*webpackChunkName: "Products" */"../PCV/OtherComprehensivePCV.jsx"),
+    loading: () => loadingContent
+});
+const AdditionalDetailsPCV = Loadable({
+    loader: () => import(/*webpackChunkName: "Products" */"../PCV/AdditionalDetailsPCV.jsx"),
+    loading: () => loadingContent
+});
+const PremiumPCV = Loadable({
+    loader: () => import(/*webpackChunkName: "Products" */"../PCV/PremiumPCV.jsx"),
+    loading: () => loadingContent
+});
+
+
 // ======================KSB Retail =============================================
 
 const Health_KSB = Loadable({
@@ -714,6 +743,15 @@ const TranscropGateway = Loadable({
     loading: () => loadingContent
 });
 
+//  ************ Fia Payment Gateway ******************
+
+const FiaGateway = Loadable({
+    loader: () => import(/*webpackChunkName: "Products" */"../common/Fia_gateway.jsx"),
+    loading: () => loadingContent
+});
+
+
+
 
 //  ************ Renewal ******************
 
@@ -753,7 +791,7 @@ const ClaimStatus = Loadable({
     loader: () => import(/*webpackChunkName: "Products" */"../Claim_Intimation/ClaimStatus/ClaimStatus.jsx"),
     loading: () => loadingContent
 })
-;
+    ;
 
 //  ************ DIY Endorsement ******************
 
@@ -761,6 +799,35 @@ const NewEndorsement = Loadable({
     loader: () => import(/*webpackChunkName: "Products" */"../DIY-Endorsement/NewEndorsement.jsx"),
     loading: () => loadingContent
 });
+
+
+//========================PCV TP================================================
+
+const RegistrationPCVTP = Loadable({
+    loader: () => import(/*webpackChunkName: "Products" */"../PCV-TP/RegistrationPCV_TP.jsx"),
+    loading: () => loadingContent
+});
+const SelectBrandPCVTP = Loadable({
+    loader: () => import(/*webpackChunkName: "Products" */"../PCV-TP/SelectBrandPCV_TP.jsx"),
+    loading: () => loadingContent
+});
+const VehicleDetailsPCVTP = Loadable({
+    loader: () => import(/*webpackChunkName: "Products" */"../PCV-TP/VehicleDetailsPCV_TP.jsx"),
+    loading: () => loadingContent
+});
+const OtherComprehensivePCVTP = Loadable({
+    loader: () => import(/*webpackChunkName: "Products" */"../PCV-TP/OtherComprehensivePCV_TP.jsx"),
+    loading: () => loadingContent
+});
+const AdditionalDetailsPCVTP = Loadable({
+    loader: () => import(/*webpackChunkName: "Products" */"../PCV-TP/AdditionalDetailsPCV_TP.jsx"),
+    loading: () => loadingContent
+});
+const PremiumPCVTP = Loadable({
+    loader: () => import(/*webpackChunkName: "Products" */"../PCV-TP/PremiumPCV_TP.jsx"),
+    loading: () => loadingContent
+});
+
 
 
 
@@ -966,6 +1033,14 @@ class Routes extends Component {
                         <PrivateRoute exact path="/AdditionalDetails_MISCDST/:productId" component={AdditionalDetailsMISCDST} />
                         <PrivateRoute exact path="/Premium_MISCDST/:productId" component={PremiumMISCDST} />
 
+                        {/************ Motor PCV ******************/}
+                        <PrivateRoute exact path="/Registration_PCV/:productId" component={RegistrationPCV} />
+                        <PrivateRoute exact path="/SelectBrand_PCV/:productId" component={SelectBrandPCV} />
+                        <PrivateRoute exact path="/VehicleDetails_PCV/:productId" component={VehicleDetailsPCV} />
+                        <PrivateRoute exact path="/OtherComprehensive_PCV/:productId" component={OtherComprehensivePCV} />
+                        <PrivateRoute exact path="/AdditionalDetails_PCV/:productId" component={AdditionalDetailsPCV} />
+                        <PrivateRoute exact path="/Premium_PCV/:productId" component={PremiumPCV} />
+
                         {/************ KSB-Retail ******************/}
                         <PrivateRoute exact path="/Health_KSB/:productId" component={Health_KSB} />
                         <PrivateRoute exact path="/PreExistingDisease_KSB/:productId" component={PreExistingDisease_KSB} />
@@ -996,8 +1071,11 @@ class Routes extends Component {
                         {/************ Sahipay Payment Gateway ******************/}
                         <PrivateRoute exact path="/Sahipay_gateway/:productId" component={SahipayGateway} />
 
-                        {/************ Trabscrop Payment Gateway ******************/}
+                        {/************ Transcrop Payment Gateway ******************/}
                         <PrivateRoute exact path="/Transcrop_gateway/:productId" component={TranscropGateway} />
+
+                        {/************ FIA Payment Gateway ******************/}
+                        <PrivateRoute exact path="/Fia_gateway/:productId" component={FiaGateway} />
 
 
                         <PrivateRoute exact path="/UnderMaintenance" component={UnderMaintenance} />
@@ -1025,7 +1103,16 @@ class Routes extends Component {
 
                         {/************ DIY Endorsement ******************/}
                         <PrivateRoute exact path="/NewEndorsement" component={NewEndorsement} />
-                        
+
+                        {/************ PCV - TP ******************/}
+                        <PrivateRoute exact path="/Registration_PCV_TP/:productId" component={RegistrationPCVTP} />
+                        <PrivateRoute exact path="/SelectBrand_PCV_TP/:productId" component={SelectBrandPCVTP} />
+                        <PrivateRoute exact path="/VehicleDetails_PCV_TP/:productId" component={VehicleDetailsPCVTP} />
+                        <PrivateRoute exact path="/OtherComprehensive_PCV_TP/:productId" component={OtherComprehensivePCVTP} />
+                        <PrivateRoute exact path="/AdditionalDetails_PCV_TP/:productId" component={AdditionalDetailsPCVTP} />
+                        <PrivateRoute exact path="/Premium_PCV_TP/:productId" component={PremiumPCVTP} />
+
+
 
                         <Redirect from="/" to="/Dashboard" />
                     </Switch>

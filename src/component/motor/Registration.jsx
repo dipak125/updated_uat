@@ -496,8 +496,8 @@ class Registration extends Component {
                                                                                         key='1'
                                                                                         checked={values.policy_type == '1' ? true : false}
                                                                                         onChange={() => {
-                                                                                            setFieldTouched('policy_type')
                                                                                             setFieldValue('policy_type', '1');
+                                                                                            setFieldValue('lapse_duration', '')
                                                                                             this.handleChange(values, setFieldTouched, setFieldValue)
                                                                                         }
                                                                                         }
@@ -515,9 +515,9 @@ class Registration extends Component {
                                                                                         key='1'
                                                                                         checked={values.policy_type == '2' ? true : false}
                                                                                         onChange={() => {
-                                                                                            setFieldTouched('policy_type')
                                                                                             setFieldValue('policy_type', '2');
-                                                                                            setFieldValue('check_registration', '2');                                                                                         
+                                                                                            setFieldValue('check_registration', '2');    
+                                                                                            setFieldValue('lapse_duration', '')                                                                                     
                                                                                             this.handleChange(values, setFieldTouched, setFieldValue)
                                                                                         }
                                                                                         }
@@ -535,7 +535,6 @@ class Registration extends Component {
                                                                                         key='1'
                                                                                         checked={values.policy_type == '3' ? true : false}
                                                                                         onChange={() => {
-                                                                                            setFieldTouched('policy_type')
                                                                                             setFieldValue('policy_type', '3');
                                                                                             setFieldValue('check_registration', '2');
                                                                                             this.handleChange(values, setFieldTouched, setFieldValue)

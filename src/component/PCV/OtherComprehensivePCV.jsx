@@ -20,7 +20,7 @@ import moment from "moment";
 import { validRegistrationNumber } from "../../shared/validationFunctions";
 import {  userTypes } from "../../shared/staticValues";
 
-const menumaster_id = 7
+const menumaster_id = 12
 let encryption = new Encryption()
 let translation = localStorage.getItem("phrases") ? JSON.parse(localStorage.getItem("phrases")) : []
 
@@ -340,7 +340,7 @@ const Coverage = {
     "B00022": translation["B00022"],
 }
 
-class OtherComprehensiveMISCD extends Component {
+class OtherComprehensivePCV extends Component {
 
     constructor(props) {
         super(props);
@@ -464,7 +464,7 @@ class OtherComprehensiveMISCD extends Component {
 
 
     vehicleDetails = (productId) => {
-        this.props.history.push(`/VehicleDetails_MISCD/${productId}`);
+        this.props.history.push(`/VehicleDetails_PCV/${productId}`);
     }
 
 
@@ -472,7 +472,7 @@ class OtherComprehensiveMISCD extends Component {
         const { productId } = this.props.match.params
         let policyHolder_id = localStorage.getItem("policyHolder_refNo") ? localStorage.getItem("policyHolder_refNo") : 0;
         let encryption = new Encryption();
-        axios.get(`miscd/policy-holder/details/${policyHolder_id}`)
+        axios.get(`pcv/policy-holder/details/${policyHolder_id}`)
             .then(res => {
                 let decryptResp = JSON.parse(encryption.decrypt(res.data))
                 console.log("decrypt--fetchData-- ", decryptResp)
@@ -486,7 +486,7 @@ class OtherComprehensiveMISCD extends Component {
                 let valid_previous_policy = motorInsurance ? motorInsurance.valid_previous_policy : "0"
                 let policytype_id = motorInsurance ? motorInsurance.policytype_id : ""
                 let vehicle_age = 0
-                let bodySliderVal = motorInsurance && motorInsurance.body_idv_value ? motorInsurance.body_idv_value : 0
+                // let bodySliderVal = motorInsurance && motorInsurance.body_idv_value ? motorInsurance.body_idv_value : 0
                 let sliderVal = motorInsurance && motorInsurance.idv_value ? motorInsurance.idv_value : 0
 
 
@@ -575,7 +575,7 @@ class OtherComprehensiveMISCD extends Component {
 
 
                 this.setState({
-                    motorInsurance, add_more_coverage, request_data, vehicleDetails, bodySliderVal, sliderVal,
+                    motorInsurance, add_more_coverage, request_data, vehicleDetails, sliderVal,
                     showCNG: motorInsurance.cng_kit == 1 ? true : false,
                     vahanVerify: motorInsurance.chasis_no && motorInsurance.engine_no ? true : false,
                     selectFlag: motorInsurance && motorInsurance.add_more_coverage != null ? '0' : '1',
@@ -583,7 +583,7 @@ class OtherComprehensiveMISCD extends Component {
                     add_more_coverage_request_array, trailer_array, vehicle_age
                 })
                 this.props.loadingStop();
-                this.depreciation(values)
+                this.fullQuote(values)
 
             })
             .catch(err => {
@@ -592,51 +592,32 @@ class OtherComprehensiveMISCD extends Component {
             })
     }
 
-    depreciation = (values) => {
-        const { vehicle_age } = this.state
-        const formData = new FormData();
-        this.props.loadingStart();
-        const post_data = {
-            'vehicle_age': vehicle_age,
-        }
-        let encryption = new Encryption();
-        formData.append('enc_data', encryption.encrypt(JSON.stringify(post_data)))
-        axios
-            .post(`/miscd/getMaxBodyIDV`, formData)
-            .then((res) => {
-                let decryptResp = JSON.parse(encryption.decrypt(res.data))
-                this.setState({
-                    depreciationPercentage: decryptResp.data,
-                });
-                this.getAccessToken(values)
-            })
-            .catch((err) => {
-                this.setState({
-                    accessToken: '',
-                });
-                this.props.loadingStop();
-            });
+    // depreciation = (values) => {
+    //     const { vehicle_age } = this.state
+    //     const formData = new FormData();
+    //     this.props.loadingStart();
+    //     const post_data = {
+    //         'vehicle_age': vehicle_age,
+    //     }
+    //     let encryption = new Encryption();
+    //     formData.append('enc_data', encryption.encrypt(JSON.stringify(post_data)))
+    //     axios
+    //         .post(`/gcv/getMaxBodyIDV`, formData)
+    //         .then((res) => {
+    //             let decryptResp = JSON.parse(encryption.decrypt(res.data))
+    //             this.setState({
+    //                 depreciationPercentage: decryptResp.data,
+    //             });
+    //             this.getAccessToken(values)
+    //         })
+    //         .catch((err) => {
+    //             this.setState({
+    //                 accessToken: '',
+    //             });
+    //             this.props.loadingStop();
+    //         });
 
-    }
-
-
-    getAccessToken = (values) => {
-        this.props.loadingStart();
-        axios
-            .post(`/callTokenService`)
-            .then((res) => {
-                this.setState({
-                    accessToken: res.data.access_token,
-                });
-                this.fullQuote(res.data.access_token, values)
-            })
-            .catch((err) => {
-                this.setState({
-                    accessToken: '',
-                });
-                this.props.loadingStop();
-            });
-    };
+    // }
 
     getFuelList = (values) => {
         this.props.loadingStart();
@@ -660,7 +641,7 @@ class OtherComprehensiveMISCD extends Component {
         this.props.loadingStart();
         let encryption = new Encryption();
         axios
-            .get(`miscd/coverage-list/${localStorage.getItem('policyHolder_id')}`)
+            .get(`gcv/coverage-list/${localStorage.getItem('policyHolder_id')}`)
             .then((res) => {
                 let decryptResp = JSON.parse(encryption.decrypt(res.data))
                 let Coverage = []
@@ -754,8 +735,8 @@ class OtherComprehensiveMISCD extends Component {
 
 
 
-    fullQuote = (access_token, values) => {
-        const { PolicyArray, sliderVal, add_more_coverage, motorInsurance, bodySliderVal, vehicleDetails, chasis_price, userIdvStatus, bodyIdvStatus } = this.state
+    fullQuote = (values) => {
+        const { PolicyArray, sliderVal, add_more_coverage, motorInsurance, vehicleDetails, chasis_price, userIdvStatus, bodyIdvStatus } = this.state
 
         // let cng_kit_flag = 0;
         // let cngKit_Cost = 0;
@@ -764,7 +745,6 @@ class OtherComprehensiveMISCD extends Component {
         //     cngKit_Cost = values.cngKit_Cost
         // }
         let defaultSliderValue = PolicyArray.length > 0 ? Math.round(PolicyArray[0].PolicyRiskList[0].IDV_User) : 0
-        let defaultBodySliderValue = 0
         let coverage_data = {}
         const formData = new FormData();
         let encryption = new Encryption();
@@ -799,7 +779,7 @@ class OtherComprehensiveMISCD extends Component {
 
         const post_data = {
             'ref_no': localStorage.getItem('policyHolder_refNo'),
-            'access_token': access_token,
+            'id': localStorage.getItem('policyHolder_id'),
             'policy_type': motorInsurance.policy_type,
             'add_more_coverage': add_more_coverage.toString(),
             'PA_Cover': values.PA_flag ? values.PA_Cover : "0",
@@ -807,9 +787,9 @@ class OtherComprehensiveMISCD extends Component {
             'trailer_array': values.trailer_array,
             'fuel_type': values.fuel_type ? values.fuel_type : (vehicleDetails && vehicleDetails.varientmodel && vehicleDetails.varientmodel.fueltype ? vehicleDetails.varientmodel.fueltype.id : ""),
             'idv_value': sliderVal ? sliderVal : 0,
-            'body_idv_value': bodySliderVal ? bodySliderVal : defaultBodySliderValue,
-            'userIdvStatus': userIdvStatus ? userIdvStatus : 0,
-            'bodyIdvStatus': bodyIdvStatus ? bodyIdvStatus : 0
+            // 'body_idv_value': bodySliderVal ? bodySliderVal : defaultBodySliderValue,
+            // 'userIdvStatus': userIdvStatus ? userIdvStatus : 0,
+            // 'bodyIdvStatus': bodyIdvStatus ? bodyIdvStatus : 0
         }
         console.log('fullQuote_post_data', post_data)
         total_idv = parseInt(other_idv) + parseInt(post_data.idv_value) + parseInt(post_data.body_idv_value)
@@ -825,46 +805,47 @@ class OtherComprehensiveMISCD extends Component {
         }
 
         formData.append('enc_data', encryption.encrypt(JSON.stringify(post_data)))
-        axios.post('fullQuoteMISCD', formData)
+        this.props.loadingStart();
+        axios.post('pcv/full-quote', formData)
             .then(res => {
 
-                if (res.data.data.PolicyObject && res.data.data.UnderwritingResult && res.data.data.UnderwritingResult.Status == "Success") {
-                    let PolicyArray = res.data.data.PolicyObject.PolicyLobList
-                    let ncbDiscount = (res.data.data.PolicyObject.PolicyLobList && res.data.data.PolicyObject.PolicyLobList[0].PolicyRiskList[0].IsNCB) ? res.data.data.PolicyObject.PolicyLobList[0].PolicyRiskList[0].OD_NCBAmount : 0
+                if (res.data.PolicyObject && res.data.UnderwritingResult && res.data.UnderwritingResult.Status == "Success") {
+                    let PolicyArray = res.data.PolicyObject.PolicyLobList
+                    let ncbDiscount = (res.data.PolicyObject.PolicyLobList && res.data.PolicyObject.PolicyLobList[0].PolicyRiskList[0].IsNCB) ? res.data.PolicyObject.PolicyLobList[0].PolicyRiskList[0].OD_NCBAmount : 0
                     this.setState({
-                        fulQuoteResp: res.data.data.PolicyObject,
+                        fulQuoteResp: res.data.PolicyObject,
                         PolicyArray: PolicyArray,
-                        chasis_price: res.data.data.chasis_price,
+                        chasis_price: res.data.chasis_price,
                         error: [],
                         validation_error: [],
                         userIdvStatus: 1,
                         bodyIdvStatus: 1,
-                        sliderVal: res.data.data.PolicyObject.PolicyLobList ? Math.round(res.data.data.PolicyObject.PolicyLobList[0].PolicyRiskList[0].IDV_User) : 0,
+                        sliderVal: res.data.PolicyObject.PolicyLobList ? Math.round(res.data.PolicyObject.PolicyLobList[0].PolicyRiskList[0].IDV_User) : 0,
                         ncbDiscount,
-                        serverResponse: res.data.data.PolicyObject,
-                        policyCoverage: res.data.data.PolicyObject.PolicyLobList ? res.data.data.PolicyObject.PolicyLobList[0].PolicyRiskList[0].PolicyCoverageList : [],
+                        serverResponse: res.data.PolicyObject,
+                        policyCoverage: res.data.PolicyObject.PolicyLobList ? res.data.PolicyObject.PolicyLobList[0].PolicyRiskList[0].PolicyCoverageList : [],
                     });
                 }
-                else if (res.data.data.PolicyObject && res.data.data.UnderwritingResult && res.data.data.UnderwritingResult.Status == "Fail") {
+                else if (res.data.PolicyObject && res.data.UnderwritingResult && res.data.UnderwritingResult.Status == "Fail") {
                     var validationErrors = []
-                    for (const x in res.data.data.UnderwritingResult.MessageList) {
-                        validationErrors.push(res.data.data.UnderwritingResult.MessageList[x].Message)
+                    for (const x in res.data.UnderwritingResult.MessageList) {
+                        validationErrors.push(res.data.UnderwritingResult.MessageList[x].Message)
                     }
                     this.setState({
-                        fulQuoteResp: res.data.data.PolicyObject,
+                        fulQuoteResp: res.data.PolicyObject,
                         error: { "message": 0 },
                         validation_error: validationErrors,
                         serverResponse: [],
                         userIdvStatus: 1,
                         bodyIdvStatus: 1,
-                        policyCoverage: res.data.data.PolicyObject.PolicyLobList ? res.data.data.PolicyObject.PolicyLobList[0].PolicyRiskList[0].PolicyCoverageList : [],
+                        policyCoverage: res.data.PolicyObject.PolicyLobList ? res.data.PolicyObject.PolicyLobList[0].PolicyRiskList[0].PolicyCoverageList : [],
                     });
 
                 }
-                else if (res.data.data.code && res.data.data.message && res.data.data.code == "validation failed" && res.data.data.message == "validation failed") {
+                else if (res.data.code && res.data.message && res.data.code == "validation failed" && res.data.message == "validation failed") {
                     var validationErrors = []
-                    for (const x in res.data.data.messages) {
-                        validationErrors.push(res.data.data.messages[x].message)
+                    for (const x in res.data.messages) {
+                        validationErrors.push(res.data.messages[x].message)
                     }
                     this.setState({
                         fulQuoteResp: [], add_more_coverage,
@@ -877,7 +858,7 @@ class OtherComprehensiveMISCD extends Component {
                 else {
                     this.setState({
                         fulQuoteResp: [], add_more_coverage,
-                        error: res.data.data,
+                        error: res.data,
                         serverResponse: [],
                         userIdvStatus: 1,
                         bodyIdvStatus: 1,
@@ -900,7 +881,6 @@ class OtherComprehensiveMISCD extends Component {
         const { motorInsurance, PolicyArray, sliderVal, add_more_coverage, bodySliderVal } = this.state
         let defaultSliderValue = PolicyArray.length > 0 ? Math.round(PolicyArray[0].PolicyRiskList[0].IDV_User) : 0
         let total_idv = PolicyArray.length > 0 ? Math.round(PolicyArray[0].PolicyRiskList[0].SumInsured) : 0
-        let defaultBodySliderValue = 0
         let coverage_data = {}
 
 
@@ -947,11 +927,12 @@ class OtherComprehensiveMISCD extends Component {
                 'pa_flag': values.PA_cover_flag,
                 'page_name': `OtherComprehensive/${productId}`,
                 'coverage_data': JSON.stringify(coverage_data),
-                'body_idv_value': bodySliderVal ? bodySliderVal : defaultBodySliderValue,
+                // 'body_idv_value': bodySliderVal ? bodySliderVal : defaultBodySliderValue,
                 'fuel_type': values.fuel_type,
                 'trailer_array': values.trailer_array,
-                'page_name': `OtherComprehensive_MISCD/${productId}`,
-            }       
+                'page_name': `OtherComprehensive_PCV/${productId}`,
+            }
+
         }
         else {
             post_data = {
@@ -966,9 +947,9 @@ class OtherComprehensiveMISCD extends Component {
                 'idv_value': sliderVal ? sliderVal.toString() : defaultSliderValue.toString(),
                 'puc': values.puc,
                 'page_name': `OtherComprehensive/${productId}`,
-                'body_idv_value': bodySliderVal ? bodySliderVal : defaultBodySliderValue,
+                // 'body_idv_value': bodySliderVal ? bodySliderVal : defaultBodySliderValue,
                 'fuel_type': values.fuel_type,
-                'page_name': `OtherComprehensive_MISCD/${productId}`,
+                'page_name': `OtherComprehensive_PCV/${productId}`,
             }
         }
 
@@ -988,12 +969,12 @@ class OtherComprehensiveMISCD extends Component {
                 else {
                     formData.append('enc_data', encryption.encrypt(JSON.stringify(post_data)))
                     this.props.loadingStart();
-                    axios.post('miscd/update-insured-value', formData).then(res => {
+                    axios.post('pcv/update-insured-value', formData).then(res => {
                         this.props.loadingStop();
                         let decryptResp = JSON.parse(encryption.decrypt(res.data))
                         console.log("decrypt--fetchData-- ", decryptResp)
                         if (decryptResp.error == false) {
-                            this.props.history.push(`/AdditionalDetails_MISCD/${productId}`);
+                            this.props.history.push(`/AdditionalDetails_PCV/${productId}`);
                         }
                         else {
                             swal(decryptResp.msg)
@@ -1281,7 +1262,7 @@ class OtherComprehensiveMISCD extends Component {
 
     render() {
         const { showCNG, is_CNG_account, vahanDetails, error, policyCoverage, vahanVerify, selectFlag, fulQuoteResp, PolicyArray, fuelList, depreciationPercentage, vehicleDetails, validation_error,
-            moreCoverage, sliderVal, bodySliderVal, motorInsurance, serverResponse, engine_no, chasis_no, initialValue, add_more_coverage_request_array, ncbDiscount } = this.state
+            moreCoverage, sliderVal, motorInsurance, serverResponse, engine_no, chasis_no, initialValue, add_more_coverage_request_array, ncbDiscount } = this.state
         const { productId } = this.props.match.params
         let user_data = sessionStorage.getItem("users") ? JSON.parse(sessionStorage.getItem("users")) : "";
         if (user_data.user) {
@@ -1306,7 +1287,7 @@ class OtherComprehensiveMISCD extends Component {
         let maxBodyIDV = PolicyArray.length > 0 ? Math.floor(maxBodyVal / 2) : 0
 
         //let defaultBodySliderValue =  motorInsurance && motorInsurance.body_idv_value ? Math.round(motorInsurance.body_idv_value) : 0
-        let defaultBodySliderValue = bodySliderVal
+        // let defaultBodySliderValue = bodySliderVal
 
         let covList = motorInsurance && motorInsurance.add_more_coverage ? motorInsurance.add_more_coverage.split(",") : ""
         let newInnitialArray = {}
@@ -1578,7 +1559,7 @@ class OtherComprehensiveMISCD extends Component {
                                             </div>
                                         </div>
                                         <Formik initialValues={newInitialValues}
-                                            onSubmit={serverResponse && serverResponse != "" ? (serverResponse.message ? this.getAccessToken : this.handleSubmit) : this.getAccessToken}
+                                            onSubmit={serverResponse && serverResponse != "" ? (serverResponse.message ? this.fullQuote : this.handleSubmit) : this.fullQuote}
                                             validationSchema={ComprehensiveValidation}>
                                             {({ values, errors, setFieldValue, setFieldTouched, isValid, isSubmitting, touched }) => {
                                                 // console.log("values----------------- ", values)
@@ -1590,7 +1571,7 @@ class OtherComprehensiveMISCD extends Component {
                                                                     <Collapsible trigger={phrases['DefaultCovered']} open={true}>
                                                                         <div className="listrghtsideTrigr">
                                                                             {policyCoverageList}
-                                                                            {/* {ncbStr} */}
+                                                                            {ncbStr}
                                                                             {policyCoveragIMT}
                                                                         </div>
                                                                     </Collapsible>
@@ -1790,92 +1771,6 @@ class OtherComprehensiveMISCD extends Component {
                                                                         : null}
                                                                 </Row>
 
-                                                                <Row>
-                                                                    <Col sm={12} md={5} lg={4}>
-                                                                        <FormGroup>
-                                                                            <div className="insurerName">
-                                                                                {phrases['BodyIDV']}
-                                                                            </div>
-                                                                        </FormGroup>
-                                                                    </Col>
-                                                                    <Col sm={12} md={5} lg={2}>
-                                                                        <FormGroup>
-                                                                            <div className="insurerName">
-                                                                                <Field
-                                                                                    name="body_idv_value"
-                                                                                    type="text"
-                                                                                    placeholder=""
-                                                                                    autoComplete="off"
-                                                                                    className="premiumslid"
-                                                                                    onFocus={e => this.changePlaceHoldClassAdd(e)}
-                                                                                    onBlur={e => this.changePlaceHoldClassRemove(e)}
-                                                                                    value={defaultBodySliderValue}
-                                                                                />
-                                                                                {errors.body_idv_value && touched.body_idv_value ? (
-                                                                                    <span className="errorMsg">{errors.body_idv_value}</span>
-                                                                                ) : null}
-                                                                            </div>
-                                                                        </FormGroup>
-                                                                    </Col>
-
-                                                                    {defaultSliderValue ?
-                                                                        <Col sm={12} md={12} lg={6}>
-                                                                            <FormGroup>
-                                                                                <input type="range" className="W-90"
-                                                                                    name='slider1'
-                                                                                    min={minBodyIDV}
-                                                                                    max={maxBodyIDV}
-                                                                                    step='1'
-                                                                                    disabled={(this.state.bodyIdvStatus == 0) ? "disabled" : ""}
-                                                                                    value={defaultBodySliderValue}
-                                                                                    onChange={(e) => {
-                                                                                        setFieldTouched("slider1");
-                                                                                        setFieldValue("slider1", values.slider1);
-                                                                                        this.bodySliderValue(e.target.value)
-                                                                                    }}
-                                                                                />
-                                                                            </FormGroup>
-                                                                        </Col>
-                                                                        : null}
-                                                                </Row>
-
-                                                                {/* <Row>
-                                <Col sm={12} md={5} lg={4}>
-                                    <FormGroup>
-                                        <div className="insurerName">
-                                             Fuel Type
-                                        </div>
-                                    </FormGroup>
-                                </Col>
-                                <Col sm={12} md={3} lg={3}>
-                                    <FormGroup>                                      
-                                        <div className="formSection">
-                                            <Field
-                                                name='fuel_type'
-                                                component="select"
-                                                autoComplete="off"
-                                                className="formGrp inputfs12"
-                                                value = {values.fuel_type}
-                                                onChange={(e) => {
-                                                    setFieldTouched('fuel_type')
-                                                    setFieldValue('fuel_type', e.target.value);
-                                                    this.handleChange()
-                                                }}  
-                                            >
-                                                <option value="">Fuel Type</option>
-                                                {fuelList.map((fuel, qIndex) => ( 
-                                                    <option value= {fuel.id}>{fuel.descriptions}</option>
-                                                ))}
-                                    
-                                            </Field>
-                                            {errors.fuel_type && touched.fuel_type ? (
-                                                <span className="errorMsg">{errors.fuel_type}</span>
-                                            ) : null}
-                                        </div>               
-                                    </FormGroup>
-                                </Col>
-                            </Row>
-                             */}
                                                                 <Row>
                                                                     <Col sm={12} md={12} lg={12}>
                                                                         <FormGroup>
@@ -2637,4 +2532,4 @@ const mapDispatchToProps = dispatch => {
     };
 };
 
-export default withRouter(connect(mapStateToProps, mapDispatchToProps)(OtherComprehensiveMISCD));
+export default withRouter(connect(mapStateToProps, mapDispatchToProps)(OtherComprehensivePCV));

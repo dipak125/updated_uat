@@ -17,8 +17,9 @@ import Encryption from '../../shared/payload-encryption';
 import * as Yup from "yup";
 import swal from 'sweetalert';
 import moment from "moment";
-import {  validRegistrationNumber } from "../../shared/validationFunctions";
+import {  validRegistrationNumber,compareStartEndYear } from "../../shared/validationFunctions";
 import {  userTypes } from "../../shared/staticValues";
+
 
 
 let translation = localStorage.getItem("phrases") ? JSON.parse(localStorage.getItem("phrases")) : []
@@ -207,6 +208,45 @@ const ComprehensiveValidation = Yup.object().shape({
         then: Yup.string().required('pleaseProvideDriver'),
         otherwise: Yup.string()
     }),
+    tyre_rim_array: Yup.array().of(
+        Yup.object().shape({
+            tyreMfgYr : Yup.string().when(['policy_for'], {
+                is: policy_for => [policy_for == '1', policy_for == '2'],
+                then: Yup.string().required('MFG year required')
+                    .test(
+                        "checkGreaterTimes",
+                        "Mfg date must be greater than registration date",
+                        function (value) {
+                            if (value) { 
+                                return compareStartEndYear(new Date(this.parent.vehicleRegDate), value);
+                            }
+                            return true;
+                        }
+                    )
+                    .test(
+                        "checkGreaterTimes",
+                        "Mfg date must be less than today",
+                        function (value) {
+                            if (value) {
+                                return compareStartEndYear(value, new Date());
+                            }
+                            return true;
+                        }
+                    ),
+                otherwise: Yup.string()
+            }),
+
+            tyreSerialNo : Yup.string().when(['policy_for'], {
+                is: policy_for => [policy_for == '1', policy_for == '2'],
+                then: Yup.string().required('Serial No Required')
+                    .matches(/^[a-zA-Z0-9]*$/, function() {
+                        return "Invalid Serial No"
+                    }),
+                otherwise: Yup.string()
+            })
+           
+        }),
+    )
    
 });
 
@@ -230,44 +270,7 @@ const ComprehensiveValidation = Yup.object().shape({
 //         "TOTALOD": "Total Own Damage"
 // }
 
-const Coverage = {
-    "C101064":translation["C101064"],
-    "C101065":translation["C101065"],
-    "C101066":translation["C101066"],
-    "C101069":translation["C101069"],
-    "C101072":translation["C101072"],
-    "C101067":translation["C101067"],
-    "C101108":translation["C101108"],
-    "C101111":translation["C101111"], 
-    "NCB":translation["NCB"],
-    "TOTALOD":translation["TOTALOD"],
-    "GEOGRAPHYOD":translation["GEOGRAPHYOD"],
-    "GEOGRAPHYTP":translation["GEOGRAPHYTP"],
 
-    "B00016":translation["B00016"],
-    "B00002":  translation["B00002"],
-    "B00003":  translation["B00003"],
-    "B00004":  translation["B00004"],
-    "B00005":  translation["B00005"],
-    "B00006":  translation["B00006"],
-    "B00007":  translation["B00007"],
-    "B00008":  translation["B00008"],
-    "B00009":  translation["B00009"],
-    "B00010":  translation["B00010"],
-    "B00011":  translation["B00011"],
-    "B00012":  translation["B00012"],
-    "B00013":  translation["B00013"],
-    "B00069":  translation["B00069"],
-    "B00070":  translation["B00070"],
-    "B00071":  translation["B00071"],
-    "B00015":  translation["B00015"],
-    "B00073":  translation["B00073"],
-    "B00018":  translation["B00018"],
-    "B00019":  translation["B00019"],
-    "B00020":  translation["B00020"],
-    "B00022":  translation["B00022"],  
-    "B00025":  translation["B00025"] 
-}
 
 class OtherComprehensive extends Component {
 
@@ -314,7 +317,10 @@ class OtherComprehensive extends Component {
             request_data: [],
             geographical_extension: [],
             add_more_coverage_request_array: [],
-            ncbDiscount: 0
+            ncbDiscount: 0,
+            no_of_claim:4,
+            policy_for:1,
+            tyre_rim_array : []
         };
     }
 
@@ -383,6 +389,7 @@ class OtherComprehensive extends Component {
                 console.log("decrypt--fetchData-- ", decryptResp)
                 let motorInsurance = decryptResp.data.policyHolder ? decryptResp.data.policyHolder.motorinsurance : {}
                 let request_data = decryptResp.data.policyHolder ? decryptResp.data.policyHolder.request_data : {};
+                let vehicleRegDate = motorInsurance &&  motorInsurance.registration_date != null ? motorInsurance.registration_date : ''
                 let values = []
                 let add_more_coverage = motorInsurance && motorInsurance.add_more_coverage != null ? motorInsurance.add_more_coverage.split(",") : ['B00015']
                 add_more_coverage = add_more_coverage.flat()
@@ -401,7 +408,7 @@ class OtherComprehensive extends Component {
                 values.B00003_description = add_more_coverage_request_array.B00003 ? add_more_coverage_request_array.B00003.description : ""
 
                 this.setState({
-                    motorInsurance, add_more_coverage,request_data,geographical_extension,add_more_coverage_request_array,
+                    motorInsurance, add_more_coverage,request_data,geographical_extension,add_more_coverage_request_array,vehicleRegDate,
                     showCNG: motorInsurance.cng_kit == 1 ? true : false,
                     vahanVerify: motorInsurance.chasis_no && motorInsurance.engine_no ? true : false,
                     selectFlag: motorInsurance && motorInsurance.add_more_coverage != null ? '0' : '1'
@@ -537,10 +544,9 @@ class OtherComprehensive extends Component {
         let coverage_data = {}
         const formData = new FormData();
         let encryption = new Encryption();
+        let total_idv = PolicyArray.length > 0 ? Math.round(PolicyArray[0].PolicyRiskList[0].SumInsured) : 0
 
-        let total_idv=0
-        let other_idv=0
-
+        console.log("Values------------------ ", values)
         if(add_more_coverage) {
             coverage_data = {
                 'B00004' : {'value': values.B00004_value, 'description': values.B00004_description},
@@ -548,12 +554,6 @@ class OtherComprehensive extends Component {
                 'B00005' : {'value': values.B00005_value},
                 'B00013' : {'value': values.B00013_value},
                 geographical_extension
-            }
-            if(values.B00004_value){
-                other_idv = other_idv + parseInt(values.B00004_value)
-            }
-            if(values.B00003_value){
-                other_idv = other_idv + parseInt(values.B00003_value)
             }
             
         }
@@ -566,11 +566,11 @@ class OtherComprehensive extends Component {
             'add_more_coverage': add_more_coverage.toString(),
             'coverage_data': JSON.stringify(coverage_data),
             'PA_Cover': values.PA_flag ? values.PA_Cover : "0",
+            'tyre_rim_array' : values.tyre_rim_array ? values.tyre_rim_array : [],
             // 'cng_kit': cng_kit_flag,
             // 'cngKit_Cost': cngKit_Cost
         }
         console.log('fullQuote_post_data', post_data)
-        total_idv = parseInt(other_idv) + parseInt(post_data.idv_value)
 
         let user_data = sessionStorage.getItem("users") ? JSON.parse(sessionStorage.getItem("users")) : "";
         if (user_data) {
@@ -679,9 +679,8 @@ class OtherComprehensive extends Component {
         const { productId } = this.props.match.params
         const { motorInsurance, PolicyArray, sliderVal, add_more_coverage, geographical_extension } = this.state
         let defaultSliderValue = PolicyArray.length > 0 ? Math.round(PolicyArray[0].PolicyRiskList[0].IDV_Suggested) : 0
-        let coverage_data = {}
-        let total_idv=0
-        let other_idv=0    
+        let total_idv = PolicyArray.length > 0 ? Math.round(PolicyArray[0].PolicyRiskList[0].SumInsured) : 0
+        let coverage_data = {}   
         var user_data = sessionStorage.getItem("users") ? JSON.parse(sessionStorage.getItem("users")) : "";
         var tempEncryption = new Encryption();
         if (user_data.user) {
@@ -696,12 +695,12 @@ class OtherComprehensive extends Component {
                 'B00013' : {'value': values.B00013_value},
                 geographical_extension
             }
-            if(values.B00004_value){
-                other_idv = other_idv + parseInt(values.B00004_value)
-            }
-            if(values.B00003_value){
-                other_idv = other_idv + parseInt(values.B00003_value)
-            }
+            // if(values.B00004_value){
+            //     other_idv = other_idv + parseInt(values.B00004_value)
+            // }
+            // if(values.B00003_value){
+            //     other_idv = other_idv + parseInt(values.B00003_value)
+            // }
             
         }
 
@@ -725,6 +724,7 @@ class OtherComprehensive extends Component {
                 'puc': values.puc,
                 'pa_cover': values.PA_flag ? values.PA_Cover : "0",
                 'pa_flag' : values.PA_cover_flag,
+                'tyre_rim_array' : values.tyre_rim_array ? values.tyre_rim_array : [],
                 'page_name': `OtherComprehensive/${productId}`
             }
         }
@@ -744,7 +744,7 @@ class OtherComprehensive extends Component {
             }
         }
         console.log('post_data',post_data)
-        total_idv = parseInt(other_idv) + parseInt(post_data.idv_value)
+        // total_idv = parseInt(other_idv) + parseInt(post_data.idv_value)
 
         if (user_data && total_idv) {
             if(userTypes.includes(user_data.login_type) && add_more_coverage.indexOf('B00015') < 0){
@@ -778,50 +778,71 @@ class OtherComprehensive extends Component {
         }   
     }
 
-    onRowSelect = (values, isSelect, setFieldTouched, setFieldValue) => {
+    onRowSelect = (value, isSelect, setFieldTouched, setFieldValue, values) => {
 
         const { add_more_coverage } = this.state;
         var drv = [];
 
         if (isSelect) {
-            add_more_coverage.push(values);
+            add_more_coverage.push(value);
+            let tyre_cover = []
+            if(value == 'C101110') {
+                var array_length = 4
+                var newTyreMfgYr = new Date(this.state.vehicleRegDate)       
+                 if(values.tyre_rim_array && values.tyre_rim_array.length < array_length) { 
+                    for(var i = values.tyre_rim_array.length ; i < array_length ; i++) {
+                        tyre_cover.push(
+                            {
+                                tyreSerialNo : "",
+                                tyreMfgYr : newTyreMfgYr.getFullYear(),
+                                vehicleRegDate: this.state.vehicleRegDate,
+                                policy_for: this.state.policy_for
+                            })
+                    }
+                    setFieldValue("tyre_rim_array", tyre_cover);
+                }
+            }
             this.setState({
                 add_more_coverage: add_more_coverage,
                 serverResponse: [],
-                error: []
+                error: [], no_of_claim : array_length
             });
-            if(values == "B00016") {
+            if(value == "B00016") {
                 setFieldTouched("PA_flag");
                 setFieldValue("PA_flag", '1');
             }  
-            if(values == "B00015") {
+            if(value == "B00015") {
                 setFieldTouched("PA_cover_flag");
                 setFieldValue("PA_cover_flag", '1');
             } 
-            if(values == "B00003") {
+            if(value == "B00003") {
                 setFieldTouched("nonElectric_flag");
                 setFieldValue("nonElectric_flag", '1');
                 
             }
-            if(values == "B00004") {
+            if(value == "B00004") {
                 setFieldTouched("electric_flag");
                 setFieldValue("electric_flag", '1');
             }        
-            if(values == "geographical_extension") {
+            if(value == "geographical_extension") {
                 setFieldTouched("Geographical_flag");
                 setFieldValue("Geographical_flag", '1');
             }   
-            if(values == "B00005") {
+            if(value == "B00005") {
                 setFieldTouched("CNG_OD_flag");
                 setFieldValue("CNG_OD_flag", '1');
             }
-            if(values == "B00013") {
+            if(value == "B00013") {
                 setFieldTouched("LL_PD_flag");
                 setFieldValue("LL_PD_flag", '1');
             }
+            if(value == "C101110") {
+                setFieldTouched("tyre_cover_flag");
+                setFieldValue("tyre_cover_flag", '1');
+            }  
         }
         else {
-            const index = add_more_coverage.indexOf(values);
+            const index = add_more_coverage.indexOf(value);
             if (index !== -1) {
                 add_more_coverage.splice(index, 1);
                 this.setState({
@@ -830,28 +851,28 @@ class OtherComprehensive extends Component {
                 });
             }
 
-            if(values == "B00016") {
+            if(value == "B00016") {
                 setFieldTouched("PA_flag");
                 setFieldValue("PA_flag", '0');
                 setFieldTouched("PA_Cover");
                 setFieldValue("PA_Cover", '');
             } 
-            if(values == "B00015" ) {
+            if(value == "B00015" ) {
                 setFieldTouched("PA_cover_flag");
                 setFieldValue("PA_cover_flag", '0');
             } 
-            if(values == "B00003") {
+            if(value == "B00003") {
                 setFieldTouched("nonElectric_flag");
                 setFieldValue("nonElectric_flag", '0');
                 setFieldValue("B00003_value", 0);
                 
             }
-            if(values == "B00004") {
+            if(value == "B00004") {
                 setFieldTouched("electric_flag");
                 setFieldValue("electric_flag", '0'); 
                 setFieldValue("B00004_value", 0);
             }      
-            if(values == "geographical_extension") {
+            if(value == "geographical_extension") {
                 setFieldTouched("Geographical_flag");
                 setFieldValue("Geographical_flag", '0');
 
@@ -865,16 +886,42 @@ class OtherComprehensive extends Component {
                     geographical_extension: []
                 })
             }
-            if(values == "B00005") {
+            if(value == "B00005") {
                 setFieldTouched("CNG_OD_flag");
                 setFieldValue("CNG_OD_flag", '0');
             }
-            if(values == "B00013") {
+            if(value == "B00013") {
                 setFieldTouched("LL_PD_flag");
                 setFieldValue("LL_PD_flag", '0');
             }
+
+            if(value == "C101110") {
+                setFieldTouched("tyre_cover_flag");
+                setFieldValue("tyre_cover_flag", '0');
+            }  
         }      
     }
+
+    initClaimDetailsList = () => {
+        let innicialClaimList = []
+        const {tyre_rim_array,vehicleRegDate, policy_for} = this.state
+        if(tyre_rim_array && tyre_rim_array.length > 0) {
+            for (var i = 0; i < this.state.no_of_claim ; i++) {
+                innicialClaimList.push(
+                    {
+                        tyreSerialNo :  tyre_rim_array && tyre_rim_array[i] && tyre_rim_array[i].tyreSerialNo ? tyre_rim_array[i].tyreSerialNo : "",
+                        tyreMfgYr :  tyre_rim_array && tyre_rim_array[i] && tyre_rim_array[i].tyreMfgYr ? tyre_rim_array[i].tyreMfgYr : "",
+                        vehicleRegDate : vehicleRegDate ,
+                        policy_for : policy_for
+                    }
+                )
+            }   
+        }
+            
+
+    return innicialClaimList
+    
+    };
 
     onGeoAreaSelect = (value, values, isSelect, setFieldTouched, setFieldValue) => {
 
@@ -921,9 +968,63 @@ class OtherComprehensive extends Component {
         this.getMoreCoverage()
     }
 
+    handleClaims = (values, errors, touched, setFieldTouched, setFieldValue) => {
+        let field_array = []        
+        let phrases = localStorage.getItem("phrases") ? JSON.parse(localStorage.getItem("phrases")) : []
+        
+        for (var i = 0; i < 4 ; i++) {
+            field_array.push(
+                <Col sm={12} md={12} lg={12}>
+                    <Row >
+                        <Col sm={1} md={1} lg={2}><span className="indexing"> Tyre{i+1} </span></Col>
+                        <Col sm={12} md={5} lg={3}>
+                            <FormGroup>
+                                <div className="formSection">
+                                <Field
+                                        name={`tyre_rim_array[${i}].tyreMfgYr`}
+                                        type="text"
+                                        placeholder="MFG Year"
+                                        autoComplete="off"
+                                        onFocus={e => this.changePlaceHoldClassAdd(e)}
+                                        onBlur={e => this.changePlaceHoldClassRemove(e)}
+                                        // value = {values[`tyre_rim_array[${i}].chassisNo`]}
+
+                                    />
+                                    {errors.tyre_rim_array && errors.tyre_rim_array[i] && errors.tyre_rim_array[i].tyreMfgYr ? (
+                                    <span className="errorMsg">{errors.tyre_rim_array[i].tyreMfgYr}</span>
+                                    ) : null}    
+                                </div>
+                            </FormGroup>
+                        </Col>
+                        <Col sm={12} md={5} lg={4}>
+                            <FormGroup>
+                                <div className="formSection">
+                                    <Field
+                                        name={`tyre_rim_array[${i}].tyreSerialNo`}
+                                        type="text"
+                                        placeholder="Serial No"
+                                        autoComplete="off"
+                                        onFocus={e => this.changePlaceHoldClassAdd(e)}
+                                        onBlur={e => this.changePlaceHoldClassRemove(e)}
+                                        // value = {values[`tyre_rim_array[${i}].tyreSerialNo`]}
+
+                                    />
+                                    {errors.tyre_rim_array && errors.tyre_rim_array[i] && errors.tyre_rim_array[i].tyreSerialNo ? (
+                                    <span className="errorMsg">{errors.tyre_rim_array[i].tyreSerialNo}</span>
+                                    ) : null}   
+                                </div>
+                            </FormGroup>
+                        </Col>
+                    </Row>
+                </Col>
+            )
+            } 
+        return field_array
+
+    }
 
     render() {
-        const {showCNG, vahanDetails,error, policyCoverage, vahanVerify, selectFlag, fulQuoteResp, PolicyArray, geographical_extension,ncbDiscount,validation_error,
+        const {showCNG, policy_for,vahanDetails,error, policyCoverage, vahanVerify, selectFlag, fulQuoteResp, PolicyArray, geographical_extension,ncbDiscount,validation_error,
             moreCoverage, sliderVal, motorInsurance, serverResponse, engine_no, chasis_no, initialValue, add_more_coverage, add_more_coverage_request_array} = this.state
         const {productId} = this.props.match.params 
 
@@ -950,8 +1051,13 @@ class OtherComprehensive extends Component {
         let nonElectric_flag= add_more_coverage_request_array.B00003 && add_more_coverage_request_array.B00003.value ? '1' : '0'
         let LL_PD_flag= add_more_coverage_request_array.B00013 && add_more_coverage_request_array.B00013.value ? '1' : '0'
         let newInitialValues = {}
-        
+        let tyre_cover_flag=  '0'
+
         let phrases = localStorage.getItem("phrases") ? JSON.parse(localStorage.getItem("phrases")) : []
+
+        for(var i = 0; i<covList.length; i++) {
+            if(covList.indexOf('C101110')) tyre_cover_flag = '1'
+        }
 
         if(selectFlag == '1') {
              newInitialValues = Object.assign(initialValue, {
@@ -971,7 +1077,9 @@ class OtherComprehensive extends Component {
                 electric_flag: '0',
                 LL_PD_flag: '0',
                 nonElectric_flag: '0',
-                geographical_extension_length: geographical_extension && geographical_extension.length
+                policy_for:policy_for,
+                geographical_extension_length: geographical_extension && geographical_extension.length,
+                tyre_rim_array:  this.initClaimDetailsList(),
 
             });
         }
@@ -992,7 +1100,9 @@ class OtherComprehensive extends Component {
                     electric_flag: '0',
                     nonElectric_flag: '0',
                     LL_PD_flag: '0',
-                    geographical_extension_length: geographical_extension && geographical_extension.length
+                    policy_for:policy_for,
+                    geographical_extension_length: geographical_extension && geographical_extension.length,
+                    tyre_rim_array:  this.initClaimDetailsList(),
                 });
         }
 
@@ -1003,6 +1113,7 @@ class OtherComprehensive extends Component {
         }    
         newInnitialArray.PA_flag = PA_flag   
         newInnitialArray.PA_Cover = PA_Cover
+	    newInnitialArray.tyre_cover_flag = tyre_cover_flag
         newInnitialArray.Geographical_flag = Geographical_flag
         newInnitialArray.CNG_OD_flag = CNG_OD_flag
         newInnitialArray.electric_flag = electric_flag
@@ -1025,7 +1136,45 @@ class OtherComprehensive extends Component {
         newInitialValues = Object.assign(initialValue, newInnitialArray );
 
 
-        let OD_TP_premium = serverResponse.PolicyLobList ? serverResponse.PolicyLobList[0].PolicyRiskList[0] : []
+        const Coverage = {
+            "C101064":translation["C101064"],
+            "C101065":translation["C101065"],
+            "C101066":translation["C101066"],
+            "C101069":translation["C101069"],
+            "C101072":translation["C101072"],
+            "C101067":translation["C101067"],
+            "C101108":translation["C101108"],
+            "C101111":translation["C101111"], 
+            "NCB":translation["NCB"],
+            "TOTALOD":translation["TOTALOD"],
+            "GEOGRAPHYOD":translation["GEOGRAPHYOD"],
+            "GEOGRAPHYTP":translation["GEOGRAPHYTP"],
+        
+            "B00016":translation["B00016"],
+            "B00002":  translation["B00002"],
+            "B00003":  translation["B00003"],
+            "B00004":  translation["B00004"],
+            "B00005":  translation["B00005"],
+            "B00006":  translation["B00006"],
+            "B00007":  translation["B00007"],
+            "B00008":  translation["B00008"],
+            "B00009":  translation["B00009"],
+            "B00010":  translation["B00010"],
+            "B00011":  translation["B00011"],
+            "B00012":  translation["B00012"],
+            "B00013":  translation["B00013"],
+            "B00069":  translation["B00069"],
+            "B00070":  translation["B00070"],
+            "B00071":  translation["B00071"],
+            "B00015":  translation["B00015"],
+            "B00073":  translation["B00073"],
+            "B00018":  translation["B00018"],
+            "B00019":  translation["B00019"],
+            "B00020":  translation["B00020"],
+            "B00022":  translation["B00022"],  
+            "B00025":  translation["B00025"],
+            "C101110": translation["C101110"], 
+        }
 
 
         const policyCoverageList =  policyCoverage && policyCoverage.length > 0 ?
@@ -1146,7 +1295,7 @@ class OtherComprehensive extends Component {
                         onSubmit={ serverResponse && serverResponse != "" ? (serverResponse.message ? this.getAccessToken : this.handleSubmit ) : this.getAccessToken} 
                         validationSchema={ComprehensiveValidation}>
                         {({ values, errors, setFieldValue, setFieldTouched, isValid, isSubmitting, touched }) => {
-
+console.log("Values render------------------ ", values)
                         return (
                             <Form>
                             <Row>
@@ -1160,16 +1309,16 @@ class OtherComprehensive extends Component {
                                     </div>
 
                                 <Row>
-                                <Col sm={12} md={12} lg={4}>
-                                <Row>
-                                <Col sm={12} md={5} lg={6}>
-                                    <FormGroup>
-                                        <div className="insurerName">
-                                        {phrases['RegNo']}
-                                        </div>
-                                    </FormGroup>
-                                </Col>
-                                    
+                                    <Col sm={12} md={12} lg={4}>
+                                    <Row>
+                                    <Col sm={12} md={5} lg={6}>
+                                        <FormGroup>
+                                            <div className="insurerName">
+                                            {phrases['RegNo']}
+                                            </div>
+                                        </FormGroup>
+                                    </Col>
+                                        
                                     <Col sm={12} md={5} lg={6}>
                                         <FormGroup>
                                             <div className="insurerName">
@@ -1244,15 +1393,15 @@ class OtherComprehensive extends Component {
                                         </Row>
                                         </Col>
 
-                                        <Col sm={12} md={2} lg={2}>
-                                            <FormGroup>
-                                            
-                                                <Button className="btn btn-primary vrifyBtn" onClick= {!errors.chasis_no_last_part ? this.getVahanDetails.bind(this,values, setFieldTouched, setFieldValue, errors) : null}>{phrases['Verify']}</Button>
-                                                {errors.vahanVerify ? (
-                                                        <span className="errorMsg">{phrases[errors.vahanVerify]}</span>
-                                                    ) : null}
-                                            </FormGroup>
-                                        </Col>
+                                    <Col sm={12} md={2} lg={2}>
+                                        <FormGroup>
+                                        
+                                            <Button className="btn btn-primary vrifyBtn" onClick= {!errors.chasis_no_last_part ? this.getVahanDetails.bind(this,values, setFieldTouched, setFieldValue, errors) : null}>{phrases['Verify']}</Button>
+                                            {errors.vahanVerify ? (
+                                                    <span className="errorMsg">{phrases[errors.vahanVerify]}</span>
+                                                ) : null}
+                                        </FormGroup>
+                                    </Col>
                                 </Row>
                                 {values.vahanVerify && !errors.chasis_no_last_part ?
                                 <Row>
@@ -1353,89 +1502,7 @@ class OtherComprehensive extends Component {
                                         </FormGroup>
                                     </Col>
                                     : null}
-                                </Row>
-
-                                                                
-
-                                {/* <Row>
-                                    <Col sm={12} md={5} lg={5}>
-                                        <FormGroup>
-                                            <div className="insurerName">
-                                                <span className="fs-16"> Have you fitted external CNG Kit</span>
-                                            </div>
-                                        </FormGroup>
-                                    </Col>
-                                    <Col sm={12} md={3} lg={3}>
-                                        <FormGroup>
-                                            <div className="d-inline-flex m-b-35">
-                                                <div className="p-r-25">
-                                                    <label className="customRadio3">
-                                                    <Field
-                                                        type="radio"
-                                                        name='cng_kit'                                            
-                                                        value='1'
-                                                        key='1'  
-                                                        onChange={(e) => {
-                                                            setFieldValue(`cng_kit`, e.target.value);
-                                                            this.showCNGText(1);
-                                                        }}
-                                                        checked={values.cng_kit == '1' ? true : false}
-                                                    />
-                                                        <span className="checkmark " /><span className="fs-14"> Yes</span>
-                                                    </label>
-                                                </div>
-
-                                                <div className="">
-                                                    <label className="customRadio3">
-                                                    <Field
-                                                        type="radio"
-                                                        name='cng_kit'                                            
-                                                        value='0'
-                                                        key='1'  
-                                                        onChange={(e) => {
-                                                            setFieldValue(`cng_kit`, e.target.value);
-                                                            this.showCNGText(0);
-                                                        }}
-                                                        checked={values.cng_kit == '0' ? true : false}
-                                                    />
-                                                        <span className="checkmark" />
-                                                        <span className="fs-14">No</span>      
-                                                    </label>
-                                                    {errors.cng_kit && touched.cng_kit ? (
-                                                    <span className="errorMsg">{errors.cng_kit}</span>
-                                                    ) : null}
-                                                </div>
-                                            </div>
-                                        </FormGroup>
-                                    </Col>
-                                    {showCNG || is_CNG_account == 1 ?
-                                    <Col sm={12} md={12} lg={4}>
-                                        <FormGroup>
-                                        <div className="insurerName">   
-                                            <Field
-                                                name="cngKit_Cost"
-                                                type="text"
-                                                placeholder="Cost of Kit"
-                                                autoComplete="off"
-                                                className="W-80"
-                                                value = {values.cngKit_Cost}
-                                                onFocus={e => this.changePlaceHoldClassAdd(e)}
-                                                onBlur={e => this.changePlaceHoldClassRemove(e)}
-                                                onChange={e => {
-                                                    setFieldTouched('cngKit_Cost');
-                                                    setFieldValue('cngKit_Cost', e.target.value);
-                                                    this.handleChange()
-
-                                                }}
-                                            />
-                                            {errors.cngKit_Cost && touched.cngKit_Cost ? (
-                                            <span className="errorMsg">{errors.cngKit_Cost}</span>
-                                            ) : null}                                             
-                                            </div>
-                                        </FormGroup>
-                                    </Col> : ''}
-                                </Row>
-                                    */}
+                                </Row>                                                     
 
                                 <Row>
                                     <Col sm={12} md={12} lg={12}>
@@ -1445,7 +1512,7 @@ class OtherComprehensive extends Component {
                                     </Col>
                                 </Row>
     
-
+ 
                                     {moreCoverage && moreCoverage.length > 0 ? moreCoverage.map((coverage, qIndex) => (
                                     <Row key={qIndex}>   
                                         <Col sm={12} md={11} lg={6} key={qIndex+"a"} >
@@ -1465,7 +1532,7 @@ class OtherComprehensive extends Component {
                                                             swal(phrases.SwalIRDAI,
                                                                 {button: phrases.OK})
                                                         }
-                                                        this.onRowSelect(e.target.value, e.target.checked, setFieldTouched, setFieldValue)         
+                                                        this.onRowSelect(e.target.value, e.target.checked, setFieldTouched, setFieldValue, values)         
                                                     }
                                                     }
                                                     checked = {values[coverage.code] == coverage.code ? true : false}
@@ -1504,6 +1571,7 @@ class OtherComprehensive extends Component {
                                         }
                                         {values.nonElectric_flag == '1' && values[coverage.code] == 'B00003' ?
                                         <Fragment>
+                                            
                                             <Col sm={12} md={11} lg={2} key={qIndex+"b"}>
                                                 <FormGroup>
                                                     <div className="formSection">
@@ -1604,6 +1672,7 @@ class OtherComprehensive extends Component {
                                                 </FormGroup>
                                             </Col> </Fragment> : null
                                         }
+
                                         {values.Geographical_flag == '1' && values[coverage.code] == 'geographical_extension' ?
                                             <Fragment>
                                             <Col sm={12} md={11} lg={3} key={qIndex+"c"}>
@@ -1688,6 +1757,12 @@ class OtherComprehensive extends Component {
                                                 </FormGroup>
                                             </Col>
                                             </Fragment> : null
+                                        }
+
+                                        {values.tyre_cover_flag == '0' ? values.tyre_rim_array = [] : null }
+                                        
+                                        {values.tyre_cover_flag == '1' && values[coverage.code] == 'C101110' ?
+                                            this.handleClaims(values, errors, touched, setFieldTouched, setFieldValue) : null
                                         }
                                     </Row>
                                     )) : null}

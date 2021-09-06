@@ -21,16 +21,16 @@ import {registrationNoFormat, paymentGateways} from '../../shared/reUseFunctions
 const initialValue = {
     gateway : ""
 }
-const menumaster_id = 7
+const menumaster_id = 12
 
-const validatePremium = Yup.object().shape({
-    refNo: Yup.string().notRequired('Reference number is required')
-    .matches(/^[a-zA-Z0-9]*$/, function() {
-        return "Please enter valid reference number"
-    }),
-    })
+// const validatePremium = Yup.object().shape({
+//     refNo: Yup.string().notRequired('Reference number is required')
+//     .matches(/^[a-zA-Z0-9]*$/, function() {
+//         return "Please enter valid reference number"
+//     }),
+//     })
 
-class Premium extends Component {
+class PremiumPCV extends Component {
 
     constructor(props) {
         super(props);
@@ -39,8 +39,10 @@ class Premium extends Component {
 
         this.state = {
             show: false,
-            refNo: "",
-            whatsapp: "",
+            // refNo: "",
+            // whatsapp: "",
+            paymentButton: false,
+            smsButton: true,
             fulQuoteResp: [],
             motorInsurance: [],
             error: [],
@@ -59,10 +61,8 @@ class Premium extends Component {
             previousPolicy: [],
             request_data: [],
             breakin_flag: 0,
-            menumaster: [],
-            paymentgateway: [],
-            policyHolder_refNo: queryString.parse(this.props.location.search).access_id ? 
-                                queryString.parse(this.props.location.search).access_id : 
+            policyHolder_refNo: queryString.parse(this.props.location.search).access_id ?
+                                queryString.parse(this.props.location.search).access_id :
                                 localStorage.getItem("policyHolder_refNo")
         };
     }
@@ -73,9 +73,13 @@ class Premium extends Component {
     }
 
     handleOtp(e) {
-        console.log("otp", e)
-        this.setState({ show: false, });
-        this.props.history.push(`/ThankYou_motor`)
+        if(e === true) {
+            this.setState({ show: false, paymentButton: true, smsButton: false});
+        }
+        else {
+            this.setState({ show: false, paymentButton: false, smsButton: true});
+        }
+
     }
 
     changePlaceHoldClassAdd(e) {
@@ -89,10 +93,14 @@ class Premium extends Component {
     }
 
     additionalDetails = (productId) => {
-        this.props.history.push(`/Additional_details/${productId}`);
+        this.props.history.push(`/AdditionalDetails_PCV/${productId}`);
     }
 
-    handleSubmit = (values) => {    
+    handleModal = () => {
+        this.setState({ show: true});
+    }
+
+    handleSubmit = (values) => {
         const { refNumber , policyHolder} = this.state
         const { productId } = this.props.match.params
         paymentGateways(values, policyHolder, refNumber, productId)
@@ -102,8 +110,8 @@ class Premium extends Component {
         const { productId } = this.props.match.params
         let policyHolder_id = this.state.policyHolder_refNo ? this.state.policyHolder_refNo : '0'
         let encryption = new Encryption();
-    
-        axios.get(`policy-holder/motor/${policyHolder_id}`)
+
+        axios.get(`pcv/policy-holder/details/${policyHolder_id}`)
             .then(res => {
                 let decryptResp = JSON.parse(encryption.decrypt(res.data))
                 console.log("decrypt", decryptResp)
@@ -119,14 +127,14 @@ class Premium extends Component {
                 let paymentgateway = decryptResp.data.policyHolder && decryptResp.data.policyHolder.bcmaster && decryptResp.data.policyHolder.bcmaster.bcpayment
 
                 this.setState({
-                    motorInsurance,policyHolder,vehicleDetails,previousPolicy,request_data,menumaster, step_completed, bcMaster, paymentgateway,
+                    motorInsurance,policyHolder,vehicleDetails,previousPolicy,request_data,step_completed, bcMaster,menumaster,paymentgateway,
                     refNumber: decryptResp.data.policyHolder.reference_no,
                     paymentStatus: decryptResp.data.policyHolder.payment ? decryptResp.data.policyHolder.payment[0] : [],
                     memberdetails : decryptResp.data.policyHolder ? decryptResp.data.policyHolder : [],
-                    nomineedetails: decryptResp.data.policyHolder ? decryptResp.data.policyHolder.request_data.nominee[0]:[]
-                    
+                    nomineedetails: decryptResp.data.policyHolder && decryptResp.data.policyHolder.request_data.nominee ? decryptResp.data.policyHolder.request_data.nominee[0]:[]
+
                 })
-                this.getAccessToken(motorInsurance)
+                this.fullQuote(motorInsurance)
             })
             .catch(err => {
                 // handle error
@@ -137,8 +145,8 @@ class Premium extends Component {
     fetchRequestData = () => {
         let policyHolder_id = this.state.policyHolder_refNo ? this.state.policyHolder_refNo : '0'
         let encryption = new Encryption();
-    
-        axios.get(`policy-holder/motor/${policyHolder_id}`)
+
+        axios.get(`pcv/policy-holder/details/${policyHolder_id}`)
             .then(res => {
                 let decryptResp = JSON.parse(encryption.decrypt(res.data))
                 let request_data = decryptResp.data.policyHolder ? decryptResp.data.policyHolder.request_data : {}
@@ -170,10 +178,10 @@ class Premium extends Component {
         if(bc_data) {
             bc_data = JSON.parse(encryption.decrypt(bc_data));
         }
-        formData.append('bcmaster_id', sessionStorage.getItem('csc_id') ? "5" : bc_data ? bc_data.agent_id : "" ) 
-        formData.append('ref_no', policyHolder_id) 
+        formData.append('bcmaster_id', sessionStorage.getItem('csc_id') ? "5" : bc_data ? bc_data.agent_id : "" )
+        formData.append('ref_no', policyHolder_id)
         formData.append('registrationNo', val)
-        formData.append('page_name', `Premium/${this.props.match.params.productId}`)
+        formData.append('page_name', `Premium_PCV/${this.props.match.params.productId}`)
 
         this.props.loadingStart();
         axios.post('breakin/create',formData)
@@ -183,111 +191,103 @@ class Premium extends Component {
         }).
         catch(err=>{
             this.props.loadingStop();
-        })  
+        })
     }
 
-    getAccessToken = (motorInsurance) => {
-        axios
-            .post(`/callTokenService`)
-            .then((res) => {
-                this.setState({
-                    accessToken: res.data.access_token,
-                });
-                this.fullQuote(res.data.access_token, motorInsurance)
-            })
-            .catch((err) => {
-                this.setState({
-                    accessToken: '',
-                });
-                this.props.loadingStop();
-            });
-    };
 
-    fullQuote = (access_token, motorInsurance) => {
+    fullQuote = ( motorInsurance) => {
         const formData = new FormData();
         let encryption = new Encryption();
-        let dateDiff = 0
-        let policy_type_id= motorInsurance && motorInsurance.policytype_id ? motorInsurance.policytype_id : ""
         const {previousPolicy, request_data, policyHolder} = this.state
+        let dateDiff = 0
+        let trailer_array = motorInsurance.trailers ? motorInsurance.trailers : null
+        trailer_array = trailer_array ? JSON.parse(trailer_array) : []
+        let policy_type_id= motorInsurance && motorInsurance.policytype_id ? motorInsurance.policytype_id : ""
+
         const post_data = {
             'ref_no':this.state.policyHolder_refNo ? this.state.policyHolder_refNo : '0',
-            'access_token':access_token,
-            'idv_value': motorInsurance.idv_value,
+            'id': localStorage.getItem('policyHolder_id'),
+            'idv_value': motorInsurance.idv_value ? motorInsurance.idv_value : '0',
             'policy_type':  motorInsurance.policy_type,
             'add_more_coverage': motorInsurance.add_more_coverage,
-            'coverage_data': motorInsurance && motorInsurance.add_more_coverage_request_json != null ? motorInsurance.add_more_coverage_request_json : "",	
-            'cng_kit': motorInsurance.cng_kit,
-            'cngKit_Cost': Math.floor(motorInsurance.cngkit_cost),
+            // 'cng_kit': motorInsurance.cng_kit,
+            // 'cngKit_Cost': Math.floor(motorInsurance.cngkit_cost),
             'PA_Cover': motorInsurance && motorInsurance.pa_cover ? motorInsurance.pa_cover : '0',
+            'coverage_data': motorInsurance && motorInsurance.add_more_coverage_request_json != null ? motorInsurance.add_more_coverage_request_json : "",
+            'trailer_array' : trailer_array,
         }
-
+console.log("Post data ---------------- ", post_data)
         formData.append('enc_data',encryption.encrypt(JSON.stringify(post_data)))
-        console.log("post_data--fullQuotePMCAR- ", post_data)
-        axios.post('fullQuotePMCAR', formData)
+
+        axios.post('pcv/full-quote', formData)
             .then(res => {
-                if (res.data.PolicyObject && res.data.UnderwritingResult && res.data.UnderwritingResult.Status == "Success") {
+                if (res.data.PolicyObject) {
                     this.setState({
                         fulQuoteResp: res.data.PolicyObject,
                         PolicyArray: res.data.PolicyObject.PolicyLobList,
                         error: [],
                     });
                     this.fetchRequestData()
-                } else {
+                }
+                else if(res.data.ValidateResult) {
+                    swal(res.data.ValidateResult.message)
+                }
+                 else {
                     this.setState({
                         fulQuoteResp: [],
                         error: res.data,
                     });
+                    swal(res.data.msg)
                 }
                 this.props.loadingStop();
 
-                 if((previousPolicy && policyHolder.break_in_status != "Vehicle Recommended and Reports Uploaded") || (policy_type_id == "3" && policyHolder.break_in_status != "Vehicle Recommended and Reports Uploaded") ){
+                if((previousPolicy && policyHolder.break_in_status != "Vehicle Recommended and Reports Uploaded") || (policy_type_id == "3" && policyHolder.break_in_status != "Vehicle Recommended and Reports Uploaded") ){
                     dateDiff = previousPolicy ? Math.floor(moment().diff(previousPolicy.end_date, 'days', true)) : "";
                     let previousPolicyName = previousPolicy ? previousPolicy.name : ""
 
-                    if(dateDiff > 0 || previousPolicyName == "2" || policy_type_id == "3") {                
-                        const formData1 = new FormData();
-                        let policyHolder_id = this.state.policyHolder_refNo ? this.state.policyHolder_refNo : '0'
-                        formData1.append('policy_ref_no',policyHolder_id)
-                        axios.post('breakin/checking', formData1)
-                        .then(res => {	
-                            let break_in_checking = res.data.data.break_in_checking	
-                            let break_in_inspection_no = res.data.data.break_in_inspection_no
-                            let break_in_status = res.data.data.break_in_status
-                            if( break_in_checking == true) {
+                     if(dateDiff > 0 || previousPolicyName == "2" || policy_type_id == "3") {
+                            const formData1 = new FormData();
+                            let policyHolder_id = this.state.policyHolder_refNo ? this.state.policyHolder_refNo : '0'
+                            formData1.append('policy_ref_no',policyHolder_id)
+                            axios.post('breakin/checking', formData1)
+                            .then(res => {
+                                let break_in_checking = res.data.data.break_in_checking
+                                let break_in_inspection_no = res.data.data.break_in_inspection_no
+                                let break_in_status = res.data.data.break_in_status
+                                if( break_in_checking == true){
+                                    this.setState({breakin_flag: 1})
+                                    if( break_in_inspection_no == "" && (break_in_status == null || break_in_status == "0")) {
+                                        swal({
+                                            title: "Breakin",
+                                            text: `Your Quotation number is ${request_data.quote_id}. Your vehicle needs inspection. Do you want to raise inspection.`,
+                                            icon: "warning",
+                                            buttons: true,
+                                            dangerMode: true,
+                                        })
+                                        .then((willCreate) => {
+                                            if (willCreate) {
+                                                this.callBreakin(motorInsurance && motorInsurance.registration_no)
+                                            }
+                                            else {
+                                                this.props.loadingStop();
+                                            }
+                                        })
+                                    }
+                                    else {
+                                        swal({
+                                            title: "Breakin",
+                                            text: `Breakin already raised. \nBreaking number ${break_in_inspection_no}.`,
+                                            icon: "warning",
+                                        })
+                                    }
+                                }
+                            })
+                            .catch(err => {
                                 this.setState({breakin_flag: 1})
-                                if(break_in_inspection_no == "" && (break_in_status == null || break_in_status == "0")) {
-                                    swal({
-                                        title: "Breakin",
-                                        text: `Your Quotation number is ${request_data.quote_id}. Your vehicle needs inspection. Do you want to raise inspection.`,
-                                        icon: "warning",
-                                        buttons: true,
-                                        dangerMode: true,
-                                    })
-                                    .then((willCreate) => {
-                                        if (willCreate) {
-                                            this.callBreakin(motorInsurance && motorInsurance.registration_no)
-                                        }
-                                        else {
-                                            this.props.loadingStop();
-                                        }
-                                    })
-                                }
-                                else {
-                                    swal({
-                                        title: "Breakin",
-                                        text: `Breakin already raised. \nBreaking number ${break_in_inspection_no}.`,
-                                        icon: "warning",
-                                    })
-                                }
-                            }
-                            
-                        })
-                        .catch(err => {
-                            this.setState({breakin_flag: 1})
-                            this.props.loadingStop();
-                        })
+                                this.props.loadingStop();
+                            })
                     }
-                }                     
+                }
             })
             .catch(err => {
                 this.setState({
@@ -303,7 +303,7 @@ class Premium extends Component {
         this.props.loadingStart();
         axios.get('relations')
         .then(res=>{
-            let relation = res.data.data ? res.data.data : []                        
+            let relation = res.data.data ? res.data.data : []
             this.setState({
                 relation
             });
@@ -315,26 +315,26 @@ class Premium extends Component {
                 relation: []
             });
         })
-    
-}
+    }
 
-sendPaymentLink = () => {
-    let encryption = new Encryption();
-    const formData = new FormData();
-    let policyHolder_refNo = localStorage.getItem("policyHolder_refNo") ? localStorage.getItem("policyHolder_refNo") : 0;
-    formData.append('reference_no', policyHolder_refNo)
+    sendPaymentLink = () => {
+        let encryption = new Encryption();
+        const formData = new FormData();
+        let policyHolder_refNo = localStorage.getItem("policyHolder_refNo") ? localStorage.getItem("policyHolder_refNo") : 0;
+        formData.append('reference_no', policyHolder_refNo)
 
-    this.props.loadingStart();
-    axios
-      .post("send-payment-link", formData)
-      .then((res) => {
-        swal(res.data.msg)
-        this.props.loadingStop();
-      })
-      .catch((err) => {
-        this.props.loadingStop();
-      });
-  };
+        this.props.loadingStart();
+        axios
+          .post("send-payment-link", formData)
+          .then((res) => {
+            swal(res.data.msg)
+            this.props.loadingStop();
+          })
+          .catch((err) => {
+            this.props.loadingStop();
+          });
+      };
+
 
 
     componentDidMount() {
@@ -343,10 +343,9 @@ sendPaymentLink = () => {
     }
 
     render() {
-        const { policyHolder, paymentgateway, fulQuoteResp, motorInsurance, error, error1, refNumber, paymentStatus, relation, 
-            memberdetails,nomineedetails, vehicleDetails, breakin_flag, request_data, bcMaster,menumaster } = this.state
+        const { policyHolder, show, fulQuoteResp, motorInsurance, error, error1, refNumber, paymentStatus, relation, memberdetails,paymentgateway,
+            nomineedetails, vehicleDetails, breakin_flag, step_completed, paymentButton, smsButton, bcMaster,menumaster,request_data } = this.state
         const { productId } = this.props.match.params
-        let phrases = localStorage.getItem("phrases") ? JSON.parse(localStorage.getItem("phrases")) : null
 
         const errMsg =
             error && error.message ? (
@@ -372,25 +371,25 @@ sendPaymentLink = () => {
                 </span>
             ) : null;
 
+        let phrases = localStorage.getItem("phrases") ? JSON.parse(localStorage.getItem("phrases")) : null
+
         return (
             <>
                 <BaseComponent>
-				
-				<div className="page-wrapper">	
-				
+
+				<div className="page-wrapper">
                     <div className="container-fluid">
                         <div className="row">
-						
-						<aside className="left-sidebar">
-		 				 <div className="scroll-sidebar ps-container ps-theme-default ps-active-y">
-						 <SideNav />
-						</div>
-						</aside>
-								
-                            <div className="col-sm-12 col-md-12 col-lg-12 col-xl-12 infobox premiumPage1">
+                            <aside className="left-sidebar">
+                                <div className="scroll-sidebar ps-container ps-theme-default ps-active-y">
+                                <SideNav />
+                                </div>
+                            </aside>
+                            { step_completed >= '4' && vehicleDetails.vehicletype_id == '1' ?
+                            <div className="col-sm-12 col-md-12 col-lg-12 col-xl-12 infobox premiumMisd">
                                 <h4 className="text-center mt-3 mb-3">{phrases['SBIGICL']}</h4>
                                 <Formik initialValues={initialValue} onSubmit={this.handleSubmit}
-                                validationSchema={validatePremium}
+                                // validationSchema={validatePremium}
                                 >
                                     {({ values, errors, setFieldValue, setFieldTouched, isValid, isSubmitting, touched }) => {
 
@@ -399,96 +398,94 @@ sendPaymentLink = () => {
                                                 <section className="brand m-t-11 m-b-25">
                                                     <div className="d-flex justify-content-left">
                                                         <div className="brandhead m-b-10">
-                                                            <h4>{phrases['PremiumDetails']}</h4>
+                                                            <h4>{phrases['PremiumDetails']} </h4>
                                                         </div>
                                                     </div>
                                                     <div className="brandhead m-b-30">
                                                         <h5>{errMsg}</h5>
                                                         <h5>{paymentErrMsg}</h5>
                                                         <h4>
-                                                            {phrases['PolRefNumber']} {fulQuoteResp.QuotationNo}
+                                                        {phrases['PolRefNumber']} {fulQuoteResp.QuotationNo}
                                                         </h4>
                                                     </div>
 
                                                     <Row>
                                                         <Col sm={12} md={12} lg={9}>
                                                             <div className="rghtsideTrigr">
-                                                                    <Collapsible trigger={phrases['PolicyDetails']} >
-                                                                        <div className="listrghtsideTrigr">
-                                                                            <Row>                                                                      
-                                                                                <Col sm={12} md={6}>
-                                                                                    <div className="motopremium">
-                                                                                        Policy Start date:
-                                                                                    </div>
-                                                                                </Col> 
-                                                                                <Col sm={12} md={6}>
-                                                                                <div className="premamount">
-                                                                                    {fulQuoteResp && fulQuoteResp.EffectiveDate ? moment(fulQuoteResp.EffectiveDate).format('DD-MM-yyy') : null}
+                                                                <Collapsible trigger={phrases['PolicyDetails']}>
+                                                                    <div className="listrghtsideTrigr">
+                                                                        <Row>
+                                                                            <Col sm={12} md={3}>
+                                                                                <div className="motopremium">
+                                                                                    Policy Start date:
                                                                                 </div>
-                                                                                </Col>
+                                                                            </Col>
+                                                                            <Col sm={12} md={3}>
+                                                                                <div className="premamount">
+                                                                                    {request_data && request_data.start_date ? moment(request_data.start_date).format('DD-MM-yyy') : null}
+                                                                                </div>
+                                                                            </Col>
 
-                                                                                <Col sm={12} md={6}>
+                                                                            <Col sm={12} md={3}>
                                                                                 <div className="motopremium">
                                                                                     Policy End Date:
                                                                                 </div>
-                                                                                </Col>
-                                                                                <Col sm={12} md={6}>
-                                                                                    <div className="premamount">
-                                                                                    {fulQuoteResp && fulQuoteResp.ExpiryDate ? moment(fulQuoteResp.ExpiryDate).format('DD-MM-yyy') : null}
-                                                                                    </div>
-                                                                                </Col>
-                                                                                <Col sm={12} md={6}>
+                                                                            </Col>
+                                                                            <Col sm={12} md={3}>
+                                                                                <div className="premamount">
+                                                                                {request_data && request_data.end_date ? moment(request_data.end_date).format('DD-MM-yyy') : null}
+                                                                                </div>
+                                                                            </Col>
+                                                                            <Col sm={12} md={3}>
                                                                                 <div className="motopremium">
                                                                                     Product Name:
                                                                                 </div>
-                                                                                </Col>
-                                                                                <Col sm={12} md={6}>
+                                                                            </Col>
+                                                                            <Col sm={12} md={6}>
                                                                                 <div className="premamount">
-                                                                                {vehicleDetails && vehicleDetails.vehicletype ? vehicleDetails.vehicletype.description : null}
+                                                                                    {vehicleDetails && vehicleDetails.vehicletype ? vehicleDetails.vehicletype.description : null}
                                                                                 </div>
-                                                                                </Col>
-                                                                            </Row>
-                                                                        </div>
+                                                                            </Col>
+                                                                        </Row>
+                                                                    </div>
 
-                                                                    </Collapsible>
-                                                                </div>
+                                                                </Collapsible>
+                                                            </div>
 
                                                             <div className="rghtsideTrigr">
                                                                 <Collapsible trigger={phrases['RMPolicy']}  open= {true}>
                                                                     <div className="listrghtsideTrigr">
                                                                         <Row>
-                                                                            <Col sm={12} md={6}>
+                                                                            <Col sm={12} md={3}>
                                                                                 <div className="motopremium">
-                                                                                    {phrases['Premium']}:
+                                                                                {phrases['Premium']}:
                                                                                 </div>
                                                                             </Col>
-                                                                            <Col sm={12} md={6}>
+                                                                            <Col sm={12} md={3}>
                                                                                 <div className="premamount">
-                                                                                    ₹ {fulQuoteResp.DuePremium}
+                                                                                    ₹ {fulQuoteResp.DuePremium ? fulQuoteResp.DuePremium : 0}
                                                                                 </div>
                                                                             </Col>
-
-                                                                            <Col sm={12} md={6}>
+                                                                            <Col sm={12} md={3}>
                                                                                 <div className="motopremium">
-                                                                                    {phrases['GrossPremium']}:
+                                                                                {phrases['GrossPremium']}:
                                                                                 </div>
                                                                             </Col>
-                                                                            <Col sm={12} md={6}>
+                                                                            <Col sm={12} md={3}>
                                                                                 <div className="premamount">
-                                                                                    ₹ {Math.round(fulQuoteResp.BeforeVatPremium)}
+                                                                                    ₹ {fulQuoteResp.BeforeVatPremium ? Math.round(fulQuoteResp.BeforeVatPremium) : 0}
                                                                                 </div>
                                                                             </Col>
-
-                                                                            <Col sm={12} md={6}>
+                                                                            <Col sm={12} md={3}>
                                                                                 <div className="motopremium">
-                                                                                    {phrases['GST']}:
+                                                                                {phrases['GST']}:
                                                                                 </div>
                                                                             </Col>
-                                                                            <Col sm={12} md={6}>
+                                                                            <Col sm={12} md={3}>
                                                                                 <div className="premamount">
-                                                                                    ₹ {Math.round(fulQuoteResp.TGST)}
+                                                                                    ₹ {fulQuoteResp.TGST ? Math.round(fulQuoteResp.TGST) : 0}
                                                                                 </div>
-                                                                            </Col>          
+                                                                            </Col>
                                                                         </Row>
                                                                     </div>
 
@@ -502,7 +499,7 @@ sendPaymentLink = () => {
 
                                                                                 <div>
                                                                                     <Row>
-                                                                                        <Col sm={12} md={12}>
+                                                                                        <Col sm={12} md={6}>
                                                                                             <Row>
                                                                                                 <Col sm={12} md={6}>
                                                                                                     <FormGroup>{phrases['RegNo']}:</FormGroup>
@@ -554,7 +551,7 @@ sendPaymentLink = () => {
                                                                                             </Row>
                                                                                             <Row>
                                                                                                 <Col sm={12} md={6}>
-                                                                                                    <FormGroup>{phrases['FuelType']}</FormGroup>
+                                                                                                    <FormGroup>{phrases['Fuel']}</FormGroup>
                                                                                                 </Col>
                                                                                                 <Col sm={12} md={6}>
                                                                                                     <FormGroup>{vehicleDetails && vehicleDetails.varientmodel && vehicleDetails.varientmodel.fuel_type ? fuel[parseInt(vehicleDetails.varientmodel.fuel_type)] : null}</FormGroup>
@@ -572,10 +569,28 @@ sendPaymentLink = () => {
 
                                                                                             <Row>
                                                                                                 <Col sm={12} md={6}>
+                                                                                                    <FormGroup>{phrases['BodyStyle']}</FormGroup>
+                                                                                                </Col>
+                                                                                                <Col sm={12} md={6}>
+                                                                                                    <FormGroup>{vehicleDetails && vehicleDetails.varientmodel && vehicleDetails.varientmodel.body_style ? vehicleDetails.varientmodel.body_style : null}</FormGroup>
+                                                                                                </Col>
+                                                                                            </Row>
+
+                                                                                            <Row>
+                                                                                                <Col sm={12} md={6}>
+                                                                                                    <FormGroup>{phrases['HorsePower']}</FormGroup>
+                                                                                                </Col>
+                                                                                                <Col sm={12} md={6}>
+                                                                                                    <FormGroup>{vehicleDetails && vehicleDetails.varientmodel && vehicleDetails.varientmodel.horse_power ? vehicleDetails.varientmodel.horse_power+" BHP" : null}</FormGroup>
+                                                                                                </Col>
+                                                                                            </Row>
+
+                                                                                            <Row>
+                                                                                                <Col sm={12} md={6}>
                                                                                                     <FormGroup>{phrases['IDVofVehicle']}</FormGroup>
                                                                                                 </Col>
                                                                                                 <Col sm={12} md={6}>
-                                                                                                    <FormGroup>{motorInsurance && motorInsurance.idv_value ? motorInsurance.idv_value : null}</FormGroup>
+                                                                                                    <FormGroup>{this.state.request_data.IDV_Suggested ? parseInt(this.state.request_data.IDV_Suggested) : null}</FormGroup>
                                                                                                 </Col>
                                                                                             </Row>
 
@@ -586,7 +601,7 @@ sendPaymentLink = () => {
                                                                                     </Row>
                                                                                 </div>
                                                                             : (<p></p>)}
-                                                                                   
+
                                                                         <div>
                                                                             <Row>
                                                                                 <p></p>
@@ -603,30 +618,38 @@ sendPaymentLink = () => {
                                                                         {memberdetails ?
 
                                                                                 <div>
-                                                                                    <strong>{phrases['OwnerDetails']} :</strong>
+                                                                                    <strong>Owner Details </strong>
                                                                                     <br/>
                                                                                        <Row>
-                                                                                        <Col sm={12} md={12}>
+                                                                                        <Col sm={12} md={6}>
                                                                                             <Row>
                                                                                                 <Col sm={12} md={6}>
-                                                                                                    <FormGroup>{phrases['Name']}:</FormGroup>
+                                                                                                {motorInsurance.policy_for == '1' ?  <FormGroup>{phrases['Name']}:</FormGroup> : <FormGroup>{phrases['CompanyName']}:</FormGroup> }
                                                                                                 </Col>
                                                                                                 <Col sm={12} md={6}>
                                                                                                     <FormGroup>{memberdetails.first_name }</FormGroup>
                                                                                                 </Col>
                                                                                             </Row>
-
+                                                                                            {motorInsurance.policy_for == '1' ?
+                                                                                                <Row>
+                                                                                                    <Col sm={12} md={6}>
+                                                                                                        <FormGroup>{phrases['DateOfBirth']}:</FormGroup>
+                                                                                                    </Col>
+                                                                                                    <Col sm={12} md={6}>
+                                                                                                        <FormGroup>{ memberdetails ? moment(memberdetails.dob).format("DD-MM-YYYY") : null}</FormGroup>
+                                                                                                    </Col>
+                                                                                                </Row> :
+                                                                                                 <Row>
+                                                                                                    <Col sm={12} md={6}>
+                                                                                                        <FormGroup>{phrases['IncorporationDate']}:</FormGroup>
+                                                                                                    </Col>
+                                                                                                    <Col sm={12} md={6}>
+                                                                                                        <FormGroup>{ memberdetails ? moment(memberdetails.date_of_incorporation).format("DD-MM-YYYY") : null}</FormGroup>
+                                                                                                    </Col>
+                                                                                                </Row>}
                                                                                             <Row>
                                                                                                 <Col sm={12} md={6}>
-                                                                                                    <FormGroup>{phrases['DateOfBirth']}:</FormGroup>
-                                                                                                </Col>
-                                                                                                <Col sm={12} md={6}>
-                                                                                                    <FormGroup>{memberdetails.dob}</FormGroup>
-                                                                                                </Col>
-                                                                                            </Row>
-                                                                                            <Row>
-                                                                                                <Col sm={12} md={6}>
-                                                                                                    <FormGroup>{phrases['MobileNo']}</FormGroup>
+                                                                                                    <FormGroup>{phrases['MobileNo']}:</FormGroup>
                                                                                                 </Col>
                                                                                                 <Col sm={12} md={6}>
                                                                                                     <FormGroup>{memberdetails.mobile}</FormGroup>
@@ -634,21 +657,29 @@ sendPaymentLink = () => {
                                                                                             </Row>
                                                                                             <Row>
                                                                                                 <Col sm={12} md={6}>
-                                                                                                    <FormGroup>{phrases['EmailId']}</FormGroup>
+                                                                                                    <FormGroup>{phrases['EmailId']}:</FormGroup>
                                                                                                 </Col>
                                                                                                 <Col sm={12} md={6}>
                                                                                                     <FormGroup>{memberdetails.email_id}</FormGroup>
                                                                                                 </Col>
                                                                                             </Row>
-
-                                                                                            <Row>
-                                                                                                <Col sm={12} md={6}>
-                                                                                                    <FormGroup>{phrases['Gender']}</FormGroup>
-                                                                                                </Col>
-                                                                                                <Col sm={12} md={6}>
-                                                                                                    <FormGroup>{memberdetails.gender == "m" ? "Male" : "Female"}</FormGroup>
-                                                                                                </Col>
-                                                                                            </Row>
+                                                                                            {motorInsurance.policy_for == '1' ?
+                                                                                                <Row>
+                                                                                                    <Col sm={12} md={6}>
+                                                                                                        <FormGroup>{phrases['Gender']}</FormGroup>
+                                                                                                    </Col>
+                                                                                                    <Col sm={12} md={6}>
+                                                                                                        <FormGroup>{memberdetails.gender == "m" ? "Male" : "Female"}</FormGroup>
+                                                                                                    </Col>
+                                                                                                </Row> :
+                                                                                                <Row>
+                                                                                                    <Col sm={12} md={6}>
+                                                                                                        <FormGroup>{phrases['GSTIN']}:</FormGroup>
+                                                                                                    </Col>
+                                                                                                    <Col sm={12} md={6}>
+                                                                                                        <FormGroup>{memberdetails.gstn_no}</FormGroup>
+                                                                                                    </Col>
+                                                                                                </Row> }
 
                                                                                         </Col>
                                                                                     </Row>
@@ -657,20 +688,18 @@ sendPaymentLink = () => {
                                                                                     </Row>
                                                                                 </div>
                                                                             : (<p></p>)}
-                                                                                   
-                                                                        <div>
-                                                                        {motorInsurance && motorInsurance.pa_flag == '1' ? 
+                                                                        {motorInsurance.policy_for == '1' && motorInsurance.pa_flag == '1' ?
                                                                         <div>
                                                                         <strong>{phrases['NomineeDetails']} :</strong>
                                                                             <br/>
                                                                             <Row>
-                                                                                <Col sm={12} md={12}>
+                                                                                <Col sm={12} md={6}>
                                                                                     <Row>
                                                                                         <Col sm={12} md={6}>
                                                                                             <FormGroup>{phrases['Name']}:</FormGroup>
                                                                                         </Col>
                                                                                         <Col sm={12} md={6}>
-                                                                                            <FormGroup>{nomineedetails.first_name}</FormGroup>
+                                                                                            <FormGroup>{nomineedetails ? nomineedetails.first_name : null}</FormGroup>
                                                                                         </Col>
                                                                                     </Row>
 
@@ -679,7 +708,7 @@ sendPaymentLink = () => {
                                                                                             <FormGroup>{phrases['DateOfBirth']}:</FormGroup>
                                                                                         </Col>
                                                                                         <Col sm={12} md={6}>
-                                                                                            <FormGroup>{nomineedetails.dob}</FormGroup>
+                                                                                            <FormGroup>{ nomineedetails ? moment(nomineedetails.dob).format("DD-MM-YYYY") : null}</FormGroup>
                                                                                         </Col>
                                                                                     </Row>
 
@@ -688,9 +717,9 @@ sendPaymentLink = () => {
                                                                                             <FormGroup>{phrases['ProposerRelation']}:</FormGroup>
                                                                                         </Col>
                                                                                         <Col sm={12} md={6}>
-                                                                                        { relation.map((relations, qIndex) => 
+                                                                                        {nomineedetails && relation.map((relations, qIndex) =>
                                                                                         relations.id == nomineedetails.relation_with ?
-                                                                                            <FormGroup>{relations.name}</FormGroup> : null
+                                                                                            <FormGroup key={qIndex}>{relations.name}</FormGroup> : null
                                                                                         )}
                                                                                         </Col>
                                                                                     </Row>
@@ -700,7 +729,7 @@ sendPaymentLink = () => {
                                                                                             <FormGroup>{phrases['Gender']}</FormGroup>
                                                                                         </Col>
                                                                                         <Col sm={12} md={6}>
-                                                                                            <FormGroup>{nomineedetails.gender == "m" ? "Male" : "Female"}</FormGroup>
+                                                                                            <FormGroup>{nomineedetails && nomineedetails.gender == "m" ? "Male" : "Female"}</FormGroup>
                                                                                         </Col>
                                                                                     </Row>
                                                                                 </Col>
@@ -708,13 +737,14 @@ sendPaymentLink = () => {
                                                                             <Row>
                                                                                 <p></p>
                                                                             </Row>
-                                                                            </div> : null }
-                                                                            {nomineedetails && nomineedetails.is_appointee == '1' && motorInsurance.pa_flag == '1' ?      
+                                                                        </div> : null}
+
+                                                                        {motorInsurance.policy_for == '1' && nomineedetails && nomineedetails.is_appointee == '1' && motorInsurance.pa_flag == '1' ?
                                                                             <div>
                                                                             <strong>{phrases['AppoDetails']} :</strong>
                                                                                 <br/>
                                                                                 <Row>
-                                                                                    <Col sm={12} md={12}>
+                                                                                    <Col sm={12} md={6}>
                                                                                         <Row>
                                                                                             <Col sm={12} md={6}>
                                                                                                 <FormGroup>{phrases['Name']}:</FormGroup>
@@ -726,12 +756,12 @@ sendPaymentLink = () => {
 
                                                                                         <Row>
                                                                                             <Col sm={12} md={6}>
-                                                                                                <FormGroup>{phrases['ProposerRelation']}:</FormGroup>
+                                                                                                <FormGroup>{phrases['RelationNominee']}:</FormGroup>
                                                                                             </Col>
                                                                                             <Col sm={12} md={6}>
-                                                                                            {nomineedetails && nomineedetails.appointee_relation_with && relation.map((relations, qIndex) => 
+                                                                                            {nomineedetails && nomineedetails.appointee_relation_with && relation.map((relations, qIndex) =>
                                                                                             relations.id == nomineedetails.appointee_relation_with ?
-                                                                                                <FormGroup>{relations.name}</FormGroup> : null
+                                                                                                <FormGroup key={qIndex}>{relations.name}</FormGroup> : null
                                                                                             )}
                                                                                             </Col>
                                                                                         </Row>
@@ -740,40 +770,38 @@ sendPaymentLink = () => {
                                                                                 <Row>
                                                                                     <p></p>
                                                                                 </Row>
-                                                                            </div> 
-                                                                            : null }
-                                                                        </div>
+                                                                            </div> : null }
                                                                     </div>
 
                                                                 </Collapsible>
                                                             </div>
-                                                          
+                                                          {fulQuoteResp.QuotationNo && breakin_flag == 0  ?
                                                             <Row>
                                                             <Col sm={12} md={6}>
                                                             </Col>
                                                                 <Col sm={12} md={6}>
                                                                     <FormGroup>
+
                                                                      <div className="paymntgatway">
                                                                      {phrases['SelectPayGateway']}
 
                                                                      { paymentgateway && paymentgateway.length > 0 ? paymentgateway.map((gateways,index) =>
-                                                                        gateways.hasOwnProperty('paymentgateway') && gateways.paymentgateway ? 
+                                                                        gateways.hasOwnProperty('paymentgateway') && gateways.paymentgateway ?
                                                                         <div>
-                                                                            {/* {console.log("gateways--------------- ", gateways)} */}
                                                                             <label className="customRadio3">
                                                                             <Field
                                                                                 type="radio"
-                                                                                name='gateway'                                            
+                                                                                name='gateway'
                                                                                 value={index+1}
-                                                                                key= {index} 
+                                                                                key= {index}
                                                                                 onChange={(e) => {
                                                                                     setFieldValue(`gateway`, e.target.value);
                                                                                     setFieldValue(`slug`, gateways.paymentgateway.slug);
                                                                                 }}
                                                                                 checked={values.gateway == `${index+1}` ? true : false}
                                                                             />
-                                                                                <span className="checkmark " /><span className="fs-14"> 
-                                                                            
+                                                                                <span className="checkmark " /><span className="fs-14">
+
                                                                                     { gateways.paymentgateway.logo ? <img src={require('../../assets/images/'+ gateways.paymentgateway.logo)} alt="" /> :
                                                                                     null
                                                                                     }
@@ -785,24 +813,27 @@ sendPaymentLink = () => {
                                                                     </div>
                                                                     </FormGroup>
                                                                 </Col>
-                                                            </Row>
+                                                            </Row> : null }
 
                                                             <Row>&nbsp;</Row>
                                                             <div className="d-flex justify-content-left resmb">
-                                                                <Button className="backBtn" type="button" onClick={this.additionalDetails.bind(this, productId)}>Back</Button>
-                                                                
+                                                                <Button className="backBtn" type="button" onClick={this.additionalDetails.bind(this, productId)}>{phrases['Back']}</Button>
                                                                 {bcMaster && bcMaster.eligible_for_payment_link == 1 && breakin_flag == 0 ?
                                                                     <div>
                                                                     <Button type="button" className="proceedBtn" onClick = {this.sendPaymentLink.bind(this)}>  {phrases['PaymentLink']}  </Button>
                                                                     &nbsp;&nbsp;&nbsp;&nbsp;
                                                                     </div> : null }
-                                                                
-                                                                {fulQuoteResp.QuotationNo && breakin_flag == 0 && values.gateway != "" ?
+
+                                                                {smsButton === true && breakin_flag == 0 ?
+                                                                <Button className="backBtn" type="button" onClick={this.handleModal.bind(this)}>{phrases['SendSMS']}</Button>
+                                                                : null}
+
+                                                                {fulQuoteResp.QuotationNo && breakin_flag == 0 && values.gateway != "" && paymentButton === true ?
                                                                     <Button type="submit"
                                                                         className="proceedBtn"
                                                                     >
-                                                                        {phrases['MakePayment']}
-                                                                </Button> 
+                                                                        Make Payment
+                                                                </Button>
                                                             : null}
                                                             </div>
                                                         </Col>
@@ -817,27 +848,27 @@ sendPaymentLink = () => {
                                         );
                                     }}
                                 </Formik>
-                                {/* <Modal className="" bsSize="md"
+                                <Modal className="" bsSize="md"
                                     show={show}
                                     onHide={this.handleClose}>
                                     <div className="otpmodal">
+                                    <Modal.Header closeButton />
                                         <Modal.Body>
                                             <Otp
                                                 quoteNo={fulQuoteResp.QuotationNo}
                                                 duePremium={fulQuoteResp.DuePremium}
                                                 refNumber={refNumber}
-                                                whatsapp={whatsapp}
-                                                reloadPage={(e) => this.payment(e)}
+                                                // whatsapp={whatsapp}
+                                                reloadPage={(e) => this.handleOtp(e)}
                                             />
                                         </Modal.Body>
                                     </div>
-                                </Modal> */}
-
-                            </div>
+                                </Modal>
+                            </div> : step_completed == "" ? "Forbidden" : null }
                             <Footer />
                         </div>
                     </div>
-					</div>
+					  </div>
                 </BaseComponent>
             </>
         );
@@ -858,5 +889,5 @@ const mapDispatchToProps = (dispatch) => {
 };
 
 export default withRouter(
-    connect(mapStateToProps, mapDispatchToProps)(Premium)
+    connect(mapStateToProps, mapDispatchToProps)(PremiumPCV)
 );

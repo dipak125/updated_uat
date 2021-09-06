@@ -13,7 +13,7 @@ import Encryption from '../../shared/payload-encryption';
 import { Formik, Form, Field, ErrorMessage } from 'formik';
 import { registrationNumberFirstBlock, registrationNumberSecondBlock, registrationNumberThirdBlock, registrationNumberLastBlock } from "../../shared/validationFunctions";
 
-const menumaster_id = 7
+const menumaster_id = 12
 const initialValues = {
     regNumber: '',
     reg_number_part_one: '',
@@ -97,7 +97,7 @@ const vehicleRegistrationValidation = Yup.object().shape({
 });
 
 
-class RegistrationMISCD extends Component {
+class RegistrationPCV extends Component {
     state = {
         motorInsurance:'',
         regno:'',
@@ -129,7 +129,7 @@ fetchData=()=>{
     const {productId } = this.props.match.params
     let policyHolder_id = localStorage.getItem("policyHolder_refNo") ? localStorage.getItem("policyHolder_refNo"):0;
     let encryption = new Encryption();
-    axios.get(`miscd/policy-holder/details/${policyHolder_id}`)
+    axios.get(`pcv/policy-holder/details/${policyHolder_id}`)
         .then(res=>{
             let decryptResp = JSON.parse(encryption.decrypt(res.data))
             console.log("decrypt", decryptResp)
@@ -160,7 +160,7 @@ fetchSubVehicle=()=>{
     const {productId } = this.props.match.params
     let encryption = new Encryption();
     this.props.loadingStart();
-    axios.get(`miscd/sub-vehical-list/${menumaster_id}`)
+    axios.get(`gcv/sub-vehical-list/${menumaster_id}`)
         .then(res=>{
             let decryptResp = JSON.parse(encryption.decrypt(res.data))
             console.log("decrypt--fetchSubVehicle------ ", decryptResp)
@@ -240,7 +240,7 @@ handleSubmit=(values)=>{
                 'policy_for': values.policy_for,
                 'subclass_id' : values.subclass_id,
                 'fastlaneLog_id': this.state.fastLaneData && this.state.fastLaneData.fastlaneLog_id ? this.state.fastLaneData.fastlaneLog_id : fastlanelog && fastlanelog.id ? fastlanelog.id : "",
-                'page_name': `Registration_MISCD/${productId}`
+                'page_name': `Registration_PCV/${productId}`
             } 
         }
         else {
@@ -260,7 +260,7 @@ handleSubmit=(values)=>{
                 'policy_for': values.policy_for,
                 'subclass_id' : values.subclass_id,
                 'fastlaneLog_id': this.state.fastLaneData && this.state.fastLaneData.fastlaneLog_id ? this.state.fastLaneData.fastlaneLog_id : fastlanelog && fastlanelog.id ? fastlanelog.id : "",
-                'page_name': `Registration_MISCD/${productId}`
+                'page_name': `Registration_PCV/${productId}`
             } 
         }
 
@@ -269,13 +269,13 @@ handleSubmit=(values)=>{
     
         this.props.loadingStart();
         axios
-        .post(`miscd/update-registration`, formData)
+        .post(`pcv/update-registration`, formData)
         .then(res => {
             let decryptResp = JSON.parse(encryption.decrypt(res.data))
             console.log("decrypt", decryptResp)
 
             if(decryptResp.error == false) {
-                this.props.history.push(`/SelectBrand_MISCD/${productId}`);
+                this.props.history.push(`/SelectBrand_PCV/${productId}`);
             }
             else{
                 swal(decryptResp.msg)
@@ -305,7 +305,7 @@ handleSubmit=(values)=>{
                 'product_id':sessionStorage.getItem('product_id') ? sessionStorage.getItem('product_id') : "",
                 'bcmaster_id': "5",
 		        'lapse_duration': values.lapse_duration,
-                'page_name': `Registration_MISCD/${productId}`,
+                'page_name': `Registration_PCV/${productId}`,
                 'policy_type_id':values.policy_type,
                 'policy_for': values.policy_for,
                 'subclass_id': values.subclass_id,
@@ -323,7 +323,7 @@ handleSubmit=(values)=>{
                 'bcmaster_id': bc_data ? bc_data.agent_id : "",
                 'bc_token': bc_data ? bc_data.token : "",
                 'bc_agent_id': bc_data ? bc_data.user_info.data.user.username : "",
-                'page_name': `Registration_MISCD/${productId}`,
+                'page_name': `Registration_PCV/${productId}`,
                 'policy_type_id':values.policy_type,
                 'policy_for': values.policy_for,
                 'subclass_id': values.subclass_id,
@@ -334,7 +334,7 @@ handleSubmit=(values)=>{
         formData.append('enc_data',encryption.encrypt(JSON.stringify(post_data)))
         this.props.loadingStart();
         axios
-        .post(`miscd/registration`, formData)
+        .post(`pcv/registration`, formData)
         .then(res => {
             let decryptResp = JSON.parse(encryption.decrypt(res.data))
             console.log("decrypt", decryptResp)
@@ -343,7 +343,7 @@ handleSubmit=(values)=>{
             if(decryptResp.error == false) {
                 localStorage.setItem('policyHolder_id', decryptResp.data.policyHolder_id);
                 localStorage.setItem('policyHolder_refNo', decryptResp.data.policyHolder_refNo);
-                this.props.history.push(`/SelectBrand_MISCD/${productId}`); 
+                this.props.history.push(`/SelectBrand_PCV/${productId}`); 
             }   
             else{
                 swal(decryptResp.msg)
@@ -351,6 +351,8 @@ handleSubmit=(values)=>{
         })
         .catch(err => {
         this.props.loadingStop();
+        let decryptResp = JSON.parse(encryption.decrypt(err.data))
+        console.log("decrypt", decryptResp)
         if(err && err.data){
             swal('Please check..something went wrong!!');
         }      
@@ -383,12 +385,12 @@ regnoFormat = (e, setFieldTouched, setFieldValue) => {
 
     render() {
         const {motorInsurance, subVehicleList} = this.state
-        var tempRegNo = motorInsurance && motorInsurance.registration_part_numbers ? JSON.parse(motorInsurance.registration_part_numbers) : []
+	    var tempRegNo = motorInsurance && motorInsurance.registration_part_numbers && JSON.parse(motorInsurance.registration_part_numbers)
         const newInitialValues = Object.assign(initialValues,{
-            reg_number_part_one: tempRegNo && tempRegNo.reg_number_part_one ? tempRegNo.reg_number_part_one : "",
-            reg_number_part_two: tempRegNo && tempRegNo.reg_number_part_two ? tempRegNo.reg_number_part_two : "",
-            reg_number_part_three: tempRegNo && tempRegNo.reg_number_part_three ? tempRegNo.reg_number_part_three : "",
-            reg_number_part_four: tempRegNo && tempRegNo.reg_number_part_four ? tempRegNo.reg_number_part_four : "",
+	        reg_number_part_one: tempRegNo && tempRegNo.reg_number_part_one,
+            reg_number_part_two: tempRegNo && tempRegNo.reg_number_part_two,
+            reg_number_part_three: tempRegNo && tempRegNo.reg_number_part_three,
+            reg_number_part_four: tempRegNo && tempRegNo.reg_number_part_four,
             regNumber: motorInsurance && motorInsurance.registration_no ? motorInsurance.registration_no : "",
             policy_type: motorInsurance && motorInsurance.policytype_id ? motorInsurance.policytype_id : "",
             policy_for: motorInsurance && motorInsurance.policy_for ? motorInsurance.policy_for : "",
@@ -428,7 +430,7 @@ regnoFormat = (e, setFieldTouched, setFieldValue) => {
                                         <Form>                                           
                                             <div className="d-flex justify-content-left">
                                                 <div className="brandhead"> 
-                                                <p>{phrases['MISDPolicy']}</p>
+                                                <p>{phrases['customerType']}</p>
                                                     <div className="d-inline-flex m-b-15">
                                                         <div className="p-r-25">
                                                             <label className="customRadio3">
@@ -474,7 +476,7 @@ regnoFormat = (e, setFieldTouched, setFieldValue) => {
                                             </div>
                                             <div className="d-flex justify-content-left">
                                                 <div className="brandhead"> 
-                                                    <p>{phrases['TellAboutPolicy']}</p>
+                                                    <p>{phrases['businessType']}</p>
 
                                                     <div className="d-inline-flex m-b-15">
                                                         <div className="p-r-25">
@@ -486,6 +488,7 @@ regnoFormat = (e, setFieldTouched, setFieldValue) => {
                                                                     key='1'
                                                                     checked = {values.policy_type == '1' ? true : false}
                                                                     onChange = {() =>{
+                                                                        setFieldTouched('policy_type')
                                                                         setFieldValue('policy_type', '1');
                                                                         this.handleChange(values,setFieldTouched, setFieldValue)
                                                                     }  
@@ -504,6 +507,7 @@ regnoFormat = (e, setFieldTouched, setFieldValue) => {
                                                                     key='1'
                                                                     checked = {values.policy_type == '2' ? true : false}
                                                                     onChange = {() =>{
+                                                                        setFieldTouched('policy_type')
                                                                         setFieldValue('policy_type', '2');
                                                                         setFieldValue('check_registration', '2');
                                                                         this.handleChange(values,setFieldTouched, setFieldValue)
@@ -511,7 +515,8 @@ regnoFormat = (e, setFieldTouched, setFieldValue) => {
                                                                     }
                                                                 />
                                                                 <span className="checkmark " /><span className="fs-14"> {phrases['RollOver']}</span>
-                                                            </label>                                                      
+                                                            </label>
+                                                            
                                                         </div>
 
                                                         <div className="p-r-25">
@@ -523,6 +528,7 @@ regnoFormat = (e, setFieldTouched, setFieldValue) => {
                                                                     key='1'
                                                                     checked = {values.policy_type == '3' ? true : false}
                                                                     onChange = {() =>{
+                                                                        setFieldTouched('policy_type')
                                                                         setFieldValue('policy_type', '3');
                                                                         setFieldValue('check_registration', '2');
                                                                         this.handleChange(values,setFieldTouched, setFieldValue)
@@ -589,7 +595,7 @@ regnoFormat = (e, setFieldTouched, setFieldValue) => {
                                                         >
                                                             <option value="">{phrases['SelectProduct']}</option>
                                                             {subVehicleList.map((subVehicle, qIndex) => ( 
-                                                                <option disabled = {subVehicle.status == 1 ? false : true } value= {subVehicle.subclass_id}>{subVehicle.subclass_title}</option>
+                                                                <option value= {subVehicle.subclass_id}>{subVehicle.subclass_title}</option>
                                                             ))}
                                                 
                                                         </Field>
@@ -769,4 +775,4 @@ const mapStateToProps = state => {
     };
   };
 
-export default withRouter (connect( mapStateToProps, mapDispatchToProps)(RegistrationMISCD));
+export default withRouter (connect( mapStateToProps, mapDispatchToProps)(RegistrationPCV));

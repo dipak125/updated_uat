@@ -17,7 +17,7 @@ import Encryption from '../../shared/payload-encryption';
 import * as Yup from "yup";
 import swal from 'sweetalert';
 import moment from "moment";
-import {  validRegistrationNumber } from "../../shared/validationFunctions";
+import {  validRegistrationNumber,compareStartEndYear } from "../../shared/validationFunctions";
 
 
 let translation = localStorage.getItem("phrases") ? JSON.parse(localStorage.getItem("phrases")) : []
@@ -206,6 +206,46 @@ const ComprehensiveValidation = Yup.object().shape({
         then: Yup.string().required('pleaseProvideDriver'),
         otherwise: Yup.string()
     }),
+
+    tyre_rim_array: Yup.array().of(
+        Yup.object().shape({
+            tyreMfgYr : Yup.string().when(['policy_for'], {
+                is: policy_for => [policy_for == '1', policy_for == '2'],
+                then: Yup.string().required('MFG year required')
+                    .test(
+                        "checkGreaterTimes",
+                        "Mfg date must be greater than registration date",
+                        function (value) {
+                            if (value) { 
+                                return compareStartEndYear(new Date(this.parent.vehicleRegDate), value);
+                            }
+                            return true;
+                        }
+                    )
+                    .test(
+                        "checkGreaterTimes",
+                        "Mfg date must be less than today",
+                        function (value) {
+                            if (value) {
+                                return compareStartEndYear(value, new Date());
+                            }
+                            return true;
+                        }
+                    ),
+                otherwise: Yup.string()
+            }),
+
+            tyreSerialNo : Yup.string().when(['policy_for'], {
+                is: policy_for => [policy_for == '1', policy_for == '2'],
+                then: Yup.string().required('Serial No Required')
+                    .matches(/^[a-zA-Z0-9]*$/, function() {
+                        return "Invalid Serial No"
+                    }),
+                otherwise: Yup.string()
+            })
+           
+        }),
+    )
    
 });
 
@@ -246,7 +286,8 @@ const Coverage = {
     "B00019":  translation["B00019"],
     "B00020":  translation["B00020"],
     "B00022":  translation["B00022"],  
-    "B00025":  translation["B00025"] 
+    "B00025":  translation["B00025"],
+    "C101110": translation["C101110"], 
 }
 
 class OtherComprehensiveOD extends Component {
@@ -294,7 +335,10 @@ class OtherComprehensiveOD extends Component {
             request_data: [],
             geographical_extension: [],
             add_more_coverage_request_array: [],
-            ncbDiscount: 0
+            ncbDiscount: 0,
+            no_of_claim:4,
+            policy_for:1,
+            tyre_rim_array : []
         };
     }
 
@@ -367,7 +411,7 @@ class OtherComprehensiveOD extends Component {
                 let add_more_coverage = motorInsurance && motorInsurance.add_more_coverage != null ? motorInsurance.add_more_coverage.split(",") : ['B00015']
                 add_more_coverage = add_more_coverage.flat()
                 let sliderVal = motorInsurance && motorInsurance.idv_value ? motorInsurance.idv_value : 0
-
+                let vehicleRegDate = motorInsurance &&  motorInsurance.registration_date != null ? motorInsurance.registration_date : ''
                 let add_more_coverage_request_json = motorInsurance && motorInsurance.add_more_coverage_request_json != null ? motorInsurance.add_more_coverage_request_json : ""
                 let add_more_coverage_request_array = add_more_coverage_request_json != "" ? JSON.parse(add_more_coverage_request_json) : []
                 var geographical_extension = add_more_coverage_request_array && add_more_coverage_request_array.geographical_extension ? add_more_coverage_request_array.geographical_extension : []
@@ -385,7 +429,8 @@ class OtherComprehensiveOD extends Component {
                     motorInsurance, add_more_coverage,request_data,geographical_extension,add_more_coverage_request_array,sliderVal,
                     showCNG: motorInsurance.cng_kit == 1 ? true : false,
                     vahanVerify: motorInsurance.chasis_no && motorInsurance.engine_no ? true : false,
-                    selectFlag: motorInsurance && motorInsurance.add_more_coverage != null ? '0' : '1'
+                    selectFlag: motorInsurance && motorInsurance.add_more_coverage != null ? '0' : '1',
+                    vehicleRegDate
                 })
                 this.props.loadingStop();
                 this.fullQuote(values)
@@ -537,6 +582,7 @@ class OtherComprehensiveOD extends Component {
             'add_more_coverage': add_more_coverage.toString(),
             'coverage_data': JSON.stringify(coverage_data),
             'PA_Cover': values.PA_flag ? values.PA_Cover : "0",
+            'tyre_rim_array' : values.tyre_rim_array ? values.tyre_rim_array : [],
             // 'cng_kit': cng_kit_flag,
             // 'cngKit_Cost': cngKit_Cost
         }
@@ -641,8 +687,7 @@ class OtherComprehensiveOD extends Component {
         const { motorInsurance, PolicyArray, sliderVal, add_more_coverage, geographical_extension } = this.state
         let defaultSliderValue = PolicyArray.length > 0 ? Math.round(PolicyArray[0].PolicyRiskList[0].IDV_Suggested) : 0
         let coverage_data = {}
-        let total_idv=0
-        let other_idv=0
+        let total_idv = PolicyArray.length > 0 ? Math.round(PolicyArray[0].PolicyRiskList[0].SumInsured) : 0
 
 
         if(add_more_coverage) {
@@ -653,12 +698,12 @@ class OtherComprehensiveOD extends Component {
                 'B00013' : {'value': values.B00013_value},
                 geographical_extension
             }
-            if(values.B00004_value){
-                other_idv = other_idv + parseInt(values.B00004_value)
-            }
-            if(values.B00003_value){
-                other_idv = other_idv + parseInt(values.B00003_value)
-            }
+            // if(values.B00004_value){
+            //     other_idv = other_idv + parseInt(values.B00004_value)
+            // }
+            // if(values.B00003_value){
+            //     other_idv = other_idv + parseInt(values.B00003_value)
+            // }
             
         }
 
@@ -681,6 +726,7 @@ class OtherComprehensiveOD extends Component {
                 'puc': values.puc,
                 'pa_cover': values.PA_flag ? values.PA_Cover : "0",
                 'pa_flag' : values.PA_cover_flag,
+                'tyre_rim_array' : values.tyre_rim_array ? values.tyre_rim_array : [],
                 'page_name': `OtherComprehensiveOD/${productId}`
             }
         }
@@ -694,16 +740,17 @@ class OtherComprehensiveOD extends Component {
                 'cng_kit': values.cng_kit,
                 // 'cngkit_cost': values.cngKit_Cost,
                 'engine_no': values.engine_no,
+                'tyre_rim_array' : values.tyre_rim_array ? values.tyre_rim_array : [],
                 'idv_value': sliderVal ? sliderVal : defaultSliderValue.toString(),
                 'puc': values.puc,
                 'page_name': `OtherComprehensiveOD/${productId}`
             }
         }
         console.log('post_data',post_data)
-        total_idv = parseInt(other_idv) + parseInt(post_data.idv_value)
+        // total_idv = parseInt(other_idv) + parseInt(post_data.idv_value)
 
         let user_data = sessionStorage.getItem("users") ? JSON.parse(sessionStorage.getItem("users")) : "";
-        if (user_data) {
+        if (user_data && total_idv) {
             user_data = JSON.parse(encryption.decrypt(user_data.user));
 
             if((total_idv> 5000000) && user_data.user_type == "POSP"  ) {
@@ -712,6 +759,7 @@ class OtherComprehensiveOD extends Component {
                 return false
             }
         }
+        else return false;
 
         formData.append('enc_data', encryption.encrypt(JSON.stringify(post_data)))
         this.props.loadingStart();
@@ -723,13 +771,13 @@ class OtherComprehensiveOD extends Component {
                 this.props.history.push(`/Additional_detailsOD/${productId}`);
             }
         })
-            .catch(err => {
-                // handle error
-                this.props.loadingStop();
-            })
+        .catch(err => {
+            // handle error
+            this.props.loadingStop();
+        })
     }
 
-    onRowSelect = (values, isSelect, setFieldTouched, setFieldValue) => {
+    onRowSelect = (value, isSelect, setFieldTouched, setFieldValue, values) => {
 
         const { add_more_coverage } = this.state;
         var drv = [];
@@ -737,40 +785,61 @@ class OtherComprehensiveOD extends Component {
 
         if (isSelect) {
             add_more_coverage.push(values);
+            let tyre_cover = []
+            if(value == 'C101110') {
+                var array_length = 4
+                var newTyreMfgYr = new Date(this.state.vehicleRegDate)       
+                 if(values.tyre_rim_array && values.tyre_rim_array.length < array_length) { 
+                    for(var i = values.tyre_rim_array.length ; i < array_length ; i++) {
+                        tyre_cover.push(
+                            {
+                                tyreSerialNo : "",
+                                tyreMfgYr : newTyreMfgYr.getFullYear(),
+                                vehicleRegDate: this.state.vehicleRegDate,
+                                policy_for: this.state.policy_for
+                            })
+                    }
+                    setFieldValue("tyre_rim_array", tyre_cover);
+                }
+            }
             this.setState({
                 add_more_coverage: add_more_coverage,
                 serverResponse: [],
                 error: []
             });
-            if(values == "B00016") {
+            if(value == "B00016") {
                 setFieldTouched("PA_flag");
                 setFieldValue("PA_flag", '1');
             }  
-            if(values == "B00015") {
+            if(value == "B00015") {
                 setFieldTouched("PA_cover_flag");
                 setFieldValue("PA_cover_flag", '1');
             } 
-            if(values == "B00003") {
+            if(value == "B00003") {
                 setFieldTouched("nonElectric_flag");
                 setFieldValue("nonElectric_flag", '1');
                 
             }
-            if(values == "B00004") {
+            if(value == "B00004") {
                 setFieldTouched("electric_flag");
                 setFieldValue("electric_flag", '1');
             }        
-            if(values == "geographical_extension") {
+            if(value == "geographical_extension") {
                 setFieldTouched("Geographical_flag");
                 setFieldValue("Geographical_flag", '1');
             }   
-            if(values == "B00005") {
+            if(value == "B00005") {
                 setFieldTouched("CNG_OD_flag");
                 setFieldValue("CNG_OD_flag", '1');
             }
-            if(values == "B00013") {
+            if(value == "B00013") {
                 setFieldTouched("LL_PD_flag");
                 setFieldValue("LL_PD_flag", '1');
             }
+            if(value == "C101110") {
+                setFieldTouched("tyre_cover_flag");
+                setFieldValue("tyre_cover_flag", '1');
+            }  
         }
         else {
             const index = add_more_coverage.indexOf(values);
@@ -782,26 +851,26 @@ class OtherComprehensiveOD extends Component {
                 });
             }
 
-            if(values == "B00016") {
+            if(value == "B00016") {
                 setFieldTouched("PA_flag");
                 setFieldValue("PA_flag", '0');
                 setFieldTouched("PA_Cover");
                 setFieldValue("PA_Cover", '');
             } 
-            if(values == "B00015") {
+            if(value == "B00015") {
                 setFieldTouched("PA_cover_flag");
                 setFieldValue("PA_cover_flag", '0');
             } 
-            if(values == "B00003") {
+            if(value == "B00003") {
                 setFieldTouched("nonElectric_flag");
                 setFieldValue("nonElectric_flag", '0');
                 
             }
-            if(values == "B00004") {
+            if(value == "B00004") {
                 setFieldTouched("electric_flag");
                 setFieldValue("electric_flag", '0');
             }      
-            if(values == "geographical_extension") {
+            if(value == "geographical_extension") {
                 setFieldTouched("Geographical_flag");
                 setFieldValue("Geographical_flag", '0');
 
@@ -815,16 +884,41 @@ class OtherComprehensiveOD extends Component {
                     geographical_extension: []
                 })
             }
-            if(values == "B00005") {
+            if(value == "B00005") {
                 setFieldTouched("CNG_OD_flag");
                 setFieldValue("CNG_OD_flag", '0');
             }
-            if(values == "B00013") {
+            if(value == "B00013") {
                 setFieldTouched("LL_PD_flag");
                 setFieldValue("LL_PD_flag", '0');
             }
+            if(value == "C101110") {
+                setFieldTouched("tyre_cover_flag");
+                setFieldValue("tyre_cover_flag", '0');
+            } 
         }      
     }
+
+    initClaimDetailsList = () => {
+        let innicialClaimList = []
+        const {tyre_rim_array,vehicleRegDate, policy_for} = this.state
+        if(tyre_rim_array && tyre_rim_array.length > 0) {
+            for (var i = 0; i < this.state.no_of_claim ; i++) {
+                innicialClaimList.push(
+                    {
+                        tyreSerialNo :  tyre_rim_array && tyre_rim_array[i] && tyre_rim_array[i].tyreSerialNo ? tyre_rim_array[i].tyreSerialNo : "",
+                        tyreMfgYr :  tyre_rim_array && tyre_rim_array[i] && tyre_rim_array[i].tyreMfgYr ? tyre_rim_array[i].tyreMfgYr : "",
+                        vehicleRegDate : vehicleRegDate ,
+                        policy_for : policy_for
+                    }
+                )
+            }   
+        }
+            
+
+    return innicialClaimList
+    
+    };
 
     onGeoAreaSelect = (value, values, isSelect, setFieldTouched, setFieldValue) => {
 
@@ -833,6 +927,7 @@ class OtherComprehensiveOD extends Component {
         
         if (isSelect) {
             geographical_extension.push(value);
+            let tyre_cover = []
             this.setState({
                 geographical_extension,
                 serverResponse: [],
@@ -851,14 +946,13 @@ class OtherComprehensiveOD extends Component {
                     serverResponse: [],
                     error: []
                 });
-            }
+            } 
             setFieldTouched(value);
             setFieldValue(value, '');
             setFieldTouched("geographical_extension_length");
             setFieldValue("geographical_extension_length", geographical_extension.length);
             }        
     }
-
     regnoFormat = (e, setFieldTouched, setFieldValue) => {
     
         let regno = e.target.value        
@@ -871,9 +965,63 @@ class OtherComprehensiveOD extends Component {
         this.getMoreCoverage()
     }
 
+    handleClaims = (values, errors, touched, setFieldTouched, setFieldValue) => {
+        let field_array = []        
+        let phrases = localStorage.getItem("phrases") ? JSON.parse(localStorage.getItem("phrases")) : []
+        
+        for (var i = 0; i < 4 ; i++) {
+            field_array.push(
+                <Col sm={12} md={12} lg={12}>
+                    <Row >
+                        <Col sm={1} md={1} lg={2}><span className="indexing"> Tyre{i+1} </span></Col>
+                        <Col sm={12} md={5} lg={3}>
+                            <FormGroup>
+                                <div className="formSection">
+                                <Field
+                                        name={`tyre_rim_array[${i}].tyreMfgYr`}
+                                        type="text"
+                                        placeholder="MFG Year"
+                                        autoComplete="off"
+                                        onFocus={e => this.changePlaceHoldClassAdd(e)}
+                                        onBlur={e => this.changePlaceHoldClassRemove(e)}
+                                        // value = {values[`tyre_rim_array[${i}].chassisNo`]}
+
+                                    />
+                                    {errors.tyre_rim_array && errors.tyre_rim_array[i] && errors.tyre_rim_array[i].tyreMfgYr ? (
+                                    <span className="errorMsg">{errors.tyre_rim_array[i].tyreMfgYr}</span>
+                                    ) : null}    
+                                </div>
+                            </FormGroup>
+                        </Col>
+                        <Col sm={12} md={5} lg={4}>
+                            <FormGroup>
+                                <div className="formSection">
+                                    <Field
+                                        name={`tyre_rim_array[${i}].tyreSerialNo`}
+                                        type="text"
+                                        placeholder="Serial No"
+                                        autoComplete="off"
+                                        onFocus={e => this.changePlaceHoldClassAdd(e)}
+                                        onBlur={e => this.changePlaceHoldClassRemove(e)}
+                                        // value = {values[`tyre_rim_array[${i}].tyreSerialNo`]}
+
+                                    />
+                                    {errors.tyre_rim_array && errors.tyre_rim_array[i] && errors.tyre_rim_array[i].tyreSerialNo ? (
+                                    <span className="errorMsg">{errors.tyre_rim_array[i].tyreSerialNo}</span>
+                                    ) : null}   
+                                </div>
+                            </FormGroup>
+                        </Col>
+                    </Row>
+                </Col>
+            )
+            } 
+        return field_array
+
+    }
 
     render() {
-        const {showCNG, vahanDetails,error, policyCoverage, vahanVerify, selectFlag, fulQuoteResp, PolicyArray, geographical_extension,ncbDiscount,
+        const {showCNG, policy_for,vahanDetails,error, policyCoverage, vahanVerify, selectFlag, fulQuoteResp, PolicyArray, geographical_extension,ncbDiscount,
             moreCoverage, sliderVal, motorInsurance, serverResponse, engine_no, chasis_no, initialValue, add_more_coverage, add_more_coverage_request_array} = this.state
         const {productId} = this.props.match.params 
         let defaultSliderValue = PolicyArray.length > 0 ? Math.round(PolicyArray[0].PolicyRiskList[0].IDV_Suggested) : 0
@@ -897,6 +1045,11 @@ class OtherComprehensiveOD extends Component {
         let nonElectric_flag= add_more_coverage_request_array.B00003 && add_more_coverage_request_array.B00003.value ? '1' : '0'
         let LL_PD_flag= add_more_coverage_request_array.B00013 && add_more_coverage_request_array.B00013.value ? '1' : '0'
         let newInitialValues = {}
+        let tyre_cover_flag=  '0'
+
+        for(var i = 0; i<covList.length; i++) {
+            if(covList.indexOf('C101110')) tyre_cover_flag = '1'
+        }
         
         let phrases = localStorage.getItem("phrases") ? JSON.parse(localStorage.getItem("phrases")) : []
 
@@ -917,7 +1070,9 @@ class OtherComprehensiveOD extends Component {
                 CNG_OD_flag: "",
                 electric_flag: '0',
                 LL_PD_flag: '0',
+                policy_for:policy_for,
                 nonElectric_flag: '0',
+                tyre_rim_array:  this.initClaimDetailsList(),
                 geographical_extension_length: geographical_extension && geographical_extension.length
 
             });
@@ -939,6 +1094,8 @@ class OtherComprehensiveOD extends Component {
                     electric_flag: '0',
                     nonElectric_flag: '0',
                     LL_PD_flag: '0',
+                    policy_for:policy_for,
+                    tyre_rim_array:  this.initClaimDetailsList(),
                     geographical_extension_length: geographical_extension && geographical_extension.length
                 });
         }
@@ -1376,7 +1533,8 @@ class OtherComprehensiveOD extends Component {
                                                                     swal(phrases.SwalIRDAI,
                                                                         {button: phrases.OK})
                                                                 }
-                                                                this.onRowSelect(e.target.value, e.target.checked, setFieldTouched, setFieldValue)         
+                                                                //this.onRowSelect(e.target.value, e.target.checked, setFieldTouched, setFieldValue)
+                                                                this.onRowSelect(e.target.value, e.target.checked, setFieldTouched, setFieldValue, values)         
                                                             }
                                                             }
                                                             checked = {values[coverage.code] == coverage.code ? true : false}
@@ -1599,6 +1757,12 @@ class OtherComprehensiveOD extends Component {
                                                         </FormGroup>
                                                     </Col>
                                                     </Fragment> : null
+                                                }
+
+                                                {values.tyre_cover_flag == '0' ? values.tyre_rim_array = [] : null }
+                                        
+                                                {values.tyre_cover_flag == '1' && values[coverage.code] == 'C101110' ?
+                                                    this.handleClaims(values, errors, touched, setFieldTouched, setFieldValue) : null
                                                 }
                                             </Row>
                                             )) : null}

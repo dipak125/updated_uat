@@ -392,6 +392,7 @@ class TwoWheelerOtherComprehensive extends Component {
         const { productId } = this.props.match.params
         const { motorInsurance, PolicyArray, sliderVal, add_more_coverage } = this.state
         let defaultSliderValue = PolicyArray.length > 0 ? Math.round(PolicyArray[0].PolicyRiskList[0].IDV_Suggested) : 0
+        let total_idv = PolicyArray.length > 0 ? Math.round(PolicyArray[0].PolicyRiskList[0].SumInsured) : 0
 
         let phrases = localStorage.getItem("phrases") ? JSON.parse(localStorage.getItem("phrases")) : []
 
@@ -429,13 +430,13 @@ class TwoWheelerOtherComprehensive extends Component {
         }
         console.log('post_data', post_data)
         
-        if (user_data) {
+        if (user_data && total_idv) {
             if(userTypes.includes(user_data.login_type) && add_more_coverage.indexOf('B00015') < 0){
                 swal("This cover is mandated by IRDAI, it is compulsory for Owner-Driver to possess a PA cover of minimum Rs 15 Lacs, except in certain conditions. By not choosing this cover, you confirm that you hold an existing PA cover or you do not possess a valid driving license.")
                 return false
             }
             else {
-                if((post_data.idv_value> 500000) && user_data.user_type == "POSP"  ) {
+                if((total_idv > 500000) && user_data.user_type == "POSP"  ) {
                     swal("Quote cannot proceed with IDV greater than 500000")
                     this.props.loadingStop();
                     return false

@@ -423,7 +423,7 @@ class TwoWheelerSelectBrand extends Component {
                     'brand_model_id': selectedModelId ? selectedModelId : fastLaneData && fastLaneData.brand_model_id ? fastLaneData.brand_model_id : values.selectedModelId ? values.selectedModelId : "",
                     'model_varient_id': selectedVarientId ? selectedVarientId : fastLaneData && fastLaneData.model_varient_id ? fastLaneData.model_varient_id : values.selectedVarientId ? values.selectedVarientId : "",
                     'vehicle_type_id':4,
-		    'product_id': this.props.match.params.productId,
+		            'product_id': this.props.match.params.productId,
                     'registration_no': regNumber,
                     'registration_part_numbers': JSON.stringify(registration_part_numbers),
                     'policy_type_id':values.policy_type,
@@ -478,7 +478,7 @@ class TwoWheelerSelectBrand extends Component {
                     'brand_model_id': brandView == '1' ? selectedModelId : fastLaneData ? fastLaneData.brand_model_id : "",
                     'model_varient_id': brandView == '1' ? selectedVarientId : fastLaneData ? fastLaneData.model_varient_id : "",
                     'vehicle_type_id':4,
-		'product_id': this.props.match.params.productId,
+		            'product_id': this.props.match.params.productId,
                     'registration_no': regNumber,
                     'registration_part_numbers': JSON.stringify(registration_part_numbers),
                     'policy_type_id':values.policy_type,
@@ -500,7 +500,7 @@ class TwoWheelerSelectBrand extends Component {
                     'brand_model_id': brandView == '1' ? selectedModelId : fastLaneData ? fastLaneData.brand_model_id : "",
                     'model_varient_id': brandView == '1' ? selectedVarientId : fastLaneData ? fastLaneData.model_varient_id : "",
                     'vehicle_type_id':4,
-		    'product_id': this.props.match.params.productId,
+		            'product_id': this.props.match.params.productId,
                     'registration_no': regNumber,
                     'registration_part_numbers': JSON.stringify(registration_part_numbers),
                     'policy_type_id':values.policy_type,
@@ -607,7 +607,7 @@ class TwoWheelerSelectBrand extends Component {
         const { brandList, motorInsurance, selectedBrandDetails, brandModelList, selectedBrandId,fuelType,fastLaneData, brandView,
             selectedModelId, selectedVarientId, otherBrands, vehicleDetails, error_msg, brandName, modelName } = this.state
         const { productId } = this.props.match.params
-        var tempRegNo = motorInsurance && motorInsurance.registration_part_numbers && JSON.parse(motorInsurance.registration_part_numbers)
+        var tempRegNo = motorInsurance && motorInsurance.registration_part_numbers ? JSON.parse(motorInsurance.registration_part_numbers) : []
         const newInitialValues = Object.assign(initialValues, {
             selectedBrandId: selectedBrandId ? selectedBrandId : (vehicleDetails && vehicleDetails.vehiclebrand_id ? vehicleDetails.vehiclebrand_id : ""),
             selectedModelId:  selectedModelId ? selectedModelId : (selectedBrandId ? "" : vehicleDetails && vehicleDetails.vehiclemodel_id ? vehicleDetails.vehiclemodel_id : ""),
@@ -619,10 +619,10 @@ class TwoWheelerSelectBrand extends Component {
             check_registration: motorInsurance && motorInsurance.registration_no == "NEW"? '1' : '2',
             lapse_duration: motorInsurance && motorInsurance.lapse_duration ? motorInsurance.lapse_duration : "",
             policy_for: motorInsurance && motorInsurance.policy_for ? motorInsurance.policy_for : "1",
-	        reg_number_part_one: tempRegNo && tempRegNo.reg_number_part_one,
-            reg_number_part_two: tempRegNo && tempRegNo.reg_number_part_two,
-            reg_number_part_three: tempRegNo && tempRegNo.reg_number_part_three,
-            reg_number_part_four: tempRegNo && tempRegNo.reg_number_part_four,
+	        reg_number_part_one: tempRegNo && tempRegNo.reg_number_part_one ? tempRegNo.reg_number_part_one : "",
+            reg_number_part_two: tempRegNo && tempRegNo.reg_number_part_two ? tempRegNo.reg_number_part_two : "",
+            reg_number_part_three: tempRegNo && tempRegNo.reg_number_part_three ? tempRegNo.reg_number_part_three : "",
+            reg_number_part_four: tempRegNo && tempRegNo.reg_number_part_four ? tempRegNo.reg_number_part_four : "",
         })
         let phrases = localStorage.getItem("phrases") ? JSON.parse(localStorage.getItem("phrases")) : null
 

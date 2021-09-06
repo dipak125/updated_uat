@@ -48,11 +48,13 @@ export const currentEndDate = (value) => {
     }
     
 }
-export const fourwheelerODEndDate = (value) => {
-    if(value){
+export const fourwheelerODEndDate = (value,tenure) => {
+
+    if(value && tenure){
         var day =  value.getDate() - 1
         var month = value.getMonth()
-        var year =   value.getFullYear() + 3
+        var year =   value.getFullYear() + parseInt(tenure)
+        console.log("tenure --year--------- ", year)
         var endDate = new Date(year,month,day)
         return endDate
     }
@@ -92,6 +94,9 @@ export const paymentGateways = (values,policyHolder,refNumber, productId) => {
                 if(values.slug == "transcrop_wallet") {
                     window.location.href = `#/Transcrop_gateway/${productId}?access_id=${refNumber}` 
                 }
+                if(values.slug == "fia_global") {
+                    window.location.href = `#/Fia_gateway/${productId}?access_id=${refNumber}` 
+                }
                 
             }
             else {
@@ -113,6 +118,9 @@ export const paymentGateways = (values,policyHolder,refNumber, productId) => {
                 if(values.slug == "transcrop_wallet") {
                     window.location.href = `#/Transcrop_gateway/${productId}?access_id=${refNumber}` 
                 }
+                if(values.slug == "fia_global") {
+                    window.location.href = `#/Fia_gateway/${productId}?access_id=${refNumber}` 
+                }
             }
         }
     }
@@ -120,7 +128,7 @@ export const paymentGateways = (values,policyHolder,refNumber, productId) => {
 }
 
 function payment(refNumber, productId) {
-	const motor_productIds = [2,3,4,6,7,8,11,15,16,17,18,19];
+	const motor_productIds = [1,2,3,4,6,7,8,11,15,16,17,18,19,27];
     const user_type = sessionStorage.getItem('type') ? sessionStorage.getItem('type') : ''
     productId = parseInt(productId)
 	if(motor_productIds.includes(productId)){

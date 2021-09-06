@@ -903,6 +903,7 @@ class OtherComprehensiveMISCD extends Component {
         const { productId } = this.props.match.params
         const { motorInsurance, PolicyArray, sliderVal, add_more_coverage, bodySliderVal } = this.state
         let defaultSliderValue = PolicyArray.length > 0 ? Math.round(PolicyArray[0].PolicyRiskList[0].IDV_User) : 0
+        let total_idv = PolicyArray.length > 0 ? Math.round(PolicyArray[0].PolicyRiskList[0].SumInsured) : 0
         let defaultBodySliderValue = 0
         let coverage_data = {}
 
@@ -931,8 +932,6 @@ class OtherComprehensiveMISCD extends Component {
         if (user_data.user) {
             user_data = JSON.parse(encryption.decrypt(user_data.user));
         }
-        let total_idv = 0
-        let other_idv = 0
         let post_data = {}
         if (add_more_coverage.length > 0) {
             post_data = {
@@ -956,13 +955,6 @@ class OtherComprehensiveMISCD extends Component {
                 'trailer_array': values.trailer_array,
                 'page_name': `OtherComprehensive_MISCDST/${productId}`,
             }
-            if (values.B00004_value) {
-                other_idv = other_idv + parseInt(values.B00004_value)
-            }
-            if (values.B00003_value) {
-                other_idv = other_idv + parseInt(values.B00003_value)
-            }
-            total_idv = parseInt(post_data.idv_value) + parseInt(post_data.body_idv_value) + other_idv
         }
         else {
             post_data = {
@@ -981,12 +973,11 @@ class OtherComprehensiveMISCD extends Component {
                 'fuel_type': values.fuel_type,
                 'page_name': `OtherComprehensive_MISCD/${productId}`,
             }
-            total_idv = parseInt(post_data.idv_value) + parseInt(post_data.body_idv_value)
         }
 
         console.log('post_data', post_data)
 
-        if (user_data) {
+        if (user_data && total_idv) {
             // if(userTypes.includes(user_data.login_type) && add_more_coverage.indexOf('B00015') < 0){
             //     swal("This cover is mandated by IRDAI, it is compulsory for Owner-Driver to possess a PA cover of minimum Rs 15 Lacs, except in certain conditions. By not choosing this cover, you confirm that you hold an existing PA cover or you do not possess a valid driving license.")
             //     return false

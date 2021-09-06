@@ -20,7 +20,7 @@ import moment from "moment";
 import { validRegistrationNumber } from "../../shared/validationFunctions";
 import {  userTypes } from "../../shared/staticValues";
 
-const menumaster_id = 7
+const menumaster_id = 12
 let encryption = new Encryption()
 let translation = localStorage.getItem("phrases") ? JSON.parse(localStorage.getItem("phrases")) : []
 
@@ -224,11 +224,11 @@ const ComprehensiveValidation = Yup.object().shape({
         then: Yup.string().required('pleaseProvideTrailerIDV').matches(/^[0-9]*$/, 'PleaseProvideValidIDV'),
         otherwise: Yup.string()
     }),
-    // B00011_value: Yup.string().when(['trailer_flag_TP'], {
-    //     is: trailer_flag_TP => trailer_flag_TP == '1',
-    //     then: Yup.string().required('Please provide No. of trailer').matches(/^[0-9]$/, 'Please provide valid No.'),
-    //     otherwise: Yup.string()
-    // }),
+    B00011_value: Yup.string().when(['trailer_flag_TP'], {
+        is: trailer_flag_TP => trailer_flag_TP == '1',
+        then: Yup.string().required('Please provide No. of trailer').matches(/^[0-9]$/, 'Please provide valid No.'),
+        otherwise: Yup.string()
+    }),
 
     // B00011_description: Yup.string().when(['trailer_flag_TP'], {
     //     is: trailer_flag_TP => trailer_flag_TP == '1',
@@ -340,7 +340,7 @@ const Coverage = {
     "B00022": translation["B00022"],
 }
 
-class OtherComprehensiveMISCD extends Component {
+class OtherComprehensivePCV_TP extends Component {
 
     constructor(props) {
         super(props);
@@ -464,7 +464,7 @@ class OtherComprehensiveMISCD extends Component {
 
 
     vehicleDetails = (productId) => {
-        this.props.history.push(`/VehicleDetails_MISCD/${productId}`);
+        this.props.history.push(`/VehicleDetails_PCV_TP/${productId}`);
     }
 
 
@@ -472,7 +472,7 @@ class OtherComprehensiveMISCD extends Component {
         const { productId } = this.props.match.params
         let policyHolder_id = localStorage.getItem("policyHolder_refNo") ? localStorage.getItem("policyHolder_refNo") : 0;
         let encryption = new Encryption();
-        axios.get(`miscd/policy-holder/details/${policyHolder_id}`)
+        axios.get(`pcv-tp/policy-holder/details/${policyHolder_id}`)
             .then(res => {
                 let decryptResp = JSON.parse(encryption.decrypt(res.data))
                 console.log("decrypt--fetchData-- ", decryptResp)
@@ -569,7 +569,7 @@ class OtherComprehensiveMISCD extends Component {
                 values.B00007_value = add_more_coverage_request_array.B00007 ? add_more_coverage_request_array.B00007.value : ""
                 values.B00007_description = add_more_coverage_request_array.B00007 ? add_more_coverage_request_array.B00007.description : ""
                 values.B00070_value = add_more_coverage_request_array.B00070 ? add_more_coverage_request_array.B00070.value : ""
-                // values.B00011_value = add_more_coverage_request_array.B00011 ? add_more_coverage_request_array.B00011.value : ""
+                values.B00011_value = add_more_coverage_request_array.B00011 ? add_more_coverage_request_array.B00011.value : ""
                 // values.B00011_description = add_more_coverage_request_array.B00011 ? add_more_coverage_request_array.B00011.description : ""
                 values.trailer_array = trailer_array
 
@@ -583,7 +583,7 @@ class OtherComprehensiveMISCD extends Component {
                     add_more_coverage_request_array, trailer_array, vehicle_age
                 })
                 this.props.loadingStop();
-                this.depreciation(values)
+                this.fullQuote(values)
 
             })
             .catch(err => {
@@ -592,51 +592,6 @@ class OtherComprehensiveMISCD extends Component {
             })
     }
 
-    depreciation = (values) => {
-        const { vehicle_age } = this.state
-        const formData = new FormData();
-        this.props.loadingStart();
-        const post_data = {
-            'vehicle_age': vehicle_age,
-        }
-        let encryption = new Encryption();
-        formData.append('enc_data', encryption.encrypt(JSON.stringify(post_data)))
-        axios
-            .post(`/miscd/getMaxBodyIDV`, formData)
-            .then((res) => {
-                let decryptResp = JSON.parse(encryption.decrypt(res.data))
-                this.setState({
-                    depreciationPercentage: decryptResp.data,
-                });
-                this.getAccessToken(values)
-            })
-            .catch((err) => {
-                this.setState({
-                    accessToken: '',
-                });
-                this.props.loadingStop();
-            });
-
-    }
-
-
-    getAccessToken = (values) => {
-        this.props.loadingStart();
-        axios
-            .post(`/callTokenService`)
-            .then((res) => {
-                this.setState({
-                    accessToken: res.data.access_token,
-                });
-                this.fullQuote(res.data.access_token, values)
-            })
-            .catch((err) => {
-                this.setState({
-                    accessToken: '',
-                });
-                this.props.loadingStop();
-            });
-    };
 
     getFuelList = (values) => {
         this.props.loadingStart();
@@ -660,7 +615,7 @@ class OtherComprehensiveMISCD extends Component {
         this.props.loadingStart();
         let encryption = new Encryption();
         axios
-            .get(`miscd/coverage-list/${localStorage.getItem('policyHolder_id')}`)
+            .get(`gcv/coverage-list/${localStorage.getItem('policyHolder_id')}`)
             .then((res) => {
                 let decryptResp = JSON.parse(encryption.decrypt(res.data))
                 let Coverage = []
@@ -754,7 +709,7 @@ class OtherComprehensiveMISCD extends Component {
 
 
 
-    fullQuote = (access_token, values) => {
+    fullQuote = ( values) => {
         const { PolicyArray, sliderVal, add_more_coverage, motorInsurance, bodySliderVal, vehicleDetails, chasis_price, userIdvStatus, bodyIdvStatus } = this.state
 
         // let cng_kit_flag = 0;
@@ -785,7 +740,7 @@ class OtherComprehensiveMISCD extends Component {
                 'B00003': { 'value': values.B00003_value, 'description': values.B00003_description },
                 'B00073': { 'value': values.B00073_value, 'description': values.B00073_description },
                 'B00007': { 'value': values.B00007_value, 'description': values.B00007_description },
-                // 'B00011' : {'value': values.B00011_value, 'description': values.B00011_description},
+                'B00011' : {'value': values.B00011_value},
                 'B00070': { 'value': values.B00070_value },
                 'B00005': { 'value': values.B00005_value }
             }
@@ -799,17 +754,14 @@ class OtherComprehensiveMISCD extends Component {
 
         const post_data = {
             'ref_no': localStorage.getItem('policyHolder_refNo'),
-            'access_token': access_token,
+            'id': localStorage.getItem('policyHolder_id'),
             'policy_type': motorInsurance.policy_type,
             'add_more_coverage': add_more_coverage.toString(),
             'PA_Cover': values.PA_flag ? values.PA_Cover : "0",
             'coverage_data': JSON.stringify(coverage_data),
             'trailer_array': values.trailer_array,
             'fuel_type': values.fuel_type ? values.fuel_type : (vehicleDetails && vehicleDetails.varientmodel && vehicleDetails.varientmodel.fueltype ? vehicleDetails.varientmodel.fueltype.id : ""),
-            'idv_value': sliderVal ? sliderVal : 0,
-            'body_idv_value': bodySliderVal ? bodySliderVal : defaultBodySliderValue,
-            'userIdvStatus': userIdvStatus ? userIdvStatus : 0,
-            'bodyIdvStatus': bodyIdvStatus ? bodyIdvStatus : 0
+            'idv_value': sliderVal ? sliderVal : 0,          
         }
         console.log('fullQuote_post_data', post_data)
         total_idv = parseInt(other_idv) + parseInt(post_data.idv_value) + parseInt(post_data.body_idv_value)
@@ -825,46 +777,47 @@ class OtherComprehensiveMISCD extends Component {
         }
 
         formData.append('enc_data', encryption.encrypt(JSON.stringify(post_data)))
-        axios.post('fullQuoteMISCD', formData)
+        this.props.loadingStart();
+        axios.post('pcv-tp/full-quote', formData)
             .then(res => {
 
-                if (res.data.data.PolicyObject && res.data.data.UnderwritingResult && res.data.data.UnderwritingResult.Status == "Success") {
-                    let PolicyArray = res.data.data.PolicyObject.PolicyLobList
-                    let ncbDiscount = (res.data.data.PolicyObject.PolicyLobList && res.data.data.PolicyObject.PolicyLobList[0].PolicyRiskList[0].IsNCB) ? res.data.data.PolicyObject.PolicyLobList[0].PolicyRiskList[0].OD_NCBAmount : 0
+                if (res.data.PolicyObject && res.data.UnderwritingResult && res.data.UnderwritingResult.Status == "Success") {
+                    let PolicyArray = res.data.PolicyObject.PolicyLobList
+                    let ncbDiscount = (res.data.PolicyObject.PolicyLobList && res.data.PolicyObject.PolicyLobList[0].PolicyRiskList[0].IsNCB) ? res.data.PolicyObject.PolicyLobList[0].PolicyRiskList[0].OD_NCBAmount : 0
                     this.setState({
-                        fulQuoteResp: res.data.data.PolicyObject,
+                        fulQuoteResp: res.data.PolicyObject,
                         PolicyArray: PolicyArray,
-                        chasis_price: res.data.data.chasis_price,
+                        chasis_price: res.data.chasis_price,
                         error: [],
                         validation_error: [],
                         userIdvStatus: 1,
                         bodyIdvStatus: 1,
-                        sliderVal: res.data.data.PolicyObject.PolicyLobList ? Math.round(res.data.data.PolicyObject.PolicyLobList[0].PolicyRiskList[0].IDV_User) : 0,
+                        sliderVal: res.data.PolicyObject.PolicyLobList ? Math.round(res.data.PolicyObject.PolicyLobList[0].PolicyRiskList[0].IDV_User) : 0,
                         ncbDiscount,
-                        serverResponse: res.data.data.PolicyObject,
-                        policyCoverage: res.data.data.PolicyObject.PolicyLobList ? res.data.data.PolicyObject.PolicyLobList[0].PolicyRiskList[0].PolicyCoverageList : [],
+                        serverResponse: res.data.PolicyObject,
+                        policyCoverage: res.data.PolicyObject.PolicyLobList ? res.data.PolicyObject.PolicyLobList[0].PolicyRiskList[0].PolicyCoverageList : [],
                     });
                 }
-                else if (res.data.data.PolicyObject && res.data.data.UnderwritingResult && res.data.data.UnderwritingResult.Status == "Fail") {
+                else if (res.data.PolicyObject && res.data.UnderwritingResult && res.data.UnderwritingResult.Status == "Fail") {
                     var validationErrors = []
-                    for (const x in res.data.data.UnderwritingResult.MessageList) {
-                        validationErrors.push(res.data.data.UnderwritingResult.MessageList[x].Message)
+                    for (const x in res.data.UnderwritingResult.MessageList) {
+                        validationErrors.push(res.data.UnderwritingResult.MessageList[x].Message)
                     }
                     this.setState({
-                        fulQuoteResp: res.data.data.PolicyObject,
+                        fulQuoteResp: res.data.PolicyObject,
                         error: { "message": 0 },
                         validation_error: validationErrors,
                         serverResponse: [],
                         userIdvStatus: 1,
                         bodyIdvStatus: 1,
-                        policyCoverage: res.data.data.PolicyObject.PolicyLobList ? res.data.data.PolicyObject.PolicyLobList[0].PolicyRiskList[0].PolicyCoverageList : [],
+                        policyCoverage: res.data.PolicyObject.PolicyLobList ? res.data.PolicyObject.PolicyLobList[0].PolicyRiskList[0].PolicyCoverageList : [],
                     });
 
                 }
-                else if (res.data.data.code && res.data.data.message && res.data.data.code == "validation failed" && res.data.data.message == "validation failed") {
+                else if (res.data.code && res.data.message && res.data.code == "validation failed" && res.data.message == "validation failed") {
                     var validationErrors = []
-                    for (const x in res.data.data.messages) {
-                        validationErrors.push(res.data.data.messages[x].message)
+                    for (const x in res.data.messages) {
+                        validationErrors.push(res.data.messages[x].message)
                     }
                     this.setState({
                         fulQuoteResp: [], add_more_coverage,
@@ -877,7 +830,7 @@ class OtherComprehensiveMISCD extends Component {
                 else {
                     this.setState({
                         fulQuoteResp: [], add_more_coverage,
-                        error: res.data.data,
+                        error: res.data,
                         serverResponse: [],
                         userIdvStatus: 1,
                         bodyIdvStatus: 1,
@@ -899,7 +852,6 @@ class OtherComprehensiveMISCD extends Component {
         const { productId } = this.props.match.params
         const { motorInsurance, PolicyArray, sliderVal, add_more_coverage, bodySliderVal } = this.state
         let defaultSliderValue = PolicyArray.length > 0 ? Math.round(PolicyArray[0].PolicyRiskList[0].IDV_User) : 0
-        let total_idv = PolicyArray.length > 0 ? Math.round(PolicyArray[0].PolicyRiskList[0].SumInsured) : 0
         let defaultBodySliderValue = 0
         let coverage_data = {}
 
@@ -917,7 +869,7 @@ class OtherComprehensiveMISCD extends Component {
                 'B00003': { 'value': values.B00003_value, 'description': values.B00003_description },
                 'B00073': { 'value': values.B00073_value, 'description': values.B00073_description },
                 'B00007': { 'value': values.B00007_value, 'description': values.B00007_description },
-                // 'B00011' : {'value': values.B00011_value, 'description': values.B00011_description},
+                'B00011' : {'value': values.B00011_value},
                 'B00070': { 'value': values.B00070_value },
                 'B00005': { 'value': values.B00005_value }
             }
@@ -929,6 +881,8 @@ class OtherComprehensiveMISCD extends Component {
         if (user_data.user) {
             user_data = JSON.parse(encryption.decrypt(user_data.user));
         }
+        let total_idv = 0
+        let other_idv = 0
         let post_data = {}
         if (add_more_coverage.length > 0) {
             post_data = {
@@ -945,13 +899,19 @@ class OtherComprehensiveMISCD extends Component {
                 'puc': values.puc,
                 'pa_cover': values.PA_flag ? values.PA_Cover : "0",
                 'pa_flag': values.PA_cover_flag,
-                'page_name': `OtherComprehensive/${productId}`,
                 'coverage_data': JSON.stringify(coverage_data),
                 'body_idv_value': bodySliderVal ? bodySliderVal : defaultBodySliderValue,
                 'fuel_type': values.fuel_type,
                 'trailer_array': values.trailer_array,
-                'page_name': `OtherComprehensive_MISCD/${productId}`,
-            }       
+                'page_name': `OtherComprehensive_PCV_TP/${productId}`,
+            }
+            if (values.B00004_value) {
+                other_idv = other_idv + parseInt(values.B00004_value)
+            }
+            if (values.B00003_value) {
+                other_idv = other_idv + parseInt(values.B00003_value)
+            }
+            total_idv = parseInt(post_data.idv_value) + parseInt(post_data.body_idv_value) + other_idv
         }
         else {
             post_data = {
@@ -965,16 +925,16 @@ class OtherComprehensiveMISCD extends Component {
                 'engine_no': values.engine_no,
                 'idv_value': sliderVal ? sliderVal.toString() : defaultSliderValue.toString(),
                 'puc': values.puc,
-                'page_name': `OtherComprehensive/${productId}`,
                 'body_idv_value': bodySliderVal ? bodySliderVal : defaultBodySliderValue,
                 'fuel_type': values.fuel_type,
-                'page_name': `OtherComprehensive_MISCD/${productId}`,
+                'page_name': `OtherComprehensive_PCV_TP/${productId}`,
             }
+            total_idv = parseInt(post_data.idv_value) + parseInt(post_data.body_idv_value)
         }
 
         console.log('post_data', post_data)
 
-        if (user_data && total_idv) {
+        if (user_data) {
             if(userTypes.includes(user_data.login_type) && add_more_coverage.indexOf('B00015') < 0){
                 swal("This cover is mandated by IRDAI, it is compulsory for Owner-Driver to possess a PA cover of minimum Rs 15 Lacs, except in certain conditions. By not choosing this cover, you confirm that you hold an existing PA cover or you do not possess a valid driving license.")
                 return false
@@ -988,12 +948,12 @@ class OtherComprehensiveMISCD extends Component {
                 else {
                     formData.append('enc_data', encryption.encrypt(JSON.stringify(post_data)))
                     this.props.loadingStart();
-                    axios.post('miscd/update-insured-value', formData).then(res => {
+                    axios.post('pcv-tp/update-insured-value', formData).then(res => {
                         this.props.loadingStop();
                         let decryptResp = JSON.parse(encryption.decrypt(res.data))
                         console.log("decrypt--fetchData-- ", decryptResp)
                         if (decryptResp.error == false) {
-                            this.props.history.push(`/AdditionalDetails_MISCD/${productId}`);
+                            this.props.history.push(`/AdditionalDetails_PCV_TP/${productId}`);
                         }
                         else {
                             swal(decryptResp.msg)
@@ -1440,7 +1400,7 @@ class OtherComprehensiveMISCD extends Component {
         newInnitialArray.B00073_description = add_more_coverage_request_array.B00073 ? add_more_coverage_request_array.B00073.description : ""
         newInnitialArray.B00007_value = add_more_coverage_request_array.B00007 ? add_more_coverage_request_array.B00007.value : ""
         newInnitialArray.B00007_description = add_more_coverage_request_array.B00007 ? add_more_coverage_request_array.B00007.description : ""
-        // newInnitialArray.B00011_value = add_more_coverage_request_array.B00011 ? add_more_coverage_request_array.B00011.value : ""
+        newInnitialArray.B00011_value = add_more_coverage_request_array.B00011 ? add_more_coverage_request_array.B00011.value : ""
         // newInnitialArray.B00011_description = add_more_coverage_request_array.B00011 ? add_more_coverage_request_array.B00011.description : ""
         newInnitialArray.B00070_value = add_more_coverage_request_array.B00070 ? add_more_coverage_request_array.B00070.value : ""
         newInnitialArray.B00005_value = add_more_coverage_request_array.B00005 ? add_more_coverage_request_array.B00005.value : ""
@@ -1572,13 +1532,13 @@ class OtherComprehensiveMISCD extends Component {
                                     <section className="brand colpd m-b-25">
                                         <div className="d-flex justify-content-left">
                                             <div className="brandhead m-b-10">
-                                                <h4 className="m-b-30">{phrases['GSBVehicleDamage']}</h4>
+                                                <h4 className="m-b-30">{phrases['GCVDamage']}</h4>
                                                 <h5>{errMsg}</h5>
                                                 <h5>{validationErrors}</h5>
                                             </div>
                                         </div>
                                         <Formik initialValues={newInitialValues}
-                                            onSubmit={serverResponse && serverResponse != "" ? (serverResponse.message ? this.getAccessToken : this.handleSubmit) : this.getAccessToken}
+                                            onSubmit={serverResponse && serverResponse != "" ? (serverResponse.message ? this.fullQuote : this.handleSubmit) : this.fullQuote}
                                             validationSchema={ComprehensiveValidation}>
                                             {({ values, errors, setFieldValue, setFieldTouched, isValid, isSubmitting, touched }) => {
                                                 // console.log("values----------------- ", values)
@@ -1739,144 +1699,6 @@ class OtherComprehensiveMISCD extends Component {
                                                                     : null}
 
                                                                 <Row>
-                                                                    <Col sm={12} md={5} lg={4}>
-                                                                        <FormGroup>
-                                                                            <div className="insurerName">
-                                                                                {phrases['IDV']}
-                                                                            </div>
-                                                                        </FormGroup>
-                                                                    </Col>
-                                                                    <Col sm={12} md={5} lg={2}>
-                                                                        <FormGroup>
-                                                                            <div className="insurerName">
-                                                                                <Field
-                                                                                    name="IDV"
-                                                                                    type="text"
-                                                                                    placeholder=""
-                                                                                    autoComplete="off"
-                                                                                    className="premiumslid"
-                                                                                    onFocus={e => this.changePlaceHoldClassAdd(e)}
-                                                                                    onBlur={e => this.changePlaceHoldClassRemove(e)}
-                                                                                    value={defaultSliderValue}
-                                                                                />
-                                                                                {errors.IDV && touched.IDV ? (
-                                                                                    <span className="errorMsg">{errors.IDV}</span>
-                                                                                ) : null}
-                                                                            </div>
-                                                                        </FormGroup>
-                                                                    </Col>
-                                                                    {/* {console.log("minIDV------------- ", minIDV)}
-                                {console.log("maxIDV------------- ", maxIDV)}
-                                {console.log("IDV_Suggested------------- ", defaultSliderValue)} */}
-                                                                    {defaultSliderValue ?
-
-                                                                        <Col sm={12} md={12} lg={6}>
-                                                                            <FormGroup>
-                                                                                <input type="range" className="W-90"
-                                                                                    name='slider'
-                                                                                    min={minIDV}
-                                                                                    max={maxIDV}
-                                                                                    step='1'
-                                                                                    disabled={(this.state.userIdvStatus == 0) ? "disabled" : ""}
-                                                                                    value={defaultSliderValue}
-                                                                                    onChange={(e) => {
-                                                                                        setFieldTouched("slider");
-                                                                                        setFieldValue("slider", e.target.value);
-                                                                                        this.sliderValue(e.target.value)
-                                                                                    }}
-                                                                                />
-                                                                            </FormGroup>
-                                                                        </Col>
-                                                                        : null}
-                                                                </Row>
-
-                                                                <Row>
-                                                                    <Col sm={12} md={5} lg={4}>
-                                                                        <FormGroup>
-                                                                            <div className="insurerName">
-                                                                                {phrases['BodyIDV']}
-                                                                            </div>
-                                                                        </FormGroup>
-                                                                    </Col>
-                                                                    <Col sm={12} md={5} lg={2}>
-                                                                        <FormGroup>
-                                                                            <div className="insurerName">
-                                                                                <Field
-                                                                                    name="body_idv_value"
-                                                                                    type="text"
-                                                                                    placeholder=""
-                                                                                    autoComplete="off"
-                                                                                    className="premiumslid"
-                                                                                    onFocus={e => this.changePlaceHoldClassAdd(e)}
-                                                                                    onBlur={e => this.changePlaceHoldClassRemove(e)}
-                                                                                    value={defaultBodySliderValue}
-                                                                                />
-                                                                                {errors.body_idv_value && touched.body_idv_value ? (
-                                                                                    <span className="errorMsg">{errors.body_idv_value}</span>
-                                                                                ) : null}
-                                                                            </div>
-                                                                        </FormGroup>
-                                                                    </Col>
-
-                                                                    {defaultSliderValue ?
-                                                                        <Col sm={12} md={12} lg={6}>
-                                                                            <FormGroup>
-                                                                                <input type="range" className="W-90"
-                                                                                    name='slider1'
-                                                                                    min={minBodyIDV}
-                                                                                    max={maxBodyIDV}
-                                                                                    step='1'
-                                                                                    disabled={(this.state.bodyIdvStatus == 0) ? "disabled" : ""}
-                                                                                    value={defaultBodySliderValue}
-                                                                                    onChange={(e) => {
-                                                                                        setFieldTouched("slider1");
-                                                                                        setFieldValue("slider1", values.slider1);
-                                                                                        this.bodySliderValue(e.target.value)
-                                                                                    }}
-                                                                                />
-                                                                            </FormGroup>
-                                                                        </Col>
-                                                                        : null}
-                                                                </Row>
-
-                                                                {/* <Row>
-                                <Col sm={12} md={5} lg={4}>
-                                    <FormGroup>
-                                        <div className="insurerName">
-                                             Fuel Type
-                                        </div>
-                                    </FormGroup>
-                                </Col>
-                                <Col sm={12} md={3} lg={3}>
-                                    <FormGroup>                                      
-                                        <div className="formSection">
-                                            <Field
-                                                name='fuel_type'
-                                                component="select"
-                                                autoComplete="off"
-                                                className="formGrp inputfs12"
-                                                value = {values.fuel_type}
-                                                onChange={(e) => {
-                                                    setFieldTouched('fuel_type')
-                                                    setFieldValue('fuel_type', e.target.value);
-                                                    this.handleChange()
-                                                }}  
-                                            >
-                                                <option value="">Fuel Type</option>
-                                                {fuelList.map((fuel, qIndex) => ( 
-                                                    <option value= {fuel.id}>{fuel.descriptions}</option>
-                                                ))}
-                                    
-                                            </Field>
-                                            {errors.fuel_type && touched.fuel_type ? (
-                                                <span className="errorMsg">{errors.fuel_type}</span>
-                                            ) : null}
-                                        </div>               
-                                    </FormGroup>
-                                </Col>
-                            </Row>
-                             */}
-                                                                <Row>
                                                                     <Col sm={12} md={12} lg={12}>
                                                                         <FormGroup>
                                                                             <span className="fs-18">{phrases['AddMoreCoverage']}</span>
@@ -2002,63 +1824,61 @@ class OtherComprehensiveMISCD extends Component {
                                                                             </Fragment> : null
                                                                         }
 
-
-
-                                                                        {/* {values.trailer_flag_TP == '1' && values[coverage.code] == 'B00011' ?
-                                     <Fragment>
-                                        <Col sm={12} md={11} lg={2} key={qIndex+"b"}>
-                                            <FormGroup>
-                                                <div className="formSection">
-                                                    <Field
-                                                        name='B00011_value'
-                                                        component="select"
-                                                        autoComplete="off"
-                                                        className="formGrp inputfs12"
-                                                        value = {values.B00011_value}
-                                                        onChange={(e) => {
-                                                            setFieldTouched('B00011_value')
-                                                            setFieldValue('B00011_value', e.target.value);
-                                                            this.handleChange()
-                                                        }}
-                                                    >
-                                                        <option value="">No of Trailer</option>
-                                                        {JSON.parse(coverage.covarage_value).value.length > 0 && JSON.parse(coverage.covarage_value).value.map((insurer, qIndex) => (
-                                                                <option value= {insurer}>{insurer}</option>
-                                                            ))}  
-                                            
-                                                    </Field>
-                                                    {errors.B00011_value ? (
-                                                        <span className="errorMsg">{errors.B00011_value}</span>
-                                                    ) : null}
-                                                </div>
-                                            </FormGroup>
-                                        </Col>
-                                        <Col sm={12} md={11} lg={3} key={qIndex+"c"}>
-                                            <FormGroup>
-                                                <div className="formSection">
-                                                    <Field
-                                                        name="B00011_description"
-                                                        type="text"
-                                                        placeholder="Trailer IDV"
-                                                        autoComplete="off"
-                                                        maxLength="8"
-                                                        onFocus={e => this.changePlaceHoldClassAdd(e)}
-                                                        onBlur={e => this.changePlaceHoldClassRemove(e)}
-                                                        onChange={(e) => {
-                                                            setFieldTouched('B00011_description')
-                                                            setFieldValue('B00011_description', e.target.value);
-                                                            this.handleChange()
-                                                        }}
-                                                    >                                     
-                                                    </Field>
-                                                    {errors.B00011_description   ? (
-                                                        <span className="errorMsg">{errors.B00011_description   }</span>
-                                                    ) : null}
-                                                </div>
-                                            </FormGroup>
-                                        </Col>
-                                        </Fragment> : null
-                                    } */}
+                                                                        {values.trailer_flag_TP == '1' && values[coverage.code] == 'B00011' ?
+                                                                        <Fragment>
+                                                                            <Col sm={12} md={11} lg={4} key={qIndex+"b"}>
+                                                                                <FormGroup>
+                                                                                    <div className="formSection">
+                                                                                        <Field
+                                                                                            name='B00011_value'
+                                                                                            component="select"
+                                                                                            autoComplete="off"
+                                                                                            className="formGrp inputfs12"
+                                                                                            value = {values.B00011_value}
+                                                                                            onChange={(e) => {
+                                                                                                setFieldTouched('B00011_value')
+                                                                                                setFieldValue('B00011_value', e.target.value);
+                                                                                                this.handleChange()
+                                                                                            }}
+                                                                                        >
+                                                                                            <option value="">No of Trailer</option>
+                                                                                            {JSON.parse(coverage.covarage_value).value.length > 0 && JSON.parse(coverage.covarage_value).value.map((insurer, qIndex) => (
+                                                                                                    <option value= {insurer}>{insurer}</option>
+                                                                                                ))}  
+                                                                                
+                                                                                        </Field>
+                                                                                        {errors.B00011_value ? (
+                                                                                            <span className="errorMsg">{errors.B00011_value}</span>
+                                                                                        ) : null}
+                                                                                    </div>
+                                                                                </FormGroup>
+                                                                            </Col>
+                                                                            {/* <Col sm={12} md={11} lg={3} key={qIndex+"c"}>
+                                                                                <FormGroup>
+                                                                                    <div className="formSection">
+                                                                                        <Field
+                                                                                            name="B00011_description"
+                                                                                            type="text"
+                                                                                            placeholder="Trailer IDV"
+                                                                                            autoComplete="off"
+                                                                                            maxLength="8"
+                                                                                            onFocus={e => this.changePlaceHoldClassAdd(e)}
+                                                                                            onBlur={e => this.changePlaceHoldClassRemove(e)}
+                                                                                            onChange={(e) => {
+                                                                                                setFieldTouched('B00011_description')
+                                                                                                setFieldValue('B00011_description', e.target.value);
+                                                                                                this.handleChange()
+                                                                                            }}
+                                                                                        >                                     
+                                                                                        </Field>
+                                                                                        {errors.B00011_description   ? (
+                                                                                            <span className="errorMsg">{errors.B00011_description   }</span>
+                                                                                        ) : null}
+                                                                                    </div>
+                                                                                </FormGroup>
+                                                                            </Col> */}
+                                                                            </Fragment> : null }
+                                    
                                                                         {values.pa_coolie_flag == '1' && values[coverage.code] == 'B00073' ?
                                                                             <Fragment>
                                                                                 <Col sm={12} md={11} lg={4} key={qIndex + "b"}>
@@ -2637,4 +2457,4 @@ const mapDispatchToProps = dispatch => {
     };
 };
 
-export default withRouter(connect(mapStateToProps, mapDispatchToProps)(OtherComprehensiveMISCD));
+export default withRouter(connect(mapStateToProps, mapDispatchToProps)(OtherComprehensivePCV_TP));

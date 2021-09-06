@@ -888,6 +888,9 @@ class OtherComprehensiveGCV extends Component {
                     let policyCoverage = res.data.PolicyObject.PolicyLobList ? res.data.PolicyObject.PolicyLobList[0].PolicyRiskList[0].PolicyCoverageList : []
                     let IsGeographicalExtension = res.data.PolicyObject.PolicyLobList ? res.data.PolicyObject.PolicyLobList[0].PolicyRiskList[0].IsGeographicalExtension : 0
 
+
+                    console.log(ncbDiscount+'----------NCB')
+
                     // if(IsGeographicalExtension == '1') {
                     //     let geoArrOD = {}
                     //     let geoArrTP = {}
@@ -953,6 +956,7 @@ class OtherComprehensiveGCV extends Component {
         let defaultSliderValue = PolicyArray.length > 0 ? Math.round(PolicyArray[0].PolicyRiskList[0].IDV_User) : 0
         let defaultBodySliderValue = 0
         let coverage_data = {}
+        let total_idv = PolicyArray.length > 0 ? Math.round(PolicyArray[0].PolicyRiskList[0].SumInsured) : 0
 
         if (add_more_coverage) {
             coverage_data = {
@@ -982,8 +986,6 @@ class OtherComprehensiveGCV extends Component {
             user_data = JSON.parse(encryption.decrypt(user_data.user));
         }
 
-        let total_idv = 0
-        let other_idv = 0
         let post_data = {}
         if (add_more_coverage.length > 0) {
             post_data = {
@@ -1005,14 +1007,7 @@ class OtherComprehensiveGCV extends Component {
                 'body_idv_value': bodySliderVal ? bodySliderVal : defaultBodySliderValue,
                 'fuel_type': values.fuel_type,
                 'trailer_array': values.trailer_array,
-            }
-            if (values.B00004_value) {
-                other_idv = other_idv + parseInt(values.B00004_value)
-            }
-            if (values.B00003_value) {
-                other_idv = other_idv + parseInt(values.B00003_value)
-            }
-            total_idv = parseInt(post_data.idv_value) + parseInt(post_data.body_idv_value) + other_idv
+            }         
         }
         else {
             post_data = {
@@ -1030,10 +1025,9 @@ class OtherComprehensiveGCV extends Component {
                 'body_idv_value': bodySliderVal ? bodySliderVal : defaultBodySliderValue,
                 'fuel_type': values.fuel_type
             }
-            total_idv = parseInt(post_data.idv_value) + parseInt(post_data.body_idv_value)
         }
 
-        if (user_data) {
+        if (user_data && total_idv) {
             if(userTypes.includes(user_data.login_type) && add_more_coverage.indexOf('B00015') < 0){
                 swal("This cover is mandated by IRDAI, it is compulsory for Owner-Driver to possess a PA cover of minimum Rs 15 Lacs, except in certain conditions. By not choosing this cover, you confirm that you hold an existing PA cover or you do not possess a valid driving license.")
                 return false
@@ -1705,7 +1699,7 @@ class OtherComprehensiveGCV extends Component {
                                                                     <Collapsible trigger={phrases['DefaultCovered']} open={true}>
                                                                         <div className="listrghtsideTrigr">
                                                                             {policyCoverageList}
-                                                                            {/* {ncbStr} */}
+                                                                            {ncbStr}
                                                                             {policyCoveragIMT}
                                                                         </div>
                                                                     </Collapsible>
@@ -1880,9 +1874,7 @@ class OtherComprehensiveGCV extends Component {
                                                                             </div>
                                                                         </FormGroup>
                                                                     </Col>
-                                                                    {/* {console.log("minIDV------------- ", minIDV)}
-                                                                    {console.log("maxIDV------------- ", maxIDV)}
-                                                                    {console.log("IDV_Suggested------------- ", defaultSliderValue)} */}
+                                                                   
                                                                     {defaultSliderValue ?
 
                                                                         <Col sm={12} md={12} lg={6}>
@@ -1953,44 +1945,6 @@ class OtherComprehensiveGCV extends Component {
                                                                         </Col>
                                                                         : null}
                                                                 </Row>
-
-                                                                {/* <Row>
-                                                                    <Col sm={12} md={5} lg={4}>
-                                                                        <FormGroup>
-                                                                            <div className="insurerName">
-                                                                                Fuel Type
-                                                                            </div>
-                                                                        </FormGroup>
-                                                                    </Col>
-                                                                    <Col sm={12} md={3} lg={3}>
-                                                                        <FormGroup>                                      
-                                                                            <div className="formSection">
-                                                                                <Field
-                                                                                    name='fuel_type'
-                                                                                    component="select"
-                                                                                    autoComplete="off"
-                                                                                    className="formGrp inputfs12"
-                                                                                    value = {values.fuel_type}
-                                                                                    onChange={(e) => {
-                                                                                        setFieldTouched('fuel_type')
-                                                                                        setFieldValue('fuel_type', e.target.value);
-                                                                                        this.handleChange()
-                                                                                    }}  
-                                                                                >
-                                                                                    <option value="">Fuel Type</option>
-                                                                                    {fuelList.map((fuel, qIndex) => ( 
-                                                                                        <option value= {fuel.id}>{fuel.descriptions}</option>
-                                                                                    ))}
-                                                                        
-                                                                                </Field>
-                                                                                {errors.fuel_type && touched.fuel_type ? (
-                                                                                    <span className="errorMsg">{errors.fuel_type}</span>
-                                                                                ) : null}
-                                                                            </div>               
-                                                                        </FormGroup>
-                                                                    </Col>
-                                                                </Row>
-                                                                */}
                                                                 <Row>
                                                                     <Col sm={12} md={12} lg={12}>
                                                                         <FormGroup>
@@ -2746,7 +2700,7 @@ class OtherComprehensiveGCV extends Component {
                             </thead>
                             <tbody>
                                 {premiumBreakup}
-                                {/* {ncbBreakup} */}
+                                {ncbBreakup}
                                 {premiumBreakupIMT}
 
                                 <tr>

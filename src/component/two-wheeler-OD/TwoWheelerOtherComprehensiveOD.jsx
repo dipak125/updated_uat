@@ -581,6 +581,7 @@ class TwoWheelerOtherComprehensiveOD extends Component {
         const { productId } = this.props.match.params
         const { motorInsurance, PolicyArray, sliderVal, add_more_coverage } = this.state
         let defaultSliderValue = PolicyArray.length > 0 ? Math.round(PolicyArray[0].PolicyRiskList[0].IDV_User) : 0
+        let total_idv = PolicyArray.length > 0 ? Math.round(PolicyArray[0].PolicyRiskList[0].SumInsured) : 0
         let coverage_data = {}
         let phrases = localStorage.getItem("phrases") ? JSON.parse(localStorage.getItem("phrases")) : []
 
@@ -595,8 +596,6 @@ class TwoWheelerOtherComprehensiveOD extends Component {
         const formData = new FormData();
         let encryption = new Encryption();
         let post_data = {}
-        let total_idv = 0
-        let other_idv = 0
 
         post_data = {
             'policy_holder_id': localStorage.getItem('policyHolder_id'),
@@ -615,19 +614,11 @@ class TwoWheelerOtherComprehensiveOD extends Component {
             'tyre_rim_array' : values.tyre_rim_array && values.tyre_rim_array.length > 0 ? values.tyre_rim_array : null ,
             'coverage_data': JSON.stringify(coverage_data),
         }
-        if(values.B00004_value){
-            other_idv = other_idv + parseInt(values.B00004_value)
-        }
-        if(values.B00003_value){
-            other_idv = other_idv + parseInt(values.B00003_value)
-        }
-        total_idv=parseInt(post_data.idv_value)+other_idv
-
 
         console.log('post_data', post_data)
 
         let user_data = sessionStorage.getItem("users") ? JSON.parse(sessionStorage.getItem("users")) : "";
-        if (user_data) {
+        if (user_data && total_idv) {
             user_data = JSON.parse(encryption.decrypt(user_data.user));
 
             if((total_idv> 500000) && user_data.user_type == "POSP"  ) {
@@ -636,6 +627,7 @@ class TwoWheelerOtherComprehensiveOD extends Component {
                 return false
             }
         }
+        else return false;
 
         formData.append('enc_data', encryption.encrypt(JSON.stringify(post_data)))
         this.props.loadingStart();

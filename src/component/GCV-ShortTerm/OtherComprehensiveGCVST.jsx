@@ -811,20 +811,13 @@ class OtherComprehensiveGCV extends Component {
 
     fullQuote = (access_token, values) => {
         const { PolicyArray, sliderVal, add_more_coverage, motorInsurance, bodySliderVal, vehicleDetails, geographical_extension, chasis_price, userIdvStatus, bodyIdvStatus } = this.state
-        // let cng_kit_flag = 0;
-        // let cngKit_Cost = 0;
-        // if(values.toString()) {            
-        //     cng_kit_flag = values.cng_kit
-        //     cngKit_Cost = values.cngKit_Cost
-        // }
+
         let defaultSliderValue = PolicyArray.length > 0 ? Math.round(PolicyArray[0].PolicyRiskList[0].IDV_User) : 0
         let defaultBodySliderValue = 0
         let coverage_data = {}
         const formData = new FormData();
         let encryption = new Encryption();
-
-        let total_idv = 0
-        let other_idv = 0
+        
 
         if (add_more_coverage) {
             coverage_data = {
@@ -843,14 +836,7 @@ class OtherComprehensiveGCV extends Component {
                 'B00070': { 'value': values.B00070_value },
                 'B00005': { 'value': values.B00005_value },
                 geographical_extension
-            }
-            if (values.B00004_value) {
-                other_idv = other_idv + parseInt(values.B00004_value)
-            }
-            if (values.B00003_value) {
-                other_idv = other_idv + parseInt(values.B00003_value)
-            }
-
+            }  
         }
 
         const post_data = {
@@ -871,19 +857,7 @@ class OtherComprehensiveGCV extends Component {
             // 'cngKit_Cost': cngKit_Cost
         }
 
-        total_idv = parseInt(other_idv) + parseInt(post_data.idv_value) + parseInt(post_data.body_idv_value)
         console.log('fullQuote_post_data', post_data)
-
-        let user_data = sessionStorage.getItem("users") ? JSON.parse(sessionStorage.getItem("users")) : "";
-        if (user_data) {
-            user_data = JSON.parse(encryption.decrypt(user_data.user));
-
-            if ((total_idv > 5000000) && user_data.user_type == "POSP") {
-                swal("Quote cannot proceed with IDV greater than 5000000")
-                this.props.loadingStop();
-                return false
-            }
-        }
 
         formData.append('enc_data', encryption.encrypt(JSON.stringify(post_data)))
         axios.post('fullQuotePMGCVShortTerm', formData)
@@ -959,6 +933,7 @@ class OtherComprehensiveGCV extends Component {
         let defaultSliderValue = PolicyArray.length > 0 ? Math.round(PolicyArray[0].PolicyRiskList[0].IDV_User) : 0
         let defaultBodySliderValue = 0
         let coverage_data = {}
+        let total_idv = PolicyArray.length > 0 ? Math.round(PolicyArray[0].PolicyRiskList[0].SumInsured) : 0
 
         if (add_more_coverage) {
             coverage_data = {
@@ -987,8 +962,7 @@ class OtherComprehensiveGCV extends Component {
         if (user_data.user) {
             user_data = JSON.parse(encryption.decrypt(user_data.user));
         }
-        let total_idv = 0
-        let other_idv = 0
+
         let post_data = {}
         if (add_more_coverage.length > 0) {
             post_data = {
@@ -1010,14 +984,7 @@ class OtherComprehensiveGCV extends Component {
                 'body_idv_value': bodySliderVal ? bodySliderVal : defaultBodySliderValue,
                 'fuel_type': values.fuel_type,
                 'trailer_array': values.trailer_array,
-            }
-            if (values.B00004_value) {
-                other_idv = other_idv + parseInt(values.B00004_value)
-            }
-            if (values.B00003_value) {
-                other_idv = other_idv + parseInt(values.B00003_value)
-            }
-            total_idv = parseInt(post_data.idv_value) + parseInt(post_data.body_idv_value) + other_idv
+            }         
         }
         else {
             post_data = {
@@ -1035,7 +1002,6 @@ class OtherComprehensiveGCV extends Component {
                 'body_idv_value': bodySliderVal ? bodySliderVal : defaultBodySliderValue,
                 'fuel_type': values.fuel_type
             }
-            total_idv = parseInt(post_data.idv_value) + parseInt(post_data.body_idv_value)
         }
 
         if (user_data) {

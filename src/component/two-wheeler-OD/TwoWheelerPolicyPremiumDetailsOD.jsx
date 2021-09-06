@@ -129,6 +129,24 @@ class TwoWheelerPolicyPremiumDetailsOD extends Component {
             })
     }
 
+    fetchRequestData = () => {
+        let policyHolder_id = this.state.policyHolder_refNo ? this.state.policyHolder_refNo : '0'
+        let encryption = new Encryption();
+    
+        axios.get(`two-wh-stal/policy-holder/motor-saod/${policyHolder_id}`)
+            .then(res => {
+                let decryptResp = JSON.parse(encryption.decrypt(res.data))
+                let request_data = decryptResp.data.policyHolder ? decryptResp.data.policyHolder.request_data : {}
+                this.setState({
+                    request_data
+                })
+            })
+            .catch(err => {
+                // handle error
+                this.props.loadingStop();
+            })
+    }
+
     getAccessToken = (motorInsurance) => {
         axios
             .post(`/callTokenService`)
@@ -164,16 +182,7 @@ class TwoWheelerPolicyPremiumDetailsOD extends Component {
             // 'cng_kit': motorInsurance.cng_kit,
             // 'cngKit_Cost': Math.floor(motorInsurance.cngkit_cost)
         }
-        // formData.append('reference_no',this.state.policyHolder_refNo ? this.state.policyHolder_refNo : '0')
-        // formData.append('access_token',access_token)
-        // formData.append('idv_value',motorInsurance.idv_value)
-        // formData.append('policy_type',motorInsurance ? motorInsurance.policy_type : "")
-        // formData.append('add_more_coverage',motorInsurance.add_more_coverage)
-        // formData.append('policytype_id',motorInsurance ? motorInsurance.policytype_id : "")
-        // formData.append('policy_for',motorInsurance ? motorInsurance.policy_for : "")
-        // formData.append('PA_Cover',motorInsurance ? motorInsurance.pa_cover : "0")
-        // formData.append('tyre_rim_array',motorInsurance ? motorInsurance.tyre_rim_array : "")
-        // formData.append('coverage_data',motorInsurance && motorInsurance.add_more_coverage_request_json != null ? motorInsurance.add_more_coverage_request_json : "")
+    
         console.log('fullQuote_post_data', post_data)
         formData.append('enc_data',encryption.encrypt(JSON.stringify(post_data)))
 
@@ -185,6 +194,7 @@ class TwoWheelerPolicyPremiumDetailsOD extends Component {
                         PolicyArray: res.data.PolicyObject.PolicyLobList,
                         error: [],
                     });
+                    this.fetchRequestData()
                 } else {
                     this.setState({
                         fulQuoteResp: [],

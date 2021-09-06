@@ -60,7 +60,11 @@ class Premium extends Component {
             paymentgateway: [],
             policyHolder_refNo: queryString.parse(this.props.location.search).access_id ? 
                                 queryString.parse(this.props.location.search).access_id : 
-                                localStorage.getItem("policyHolder_refNo")
+                                localStorage.getItem("policyHolder_refNo"),
+           policy_date:{
+               start_date:"",
+               end_date:""
+           }
         };
     }
 
@@ -104,6 +108,7 @@ class Premium extends Component {
                 let policyHolder = decryptResp.data.policyHolder ? decryptResp.data.policyHolder : [];
                 let bcMaster = decryptResp.data.policyHolder ? decryptResp.data.policyHolder.bcmaster : {};
                 let request_data = decryptResp.data.policyHolder ? decryptResp.data.policyHolder.request_data : {}
+                console.log("value1 is=======",request_data.start_date,request_data.end_date);
                 let menumaster = decryptResp.data.policyHolder ? decryptResp.data.policyHolder.menumaster : {};
                 let paymentgateway = decryptResp.data.policyHolder && decryptResp.data.policyHolder.bcmaster && decryptResp.data.policyHolder.bcmaster.bcpayment
 
@@ -112,17 +117,26 @@ class Premium extends Component {
                     refNumber: decryptResp.data.policyHolder.reference_no,
                     paymentStatus: decryptResp.data.policyHolder.payment ? decryptResp.data.policyHolder.payment[0] : [],
                     memberdetails : decryptResp.data.policyHolder ? decryptResp.data.policyHolder : [],
-                    nomineedetails: decryptResp.data.policyHolder ? decryptResp.data.policyHolder.request_data.nominee[0]:[]
+                    nomineedetails: decryptResp.data.policyHolder ? decryptResp.data.policyHolder.request_data.nominee[0]:[],
+                    
                     
                 })
 
                 this.getAccessToken(motorInsurance)
+                this.getAccessToken(motorInsurance)
+               
                
             })
             .catch(err => {
                 // handle error
                 this.props.loadingStop();
             })
+            axios.get(`two-wh/details/${policyHolder_id}`)
+            .then(res=>{
+                let decryptResp = JSON.parse(encryption.decrypt(res.data))
+                let request_data = decryptResp.data.policyHolder ? decryptResp.data.policyHolder.request_data : {}
+            })
+           
     }
 
     getAccessToken = (motorInsurance) => {
@@ -197,7 +211,8 @@ class Premium extends Component {
         this.props.loadingStart();
         axios.get('relations')
         .then(res=>{
-            let relation = res.data.data ? res.data.data : []                        
+            let relation = res.data.data ? res.data.data : []   
+                                
             this.setState({
                 relation
             });
@@ -232,9 +247,16 @@ sendPaymentLink = () => {
 
 
     componentDidMount() {
-        // this.fetchData()
-        this.fetchRelationships()
+         this.fetchData()
+        this.fetchRelationships();
+        this.fetchRelationships();
+        this.fetchRelationships();
+        this.fetchRelationships();
+        this.fetchRelationships();
+
+        
     }
+    
 
     render() {
         const { policyHolder, paymentgateway, show, fulQuoteResp, motorInsurance, error, error1, refNumber, request_data,menumaster,

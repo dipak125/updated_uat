@@ -29,9 +29,11 @@ const ageObj = new PersonAge();
 // const minDate = moment(moment().subtract(1, 'years').calendar()).add(1, 'day').calendar();
 // const maxDate = moment(minDate).add(30, 'day').calendar();
 const minDate = moment(moment().subtract(20, 'years').calendar()).add(1, 'day').calendar();
+const minDatePypLapsed = moment(moment().subtract(1, 'years').calendar()).subtract(89, 'day').calendar();
 const maxDate = moment(moment().subtract(1, 'years').calendar()).add(0, 'day').calendar();
 const maxDatePYP = moment(moment().subtract(1, 'years').calendar()).add(30, 'day').calendar();
 const maxDatePYPST = moment(moment().subtract(1, 'month').calendar()).add(1, 'day').calendar();
+const maxDatePYPLapsed = moment().subtract(1, 'years').calendar();
 const minRegnDate = moment().subtract(20, 'years').calendar();
 // const minRegnDateNew = moment(moment().subtract(1, 'months').calendar()).add(1, 'day').calendar();
 const minRegnDateNew = moment().subtract(1, 'months').calendar();
@@ -632,9 +634,10 @@ class VehicleDetailsMISCD extends Component {
     }
 
     getInsurerList = () => {
+        let policyHolder_id = localStorage.getItem("policyHolder_id") ? localStorage.getItem("policyHolder_id") : 0;
         this.props.loadingStart();
         axios
-          .get(`/company/1`)
+          .get(`/company/1/${policyHolder_id}`)
           .then(res => {
             this.setState({
                 insurerList: res.data.data
@@ -957,9 +960,7 @@ console.log("errors-------------- ", errors)
                                                                 className="datePckr inputfs12"
                                                                 selected={values.registration_date}
                                                                 onChange={(val) => {
-                                                                    setFieldTouched('registration_date');
                                                                     setFieldValue('registration_date', val); 
-
                                                                     setFieldValue('previous_end_date', ""); 
                                                                     setFieldValue('previous_start_date', "");                                                                    
                                                                 }}
@@ -1181,8 +1182,8 @@ console.log("errors-------------- ", errors)
                                                         <FormGroup>
                                                             <DatePicker
                                                                 name="previous_start_date"
-                                                                minDate={new Date(minDate)} 
-                                                                maxDate={values.previous_policy_name == '3' ? new Date(maxDatePYPST) : new Date(maxDatePYP)}
+                                                                minDate={values.policy_type_id == '3' ? new Date(minDatePypLapsed) : new Date(minDate)} 
+                                                                maxDate={values.previous_policy_name == '3' ? new Date(maxDatePYPST) :  values.policy_type_id == '3' ? new Date(maxDatePYPLapsed) : new Date(maxDatePYP)}
                                                                 dateFormat="dd MMM yyyy"
                                                                 placeholderText={phrases['PPSD']}
                                                                 peekPreviousMonth
