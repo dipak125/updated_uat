@@ -758,12 +758,7 @@ class OtherComprehensiveMISCD extends Component {
         const { PolicyArray, sliderVal, add_more_coverage, motorInsurance, bodySliderVal, vehicleDetails, chasis_price, userIdvStatus, bodyIdvStatus } = this.state
 
         // console.log("values----------------///--- ", values)
-        // let cng_kit_flag = 0;
-        // let cngKit_Cost = 0;
-        // if(values.toString()) {            
-        //     cng_kit_flag = values.cng_kit
-        //     cngKit_Cost = values.cngKit_Cost
-        // }
+
         let defaultSliderValue = PolicyArray.length > 0 ? Math.round(PolicyArray[0].PolicyRiskList[0].IDV_User) : 0
         let defaultBodySliderValue = 0
         let coverage_data = {}

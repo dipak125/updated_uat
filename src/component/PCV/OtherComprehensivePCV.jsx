@@ -1747,8 +1747,8 @@ class OtherComprehensivePCV extends Component {
                                                                         </FormGroup>
                                                                     </Col>
                                                                     {/* {console.log("minIDV------------- ", minIDV)}
-                                {console.log("maxIDV------------- ", maxIDV)}
-                                {console.log("IDV_Suggested------------- ", defaultSliderValue)} */}
+                                                                    {console.log("maxIDV------------- ", maxIDV)}
+                                                                    {console.log("IDV_Suggested------------- ", defaultSliderValue)} */}
                                                                     {defaultSliderValue ?
 
                                                                         <Col sm={12} md={12} lg={6}>
@@ -1784,7 +1784,8 @@ class OtherComprehensivePCV extends Component {
 
                                                                 {moreCoverage && moreCoverage.length > 0 ? moreCoverage.map((coverage, qIndex) => (
                                                                     <Row key={qIndex}>
-                                                                        {motorInsurance && motorInsurance.policy_for == '2' && coverage.code != 'B00015' && coverage.code != 'B00018' || motorInsurance && motorInsurance.policy_for == '1' ?
+                                                                        {(motorInsurance && motorInsurance.policy_for == '2' && coverage.code != 'B00015' && coverage.code != 'B00018' && coverage.code != 'B00019' && coverage.code != 'B00073') 
+                                                                            || (motorInsurance && motorInsurance.policy_for == '1') ?
                                                                             <Col sm={12} md={11} lg={5} key={qIndex + "a"} >
                                                                                 <label className="customCheckBox formGrp formGrp">{coverage.name}
 

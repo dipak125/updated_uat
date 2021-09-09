@@ -475,15 +475,16 @@ class TwoWheelerOtherComprehensive extends Component {
             if(value == 'C101110') {
                 var array_length = 2
                 var newTyreMfgYr = new Date(this.state.vehicleRegDate)
+                console.log("new values --------- ", values.tyre_rim_array && values.tyre_rim_array.length < array_length )
                  if(values.tyre_rim_array && values.tyre_rim_array.length < array_length) {
                     for(var i = values.tyre_rim_array.length ; i < array_length ; i++) {
                         values.tyre_rim_array.push(
-                                {
-                                    tyreSerialNo : "",
-                                    tyreMfgYr : newTyreMfgYr.getFullYear(),
-                                    vehicleRegDate: this.state.vehicleRegDate,
-                                    policy_for: this.state.policy_for
-                            } )
+                            {
+                                tyreSerialNo : "",
+                                tyreMfgYr : newTyreMfgYr.getFullYear(),
+                                vehicleRegDate: this.state.vehicleRegDate,
+                                policy_for: this.state.policy_for
+                            })
                     }
                 }
             }
@@ -810,7 +811,7 @@ class TwoWheelerOtherComprehensive extends Component {
                                         validationSchema={ComprehensiveValidation}
                                         >
                                         {({ values, errors, setFieldValue, setFieldTouched, isValid, isSubmitting, touched }) => {
-
+// console.log("values ---------------- ", values)
                                             return (
                                                 <Form>
                                                     <Row>

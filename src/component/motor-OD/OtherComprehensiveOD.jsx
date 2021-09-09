@@ -785,7 +785,7 @@ class OtherComprehensiveOD extends Component {
 
 
         if (isSelect) {
-            add_more_coverage.push(values);
+            add_more_coverage.push(value);
             let tyre_cover = []
             if(value == 'C101110') {
                 var array_length = 4
@@ -843,7 +843,7 @@ class OtherComprehensiveOD extends Component {
             }  
         }
         else {
-            const index = add_more_coverage.indexOf(values);
+            const index = add_more_coverage.indexOf(value);
             if (index !== -1) {
                 add_more_coverage.splice(index, 1);
                 this.setState({
@@ -1079,26 +1079,26 @@ class OtherComprehensiveOD extends Component {
             });
         }
         else {
-                 newInitialValues = Object.assign(initialValue, {
-                    registration_no: motorInsurance.registration_no ? motorInsurance.registration_no : "",
-                    chasis_no: motorInsurance.chasis_no ? motorInsurance.chasis_no : (chasis_no ? chasis_no : ""),
-                    chasis_no_last_part: motorInsurance.chasis_no_last_part ? motorInsurance.chasis_no_last_part : "",
-                    add_more_coverage: motorInsurance.add_more_coverage ? motorInsurance.add_more_coverage : "",
-                    engine_no: motorInsurance.engine_no ? motorInsurance.engine_no : (engine_no ? engine_no : ""),
-                    vahanVerify: vahanVerify,
-                    newRegistrationNo: localStorage.getItem('registration_number') == "NEW" ? localStorage.getItem('registration_number') : "", 
-                    PA_flag: '0',
-                    PA_Cover: "",
-                    PA_cover_flag: motorInsurance && motorInsurance.pa_flag ? motorInsurance.pa_flag : '0',
-                    Geographical_flag: "0",
-                    CNG_OD_flag: "",
-                    electric_flag: '0',
-                    nonElectric_flag: '0',
-                    LL_PD_flag: '0',
-                    policy_for:policy_for,
-                    tyre_rim_array:  this.initClaimDetailsList(),
-                    geographical_extension_length: geographical_extension && geographical_extension.length
-                });
+            newInitialValues = Object.assign(initialValue, {
+                registration_no: motorInsurance.registration_no ? motorInsurance.registration_no : "",
+                chasis_no: motorInsurance.chasis_no ? motorInsurance.chasis_no : (chasis_no ? chasis_no : ""),
+                chasis_no_last_part: motorInsurance.chasis_no_last_part ? motorInsurance.chasis_no_last_part : "",
+                add_more_coverage: motorInsurance.add_more_coverage ? motorInsurance.add_more_coverage : "",
+                engine_no: motorInsurance.engine_no ? motorInsurance.engine_no : (engine_no ? engine_no : ""),
+                vahanVerify: vahanVerify,
+                newRegistrationNo: localStorage.getItem('registration_number') == "NEW" ? localStorage.getItem('registration_number') : "", 
+                PA_flag: '0',
+                PA_Cover: "",
+                PA_cover_flag: motorInsurance && motorInsurance.pa_flag ? motorInsurance.pa_flag : '0',
+                Geographical_flag: "0",
+                CNG_OD_flag: "",
+                electric_flag: '0',
+                nonElectric_flag: '0',
+                LL_PD_flag: '0',
+                policy_for:policy_for,
+                tyre_rim_array:  this.initClaimDetailsList(),
+                geographical_extension_length: geographical_extension && geographical_extension.length
+            });
         }
 
        

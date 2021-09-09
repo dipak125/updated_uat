@@ -1028,8 +1028,8 @@ class OtherComprehensive extends Component {
             moreCoverage, sliderVal, motorInsurance, serverResponse, engine_no, chasis_no, initialValue, add_more_coverage, add_more_coverage_request_array} = this.state
         const {productId} = this.props.match.params 
 
-        var user_data = sessionStorage.getItem("users") ? JSON.parse(sessionStorage.getItem("users")) : "";
-        var tempEncryption = new Encryption();
+        let user_data = sessionStorage.getItem("users") ? JSON.parse(sessionStorage.getItem("users")) : "";
+        let tempEncryption = new Encryption();
         if (user_data.user) {
             user_data = JSON.parse(tempEncryption.decrypt(user_data.user));
         }
@@ -1054,6 +1054,46 @@ class OtherComprehensive extends Component {
         let tyre_cover_flag=  '0'
 
         let phrases = localStorage.getItem("phrases") ? JSON.parse(localStorage.getItem("phrases")) : []
+        const Coverage = {
+            "C101064":phrases["C101064"],
+            "C101065":phrases["C101065"],
+            "C101066":phrases["C101066"],
+            "C101069":phrases["C101069"],
+            "C101072":phrases["C101072"],
+            "C101067":phrases["C101067"],
+            "C101108":phrases["C101108"],
+            "C101111":phrases["C101111"], 
+            "NCB":phrases["NCB"],
+            "TOTALOD":phrases["TOTALOD"],
+            "GEOGRAPHYOD":phrases["GEOGRAPHYOD"],
+            "GEOGRAPHYTP":phrases["GEOGRAPHYTP"],
+        
+            "B00016":phrases["B00016"],
+            "B00002":  phrases["B00002"],
+            "B00003":  phrases["B00003"],
+            "B00004":  phrases["B00004"],
+            "B00005":  phrases["B00005"],
+            "B00006":  phrases["B00006"],
+            "B00007":  phrases["B00007"],
+            "B00008":  phrases["B00008"],
+            "B00009":  phrases["B00009"],
+            "B00010":  phrases["B00010"],
+            "B00011":  phrases["B00011"],
+            "B00012":  phrases["B00012"],
+            "B00013":  phrases["B00013"],
+            "B00069":  phrases["B00069"],
+            "B00070":  phrases["B00070"],
+            "B00071":  phrases["B00071"],
+            "B00015":  phrases["B00015"],
+            "B00073":  phrases["B00073"],
+            "B00018":  phrases["B00018"],
+            "B00019":  phrases["B00019"],
+            "B00020":  phrases["B00020"],
+            "B00022":  phrases["B00022"],  
+            "B00025":  phrases["B00025"],
+            "C101110": phrases["C101110"], 
+        }
+
 
         for(var i = 0; i<covList.length; i++) {
             if(covList.indexOf('C101110')) tyre_cover_flag = '1'
@@ -1135,46 +1175,6 @@ class OtherComprehensive extends Component {
 
         newInitialValues = Object.assign(initialValue, newInnitialArray );
 
-
-        const Coverage = {
-            "C101064":translation["C101064"],
-            "C101065":translation["C101065"],
-            "C101066":translation["C101066"],
-            "C101069":translation["C101069"],
-            "C101072":translation["C101072"],
-            "C101067":translation["C101067"],
-            "C101108":translation["C101108"],
-            "C101111":translation["C101111"], 
-            "NCB":translation["NCB"],
-            "TOTALOD":translation["TOTALOD"],
-            "GEOGRAPHYOD":translation["GEOGRAPHYOD"],
-            "GEOGRAPHYTP":translation["GEOGRAPHYTP"],
-        
-            "B00016":translation["B00016"],
-            "B00002":  translation["B00002"],
-            "B00003":  translation["B00003"],
-            "B00004":  translation["B00004"],
-            "B00005":  translation["B00005"],
-            "B00006":  translation["B00006"],
-            "B00007":  translation["B00007"],
-            "B00008":  translation["B00008"],
-            "B00009":  translation["B00009"],
-            "B00010":  translation["B00010"],
-            "B00011":  translation["B00011"],
-            "B00012":  translation["B00012"],
-            "B00013":  translation["B00013"],
-            "B00069":  translation["B00069"],
-            "B00070":  translation["B00070"],
-            "B00071":  translation["B00071"],
-            "B00015":  translation["B00015"],
-            "B00073":  translation["B00073"],
-            "B00018":  translation["B00018"],
-            "B00019":  translation["B00019"],
-            "B00020":  translation["B00020"],
-            "B00022":  translation["B00022"],  
-            "B00025":  translation["B00025"],
-            "C101110": translation["C101110"], 
-        }
 
 
         const policyCoverageList =  policyCoverage && policyCoverage.length > 0 ?
