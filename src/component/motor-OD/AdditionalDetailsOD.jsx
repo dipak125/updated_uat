@@ -706,9 +706,9 @@ console.log('post_data', post_data);
                                     validationSchema={ownerValidation}
                                     >
                                     {({ values, errors, setFieldValue, setFieldTouched, isValid, isSubmitting, touched }) => {
-console.log("errors---------", errors)
+
                                     return (
-                                    <Form>
+                                    <Form autoComplete="off">
                                     <Row>
                                         <Col sm={12} md={9} lg={9}>
                                         <div className="d-flex justify-content-left brandhead">
@@ -879,6 +879,7 @@ console.log("errors---------", errors)
                                                         peekPreviousYear
                                                         showMonthDropdown
                                                         showYearDropdown
+                                                        autoComplete="off"
                                                         dropdownMode="select"
                                                         maxDate={new Date(maxDobAdult)}
                                                         minDate={new Date(minDobAdult)}
@@ -1074,7 +1075,7 @@ console.log("errors---------", errors)
                                                             ))}
                                                         </Field>     
                                                         {errors.nominee_salutation && touched.nominee_salutation ? (
-                                            <span className="errorMsg">{phrases[errors.nominee_salutation]}</span>
+                                                        <span className="errorMsg">{phrases[errors.nominee_salutation]}</span>
                                                         ) : null}              
                                                         </div>
                                                     </FormGroup>

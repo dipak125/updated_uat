@@ -481,7 +481,7 @@ class SelectDuration extends Component {
                                                     <Col sm={12}>
                                                         <div className="d-flex justify-content-between align-items-center premium m-b-25">
                                                             <p>Your Total Premium for One Year :</p>
-                                                            <p><strong>Rs:</strong> { serverResponse ? (serverResponse.message ? 0 : serverResponse.DuePremium ) : 0}</p>
+                                                            <p><strong>Rs:</strong> { serverResponse ? (serverResponse.DuePremium?serverResponse.DuePremium :0) : 0}</p>
                                                         </div>
                                                     </Col>
 

@@ -7,7 +7,7 @@ export default class Footer extends Component {
             <>
                 {/* <div className="footerWrap d-flex flex-md-row flex-lg-row flex-xl-row flex-sm-column flex-column align-items-center justify-content-between"> */}
                     <div className="footer">
-                        <p>© 2020 SBI General Insurance Company Limited. | All Copy Rights Reserved</p>
+                        <p>© {new Date().getFullYear()} SBI General Insurance Company Limited. | All Copy Rights Reserved</p>
                     </div>
                 {/* </div> */}
             </>

@@ -108,7 +108,7 @@ class SideNav extends Component {
             ))        
           }
 
-          <li className="treeview leftIcon02">
+          {/* <li className="treeview leftIcon02">
             <Link to= '#' activeClassName="active" onClick = {this.toggle.bind(this)}>
                 <span className="leftIcon01">
                   <img
@@ -130,7 +130,7 @@ class SideNav extends Component {
                   </NavLink>
               </li>
            </ul>
-          </li>
+          </li> */}
 
 					<li className="logoutbtn">
 					 <button className="btn-lg" onClick={this.handleLogout}>

@@ -156,19 +156,7 @@ const vehicleRegistrationValidation = Yup.object().shape({
     .when(['policy_type_id','lapse_duration'], {
         is: (policy_type_id, lapse_duration) => (policy_type_id == '3' && lapse_duration == '2'),       
     then: Yup.date(),
-    otherwise: Yup.date().test(
-        "currentMonthChecking",
-        function() {
-            return "PleaseEED"
-        },
-        function (value) {
-            const ageObj = new PersonAge();
-            if (ageObj.whatIsCurrentMonth(this.parent.registration_date) > 0 && this.parent.valid_previous_policy == '1' && !value) {   
-                return false;    
-            }
-            return true;
-        }
-    )
+    otherwise: Yup.date()
     .test( 
         "checkGreaterEqualTimes",
         "PrevEndDateInActivDate",
@@ -198,15 +186,6 @@ const vehicleRegistrationValidation = Yup.object().shape({
         function (value) {
             if (value && this.parent.valid_previous_policy == '1') {
                 return checkGreaterTimes(value, this.parent.previous_start_date) && this.parent.valid_previous_policy == '1';
-            }
-            return true;
-        }
-    ).test(
-        "checkEndDate",
-        "Enter End Date",
-        function (value ) {     
-            if ( this.parent.previous_start_date != undefined && value == undefined && this.parent.valid_previous_policy == '1') {
-                return false;
             }
             return true;
         }
@@ -292,7 +271,8 @@ const vehicleRegistrationValidation = Yup.object().shape({
                 return "PleaseEPCB"
             },
             function (value) {
-                if (this.parent.previous_is_claim == '0' && this.parent.previous_policy_name == '1' && (!value || value == '1')) {
+                if (this.parent.previous_is_claim == '0' && this.parent.previous_policy_name == '1' && (!value || value == '1')
+                && Math.floor(moment().diff(this.parent.previous_end_date, 'days', true)) <= 0 ) {
                     return false;
                 }
                 return true;
@@ -304,7 +284,7 @@ const vehicleRegistrationValidation = Yup.object().shape({
                 return "PleaseEPCB"
             },
             function (value) {
-                if (this.parent.previous_is_claim == '1' && !value) {
+                if (this.parent.previous_is_claim == '1' && !value && Math.floor(moment().diff(this.parent.previous_end_date, 'days', true)) <= 0 ) {
                     return false;
                 }
                 return true;
@@ -323,7 +303,7 @@ const vehicleRegistrationValidation = Yup.object().shape({
         function (value) {
             const ageObj = new PersonAge();
             if (ageObj.whatIsCurrentMonth(this.parent.registration_date) > 0 && this.parent.previous_policy_name == '1' &&
-            Math.floor(moment().diff(this.parent.previous_end_date, 'days', true)) <= 90 && this.parent.valid_previous_policy == '1' && !value) {   
+            Math.floor(moment().diff(this.parent.previous_end_date, 'days', true)) <= 0 && this.parent.valid_previous_policy == '1' && !value) {   
                 return false;    
             }
             return true;
@@ -1027,7 +1007,7 @@ class TwoWheelerVehicleDetailsOD extends Component {
                 active_insurance_company_id: previousPolicy && previousPolicy[0] && previousPolicy[0].insurancecompany && previousPolicy[0].insurancecompany.Id ? previousPolicy[0].insurancecompany.Id : "",
                 active_policy_address: previousPolicy && previousPolicy[0] && previousPolicy[0].address ? previousPolicy[0].address : "test",
                 active_policy_no: previousPolicy && previousPolicy[0] && previousPolicy[0].policy_no ? previousPolicy[0].policy_no : "",
-                active_policy_tenure: previousPolicy && previousPolicy[1] && previousPolicy[1].active_policy_tenure ? previousPolicy[1].active_policy_tenure : "",
+                active_policy_tenure: previousPolicy && previousPolicy[0] && previousPolicy[0].active_policy_tenure ? previousPolicy[0].active_policy_tenure : "",
                 lapse_duration: motorInsurance && motorInsurance.lapse_duration ? motorInsurance.lapse_duration : "",
                 policy_type_id: motorInsurance && motorInsurance.policytype_id ? motorInsurance.policytype_id : "",
                 claim_array: this.initClaimDetailsList()
@@ -1068,7 +1048,6 @@ class TwoWheelerVehicleDetailsOD extends Component {
                                                 validationSchema={vehicleRegistrationValidation}
                                             >
                                                 {({ values, errors, setFieldValue, setFieldTouched, isValid, isSubmitting, touched }) => {
-                                                    console.log("errors----------- ", errors)
                                                     return (
                                                         <Form>
                                                             <Row>
@@ -1101,8 +1080,7 @@ class TwoWheelerVehicleDetailsOD extends Component {
                                                                                     className="datePckr inputfs12"
                                                                                     selected={values.registration_date}
                                                                                     onChange={(val) => {
-                                                                                        setFieldTouched('registration_date');
-                                                                                        setFieldValue('registration_date', val);
+                                                                                    setFieldValue('registration_date', val);
                                                                                     setFieldValue('previous_end_date', ""); 
                                                                                     setFieldValue('previous_start_date', ""); 
                                                                                     setFieldValue('active_end_date', ""); 
@@ -1500,7 +1478,7 @@ class TwoWheelerVehicleDetailsOD extends Component {
                                                                                     </Row>
 
                                                                                     <Row>&nbsp;</Row>
-                                                                                    { values.previous_policy_name == '1' && Math.floor(moment().diff(values.previous_end_date, 'days', true)) <= 90 ?
+                                                                                    { values.previous_policy_name == '1' && Math.floor(moment().diff(values.previous_end_date, 'days', true)) <= 0 ?
                                                                                     <Fragment>
                                                                                     <Row>
                                                                                         <Col sm={12}>
@@ -1524,7 +1502,6 @@ class TwoWheelerVehicleDetailsOD extends Component {
                                                                                                                 value='0'
                                                                                                                 key='1'
                                                                                                                 onChange={(e) => {
-                                                                                                                    setFieldTouched('previous_is_claim')
                                                                                                                     setFieldValue(`previous_is_claim`, e.target.value);
                                                                                                                     this.showClaimText(0, values);
                                                                                                                     if(e.target.checked == true) {
@@ -1545,7 +1522,6 @@ class TwoWheelerVehicleDetailsOD extends Component {
                                                                                                                 value='1'
                                                                                                                 key='1'
                                                                                                                 onChange={(e) => {
-                                                                                                                    setFieldTouched('previous_is_claim')
                                                                                                                     setFieldValue(`previous_is_claim`, e.target.value);
                                                                                                                     this.showClaimText(1, values);
                                                                                                                     if(e.target.checked == true) {

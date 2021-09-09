@@ -253,6 +253,7 @@ class arogya_SelectDuration extends Component {
             serverResponse: [],
             error: []
         })
+        console.log("serverResponse======",this.state.serverResponse)
     }
     deductibleSliderValue = (value) => {
         this.setState({
@@ -440,7 +441,7 @@ class arogya_SelectDuration extends Component {
                                             validationSchema={validateDuration}
                                         >
                                             {({ values, errors, setFieldValue, setFieldTouched, isValid, isSubmitting, touched }) => {
-                                            //    console.log("values----------------- ", values)
+                                                console.log("values============= ", values)
                                                 return (
                                                     <Form>
                                                         <Row>
@@ -651,7 +652,7 @@ class arogya_SelectDuration extends Component {
                                                                         <div className="d-flex justify-content-between align-items-center premium m-b-25">
                                                                             <p>Your Total Premium for {tenureSliderVal == 1 ? 'one' : tenureSliderVal == 2 ? 'two' : tenureSliderVal ? 'three' : 'two'} Year :</p>
                                                                             {/* <p><strong>Rs:</strong> { serverResponse ? (serverResponse.message ? 0 : serverResponse.DuePremium ) : 0}</p> */}
-                                                                            <p><strong>Rs:</strong> {serverResponse ? serverResponse.DuePremium : 0}</p>
+                                                                            <p><strong>Rs:</strong> {serverResponse ? (serverResponse.DuePremium? serverResponse.DuePremium:0): 0}</p>
                                                                         </div>
                                                                     </Col>
 
@@ -689,20 +690,22 @@ class arogya_SelectDuration extends Component {
 
                                                             <Col sm={12} md={12} lg={3}>
                                                                 <div className="regisBox grossbox">
-                                                                    {/* <h5 className="medihead">Gross Premium : <span>₹ {serverResponse ? (serverResponse.message ? 0 : serverResponse.DuePremium) : 0}</span></h5> */}
+                                                                    {/* <h5 className="medihead">Gross Premium : <span>₹ {serverResponse ? (serverResponse.message ? 0 : serverResponse.DuePremium) : 0}</span></h5> */
+                                                                        console.log("response======", serverResponse.BeforeVatPremium)
+                                                                    }
                                                                     <table className="table">
                                                                         <tbody>
                                                                             <tr>
                                                                                 <td>Net Premium:</td>
-                                                                                <td>₹{Math.round(serverResponse ? (serverResponse.message ? 0 : serverResponse.BeforeVatPremium) : 0)}</td>
+                                                                                <td>Rs {Math.round(serverResponse ? ( serverResponse.BeforeVatPremium? serverResponse.BeforeVatPremium :0) : 0)}</td>
                                                                             </tr>
                                                                             <tr>
                                                                                 <td>GST:</td>
-                                                                                <td>₹{Math.round(serverResponse ? (serverResponse.message ? 0 : serverResponse.TGST) : 0)}</td>
+                                                                                <td>Rs {Math.round(serverResponse ? (serverResponse.TGST?serverResponse.TGST:0) : 0)}</td>
                                                                             </tr>
                                                                             <tr>
                                                                                 <td>Gross Premium:</td>
-                                                                                <td>₹{serverResponse ? (serverResponse.message ? 0 : serverResponse.DuePremium) : 0}</td>
+                                                                                <td>Rs {serverResponse ? (serverResponse.DuePremium?serverResponse.DuePremium:0) : 0}</td>
                                                                             </tr>
                                                                         </tbody>
                                                                     </table>

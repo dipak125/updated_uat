@@ -654,6 +654,7 @@ class OtherComprehensiveOD extends Component {
                 else if (res.data.PolicyObject && res.data.UnderwritingResult && res.data.UnderwritingResult.Status == "Fail") {
                     this.setState({
                         fulQuoteResp: res.data.PolicyObject,
+                        PolicyArray: res.data.PolicyObject.PolicyLobList,
                         error: {"message": 1},
                         serverResponse: [],
                         policyCoverage: res.data.PolicyObject.PolicyLobList ? res.data.PolicyObject.PolicyLobList[0].PolicyRiskList[0].PolicyCoverageList : [],

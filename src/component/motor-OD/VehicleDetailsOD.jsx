@@ -291,7 +291,8 @@ const vehicleRegistrationValidation = Yup.object().shape({
                 return "PleaseEPCB"
             },
             function (value) {
-                if (this.parent.previous_is_claim == '0' && this.parent.previous_policy_name == '1' && (!value || value == '1')) {
+                if (this.parent.previous_is_claim == '0' && this.parent.previous_policy_name == '1' && (!value || value == '1')
+                && Math.floor(moment().diff(this.parent.previous_end_date, 'days', true)) <= 0) {
                     return false;
                 }
                 return true;
@@ -303,7 +304,7 @@ const vehicleRegistrationValidation = Yup.object().shape({
                 return "PleaseEPCB"
             },
             function (value) {
-                if (this.parent.previous_is_claim == '1' && !value) {
+                if (this.parent.previous_is_claim == '1' && !value && Math.floor(moment().diff(this.parent.previous_end_date, 'days', true)) <= 0) {
                     return false;
                 }
                 return true;
@@ -322,7 +323,7 @@ const vehicleRegistrationValidation = Yup.object().shape({
             function (value) {
                 const ageObj = new PersonAge();
                 if (ageObj.whatIsCurrentMonth(this.parent.registration_date) > 0 && this.parent.previous_policy_name == '1' &&
-                    Math.floor(moment().diff(this.parent.previous_end_date, 'days', true)) <= 90 && this.parent.valid_previous_policy == '1' && !value) {
+                    Math.floor(moment().diff(this.parent.previous_end_date, 'days', true)) <= 0 && this.parent.valid_previous_policy == '1' && !value) {
                     return false;
                 }
                 return true;
@@ -1086,7 +1087,8 @@ class VehicleDetailsOD extends Component {
                                             <div className="brand-bg">
                                                 <Formik initialValues={newInitialValues} onSubmit={this.handleSubmit} validationSchema={vehicleRegistrationValidation}>
                                                     {({ values, errors, setFieldValue, setFieldTouched, isValid, isSubmitting, touched }) => {
-
+console.log("errors---------------- ", errors)
+console.log("values---------------- ", values)
                                                         return (
                                                             <Form autoComplete="off">
                                                                 <Row>
@@ -1191,7 +1193,6 @@ class VehicleDetailsOD extends Component {
                                                                                             // disabled={true}
                                                                                             value={values.active_policy_tenure}
                                                                                             onChange={(e) => {
-                                                                                                setFieldTouched('active_policy_tenure')
                                                                                                 setFieldValue("active_end_date", fourwheelerODEndDate(values.active_start_date,e.target.value));
                                                                                                 setFieldValue('active_policy_tenure', e.target.value);
                                                                                             }}
@@ -1519,7 +1520,7 @@ class VehicleDetailsOD extends Component {
                                                                                 </Row>
 
                                                                                 <Row>&nbsp;</Row>
-                                                                                {values.previous_policy_name == '1' && Math.floor(moment().diff(values.previous_end_date, 'days', true)) <= 90 ?
+                                                                                {values.previous_policy_name == '1' && Math.floor(moment().diff(values.previous_end_date, 'days', true)) <= 0 ?
                                                                                     <Fragment>
                                                                                         <Row>
                                                                                             <Col sm={12}>
@@ -1543,7 +1544,6 @@ class VehicleDetailsOD extends Component {
                                                                                                                     value='0'
                                                                                                                     key='1'
                                                                                                                     onChange={(e) => {
-                                                                                                                        setFieldTouched('previous_is_claim')
                                                                                                                         setFieldValue(`previous_is_claim`, e.target.value);
                                                                                                                         this.showClaimText(0, values);
                                                                                                                         if(e.target.checked == true) {
@@ -1564,7 +1564,6 @@ class VehicleDetailsOD extends Component {
                                                                                                                     value='1'
                                                                                                                     key='1'
                                                                                                                     onChange={(e) => {
-                                                                                                                        setFieldTouched('previous_is_claim')
                                                                                                                         setFieldValue(`previous_is_claim`, e.target.value);
                                                                                                                         this.showClaimText(1, values);
                                                                                                                         if(e.target.checked == true) {

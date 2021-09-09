@@ -555,6 +555,7 @@ class TwoWheelerOtherComprehensiveOD extends Component {
                 else if (res.data.PolicyObject && res.data.UnderwritingResult && res.data.UnderwritingResult.Status == "Fail") {
                     this.setState({
                         fulQuoteResp: res.data.PolicyObject,
+                        PolicyArray: res.data.PolicyObject.PolicyLobList,
                         error: {"message": 1},
                         serverResponse: [],
                         policyCoverage: res.data.PolicyObject.PolicyLobList ? res.data.PolicyObject.PolicyLobList[0].PolicyRiskList[0].PolicyCoverageList : [],
@@ -838,7 +839,6 @@ class TwoWheelerOtherComprehensiveOD extends Component {
             step_completed, vehicleDetails, selectFlag, sliderVal, moreCoverage, ncbDiscount, add_more_coverage_request_array} = this.state
         const { productId } = this.props.match.params
         let covList = motorInsurance && motorInsurance.add_more_coverage ? motorInsurance.add_more_coverage.split(",") : ""
-        console.log("covList--------------> ", covList)
         let newInnitialArray = {}
         // let PA_flag = motorInsurance && (motorInsurance.pa_cover == null || motorInsurance.pa_cover == "") ? '0' : '1'
         let PA_Cover = motorInsurance &&  motorInsurance.pa_cover != null ? motorInsurance.pa_cover : ''
