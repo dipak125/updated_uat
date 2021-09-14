@@ -521,6 +521,7 @@ class VehicleDetailsPCV extends Component {
   //--------------------------------------------------------
 
     handleSubmit = (values, actions) => {
+        
         const {productId} = this.props.match.params 
         const {motorInsurance, changeFlag} = this.state
         let policy_type = 1
@@ -730,6 +731,7 @@ class VehicleDetailsPCV extends Component {
             .then(res => {
                  let decryptResp = JSON.parse(encryption.decrypt(res.data))
                  console.log("decrypt", decryptResp)
+                 console.log("lapseduration===", decryptResp.data.policyHolder.motorinsurance)
                  let motorInsurance = decryptResp.data.policyHolder ? decryptResp.data.policyHolder.motorinsurance : {};
                  motorInsurance.valid_previous_policy = motorInsurance.policytype_id && motorInsurance.policytype_id == '1' ? '0' : motorInsurance.valid_previous_policy;
                  let previousPolicy = decryptResp.data.policyHolder && decryptResp.data.policyHolder.previouspolicy ? decryptResp.data.policyHolder.previouspolicy : {};
@@ -964,6 +966,8 @@ class VehicleDetailsPCV extends Component {
                             validationSchema={vehicleRegistrationValidation}>
                             {({ values, errors, setFieldValue, setFieldTouched, isValid, isSubmitting, touched }) => {
 console.log("errors-------------- ", errors)
+console.log("values======",values)
+console.log("lapse duration=========",this.state. motorInsurance.lapse_duration)
                                 return (
                                     <Form enableReinitialize = {true}>
                                         <Row>

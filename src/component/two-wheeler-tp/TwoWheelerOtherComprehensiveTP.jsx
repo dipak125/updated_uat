@@ -16,7 +16,7 @@ import axios from "../../shared/axios"
 import Encryption from '../../shared/payload-encryption';
 import * as Yup from "yup";
 import swal from 'sweetalert';
-import {  userTypes } from "../../shared/staticValues";
+import {  userTypes, bcAgreementCodes } from "../../shared/staticValues";
 
 let encryption = new Encryption()
 let translation = localStorage.getItem("phrases") ? JSON.parse(localStorage.getItem("phrases")) : null
@@ -551,7 +551,7 @@ class TwoWheelerOtherComprehensive extends Component {
                                                                             name={coverage.code}
                                                                             value={coverage.code}
                                                                             className="user-self"
-                                                                            disabled={(localStorage.getItem('declinedModel')>0 && sessionStorage.getItem('csc_id') && values[coverage.code] == 'B00015') || (userTypes.includes(user_data.login_type) && values[coverage.code] == 'B00015') ? true : false}
+                                                                            disabled={(localStorage.getItem('declinedModel') > 0 && bcAgreementCodes.includes(user_data.agreement_code) && values[coverage.code] == 'B00015') || (userTypes.includes(user_data.login_type) && values[coverage.code] == 'B00015') ? true : false}
                                                                             onClick={(e) =>{
                                                                                 if( e.target.checked == false && values[coverage.code] == 'B00015') {
                                                                                     swal(phrases.SwalIRDAI,

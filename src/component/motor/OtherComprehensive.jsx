@@ -639,6 +639,7 @@ class OtherComprehensive extends Component {
                     }
                     this.setState({
                         fulQuoteResp: res.data.PolicyObject,
+                        PolicyArray: res.data.PolicyObject.PolicyLobList,
                         validation_error: validationErrors,
                         error: {"message": 0},
                         serverResponse: [],

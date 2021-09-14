@@ -808,7 +808,7 @@ class OtherComprehensivePCV extends Component {
         this.props.loadingStart();
         axios.post('pcv/full-quote', formData)
             .then(res => {
-
+                console.log("fullQuote=======>>>",res.data)
                 if (res.data.PolicyObject && res.data.UnderwritingResult && res.data.UnderwritingResult.Status == "Success") {
                     let PolicyArray = res.data.PolicyObject.PolicyLobList
                     let ncbDiscount = (res.data.PolicyObject.PolicyLobList && res.data.PolicyObject.PolicyLobList[0].PolicyRiskList[0].IsNCB) ? res.data.PolicyObject.PolicyLobList[0].PolicyRiskList[0].OD_NCBAmount : 0

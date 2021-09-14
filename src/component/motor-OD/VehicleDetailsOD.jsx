@@ -57,19 +57,19 @@ const initialValue = {
 }
 const vehicleRegistrationValidation = Yup.object().shape({
     registration_date: Yup.string().required('RegistrationRequired')
-        .test(
-            "checkGreaterTimes",
-            "RegistrationLessSysDate",
-            function (value) {
-                if (value) {
-                    if (Math.floor(moment().diff(value, 'days', true)) < 180 ) {
-                        return false;
-                    }
+        // .test(
+        //     "checkGreaterTimes",
+        //     "RegistrationLessSysDate",
+        //     function (value) {
+        //         if (value) {
+        //             if (Math.floor(moment().diff(value, 'days', true)) < 180 ) {
+        //                 return false;
+        //             }
 
-                }
-                return true;
-            }
-        )
+        //         }
+        //         return true;
+        //     }
+        // )
         .test(
             "checkGreaterTimes",
             "RegistrationLessPrevious",
@@ -704,14 +704,14 @@ class VehicleDetailsOD extends Component {
         newPolStartDate = newPolStartDate ? addDays(new Date(newPolStartDate), 1) : addDays(new Date(), 1)
         let newPolEndDate = newPolStartDate ? prevEndDate(newPolStartDate) : ""
         let vehicleAge = Math.floor(moment(newPolStartDate).diff(values.registration_date, 'months', true))
-        if (vehicleAge < 6 ) {
-            swal({
-                text: "Vehicle age should be between 6 months to 3 years !",
-                icon: "error",
-            });
-            actions.setSubmitting(false)
-            return false;
-        }
+        // if (vehicleAge < 6 ) {
+        //     swal({
+        //         text: "Vehicle age should be between 6 months to 3 years !",
+        //         icon: "error",
+        //     });
+        //     actions.setSubmitting(false)
+        //     return false;
+        // }
         const formData = new FormData();
         let encryption = new Encryption();
         let post_data = {}

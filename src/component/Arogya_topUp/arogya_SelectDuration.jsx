@@ -165,7 +165,7 @@ class arogya_SelectDuration extends Component {
             user_data = JSON.parse(encryption.decrypt(user_data.user));
 
             if((total_idv> 500000) && user_data.user_type == "POSP"  ) {
-                swal("Quote cannot proceed with IDV greater than 500000")
+                swal("Quote cannot proceed with SI greater than 500000")
                 this.props.loadingStop();
                 return false
             }

@@ -195,7 +195,7 @@ class SelectBrandPCV extends Component {
         axios.get(`pcv/policy-holder/details/${policyHolder_id}`)
             .then(res => {
                 let decryptResp = JSON.parse(encryption.decrypt(res.data));
-                console.log("decrypt", decryptResp)
+                console.log("decrypt",decryptResp.data.policyHolder.motorinsurance  )
                 let motorInsurance = decryptResp.data.policyHolder ? decryptResp.data.policyHolder.motorinsurance : {}
                 let vehicleDetails = decryptResp.data.policyHolder ? decryptResp.data.policyHolder.vehiclebrandmodel : {};
                 this.setState({
@@ -365,6 +365,7 @@ class SelectBrandPCV extends Component {
         let phrases = localStorage.getItem("phrases") ? JSON.parse(localStorage.getItem("phrases")) : null
 
         // console.log("vehicleDetails", newInitialValues)
+        console.log("motor==",this.state.motorInsurance)
 
         return (
             <>

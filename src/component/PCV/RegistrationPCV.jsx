@@ -9,6 +9,7 @@ import { loaderStart, loaderStop } from "../../store/actions/loader";
 import { connect } from "react-redux";
 import * as Yup from 'yup';
 import swal from 'sweetalert';
+
 import Encryption from '../../shared/payload-encryption';
 import { Formik, Form, Field, ErrorMessage } from 'formik';
 import { registrationNumberFirstBlock, registrationNumberSecondBlock, registrationNumberThirdBlock, registrationNumberLastBlock } from "../../shared/validationFunctions";
@@ -131,8 +132,9 @@ fetchData=()=>{
     let encryption = new Encryption();
     axios.get(`pcv/policy-holder/details/${policyHolder_id}`)
         .then(res=>{
+           console.log("checking====",res.data)
             let decryptResp = JSON.parse(encryption.decrypt(res.data))
-            console.log("decrypt", decryptResp)
+            
             if(decryptResp.data.policyHolder){
                 var obj = decryptResp.data.policyHolder
                 var i = 0
@@ -272,7 +274,7 @@ handleSubmit=(values)=>{
         .post(`pcv/update-registration`, formData)
         .then(res => {
             let decryptResp = JSON.parse(encryption.decrypt(res.data))
-            console.log("decrypt", decryptResp)
+           console.log("errror ======="/decryptResp.error)
 
             if(decryptResp.error == false) {
                 this.props.history.push(`/SelectBrand_PCV/${productId}`);
@@ -351,8 +353,8 @@ handleSubmit=(values)=>{
         })
         .catch(err => {
         this.props.loadingStop();
-        let decryptResp = JSON.parse(encryption.decrypt(err.data))
-        console.log("decrypt", decryptResp)
+        // let decryptResp = JSON.parse(encryption.decrypt(err.data))
+      
         if(err && err.data){
             swal('Please check..something went wrong!!');
         }      
@@ -424,7 +426,7 @@ regnoFormat = (e, setFieldTouched, setFieldValue) => {
                                         validationSchema={vehicleRegistrationValidation}
                                         >
                                         {({ values, errors, setFieldValue, setFieldTouched, isValid, isSubmitting, touched }) => {
-                                            // console.log('values',values)
+                                             console.log('values========',values)
                                             
                                         return (
                                         <Form>                                           

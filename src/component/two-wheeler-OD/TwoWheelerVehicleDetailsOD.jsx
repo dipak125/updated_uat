@@ -672,14 +672,14 @@ class TwoWheelerVehicleDetailsOD extends Component {
         newPolStartDate = newPolStartDate ? addDays(new Date(newPolStartDate), 1) : addDays(new Date(), 1)
         let newPolEndDate = newPolStartDate ? prevEndDate(newPolStartDate) : ""
         let vehicleAge = Math.floor(moment(newPolStartDate).diff(values.registration_date, 'months', true))
-        if(vehicleAge < 6 || vehicleAge > 60) {
-            swal({
-                text: "Vehicle age should be between 6 months to 5 years !",
-                icon: "error",
-              });
-            actions.setSubmitting(false)
-            return false;
-        }
+        // if(vehicleAge < 6 || vehicleAge > 60) {
+        //     swal({
+        //         text: "Vehicle age should be between 6 months to 5 years !",
+        //         icon: "error",
+        //       });
+        //     actions.setSubmitting(false)
+        //     return false;
+        // }
         const formData = new FormData(); 
         let encryption = new Encryption();
         let post_data = {}

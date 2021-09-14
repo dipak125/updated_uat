@@ -134,7 +134,8 @@ class PremiumPCV extends Component {
                     nomineedetails: decryptResp.data.policyHolder && decryptResp.data.policyHolder.request_data.nominee ? decryptResp.data.policyHolder.request_data.nominee[0]:[]
 
                 })
-                this.fullQuote(motorInsurance)
+                //this.fullQuote(motorInsurance)
+                this.getAccessToken(motorInsurance)
             })
             .catch(err => {
                 // handle error
@@ -161,7 +162,7 @@ class PremiumPCV extends Component {
     }
 
     callBreakin=(regnNumber)=>{
-
+        console.log("regno====",regnNumber)
         const formData = new FormData();
         let encryption = new Encryption();
         let num = regnNumber
@@ -181,11 +182,15 @@ class PremiumPCV extends Component {
         formData.append('bcmaster_id', sessionStorage.getItem('csc_id') ? "5" : bc_data ? bc_data.agent_id : "" )
         formData.append('ref_no', policyHolder_id)
         formData.append('registrationNo', val)
+       
         formData.append('page_name', `Premium_PCV/${this.props.match.params.productId}`)
-
+       
+        console.log("product_id=====",this.props.match.params.productId)
         this.props.loadingStart();
+       
         axios.post('breakin/create',formData)
         .then(res=>{
+            console.log("insep===",res.data)
             swal(`Your breakin request has been raised. Your inspection Number: ${res.data.data.inspection_no}`)
             this.props.loadingStop();
         }).
@@ -193,9 +198,27 @@ class PremiumPCV extends Component {
             this.props.loadingStop();
         })
     }
+    getAccessToken = (motorInsurance) => {
+        axios
+            .post(`/callTokenService`)
+            .then((res) => {
+                
+                this.setState({
+                    accessToken: res.data.access_token,
+                });
+                this.fullQuote(res.data.access_token, motorInsurance)
+            })
+            .catch((err) => {
+                this.setState({
+                    accessToken: '',
+                });
+                this.props.loadingStop();
+            });
+    };
 
 
-    fullQuote = ( motorInsurance) => {
+    fullQuote = ( access_token, motorInsurance) => {
+        console.log("motor=======2",motorInsurance,access_token)
         const formData = new FormData();
         let encryption = new Encryption();
         const {previousPolicy, request_data, policyHolder} = this.state
@@ -206,21 +229,26 @@ class PremiumPCV extends Component {
 
         const post_data = {
             'ref_no':this.state.policyHolder_refNo ? this.state.policyHolder_refNo : '0',
+            'access_token':access_token,
             'id': localStorage.getItem('policyHolder_id'),
             'idv_value': motorInsurance.idv_value ? motorInsurance.idv_value : '0',
             'policy_type':  motorInsurance.policy_type,
             'add_more_coverage': motorInsurance.add_more_coverage,
+            'body_idv_value' : this.state.request_data.VehicleBodyPrice ? this.state.request_data.VehicleBodyPrice : '0',
             // 'cng_kit': motorInsurance.cng_kit,
             // 'cngKit_Cost': Math.floor(motorInsurance.cngkit_cost),
             'PA_Cover': motorInsurance && motorInsurance.pa_cover ? motorInsurance.pa_cover : '0',
             'coverage_data': motorInsurance && motorInsurance.add_more_coverage_request_json != null ? motorInsurance.add_more_coverage_request_json : "",
             'trailer_array' : trailer_array,
+            'userIdvStatus' : 1,
+            'bodyIdvStatus' : 1,
         }
 console.log("Post data ---------------- ", post_data)
         formData.append('enc_data',encryption.encrypt(JSON.stringify(post_data)))
 
         axios.post('pcv/full-quote', formData)
             .then(res => {
+                
                 if (res.data.PolicyObject) {
                     this.setState({
                         fulQuoteResp: res.data.PolicyObject,
@@ -251,6 +279,7 @@ console.log("Post data ---------------- ", post_data)
                             formData1.append('policy_ref_no',policyHolder_id)
                             axios.post('breakin/checking', formData1)
                             .then(res => {
+                               
                                 let break_in_checking = res.data.data.break_in_checking
                                 let break_in_inspection_no = res.data.data.break_in_inspection_no
                                 let break_in_status = res.data.data.break_in_status
