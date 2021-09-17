@@ -538,7 +538,7 @@ class TwoWheelerOtherComprehensive extends Component {
                                                             {motorInsurance && motorInsurance.policy_for == '1' && moreCoverage.map((coverage, qIndex) => (
                                                             <Row key={qIndex}>   
                                                                 <Col sm={12} md={11} lg={6} key={qIndex+"a"} >
-                                                                <div id={coverage.code+"_d"} onClick={(e) =>{if(localStorage.getItem('declinedModel')>0 && sessionStorage.getItem('csc_id') && values[coverage.code] == 'B00015'){
+                                                                <div id={coverage.code+"_d"} onClick={(e) =>{if(localStorage.getItem('declinedModel')>0 && bcAgreementCodes.includes(user_data.agreement_code) && values[coverage.code] == 'B00015'){
                                                                                     swal('PA cover for owner driver with Sum Insured: Rs. 15,00,000 is mandatory for selected Model or Location')
                                                                                 }}}>
                                                                     <label className="customCheckBox formGrp formGrp">{coverage.name}

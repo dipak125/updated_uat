@@ -26,7 +26,7 @@ const initialValues = {
     check_registration: 2,
     policy_for: "1",
     lapse_duration: '',
-    policy_type: ''
+    policy_type: '2'
 }
 
 const vehicleRegistrationValidation = Yup.object().shape({
@@ -382,7 +382,7 @@ class RegistrationOD extends Component {
             check_registration: 2,
 
             lapse_duration: motorInsurance && motorInsurance.lapse_duration ? motorInsurance.lapse_duration : "",
-            policy_type: motorInsurance && motorInsurance.policytype_id ? motorInsurance.policytype_id : "",
+            policy_type: motorInsurance && motorInsurance.policytype_id ? motorInsurance.policytype_id : "2",
             policy_for: motorInsurance && motorInsurance.policy_for ? motorInsurance.policy_for : "1",
         })
         let phrases = localStorage.getItem("phrases") ? JSON.parse(localStorage.getItem("phrases")) : null
@@ -506,7 +506,7 @@ class RegistrationOD extends Component {
                                                                                 </label>
                                                                             </div>
 
-                                                                            <div>
+                                                                            {/* <div>
                                                                                 <label className="customRadio3">
                                                                                     <Field
                                                                                         type="radio"
@@ -528,12 +528,12 @@ class RegistrationOD extends Component {
                                                                                 {errors.policy_type && touched.policy_type ? (
                                                                                     <span className="errorMsg">{phrases[errors.policy_type]}</span>
                                                                                 ) : null}
-                                                                            </div>
+                                                                            </div> */}
                                                                         </div>
                                                                     </div>
                                                                 </div>
 
-                                                                {values.policy_type == '3' ?
+                                                                {/* {values.policy_type == '3' ?
                                                                     <div className="d-flex justify-content-left">
                                                                         <div className="brandhead">
                                                                             <p>{phrases['LapseDuration']}</p>
@@ -567,7 +567,7 @@ class RegistrationOD extends Component {
                                                                                 </div>
                                                                             </div>
                                                                         </div>
-                                                                    </div> : null}
+                                                                    </div> : null} */}
 
                                                                 <div className="brandhead">
                                                                     <h4 className="m-b-30">{phrases['About']}</h4>

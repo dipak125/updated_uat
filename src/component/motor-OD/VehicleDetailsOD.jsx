@@ -690,7 +690,7 @@ class VehicleDetailsOD extends Component {
         const { motorInsurance } = this.state
         let policy_type = 15
 
-        if (values.valid_previous_policy == "0" && (motorInsurance.policytype_id == 2 || (values.policy_type_id == '3' && values.lapse_duration == '1')) ) {
+        if (values.valid_previous_policy == "0" && (values.policy_type_id == 2 || (values.policy_type_id == '3' && values.lapse_duration == '1')) ) {
             swal({
                 text: "Kindly connect with nearest branch for Policy Issuance",
                 icon: "error",
@@ -1386,8 +1386,8 @@ console.log("values---------------- ", values)
 
                                                                                             <DatePicker
                                                                                                 name={phrases['previous_start_date']}
-                                                                                                minDate={values.policy_type_id == '3' ? new Date(minDatePypLapsed) : new Date(minDatePyp)}
-                                                                                                maxDate={values.policy_type_id == '3' ? new Date(maxDatePYPLapsed) : new Date(maxDatePYP)}
+                                                                                                // minDate={values.policy_type_id == '3' ? new Date(minDatePypLapsed) : new Date(minDatePyp)}
+                                                                                                // maxDate={values.policy_type_id == '3' ? new Date(maxDatePYPLapsed) : new Date(maxDatePYP)}
                                                                                                 dateFormat="dd MMM yyyy"
                                                                                                 placeholderText={phrases['PPSD']}
                                                                                                 peekPreviousMonth

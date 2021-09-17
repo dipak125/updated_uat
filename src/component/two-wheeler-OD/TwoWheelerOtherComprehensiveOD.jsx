@@ -553,12 +553,29 @@ class TwoWheelerOtherComprehensiveOD extends Component {
                     });
                 } 
                 else if (res.data.PolicyObject && res.data.UnderwritingResult && res.data.UnderwritingResult.Status == "Fail") {
+                    var validationErrors = []
+                    for (const x in res.data.UnderwritingResult.MessageList) {
+                        validationErrors.push(res.data.UnderwritingResult.MessageList[x].Message)
+                    }
+
                     this.setState({
                         fulQuoteResp: res.data.PolicyObject,
                         PolicyArray: res.data.PolicyObject.PolicyLobList,
-                        error: {"message": 1},
+                        error: {"message": 0},
+                        validation_error: validationErrors,
                         serverResponse: [],
                         policyCoverage: res.data.PolicyObject.PolicyLobList ? res.data.PolicyObject.PolicyLobList[0].PolicyRiskList[0].PolicyCoverageList : [],
+                    });
+                }
+                else if (res.data.code && res.data.message && res.data.code == "validation failed" && res.data.message == "validation failed") {
+                    var validationErrors = []
+                    for (const x in res.data.data.messages) {
+                        validationErrors.push(res.data.messages[x].message)
+                    }
+                    this.setState({
+                        fulQuoteResp: [], add_more_coverage,
+                        validation_error: validationErrors,
+                        serverResponse: []
                     });
                 }
                 else {
@@ -835,7 +852,7 @@ class TwoWheelerOtherComprehensiveOD extends Component {
 
 
     render() {
-        const { vahanDetails, error, policyCoverage, vahanVerify, fulQuoteResp, PolicyArray, motorInsurance, serverResponse, add_more_coverage,
+        const { validation_error, error, policyCoverage, vahanVerify, fulQuoteResp, PolicyArray, motorInsurance, serverResponse, add_more_coverage,
             step_completed, vehicleDetails, selectFlag, sliderVal, moreCoverage, ncbDiscount, add_more_coverage_request_array} = this.state
         const { productId } = this.props.match.params
         let covList = motorInsurance && motorInsurance.add_more_coverage ? motorInsurance.add_more_coverage.split(",") : ""
@@ -995,7 +1012,18 @@ class TwoWheelerOtherComprehensiveOD extends Component {
                 </span>
             ) : null;
 
-            // console.log("step_completed---", step_completed)
+        const validationErrors =
+            validation_error ? (
+                validation_error.map((errors, qIndex) => (
+                    <span className="errorMsg" key={qIndex}>
+                        <li>
+                            <strong>
+                                {errors}
+                            </strong>
+                        </li>
+                    </span>
+                ))
+            ) : null;
 
         return (
             
@@ -1019,6 +1047,7 @@ class TwoWheelerOtherComprehensiveOD extends Component {
                                         <div className="brandhead m-b-10">
                                             <h4 className="m-b-30">{phrases['CoversM2WOD']}</h4>
                                             <h5>{errMsg}</h5>
+                                            <h5>{validationErrors}</h5>
                                         </div>
                                     </div>
                                     <Formik initialValues={newInitialValues}

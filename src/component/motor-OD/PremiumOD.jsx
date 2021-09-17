@@ -105,7 +105,7 @@ class PremiumOD extends Component {
                 let motorInsurance = decryptResp.data.policyHolder ? decryptResp.data.policyHolder.motorinsurance : {}
                 let policyHolder = decryptResp.data.policyHolder ? decryptResp.data.policyHolder : [];
                 let vehicleDetails = decryptResp.data.policyHolder ? decryptResp.data.policyHolder.vehiclebrandmodel : {};
-                let previousPolicy = decryptResp.data.policyHolder ? decryptResp.data.policyHolder.previouspolicy : {};
+                let previousPolicy = decryptResp.data.policyHolder && decryptResp.data.policyHolder.previouspolicyforsaod && decryptResp.data.policyHolder.previouspolicyforsaod.length == 2 ? decryptResp.data.policyHolder.previouspolicyforsaod[0] : {};
                 let request_data = decryptResp.data.policyHolder ? decryptResp.data.policyHolder.request_data : {}
                 let step_completed = decryptResp.data.policyHolder ? decryptResp.data.policyHolder.step_no : "";
                 let bcMaster = decryptResp.data.policyHolder ? decryptResp.data.policyHolder.bcmaster : {};
@@ -172,8 +172,15 @@ class PremiumOD extends Component {
         this.props.loadingStart();
         axios.post('breakin/create',formData)
         .then(res=>{
-            swal(`Your breakin request has been raised. Your inspection Number: ${res.data.data.inspection_no}`)
-            this.props.loadingStop();
+            if(res.data.error == false) {
+                swal(`Your breakin request has been raised. Your inspection Number: ${res.data.data.inspection_no}`)
+                this.props.loadingStop();
+            }
+            else {
+                swal(res.data.msg)
+                this.props.loadingStop();
+            }
+            
         }).
         catch(err=>{
             this.props.loadingStop();
